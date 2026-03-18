@@ -8,20 +8,26 @@ interface ChatBubbleProps {
 const ChatBubble = ({ message, isUser }: ChatBubbleProps) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+      initial={{ opacity: 0, y: 16, scale: 0.92 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
       className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}
     >
+      {!isUser && (
+        <span className="text-2xl mr-2 mt-1">🐶</span>
+      )}
       <div
-        className={`max-w-[80%] px-5 py-3 rounded-3xl font-kids text-base leading-relaxed shadow-md ${
+        className={`max-w-[80%] px-4 py-3 text-base leading-relaxed shadow-md ${
           isUser
-            ? "bg-accent text-accent-foreground rounded-br-lg"
-            : "bg-card text-card-foreground rounded-bl-lg border-2 border-primary/20"
+            ? "bg-secondary text-secondary-foreground rounded-3xl rounded-br-lg"
+            : "bg-card text-card-foreground rounded-3xl rounded-bl-lg border-2 border-kid-orange/20"
         }`}
       >
         {message}
       </div>
+      {isUser && (
+        <span className="text-2xl ml-2 mt-1">👧</span>
+      )}
     </motion.div>
   );
 };

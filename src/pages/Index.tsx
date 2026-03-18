@@ -1,10 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Send, Shield } from "lucide-react";
-import ChameleonMascot from "@/components/ChameleonMascot";
+import { Send, Shield, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import DogMascot from "@/components/DogMascot";
 import ChatBubble from "@/components/ChatBubble";
+import VoiceInput from "@/components/VoiceInput";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
+import farmBg from "@/assets/farm-bg.jpg";
+import { toast } from "sonner";
 
 interface Message {
   id: number;
@@ -12,14 +16,8 @@ interface Message {
   isUser: boolean;
 }
 
-const kidResponses = [
-  "Que pergunta legal! 🌟 Sabia que os camaleões mudam de cor para se comunicar? Assim como nós falamos, eles usam cores!",
-  "Uau, ótima pergunta! 🦎 O céu é azul porque a luz do sol se espalha na atmosfera e o azul é a cor que mais aparece!",
-  "Adorei essa curiosidade! 🌈 Os dinossauros viveram há milhões de anos e alguns eram do tamanho de um ônibus!",
-  "Que legal que você quer saber isso! ⭐ A Lua brilha porque reflete a luz do Sol, como um espelho gigante no céu!",
-  "Essa é uma pergunta incrível! 🌊 O mar é salgado porque os rios carregam minerais das rochas para o oceano há milhões de anos!",
-  "Boa pergunta, amiguinho! 🦋 As borboletas começam como lagartas e depois se transformam dentro de um casulo. É mágico!",
-];
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
+const MAX_FREE_QUESTIONS = 5;
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -29,109 +27,196 @@ const Index = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [questionsToday, setQuestionsToday] = useState(0);
   const chatRef = useRef<HTMLDivElement>(null);
-  const maxFreeQuestions = 5;
 
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = (text: string) => {
+  const streamChat = useCallback(async (userMessages: { role: string; content: string }[]) => {
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages: userMessages }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: "Erro desconhecido" }));
+      throw new Error(err.error || `Erro ${resp.status}`);
+    }
+
+    if (!resp.body) throw new Error("Sem resposta");
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let textBuffer = "";
+    let assistantText = "";
+
+    const updateAssistant = (text: string) => {
+      setMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last && !last.isUser) {
+          return prev.map((m, i) => i === prev.length - 1 ? { ...m, text } : m);
+        }
+        return [...prev, { id: Date.now() + 1, text, isUser: false }];
+      });
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      textBuffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+        let line = textBuffer.slice(0, newlineIndex);
+        textBuffer = textBuffer.slice(newlineIndex + 1);
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (!line.startsWith("data: ")) continue;
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === "[DONE]") break;
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) {
+            assistantText += content;
+            updateAssistant(assistantText);
+          }
+        } catch {
+          textBuffer = line + "\n" + textBuffer;
+          break;
+        }
+      }
+    }
+  }, []);
+
+  const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isTyping) return;
-    if (questionsToday >= maxFreeQuestions) return;
+    if (questionsToday >= MAX_FREE_QUESTIONS) return;
 
     const userMsg: Message = { id: Date.now(), text: text.trim(), isUser: true };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
-    setQuestionsToday((q) => q + 1);
+    setQuestionsToday(q => q + 1);
 
-    setTimeout(() => {
-      const response = kidResponses[Math.floor(Math.random() * kidResponses.length)];
-      setMessages((prev) => [...prev, { id: Date.now() + 1, text: response, isUser: false }]);
+    const allMessages = [...messages, userMsg].map(m => ({
+      role: m.isUser ? "user" as const : "assistant" as const,
+      content: m.text,
+    }));
+
+    try {
+      await streamChat(allMessages);
+    } catch (e: any) {
+      toast.error(e.message || "Ops, algo deu errado!");
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        text: "Ops, não consegui responder agora! Tente de novo em um pouquinho 🐶💛",
+        isUser: false,
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
-  };
+    }
+  }, [isTyping, questionsToday, messages, streamChat]);
 
-  const isFreeLimitReached = questionsToday >= maxFreeQuestions;
+  const handleVoiceResult = useCallback((text: string) => {
+    setInput(text);
+    sendMessage(text);
+  }, [sendMessage]);
+
+  const isFreeLimitReached = questionsToday >= MAX_FREE_QUESTIONS;
 
   return (
-    <div className="min-h-screen bg-background font-kids flex flex-col overflow-hidden relative">
-      {/* Decorative background circles */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-primary/5" />
-        <div className="absolute top-1/3 -right-16 w-48 h-48 rounded-full bg-secondary/20" />
-        <div className="absolute bottom-20 -left-10 w-32 h-32 rounded-full bg-accent/10" />
-      </div>
+    <div className="min-h-screen flex flex-col overflow-hidden relative">
+      {/* Farm background */}
+      <div
+        className="fixed inset-0 bg-cover bg-bottom opacity-30"
+        style={{ backgroundImage: `url(${farmBg})` }}
+      />
+      <div className="fixed inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-5 pt-5 pb-2">
-        <div className="flex items-center gap-2">
-          <motion.h1
-            className="text-3xl font-900 text-foreground tracking-tight"
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-          >
-            Kidzz
-          </motion.h1>
-          <motion.span
-            className="text-xs font-bold bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            FREE
-          </motion.span>
-        </div>
-        <button
-          onClick={() => setShowParentalGate(true)}
-          className="p-2.5 rounded-2xl bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all"
-          aria-label="Controle parental"
+      <header className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2">
+        <motion.div
+          className="flex items-center gap-2"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
         >
-          <Shield size={20} />
-        </button>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            Kidzz
+          </h1>
+          <span className="text-[10px] font-bold bg-kid-yellow text-foreground px-2 py-0.5 rounded-full">
+            FREE
+          </span>
+        </motion.div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground font-bold">
+            {MAX_FREE_QUESTIONS - questionsToday} 💬
+          </span>
+          <button
+            onClick={() => setShowParentalGate(true)}
+            className="p-2 rounded-2xl bg-card/80 text-muted-foreground hover:text-primary transition-all shadow-sm"
+            aria-label="Controle parental"
+          >
+            <Shield size={18} />
+          </button>
+        </div>
       </header>
 
-      {/* Chameleon + Welcome or Chat */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col relative z-10 min-h-0">
         {messages.length === 0 ? (
           <motion.div
-            className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            className="flex-1 flex flex-col items-center justify-center px-6 gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <ChameleonMascot className="w-44 h-44" />
-            <h2 className="text-2xl font-800 text-foreground text-center">
-              Olá! Eu sou o Kiko! 🦎
+            <DogMascot size="lg" />
+            <h2 className="text-2xl font-extrabold text-foreground text-center mt-2">
+              Oi! Eu sou o Kidzz! 🐶
             </h2>
-            <p className="text-muted-foreground text-center text-base max-w-xs">
-              Me pergunte qualquer coisa! Eu adoro responder curiosidades!
+            <p className="text-muted-foreground text-center text-sm max-w-[280px]">
+              Aprender nunca foi tão divertido! ✨
+              <br />Me pergunte qualquer coisa!
             </p>
-            <p className="text-xs text-muted-foreground/60">
-              {maxFreeQuestions - questionsToday} perguntas gratuitas restantes hoje
-            </p>
+
+            {/* Quick suggestions */}
+            <div className="flex flex-wrap justify-center gap-2 mt-3 max-w-xs">
+              {["Por que o céu é azul? 🌤️", "Como os peixes respiram? 🐟", "Por que a Lua brilha? 🌙"].map(q => (
+                <button
+                  key={q}
+                  onClick={() => sendMessage(q)}
+                  className="bg-card/80 backdrop-blur-sm border border-border px-3 py-2 rounded-2xl text-xs font-bold text-foreground hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-95 shadow-sm"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
           </motion.div>
         ) : (
           <>
-            {/* Mini chameleon header */}
-            <div className="flex items-center gap-2 px-5 py-2">
-              <ChameleonMascot isTalking={isTyping} className="w-10 h-10" />
-              <span className="text-sm font-bold text-foreground">Kiko</span>
+            {/* Chat header */}
+            <div className="flex items-center gap-2 px-4 py-2">
+              <DogMascot isTalking={isTyping} size="sm" />
+              <span className="text-sm font-extrabold text-foreground">Kidzz</span>
               {isTyping && (
                 <motion.span
-                  className="text-xs text-muted-foreground"
+                  className="text-xs text-muted-foreground font-bold"
                   animate={{ opacity: [1, 0.4, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
-                  digitando...
+                  pensando...
                 </motion.span>
               )}
             </div>
 
-            {/* Chat area */}
+            {/* Chat messages */}
             <div ref={chatRef} className="flex-1 overflow-y-auto px-4 pb-2">
               <AnimatePresence>
-                {messages.map((msg) => (
+                {messages.map(msg => (
                   <ChatBubble key={msg.id} message={msg.text} isUser={msg.isUser} />
                 ))}
               </AnimatePresence>
@@ -146,54 +231,49 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            className="text-center space-y-3"
           >
-            <p className="font-kids text-sm text-muted-foreground mb-3">
-              Você usou todas as perguntas gratuitas de hoje! ⭐
+            <p className="text-sm text-muted-foreground font-bold">
+              Você usou todas as perguntas de hoje! 🌟
             </p>
-            <button className="w-full py-4 rounded-3xl bg-kid-orange text-primary-foreground font-kids font-800 text-lg shadow-xl hover:shadow-2xl transition-all active:scale-95">
-              ⭐ Seja Premium — Perguntas ilimitadas!
-            </button>
+            <Button variant="kidPremium" size="xl" className="w-full">
+              <Sparkles size={22} />
+              Seja Premium — Ilimitado!
+            </Button>
           </motion.div>
         ) : (
-          <div className="flex gap-2 items-end">
+          <div className="flex items-end gap-2">
+            <VoiceInput onResult={handleVoiceResult} disabled={isTyping} />
             <div className="flex-1 relative">
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
-                placeholder="Faça uma pergunta ao Kiko..."
-                className="w-full py-4 px-5 pr-12 rounded-3xl bg-card border-2 border-border text-foreground font-kids text-base placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm transition-all"
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && sendMessage(input)}
+                placeholder="Pergunte qualquer coisa 😊"
+                className="w-full py-4 px-5 rounded-3xl bg-card/90 backdrop-blur-sm border-2 border-border text-foreground text-base placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-md transition-all"
               />
-              <button
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full text-muted-foreground hover:text-primary transition-colors"
-                aria-label="Falar pergunta"
-              >
-                <Mic size={20} />
-              </button>
             </div>
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => sendMessage(input)}
-              disabled={!input.trim() || isTyping}
-              className="p-4 rounded-3xl bg-primary text-primary-foreground shadow-lg hover:shadow-xl disabled:opacity-40 disabled:shadow-sm transition-all"
-              aria-label="Enviar pergunta"
-            >
-              <Send size={22} />
-            </motion.button>
+            <motion.div whileTap={{ scale: 0.9 }}>
+              <Button
+                variant="kidAsk"
+                size="iconXl"
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || isTyping}
+                aria-label="Perguntar"
+              >
+                <Send size={24} />
+              </Button>
+            </motion.div>
           </div>
         )}
       </div>
 
-      {/* Parental Gate */}
+      {/* Modals */}
       <AnimatePresence>
         {showParentalGate && (
           <ParentalGate
-            onSuccess={() => {
-              setShowParentalGate(false);
-              setShowSettings(true);
-            }}
+            onSuccess={() => { setShowParentalGate(false); setShowSettings(true); }}
             onCancel={() => setShowParentalGate(false)}
           />
         )}
