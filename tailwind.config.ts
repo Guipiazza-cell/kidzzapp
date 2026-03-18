@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        kids: ['"Nunito"', '"Comic Neue"', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -46,6 +49,14 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        kid: {
+          orange: "hsl(var(--kid-orange))",
+          purple: "hsl(var(--kid-purple))",
+          pink: "hsl(var(--kid-pink))",
+          green: "hsl(var(--kid-green))",
+          yellow: "hsl(var(--kid-yellow))",
+          blue: "hsl(var(--kid-blue))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
