@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        kids: ['"Nunito"', '"Comic Neue"', 'sans-serif'],
+        kids: ['"Nunito"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -52,11 +52,12 @@ export default {
         },
         kid: {
           orange: "hsl(var(--kid-orange))",
-          purple: "hsl(var(--kid-purple))",
-          pink: "hsl(var(--kid-pink))",
+          blue: "hsl(var(--kid-blue))",
           green: "hsl(var(--kid-green))",
           yellow: "hsl(var(--kid-yellow))",
-          blue: "hsl(var(--kid-blue))",
+          pink: "hsl(var(--kid-pink))",
+          purple: "hsl(var(--kid-purple))",
+          red: "hsl(var(--kid-red))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -76,25 +77,32 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "bounce-gentle": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        "wag-tail": {
+          "0%, 100%": { transform: "rotate(-3deg)" },
+          "50%": { transform: "rotate(3deg)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--kid-orange) / 0.4)" },
+          "50%": { boxShadow: "0 0 0 12px hsl(var(--kid-orange) / 0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "bounce-gentle": "bounce-gentle 2s ease-in-out infinite",
+        "wag-tail": "wag-tail 0.4s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },

@@ -2,57 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 80 60% 96%;
-    --foreground: 150 30% 15%;
+    --background: 45 100% 97%;
+    --foreground: 25 40% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 150 30% 15%;
+    --card-foreground: 25 40% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 30% 15%;
+    --popover-foreground: 25 40% 18%;
 
-    --primary: 145 65% 42%;
+    --primary: 25 90% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 95% 60%;
-    --secondary-foreground: 30 60% 20%;
+    --secondary: 200 80% 55%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 80 30% 90%;
-    --muted-foreground: 150 15% 45%;
+    --muted: 45 40% 90%;
+    --muted-foreground: 25 20% 45%;
 
-    --accent: 200 85% 55%;
+    --accent: 145 60% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 145 25% 82%;
-    --input: 145 25% 82%;
-    --ring: 145 65% 42%;
+    --border: 35 30% 85%;
+    --input: 35 30% 85%;
+    --ring: 25 90% 55%;
 
-    --radius: 1.25rem;
+    --radius: 1.5rem;
 
-    --kid-orange: 25 95% 58%;
-    --kid-purple: 270 60% 60%;
-    --kid-pink: 340 80% 65%;
-    --kid-green: 145 65% 42%;
-    --kid-yellow: 45 95% 60%;
-    --kid-blue: 200 85% 55%;
+    --kid-orange: 25 90% 55%;
+    --kid-blue: 200 80% 55%;
+    --kid-green: 145 60% 45%;
+    --kid-yellow: 45 95% 55%;
+    --kid-pink: 340 75% 60%;
+    --kid-purple: 270 55% 58%;
+    --kid-red: 0 75% 55%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 145 65% 42%;
+    --sidebar-primary: 25 90% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 80 30% 90%;
-    --sidebar-accent-foreground: 150 30% 15%;
-    --sidebar-border: 145 25% 82%;
-    --sidebar-ring: 145 65% 42%;
+    --sidebar-accent: 45 40% 90%;
+    --sidebar-accent-foreground: 25 40% 18%;
+    --sidebar-border: 35 30% 85%;
+    --sidebar-ring: 25 90% 55%;
   }
 }
 
@@ -62,6 +59,28 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-kids;
+  }
+}
+
+@layer utilities {
+  .text-shadow-kid {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .kid-gradient-orange {
+    background: linear-gradient(135deg, hsl(var(--kid-orange)), hsl(25 95% 65%));
+  }
+
+  .kid-gradient-blue {
+    background: linear-gradient(135deg, hsl(var(--kid-blue)), hsl(210 85% 65%));
+  }
+
+  .kid-gradient-green {
+    background: linear-gradient(135deg, hsl(var(--kid-green)), hsl(155 65% 55%));
+  }
+
+  .kid-gradient-premium {
+    background: linear-gradient(135deg, hsl(var(--kid-purple)), hsl(var(--kid-pink)));
   }
 }
