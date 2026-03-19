@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Shield, Sparkles } from "lucide-react";
+import { Send, Shield, Sparkles, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DogMascot from "@/components/DogMascot";
+import ChameleonMascot from "@/components/ChameleonMascot";
 import ChatBubble from "@/components/ChatBubble";
 import VoiceInput from "@/components/VoiceInput";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
-import farmBg from "@/assets/farm-bg.jpg";
+import { useTTS } from "@/hooks/useTTS";
+import forestBg from "@/assets/forest-bg.jpg";
 import { toast } from "sonner";
 
 interface Message {
@@ -27,6 +28,8 @@ const Index = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [questionsToday, setQuestionsToday] = useState(0);
   const chatRef = useRef<HTMLDivElement>(null);
+  const { speak } = useTTS();
+  const lastAssistantTextRef = useRef("");
 
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
@@ -90,6 +93,8 @@ const Index = () => {
         }
       }
     }
+
+    lastAssistantTextRef.current = assistantText;
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
@@ -109,17 +114,21 @@ const Index = () => {
 
     try {
       await streamChat(allMessages);
+      // Read the response aloud after streaming completes
+      if (lastAssistantTextRef.current) {
+        speak(lastAssistantTextRef.current);
+      }
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
-        text: "Ops, não consegui responder agora! Tente de novo em um pouquinho 🐶💛",
+        text: "Ops, não consegui responder agora! Tente de novo em um pouquinho 🦎💛",
         isUser: false,
       }]);
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping, questionsToday, messages, streamChat]);
+  }, [isTyping, questionsToday, messages, streamChat, speak]);
 
   const handleVoiceResult = useCallback((text: string) => {
     setInput(text);
@@ -130,12 +139,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden relative">
-      {/* Farm background */}
+      {/* Forest background */}
       <div
-        className="fixed inset-0 bg-cover bg-bottom opacity-30"
-        style={{ backgroundImage: `url(${farmBg})` }}
+        className="fixed inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${forestBg})` }}
       />
-      <div className="fixed inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
+      <div className="fixed inset-0 bg-gradient-to-b from-background/50 via-background/30 to-background/70" />
+
+      {/* Floating particles */}
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="fixed w-2 h-2 rounded-full bg-kid-yellow/40"
+          style={{ left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%` }}
+          animate={{ y: [0, -20, 0], opacity: [0.3, 0.7, 0.3] }}
+          transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.5 }}
+        />
+      ))}
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2">
@@ -144,20 +164,20 @@ const Index = () => {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight drop-shadow-md">
             Kidzz
           </h1>
-          <span className="text-[10px] font-bold bg-kid-yellow text-foreground px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-bold bg-kid-yellow text-foreground px-2 py-0.5 rounded-full shadow-sm">
             FREE
           </span>
         </motion.div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground font-bold">
+          <span className="text-xs text-foreground font-bold bg-card/70 backdrop-blur-sm px-2 py-1 rounded-full">
             {MAX_FREE_QUESTIONS - questionsToday} 💬
           </span>
           <button
             onClick={() => setShowParentalGate(true)}
-            className="p-2 rounded-2xl bg-card/80 text-muted-foreground hover:text-primary transition-all shadow-sm"
+            className="p-2 rounded-2xl bg-card/70 backdrop-blur-sm text-muted-foreground hover:text-primary transition-all shadow-sm"
             aria-label="Controle parental"
           >
             <Shield size={18} />
@@ -174,11 +194,11 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <DogMascot size="lg" />
-            <h2 className="text-2xl font-extrabold text-foreground text-center mt-2">
-              Oi! Eu sou o Kidzz! 🐶
+            <ChameleonMascot size="xl" />
+            <h2 className="text-2xl font-extrabold text-foreground text-center mt-2 drop-shadow-md">
+              Oi! Eu sou o Kidzz! 🦎
             </h2>
-            <p className="text-muted-foreground text-center text-sm max-w-[280px]">
+            <p className="text-muted-foreground text-center text-sm max-w-[280px] bg-card/60 backdrop-blur-sm rounded-2xl px-4 py-2">
               Aprender nunca foi tão divertido! ✨
               <br />Me pergunte qualquer coisa!
             </p>
@@ -189,7 +209,7 @@ const Index = () => {
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="bg-card/80 backdrop-blur-sm border border-border px-3 py-2 rounded-2xl text-xs font-bold text-foreground hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-95 shadow-sm"
+                  className="bg-card/80 backdrop-blur-sm border border-border px-3 py-2 rounded-2xl text-xs font-bold text-foreground hover:bg-primary/10 hover:border-primary/30 transition-all active:scale-95 shadow-md"
                 >
                   {q}
                 </button>
@@ -199,8 +219,8 @@ const Index = () => {
         ) : (
           <>
             {/* Chat header */}
-            <div className="flex items-center gap-2 px-4 py-2">
-              <DogMascot isTalking={isTyping} size="sm" />
+            <div className="flex items-center gap-2 px-4 py-2 bg-card/50 backdrop-blur-sm">
+              <ChameleonMascot isTalking={isTyping} size="sm" />
               <span className="text-sm font-extrabold text-foreground">Kidzz</span>
               {isTyping && (
                 <motion.span
@@ -231,7 +251,7 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-3"
+            className="text-center space-y-3 bg-card/80 backdrop-blur-sm rounded-3xl p-5"
           >
             <p className="text-sm text-muted-foreground font-bold">
               Você usou todas as perguntas de hoje! 🌟
@@ -240,9 +260,12 @@ const Index = () => {
               <Sparkles size={22} />
               Seja Premium — Ilimitado!
             </Button>
+            <p className="text-xs text-muted-foreground">
+              A partir de R$ 14,90/mês · 7 dias grátis
+            </p>
           </motion.div>
         ) : (
-          <div className="flex items-end gap-2">
+          <div className="flex items-end gap-3">
             <VoiceInput onResult={handleVoiceResult} disabled={isTyping} />
             <div className="flex-1 relative">
               <input
@@ -251,7 +274,7 @@ const Index = () => {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && sendMessage(input)}
                 placeholder="Pergunte qualquer coisa 😊"
-                className="w-full py-4 px-5 rounded-3xl bg-card/90 backdrop-blur-sm border-2 border-border text-foreground text-base placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-md transition-all"
+                className="w-full py-4 px-5 rounded-3xl bg-card/90 backdrop-blur-sm border-2 border-border text-foreground text-base placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-lg transition-all"
               />
             </div>
             <motion.div whileTap={{ scale: 0.9 }}>
@@ -261,8 +284,9 @@ const Index = () => {
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || isTyping}
                 aria-label="Perguntar"
+                className="w-16 h-16"
               >
-                <Send size={24} />
+                <Send size={26} />
               </Button>
             </motion.div>
           </div>

@@ -14,13 +14,13 @@ const ChatBubble = ({ message, isUser }: ChatBubbleProps) => {
       className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}
     >
       {!isUser && (
-        <span className="text-2xl mr-2 mt-1">🐶</span>
+        <span className="text-2xl mr-2 mt-1">🦎</span>
       )}
       <div
         className={`max-w-[80%] px-4 py-3 text-base leading-relaxed shadow-md ${
           isUser
             ? "bg-secondary text-secondary-foreground rounded-3xl rounded-br-lg"
-            : "bg-card text-card-foreground rounded-3xl rounded-bl-lg border-2 border-kid-orange/20"
+            : "bg-card/95 text-card-foreground rounded-3xl rounded-bl-lg border-2 border-kid-green/30"
         }`}
       >
         {message}
