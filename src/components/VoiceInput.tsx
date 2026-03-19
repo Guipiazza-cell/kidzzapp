@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { Mic, MicOff } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 
 interface VoiceInputProps {
   onResult: (text: string) => void;
@@ -36,17 +35,49 @@ const VoiceInput = ({ onResult, disabled }: VoiceInputProps) => {
   }, [onResult]);
 
   return (
-    <motion.div whileTap={{ scale: 0.9 }}>
-      <Button
-        variant="kidMic"
-        size="iconXl"
+    <motion.div
+      whileTap={{ scale: 0.9 }}
+      className="relative"
+    >
+      {/* Pulsing rings when listening */}
+      {isListening && (
+        <>
+          <motion.div
+            className="absolute inset-0 rounded-full bg-kid-green/30"
+            animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
+          />
+          <motion.div
+            className="absolute inset-0 rounded-full bg-kid-green/20"
+            animate={{ scale: [1, 2.2], opacity: [0.4, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
+          />
+        </>
+      )}
+      {/* Persistent pulse when idle */}
+      {!isListening && !disabled && (
+        <motion.div
+          className="absolute inset-0 rounded-full bg-kid-blue/25"
+          animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.2, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+      <button
         onClick={startListening}
         disabled={disabled || isListening}
-        className={isListening ? "animate-pulse" : ""}
+        className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center shadow-xl transition-all ${
+          isListening
+            ? "kid-gradient-green animate-pulse"
+            : "kid-gradient-blue hover:shadow-2xl"
+        } disabled:opacity-50`}
         aria-label={isListening ? "Ouvindo..." : "Falar pergunta"}
       >
-        {isListening ? <MicOff size={28} /> : <Mic size={28} />}
-      </Button>
+        {isListening ? (
+          <MicOff size={28} className="text-primary-foreground" />
+        ) : (
+          <Mic size={28} className="text-primary-foreground" />
+        )}
+      </button>
     </motion.div>
   );
 };
