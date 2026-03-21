@@ -5,9 +5,10 @@ import { motion } from "framer-motion";
 interface VoiceInputProps {
   onResult: (text: string) => void;
   disabled?: boolean;
+  large?: boolean;
 }
 
-const VoiceInput = ({ onResult, disabled }: VoiceInputProps) => {
+const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
   const [isListening, setIsListening] = useState(false);
 
   const startListening = useCallback(() => {
@@ -25,7 +26,7 @@ const VoiceInput = ({ onResult, disabled }: VoiceInputProps) => {
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
     recognition.onerror = () => setIsListening(false);
-    
+
     recognition.onresult = (event: any) => {
       const text = event.results[0][0].transcript;
       if (text) onResult(text);
@@ -33,6 +34,12 @@ const VoiceInput = ({ onResult, disabled }: VoiceInputProps) => {
 
     recognition.start();
   }, [onResult]);
+
+  const sizeClasses = large
+    ? "w-32 h-32"
+    : "w-16 h-16";
+  
+  const iconSize = large ? 48 : 28;
 
   return (
     <motion.div
@@ -54,8 +61,15 @@ const VoiceInput = ({ onResult, disabled }: VoiceInputProps) => {
           />
         </>
       )}
-      {/* Persistent pulse when idle */}
-      {!isListening && !disabled && (
+      {/* Persistent pulse when idle and large */}
+      {!isListening && !disabled && large && (
+        <motion.div
+          className="absolute inset-0 rounded-full bg-kid-orange/30"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.2, 0.6] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+      {!isListening && !disabled && !large && (
         <motion.div
           className="absolute inset-0 rounded-full bg-kid-blue/25"
           animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.2, 0.5] }}
@@ -65,17 +79,19 @@ const VoiceInput = ({ onResult, disabled }: VoiceInputProps) => {
       <button
         onClick={startListening}
         disabled={disabled || isListening}
-        className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center shadow-xl transition-all ${
+        className={`relative z-10 ${sizeClasses} rounded-full flex items-center justify-center shadow-xl transition-all ${
           isListening
             ? "kid-gradient-green animate-pulse"
+            : large
+            ? "kid-gradient-orange hover:shadow-[0_0_50px_hsl(var(--kid-orange)/0.5)]"
             : "kid-gradient-blue hover:shadow-2xl"
         } disabled:opacity-50`}
         aria-label={isListening ? "Ouvindo..." : "Falar pergunta"}
       >
         {isListening ? (
-          <MicOff size={28} className="text-primary-foreground" />
+          <MicOff size={iconSize} className="text-primary-foreground" />
         ) : (
-          <Mic size={28} className="text-primary-foreground" />
+          <Mic size={iconSize} className="text-primary-foreground" />
         )}
       </button>
     </motion.div>
