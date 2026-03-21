@@ -388,39 +388,74 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-3 bg-black/40 backdrop-blur-md rounded-3xl p-5"
+            className="text-center bg-black/50 backdrop-blur-xl rounded-3xl p-6 space-y-4 border border-white/10"
           >
-            <p className="text-sm text-white/80 font-bold">Você usou suas {MAX_FREE_QUESTIONS} perguntas de hoje! 🌟</p>
-            <Button variant="kidPremium" size="xl" className="w-full">
-              <Sparkles size={22} />
-              Seja Premium — Ilimitado!
+            <div className="text-5xl">🌟</div>
+            <h3 className="text-2xl font-extrabold text-white">
+              Suas {MAX_FREE_QUESTIONS} perguntas teste acabaram!
+            </h3>
+            <p className="text-white/70 text-sm">Desbloqueie perguntas ilimitadas e narração por voz premium</p>
+
+            <div className="bg-gradient-to-r from-kid-orange to-kid-yellow rounded-2xl p-5 shadow-2xl">
+              <p className="text-4xl font-extrabold text-white drop-shadow-lg">
+                R$ 14,99<span className="text-lg font-bold opacity-80">/mês</span>
+              </p>
+              <p className="text-white/80 text-xs mt-1">7 dias grátis para testar!</p>
+            </div>
+
+            <Button variant="kidPremium" size="xl" className="w-full text-lg py-6">
+              <Sparkles size={24} />
+              Assinar Premium Agora
             </Button>
-            <p className="text-xs text-white/60">A partir de R$ 14,90/mês · 7 dias grátis</p>
+
+            <div className="flex items-center justify-center gap-3 text-white/50 text-xs">
+              <span>💳 Cartão</span>
+              <span>•</span>
+              <span> Apple Pay</span>
+              <span>•</span>
+              <span>Google Pay</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-left">
+              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ Perguntas ilimitadas</div>
+              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ Voz premium</div>
+              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ Sem anúncios</div>
+              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ 5 personagens</div>
+            </div>
           </motion.div>
         ) : (
-          <div className="flex items-end gap-3">
-            <VoiceInput onResult={handleVoiceResult} disabled={isTyping} />
-            <div className="flex-1 relative">
-              <input
-                id="kidzz-input"
-                type="text"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && sendMessage(input)}
-                placeholder="Pergunte qualquer coisa 😊"
-                className="w-full py-4 px-5 rounded-3xl bg-black/40 backdrop-blur-md border-2 border-white/20 text-white text-base placeholder:text-white/50 focus:outline-none focus:border-kid-orange focus:ring-2 focus:ring-kid-orange/30 shadow-lg transition-all"
-              />
+          <div className="space-y-2">
+            {/* Remaining questions badge */}
+            <div className="flex justify-center">
+              <div className="bg-black/40 backdrop-blur-md rounded-full px-4 py-1.5 flex items-center gap-2">
+                <span className="text-kid-yellow text-lg font-extrabold">{MAX_FREE_QUESTIONS - questionsToday}</span>
+                <span className="text-white/70 text-xs font-bold">de {MAX_FREE_QUESTIONS} perguntas teste restantes</span>
+              </div>
             </div>
-            <motion.div whileTap={{ scale: 0.85 }}>
-              <button
-                onClick={() => sendMessage(input)}
-                disabled={!input.trim() || isTyping}
-                aria-label="Perguntar"
-                className="relative w-14 h-14 rounded-full kid-gradient-orange shadow-2xl flex items-center justify-center disabled:opacity-40 transition-all"
-              >
-                <Send size={24} className="text-white" />
-              </button>
-            </motion.div>
+            <div className="flex items-end gap-3">
+              <VoiceInput onResult={handleVoiceResult} disabled={isTyping} />
+              <div className="flex-1 relative">
+                <input
+                  id="kidzz-input"
+                  type="text"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && sendMessage(input)}
+                  placeholder="Pergunte qualquer coisa 😊"
+                  className="w-full py-4 px-5 rounded-3xl bg-black/40 backdrop-blur-md border-2 border-white/20 text-white text-base placeholder:text-white/50 focus:outline-none focus:border-kid-orange focus:ring-2 focus:ring-kid-orange/30 shadow-lg transition-all"
+                />
+              </div>
+              <motion.div whileTap={{ scale: 0.85 }}>
+                <button
+                  onClick={() => sendMessage(input)}
+                  disabled={!input.trim() || isTyping}
+                  aria-label="Perguntar"
+                  className="relative w-14 h-14 rounded-full kid-gradient-orange shadow-2xl flex items-center justify-center disabled:opacity-40 transition-all"
+                >
+                  <Send size={24} className="text-white" />
+                </button>
+              </motion.div>
+            </div>
           </div>
         )}
       </div>
