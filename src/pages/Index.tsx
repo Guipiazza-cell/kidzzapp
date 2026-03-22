@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Shield, Sparkles, Mic } from "lucide-react";
+import { Send, Shield, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ChameleonMascot from "@/components/ChameleonMascot";
 import ChatBubble from "@/components/ChatBubble";
 import VoiceInput from "@/components/VoiceInput";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
+import NameOnboarding from "@/components/NameOnboarding";
+import PremiumCharacters from "@/components/PremiumCharacters";
 import { useTTS } from "@/hooks/useTTS";
 import jungleBg from "@/assets/jungle-bg.jpg";
 import { toast } from "sonner";
@@ -18,33 +20,17 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
+const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`;
 const MAX_FREE_QUESTIONS = 3;
 
 const AGE_OPTIONS = [
-  {
-    range: "0-3",
-    emoji: "👶",
-    label: "0 a 3 anos",
-    desc: "Sons, cores e palavrinhas simples",
-    color: "from-pink-400 to-rose-500",
-  },
-  {
-    range: "3-7",
-    emoji: "🧒",
-    label: "3 a 7 anos",
-    desc: "Historinhas e exemplos do dia a dia",
-    color: "from-emerald-400 to-teal-500",
-  },
-  {
-    range: "7-10",
-    emoji: "🧑‍🎓",
-    label: "7 a 10 anos",
-    desc: "Curiosidades e desafios científicos",
-    color: "from-blue-400 to-indigo-500",
-  },
+  { range: "0-3", emoji: "👶", label: "0 a 3 anos", desc: "Sons, cores e palavrinhas simples", color: "from-pink-400 to-rose-500" },
+  { range: "3-7", emoji: "🧒", label: "3 a 7 anos", desc: "Historinhas e exemplos do dia a dia", color: "from-emerald-400 to-teal-500" },
+  { range: "7-10", emoji: "🧑‍🎓", label: "7 a 10 anos", desc: "Curiosidades e desafios científicos", color: "from-blue-400 to-indigo-500" },
 ];
 
 const Index = () => {
+  const [childName, setChildName] = useState<string | null>(() => localStorage.getItem("kidzz_name"));
   const [ageRange, setAgeRange] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -52,6 +38,7 @@ const Index = () => {
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [questionsToday, setQuestionsToday] = useState(0);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const { speak } = useTTS();
   const lastAssistantTextRef = useRef("");
@@ -59,6 +46,35 @@ const Index = () => {
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  const handleNameSubmit = useCallback((name: string) => {
+    setChildName(name);
+    localStorage.setItem("kidzz_name", name);
+  }, []);
+
+  const handleCheckout = useCallback(async () => {
+    setCheckoutLoading(true);
+    try {
+      const resp = await fetch(CHECKOUT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ childName }),
+      });
+      const data = await resp.json();
+      if (data.url) {
+        window.open(data.url, "_blank");
+      } else {
+        toast.error("Erro ao criar checkout");
+      }
+    } catch {
+      toast.error("Erro ao iniciar pagamento");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  }, [childName]);
 
   const streamChat = useCallback(async (userMessages: { role: string; content: string }[]) => {
     const resp = await fetch(CHAT_URL, {
@@ -158,6 +174,11 @@ const Index = () => {
 
   const isFreeLimitReached = questionsToday >= MAX_FREE_QUESTIONS;
 
+  // ====== NAME ONBOARDING ======
+  if (!childName) {
+    return <NameOnboarding onSubmit={handleNameSubmit} />;
+  }
+
   // ====== AGE SELECTION SCREEN ======
   if (!ageRange) {
     return (
@@ -165,7 +186,6 @@ const Index = () => {
         <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
         <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
 
-        {/* Fireflies */}
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
@@ -178,16 +198,16 @@ const Index = () => {
 
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
           <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 200 }}>
-            <ChameleonMascot size="xl" />
+            <ChameleonMascot size="lg" />
           </motion.div>
 
           <motion.h1
-            className="text-4xl font-extrabold text-white text-center mt-3 drop-shadow-xl"
+            className="text-3xl font-extrabold text-white text-center mt-3 drop-shadow-xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Olá! Eu sou o Kidzz! 🦎
+            Olá, {childName}! 🦎✨
           </motion.h1>
 
           <motion.p
@@ -196,11 +216,11 @@ const Index = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            Qual a idade do explorador? Assim eu sei como conversar! 🌿
+            Qual a sua idade? Assim eu sei como conversar! 🌿
           </motion.p>
 
           <motion.div
-            className="w-full max-w-sm mt-6 space-y-3"
+            className="w-full max-w-sm mt-5 space-y-3"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
@@ -225,12 +245,22 @@ const Index = () => {
             ))}
           </motion.div>
 
-          <motion.button
-            onClick={() => setShowParentalGate(true)}
-            className="mt-6 flex items-center gap-2 text-white/60 text-xs hover:text-white/90 transition-colors"
+          {/* Premium Characters Preview */}
+          <motion.div
+            className="mt-6 w-full max-w-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.3 }}
+            transition={{ delay: 1.2 }}
+          >
+            <PremiumCharacters onUnlockPress={handleCheckout} />
+          </motion.div>
+
+          <motion.button
+            onClick={() => setShowParentalGate(true)}
+            className="mt-4 flex items-center gap-2 text-white/60 text-xs hover:text-white/90 transition-colors"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
           >
             <Shield size={14} />
             Controle Parental
@@ -256,7 +286,6 @@ const Index = () => {
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
       <div className="fixed inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
 
-      {/* Fireflies */}
       {[...Array(6)].map((_, i) => (
         <motion.div
           key={i}
@@ -270,20 +299,20 @@ const Index = () => {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2">
         <motion.div className="flex items-center gap-2" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-lg">Kidzz</h1>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight drop-shadow-lg">Kidzz</h1>
           <span className="text-[10px] font-bold bg-kid-yellow text-foreground px-2 py-0.5 rounded-full shadow-sm">
             {AGE_OPTIONS.find(a => a.range === ageRange)?.emoji} {ageRange}
           </span>
         </motion.div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-white font-bold bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
+          <span className="text-sm text-white font-extrabold bg-kid-orange/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
             {MAX_FREE_QUESTIONS - questionsToday} 💬
           </span>
           <button
             onClick={() => setAgeRange(null)}
             className="text-[10px] text-white/60 bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full hover:text-white"
           >
-            trocar idade
+            trocar
           </button>
           <button
             onClick={() => setShowParentalGate(true)}
@@ -306,15 +335,13 @@ const Index = () => {
           >
             <ChameleonMascot size="lg" />
             <h2 className="text-xl font-extrabold text-white text-center mt-2 drop-shadow-lg">
-              Pronto pra explorar? 🌿
+              Pronto, {childName}? 🌿
             </h2>
             <p className="text-white/70 text-center text-sm max-w-[260px] mt-1">
               Toque no botão ou fale sua pergunta!
             </p>
 
-            {/* MASSIVE PULSING MIC BUTTON */}
             <motion.div className="mt-6 relative flex items-center justify-center">
-              {/* Multiple pulsing rings */}
               <motion.div
                 className="absolute w-44 h-44 rounded-full bg-kid-orange/20"
                 animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0, 0.4] }}
@@ -325,12 +352,6 @@ const Index = () => {
                 animate={{ scale: [1, 1.7, 1], opacity: [0.3, 0, 0.3] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
               />
-              <motion.div
-                className="absolute w-44 h-44 rounded-full bg-kid-orange/10"
-                animate={{ scale: [1, 2, 1], opacity: [0.2, 0, 0.2] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              />
-
               <VoiceInput onResult={handleVoiceResult} disabled={isTyping} large />
             </motion.div>
 
@@ -338,7 +359,6 @@ const Index = () => {
               🎤 Toque para falar sua pergunta!
             </p>
 
-            {/* Quick suggestions */}
             <div className="flex flex-wrap justify-center gap-2 mt-4 max-w-xs">
               {(ageRange === "0-3"
                 ? ["Que som faz o gato? 🐱", "De que cor é o sol? ☀️", "O que é chuva? 🌧️"]
@@ -388,48 +408,56 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center bg-black/50 backdrop-blur-xl rounded-3xl p-6 space-y-4 border border-white/10"
+            className="text-center bg-black/60 backdrop-blur-xl rounded-3xl p-6 space-y-4 border border-white/10"
           >
             <div className="text-5xl">🌟</div>
             <h3 className="text-2xl font-extrabold text-white">
-              Suas {MAX_FREE_QUESTIONS} perguntas teste acabaram!
+              {childName}, suas {MAX_FREE_QUESTIONS} perguntas teste acabaram!
             </h3>
-            <p className="text-white/70 text-sm">Desbloqueie perguntas ilimitadas e narração por voz premium</p>
+            <p className="text-white/70 text-sm">Desbloqueie perguntas ilimitadas, voz premium e todos os personagens!</p>
 
-            <div className="bg-gradient-to-r from-kid-orange to-kid-yellow rounded-2xl p-5 shadow-2xl">
-              <p className="text-4xl font-extrabold text-white drop-shadow-lg">
-                R$ 14,99<span className="text-lg font-bold opacity-80">/mês</span>
+            <div className="bg-gradient-to-r from-kid-orange to-kid-yellow rounded-2xl p-6 shadow-2xl">
+              <p className="text-5xl font-extrabold text-white drop-shadow-lg">
+                R$ 14,99<span className="text-xl font-bold opacity-80">/mês</span>
               </p>
-              <p className="text-white/80 text-xs mt-1">7 dias grátis para testar!</p>
+              <p className="text-white/90 text-sm mt-2 font-bold">7 dias grátis para testar! 🎉</p>
             </div>
 
-            <Button variant="kidPremium" size="xl" className="w-full text-lg py-6">
+            {/* Characters preview */}
+            <PremiumCharacters onUnlockPress={handleCheckout} />
+
+            <Button
+              onClick={handleCheckout}
+              disabled={checkoutLoading}
+              variant="kidPremium"
+              size="xl"
+              className="w-full text-lg py-7 shadow-2xl"
+            >
               <Sparkles size={24} />
-              Assinar Premium Agora
+              {checkoutLoading ? "Abrindo..." : "Assinar Premium Agora"}
             </Button>
 
-            <div className="flex items-center justify-center gap-3 text-white/50 text-xs">
+            <div className="flex items-center justify-center gap-4 text-white/60 text-sm font-bold">
               <span>💳 Cartão</span>
               <span>•</span>
               <span> Apple Pay</span>
               <span>•</span>
-              <span>Google Pay</span>
+              <span> Google Pay</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-left">
-              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ Perguntas ilimitadas</div>
-              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ Voz premium</div>
-              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ Sem anúncios</div>
-              <div className="bg-white/10 rounded-xl p-2.5 text-xs text-white/80">✅ 5 personagens</div>
+              <div className="bg-white/10 rounded-xl p-3 text-sm text-white/90 font-bold">✅ Perguntas ilimitadas</div>
+              <div className="bg-white/10 rounded-xl p-3 text-sm text-white/90 font-bold">✅ Voz premium</div>
+              <div className="bg-white/10 rounded-xl p-3 text-sm text-white/90 font-bold">✅ Sem anúncios</div>
+              <div className="bg-white/10 rounded-xl p-3 text-sm text-white/90 font-bold">✅ 4 personagens</div>
             </div>
           </motion.div>
         ) : (
           <div className="space-y-2">
-            {/* Remaining questions badge */}
             <div className="flex justify-center">
-              <div className="bg-black/40 backdrop-blur-md rounded-full px-4 py-1.5 flex items-center gap-2">
-                <span className="text-kid-yellow text-lg font-extrabold">{MAX_FREE_QUESTIONS - questionsToday}</span>
-                <span className="text-white/70 text-xs font-bold">de {MAX_FREE_QUESTIONS} perguntas teste restantes</span>
+              <div className="bg-kid-orange/90 backdrop-blur-md rounded-full px-5 py-2 flex items-center gap-2 shadow-lg">
+                <span className="text-white text-2xl font-extrabold">{MAX_FREE_QUESTIONS - questionsToday}</span>
+                <span className="text-white/90 text-sm font-bold">de {MAX_FREE_QUESTIONS} perguntas teste</span>
               </div>
             </div>
             <div className="flex items-end gap-3">
