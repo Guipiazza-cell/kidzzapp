@@ -1,21 +1,26 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import ChameleonMascot from "./ChameleonMascot";
+import { useAuth } from "@/contexts/AuthContext";
 import jungleBg from "@/assets/jungle-bg.jpg";
 
-interface NameOnboardingProps {
-  onSubmit: (name: string) => void;
-}
-
-const NameOnboarding = ({ onSubmit }: NameOnboardingProps) => {
+const NameOnboarding = () => {
+  const { updateProfile } = useAuth();
   const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!name.trim() || saving) return;
+    setSaving(true);
+    await updateProfile({ child_name: name.trim() });
+    setSaving(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden relative">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
       <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
 
-      {/* Fireflies */}
       {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
@@ -59,23 +64,21 @@ const NameOnboarding = ({ onSubmit }: NameOnboardingProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
         >
-          <div className="relative">
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && name.trim() && onSubmit(name.trim())}
-              placeholder="Digite seu nome aqui 🌟"
-              className="w-full py-5 px-6 rounded-3xl bg-white/15 backdrop-blur-xl border-2 border-white/30 text-white text-xl font-bold text-center placeholder:text-white/40 focus:outline-none focus:border-kid-yellow focus:ring-4 focus:ring-kid-yellow/30 shadow-2xl transition-all"
-              autoFocus
-              maxLength={20}
-            />
-          </div>
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleSubmit()}
+            placeholder="Digite seu nome aqui 🌟"
+            className="w-full py-5 px-6 rounded-3xl bg-white/15 backdrop-blur-xl border-2 border-white/30 text-white text-xl font-bold text-center placeholder:text-white/40 focus:outline-none focus:border-kid-yellow focus:ring-4 focus:ring-kid-yellow/30 shadow-2xl transition-all"
+            autoFocus
+            maxLength={20}
+          />
 
           <motion.button
-            onClick={() => name.trim() && onSubmit(name.trim())}
-            disabled={!name.trim()}
-            className="w-full py-5 rounded-3xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-xl shadow-2xl hover:shadow-[0_0_40px_hsl(var(--kid-orange)/0.5)] transition-all disabled:opacity-30 disabled:hover:shadow-2xl active:scale-95"
+            onClick={handleSubmit}
+            disabled={!name.trim() || saving}
+            className="w-full py-5 rounded-3xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-xl shadow-2xl hover:shadow-[0_0_40px_hsl(var(--kid-orange)/0.5)] transition-all disabled:opacity-30 active:scale-95"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >

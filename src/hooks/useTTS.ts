@@ -6,14 +6,14 @@ const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 export const useTTS = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const speak = useCallback(async (text: string) => {
-    // Stop any current audio
+  const speak = useCallback(async (text: string): Promise<void> => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
 
     try {
+      const cleanText = text.replace(/[*#_~`]/g, "").slice(0, 500);
       const response = await fetch(TTS_URL, {
         method: "POST",
         headers: {
@@ -21,12 +21,11 @@ export const useTTS = () => {
           apikey: ANON_KEY,
           Authorization: `Bearer ${ANON_KEY}`,
         },
-        body: JSON.stringify({ text: text.replace(/[*#_~`]/g, "").slice(0, 500) }),
+        body: JSON.stringify({ text: cleanText }),
       });
 
       if (!response.ok) {
-        // Fallback to browser TTS
-        fallbackSpeak(text);
+        fallbackSpeak(cleanText);
         return;
       }
 
@@ -35,9 +34,19 @@ export const useTTS = () => {
         const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
         const audio = new Audio(audioUrl);
         audioRef.current = audio;
-        await audio.play();
+        return new Promise<void>((resolve) => {
+          audio.onended = () => {
+            audioRef.current = null;
+            resolve();
+          };
+          audio.onerror = () => {
+            audioRef.current = null;
+            resolve();
+          };
+          audio.play().catch(() => resolve());
+        });
       } else {
-        fallbackSpeak(text);
+        fallbackSpeak(cleanText);
       }
     } catch {
       fallbackSpeak(text);

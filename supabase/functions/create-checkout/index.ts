@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,28 +18,34 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    );
+
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
+    if (!user?.email) throw new Error("User not authenticated");
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    const { email, childName } = await req.json();
-
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId: string | undefined;
-    if (email) {
-      const customers = await stripe.customers.list({ email, limit: 1 });
-      if (customers.data.length > 0) {
-        customerId = customers.data[0].id;
-      }
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
     }
 
     const origin = req.headers.get("origin") || "https://id-preview--19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovable.app";
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : email || undefined,
+      customer_email: customerId ? undefined : user.email,
       line_items: [{ price: PRICE_ID, quantity: 1 }],
       mode: "subscription",
-      success_url: `${origin}/?subscribed=true`,
+      success_url: `${origin}/success`,
       cancel_url: `${origin}/`,
-      metadata: { childName: childName || "" },
       subscription_data: {
         trial_period_days: 7,
       },
