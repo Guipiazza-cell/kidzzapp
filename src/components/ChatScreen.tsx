@@ -201,13 +201,9 @@ const ChatScreen = () => {
   const followUps = FOLLOW_UPS[ageRange] || FOLLOW_UPS["3-7"];
   const randomFollowUp = followUps[Math.floor(Math.random() * followUps.length)];
 
-  // Lazy import for modals
-  const ParentalGate = require("./ParentalGate").default;
-  const ParentalSettings = require("./ParentalSettings").default;
-
   return (
     <div className="min-h-screen flex flex-col overflow-hidden relative">
-      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${new URL("@/assets/jungle-bg.jpg", import.meta.url).href})` }} />
+      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
       <div className="fixed inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
 
       {[...Array(6)].map((_, i) => (
