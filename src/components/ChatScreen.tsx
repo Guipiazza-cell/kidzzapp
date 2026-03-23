@@ -5,9 +5,12 @@ import ChameleonMascot from "./ChameleonMascot";
 import ChatBubble from "./ChatBubble";
 import VoiceInput from "./VoiceInput";
 import ConversionScreen from "./ConversionScreen";
+import ParentalGate from "./ParentalGate";
+import ParentalSettings from "./ParentalSettings";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import jungleBg from "@/assets/jungle-bg.jpg";
 
 interface Message {
   id: number;
