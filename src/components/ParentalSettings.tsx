@@ -34,7 +34,7 @@ const PLANS = [
   },
   {
     id: "premium",
-    name: "Premium",
+    name: "Plano KIDZZ",
     price: "R$ 14,90",
     period: "/mês",
     icon: Crown,
