@@ -7,72 +7,72 @@ interface ParentalSettingsProps {
 }
 
 const AGE_RANGES = [
-  { range: "0-3", label: "0 a 3 anos", emoji: "👶", description: "Sons, cores e palavras curtas." },
-  { range: "3-7", label: "3 a 7 anos", emoji: "🧒", description: "Historinhas e exemplos do dia a dia." },
-  { range: "7-10", label: "7 a 10 anos", emoji: "🧑‍🎓", description: "Curiosidades e desafios científicos." },
-];
+{ range: "0-3", label: "0 a 3 anos", emoji: "👶", description: "Sons, cores e palavras curtas." },
+{ range: "3-7", label: "3 a 7 anos", emoji: "🧒", description: "Historinhas e exemplos do dia a dia." },
+{ range: "7-10", label: "7 a 10 anos", emoji: "🧑‍🎓", description: "Curiosidades e desafios científicos." }];
+
 
 const PLANS = [
-  {
-    id: "free",
-    name: "Gratuito",
-    price: "R$ 0",
-    period: "",
-    icon: MessageCircle,
-    color: "bg-muted",
-    textColor: "text-foreground",
-    borderColor: "border-border",
-    features: [
-      "3 perguntas no total",
-      "1 personagem (camaleão verde)",
-      "Respostas em texto",
-      "Filtro de conteúdo ativo",
-    ],
-    limitations: [
-      "Sem narração por voz",
-      "Sem personagens extras",
-    ],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: "R$ 14,90",
-    period: "/mês",
-    icon: Crown,
-    color: "kid-gradient-premium",
-    textColor: "text-white",
-    borderColor: "border-kid-purple/40",
-    badge: "POPULAR",
-    features: [
-      "Perguntas ilimitadas",
-      "Narração por voz amigável 🔊",
-      "3 personagens desbloqueados",
-      "Respostas adaptadas por idade",
-      "Filtro de conteúdo avançado",
-    ],
-    limitations: [],
-  },
-  {
-    id: "super_premium",
-    name: "Super Premium",
-    price: "R$ 24,90",
-    period: "/mês",
-    icon: Zap,
-    color: "bg-gradient-to-br from-kid-yellow via-kid-orange to-kid-red",
-    textColor: "text-white",
-    borderColor: "border-kid-yellow/40",
-    badge: "COMPLETO",
-    features: [
-      "Tudo do Premium +",
-      "Todos os personagens exclusivos",
-      "Voz premium personalizada",
-      "Conteúdo educativo exclusivo",
-      "Suporte prioritário",
-      "Novidades em primeira mão 🚀",
-    ],
-    limitations: [],
-  },
-];
+{
+  id: "free",
+  name: "Gratuito",
+  price: "R$ 0",
+  period: "",
+  icon: MessageCircle,
+  color: "bg-muted",
+  textColor: "text-foreground",
+  borderColor: "border-border",
+  features: [
+  "3 perguntas no total",
+  "1 personagem (camaleão verde)",
+  "Respostas em texto",
+  "Filtro de conteúdo ativo"],
+
+  limitations: [
+  "Sem narração por voz",
+  "Sem personagens extras"]
+
+},
+{
+  id: "premium",
+  name: "Premium",
+  price: "R$ 14,90",
+  period: "/mês",
+  icon: Crown,
+  color: "kid-gradient-premium",
+  textColor: "text-white",
+  borderColor: "border-kid-purple/40",
+  badge: "POPULAR",
+  features: [
+  "Perguntas ilimitadas",
+  "Narração por voz amigável 🔊",
+  "3 personagens desbloqueados",
+  "Respostas adaptadas por idade",
+  "Filtro de conteúdo avançado"],
+
+  limitations: []
+},
+{
+  id: "super_premium",
+  name: "Super Premium",
+  price: "R$ 24,90",
+  period: "/mês",
+  icon: Zap,
+  color: "bg-gradient-to-br from-kid-yellow via-kid-orange to-kid-red",
+  textColor: "text-white",
+  borderColor: "border-kid-yellow/40",
+  badge: "COMPLETO",
+  features: [
+  "Tudo do Premium +",
+  "Todos os personagens exclusivos",
+  "Voz premium personalizada",
+  "Conteúdo educativo exclusivo",
+  "Suporte prioritário",
+  "Novidades em primeira mão 🚀"],
+
+  limitations: []
+}];
+
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const { user, profile, updateProfile, signOut } = useAuth();
@@ -95,13 +95,13 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
-    >
+      className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      
       <motion.div
         initial={{ scale: 0.85 }}
         animate={{ scale: 1 }}
-        className="bg-card rounded-3xl p-5 w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto"
-      >
+        className="bg-card rounded-3xl p-5 w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto opacity-85 border-4">
+        
         <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground z-10">
           <X size={20} />
         </button>
@@ -114,9 +114,9 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           <div className={`rounded-2xl p-4 text-center ${isPremium ? "kid-gradient-premium text-white" : "bg-muted"}`}>
             <p className="font-extrabold text-lg">{isPremium ? "⭐ Premium Ativo" : "Plano Gratuito"}</p>
             <p className="text-sm opacity-80">
-              {isPremium
-                ? "Perguntas ilimitadas • Voz ativa • Todos os personagens"
-                : `${Math.max(0, 3 - (profile?.questions_used ?? 0))} de 3 perguntas restantes`}
+              {isPremium ?
+              "Perguntas ilimitadas • Voz ativa • Todos os personagens" :
+              `${Math.max(0, 3 - (profile?.questions_used ?? 0))} de 3 perguntas restantes`}
             </p>
           </div>
 
@@ -134,19 +134,19 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                   <div
                     key={plan.id}
                     className={`relative rounded-2xl border-2 p-4 transition-all ${
-                      isCurrentPlan ? "border-primary shadow-lg" : plan.borderColor
-                    }`}
-                  >
-                    {plan.badge && (
-                      <span className="absolute -top-2.5 right-3 text-[10px] font-extrabold bg-kid-orange text-white px-3 py-0.5 rounded-full shadow-md">
+                    isCurrentPlan ? "border-primary shadow-lg" : plan.borderColor}`
+                    }>
+                    
+                    {plan.badge &&
+                    <span className="absolute -top-2.5 right-3 text-[10px] font-extrabold bg-kid-orange text-white px-3 py-0.5 rounded-full shadow-md">
                         {plan.badge}
                       </span>
-                    )}
-                    {isCurrentPlan && (
-                      <span className="absolute -top-2.5 left-3 text-[10px] font-extrabold bg-kid-green text-white px-3 py-0.5 rounded-full shadow-md">
+                    }
+                    {isCurrentPlan &&
+                    <span className="absolute -top-2.5 left-3 text-[10px] font-extrabold bg-kid-green text-white px-3 py-0.5 rounded-full shadow-md">
                         SEU PLANO
                       </span>
-                    )}
+                    }
                     <div className="flex items-center gap-2 mb-2">
                       <div className={`w-8 h-8 rounded-xl ${plan.id === "free" ? "bg-muted" : plan.color} flex items-center justify-center`}>
                         <Icon size={16} className={plan.id === "free" ? "text-muted-foreground" : "text-white"} />
@@ -160,21 +160,21 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                       </div>
                     </div>
                     <ul className="space-y-1">
-                      {plan.features.map((f) => (
-                        <li key={f} className="flex items-start gap-1.5 text-xs text-foreground">
+                      {plan.features.map((f) =>
+                      <li key={f} className="flex items-start gap-1.5 text-xs text-foreground">
                           <Star size={10} className="text-kid-yellow mt-0.5 flex-shrink-0" />
                           {f}
                         </li>
-                      ))}
-                      {plan.limitations.map((l) => (
-                        <li key={l} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                      )}
+                      {plan.limitations.map((l) =>
+                      <li key={l} className="flex items-start gap-1.5 text-xs text-muted-foreground">
                           <Lock size={10} className="mt-0.5 flex-shrink-0 opacity-50" />
                           {l}
                         </li>
-                      ))}
+                      )}
                     </ul>
-                  </div>
-                );
+                  </div>);
+
               })}
             </div>
           </div>
@@ -186,21 +186,21 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
               Faixa etária
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {AGE_RANGES.map(({ range, emoji, label, description }) => (
-                <button
-                  key={range}
-                  onClick={() => handleAgeChange(range)}
-                  className={`py-3 rounded-2xl font-bold text-xs transition-all ${
-                    currentAge === range
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : "bg-muted text-muted-foreground hover:bg-primary/10"
-                  }`}
-                >
+              {AGE_RANGES.map(({ range, emoji, label, description }) =>
+              <button
+                key={range}
+                onClick={() => handleAgeChange(range)}
+                className={`py-3 rounded-2xl font-bold text-xs transition-all ${
+                currentAge === range ?
+                "bg-primary text-primary-foreground shadow-md" :
+                "bg-muted text-muted-foreground hover:bg-primary/10"}`
+                }>
+                
                   <span className="text-lg block">{emoji}</span>
                   {label}
                   <span className="block text-[9px] mt-0.5 opacity-70">{description}</span>
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
@@ -221,14 +221,14 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           {/* Logout */}
           <button
             onClick={handleReset}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-destructive/10 text-destructive font-bold text-sm hover:bg-destructive/20 transition-all"
-          >
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-destructive/10 text-destructive font-bold text-sm hover:bg-destructive/20 transition-all">
+            
             {user ? "Sair da conta" : "Reiniciar modo teste"}
           </button>
         </div>
       </motion.div>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default ParentalSettings;
