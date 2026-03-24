@@ -32,7 +32,7 @@ const ChameleonMascot = ({ isTalking = false, size = "lg", className = "" }: Cha
       <motion.img
         src={chameleonMain}
         alt="Kidzz - camaleão mascote"
-        className="w-full h-full object-contain drop-shadow-2xl rounded-full"
+        className="w-full h-full object-contain drop-shadow-2xl"
         whileHover={{ scale: 1.1 }}
         transition={{ type: "spring", stiffness: 300 }}
       />

@@ -38,11 +38,19 @@ const Auth = () => {
 
       if (mode === "signup") {
         const { error } = await signUp(email, password);
-        if (error) toast.error(error);
-        else toast.success("Conta criada com sucesso! 🎉");
+        if (error) {
+          console.error("Signup error:", error);
+          toast.error(error);
+        } else {
+          toast.success("Conta criada! Entrando... 🎉");
+          // Auto-confirm is enabled, so onAuthStateChange will pick up the session
+        }
       } else {
         const { error } = await signIn(email, password);
-        if (error) toast.error("Email ou senha incorretos");
+        if (error) {
+          console.error("Login error:", error);
+          toast.error(error);
+        }
       }
     } catch {
       toast.error("Algo deu errado, tente novamente");
