@@ -40,7 +40,7 @@ const AGE_OPTIONS = [
 { range: "7-10", emoji: "🧑‍🎓", label: "7 a 10 anos" }];
 
 
-const ChatScreen = () => {
+const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void }) => {
   const { profile, user, session, updateProfile, incrementQuestions } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
