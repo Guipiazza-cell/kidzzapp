@@ -7,7 +7,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PRICE_ID = "price_1TDcj94llPC7khcdaWJ6OSDJ";
+const PRICES: Record<string, string> = {
+  premium: "price_1TDcj94llPC7khcdaWJ6OSDJ",
+  super_premium: "price_1TEWH34llPC7khcdvEvxOYHV",
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -29,6 +32,11 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
+    const body = await req.json().catch(() => ({}));
+    const plan = body.plan || "premium";
+    const priceId = PRICES[plan];
+    if (!priceId) throw new Error(`Invalid plan: ${plan}`);
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
@@ -42,7 +50,7 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: PRICE_ID, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       success_url: `${origin}/success`,
       cancel_url: `${origin}/`,

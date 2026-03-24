@@ -7,6 +7,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const PRODUCT_TIERS: Record<string, string> = {
+  "prod_UC0kQKWPgj4Cwu": "premium",
+  "prod_UCw9wWcpKskqkC": "super_premium",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -35,7 +40,7 @@ serve(async (req) => {
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
     if (customers.data.length === 0) {
-      return new Response(JSON.stringify({ subscribed: false }), {
+      return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -43,24 +48,45 @@ serve(async (req) => {
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
       status: "active",
-      limit: 1,
+      limit: 10,
     });
 
-    const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionEnd = null;
-
-    if (hasActiveSub) {
-      subscriptionEnd = new Date(subscriptions.data[0].current_period_end * 1000).toISOString();
-
-      // Sync premium status to profile
-      await supabaseClient
-        .from("profiles")
-        .update({ is_premium: true })
-        .eq("id", user.id);
+    if (subscriptions.data.length === 0) {
+      // Check trialing
+      const trialingSubs = await stripe.subscriptions.list({
+        customer: customers.data[0].id,
+        status: "trialing",
+        limit: 10,
+      });
+      if (trialingSubs.data.length === 0) {
+        return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      subscriptions.data.push(...trialingSubs.data);
     }
 
+    // Find highest tier
+    let bestTier = "premium";
+    let subscriptionEnd = null;
+
+    for (const sub of subscriptions.data) {
+      const productId = sub.items.data[0]?.price?.product as string;
+      const tier = PRODUCT_TIERS[productId] || "premium";
+      if (tier === "super_premium") bestTier = "super_premium";
+      const end = new Date(sub.current_period_end * 1000).toISOString();
+      if (!subscriptionEnd || end > subscriptionEnd) subscriptionEnd = end;
+    }
+
+    // Sync premium status
+    await supabaseClient
+      .from("profiles")
+      .update({ is_premium: true })
+      .eq("id", user.id);
+
     return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
+      subscribed: true,
+      tier: bestTier,
       subscription_end: subscriptionEnd,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

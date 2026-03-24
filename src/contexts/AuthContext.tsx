@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState, useCallback, type React
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
+export type SubscriptionTier = "free" | "premium" | "super_premium";
+
 interface Profile {
   child_name: string;
   age_range: string | null;
@@ -14,6 +16,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
+  tier: SubscriptionTier;
   loading: boolean;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
@@ -22,10 +25,12 @@ interface AuthContextType {
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   incrementQuestions: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
+  handleCheckout: (plan: "premium" | "super_premium") => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-subscription`;
+const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
 
 const createDefaultProfile = (): Profile => ({
@@ -46,7 +51,6 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
 
 const getGuestProfile = (): Profile => {
   if (typeof window === "undefined") return createDefaultProfile();
-
   try {
     const stored = window.localStorage.getItem(GUEST_PROFILE_STORAGE_KEY);
     return stored ? normalizeProfile(JSON.parse(stored)) : createDefaultProfile();
@@ -75,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [tier, setTier] = useState<SubscriptionTier>("free");
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
@@ -88,7 +93,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setProfile(data as Profile);
       return;
     }
-
     setProfile(getGuestProfile());
   }, []);
 
@@ -104,14 +108,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
       const data = await resp.json();
-      if (data.subscribed && !profile?.is_premium) {
-        await supabase.from("profiles").update({ is_premium: true }).eq("id", user.id);
-        setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
+      if (data.subscribed) {
+        const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
+        setTier(newTier);
+        if (!profile?.is_premium) {
+          await supabase.from("profiles").update({ is_premium: true }).eq("id", user.id);
+          setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
+        }
+      } else {
+        setTier("free");
       }
     } catch {
       // silent fail
     }
   }, [session, profile?.is_premium, user]);
+
+  const handleCheckout = useCallback(async (plan: "premium" | "super_premium") => {
+    if (!session?.access_token) {
+      // Guest - need to create account first
+      const { toast } = await import("sonner");
+      toast.error("Crie uma conta para assinar! Acesse o controle parental para fazer login.");
+      return;
+    }
+
+    try {
+      const resp = await fetch(CHECKOUT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ plan }),
+      });
+      const data = await resp.json();
+      if (data.url) window.open(data.url, "_blank");
+      else {
+        const { toast } = await import("sonner");
+        toast.error("Erro ao criar checkout");
+      }
+    } catch {
+      const { toast } = await import("sonner");
+      toast.error("Erro ao iniciar pagamento");
+    }
+  }, [session]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
@@ -122,6 +161,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await fetchProfile(nextSession.user.id);
       } else {
         setProfile(getGuestProfile());
+        setTier("free");
       }
 
       setLoading(false);
@@ -152,24 +192,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password });
+    if (error) console.error("Signup error:", error.message);
     return { error: error?.message ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) console.error("Login error:", error.message);
     return { error: error?.message ?? null };
   };
 
   const signOut = async () => {
     clearGuestProfile();
-
     if (user) {
       await supabase.auth.signOut();
     }
-
     setUser(null);
     setSession(null);
     setProfile(getGuestProfile());
+    setTier("free");
   };
 
   const resetPassword = async (email: string) => {
@@ -185,7 +226,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setProfile(prev => (prev ? { ...prev, ...updates } : prev));
       return;
     }
-
     setProfile(prev => {
       const next = normalizeProfile({ ...(prev ?? getGuestProfile()), ...updates });
       saveGuestProfile(next);
@@ -195,15 +235,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const incrementQuestions = async () => {
     if (!profile) return;
-
     const newCount = profile.questions_used + 1;
-
     if (user) {
       await supabase.from("profiles").update({ questions_used: newCount }).eq("id", user.id);
       setProfile(prev => (prev ? { ...prev, questions_used: newCount } : prev));
       return;
     }
-
     const next = normalizeProfile({ ...profile, questions_used: newCount });
     saveGuestProfile(next);
     setProfile(next);
@@ -211,17 +248,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{
-      user,
-      session,
-      profile,
-      loading,
-      signUp,
-      signIn,
-      signOut,
-      resetPassword,
-      updateProfile,
-      incrementQuestions,
-      refreshSubscription,
+      user, session, profile, tier, loading,
+      signUp, signIn, signOut, resetPassword,
+      updateProfile, incrementQuestions, refreshSubscription, handleCheckout,
     }}>
       {children}
     </AuthContext.Provider>
