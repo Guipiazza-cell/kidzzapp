@@ -87,6 +87,22 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
           <p className="text-white/90 text-xs mt-1 font-bold">7 dias grátis para testar! 🎉</p>
         </motion.div>
 
+        {/* Story Factory highlight */}
+        <motion.div
+          className="bg-gradient-to-r from-kid-yellow/20 to-kid-orange/20 border border-kid-yellow/30 rounded-2xl p-4 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4 }}
+        >
+          <div className="flex items-center gap-2 justify-center mb-2">
+            <BookOpen className="text-kid-yellow" size={18} />
+            <span className="text-sm font-extrabold text-white">Super Premium — R$ 24,90/mês</span>
+          </div>
+          <p className="text-xs text-white/70 font-bold">
+            🏭 Fábrica de Histórias com IA • Avatar personalizado • Ilustrações exclusivas
+          </p>
+        </motion.div>
+
         <motion.button
           onClick={onSubscribe}
           disabled={loading}
