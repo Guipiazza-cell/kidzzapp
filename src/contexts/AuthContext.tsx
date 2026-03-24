@@ -208,13 +208,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    console.log("SignOut: starting...");
     clearGuestProfile();
-    if (user) {
-      await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) console.error("SignOut error:", error.message);
+      else console.log("SignOut: success");
+    } catch (e) {
+      console.error("SignOut exception:", e);
     }
     setUser(null);
     setSession(null);
-    setProfile(getGuestProfile());
+    setProfile(createDefaultProfile());
     setTier("free");
   };
 
