@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Shield, RotateCcw } from "lucide-react";
+import { Send, Shield, RotateCcw, BookOpen } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 import ChatBubble from "./ChatBubble";
 import VoiceInput from "./VoiceInput";
@@ -40,7 +40,7 @@ const AGE_OPTIONS = [
 { range: "7-10", emoji: "🧑‍🎓", label: "7 a 10 anos" }];
 
 
-const ChatScreen = () => {
+const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void }) => {
   const { profile, user, session, updateProfile, incrementQuestions } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -237,6 +237,16 @@ const ChatScreen = () => {
           <span className="text-sm text-white font-extrabold bg-kid-orange/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
               {MAX_FREE_QUESTIONS - questionsUsed} 💬
             </span>
+          }
+          {isPremium && onOpenStoryFactory &&
+          <motion.button
+            onClick={onOpenStoryFactory}
+            className="p-2.5 rounded-2xl bg-gradient-to-r from-kid-yellow to-kid-orange text-white shadow-lg border border-white/20"
+            aria-label="Fábrica de Histórias"
+            whileTap={{ scale: 0.9 }}
+          >
+            <BookOpen size={22} />
+          </motion.button>
           }
           <motion.button
             onClick={() => setShowParentalGate(true)}

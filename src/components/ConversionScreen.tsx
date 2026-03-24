@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sparkles, MessageCircle, Volume2, Crown } from "lucide-react";
+import { Sparkles, MessageCircle, Volume2, Crown, BookOpen, Zap } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 
 interface ConversionScreenProps {
@@ -85,6 +85,22 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
             R$ 14,90<span className="text-base font-bold opacity-80">/mês</span>
           </p>
           <p className="text-white/90 text-xs mt-1 font-bold">7 dias grátis para testar! 🎉</p>
+        </motion.div>
+
+        {/* Story Factory highlight */}
+        <motion.div
+          className="bg-gradient-to-r from-kid-yellow/20 to-kid-orange/20 border border-kid-yellow/30 rounded-2xl p-4 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4 }}
+        >
+          <div className="flex items-center gap-2 justify-center mb-2">
+            <BookOpen className="text-kid-yellow" size={18} />
+            <span className="text-sm font-extrabold text-white">Super Premium — R$ 24,90/mês</span>
+          </div>
+          <p className="text-xs text-white/70 font-bold">
+            🏭 Fábrica de Histórias com IA • Avatar personalizado • Ilustrações exclusivas
+          </p>
         </motion.div>
 
         <motion.button

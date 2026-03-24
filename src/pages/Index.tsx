@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import ChatScreen from "@/components/ChatScreen";
+import StoryFactory from "@/components/story/StoryFactory";
 
 const Index = () => {
   const { profile, loading } = useAuth();
+  const [showStoryFactory, setShowStoryFactory] = useState(false);
 
   if (loading) {
     return (
@@ -27,8 +30,13 @@ const Index = () => {
     return <AgeSelection />;
   }
 
+  // Story Factory (Super Premium)
+  if (showStoryFactory) {
+    return <StoryFactory onBack={() => setShowStoryFactory(false)} />;
+  }
+
   // Step 3: Chat
-  return <ChatScreen />;
+  return <ChatScreen onOpenStoryFactory={() => setShowStoryFactory(true)} />;
 };
 
 export default Index;
