@@ -144,7 +144,7 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
       </motion.button>
 
       <p className="text-white/50 text-xs text-center">
-        7 dias grátis para testar! Cancele quando quiser.
+        Cancele quando quiser. Cobrança mensal.
       </p>
     </motion.div>
   );

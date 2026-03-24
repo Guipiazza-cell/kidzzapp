@@ -213,7 +213,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
           </span>
           {isPremium && (
             <span className="text-[10px] font-bold bg-kid-purple text-white px-2 py-0.5 rounded-full">
-              {isSuperPremium ? "⚡ Super" : "⭐ Premium"}
+              {isSuperPremium ? "⚡ KIDZZ Premium" : "⭐ Plano KIDZZ"}
             </span>
           )}
         </motion.div>

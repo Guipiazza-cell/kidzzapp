@@ -232,7 +232,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           {/* Current plan highlight */}
           <div className={`rounded-2xl p-4 text-center ${isPremium ? "kid-gradient-premium text-white" : "bg-muted"}`}>
             <p className="font-extrabold text-lg">
-              {tier === "super_premium" ? "⚡ Super Premium Ativo" : isPremium ? "⭐ Premium Ativo" : "Plano Gratuito"}
+              {tier === "super_premium" ? "⚡ KIDZZ Premium Ativo" : isPremium ? "⭐ Plano KIDZZ Ativo" : "Plano Gratuito"}
             </p>
             <p className="text-sm opacity-80">
               {isPremium
