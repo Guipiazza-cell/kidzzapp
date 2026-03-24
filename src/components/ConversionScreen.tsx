@@ -90,7 +90,7 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Zap className="text-kid-yellow" size={20} />
-              <span className="font-extrabold text-white text-lg">Super Premium</span>
+              <span className="font-extrabold text-white text-lg">KIDZZ Premium</span>
               <span className="text-[10px] font-extrabold bg-kid-orange text-white px-2 py-0.5 rounded-full">COMPLETO</span>
             </div>
             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
