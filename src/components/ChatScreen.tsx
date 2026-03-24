@@ -238,13 +238,14 @@ const ChatScreen = () => {
               {MAX_FREE_QUESTIONS - questionsUsed} 💬
             </span>
           }
-          <button
+          <motion.button
             onClick={() => setShowParentalGate(true)}
-            className="p-2 rounded-2xl bg-black/30 backdrop-blur-sm text-white/80 hover:text-white transition-all shadow-sm"
-            aria-label="Controle parental">
-            
-            <Shield size={18} />
-          </button>
+            className="p-3 rounded-2xl bg-black/40 backdrop-blur-md text-white hover:bg-black/50 transition-all shadow-lg border border-white/20"
+            aria-label="Controle parental"
+            whileTap={{ scale: 0.9 }}
+          >
+            <Shield size={28} />
+          </motion.button>
         </div>
       </header>
 
