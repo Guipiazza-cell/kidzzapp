@@ -64,13 +64,18 @@ const ChatScreen = () => {
   }, [messages]);
 
   const handleCheckout = useCallback(async () => {
+    if (!session?.access_token) {
+      toast.error("O pagamento volta a funcionar quando o login for reativado. Por enquanto, aprove o app para revisar tudo 😊");
+      return;
+    }
+
     setCheckoutLoading(true);
     try {
       const resp = await fetch(CHECKOUT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({}),
       });

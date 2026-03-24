@@ -13,12 +13,17 @@ const AGE_RANGES = [
 ];
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
-  const { profile, updateProfile, signOut } = useAuth();
+  const { user, profile, updateProfile, signOut } = useAuth();
   const currentAge = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
 
   const handleAgeChange = async (range: string) => {
     await updateProfile({ age_range: range });
+  };
+
+  const handleReset = async () => {
+    await signOut();
+    onClose();
   };
 
   return (
@@ -41,7 +46,6 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
         <p className="text-muted-foreground text-xs text-center mb-4">Gerencie a experiência</p>
 
         <div className="space-y-4">
-          {/* Plan status */}
           <div className={`rounded-2xl p-4 text-center ${isPremium ? "kid-gradient-premium text-white" : "bg-muted"}`}>
             <p className="font-extrabold text-lg">{isPremium ? "⭐ Premium Ativo" : "Plano Gratuito"}</p>
             <p className="text-sm opacity-80">
@@ -51,7 +55,6 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             </p>
           </div>
 
-          {/* Age Range */}
           <div>
             <label className="font-bold text-foreground text-sm block mb-2">
               <ShieldCheck size={14} className="inline mr-1" />
@@ -75,7 +78,6 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             </div>
           </div>
 
-          {/* Safety info */}
           <div className="bg-kid-green/10 border border-kid-green/30 rounded-2xl p-3">
             <p className="font-extrabold text-sm text-foreground">🔒 Segurança de conteúdo</p>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
@@ -83,19 +85,17 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             </p>
           </div>
 
-          {/* Child info */}
           <div className="bg-muted/50 rounded-2xl p-3">
             <p className="font-bold text-sm text-foreground">👧 Nome da criança</p>
             <p className="text-sm text-muted-foreground">{profile?.child_name || "Não definido"}</p>
           </div>
 
-          {/* Sign out */}
           <button
-            onClick={signOut}
+            onClick={handleReset}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-destructive/10 text-destructive font-bold text-sm hover:bg-destructive/20 transition-all"
           >
             <LogOut size={16} />
-            Sair da conta
+            {user ? "Sair da conta" : "Reiniciar modo teste"}
           </button>
         </div>
       </motion.div>

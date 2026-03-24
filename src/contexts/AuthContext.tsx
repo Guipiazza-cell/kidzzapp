@@ -25,14 +25,51 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-subscription`;
+const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
+
+const createDefaultProfile = (): Profile => ({
+  child_name: "",
+  age_range: null,
+  questions_used: 0,
+  is_premium: false,
+  voice_enabled: false,
+});
+
+const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
+  child_name: value?.child_name ?? "",
+  age_range: value?.age_range ?? null,
+  questions_used: value?.questions_used ?? 0,
+  is_premium: value?.is_premium ?? false,
+  voice_enabled: value?.voice_enabled ?? false,
+});
+
+const getGuestProfile = (): Profile => {
+  if (typeof window === "undefined") return createDefaultProfile();
+
+  try {
+    const stored = window.localStorage.getItem(GUEST_PROFILE_STORAGE_KEY);
+    return stored ? normalizeProfile(JSON.parse(stored)) : createDefaultProfile();
+  } catch {
+    return createDefaultProfile();
+  }
+};
+
+const saveGuestProfile = (profile: Profile) => {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+};
+
+const clearGuestProfile = () => {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(GUEST_PROFILE_STORAGE_KEY);
+};
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 };
-
-const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-subscription`;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -46,11 +83,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .select("child_name, age_range, questions_used, is_premium, voice_enabled")
       .eq("id", userId)
       .single();
-    if (data) setProfile(data as Profile);
+
+    if (data) {
+      setProfile(data as Profile);
+      return;
+    }
+
+    setProfile(getGuestProfile());
   }, []);
 
   const refreshSubscription = useCallback(async () => {
-    if (!session?.access_token) return;
+    if (!session?.access_token || !user) return;
+
     try {
       const resp = await fetch(CHECK_SUB_URL, {
         method: "POST",
@@ -61,8 +105,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       const data = await resp.json();
       if (data.subscribed && !profile?.is_premium) {
-        await supabase.from("profiles").update({ is_premium: true }).eq("id", user!.id);
-        setProfile(prev => prev ? { ...prev, is_premium: true } : prev);
+        await supabase.from("profiles").update({ is_premium: true }).eq("id", user.id);
+        setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
       }
     } catch {
       // silent fail
@@ -70,28 +114,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [session, profile?.is_premium, user]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchProfile(session.user.id);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+
+      if (nextSession?.user) {
+        await fetchProfile(nextSession.user.id);
       } else {
-        setProfile(null);
+        setProfile(getGuestProfile());
       }
+
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+
+      if (currentSession?.user) {
+        fetchProfile(currentSession.user.id);
+      } else {
+        setProfile(getGuestProfile());
+      }
+
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
-  // Check subscription periodically
   useEffect(() => {
     if (!session) return;
     refreshSubscription();
@@ -110,8 +161,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
+    clearGuestProfile();
+
+    if (user) {
+      await supabase.auth.signOut();
+    }
+
+    setUser(null);
+    setSession(null);
+    setProfile(getGuestProfile());
   };
 
   const resetPassword = async (email: string) => {
@@ -122,23 +180,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
-    if (!user) return;
-    await supabase.from("profiles").update(updates).eq("id", user.id);
-    setProfile(prev => prev ? { ...prev, ...updates } : prev);
+    if (user) {
+      await supabase.from("profiles").update(updates).eq("id", user.id);
+      setProfile(prev => (prev ? { ...prev, ...updates } : prev));
+      return;
+    }
+
+    setProfile(prev => {
+      const next = normalizeProfile({ ...(prev ?? getGuestProfile()), ...updates });
+      saveGuestProfile(next);
+      return next;
+    });
   };
 
   const incrementQuestions = async () => {
-    if (!user || !profile) return;
+    if (!profile) return;
+
     const newCount = profile.questions_used + 1;
-    await supabase.from("profiles").update({ questions_used: newCount }).eq("id", user.id);
-    setProfile(prev => prev ? { ...prev, questions_used: newCount } : prev);
+
+    if (user) {
+      await supabase.from("profiles").update({ questions_used: newCount }).eq("id", user.id);
+      setProfile(prev => (prev ? { ...prev, questions_used: newCount } : prev));
+      return;
+    }
+
+    const next = normalizeProfile({ ...profile, questions_used: newCount });
+    saveGuestProfile(next);
+    setProfile(next);
   };
 
   return (
     <AuthContext.Provider value={{
-      user, session, profile, loading,
-      signUp, signIn, signOut, resetPassword,
-      updateProfile, incrementQuestions, refreshSubscription,
+      user,
+      session,
+      profile,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      resetPassword,
+      updateProfile,
+      incrementQuestions,
+      refreshSubscription,
     }}>
       {children}
     </AuthContext.Provider>
