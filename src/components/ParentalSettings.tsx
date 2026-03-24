@@ -53,7 +53,7 @@ const PLANS = [
   },
   {
     id: "super_premium",
-    name: "Super Premium",
+    name: "KIDZZ Premium",
     price: "R$ 24,90",
     period: "/mês",
     icon: Zap,
