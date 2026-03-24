@@ -49,7 +49,7 @@ const AgeSelection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}>
           
-          Olá, {childName}! 🦎✨
+          Olá, {childName}!
         </motion.h1>
 
         <motion.p
