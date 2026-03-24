@@ -64,9 +64,11 @@ const PLANS = [
     badge: "COMPLETO",
     features: [
       "Tudo do Premium +",
+      "🏭 Fábrica de Histórias com IA",
+      "Avatar personalizado do seu filho",
+      "Ilustrações exclusivas geradas por IA",
       "Todos os personagens exclusivos",
       "Narração por voz Premium",
-      "Conteúdo educativo exclusivo",
       "Suporte prioritário",
       "Novidades em primeira mão"],
 

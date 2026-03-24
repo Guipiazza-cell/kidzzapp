@@ -238,6 +238,16 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
               {MAX_FREE_QUESTIONS - questionsUsed} 💬
             </span>
           }
+          {isPremium && onOpenStoryFactory &&
+          <motion.button
+            onClick={onOpenStoryFactory}
+            className="p-2.5 rounded-2xl bg-gradient-to-r from-kid-yellow to-kid-orange text-white shadow-lg border border-white/20"
+            aria-label="Fábrica de Histórias"
+            whileTap={{ scale: 0.9 }}
+          >
+            <BookOpen size={22} />
+          </motion.button>
+          }
           <motion.button
             onClick={() => setShowParentalGate(true)}
             className="p-3 rounded-2xl bg-black/40 backdrop-blur-md text-white hover:bg-black/50 transition-all shadow-lg border border-white/20"
