@@ -13,65 +13,65 @@ const AGE_RANGES = [
 
 
 const PLANS = [
-{
-  id: "free",
-  name: "Gratuito",
-  price: "R$ 0",
-  period: "",
-  icon: MessageCircle,
-  color: "bg-muted",
-  textColor: "text-foreground",
-  borderColor: "border-border",
-  features: [
-  "3 perguntas no total",
-  "1 personagem (camaleão verde)",
-  "Respostas em texto",
-  "Filtro de conteúdo ativo"],
+  {
+    id: "free",
+    name: "Gratuito",
+    price: "R$ 0",
+    period: "",
+    icon: MessageCircle,
+    color: "bg-muted",
+    textColor: "text-foreground",
+    borderColor: "border-border",
+    features: [
+      "3 perguntas no total",
+      "1 personagem ",
+      "Respostas em texto",
+      "Filtro de conteúdo ativo"],
 
-  limitations: [
-  "Sem narração por voz",
-  "Sem personagens extras"]
+    limitations: [
+      "Sem narração por voz",
+      "Sem personagens extras"]
 
-},
-{
-  id: "premium",
-  name: "Premium",
-  price: "R$ 14,90",
-  period: "/mês",
-  icon: Crown,
-  color: "kid-gradient-premium",
-  textColor: "text-white",
-  borderColor: "border-kid-purple/40",
-  badge: "POPULAR",
-  features: [
-  "Perguntas ilimitadas",
-  "Narração por voz amigável 🔊",
-  "3 personagens desbloqueados",
-  "Respostas adaptadas por idade",
-  "Filtro de conteúdo avançado"],
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: "R$ 14,90",
+    period: "/mês",
+    icon: Crown,
+    color: "kid-gradient-premium",
+    textColor: "text-white",
+    borderColor: "border-kid-purple/40",
+    badge: "POPULAR",
+    features: [
+      "Perguntas ilimitadas",
+      "Narração por voz amigável ",
+      "3 personagens desbloqueados",
+      "Respostas adaptadas por idade",
+      "Filtro de conteúdo avançado"],
 
-  limitations: []
-},
-{
-  id: "super_premium",
-  name: "Super Premium",
-  price: "R$ 24,90",
-  period: "/mês",
-  icon: Zap,
-  color: "bg-gradient-to-br from-kid-yellow via-kid-orange to-kid-red",
-  textColor: "text-white",
-  borderColor: "border-kid-yellow/40",
-  badge: "COMPLETO",
-  features: [
-  "Tudo do Premium +",
-  "Todos os personagens exclusivos",
-  "Voz premium personalizada",
-  "Conteúdo educativo exclusivo",
-  "Suporte prioritário",
-  "Novidades em primeira mão 🚀"],
+    limitations: []
+  },
+  {
+    id: "super_premium",
+    name: "Super Premium",
+    price: "R$ 24,90",
+    period: "/mês",
+    icon: Zap,
+    color: "bg-gradient-to-br from-kid-yellow via-kid-orange to-kid-red",
+    textColor: "text-white",
+    borderColor: "border-kid-yellow/40",
+    badge: "COMPLETO",
+    features: [
+      "Tudo do Premium +",
+      "Todos os personagens exclusivos",
+      "Narração por voz Premium",
+      "Conteúdo educativo exclusivo",
+      "Suporte prioritário",
+      "Novidades em primeira mão"],
 
-  limitations: []
-}];
+    limitations: []
+  }];
 
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
