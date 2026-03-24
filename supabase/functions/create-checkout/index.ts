@@ -54,9 +54,6 @@ serve(async (req) => {
       mode: "subscription",
       success_url: `${origin}/success`,
       cancel_url: `${origin}/`,
-      subscription_data: {
-        trial_period_days: 7,
-      },
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
