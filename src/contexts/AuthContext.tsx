@@ -116,7 +116,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
         }
       } else {
-        setTier("free");
+        // Respect manual premium grants from profile
+        if (profile?.is_premium) {
+          setTier("super_premium");
+        } else {
+          setTier("free");
+        }
       }
     } catch {
       // silent fail
