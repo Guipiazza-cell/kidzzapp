@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Shield, RotateCcw } from "lucide-react";
+import { Send, Shield, RotateCcw, BookOpen } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 import ChatBubble from "./ChatBubble";
 import VoiceInput from "./VoiceInput";
