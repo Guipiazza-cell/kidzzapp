@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sparkles, MessageCircle, Volume2, Crown } from "lucide-react";
+import { Sparkles, MessageCircle, Volume2, Crown, BookOpen, Zap } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 
 interface ConversionScreenProps {
