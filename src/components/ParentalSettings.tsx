@@ -305,7 +305,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                       "kid-gradient-premium"}`
                       }>
                       
-                        {checkoutLoading === plan.id ? "Abrindo..." : `Assinar ${plan.name} 🚀`}
+                        {checkoutLoading === plan.id ? "Abrindo..." : `Assinar ${plan.name} `}
                       </button>
                     }
                   </div>);
