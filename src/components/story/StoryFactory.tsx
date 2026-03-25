@@ -136,10 +136,11 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
             <div className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 w-full max-w-xs space-y-2">
               {[
-            { emoji: "🎨", text: "Crie o avatar do seu filho" },
-            { emoji: "📝", text: "Escolha temas e interesses" },
-            { emoji: "✨", text: "IA gera história + ilustrações" },
-            { emoji: "🔊", text: "Narração por voz inclusa" }].
+                { emoji: "🎨", text: "Crie o avatar do seu filho" },
+                { emoji: "📝", text: "Escolha temas e interesses" },
+                { emoji: "✨", text: " Vamos criar a história + ilustrações" },
+                { emoji: "🔊", text: "Narração por voz inclusa" }
+              ].
             map((item, i) =>
             <motion.div
               key={i}
