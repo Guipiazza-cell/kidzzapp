@@ -178,12 +178,6 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
     sendMessage(text);
   }, [sendMessage]);
 
-  const handleReplay = useCallback(() => {
-    if (lastAssistantTextRef.current) {
-      speakText(lastAssistantTextRef.current);
-    }
-  }, [speakText]);
-
   const followUps = FOLLOW_UPS[ageRange] || FOLLOW_UPS["3-7"];
   const randomFollowUp = followUps[Math.floor(Math.random() * followUps.length)];
 
