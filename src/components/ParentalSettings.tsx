@@ -357,6 +357,58 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             <p className="text-sm text-muted-foreground">{profile?.child_name || "Não definido"}</p>
           </div>
 
+          {/* Affiliate program */}
+          {user &&
+          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Link2 size={16} className="text-primary" />
+              <p className="font-extrabold text-sm text-foreground">Programa de Afiliados</p>
+            </div>
+            <p className="text-xs text-muted-foreground">Ganhe 10% de comissão por cada assinatura feita pelo seu link!</p>
+            
+            {affiliateCode ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    readOnly
+                    value={`${window.location.origin}/?ref=${affiliateCode}`}
+                    className="flex-1 py-2 px-3 rounded-xl bg-background border border-border text-foreground text-xs"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/?ref=${affiliateCode}`);
+                      setCopied(true);
+                      toast.success("Link copiado!");
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="p-2 rounded-xl bg-primary text-primary-foreground">
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  value={affInput}
+                  onChange={(e) => setAffInput(e.target.value)}
+                  placeholder="Escolha seu código (ex: joao)"
+                  className="flex-1 py-2 px-3 rounded-xl bg-background border border-border text-foreground text-xs"
+                />
+                <button
+                  onClick={async () => {
+                    const { error } = await generateCode(affInput);
+                    if (error) toast.error(error);
+                    else toast.success("Link de afiliado criado! 🎉");
+                  }}
+                  disabled={affLoading || affInput.length < 3}
+                  className="py-2 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold disabled:opacity-50">
+                  Criar
+                </button>
+              </div>
+            )}
+          </div>
+          }
+
           {/* Logout - only show when logged in */}
           {user &&
           <button
