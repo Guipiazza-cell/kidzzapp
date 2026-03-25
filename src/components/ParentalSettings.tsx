@@ -78,6 +78,7 @@ const PLANS = [
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const { user, profile, tier, updateProfile, signOut, signIn, signUp, handleCheckout } = useAuth();
+  const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
   const currentAge = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
 
@@ -88,6 +89,8 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [affInput, setAffInput] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const currentPlan = tier === "super_premium" ? "super_premium" : isPremium ? "premium" : "free";
 
