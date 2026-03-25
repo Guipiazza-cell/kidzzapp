@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { X, ShieldCheck, Crown, Sparkles, MessageCircle, Volume2, Lock, Star, Zap, LogIn } from "lucide-react";
+import { X, ShieldCheck, Crown, Sparkles, MessageCircle, Volume2, Lock, Star, Zap, LogIn, Link2, Copy, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAffiliate } from "@/hooks/useAffiliate";
 import { toast } from "sonner";
 
 interface ParentalSettingsProps {
@@ -77,6 +78,7 @@ const PLANS = [
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const { user, profile, tier, updateProfile, signOut, signIn, signUp, handleCheckout } = useAuth();
+  const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
   const currentAge = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
 
@@ -87,6 +89,8 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [affInput, setAffInput] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const currentPlan = tier === "super_premium" ? "super_premium" : isPremium ? "premium" : "free";
 
@@ -352,6 +356,58 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             <p className="font-bold text-sm text-foreground">👧 Nome da criança</p>
             <p className="text-sm text-muted-foreground">{profile?.child_name || "Não definido"}</p>
           </div>
+
+          {/* Affiliate program */}
+          {user &&
+          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Link2 size={16} className="text-primary" />
+              <p className="font-extrabold text-sm text-foreground">Programa de Afiliados</p>
+            </div>
+            <p className="text-xs text-muted-foreground">Ganhe 10% de comissão por cada assinatura feita pelo seu link!</p>
+            
+            {affiliateCode ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    readOnly
+                    value={`${window.location.origin}/?ref=${affiliateCode}`}
+                    className="flex-1 py-2 px-3 rounded-xl bg-background border border-border text-foreground text-xs"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/?ref=${affiliateCode}`);
+                      setCopied(true);
+                      toast.success("Link copiado!");
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="p-2 rounded-xl bg-primary text-primary-foreground">
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  value={affInput}
+                  onChange={(e) => setAffInput(e.target.value)}
+                  placeholder="Escolha seu código (ex: joao)"
+                  className="flex-1 py-2 px-3 rounded-xl bg-background border border-border text-foreground text-xs"
+                />
+                <button
+                  onClick={async () => {
+                    const { error } = await generateCode(affInput);
+                    if (error) toast.error(error);
+                    else toast.success("Link de afiliado criado! 🎉");
+                  }}
+                  disabled={affLoading || affInput.length < 3}
+                  className="py-2 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold disabled:opacity-50">
+                  Criar
+                </button>
+              </div>
+            )}
+          </div>
+          }
 
           {/* Logout - only show when logged in */}
           {user &&
