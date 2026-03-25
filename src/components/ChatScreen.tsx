@@ -315,15 +315,6 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
                   🔊 Kidzz está falando...
                 </motion.span>
               )}
-              {isPremium && !isTyping && !isSpeaking && lastAssistantTextRef.current && (
-                <button
-                  onClick={handleReplay}
-                  className="ml-auto flex items-center gap-1 text-xs text-white/60 hover:text-white bg-white/10 px-2 py-1 rounded-full"
-                >
-                  <RotateCcw size={12} />
-                  Ouvir
-                </button>
-              )}
             </div>
             <div ref={chatRef} className="flex-1 overflow-y-auto px-4 pb-2">
               <AnimatePresence>
