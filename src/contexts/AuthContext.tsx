@@ -137,13 +137,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
+      const ref = sessionStorage.getItem("kidzz_ref") || undefined;
       const resp = await fetch(CHECKOUT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, ref }),
       });
       const data = await resp.json();
       if (data.url) window.open(data.url, "_blank");
