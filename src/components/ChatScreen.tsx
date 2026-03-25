@@ -160,9 +160,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
 
     try {
       await streamChat(allMessages);
-      if (lastAssistantTextRef.current && isPremium) {
-        speakText(lastAssistantTextRef.current);
-      }
+      // TTS is now triggered by the "OUVIR" button, not auto-play
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
       setMessages((prev) => [...prev, {
