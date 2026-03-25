@@ -328,7 +328,12 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
             <div ref={chatRef} className="flex-1 overflow-y-auto px-4 pb-2">
               <AnimatePresence>
                 {messages.map((msg) => (
-                  <ChatBubble key={msg.id} message={msg.text} isUser={msg.isUser} />
+                  <ChatBubble
+                    key={msg.id}
+                    message={msg.text}
+                    isUser={msg.isUser}
+                    onSpeak={!msg.isUser && isPremium ? speakText : undefined}
+                  />
                 ))}
               </AnimatePresence>
 
