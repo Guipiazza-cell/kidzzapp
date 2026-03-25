@@ -353,13 +353,15 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             <p className="text-sm text-muted-foreground">{profile?.child_name || "Não definido"}</p>
           </div>
 
-          {/* Logout */}
-          <button
-            onClick={handleReset}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-destructive/10 text-destructive font-bold text-sm hover:bg-destructive/20 transition-all"
-          >
-            {user ? "Sair da conta" : "Reiniciar modo teste"}
-          </button>
+          {/* Logout - only show when logged in */}
+          {user && (
+            <button
+              onClick={handleReset}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-destructive/10 text-destructive font-bold text-sm hover:bg-destructive/20 transition-all"
+            >
+              Sair da conta
+            </button>
+          )}
         </div>
       </motion.div>
     </motion.div>
