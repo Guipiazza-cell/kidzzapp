@@ -16,7 +16,7 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 
 type Step = "intro" | "avatar" | "form" | "display";
 
-const StoryFactory = ({ onBack }: { onBack: () => void }) => {
+const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const { profile } = useAuth();
   const { speak } = useTTS();
   const childName = profile?.child_name || "Explorador";
@@ -39,7 +39,7 @@ const StoryFactory = ({ onBack }: { onBack: () => void }) => {
     setProgress(5);
 
     const timer = setInterval(() => {
-      setProgress((p) => (p < 85 ? p + 2 : p));
+      setProgress((p) => p < 85 ? p + 2 : p);
     }, 800);
 
     try {
@@ -47,15 +47,15 @@ const StoryFactory = ({ onBack }: { onBack: () => void }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
         },
         body: JSON.stringify({
           childName,
           childAvatar: avatar,
           age,
           interests,
-          ageRange: profile?.age_range || "3-7",
-        }),
+          ageRange: profile?.age_range || "3-7"
+        })
       });
 
       if (!resp.ok) {
@@ -104,8 +104,8 @@ const StoryFactory = ({ onBack }: { onBack: () => void }) => {
         <motion.button
           onClick={onBack}
           className="p-2 rounded-xl bg-black/40 backdrop-blur-md text-white border border-white/20"
-          whileTap={{ scale: 0.9 }}
-        >
+          whileTap={{ scale: 0.9 }}>
+          
           <ArrowLeft size={20} />
         </motion.button>
         <div className="flex items-center gap-2">
@@ -119,16 +119,16 @@ const StoryFactory = ({ onBack }: { onBack: () => void }) => {
 
       {/* Content */}
       <div className="flex-1 relative z-10 overflow-y-auto px-4 pb-6">
-        {step === "intro" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4"
-          >
+        {step === "intro" &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+          
             <ChameleonMascot size="lg" />
-            <h2 className="text-2xl font-extrabold text-white drop-shadow-lg">
-              Fábrica de Histórias Mágicas 📖✨
-            </h2>
+            <h2 className="text-2xl font-extrabold text-white drop-shadow-lg">Fábrica de Histórias 
+
+          </h2>
             <p className="text-white/70 text-sm max-w-[280px]">
               Crie histórias personalizadas com ilustrações exclusivas!
               Seu filho será o protagonista da aventura.
@@ -136,63 +136,63 @@ const StoryFactory = ({ onBack }: { onBack: () => void }) => {
 
             <div className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 w-full max-w-xs space-y-2">
               {[
-                { emoji: "🎨", text: "Crie o avatar do seu filho" },
-                { emoji: "📝", text: "Escolha temas e interesses" },
-                { emoji: "✨", text: "IA gera história + ilustrações" },
-                { emoji: "🔊", text: "Narração por voz inclusa" },
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
-                  className="flex items-center gap-3 p-2"
-                >
+            { emoji: "🎨", text: "Crie o avatar do seu filho" },
+            { emoji: "📝", text: "Escolha temas e interesses" },
+            { emoji: "✨", text: "IA gera história + ilustrações" },
+            { emoji: "🔊", text: "Narração por voz inclusa" }].
+            map((item, i) =>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 + i * 0.1 }}
+              className="flex items-center gap-3 p-2">
+              
                   <span className="text-xl">{item.emoji}</span>
                   <span className="text-sm text-white/80 font-bold">{item.text}</span>
                 </motion.div>
-              ))}
+            )}
             </div>
 
             <motion.button
-              onClick={() => setStep("avatar")}
-              className="w-full max-w-xs py-5 rounded-2xl bg-gradient-to-r from-kid-yellow via-kid-orange to-kid-red text-white font-extrabold text-lg shadow-2xl flex items-center justify-center gap-2 active:scale-95"
-              whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-            >
+            onClick={() => setStep("avatar")}
+            className="w-full max-w-xs py-5 rounded-2xl bg-gradient-to-r from-kid-yellow via-kid-orange to-kid-red text-white font-extrabold text-lg shadow-2xl flex items-center justify-center gap-2 active:scale-95"
+            whileTap={{ scale: 0.97 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}>
+            
               <Zap size={22} />
               Começar! 🚀
             </motion.button>
           </motion.div>
-        )}
+        }
 
-        {step === "avatar" && (
-          <AvatarCustomization childName={childName} onComplete={handleAvatarComplete} />
-        )}
+        {step === "avatar" &&
+        <AvatarCustomization childName={childName} onComplete={handleAvatarComplete} />
+        }
 
-        {step === "form" && (
-          <StoryForm
-            childName={childName}
-            onGenerate={handleGenerate}
-            isLoading={isGenerating}
-          />
-        )}
+        {step === "form" &&
+        <StoryForm
+          childName={childName}
+          onGenerate={handleGenerate}
+          isLoading={isGenerating} />
 
-        {step === "display" && (
-          <StoryDisplay
-            story={story}
-            images={images}
-            onReset={handleReset}
-            onSpeak={handleSpeak}
-          />
-        )}
+        }
+
+        {step === "display" &&
+        <StoryDisplay
+          story={story}
+          images={images}
+          onReset={handleReset}
+          onSpeak={handleSpeak} />
+
+        }
       </div>
 
       <GeneratingOverlay open={isGenerating} progress={progress} />
-    </div>
-  );
+    </div>);
+
 };
 
 export default StoryFactory;
