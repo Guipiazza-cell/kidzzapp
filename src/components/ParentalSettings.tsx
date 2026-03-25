@@ -61,15 +61,15 @@ const PLANS = [
   textColor: "text-white",
   borderColor: "border-kid-yellow/40",
   badge: "COMPLETO",
-  features: [
-  "Tudo do Premium +",
-  "🏭 Fábrica de Histórias com IA",
-  "Avatar personalizado do seu filho",
-  "Ilustrações exclusivas geradas por IA",
-  "Todos os personagens exclusivos",
-  "Narração por voz Premium",
-  "Suporte prioritário",
-  "Novidades em primeira mão"],
+    features: [
+      "Tudo do Premium +",
+      "🏭 Fábrica de Histórias ",
+      "Avatar personalizado do seu filho",
+      "Ilustrações exclusivas",
+      "Todos os personagens exclusivos",
+      "Narração por voz Premium",
+      "Suporte prioritário",
+      "Novidades em primeira mão"],
 
   limitations: []
 }];
@@ -305,7 +305,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                       "kid-gradient-premium"}`
                       }>
                       
-                        {checkoutLoading === plan.id ? "Abrindo..." : `Assinar ${plan.name} 🚀`}
+                        {checkoutLoading === plan.id ? "Abrindo..." : `Assinar ${plan.name} `}
                       </button>
                     }
                   </div>);
