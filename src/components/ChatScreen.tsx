@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Shield, RotateCcw, BookOpen } from "lucide-react";
+import { Send, Shield, BookOpen } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 import ChatBubble from "./ChatBubble";
 import VoiceInput from "./VoiceInput";
@@ -160,9 +160,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
 
     try {
       await streamChat(allMessages);
-      if (lastAssistantTextRef.current && isPremium) {
-        speakText(lastAssistantTextRef.current);
-      }
+      // TTS is now triggered by the "OUVIR" button, not auto-play
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
       setMessages((prev) => [...prev, {
@@ -179,12 +177,6 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
     setInput(text);
     sendMessage(text);
   }, [sendMessage]);
-
-  const handleReplay = useCallback(() => {
-    if (lastAssistantTextRef.current) {
-      speakText(lastAssistantTextRef.current);
-    }
-  }, [speakText]);
 
   const followUps = FOLLOW_UPS[ageRange] || FOLLOW_UPS["3-7"];
   const randomFollowUp = followUps[Math.floor(Math.random() * followUps.length)];
@@ -317,20 +309,16 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
                   🔊 Kidzz está falando...
                 </motion.span>
               )}
-              {isPremium && !isTyping && !isSpeaking && lastAssistantTextRef.current && (
-                <button
-                  onClick={handleReplay}
-                  className="ml-auto flex items-center gap-1 text-xs text-white/60 hover:text-white bg-white/10 px-2 py-1 rounded-full"
-                >
-                  <RotateCcw size={12} />
-                  Ouvir
-                </button>
-              )}
             </div>
             <div ref={chatRef} className="flex-1 overflow-y-auto px-4 pb-2">
               <AnimatePresence>
                 {messages.map((msg) => (
-                  <ChatBubble key={msg.id} message={msg.text} isUser={msg.isUser} />
+                  <ChatBubble
+                    key={msg.id}
+                    message={msg.text}
+                    isUser={msg.isUser}
+                    onSpeak={!msg.isUser && isPremium ? speakText : undefined}
+                  />
                 ))}
               </AnimatePresence>
 

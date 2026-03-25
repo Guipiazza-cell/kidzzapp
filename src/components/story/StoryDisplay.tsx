@@ -1,16 +1,28 @@
 import { motion } from "framer-motion";
 import { RotateCcw, Volume2 } from "lucide-react";
+import { useState } from "react";
 import ChameleonMascot from "../ChameleonMascot";
 
 interface StoryDisplayProps {
   story: string;
   images: string[];
   onReset: () => void;
-  onSpeak?: (text: string) => void;
+  onSpeak?: (text: string) => Promise<void>;
 }
 
 const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) => {
   const scenes = story.split(/\[CENA \d+\]/).filter((s) => s.trim());
+  const [playingScene, setPlayingScene] = useState<number | null>(null);
+
+  const handleSpeak = async (scene: string, index: number) => {
+    if (!onSpeak || playingScene !== null) return;
+    setPlayingScene(index);
+    try {
+      await onSpeak(scene);
+    } finally {
+      setPlayingScene(null);
+    }
+  };
 
   return (
     <motion.div
@@ -53,13 +65,19 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
                 </p>
               ))}
             {onSpeak && (
-              <button
-                onClick={() => onSpeak(scene)}
-                className="mt-2 flex items-center gap-1 text-xs text-kid-yellow/80 hover:text-kid-yellow"
+              <motion.button
+                onClick={() => handleSpeak(scene, i)}
+                disabled={playingScene !== null}
+                className={`mt-3 w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-sm shadow-lg transition-all active:scale-95 ${
+                  playingScene === i
+                    ? "bg-kid-yellow/80 text-foreground"
+                    : "bg-gradient-to-r from-kid-purple to-kid-purple/80 text-white hover:from-kid-purple/90 hover:to-kid-purple/70"
+                }`}
+                whileTap={{ scale: 0.95 }}
               >
-                <Volume2 size={14} />
-                Ouvir cena
-              </button>
+                <Volume2 size={20} />
+                {playingScene === i ? "Reproduzindo..." : `🔊 Ouvir Cena ${i + 1}`}
+              </motion.button>
             )}
           </motion.div>
         ))}
