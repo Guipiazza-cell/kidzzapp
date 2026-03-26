@@ -48,9 +48,9 @@ const Success = () => {
           <h2 className="text-2xl font-extrabold text-white drop-shadow-lg">
             Agora o Kidzz é seu amigo completo!
           </h2>
-          <p className="text-white/80 text-base max-w-xs mx-auto">
-            Perguntas ilimitadas, voz do Kidzz e todos os personagens desbloqueados!
-          </p>
+           <p className="text-white/80 text-base max-w-xs mx-auto">
+             10 perguntas por dia, voz do Kidzz e personagens desbloqueados!
+           </p>
         </motion.div>
 
         <motion.div
