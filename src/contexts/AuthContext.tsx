@@ -26,11 +26,13 @@ interface AuthContextType {
   incrementQuestions: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
   handleCheckout: (plan: "premium" | "super_premium") => Promise<void>;
+  openCustomerPortal: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-subscription`;
 const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`;
+const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-portal`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
 
 const createDefaultProfile = (): Profile => ({
@@ -158,6 +160,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [session]);
 
+  const openCustomerPortal = useCallback(async () => {
+    if (!session?.access_token) {
+      const { toast } = await import("sonner");
+      toast.error("Faça login para gerenciar sua assinatura");
+      return;
+    }
+    try {
+      const resp = await fetch(PORTAL_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      const data = await resp.json();
+      if (data.url) window.open(data.url, "_blank");
+      else {
+        const { toast } = await import("sonner");
+        toast.error(data.error || "Erro ao abrir portal");
+      }
+    } catch {
+      const { toast } = await import("sonner");
+      toast.error("Erro ao abrir gerenciamento de assinatura");
+    }
+  }, [session]);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
       setSession(nextSession);
@@ -261,7 +289,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider value={{
       user, session, profile, tier, loading,
       signUp, signIn, signOut, resetPassword,
-      updateProfile, incrementQuestions, refreshSubscription, handleCheckout,
+      updateProfile, incrementQuestions, refreshSubscription, handleCheckout, openCustomerPortal,
     }}>
       {children}
     </AuthContext.Provider>

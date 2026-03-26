@@ -77,7 +77,7 @@ const PLANS = [
 
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
-  const { user, profile, tier, updateProfile, signOut, signIn, signUp, handleCheckout } = useAuth();
+  const { user, profile, tier, updateProfile, signOut, signIn, signUp, handleCheckout, openCustomerPortal } = useAuth();
   const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
   const currentAge = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
@@ -407,6 +407,24 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Manage subscription */}
+          {user && isPremium && (
+            <button
+              onClick={() => openCustomerPortal()}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-kid-purple/10 text-kid-purple font-bold text-sm hover:bg-kid-purple/20 transition-all border border-kid-purple/30">
+              <Crown size={16} />
+              Gerenciar / Cancelar assinatura
+            </button>
+          )}
+
+          {/* Support email */}
+          <div className="bg-muted/50 rounded-2xl p-3 text-center">
+            <p className="font-bold text-sm text-foreground">📧 Suporte</p>
+            <a href="mailto:kidzz.ia@icloud.com" className="text-xs text-primary font-bold hover:underline">
+              kidzz.ia@icloud.com
+            </a>
           </div>
 
           {/* Logout - only show when logged in */}

@@ -12,6 +12,11 @@ const PRODUCT_TIERS: Record<string, string> = {
   "prod_UDg2zSZBKNtI2i": "super_premium",
 };
 
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -36,49 +41,78 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
+    logStep("User authenticated", { userId: user.id, email: user.email });
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
     if (customers.data.length === 0) {
+      logStep("No Stripe customer found");
       return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    const customerId = customers.data[0].id;
+    logStep("Found customer", { customerId });
+
+    // Fetch active and trialing subscriptions
     const subscriptions = await stripe.subscriptions.list({
-      customer: customers.data[0].id,
+      customer: customerId,
       status: "active",
       limit: 10,
+      expand: ["data.items.data.price"],
     });
 
-    if (subscriptions.data.length === 0) {
-      // Check trialing
-      const trialingSubs = await stripe.subscriptions.list({
-        customer: customers.data[0].id,
-        status: "trialing",
-        limit: 10,
+    const trialingSubs = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "trialing",
+      limit: 10,
+      expand: ["data.items.data.price"],
+    });
+
+    const allSubs = [...subscriptions.data, ...trialingSubs.data];
+
+    if (allSubs.length === 0) {
+      logStep("No active/trialing subscriptions");
+      return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
-      if (trialingSubs.data.length === 0) {
-        return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      subscriptions.data.push(...trialingSubs.data);
     }
 
     // Find highest tier
     let bestTier = "premium";
-    let subscriptionEnd = null;
+    let subscriptionEnd: string | null = null;
 
-    for (const sub of subscriptions.data) {
-      const productId = sub.items.data[0]?.price?.product as string;
+    for (const sub of allSubs) {
+      const productId = typeof sub.items.data[0]?.price?.product === "string"
+        ? sub.items.data[0].price.product
+        : (sub.items.data[0]?.price?.product as any)?.id ?? "";
+      
+      logStep("Checking subscription", { 
+        subId: sub.id, 
+        productId, 
+        status: sub.status,
+        currentPeriodEnd: sub.current_period_end 
+      });
+
       const tier = PRODUCT_TIERS[productId] || "premium";
       if (tier === "super_premium") bestTier = "super_premium";
-      const end = new Date(sub.current_period_end * 1000).toISOString();
-      if (!subscriptionEnd || end > subscriptionEnd) subscriptionEnd = end;
+
+      // Safely handle the date
+      if (sub.current_period_end && typeof sub.current_period_end === "number") {
+        try {
+          const end = new Date(sub.current_period_end * 1000).toISOString();
+          if (!subscriptionEnd || end > subscriptionEnd) subscriptionEnd = end;
+        } catch (e) {
+          logStep("Date conversion error, skipping", { current_period_end: sub.current_period_end });
+        }
+      }
     }
 
-    // Sync premium status
+    logStep("Subscription found", { bestTier, subscriptionEnd });
+
+    // Sync premium status to profile
     await supabaseClient
       .from("profiles")
       .update({ is_premium: true })
