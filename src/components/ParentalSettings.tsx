@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { X, ShieldCheck, Crown, Sparkles, MessageCircle, Volume2, Lock, Star, Zap, LogIn, Link2, Copy, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAffiliate } from "@/hooks/useAffiliate";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface ParentalSettingsProps {
