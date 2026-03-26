@@ -35,6 +35,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
   const handleGenerate = useCallback(async (age: number, interests: string) => {
     if (!avatar) return;
+    if (!canGenerateStory()) {
+      toast.error("Você atingiu o limite de 3 histórias por dia! Volte amanhã 💛");
+      return;
+    }
     setIsGenerating(true);
     setProgress(3);
 
