@@ -113,10 +113,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.subscribed) {
         const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
         setTier(newTier);
-        if (!profile?.is_premium) {
-          await supabase.from("profiles").update({ is_premium: true }).eq("id", user.id);
-          setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
-        }
+        // Re-fetch profile to get updated is_premium and reset questions_used
+        setProfile(prev => (prev ? { ...prev, is_premium: true, questions_used: 0 } : prev));
       } else {
         // Respect manual premium grants from profile
         if (profile?.is_premium) {
