@@ -13,40 +13,46 @@ export const useTTS = () => {
     }
 
     try {
-      const cleanText = text.replace(/[*#_~`]/g, "").slice(0, 500);
-      const response = await fetch(TTS_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: ANON_KEY,
-          Authorization: `Bearer ${ANON_KEY}`,
-        },
-        body: JSON.stringify({ text: cleanText }),
-      });
-
-      if (!response.ok) {
-        fallbackSpeak(cleanText);
-        return;
-      }
-
-      const data = await response.json();
-      if (data.audioContent) {
-        const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
-        const audio = new Audio(audioUrl);
-        audioRef.current = audio;
-        return new Promise<void>((resolve) => {
-          audio.onended = () => {
-            audioRef.current = null;
-            resolve();
-          };
-          audio.onerror = () => {
-            audioRef.current = null;
-            resolve();
-          };
-          audio.play().catch(() => resolve());
+      const cleanText = text.replace(/[*#_~`]/g, "");
+      
+      // Split into chunks of ~900 chars at sentence boundaries
+      const chunks = splitIntoChunks(cleanText, 900);
+      
+      for (const chunk of chunks) {
+        const response = await fetch(TTS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: ANON_KEY,
+            Authorization: `Bearer ${ANON_KEY}`,
+          },
+          body: JSON.stringify({ text: chunk }),
         });
-      } else {
-        fallbackSpeak(cleanText);
+
+        if (!response.ok) {
+          fallbackSpeak(chunk);
+          continue;
+        }
+
+        const data = await response.json();
+        if (data.audioContent) {
+          const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+          const audio = new Audio(audioUrl);
+          audioRef.current = audio;
+          await new Promise<void>((resolve) => {
+            audio.onended = () => {
+              audioRef.current = null;
+              resolve();
+            };
+            audio.onerror = () => {
+              audioRef.current = null;
+              resolve();
+            };
+            audio.play().catch(() => resolve());
+          });
+        } else {
+          fallbackSpeak(chunk);
+        }
       }
     } catch {
       fallbackSpeak(text);

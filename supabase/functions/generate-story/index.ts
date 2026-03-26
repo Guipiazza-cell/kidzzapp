@@ -79,6 +79,7 @@ Incorpore ${interests} na trama.`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        max_tokens: 8192,
       }),
     });
 
