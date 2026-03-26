@@ -169,7 +169,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping, isFreeLimitReached, isPremium, messages, streamChat, speakText, incrementQuestions]);
+  }, [isTyping, canAskQuestion, messages, streamChat, speakText, incrementQuestions]);
 
   const handleVoiceResult = useCallback((text: string) => {
     setInput(text);
