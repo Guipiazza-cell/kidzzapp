@@ -40,7 +40,7 @@ const AGE_OPTIONS = [
 ];
 
 const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void }) => {
-  const { profile, user, session, tier, updateProfile, incrementQuestions, handleCheckout } = useAuth();
+  const { profile, user, session, tier, updateProfile, incrementQuestions, handleCheckout, canAskQuestion, questionsRemaining } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -56,8 +56,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
   const ageRange = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "super_premium";
-  const questionsUsed = profile?.questions_used ?? 0;
-  const isFreeLimitReached = !isPremium && questionsUsed >= MAX_FREE_QUESTIONS;
+  const isFreeLimitReached = !canAskQuestion();
 
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
