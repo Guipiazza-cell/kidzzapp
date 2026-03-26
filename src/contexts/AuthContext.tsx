@@ -97,19 +97,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [tier, setTier] = useState<SubscriptionTier>("free");
   const [loading, setLoading] = useState(true);
 
+  const resetDailyIfNeeded = useCallback((p: Profile): Profile => {
+    const today = todayStr();
+    if (p.last_usage_date !== today) {
+      return { ...p, questions_used: 0, stories_used: 0, last_usage_date: today };
+    }
+    return p;
+  }, []);
+
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, questions_used, is_premium, voice_enabled")
+      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled")
       .eq("id", userId)
       .single();
 
     if (data) {
-      setProfile(data as Profile);
+      const prof = resetDailyIfNeeded(data as Profile);
+      // If daily reset happened, persist it
+      if (prof !== data) {
+        await supabase.from("profiles").update({ 
+          questions_used: prof.questions_used, 
+          stories_used: prof.stories_used, 
+          last_usage_date: prof.last_usage_date 
+        }).eq("id", userId);
+      }
+      setProfile(prof);
       return;
     }
     setProfile(getGuestProfile());
-  }, []);
+  }, [resetDailyIfNeeded]);
 
   const refreshSubscription = useCallback(async () => {
     if (!session?.access_token || !user) return;
