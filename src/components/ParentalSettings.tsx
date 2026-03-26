@@ -430,6 +430,14 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             </a>
           </div>
 
+          {/* Privacy Policy */}
+          <button
+            onClick={() => { onClose(); navigate("/privacy"); }}
+            className="w-full py-3 rounded-2xl bg-muted/50 text-muted-foreground font-bold text-xs hover:bg-muted transition-all"
+          >
+            🔒 Política de Privacidade e Termos de Uso
+          </button>
+
           {/* Logout - only show when logged in */}
           {user &&
           <button
