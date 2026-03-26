@@ -358,7 +358,6 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           </div>
 
           {/* Affiliate program */}
-          {user &&
           <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 space-y-3">
             <div className="flex items-center gap-2">
               <Link2 size={16} className="text-primary" />
@@ -366,7 +365,9 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             </div>
             <p className="text-xs text-muted-foreground">Ganhe 10% de comissão por cada assinatura feita pelo seu link!</p>
             
-            {affiliateCode ? (
+            {!user ? (
+              <p className="text-xs text-primary font-bold">Faça login acima para criar seu link de afiliado.</p>
+            ) : affiliateCode ? (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <input
@@ -407,7 +408,6 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
               </div>
             )}
           </div>
-          }
 
           {/* Logout - only show when logged in */}
           {user &&
