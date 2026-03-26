@@ -141,7 +141,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
   }, [ageRange]);
 
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isTyping || isFreeLimitReached) return;
+    if (!text.trim() || isTyping || !canAskQuestion()) return;
 
     const userMsg: Message = { id: Date.now(), text: text.trim(), isUser: true };
     setMessages((prev) => [...prev, userMsg]);
