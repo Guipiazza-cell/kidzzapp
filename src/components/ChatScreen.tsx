@@ -208,9 +208,9 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
           )}
         </motion.div>
         <div className="flex items-center gap-2">
-          {!isPremium && (
+          {(
             <span className="text-sm text-white font-extrabold bg-kid-orange/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
-              {MAX_FREE_QUESTIONS - questionsUsed} 💬
+              {questionsRemaining()} 💬
             </span>
           )}
           {isSuperPremium && onOpenStoryFactory && (
