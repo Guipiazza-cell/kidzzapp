@@ -80,6 +80,8 @@ const PLANS = [
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const { user, profile, tier, updateProfile, signOut, signIn, signUp, handleCheckout, openCustomerPortal } = useAuth();
   const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
+  const navigate = useNavigate();
+  const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
   const currentAge = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
 
