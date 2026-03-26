@@ -148,9 +148,8 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
     setInput("");
     setIsTyping(true);
 
-    if (!isPremium) {
-      await incrementQuestions();
-    }
+    // Always increment (daily reset handles paid users)
+    await incrementQuestions();
 
     const allMessages = [...messages, userMsg].map((m) => ({
       role: m.isUser ? "user" as const : "assistant" as const,
