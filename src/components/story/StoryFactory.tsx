@@ -87,7 +87,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(100);
       setTimeout(() => setIsGenerating(false), 500);
     }
-  }, [avatar, childName, profile?.age_range]);
+  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining]);
 
   const handleReset = useCallback(() => {
     setStep("intro");
