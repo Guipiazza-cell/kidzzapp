@@ -61,14 +61,12 @@ serve(async (req) => {
       customer: customerId,
       status: "active",
       limit: 10,
-      expand: ["data.items.data.price"],
     });
 
     const trialingSubs = await stripe.subscriptions.list({
       customer: customerId,
       status: "trialing",
       limit: 10,
-      expand: ["data.items.data.price"],
     });
 
     const allSubs = [...subscriptions.data, ...trialingSubs.data];
@@ -85,37 +83,44 @@ serve(async (req) => {
     let subscriptionEnd: string | null = null;
 
     for (const sub of allSubs) {
-      const productId = typeof sub.items.data[0]?.price?.product === "string"
-        ? sub.items.data[0].price.product
-        : (sub.items.data[0]?.price?.product as any)?.id ?? "";
+      // Get product ID from the subscription item
+      const priceObj = sub.items.data[0]?.price;
+      const productId = typeof priceObj?.product === "string"
+        ? priceObj.product
+        : (priceObj?.product as any)?.id ?? "";
       
       logStep("Checking subscription", { 
         subId: sub.id, 
         productId, 
         status: sub.status,
-        currentPeriodEnd: sub.current_period_end 
+        currentPeriodEnd: sub.current_period_end,
+        currentPeriodEndType: typeof sub.current_period_end,
       });
 
       const tier = PRODUCT_TIERS[productId] || "premium";
       if (tier === "super_premium") bestTier = "super_premium";
 
-      // Safely handle the date
-      if (sub.current_period_end && typeof sub.current_period_end === "number") {
-        try {
-          const end = new Date(sub.current_period_end * 1000).toISOString();
-          if (!subscriptionEnd || end > subscriptionEnd) subscriptionEnd = end;
-        } catch (e) {
-          logStep("Date conversion error, skipping", { current_period_end: sub.current_period_end });
+      // Parse subscription end date
+      try {
+        const rawEnd = sub.current_period_end;
+        if (rawEnd) {
+          const timestamp = typeof rawEnd === "number" ? rawEnd : Number(rawEnd);
+          if (!isNaN(timestamp) && timestamp > 0) {
+            const end = new Date(timestamp * 1000).toISOString();
+            if (!subscriptionEnd || end > subscriptionEnd) subscriptionEnd = end;
+          }
         }
+      } catch (e) {
+        logStep("Date conversion error, skipping", { current_period_end: sub.current_period_end });
       }
     }
 
     logStep("Subscription found", { bestTier, subscriptionEnd });
 
-    // Sync premium status to profile
+    // Sync premium status and reset questions_used to 0 for premium users
     await supabaseClient
       .from("profiles")
-      .update({ is_premium: true })
+      .update({ is_premium: true, questions_used: 0 })
       .eq("id", user.id);
 
     return new Response(JSON.stringify({
