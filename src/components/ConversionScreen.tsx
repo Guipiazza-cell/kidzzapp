@@ -34,7 +34,7 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Desbloqueie tudo e continue aprendendo sem limites
+          Desbloqueie perguntas diárias e muito mais
         </motion.p>
       </div>
 
