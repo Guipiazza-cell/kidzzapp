@@ -123,13 +123,12 @@ Incorpore ${interests} na trama.`;
       }
     }
 
-    // Generate illustrations
-    const images: string[] = [];
-    for (let i = 0; i < Math.min(4, sceneSnippets.length); i++) {
+    // Generate illustrations IN PARALLEL for speed
+    const imagePromises = sceneSnippets.slice(0, 4).map(async (snippet, i) => {
       try {
         const imgPrompt = `Crie uma ilustração infantil estilo cartoon premium (Pixar/DreamWorks) para esta cena de livro infantil:
 
-"${sceneSnippets[i]}"
+"${snippet}"
 
 Personagens: ${childName} (${age} anos ${avatarDesc}) e um camaleão verde mágico chamado Kidzz.
 Cenário relacionado a: ${interests}.
@@ -142,7 +141,7 @@ Estilo: cores vibrantes, iluminação cinematográfica, sem texto na imagem.`;
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-3-pro-image-preview",
+            model: "google/gemini-3.1-flash-image-preview",
             messages: [{ role: "user", content: imgPrompt }],
             modalities: ["image", "text"],
           }),
@@ -152,8 +151,8 @@ Estilo: cores vibrantes, iluminação cinematográfica, sem texto na imagem.`;
           const imgData = await imgResp.json();
           const url = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
           if (url) {
-            images.push(url);
             console.log(`Image ${i + 1} generated`);
+            return url;
           }
         } else {
           console.error(`Image ${i + 1} error:`, await imgResp.text());
@@ -161,7 +160,11 @@ Estilo: cores vibrantes, iluminação cinematográfica, sem texto na imagem.`;
       } catch (e) {
         console.error(`Image ${i + 1} exception:`, e);
       }
-    }
+      return null;
+    });
+
+    const imageResults = await Promise.all(imagePromises);
+    const images = imageResults.filter((url): url is string => url !== null);
 
     return new Response(
       JSON.stringify({ story, images }),

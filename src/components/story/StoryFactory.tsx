@@ -36,11 +36,16 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const handleGenerate = useCallback(async (age: number, interests: string) => {
     if (!avatar) return;
     setIsGenerating(true);
-    setProgress(5);
+    setProgress(3);
 
+    // Smooth, decelerating progress that never truly stalls
+    const startTime = Date.now();
     const timer = setInterval(() => {
-      setProgress((p) => p < 85 ? p + 2 : p);
-    }, 800);
+      const elapsed = (Date.now() - startTime) / 1000;
+      // Asymptotic curve: fast start, slows down, caps at ~92%
+      const target = 92 * (1 - Math.exp(-elapsed / 25));
+      setProgress((p) => Math.max(p, target));
+    }, 300);
 
     try {
       const resp = await fetch(GENERATE_URL, {
