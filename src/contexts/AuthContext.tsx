@@ -26,6 +26,7 @@ interface AuthContextType {
   incrementQuestions: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
   handleCheckout: (plan: "premium" | "super_premium") => Promise<void>;
+  openCustomerPortal: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
