@@ -12,8 +12,13 @@ const NameOnboarding = () => {
   const handleSubmit = async () => {
     if (!name.trim() || saving) return;
     setSaving(true);
-    await updateProfile({ child_name: name.trim() });
-    setSaving(false);
+    try {
+      await updateProfile({ child_name: name.trim() });
+    } catch (e) {
+      console.error("NameOnboarding: updateProfile error", e);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
