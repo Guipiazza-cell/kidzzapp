@@ -242,9 +242,11 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
               {tier === "super_premium" ? "⚡ KIDZZ Premium Ativo" : isPremium ? "⭐ Plano KIDZZ Ativo" : "Plano Gratuito"}
             </p>
             <p className="text-sm opacity-80">
-              {isPremium ?
-              "Perguntas ilimitadas • Voz ativa • Personagens desbloqueados" :
-              `${Math.max(0, 3 - (profile?.questions_used ?? 0))} de 3 perguntas restantes`}
+              {tier === "super_premium"
+                ? `${10 - (profile?.questions_used ?? 0)} perguntas • ${3 - (profile?.stories_used ?? 0)} histórias hoje`
+                : isPremium
+                ? `${10 - (profile?.questions_used ?? 0)} de 10 perguntas restantes hoje`
+                : `${Math.max(0, 3 - (profile?.questions_used ?? 0))} de 3 perguntas restantes`}
             </p>
           </div>
 

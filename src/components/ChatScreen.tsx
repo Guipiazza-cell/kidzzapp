@@ -344,11 +344,13 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
       {!isFreeLimitReached && (
         <div className="relative z-10 p-4 pb-6">
           <div className="space-y-2">
-            {!isPremium && (
+            {(
               <div className="flex justify-center">
                 <div className="bg-kid-orange/90 backdrop-blur-md rounded-full px-5 py-2 flex items-center gap-2 shadow-lg">
-                  <span className="text-white text-2xl font-extrabold">{MAX_FREE_QUESTIONS - questionsUsed}</span>
-                  <span className="text-white/90 text-sm font-bold">de {MAX_FREE_QUESTIONS} perguntas</span>
+                  <span className="text-white text-2xl font-extrabold">{questionsRemaining()}</span>
+                  <span className="text-white/90 text-sm font-bold">
+                    {isPremium ? "perguntas hoje" : "perguntas restantes"}
+                  </span>
                 </div>
               </div>
             )}
