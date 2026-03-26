@@ -383,7 +383,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider value={{
       user, session, profile, tier, loading,
       signUp, signIn, signOut, resetPassword,
-      updateProfile, incrementQuestions, refreshSubscription, handleCheckout, openCustomerPortal,
+      updateProfile, incrementQuestions, incrementStories,
+      canAskQuestion, canGenerateStory, questionsRemaining, storiesRemaining,
+      refreshSubscription, handleCheckout, openCustomerPortal,
     }}>
       {children}
     </AuthContext.Provider>
