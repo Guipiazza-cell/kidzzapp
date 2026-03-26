@@ -19,7 +19,7 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
-const MAX_FREE_QUESTIONS = 3;
+
 
 const SUGGESTIONS: Record<string, string[]> = {
   "0-3": ["Que som faz o gato? 🐱", "De que cor é o sol? ☀️", "O que é chuva? 🌧️"],
@@ -40,7 +40,7 @@ const AGE_OPTIONS = [
 ];
 
 const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void }) => {
-  const { profile, user, session, tier, updateProfile, incrementQuestions, handleCheckout } = useAuth();
+  const { profile, user, session, tier, updateProfile, incrementQuestions, handleCheckout, canAskQuestion, questionsRemaining } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -56,8 +56,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
   const ageRange = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "super_premium";
-  const questionsUsed = profile?.questions_used ?? 0;
-  const isFreeLimitReached = !isPremium && questionsUsed >= MAX_FREE_QUESTIONS;
+  const isFreeLimitReached = !canAskQuestion();
 
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
@@ -142,16 +141,15 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
   }, [ageRange]);
 
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isTyping || isFreeLimitReached) return;
+    if (!text.trim() || isTyping || !canAskQuestion()) return;
 
     const userMsg: Message = { id: Date.now(), text: text.trim(), isUser: true };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
 
-    if (!isPremium) {
-      await incrementQuestions();
-    }
+    // Always increment (daily reset handles paid users)
+    await incrementQuestions();
 
     const allMessages = [...messages, userMsg].map((m) => ({
       role: m.isUser ? "user" as const : "assistant" as const,
@@ -171,7 +169,7 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping, isFreeLimitReached, isPremium, messages, streamChat, speakText, incrementQuestions]);
+  }, [isTyping, canAskQuestion, messages, streamChat, speakText, incrementQuestions]);
 
   const handleVoiceResult = useCallback((text: string) => {
     setInput(text);
@@ -210,9 +208,9 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
           )}
         </motion.div>
         <div className="flex items-center gap-2">
-          {!isPremium && (
+          {(
             <span className="text-sm text-white font-extrabold bg-kid-orange/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
-              {MAX_FREE_QUESTIONS - questionsUsed} 💬
+              {questionsRemaining()} 💬
             </span>
           )}
           {isSuperPremium && onOpenStoryFactory && (
@@ -346,11 +344,13 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
       {!isFreeLimitReached && (
         <div className="relative z-10 p-4 pb-6">
           <div className="space-y-2">
-            {!isPremium && (
+            {(
               <div className="flex justify-center">
                 <div className="bg-kid-orange/90 backdrop-blur-md rounded-full px-5 py-2 flex items-center gap-2 shadow-lg">
-                  <span className="text-white text-2xl font-extrabold">{MAX_FREE_QUESTIONS - questionsUsed}</span>
-                  <span className="text-white/90 text-sm font-bold">de {MAX_FREE_QUESTIONS} perguntas</span>
+                  <span className="text-white text-2xl font-extrabold">{questionsRemaining()}</span>
+                  <span className="text-white/90 text-sm font-bold">
+                    {isPremium ? "perguntas hoje" : "perguntas restantes"}
+                  </span>
                 </div>
               </div>
             )}

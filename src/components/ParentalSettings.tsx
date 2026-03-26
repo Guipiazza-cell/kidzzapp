@@ -27,7 +27,7 @@ const PLANS = [
   textColor: "text-foreground",
   borderColor: "border-border",
   features: [
-  "3 perguntas no total",
+  "3 perguntas de teste (única vez)",
   "1 personagem",
   "Respostas em texto",
   "Filtro de conteúdo ativo"],
@@ -45,7 +45,7 @@ const PLANS = [
   borderColor: "border-kid-purple/40",
   badge: "POPULAR",
   features: [
-  "Perguntas ilimitadas",
+  "10 perguntas por dia",
   "Narração por voz amigável",
   "3 personagens desbloqueados",
   "Respostas adaptadas por idade",
@@ -64,8 +64,9 @@ const PLANS = [
   borderColor: "border-kid-yellow/40",
   badge: "COMPLETO",
     features: [
-      "Tudo do Premium +",
-      "🏭 Fábrica de Histórias ",
+      "Tudo do Plano KIDZZ +",
+      "10 perguntas por dia",
+      "🏭 3 histórias por dia",
       "Avatar personalizado do seu filho",
       "Ilustrações exclusivas",
       "Todos os personagens exclusivos",
@@ -241,9 +242,11 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
               {tier === "super_premium" ? "⚡ KIDZZ Premium Ativo" : isPremium ? "⭐ Plano KIDZZ Ativo" : "Plano Gratuito"}
             </p>
             <p className="text-sm opacity-80">
-              {isPremium ?
-              "Perguntas ilimitadas • Voz ativa • Personagens desbloqueados" :
-              `${Math.max(0, 3 - (profile?.questions_used ?? 0))} de 3 perguntas restantes`}
+              {tier === "super_premium"
+                ? `${10 - (profile?.questions_used ?? 0)} perguntas • ${3 - (profile?.stories_used ?? 0)} histórias hoje`
+                : isPremium
+                ? `${10 - (profile?.questions_used ?? 0)} de 10 perguntas restantes hoje`
+                : `${Math.max(0, 3 - (profile?.questions_used ?? 0))} de 3 perguntas restantes`}
             </p>
           </div>
 

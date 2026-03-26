@@ -17,7 +17,7 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 type Step = "intro" | "avatar" | "form" | "display";
 
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
-  const { profile } = useAuth();
+  const { profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
   const childName = profile?.child_name || "Explorador";
 
@@ -35,6 +35,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
   const handleGenerate = useCallback(async (age: number, interests: string) => {
     if (!avatar) return;
+    if (!canGenerateStory()) {
+      toast.error("Você atingiu o limite de 3 histórias por dia! Volte amanhã 💛");
+      return;
+    }
     setIsGenerating(true);
     setProgress(3);
 
@@ -72,8 +76,9 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(95);
       setStory(data.story);
       setImages(data.images || []);
+      await incrementStories();
       setStep("display");
-      toast.success("História criada! ✨");
+      toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
     } catch (e: any) {
       console.error("Story generation error:", e);
       toast.error(e.message || "Erro ao gerar história");
@@ -82,7 +87,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(100);
       setTimeout(() => setIsGenerating(false), 500);
     }
-  }, [avatar, childName, profile?.age_range]);
+  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining]);
 
   const handleReset = useCallback(() => {
     setStep("intro");
@@ -136,8 +141,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           </h2>
             <p className="text-white/70 text-sm max-w-[280px]">
               Crie histórias personalizadas com ilustrações exclusivas!
-              Seu filho será o protagonista da aventura.
             </p>
+            <span className="text-xs font-bold bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-full">
+              {storiesRemaining()} de 3 histórias restantes hoje
+            </span>
 
             <div className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 w-full max-w-xs space-y-2">
               {[

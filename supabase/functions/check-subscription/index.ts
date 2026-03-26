@@ -117,10 +117,10 @@ serve(async (req) => {
 
     logStep("Subscription found", { bestTier, subscriptionEnd });
 
-    // Sync premium status and reset questions_used to 0 for premium users
+    // Sync premium status
     await supabaseClient
       .from("profiles")
-      .update({ is_premium: true, questions_used: 0 })
+      .update({ is_premium: true })
       .eq("id", user.id);
 
     return new Response(JSON.stringify({

@@ -8,6 +8,8 @@ interface Profile {
   child_name: string;
   age_range: string | null;
   questions_used: number;
+  stories_used: number;
+  last_usage_date: string;
   is_premium: boolean;
   voice_enabled: boolean;
 }
@@ -24,6 +26,11 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   incrementQuestions: () => Promise<void>;
+  incrementStories: () => Promise<void>;
+  canAskQuestion: () => boolean;
+  canGenerateStory: () => boolean;
+  questionsRemaining: () => number;
+  storiesRemaining: () => number;
   refreshSubscription: () => Promise<void>;
   handleCheckout: (plan: "premium" | "super_premium") => Promise<void>;
   openCustomerPortal: () => Promise<void>;
@@ -35,10 +42,14 @@ const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-c
 const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-portal`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
 
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
 const createDefaultProfile = (): Profile => ({
   child_name: "",
   age_range: null,
   questions_used: 0,
+  stories_used: 0,
+  last_usage_date: todayStr(),
   is_premium: false,
   voice_enabled: false,
 });
@@ -47,6 +58,8 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   child_name: value?.child_name ?? "",
   age_range: value?.age_range ?? null,
   questions_used: value?.questions_used ?? 0,
+  stories_used: value?.stories_used ?? 0,
+  last_usage_date: value?.last_usage_date ?? todayStr(),
   is_premium: value?.is_premium ?? false,
   voice_enabled: value?.voice_enabled ?? false,
 });
@@ -84,19 +97,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [tier, setTier] = useState<SubscriptionTier>("free");
   const [loading, setLoading] = useState(true);
 
+  const resetDailyIfNeeded = useCallback((p: Profile): Profile => {
+    const today = todayStr();
+    if (p.last_usage_date !== today) {
+      return { ...p, questions_used: 0, stories_used: 0, last_usage_date: today };
+    }
+    return p;
+  }, []);
+
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, questions_used, is_premium, voice_enabled")
+      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled")
       .eq("id", userId)
       .single();
 
     if (data) {
-      setProfile(data as Profile);
+      const prof = resetDailyIfNeeded(data as Profile);
+      // If daily reset happened, persist it
+      if (prof !== data) {
+        await supabase.from("profiles").update({ 
+          questions_used: prof.questions_used, 
+          stories_used: prof.stories_used, 
+          last_usage_date: prof.last_usage_date 
+        }).eq("id", userId);
+      }
+      setProfile(prof);
       return;
     }
     setProfile(getGuestProfile());
-  }, []);
+  }, [resetDailyIfNeeded]);
 
   const refreshSubscription = useCallback(async () => {
     if (!session?.access_token || !user) return;
@@ -114,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
         setTier(newTier);
         // Re-fetch profile to get updated is_premium and reset questions_used
-        setProfile(prev => (prev ? { ...prev, is_premium: true, questions_used: 0 } : prev));
+        setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
       } else {
         // Respect manual premium grants from profile
         if (profile?.is_premium) {
@@ -287,15 +317,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  // Limits: Free=3 total once, KIDZZ=10/day, Premium=10/day
+  const MAX_FREE_QUESTIONS = 3;
+  const DAILY_QUESTION_LIMIT = 10;
+  const DAILY_STORY_LIMIT = 3;
+
+  const canAskQuestion = useCallback(() => {
+    if (!profile) return false;
+    const p = resetDailyIfNeeded(profile);
+    if (!p.is_premium) return p.questions_used < MAX_FREE_QUESTIONS;
+    return p.questions_used < DAILY_QUESTION_LIMIT;
+  }, [profile, resetDailyIfNeeded]);
+
+  const canGenerateStory = useCallback(() => {
+    if (!profile) return false;
+    if (tier !== "super_premium") return false;
+    const p = resetDailyIfNeeded(profile);
+    return p.stories_used < DAILY_STORY_LIMIT;
+  }, [profile, tier, resetDailyIfNeeded]);
+
+  const questionsRemaining = useCallback(() => {
+    if (!profile) return 0;
+    const p = resetDailyIfNeeded(profile);
+    if (!p.is_premium) return Math.max(0, MAX_FREE_QUESTIONS - p.questions_used);
+    return Math.max(0, DAILY_QUESTION_LIMIT - p.questions_used);
+  }, [profile, resetDailyIfNeeded]);
+
+  const storiesRemaining = useCallback(() => {
+    if (!profile) return 0;
+    const p = resetDailyIfNeeded(profile);
+    return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
+  }, [profile, resetDailyIfNeeded]);
+
   const incrementQuestions = async () => {
     if (!profile) return;
-    const newCount = profile.questions_used + 1;
+    const p = resetDailyIfNeeded(profile);
+    const newCount = p.questions_used + 1;
+    const today = todayStr();
     if (user) {
-      await supabase.from("profiles").update({ questions_used: newCount }).eq("id", user.id);
-      setProfile(prev => (prev ? { ...prev, questions_used: newCount } : prev));
+      await supabase.from("profiles").update({ questions_used: newCount, last_usage_date: today }).eq("id", user.id);
+      setProfile(prev => (prev ? { ...prev, questions_used: newCount, last_usage_date: today } : prev));
       return;
     }
-    const next = normalizeProfile({ ...profile, questions_used: newCount });
+    const next = normalizeProfile({ ...p, questions_used: newCount, last_usage_date: today });
+    saveGuestProfile(next);
+    setProfile(next);
+  };
+
+  const incrementStories = async () => {
+    if (!profile) return;
+    const p = resetDailyIfNeeded(profile);
+    const newCount = p.stories_used + 1;
+    const today = todayStr();
+    if (user) {
+      await supabase.from("profiles").update({ stories_used: newCount, last_usage_date: today }).eq("id", user.id);
+      setProfile(prev => (prev ? { ...prev, stories_used: newCount, last_usage_date: today } : prev));
+      return;
+    }
+    const next = normalizeProfile({ ...p, stories_used: newCount, last_usage_date: today });
     saveGuestProfile(next);
     setProfile(next);
   };
@@ -304,7 +383,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider value={{
       user, session, profile, tier, loading,
       signUp, signIn, signOut, resetPassword,
-      updateProfile, incrementQuestions, refreshSubscription, handleCheckout, openCustomerPortal,
+      updateProfile, incrementQuestions, incrementStories,
+      canAskQuestion, canGenerateStory, questionsRemaining, storiesRemaining,
+      refreshSubscription, handleCheckout, openCustomerPortal,
     }}>
       {children}
     </AuthContext.Provider>
