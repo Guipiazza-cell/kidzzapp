@@ -66,7 +66,7 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
           </div>
           <p className="text-3xl font-extrabold text-white">R$ 14,90<span className="text-sm font-bold opacity-70">/mês</span></p>
           <div className="mt-3 space-y-1.5">
-            {["Perguntas ilimitadas", "Narração por voz amigável", "3 personagens desbloqueados"].map((f) => (
+            {["10 perguntas por dia", "Narração por voz amigável", "3 personagens desbloqueados"].map((f) => (
               <div key={f} className="flex items-center gap-2">
                 <MessageCircle size={12} className="text-kid-yellow" />
                 <span className="text-xs text-white/80 font-bold">{f}</span>
