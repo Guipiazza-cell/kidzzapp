@@ -45,7 +45,9 @@ export type Database = {
           created_at: string
           id: string
           is_premium: boolean
+          last_usage_date: string
           questions_used: number
+          stories_used: number
           updated_at: string
           voice_enabled: boolean
         }
@@ -55,7 +57,9 @@ export type Database = {
           created_at?: string
           id: string
           is_premium?: boolean
+          last_usage_date?: string
           questions_used?: number
+          stories_used?: number
           updated_at?: string
           voice_enabled?: boolean
         }
@@ -65,7 +69,9 @@ export type Database = {
           created_at?: string
           id?: string
           is_premium?: boolean
+          last_usage_date?: string
           questions_used?: number
+          stories_used?: number
           updated_at?: string
           voice_enabled?: boolean
         }
