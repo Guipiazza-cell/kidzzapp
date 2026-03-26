@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const PRODUCT_TIERS: Record<string, string> = {
-  "prod_UC0kQKWPgj4Cwu": "premium",
-  "prod_UCw9wWcpKskqkC": "super_premium",
+  "prod_UDg1BKoaDApx46": "premium",
+  "prod_UDg2zSZBKNtI2i": "super_premium",
 };
 
 serve(async (req) => {

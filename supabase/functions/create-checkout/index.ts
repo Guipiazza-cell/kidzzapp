@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const PRICES: Record<string, string> = {
-  premium: "price_1TDcj94llPC7khcdaWJ6OSDJ",
-  super_premium: "price_1TEWH34llPC7khcdvEvxOYHV",
+  premium: "price_1TFEfW8nR9x8D1BWr4RCvV84",
+  super_premium: "price_1TFEgH8nR9x8D1BWguQ8xu0w",
 };
 
 const PLAN_AMOUNTS: Record<string, number> = {
