@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { X, ShieldCheck, Crown, Sparkles, MessageCircle, Volume2, Lock, Star, Zap, LogIn, Link2, Copy, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAffiliate } from "@/hooks/useAffiliate";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface ParentalSettingsProps {
@@ -79,6 +80,7 @@ const PLANS = [
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const { user, profile, tier, updateProfile, signOut, signIn, signUp, handleCheckout, openCustomerPortal } = useAuth();
   const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
+  const navigate = useNavigate();
   const currentAge = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
 
@@ -426,6 +428,14 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
               kidzz.ia@icloud.com
             </a>
           </div>
+
+          {/* Privacy Policy */}
+          <button
+            onClick={() => { onClose(); navigate("/privacy"); }}
+            className="w-full py-3 rounded-2xl bg-muted/50 text-muted-foreground font-bold text-xs hover:bg-muted transition-all"
+          >
+            🔒 Política de Privacidade e Termos de Uso
+          </button>
 
           {/* Logout - only show when logged in */}
           {user &&
