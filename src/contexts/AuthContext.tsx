@@ -307,7 +307,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateProfile = async (updates: Partial<Profile>) => {
     if (user) {
       await supabase.from("profiles").update(updates).eq("id", user.id);
-      setProfile(prev => (prev ? { ...prev, ...updates } : prev));
+      setProfile(prev => {
+        const base = prev ?? createDefaultProfile();
+        return { ...base, ...updates };
+      });
       return;
     }
     setProfile(prev => {
