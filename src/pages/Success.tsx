@@ -60,8 +60,8 @@ const Success = () => {
           transition={{ delay: 1 }}
         >
           <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md rounded-2xl p-4">
-            <span className="text-2xl">♾️</span>
-            <span className="text-white font-bold text-sm">Perguntas ilimitadas desbloqueadas</span>
+            <span className="text-2xl">💬</span>
+            <span className="text-white font-bold text-sm">10 perguntas por dia desbloqueadas</span>
           </div>
           <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md rounded-2xl p-4">
             <span className="text-2xl">🎤</span>
