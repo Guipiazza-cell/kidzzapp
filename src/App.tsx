@@ -20,8 +20,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (loading) {
-      const timer = setTimeout(() => setTimedOut(true), 5000);
+      const timer = setTimeout(() => setTimedOut(true), 2000);
       return () => clearTimeout(timer);
+    } else {
+      setTimedOut(false);
     }
   }, [loading]);
 
