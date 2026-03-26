@@ -8,6 +8,8 @@ interface Profile {
   child_name: string;
   age_range: string | null;
   questions_used: number;
+  stories_used: number;
+  last_usage_date: string;
   is_premium: boolean;
   voice_enabled: boolean;
 }
