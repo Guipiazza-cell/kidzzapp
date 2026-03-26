@@ -76,8 +76,9 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(95);
       setStory(data.story);
       setImages(data.images || []);
+      await incrementStories();
       setStep("display");
-      toast.success("História criada! ✨");
+      toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
     } catch (e: any) {
       console.error("Story generation error:", e);
       toast.error(e.message || "Erro ao gerar história");
