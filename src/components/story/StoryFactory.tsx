@@ -141,8 +141,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           </h2>
             <p className="text-white/70 text-sm max-w-[280px]">
               Crie histórias personalizadas com ilustrações exclusivas!
-              Seu filho será o protagonista da aventura.
             </p>
+            <span className="text-xs font-bold bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-full">
+              {storiesRemaining()} de 3 histórias restantes hoje
+            </span>
 
             <div className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 w-full max-w-xs space-y-2">
               {[
