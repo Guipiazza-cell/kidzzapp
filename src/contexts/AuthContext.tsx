@@ -317,15 +317,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  // Limits: Free=3 total once, KIDZZ=10/day, Premium=10/day
+  const MAX_FREE_QUESTIONS = 3;
+  const DAILY_QUESTION_LIMIT = 10;
+  const DAILY_STORY_LIMIT = 3;
+
+  const canAskQuestion = useCallback(() => {
+    if (!profile) return false;
+    const p = resetDailyIfNeeded(profile);
+    if (!p.is_premium) return p.questions_used < MAX_FREE_QUESTIONS;
+    return p.questions_used < DAILY_QUESTION_LIMIT;
+  }, [profile, resetDailyIfNeeded]);
+
+  const canGenerateStory = useCallback(() => {
+    if (!profile) return false;
+    if (tier !== "super_premium") return false;
+    const p = resetDailyIfNeeded(profile);
+    return p.stories_used < DAILY_STORY_LIMIT;
+  }, [profile, tier, resetDailyIfNeeded]);
+
+  const questionsRemaining = useCallback(() => {
+    if (!profile) return 0;
+    const p = resetDailyIfNeeded(profile);
+    if (!p.is_premium) return Math.max(0, MAX_FREE_QUESTIONS - p.questions_used);
+    return Math.max(0, DAILY_QUESTION_LIMIT - p.questions_used);
+  }, [profile, resetDailyIfNeeded]);
+
+  const storiesRemaining = useCallback(() => {
+    if (!profile) return 0;
+    const p = resetDailyIfNeeded(profile);
+    return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
+  }, [profile, resetDailyIfNeeded]);
+
   const incrementQuestions = async () => {
     if (!profile) return;
-    const newCount = profile.questions_used + 1;
+    const p = resetDailyIfNeeded(profile);
+    const newCount = p.questions_used + 1;
+    const today = todayStr();
     if (user) {
-      await supabase.from("profiles").update({ questions_used: newCount }).eq("id", user.id);
-      setProfile(prev => (prev ? { ...prev, questions_used: newCount } : prev));
+      await supabase.from("profiles").update({ questions_used: newCount, last_usage_date: today }).eq("id", user.id);
+      setProfile(prev => (prev ? { ...prev, questions_used: newCount, last_usage_date: today } : prev));
       return;
     }
-    const next = normalizeProfile({ ...profile, questions_used: newCount });
+    const next = normalizeProfile({ ...p, questions_used: newCount, last_usage_date: today });
+    saveGuestProfile(next);
+    setProfile(next);
+  };
+
+  const incrementStories = async () => {
+    if (!profile) return;
+    const p = resetDailyIfNeeded(profile);
+    const newCount = p.stories_used + 1;
+    const today = todayStr();
+    if (user) {
+      await supabase.from("profiles").update({ stories_used: newCount, last_usage_date: today }).eq("id", user.id);
+      setProfile(prev => (prev ? { ...prev, stories_used: newCount, last_usage_date: today } : prev));
+      return;
+    }
+    const next = normalizeProfile({ ...p, stories_used: newCount, last_usage_date: today });
     saveGuestProfile(next);
     setProfile(next);
   };
