@@ -160,6 +160,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [session]);
 
+  const openCustomerPortal = useCallback(async () => {
+    if (!session?.access_token) {
+      const { toast } = await import("sonner");
+      toast.error("Faça login para gerenciar sua assinatura");
+      return;
+    }
+    try {
+      const resp = await fetch(PORTAL_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      const data = await resp.json();
+      if (data.url) window.open(data.url, "_blank");
+      else {
+        const { toast } = await import("sonner");
+        toast.error(data.error || "Erro ao abrir portal");
+      }
+    } catch {
+      const { toast } = await import("sonner");
+      toast.error("Erro ao abrir gerenciamento de assinatura");
+    }
+  }, [session]);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
       setSession(nextSession);
