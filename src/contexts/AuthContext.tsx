@@ -26,6 +26,11 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   incrementQuestions: () => Promise<void>;
+  incrementStories: () => Promise<void>;
+  canAskQuestion: () => boolean;
+  canGenerateStory: () => boolean;
+  questionsRemaining: () => number;
+  storiesRemaining: () => number;
   refreshSubscription: () => Promise<void>;
   handleCheckout: (plan: "premium" | "super_premium") => Promise<void>;
   openCustomerPortal: () => Promise<void>;
