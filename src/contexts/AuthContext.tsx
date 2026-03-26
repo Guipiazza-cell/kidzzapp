@@ -42,10 +42,14 @@ const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-c
 const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-portal`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
 
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
 const createDefaultProfile = (): Profile => ({
   child_name: "",
   age_range: null,
   questions_used: 0,
+  stories_used: 0,
+  last_usage_date: todayStr(),
   is_premium: false,
   voice_enabled: false,
 });
@@ -54,6 +58,8 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   child_name: value?.child_name ?? "",
   age_range: value?.age_range ?? null,
   questions_used: value?.questions_used ?? 0,
+  stories_used: value?.stories_used ?? 0,
+  last_usage_date: value?.last_usage_date ?? todayStr(),
   is_premium: value?.is_premium ?? false,
   voice_enabled: value?.voice_enabled ?? false,
 });
