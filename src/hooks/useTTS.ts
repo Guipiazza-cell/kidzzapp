@@ -3,6 +3,26 @@ import { useCallback, useRef } from "react";
 const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+const splitIntoChunks = (text: string, maxLen: number): string[] => {
+  if (text.length <= maxLen) return [text];
+  const chunks: string[] = [];
+  let remaining = text;
+  while (remaining.length > 0) {
+    if (remaining.length <= maxLen) {
+      chunks.push(remaining);
+      break;
+    }
+    let splitAt = remaining.lastIndexOf(". ", maxLen);
+    if (splitAt < maxLen * 0.3) splitAt = remaining.lastIndexOf("! ", maxLen);
+    if (splitAt < maxLen * 0.3) splitAt = remaining.lastIndexOf("? ", maxLen);
+    if (splitAt < maxLen * 0.3) splitAt = remaining.lastIndexOf(", ", maxLen);
+    if (splitAt < maxLen * 0.3) splitAt = maxLen;
+    chunks.push(remaining.slice(0, splitAt + 1).trim());
+    remaining = remaining.slice(splitAt + 1).trim();
+  }
+  return chunks.filter(c => c.length > 0);
+};
+
 export const useTTS = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
