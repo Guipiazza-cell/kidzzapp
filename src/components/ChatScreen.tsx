@@ -19,7 +19,7 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
-const MAX_FREE_QUESTIONS = 3;
+
 
 const SUGGESTIONS: Record<string, string[]> = {
   "0-3": ["Que som faz o gato? 🐱", "De que cor é o sol? ☀️", "O que é chuva? 🌧️"],
