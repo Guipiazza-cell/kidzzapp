@@ -17,7 +17,7 @@ const QUICK_QUESTIONS = [
 
 const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart, onQuestionClick }, ref) => {
   return (
-    <div className="flex-1 flex flex-col items-center justify-start px-5 pt-6 pb-8 overflow-y-auto">
+    <div ref={ref} className="flex-1 flex flex-col items-center justify-start px-5 pt-6 pb-8 overflow-y-auto">
       {/* Hero */}
       <motion.div
         className="text-center max-w-sm"
