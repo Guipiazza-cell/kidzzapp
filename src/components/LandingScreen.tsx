@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, MessageCircle, Star, Crown, ArrowRight } from "lucide-react";
+import { Sparkles, Star, Crown, ArrowRight } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 
 interface LandingScreenProps {
@@ -18,7 +18,6 @@ const QUICK_QUESTIONS = [
 const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart, onQuestionClick }, ref) => {
   return (
     <div ref={ref} className="flex-1 flex flex-col items-center justify-start px-5 pt-6 pb-8 overflow-y-auto">
-      {/* Hero */}
       <motion.div
         className="text-center max-w-sm"
         initial={{ opacity: 0, y: 20 }}
@@ -26,17 +25,16 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
         transition={{ duration: 0.5 }}
       >
         <ChameleonMascot size="lg" />
-        
+
         <h1 className="text-2xl font-extrabold text-white mt-3 drop-shadow-xl leading-tight">
           Seu filho faz perguntas que você não sabe responder?
         </h1>
-        
+
         <p className="text-white/80 text-base mt-2">
           Respostas inteligentes e histórias na hora, para crianças 🧒
         </p>
       </motion.div>
 
-      {/* Quick questions - WOW moment */}
       <motion.div
         className="w-full max-w-sm mt-6"
         initial={{ opacity: 0, y: 20 }}
@@ -64,7 +62,6 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
         </div>
       </motion.div>
 
-      {/* CTA */}
       <motion.button
         onClick={onStart}
         className="w-full max-w-sm mt-6 py-4 rounded-3xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-lg shadow-2xl flex items-center justify-center gap-2 active:scale-95 transition-all"
@@ -76,7 +73,6 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
         Testar agora <ArrowRight size={20} />
       </motion.button>
 
-      {/* Social proof */}
       <motion.div
         className="mt-5 flex flex-col items-center gap-2"
         initial={{ opacity: 0 }}
@@ -88,15 +84,12 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
             <Star key={i} size={14} className="text-kid-yellow fill-kid-yellow" />
           ))}
         </div>
-        <p className="text-white/70 text-xs font-bold text-center">
-          +5.000 perguntas respondidas
-        </p>
+        <p className="text-white/70 text-xs font-bold text-center">+5.000 perguntas respondidas</p>
         <p className="text-white/50 text-xs text-center italic max-w-[260px]">
           "Salvou minhas noites antes de dormir. Meu filho ama!" — Ana, mãe do Pedro
         </p>
       </motion.div>
 
-      {/* Subscribe CTA */}
       <motion.div
         className="w-full max-w-sm mt-5 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-center"
         initial={{ opacity: 0 }}
@@ -107,9 +100,7 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
           <Crown size={18} className="text-kid-yellow" />
           <span className="text-white font-extrabold text-sm">Quer acesso completo?</span>
         </div>
-        <p className="text-white/60 text-xs mb-3">
-          Perguntas diárias, voz, histórias e muito mais
-        </p>
+        <p className="text-white/60 text-xs mb-3">Perguntas diárias, voz, histórias e muito mais</p>
         <button
           onClick={onStart}
           className="w-full py-3 rounded-2xl kid-gradient-premium text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
