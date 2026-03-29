@@ -171,7 +171,7 @@ const Landing = () => {
               <span className="text-xs text-white/40">Resposta instantânea</span>
               <Zap size={12} className="text-kid-yellow" />
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </section>
 
