@@ -7,6 +7,7 @@ import VoiceInput from "./VoiceInput";
 import ConversionScreen from "./ConversionScreen";
 import ParentalGate from "./ParentalGate";
 import ParentalSettings from "./ParentalSettings";
+import SubscribeBanner from "./SubscribeBanner";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
