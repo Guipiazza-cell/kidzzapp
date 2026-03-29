@@ -63,6 +63,16 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
+  // Handle initial question from landing
+  const initialQuestionSentRef = useRef(false);
+  useEffect(() => {
+    if (initialQuestion && !initialQuestionSentRef.current && !isTyping) {
+      initialQuestionSentRef.current = true;
+      sendMessage(initialQuestion);
+      onInitialQuestionConsumed?.();
+    }
+  }, [initialQuestion]);
+
   const onCheckout = useCallback(async (plan: "premium" | "super_premium") => {
     setCheckoutLoading(true);
     try {
