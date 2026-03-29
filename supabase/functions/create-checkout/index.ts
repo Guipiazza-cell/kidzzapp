@@ -56,7 +56,7 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    const origin = req.headers.get("origin") || "https://id-preview--19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovable.app";
+    const origin = req.headers.get("origin") || "https://kidzzapp.lovable.app";
 
     // Store ref code in metadata for tracking
     const metadata: Record<string, string> = { user_id: user.id, plan };

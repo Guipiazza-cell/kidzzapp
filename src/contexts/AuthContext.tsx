@@ -177,14 +177,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ plan, ref }),
       });
       const data = await resp.json();
-      if (data.url) window.open(data.url, "_blank");
-      else {
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
         const { toast } = await import("sonner");
-        toast.error("Erro ao criar checkout");
+        toast.error(data.error || "Erro ao criar checkout. Tente novamente.");
       }
     } catch {
       const { toast } = await import("sonner");
-      toast.error("Erro ao iniciar pagamento");
+      toast.error("Erro ao iniciar pagamento. Verifique sua conexão.");
     }
   }, [session]);
 
@@ -203,7 +204,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
       const data = await resp.json();
-      if (data.url) window.open(data.url, "_blank");
+      if (data.url) window.location.href = data.url;
       else {
         const { toast } = await import("sonner");
         toast.error(data.error || "Erro ao abrir portal");
