@@ -7,6 +7,7 @@ import VoiceInput from "./VoiceInput";
 import ConversionScreen from "./ConversionScreen";
 import ParentalGate from "./ParentalGate";
 import ParentalSettings from "./ParentalSettings";
+import SubscribeBanner from "./SubscribeBanner";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -39,7 +40,7 @@ const AGE_OPTIONS = [
   { range: "7-10", emoji: "🧑‍🎓", label: "7 a 10 anos" },
 ];
 
-const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void }) => {
+const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionConsumed }: { onOpenStoryFactory?: () => void; initialQuestion?: string | null; onInitialQuestionConsumed?: () => void }) => {
   const { profile, user, session, tier, updateProfile, incrementQuestions, handleCheckout, canAskQuestion, questionsRemaining } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -61,6 +62,16 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  // Handle initial question from landing
+  const initialQuestionSentRef = useRef(false);
+  useEffect(() => {
+    if (initialQuestion && !initialQuestionSentRef.current && !isTyping) {
+      initialQuestionSentRef.current = true;
+      sendMessage(initialQuestion);
+      onInitialQuestionConsumed?.();
+    }
+  }, [initialQuestion]);
 
   const onCheckout = useCallback(async (plan: "premium" | "super_premium") => {
     setCheckoutLoading(true);
@@ -233,6 +244,13 @@ const ChatScreen = ({ onOpenStoryFactory }: { onOpenStoryFactory?: () => void })
           </motion.button>
         </div>
       </header>
+
+      {/* Subscribe banner for free users */}
+      <SubscribeBanner
+        onOpenParentalGate={() => setShowParentalGate(true)}
+        questionsRemaining={questionsRemaining()}
+        isPremium={isPremium}
+      />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col relative z-10 min-h-0">

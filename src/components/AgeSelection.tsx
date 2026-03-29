@@ -20,7 +20,12 @@ const AgeSelection = () => {
   const childName = profile?.child_name || "Explorador";
 
   const handleSelectAge = async (range: string) => {
-    await updateProfile({ age_range: range });
+    // Set age and a default name if not set yet
+    const updates: Record<string, string> = { age_range: range };
+    if (!profile?.child_name) {
+      updates.child_name = "Explorador";
+    }
+    await updateProfile(updates);
   };
 
   return (

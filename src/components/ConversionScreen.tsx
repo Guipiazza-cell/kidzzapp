@@ -26,15 +26,23 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          {childName} adorou conversar com o Kidzz 💛
+          Seu filho pergunta… e você trava? 🤔
         </motion.h2>
         <motion.p
-          className="text-white/70 text-sm mt-2"
+          className="text-white/80 text-sm mt-2 font-bold"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Desbloqueie perguntas diárias e muito mais
+          Chega de inventar resposta na hora.
+        </motion.p>
+        <motion.p
+          className="text-white/60 text-xs mt-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          Continue respondendo todas as curiosidades do {childName}
         </motion.p>
       </div>
 
