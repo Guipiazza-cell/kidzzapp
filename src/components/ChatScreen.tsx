@@ -245,6 +245,13 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
         </div>
       </header>
 
+      {/* Subscribe banner for free users */}
+      <SubscribeBanner
+        onOpenParentalGate={() => setShowParentalGate(true)}
+        questionsRemaining={questionsRemaining()}
+        isPremium={isPremium}
+      />
+
       {/* Main content */}
       <div className="flex-1 flex flex-col relative z-10 min-h-0">
         {isFreeLimitReached ? (
