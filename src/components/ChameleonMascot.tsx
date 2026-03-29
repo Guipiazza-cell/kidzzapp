@@ -58,6 +58,8 @@ const ChameleonMascot = forwardRef<HTMLDivElement, ChameleonMascotProps>(({ isTa
       }
     </motion.div>);
 
-};
+});
+
+ChameleonMascot.displayName = "ChameleonMascot";
 
 export default ChameleonMascot;

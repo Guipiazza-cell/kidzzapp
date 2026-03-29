@@ -124,6 +124,8 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
       </p>
     </div>
   );
-};
+});
+
+LandingScreen.displayName = "LandingScreen";
 
 export default LandingScreen;
