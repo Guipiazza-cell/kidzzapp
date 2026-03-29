@@ -307,13 +307,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (user) {
-      await supabase.from("profiles").update(updates).eq("id", user.id);
+      try {
+        const { error } = await supabase.from("profiles").update(updates).eq("id", user.id);
+        if (error) {
+          console.error("updateProfile DB error:", error.message);
+          // If update fails (e.g. row doesn't exist yet), try upsert
+          const { error: upsertErr } = await supabase.from("profiles").upsert({
+            id: user.id,
+            ...updates,
+          });
+          if (upsertErr) console.error("updateProfile upsert error:", upsertErr.message);
+        }
+      } catch (e) {
+        console.error("updateProfile exception:", e);
+      }
+      // Always update local state regardless of DB result to unblock navigation
       setProfile(prev => {
         const base = prev ?? createDefaultProfile();
         return { ...base, ...updates };
       });
       return;
     }
+    // Guest user
     setProfile(prev => {
       const next = normalizeProfile({ ...(prev ?? getGuestProfile()), ...updates });
       saveGuestProfile(next);
