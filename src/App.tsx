@@ -51,6 +51,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/lp" element={<Landing />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
