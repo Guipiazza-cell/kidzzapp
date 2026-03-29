@@ -204,7 +204,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
       const data = await resp.json();
-      if (data.url) window.open(data.url, "_blank");
+      if (data.url) window.location.href = data.url;
       else {
         const { toast } = await import("sonner");
         toast.error(data.error || "Erro ao abrir portal");
