@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, MessageCircle, Star, Crown, ArrowRight } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
@@ -15,9 +15,9 @@ const QUICK_QUESTIONS = [
   { text: "Como os peixes respiram?", emoji: "🐟" },
 ];
 
-const LandingScreen = ({ onStart, onQuestionClick }: LandingScreenProps) => {
+const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart, onQuestionClick }, ref) => {
   return (
-    <div className="flex-1 flex flex-col items-center justify-start px-5 pt-6 pb-8 overflow-y-auto">
+    <div ref={ref} className="flex-1 flex flex-col items-center justify-start px-5 pt-6 pb-8 overflow-y-auto">
       {/* Hero */}
       <motion.div
         className="text-center max-w-sm"
@@ -124,6 +124,8 @@ const LandingScreen = ({ onStart, onQuestionClick }: LandingScreenProps) => {
       </p>
     </div>
   );
-};
+});
+
+LandingScreen.displayName = "LandingScreen";
 
 export default LandingScreen;

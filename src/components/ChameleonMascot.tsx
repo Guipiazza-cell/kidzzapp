@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import chameleonMain from "@/assets/chameleon-main.jpeg";
 
@@ -14,7 +15,7 @@ const sizeMap = {
   xl: "w-56 h-56"
 };
 
-const ChameleonMascot = ({ isTalking = false, size = "lg", className = "" }: ChameleonMascotProps) => {
+const ChameleonMascot = forwardRef<HTMLDivElement, ChameleonMascotProps>(({ isTalking = false, size = "lg", className = "" }, ref) => {
   return (
     <motion.div
       className={`relative ${sizeMap[size]} ${className}`}
@@ -57,6 +58,8 @@ const ChameleonMascot = ({ isTalking = false, size = "lg", className = "" }: Cha
       }
     </motion.div>);
 
-};
+});
+
+ChameleonMascot.displayName = "ChameleonMascot";
 
 export default ChameleonMascot;
