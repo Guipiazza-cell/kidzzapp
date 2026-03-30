@@ -24,7 +24,10 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <ChameleonMascot size="lg" />
+        <div className="flex items-center justify-center gap-3">
+          <ChameleonMascot size="md" />
+          <span className="text-4xl font-extrabold text-white drop-shadow-xl tracking-tight">Kidzz</span>
+        </div>
 
         <h1 className="text-2xl font-extrabold text-white mt-3 drop-shadow-xl leading-tight">
           Seu filho faz perguntas que você não sabe responder?
