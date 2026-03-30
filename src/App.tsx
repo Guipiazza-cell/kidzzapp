@@ -49,10 +49,12 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/lp" element={<Landing />} />
+            <Route path="/landing" element={<Landing />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
