@@ -10,8 +10,12 @@ interface VoiceInputProps {
 }
 
 const NUM_BARS = 5;
-const TRANSCRIBE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/transcribe-audio`;
-const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+// Extend Window for webkit prefix
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
 
 const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
   const [isListening, setIsListening] = useState(false);
@@ -21,8 +25,7 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
   const animFrameRef = useRef<number>(0);
   const streamRef = useRef<MediaStream | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<any>(null);
 
   const stopAudioAnalysis = useCallback(() => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
@@ -62,103 +65,94 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
     audioCtxRef.current?.close();
     streamRef.current = null;
     audioCtxRef.current = null;
-    recorderRef.current = null;
-    chunksRef.current = [];
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+      recognitionRef.current = null;
+    }
   }, [stopAudioAnalysis]);
 
   useEffect(() => {
     return () => cleanup();
   }, [cleanup]);
 
-  const transcribeAudio = useCallback(async (audioBlob: Blob) => {
-    setIsTranscribing(true);
-    try {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
-
-      const response = await fetch(TRANSCRIBE_URL, {
-        method: "POST",
-        headers: {
-          apikey: ANON_KEY,
-          Authorization: `Bearer ${ANON_KEY}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Transcription failed");
-      }
-
-      const data = await response.json();
-      if (data.text && data.text.trim()) {
-        onResult(data.text.trim());
-      } else {
-        toast.error("Não consegui entender. Tente falar mais perto do microfone! 🎤");
-      }
-    } catch (err) {
-      console.error("Transcription error:", err);
-      toast.error("Erro na transcrição. Tente novamente! 🎤");
-    } finally {
-      setIsTranscribing(false);
-    }
-  }, [onResult]);
+  const getSpeechRecognition = (): any => {
+    const w = window as any;
+    const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SpeechRecognition) return null;
+    return new SpeechRecognition();
+  };
 
   const stopListening = useCallback(() => {
-    if (recorderRef.current && recorderRef.current.state === "recording") {
-      recorderRef.current.stop();
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
     }
     stopAudioAnalysis();
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    audioCtxRef.current?.close();
+    streamRef.current = null;
+    audioCtxRef.current = null;
     setIsListening(false);
   }, [stopAudioAnalysis]);
 
   const startListening = useCallback(async () => {
+    const recognition = getSpeechRecognition();
+    if (!recognition) {
+      toast.error("Seu navegador não suporta reconhecimento de voz. Use Chrome ou Safari! 🎤");
+      return;
+    }
+
     try {
+      // Request mic for audio visualization
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-
-      // Determine best supported mime type
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/webm")
-        ? "audio/webm"
-        : MediaRecorder.isTypeSupported("audio/mp4")
-        ? "audio/mp4"
-        : "audio/wav";
-
-      const recorder = new MediaRecorder(stream, { mimeType });
-      recorderRef.current = recorder;
-      chunksRef.current = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunksRef.current.push(e.data);
-        }
-      };
-
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(chunksRef.current, { type: mimeType });
-        cleanup();
-
-        if (audioBlob.size > 0) {
-          await transcribeAudio(audioBlob);
-        }
-      };
-
-      recorder.onerror = () => {
-        cleanup();
-        setIsListening(false);
-        toast.error("Erro no microfone. Tente novamente!");
-      };
-
-      recorder.start();
-      setIsListening(true);
       startAudioAnalysis(stream);
+    } catch {
+      // Visualization not critical, continue without it
+    }
+
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      if (transcript && transcript.trim()) {
+        onResult(transcript.trim());
+      } else {
+        toast.error("Não consegui entender. Tente falar mais perto do microfone! 🎤");
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      if (event.error === "not-allowed") {
+        toast.error("Permita o acesso ao microfone para falar! 🎤");
+      } else if (event.error === "no-speech") {
+        toast.error("Não ouvi nada. Tente de novo! 🎤");
+      } else if (event.error !== "aborted") {
+        toast.error("Erro no reconhecimento de voz. Tente novamente! 🎤");
+      }
+      cleanup();
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      cleanup();
+      setIsListening(false);
+    };
+
+    try {
+      recognition.start();
+      setIsListening(true);
     } catch (err) {
-      console.error("Mic error:", err);
-      toast.error("Permita o acesso ao microfone para falar! 🎤");
+      console.error("Recognition start error:", err);
+      toast.error("Erro ao iniciar reconhecimento de voz. Tente novamente! 🎤");
+      cleanup();
       setIsListening(false);
     }
-  }, [startAudioAnalysis, cleanup, transcribeAudio]);
+  }, [startAudioAnalysis, cleanup, onResult]);
 
   const handleClick = useCallback(() => {
     if (isListening) {
