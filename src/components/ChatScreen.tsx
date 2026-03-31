@@ -83,14 +83,15 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
   }, [handleCheckout]);
 
   const speakText = useCallback(async (text: string) => {
-    if (!isPremium) return;
     setIsSpeaking(true);
     try {
       await speak(text);
+    } catch {
+      toast.error("Erro na narração. Tente novamente! 🔊");
     } finally {
       setIsSpeaking(false);
     }
-  }, [speak, isPremium]);
+  }, [speak]);
 
   const streamChat = useCallback(async (userMessages: {role: string; content: string}[]) => {
     const resp = await fetch(CHAT_URL, {
@@ -333,7 +334,7 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
                     key={msg.id}
                     message={msg.text}
                     isUser={msg.isUser}
-                    onSpeak={!msg.isUser && isPremium ? speakText : undefined}
+                    onSpeak={!msg.isUser ? speakText : undefined}
                   />
                 ))}
               </AnimatePresence>

@@ -19,7 +19,6 @@ interface SpeechRecognitionEvent extends Event {
 
 const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
   const [isListening, setIsListening] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
   const [levels, setLevels] = useState<number[]>(new Array(NUM_BARS).fill(0));
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number>(0);
@@ -167,7 +166,7 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
   const barWidth = large ? 6 : 3;
   const barGap = large ? 4 : 2;
 
-  const isActive = isListening || isTranscribing;
+  const isActive = isListening;
 
   return (
     <motion.div whileTap={{ scale: 0.9 }} className="relative">
@@ -185,14 +184,6 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
             transition={{ duration: 1, repeat: Infinity, ease: "easeOut", delay: 0.3 }}
           />
         </>
-      )}
-      {/* Transcribing indicator */}
-      {isTranscribing && (
-        <motion.div
-          className="absolute inset-0 rounded-full bg-kid-yellow/30"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0.2, 0.6] }}
-          transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-        />
       )}
       {/* Idle pulse */}
       {!isActive && !disabled && large && (
@@ -212,29 +203,17 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
 
       <button
         onClick={handleClick}
-        disabled={disabled || isTranscribing}
+        disabled={disabled}
         className={`relative z-10 ${sizeClasses} rounded-full flex items-center justify-center shadow-xl transition-all ${
-          isTranscribing
-            ? "kid-gradient-yellow"
-            : isListening
+          isListening
             ? "kid-gradient-green"
             : large
             ? "kid-gradient-orange hover:shadow-[0_0_50px_hsl(var(--kid-orange)/0.5)]"
             : "kid-gradient-blue hover:shadow-2xl"
         } disabled:opacity-50`}
-        aria-label={isTranscribing ? "Transcrevendo..." : isListening ? "Parar gravação" : "Falar pergunta"}
+        aria-label={isListening ? "Parar gravação" : "Falar pergunta"}
       >
-        {isTranscribing ? (
-          <motion.div
-            className="flex items-center gap-1"
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1, repeat: Infinity }}
-          >
-            <div className="w-2 h-2 rounded-full bg-white" />
-            <div className="w-2 h-2 rounded-full bg-white" />
-            <div className="w-2 h-2 rounded-full bg-white" />
-          </motion.div>
-        ) : isListening ? (
+        {isListening ? (
           large ? (
             <div className="flex items-center justify-center" style={{ gap: barGap }}>
               {levels.map((level, i) => (
