@@ -19,7 +19,6 @@ interface SpeechRecognitionEvent extends Event {
 
 const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
   const [isListening, setIsListening] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
   const [levels, setLevels] = useState<number[]>(new Array(NUM_BARS).fill(0));
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number>(0);
