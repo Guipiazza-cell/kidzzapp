@@ -334,7 +334,7 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
                     key={msg.id}
                     message={msg.text}
                     isUser={msg.isUser}
-                    onSpeak={!msg.isUser && isPremium ? speakText : undefined}
+                    onSpeak={!msg.isUser ? speakText : undefined}
                   />
                 ))}
               </AnimatePresence>

@@ -211,19 +211,9 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
             ? "kid-gradient-orange hover:shadow-[0_0_50px_hsl(var(--kid-orange)/0.5)]"
             : "kid-gradient-blue hover:shadow-2xl"
         } disabled:opacity-50`}
-        aria-label={isTranscribing ? "Transcrevendo..." : isListening ? "Parar gravação" : "Falar pergunta"}
+        aria-label={isListening ? "Parar gravação" : "Falar pergunta"}
       >
-        {isTranscribing ? (
-          <motion.div
-            className="flex items-center gap-1"
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1, repeat: Infinity }}
-          >
-            <div className="w-2 h-2 rounded-full bg-white" />
-            <div className="w-2 h-2 rounded-full bg-white" />
-            <div className="w-2 h-2 rounded-full bg-white" />
-          </motion.div>
-        ) : isListening ? (
+        {isListening ? (
           large ? (
             <div className="flex items-center justify-center" style={{ gap: barGap }}>
               {levels.map((level, i) => (
