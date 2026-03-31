@@ -185,14 +185,6 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
           />
         </>
       )}
-      {/* Transcribing indicator */}
-      {isTranscribing && (
-        <motion.div
-          className="absolute inset-0 rounded-full bg-kid-yellow/30"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0.2, 0.6] }}
-          transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-        />
-      )}
       {/* Idle pulse */}
       {!isActive && !disabled && large && (
         <motion.div
