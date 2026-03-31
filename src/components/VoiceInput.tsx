@@ -203,11 +203,9 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
 
       <button
         onClick={handleClick}
-        disabled={disabled || isTranscribing}
+        disabled={disabled}
         className={`relative z-10 ${sizeClasses} rounded-full flex items-center justify-center shadow-xl transition-all ${
-          isTranscribing
-            ? "kid-gradient-yellow"
-            : isListening
+          isListening
             ? "kid-gradient-green"
             : large
             ? "kid-gradient-orange hover:shadow-[0_0_50px_hsl(var(--kid-orange)/0.5)]"
