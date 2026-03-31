@@ -166,7 +166,7 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
   const barWidth = large ? 6 : 3;
   const barGap = large ? 4 : 2;
 
-  const isActive = isListening || isTranscribing;
+  const isActive = isListening;
 
   return (
     <motion.div whileTap={{ scale: 0.9 }} className="relative">
