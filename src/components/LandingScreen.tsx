@@ -20,7 +20,7 @@ const letterVariants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.6 + i * 0.04, duration: 0.4, ease: "easeOut" },
+    transition: { delay: 0.6 + i * 0.04, duration: 0.4, ease: "easeOut" as const },
   }),
 };
 
