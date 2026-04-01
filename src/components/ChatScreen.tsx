@@ -21,17 +21,16 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
 
-
 const SUGGESTIONS: Record<string, string[]> = {
   "0-3": ["Que som faz o gato? 🐱", "De que cor é o sol? ☀️", "O que é chuva? 🌧️"],
   "3-7": ["Por que o céu é azul? 🌤️", "Como os peixes respiram? 🐟", "Por que a Lua brilha? 🌙"],
-  "7-10": ["Como funciona um vulcão? 🌋", "Por que existem fusos horários? 🕐", "Como surgiu a internet? 💻"]
+  "7-10": ["Como funciona um vulcão? 🌋", "Por que existem fusos horários? 🕐", "Como surgiu a internet? 💻"],
 };
 
 const FOLLOW_UPS: Record<string, string[]> = {
   "0-3": ["Que mais você quer saber? 🌈", "Quer ouvir de novo? 🔄"],
   "3-7": ["Quer saber por que isso acontece? 🤔", "Quer saber mais? ✨", "Tem outra pergunta? 🦎"],
-  "7-10": ["Quer se aprofundar nisso? 🔬", "Quer um desafio sobre isso? 🧠", "Pergunta mais! 🚀"]
+  "7-10": ["Quer se aprofundar nisso? 🔬", "Quer um desafio sobre isso? 🧠", "Pergunta mais! 🚀"],
 };
 
 const AGE_OPTIONS = [
@@ -40,8 +39,19 @@ const AGE_OPTIONS = [
   { range: "7-10", emoji: "🧑‍🎓", label: "7 a 10 anos" },
 ];
 
-const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionConsumed }: { onOpenStoryFactory?: () => void; initialQuestion?: string | null; onInitialQuestionConsumed?: () => void }) => {
-  const { profile, user, session, tier, updateProfile, incrementQuestions, handleCheckout, canAskQuestion, questionsRemaining } = useAuth();
+const ChatScreen = ({
+  onOpenStoryFactory,
+  initialQuestion,
+  onInitialQuestionConsumed,
+}: {
+  onOpenStoryFactory?: () => void;
+  initialQuestion?: string | null;
+  onInitialQuestionConsumed?: () => void;
+}) => {
+  const {
+    profile, user, session, tier, updateProfile, incrementQuestions,
+    handleCheckout, canAskQuestion, questionsRemaining,
+  } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -63,7 +73,6 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  // Handle initial question from landing
   const initialQuestionSentRef = useRef(false);
   useEffect(() => {
     if (initialQuestion && !initialQuestionSentRef.current && !isTyping) {
@@ -75,34 +84,23 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
 
   const onCheckout = useCallback(async (plan: "premium" | "super_premium") => {
     setCheckoutLoading(true);
-    try {
-      await handleCheckout(plan);
-    } finally {
-      setCheckoutLoading(false);
-    }
+    try { await handleCheckout(plan); } finally { setCheckoutLoading(false); }
   }, [handleCheckout]);
 
   const speakText = useCallback(async (text: string) => {
     setIsSpeaking(true);
-    try {
-      await speak(text);
-    } catch {
-      toast.error("Erro na narração. Tente novamente! 🔊");
-    } finally {
-      setIsSpeaking(false);
-    }
+    try { await speak(text); } catch { toast.error("Erro na narração. Tente novamente! 🔊"); } finally { setIsSpeaking(false); }
   }, [speak]);
 
-  const streamChat = useCallback(async (userMessages: {role: string; content: string}[]) => {
+  const streamChat = useCallback(async (userMessages: { role: string; content: string }[]) => {
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: userMessages, ageRange })
+      body: JSON.stringify({ messages: userMessages, ageRange }),
     });
-
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({ error: "Erro desconhecido" }));
       throw new Error(err.error || `Erro ${resp.status}`);
@@ -117,9 +115,7 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
     const updateAssistant = (text: string) => {
       setMessages((prev) => {
         const last = prev[prev.length - 1];
-        if (last && !last.isUser) {
-          return prev.map((m, i) => i === prev.length - 1 ? { ...m, text } : m);
-        }
+        if (last && !last.isUser) return prev.map((m, i) => (i === prev.length - 1 ? { ...m, text } : m));
         return [...prev, { id: Date.now() + 1, text, isUser: false }];
       });
     };
@@ -154,34 +150,27 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isTyping || !canAskQuestion()) return;
-
     const userMsg: Message = { id: Date.now(), text: text.trim(), isUser: true };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
-
-    // Always increment (daily reset handles paid users)
     await incrementQuestions();
-
     const allMessages = [...messages, userMsg].map((m) => ({
-      role: m.isUser ? "user" as const : "assistant" as const,
-      content: m.text
+      role: m.isUser ? ("user" as const) : ("assistant" as const),
+      content: m.text,
     }));
-
     try {
       await streamChat(allMessages);
-      // TTS is now triggered by the "OUVIR" button, not auto-play
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
-      setMessages((prev) => [...prev, {
-        id: Date.now() + 1,
-        text: "Ops, não consegui responder agora! Tente de novo 🦎💛",
-        isUser: false
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now() + 1, text: "Ops, não consegui responder agora! Tente de novo 🦎💛", isUser: false },
+      ]);
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping, canAskQuestion, messages, streamChat, speakText, incrementQuestions]);
+  }, [isTyping, canAskQuestion, messages, streamChat, incrementQuestions]);
 
   const handleVoiceResult = useCallback((text: string) => {
     setInput(text);
@@ -191,16 +180,26 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
   const followUps = FOLLOW_UPS[ageRange] || FOLLOW_UPS["3-7"];
   const randomFollowUp = followUps[Math.floor(Math.random() * followUps.length)];
 
+  const mascotMood = isTyping ? "thinking" : isSpeaking ? "talking" : messages.length === 0 ? "curious" : "happy";
+
   return (
     <div className="min-h-screen flex flex-col overflow-hidden relative">
       <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
       <div className="fixed inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
 
+      {/* Fireflies */}
       {[...Array(6)].map((_, i) => (
         <motion.div
           key={i}
-          className="fixed rounded-full bg-kid-yellow/50"
-          style={{ width: 4, height: 4, left: `${10 + i * 14}%`, top: `${15 + (i % 3) * 22}%` }}
+          className="fixed rounded-full"
+          style={{
+            width: 3,
+            height: 3,
+            left: `${10 + i * 14}%`,
+            top: `${15 + (i % 3) * 22}%`,
+            background: "hsl(var(--kid-yellow))",
+            boxShadow: "0 0 6px hsl(var(--kid-yellow) / 0.5)",
+          }}
           animate={{ y: [0, -25, 10, 0], opacity: [0.2, 0.7, 0.3, 0.2] }}
           transition={{ duration: 3.5 + i * 0.5, repeat: Infinity, delay: i * 0.5 }}
         />
@@ -220,11 +219,12 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
           )}
         </motion.div>
         <div className="flex items-center gap-2">
-          {(
-            <span className="text-sm text-white font-extrabold bg-kid-orange/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
-              {questionsRemaining()} 💬
-            </span>
-          )}
+          <motion.span
+            className="text-sm text-white font-extrabold bg-kid-orange/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg"
+            whileTap={{ scale: 0.9 }}
+          >
+            {questionsRemaining()} 💬
+          </motion.span>
           {isSuperPremium && onOpenStoryFactory && (
             <motion.button
               onClick={onOpenStoryFactory}
@@ -246,22 +246,13 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
         </div>
       </header>
 
-      {/* Subscribe banner for free users */}
-      <SubscribeBanner
-        onOpenParentalGate={() => setShowParentalGate(true)}
-        questionsRemaining={questionsRemaining()}
-        isPremium={isPremium}
-      />
+      <SubscribeBanner onOpenParentalGate={() => setShowParentalGate(true)} questionsRemaining={questionsRemaining()} isPremium={isPremium} />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col relative z-10 min-h-0">
         {isFreeLimitReached ? (
           <div className="flex-1 overflow-y-auto">
-            <ConversionScreen
-              childName={childName}
-              onSubscribe={onCheckout}
-              loading={checkoutLoading}
-            />
+            <ConversionScreen childName={childName} onSubscribe={onCheckout} loading={checkoutLoading} />
           </div>
         ) : messages.length === 0 ? (
           <motion.div
@@ -270,15 +261,30 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <ChameleonMascot size="lg" />
-            <h2 className="text-xl font-extrabold text-white text-center mt-2 drop-shadow-lg">
+            <ChameleonMascot size="lg" mood="curious" />
+            <motion.h2
+              className="text-xl font-extrabold text-white text-center mt-2 drop-shadow-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
               Pergunta pra mim qualquer coisa
-            </h2>
-            <p className="text-white/70 text-center text-sm max-w-[260px] mt-1">
+            </motion.h2>
+            <motion.p
+              className="text-white/70 text-center text-sm max-w-[260px] mt-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
               Eu adoro responder! Pode falar ou digitar
-            </p>
+            </motion.p>
 
-            <motion.div className="mt-6 relative flex items-center justify-center">
+            <motion.div
+              className="mt-6 relative flex items-center justify-center"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.8, type: "spring", stiffness: 200 }}
+            >
               <motion.div
                 className="absolute w-44 h-44 rounded-full bg-kid-orange/20"
                 animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0, 0.4] }}
@@ -287,55 +293,76 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
               <VoiceInput onResult={handleVoiceResult} disabled={isTyping} large />
             </motion.div>
 
-            <p className="text-white/50 text-xs mt-4 font-bold animate-pulse">
+            <motion.p
+              className="text-white/50 text-xs mt-4 font-bold"
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
               🎤 Toque para falar sua pergunta!
-            </p>
+            </motion.p>
 
-            <div className="flex flex-wrap justify-center gap-2 mt-4 max-w-xs">
-              {(SUGGESTIONS[ageRange] || SUGGESTIONS["3-7"]).map((q) => (
-                <button
+            <motion.div
+              className="flex flex-wrap justify-center gap-2 mt-4 max-w-xs"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              {(SUGGESTIONS[ageRange] || SUGGESTIONS["3-7"]).map((q, i) => (
+                <motion.button
                   key={q}
                   onClick={() => sendMessage(q)}
                   className="bg-black/30 backdrop-blur-md border border-white/20 px-3 py-2 rounded-2xl text-xs font-bold text-white hover:bg-white/20 transition-all active:scale-95 shadow-md"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.1 + i * 0.1 }}
+                  whileTap={{ scale: 0.93 }}
                 >
                   {q}
-                </button>
+                </motion.button>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         ) : (
           <>
             <div className="flex items-center gap-2 px-4 py-2 bg-black/30 backdrop-blur-md">
-              <ChameleonMascot isTalking={isTyping || isSpeaking} size="sm" />
+              <ChameleonMascot isTalking={isTyping || isSpeaking} mood={mascotMood} size="sm" />
               <span className="text-sm font-extrabold text-white">Kidzz</span>
               {isTyping && (
                 <motion.span
-                  className="text-xs text-white/70 font-bold"
+                  className="text-xs text-white/70 font-bold flex items-center gap-1"
                   animate={{ opacity: [1, 0.4, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
+                  <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.6, repeat: Infinity }}>
+                    🤔
+                  </motion.span>
                   pensando...
                 </motion.span>
               )}
               {isSpeaking && !isTyping && (
                 <motion.span
-                  className="text-xs text-kid-yellow font-bold"
+                  className="text-xs text-kid-yellow font-bold flex items-center gap-1"
                   animate={{ opacity: [1, 0.4, 1] }}
                   transition={{ duration: 0.8, repeat: Infinity }}
                 >
-                  🔊 Kidzz está falando...
+                  <div className="flex gap-0.5 items-end">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="w-0.5 bg-kid-yellow rounded-full"
+                        animate={{ height: [3, 10, 3] }}
+                        transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.12 }}
+                      />
+                    ))}
+                  </div>
+                  Kidzz está falando...
                 </motion.span>
               )}
             </div>
             <div ref={chatRef} className="flex-1 overflow-y-auto px-4 pb-2">
               <AnimatePresence>
                 {messages.map((msg) => (
-                  <ChatBubble
-                    key={msg.id}
-                    message={msg.text}
-                    isUser={msg.isUser}
-                    onSpeak={!msg.isUser ? speakText : undefined}
-                  />
+                  <ChatBubble key={msg.id} message={msg.text} isUser={msg.isUser} onSpeak={!msg.isUser ? speakText : undefined} />
                 ))}
               </AnimatePresence>
 
@@ -346,12 +373,13 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
                   transition={{ delay: 0.5 }}
                   className="flex justify-center mt-2 mb-2"
                 >
-                  <button
+                  <motion.button
                     onClick={() => sendMessage(randomFollowUp)}
                     className="bg-kid-green/20 border border-kid-green/30 px-4 py-2 rounded-2xl text-xs font-bold text-white/90 hover:bg-kid-green/30 transition-all active:scale-95"
+                    whileTap={{ scale: 0.93 }}
                   >
                     {randomFollowUp}
-                  </button>
+                  </motion.button>
                 </motion.div>
               )}
             </div>
@@ -361,18 +389,24 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
 
       {/* Input area */}
       {!isFreeLimitReached && (
-        <div className="relative z-10 p-4 pb-6">
+        <motion.div
+          className="relative z-10 p-4 pb-6"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
           <div className="space-y-2">
-            {(
-              <div className="flex justify-center">
-                <div className="bg-kid-orange/90 backdrop-blur-md rounded-full px-5 py-2 flex items-center gap-2 shadow-lg">
-                  <span className="text-white text-2xl font-extrabold">{questionsRemaining()}</span>
-                  <span className="text-white/90 text-sm font-bold">
-                    {isPremium ? "perguntas hoje" : "perguntas restantes"}
-                  </span>
-                </div>
-              </div>
-            )}
+            <div className="flex justify-center">
+              <motion.div
+                className="bg-kid-orange/90 backdrop-blur-md rounded-full px-5 py-2 flex items-center gap-2 shadow-lg"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-white text-2xl font-extrabold">{questionsRemaining()}</span>
+                <span className="text-white/90 text-sm font-bold">
+                  {isPremium ? "perguntas hoje" : "perguntas restantes"}
+                </span>
+              </motion.div>
+            </div>
             <div className="flex items-end gap-3">
               <VoiceInput onResult={handleVoiceResult} disabled={isTyping} />
               <div className="flex-1 relative">
@@ -385,19 +419,19 @@ const ChatScreen = ({ onOpenStoryFactory, initialQuestion, onInitialQuestionCons
                   className="w-full py-4 px-5 rounded-3xl bg-black/40 backdrop-blur-md border-2 border-white/20 text-white text-base placeholder:text-white/50 focus:outline-none focus:border-kid-orange focus:ring-2 focus:ring-kid-orange/30 shadow-lg transition-all"
                 />
               </div>
-              <motion.div whileTap={{ scale: 0.85 }}>
-                <button
-                  onClick={() => sendMessage(input)}
-                  disabled={!input.trim() || isTyping}
-                  aria-label="Perguntar"
-                  className="relative w-14 h-14 rounded-full kid-gradient-orange shadow-2xl flex items-center justify-center disabled:opacity-40 transition-all"
-                >
-                  <Send size={24} className="text-white" />
-                </button>
-              </motion.div>
+              <motion.button
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || isTyping}
+                aria-label="Perguntar"
+                className="relative w-14 h-14 rounded-full kid-gradient-orange shadow-2xl flex items-center justify-center disabled:opacity-40 transition-all"
+                whileTap={{ scale: 0.85 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <Send size={24} className="text-white" />
+              </motion.button>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       <AnimatePresence>
