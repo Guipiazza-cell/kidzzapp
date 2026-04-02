@@ -1,6 +1,6 @@
-import { forwardRef } from "react";
-import { motion } from "framer-motion";
-import { Sparkles, Star, Crown, ArrowRight } from "lucide-react";
+import { forwardRef, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Star, Shield, Mic } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 
 interface LandingScreenProps {
@@ -10,193 +10,139 @@ interface LandingScreenProps {
 
 const QUICK_QUESTIONS = [
   { text: "Por que o céu é azul?", emoji: "🌤️" },
-  { text: "Como os dinossauros morreram?", emoji: "🦕" },
-  { text: "Por que a gente sonha?", emoji: "💭" },
-  { text: "Como os peixes respiram?", emoji: "🐟" },
+  { text: "O que acontece quando a gente morre?", emoji: "💭" },
+  { text: "Como os bebês nascem?", emoji: "👶" },
+  { text: "Por que preciso dormir?", emoji: "😴" },
 ];
 
-const letterVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.6 + i * 0.04, duration: 0.4, ease: "easeOut" as const },
-  }),
-};
+const PARENT_PHRASES = [
+  "Hoje você vai responder melhor do que ontem.",
+  "Seu filho vai lembrar dessas respostas pra sempre.",
+  "Cada pergunta é uma chance de conexão.",
+];
 
 const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart, onQuestionClick }, ref) => {
-  const headline = "Seu filho faz perguntas que você não sabe responder?";
+  const [phraseIdx, setPhraseIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPhraseIdx((i) => (i + 1) % PARENT_PHRASES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div ref={ref} className="flex-1 flex flex-col items-center justify-start px-5 pt-6 pb-8 overflow-y-auto">
-      {/* Hero: mascot + brand */}
+    <div ref={ref} className="flex-1 flex flex-col items-center px-5 pt-8 pb-8 overflow-y-auto">
+      {/* Brand */}
       <motion.div
-        className="text-center max-w-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        className="flex items-center gap-3"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <motion.div
-          className="flex items-center justify-center gap-3"
-          initial={{ scale: 0, rotate: -15 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 200, damping: 14, delay: 0.1 }}
-        >
-          <ChameleonMascot size="md" mood="happy" />
-          <motion.span
-            className="text-4xl font-extrabold text-white drop-shadow-xl tracking-tight"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-          >
-            Kidzz
-          </motion.span>
-        </motion.div>
-
-        {/* Letter-by-letter headline */}
-        <h1 className="text-2xl font-extrabold text-white mt-3 drop-shadow-xl leading-tight">
-          {headline.split("").map((char, i) => (
-            <motion.span
-              key={i}
-              custom={i}
-              variants={letterVariants}
-              initial="hidden"
-              animate="visible"
-              className="inline-block"
-              style={char === " " ? { width: "0.25em" } : undefined}
-            >
-              {char === " " ? "\u00A0" : char}
-            </motion.span>
-          ))}
-        </h1>
-
-        <motion.p
-          className="text-white/80 text-base mt-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.8, duration: 0.5 }}
-        >
-          Respostas inteligentes e histórias na hora, para crianças 🧒
-        </motion.p>
+        <ChameleonMascot size="sm" mood="happy" interactive={false} />
+        <span className="text-3xl font-black text-primary-foreground tracking-tight drop-shadow-lg">
+          Kidzz
+        </span>
       </motion.div>
 
-      {/* Quick questions */}
+      {/* Dynamic parent phrase */}
+      <div className="mt-6 h-14 flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={phraseIdx}
+            className="text-center text-primary-foreground/90 text-lg font-bold max-w-[300px] leading-snug"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4 }}
+          >
+            {PARENT_PHRASES[phraseIdx]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+
+      {/* Main question prompt */}
       <motion.div
         className="w-full max-w-sm mt-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2 }}
+        transition={{ delay: 0.4 }}
       >
-        <motion.p
-          className="text-white/60 text-xs font-bold text-center mb-3 uppercase tracking-wider"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          👆 Toque em uma pergunta e veja a mágica
-        </motion.p>
-        <div className="grid grid-cols-2 gap-2">
+        <p className="text-primary-foreground/50 text-xs font-bold text-center mb-3 uppercase tracking-widest">
+          Qual pergunta seu filho fez hoje?
+        </p>
+
+        {/* Question cards - clean grid */}
+        <div className="space-y-2">
           {QUICK_QUESTIONS.map((q, i) => (
             <motion.button
               key={q.text}
               onClick={() => onQuestionClick(q.text)}
-              className="group bg-white/10 backdrop-blur-md border border-white/20 p-3 rounded-2xl text-left hover:bg-white/25 transition-all active:scale-95 shadow-md relative overflow-hidden"
-              initial={{ opacity: 0, scale: 0.85, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 2.1 + i * 0.12, type: "spring", stiffness: 200 }}
-              whileTap={{ scale: 0.93 }}
+              className="w-full flex items-center gap-3 glass-card p-4 rounded-2xl text-left active:scale-[0.98] transition-transform"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 + i * 0.1, type: "spring", stiffness: 200 }}
+              whileTap={{ scale: 0.97 }}
             >
-              {/* Shimmer effect on hover */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full"
-                whileHover={{ translateX: "200%" }}
-                transition={{ duration: 0.6 }}
-              />
-              <span className="text-2xl block mb-1">{q.emoji}</span>
-              <span className="text-xs font-bold text-white leading-tight">{q.text}</span>
+              <span className="text-2xl flex-shrink-0">{q.emoji}</span>
+              <span className="text-sm font-bold text-primary-foreground leading-tight flex-1">
+                {q.text}
+              </span>
+              <ArrowRight size={16} className="text-primary-foreground/30 flex-shrink-0" />
             </motion.button>
           ))}
         </div>
       </motion.div>
 
-      {/* CTA button */}
+      {/* CTA */}
       <motion.button
         onClick={onStart}
-        className="w-full max-w-sm mt-6 py-4 rounded-3xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-lg shadow-2xl flex items-center justify-center gap-2 active:scale-95 transition-all relative overflow-hidden"
+        className="w-full max-w-sm mt-6 py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform relative overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.6 }}
+        transition={{ delay: 0.9 }}
         whileTap={{ scale: 0.97 }}
-        whileHover={{ scale: 1.02 }}
       >
-        {/* Pulsing glow inside button */}
         <motion.div
-          className="absolute inset-0 bg-white/20 rounded-3xl"
-          animate={{ opacity: [0, 0.3, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute inset-0 bg-primary-foreground/10 rounded-2xl"
+          animate={{ opacity: [0, 0.2, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity }}
         />
-        <span className="relative z-10 flex items-center gap-2">
-          Testar agora <ArrowRight size={20} />
-        </span>
+        <Mic size={20} className="relative z-10" />
+        <span className="relative z-10">Responder agora</span>
       </motion.button>
 
-      {/* Social proof */}
+      {/* Social proof - minimal */}
       <motion.div
-        className="mt-5 flex flex-col items-center gap-2"
+        className="mt-6 flex flex-col items-center gap-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 3 }}
+        transition={{ delay: 1.2 }}
       >
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           {[...Array(5)].map((_, i) => (
-            <motion.div
-              key={i}
-              initial={{ scale: 0, rotate: -30 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 3.1 + i * 0.1, type: "spring", stiffness: 300 }}
-            >
-              <Star size={14} className="text-kid-yellow fill-kid-yellow" />
-            </motion.div>
+            <Star key={i} size={12} className="text-kid-yellow fill-kid-yellow" />
           ))}
+          <span className="text-primary-foreground/50 text-xs font-bold ml-2">+5.000 perguntas</span>
         </div>
-        <p className="text-white/70 text-xs font-bold text-center">+5.000 perguntas respondidas</p>
-        <motion.p
-          className="text-white/50 text-xs text-center italic max-w-[260px]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 3.5 }}
-        >
-          "Salvou minhas noites antes de dormir. Meu filho ama!" — Ana, mãe do Pedro
-        </motion.p>
+        <p className="text-primary-foreground/40 text-xs text-center italic max-w-[260px]">
+          "Salvou minhas noites antes de dormir." — Ana, mãe do Pedro
+        </p>
       </motion.div>
 
-      {/* Premium upsell */}
+      {/* Trust */}
       <motion.div
-        className="w-full max-w-sm mt-5 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 3.6 }}
+        className="mt-4 flex items-center gap-2 text-primary-foreground/30"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.4 }}
       >
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-            <Crown size={18} className="text-kid-yellow" />
-          </motion.div>
-          <span className="text-white font-extrabold text-sm">Quer acesso completo?</span>
-        </div>
-        <p className="text-white/60 text-xs mb-3">Perguntas diárias, voz, histórias e muito mais</p>
-        <motion.button
-          onClick={onStart}
-          className="w-full py-3 rounded-2xl kid-gradient-premium text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
-          whileTap={{ scale: 0.97 }}
-          whileHover={{ scale: 1.02 }}
-        >
-          <Sparkles size={16} />
-          Ver planos
-        </motion.button>
+        <Shield size={12} />
+        <span className="text-[10px] font-bold">
+          Conteúdo baseado em comunicação infantil responsável
+        </span>
       </motion.div>
-
-      <p className="text-white/30 text-[10px] mt-4 text-center">
-        🔒 Seguro e feito para crianças • Sem anúncios
-      </p>
     </div>
   );
 });
