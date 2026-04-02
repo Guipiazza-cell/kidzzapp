@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield } from "lucide-react";
+import { Shield, Check } from "lucide-react";
 import ChameleonMascot from "./ChameleonMascot";
 import ParentalGate from "./ParentalGate";
 import ParentalSettings from "./ParentalSettings";
 import { useAuth } from "@/contexts/AuthContext";
-import jungleBg from "@/assets/jungle-bg.jpg";
 
 const AGE_OPTIONS = [
-  { range: "0-3", emoji: "👶", label: "0 a 3 anos", desc: "Sons, cores e palavrinhas simples", color: "from-pink-400 to-rose-500" },
-  { range: "3-7", emoji: "🧒", label: "3 a 7 anos", desc: "Historinhas e exemplos do dia a dia", color: "from-emerald-400 to-teal-500" },
-  { range: "7-10", emoji: "🧑‍🎓", label: "7 a 10 anos", desc: "Curiosidades e desafios científicos", color: "from-blue-400 to-indigo-500" },
+  { range: "0-3", emoji: "🧒", label: "3 – 5 anos", desc: "Respostas simples e carinhosas", accent: "from-emerald-400 to-teal-400" },
+  { range: "3-7", emoji: "🎒", label: "6 – 8 anos", desc: "Histórias e exemplos do dia a dia", accent: "from-sky-400 to-blue-500" },
+  { range: "7-10", emoji: "🧠", label: "9 – 12 anos", desc: "Curiosidades e desafios científicos", accent: "from-violet-400 to-purple-500" },
 ];
 
 const AgeSelection = () => {
@@ -22,119 +21,98 @@ const AgeSelection = () => {
 
   const handleSelectAge = async (range: string) => {
     setSelected(range);
-    // Short delay for selection animation
     setTimeout(async () => {
       const updates: Record<string, string> = { age_range: range };
       if (!profile?.child_name) updates.child_name = "Explorador";
       await updateProfile(updates);
-    }, 400);
+    }, 500);
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden relative">
-      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-
-      {/* Magical fireflies */}
-      {[...Array(8)].map((_, i) => (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
+        {/* Mascot */}
         <motion.div
-          key={i}
-          className="fixed rounded-full"
-          style={{
-            width: 3 + Math.random() * 3,
-            height: 3 + Math.random() * 3,
-            left: `${10 + i * 11}%`,
-            top: `${15 + (i % 4) * 20}%`,
-            background: "hsl(var(--kid-yellow))",
-            boxShadow: `0 0 ${6 + i}px hsl(var(--kid-yellow) / 0.5)`,
-          }}
-          animate={{
-            y: [0, -25, 10, 0],
-            opacity: [0.2, 0.9, 0.3, 0.2],
-          }}
-          transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.4 }}
-        />
-      ))}
-
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
-        <motion.div
-          initial={{ scale: 0, rotate: -20 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 200 }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
         >
           <ChameleonMascot size="lg" mood="curious" />
         </motion.div>
 
         <motion.h1
-          className="text-3xl font-extrabold text-white text-center mt-3 drop-shadow-xl"
-          initial={{ opacity: 0, y: 20 }}
+          className="text-2xl font-black text-primary-foreground text-center mt-4"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          Olá, {childName}!
+          Qual a idade do seu filho?
         </motion.h1>
 
         <motion.p
-          className="text-white/80 text-center text-base mt-2 max-w-xs"
+          className="text-primary-foreground/50 text-center text-sm mt-1 max-w-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Qual a sua idade? Assim eu sei como conversar!
+          Assim a gente adapta cada resposta perfeitamente
         </motion.p>
 
+        {/* Age cards */}
         <motion.div
-          className="w-full max-w-sm mt-5 space-y-3"
-          initial={{ opacity: 0, y: 30 }}
+          className="w-full max-w-sm mt-8 space-y-3"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.6 }}
         >
-          {AGE_OPTIONS.map((opt, i) => (
-            <motion.button
-              key={opt.range}
-              onClick={() => handleSelectAge(opt.range)}
-              className={`w-full flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r ${opt.color} text-white shadow-xl transition-all active:scale-95 relative overflow-hidden ${
-                selected === opt.range ? "ring-4 ring-white/50" : ""
-              }`}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 + i * 0.15 }}
-            >
-              {/* Selection sparkle */}
-              {selected === opt.range && (
-                <motion.div
-                  className="absolute inset-0 bg-white/20 rounded-2xl"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.4, 0] }}
-                  transition={{ duration: 0.6 }}
-                />
-              )}
-              <motion.span
-                className="text-4xl"
-                animate={selected === opt.range ? { scale: [1, 1.3, 1], rotate: [0, 10, 0] } : {}}
-                transition={{ duration: 0.4 }}
+          {AGE_OPTIONS.map((opt, i) => {
+            const isSelected = selected === opt.range;
+            return (
+              <motion.button
+                key={opt.range}
+                onClick={() => handleSelectAge(opt.range)}
+                className={`w-full flex items-center gap-4 p-5 rounded-2xl transition-all active:scale-[0.97] relative overflow-hidden ${
+                  isSelected
+                    ? "glass-card-light ring-2 ring-primary-foreground/30"
+                    : "glass-card"
+                }`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 + i * 0.12 }}
+                whileTap={{ scale: 0.97 }}
               >
-                {opt.emoji}
-              </motion.span>
-              <div className="text-left">
-                <p className="font-extrabold text-lg">{opt.label}</p>
-                <p className="text-sm text-white/80">{opt.desc}</p>
-              </div>
-            </motion.button>
-          ))}
+                {/* Accent bar */}
+                <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${opt.accent} rounded-l-2xl`} />
+                
+                <span className="text-4xl">{opt.emoji}</span>
+                <div className="text-left flex-1">
+                  <p className="font-extrabold text-primary-foreground text-lg">{opt.label}</p>
+                  <p className="text-sm text-primary-foreground/50">{opt.desc}</p>
+                </div>
+                {isSelected && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="w-7 h-7 rounded-full bg-kid-green flex items-center justify-center"
+                  >
+                    <Check size={16} className="text-primary-foreground" />
+                  </motion.div>
+                )}
+              </motion.button>
+            );
+          })}
         </motion.div>
 
+        {/* Parental control */}
         <motion.button
           onClick={() => setShowParentalGate(true)}
-          className="mt-6 flex items-center gap-2 text-white/50 hover:text-white/80 transition-colors text-sm"
+          className="mt-8 flex items-center gap-2 text-primary-foreground/30 hover:text-primary-foreground/60 transition-colors text-xs font-bold"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
+          transition={{ delay: 1.2 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Shield size={16} />
+          <Shield size={14} />
           Controle Parental
         </motion.button>
       </div>
