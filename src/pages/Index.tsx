@@ -1,17 +1,22 @@
 import { useState, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import AgeSelection from "@/components/AgeSelection";
-import ChatScreen from "@/components/ChatScreen";
+import HomeScreen from "@/components/flow/HomeScreen";
+import AgePickerScreen from "@/components/flow/AgePickerScreen";
+import GeneratingScreen from "@/components/flow/GeneratingScreen";
+import AnswerScreen from "@/components/flow/AnswerScreen";
 import StoryFactory from "@/components/story/StoryFactory";
-import LandingScreen from "@/components/LandingScreen";
 import ChameleonMascot from "@/components/ChameleonMascot";
 import { motion } from "framer-motion";
 
+type FlowStep = "home" | "age" | "generating" | "answer";
+
 const Index = () => {
-  const { profile, loading } = useAuth();
+  const { profile, loading, updateProfile } = useAuth();
+  const [step, setStep] = useState<FlowStep>("home");
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
   const [showStoryFactory, setShowStoryFactory] = useState(false);
-  const [enteredApp, setEnteredApp] = useState(false);
-  const [initialQuestion, setInitialQuestion] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -34,35 +39,70 @@ const Index = () => {
     return <StoryFactory onBack={() => setShowStoryFactory(false)} />;
   }
 
-  const hasCompletedOnboarding = profile?.child_name && profile?.age_range;
-  const shouldShowLanding = !enteredApp && !hasCompletedOnboarding;
+  const handleQuestionSubmit = (q: string) => {
+    setQuestion(q);
+    // If user already has age_range, skip age picker
+    if (profile?.age_range) {
+      setStep("generating");
+    } else {
+      setStep("age");
+    }
+  };
 
-  if (shouldShowLanding) {
-    return (
-      <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
-        <div className="relative z-10 flex-1 flex flex-col">
-          <LandingScreen
-            onStart={() => setEnteredApp(true)}
-            onQuestionClick={(q) => {
-              setInitialQuestion(q);
-              setEnteredApp(true);
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
+  const handleAgeSelected = async (range: string) => {
+    await updateProfile({ age_range: range, child_name: profile?.child_name || "Explorador" });
+    setStep("generating");
+  };
 
-  if (!profile?.age_range) {
-    return <AgeSelection />;
-  }
+  const handleAnswerReady = (text: string) => {
+    setAnswer(text);
+    setStep("answer");
+  };
+
+  const handleNewQuestion = () => {
+    setQuestion("");
+    setAnswer("");
+    setStep("home");
+  };
 
   return (
-    <ChatScreen
-      onOpenStoryFactory={() => setShowStoryFactory(true)}
-      initialQuestion={initialQuestion}
-      onInitialQuestionConsumed={() => setInitialQuestion(null)}
-    />
+    <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
+      <AnimatePresence mode="wait">
+        {step === "home" && (
+          <HomeScreen
+            key="home"
+            onSubmit={handleQuestionSubmit}
+            onOpenStoryFactory={() => setShowStoryFactory(true)}
+          />
+        )}
+        {step === "age" && (
+          <AgePickerScreen
+            key="age"
+            question={question}
+            onSelect={handleAgeSelected}
+            onBack={() => setStep("home")}
+          />
+        )}
+        {step === "generating" && (
+          <GeneratingScreen
+            key="generating"
+            question={question}
+            ageRange={profile?.age_range || "3-7"}
+            onComplete={handleAnswerReady}
+            onError={() => setStep("home")}
+          />
+        )}
+        {step === "answer" && (
+          <AnswerScreen
+            key="answer"
+            question={question}
+            answer={answer}
+            onNewQuestion={handleNewQuestion}
+            onOpenStoryFactory={() => setShowStoryFactory(true)}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
