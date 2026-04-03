@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
@@ -7,9 +7,15 @@ import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
 import StoryFactory from "@/components/story/StoryFactory";
 import ChameleonMascot from "@/components/ChameleonMascot";
-import { motion } from "framer-motion";
 
 type FlowStep = "home" | "age" | "generating" | "answer";
+
+const AGE_STORAGE_KEY = "kidzz_last_age_range";
+
+const getCachedAgeRange = () => {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(AGE_STORAGE_KEY);
+};
 
 const Index = () => {
   const { profile, loading, updateProfile } = useAuth();
@@ -17,6 +23,13 @@ const Index = () => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [showStoryFactory, setShowStoryFactory] = useState(false);
+  const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
+
+  useEffect(() => {
+    if (!profile?.age_range || typeof window === "undefined") return;
+    setSelectedAgeRange(profile.age_range);
+    window.localStorage.setItem(AGE_STORAGE_KEY, profile.age_range);
+  }, [profile?.age_range]);
 
   if (loading) {
     return (
@@ -40,18 +53,36 @@ const Index = () => {
   }
 
   const handleQuestionSubmit = (q: string) => {
+    const resolvedAgeRange = profile?.age_range || selectedAgeRange || getCachedAgeRange();
     setQuestion(q);
-    // If user already has age_range, skip age picker
-    if (profile?.age_range) {
+
+    if (resolvedAgeRange) {
+      setSelectedAgeRange(resolvedAgeRange);
+      if (!profile?.age_range) {
+        void updateProfile({
+          age_range: resolvedAgeRange,
+          child_name: profile?.child_name || "Explorador",
+        });
+      }
       setStep("generating");
-    } else {
-      setStep("age");
+      return;
     }
+
+    setStep("age");
   };
 
-  const handleAgeSelected = async (range: string) => {
-    await updateProfile({ age_range: range, child_name: profile?.child_name || "Explorador" });
+  const handleAgeSelected = (range: string) => {
+    setSelectedAgeRange(range);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(AGE_STORAGE_KEY, range);
+    }
+
     setStep("generating");
+
+    void updateProfile({
+      age_range: range,
+      child_name: profile?.child_name || "Explorador",
+    });
   };
 
   const handleAnswerReady = (text: string) => {
@@ -87,7 +118,7 @@ const Index = () => {
           <GeneratingScreen
             key="generating"
             question={question}
-            ageRange={profile?.age_range || "3-7"}
+            ageRange={selectedAgeRange || profile?.age_range || "3-7"}
             onComplete={handleAnswerReady}
             onError={() => setStep("home")}
           />
