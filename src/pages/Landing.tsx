@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { ArrowRight, MessageCircle, Zap, Heart, Shield, Star, CheckCircle } from "lucide-react";
-import heroImg from "@/assets/hero-parent-child.jpg";
+import { ArrowRight, Zap, Heart, Shield, Star, CheckCircle, Volume2, BookOpen, MessageCircle } from "lucide-react";
+import heroImg from "@/assets/hero-emotional.jpg";
 
 const CTA_URL = "https://kidzzapp.lovable.app";
 
@@ -12,7 +12,7 @@ const fadeUp = {
 const CtaButton = ({ text, className = "" }: { text: string; className?: string }) => (
   <motion.a
     href={CTA_URL}
-    className={`inline-flex items-center justify-center gap-3 w-full max-w-md px-8 py-5 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-lg md:text-xl shadow-2xl active:scale-95 transition-transform ${className}`}
+    className={`inline-flex items-center justify-center gap-3 w-full max-w-md px-8 py-5 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-lg md:text-xl shadow-2xl active:scale-95 transition-transform ${className}`}
     whileHover={{ scale: 1.03 }}
     whileTap={{ scale: 0.97 }}
   >
@@ -22,12 +22,12 @@ const CtaButton = ({ text, className = "" }: { text: string; className?: string 
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[hsl(210,40%,10%)] via-[hsl(215,35%,15%)] to-[hsl(210,40%,10%)] text-white font-kids overflow-x-hidden">
-      
-      {/* ===== HERO ===== */}
+    <div className="min-h-screen bg-gradient-to-b from-[hsl(210,40%,10%)] via-[hsl(215,35%,15%)] to-[hsl(210,40%,10%)] text-primary-foreground font-kids overflow-x-hidden">
+
+      {/* ===== 1. HERO — IMPACTO MÁXIMO ===== */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-5 py-16 text-center">
         <div className="absolute inset-0 bg-gradient-to-b from-kid-blue/10 via-transparent to-transparent pointer-events-none" />
-        
+
         <motion.div
           className="relative z-10 max-w-2xl mx-auto"
           initial="hidden"
@@ -36,25 +36,24 @@ const Landing = () => {
           <motion.div custom={0} variants={fadeUp} className="mb-8">
             <img
               src={heroImg}
-              alt="Pai e filho em momento de curiosidade"
-              className="w-48 h-48 md:w-56 md:h-56 rounded-full mx-auto object-cover shadow-2xl border-4 border-kid-yellow/30"
+              alt="Pai e filho em momento de curiosidade e conexão"
+              className="w-56 h-56 md:w-64 md:h-64 rounded-full mx-auto object-cover shadow-2xl border-4 border-kid-yellow/30"
+              loading="eager"
               width={1024}
               height={768}
             />
           </motion.div>
 
-          <motion.h1 custom={1} variants={fadeUp} className="text-2xl md:text-4xl font-extrabold leading-tight mb-6">
-            Seu filho olha pra você esperando uma resposta…
-            <span className="block mt-2 text-kid-yellow">e você simplesmente não sabe o que dizer.</span>
+          <motion.h1 custom={1} variants={fadeUp} className="text-2xl md:text-4xl font-extrabold leading-tight mb-4">
+            Seu filho vai te fazer uma pergunta difícil hoje.
           </motion.h1>
 
-          <motion.p custom={2} variants={fadeUp} className="text-base md:text-lg text-white/70 mb-10 max-w-lg mx-auto leading-relaxed">
-            Não é falta de amor.{" "}
-            <span className="text-white font-bold">É falta de ter a resposta na hora certa.</span>
+          <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-primary-foreground/70 mb-10 max-w-lg mx-auto leading-relaxed font-bold">
+            E você precisa saber responder.
           </motion.p>
 
           <motion.div custom={3} variants={fadeUp}>
-            <CtaButton text="RESOLVER ISSO AGORA" />
+            <CtaButton text="QUERO NUNCA MAIS TRAVAR" />
           </motion.div>
         </motion.div>
 
@@ -64,13 +63,13 @@ const Landing = () => {
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
         >
-          <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-1.5">
-            <div className="w-1.5 h-3 bg-white/50 rounded-full" />
+          <div className="w-6 h-10 rounded-full border-2 border-primary-foreground/30 flex items-start justify-center p-1.5">
+            <div className="w-1.5 h-3 bg-primary-foreground/50 rounded-full" />
           </div>
         </motion.div>
       </section>
 
-      {/* ===== QUEBRA EMOCIONAL ===== */}
+      {/* ===== 2. SESSÃO DOR ===== */}
       <section className="px-5 py-20 text-center">
         <motion.div
           className="max-w-lg mx-auto space-y-8"
@@ -78,28 +77,31 @@ const Landing = () => {
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          <motion.p custom={0} variants={fadeUp} className="text-xl md:text-2xl font-bold text-kid-yellow">
-            Isso acontece mais do que você imagina.
-          </motion.p>
-          <motion.div custom={1} variants={fadeUp} className="text-base md:text-lg text-white/70 leading-loose space-y-4">
-            <p>A pergunta vem…</p>
-            <p>você trava…</p>
-            <p>e depois fica <span className="text-white font-bold">aquela sensação ruim.</span></p>
+          <motion.h2 custom={0} variants={fadeUp} className="text-xl md:text-2xl font-extrabold">
+            Se você é pai, isso já aconteceu com você:
+          </motion.h2>
+
+          <motion.div custom={1} variants={fadeUp} className="space-y-3">
+            {[
+              "\"Pai, o que é morrer?\"",
+              "\"Por que vocês se separaram?\"",
+              "\"De onde vêm os bebês?\"",
+            ].map((q, i) => (
+              <div key={i} className="glass-card rounded-2xl px-5 py-4 text-left">
+                <p className="text-base md:text-lg font-bold text-primary-foreground/90">{q}</p>
+              </div>
+            ))}
           </motion.div>
-          <motion.p custom={2} variants={fadeUp} className="text-base md:text-lg text-white/60 italic">
-            "Não é sobre saber tudo.<br />
-            É sobre <span className="text-white font-bold not-italic">não falhar naquele momento.</span>"
+
+          <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-primary-foreground/60 leading-relaxed">
+            E naquele momento…{" "}
+            <span className="text-primary-foreground font-extrabold">você trava.</span>
           </motion.p>
         </motion.div>
       </section>
 
-      {/* ===== DIVIDER ===== */}
-      <div className="flex justify-center py-4">
-        <div className="w-16 h-1 rounded-full bg-gradient-to-r from-kid-orange to-kid-yellow" />
-      </div>
-
-      {/* ===== VIRADA / INSIGHT ===== */}
-      <section className="px-5 py-20 text-center">
+      {/* ===== 3. QUEBRA DE PADRÃO ===== */}
+      <section className="px-5 py-16 text-center">
         <motion.div
           className="max-w-lg mx-auto"
           initial="hidden"
@@ -107,39 +109,57 @@ const Landing = () => {
           viewport={{ once: true, margin: "-50px" }}
         >
           <motion.h2 custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-extrabold leading-tight">
-            Seu filho não precisa de um pai perfeito.
+            Não é falta de amor.
           </motion.h2>
           <motion.p custom={1} variants={fadeUp} className="text-2xl md:text-3xl font-extrabold text-kid-yellow mt-4">
-            Ele precisa de um pai preparado.
+            É falta de preparo.
           </motion.p>
         </motion.div>
       </section>
 
-      {/* ===== SOLUÇÃO ===== */}
-      <section className="px-5 py-20 bg-white/[0.03] backdrop-blur-sm">
+      {/* Divider */}
+      <div className="flex justify-center py-4">
+        <div className="w-16 h-1 rounded-full bg-gradient-to-r from-kid-orange to-kid-yellow" />
+      </div>
+
+      {/* ===== 4. APRESENTAÇÃO DA SOLUÇÃO ===== */}
+      <section className="px-5 py-20 bg-primary-foreground/[0.03] backdrop-blur-sm">
         <motion.div
           className="max-w-lg mx-auto text-center space-y-8"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          <motion.h2 custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-extrabold">
-            É aqui que entra o <span className="text-kid-yellow">Kidzz.</span>
+          <motion.h2 custom={0} variants={fadeUp} className="text-xl md:text-2xl font-extrabold leading-tight">
+            O <span className="text-kid-yellow">KIDZZ</span> te ajuda a responder na hora,{" "}
+            <span className="text-kid-yellow">do jeito certo</span>, para a idade do seu filho.
           </motion.h2>
-          <motion.div custom={1} variants={fadeUp} className="text-base md:text-lg text-white/70 leading-loose space-y-3">
-            <p>Você digita a pergunta…</p>
-            <p>e recebe uma resposta <span className="text-white font-bold">clara, simples e inteligente</span> na hora.</p>
+
+          <motion.div custom={1} variants={fadeUp} className="grid gap-3">
+            {[
+              { icon: <MessageCircle size={20} />, label: "Resposta pronta", desc: "Clara, simples e segura" },
+              { icon: <BookOpen size={20} />, label: "História", desc: "Um conto leve e emocional" },
+              { icon: <Volume2 size={20} />, label: "Narração", desc: "Voz natural e acolhedora" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4 glass-card rounded-2xl px-5 py-4 text-left">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-kid-orange/20 to-kid-yellow/20 flex items-center justify-center text-kid-yellow flex-shrink-0">
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="font-extrabold text-sm">{item.label}</p>
+                  <p className="text-xs text-primary-foreground/50">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </motion.div>
-          <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl font-bold text-kid-yellow">
-            Como se você sempre soubesse o que dizer.
-          </motion.p>
-          <motion.div custom={3} variants={fadeUp}>
+
+          <motion.div custom={2} variants={fadeUp}>
             <CtaButton text="TESTAR GRÁTIS AGORA" />
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ===== DEMONSTRAÇÃO / SIMULAÇÃO ===== */}
+      {/* ===== 5. DEMONSTRAÇÃO VISUAL ===== */}
       <section className="px-5 py-20">
         <motion.div
           className="max-w-sm mx-auto"
@@ -147,140 +167,74 @@ const Landing = () => {
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          <motion.h3 custom={0} variants={fadeUp} className="text-center text-lg font-bold text-white/50 uppercase tracking-wider mb-8">
+          <motion.h3 custom={0} variants={fadeUp} className="text-center text-sm font-bold text-primary-foreground/40 uppercase tracking-wider mb-8">
             Veja como funciona
           </motion.h3>
-          
-          {/* Mock chat */}
-          <motion.div custom={1} variants={fadeUp} className="bg-white/[0.06] rounded-3xl border border-white/10 p-5 space-y-4 shadow-2xl">
-            {/* User message */}
+
+          <motion.div custom={1} variants={fadeUp} className="glass-card rounded-3xl p-5 space-y-4 shadow-2xl">
+            {/* User question */}
             <div className="flex justify-end">
-              <div className="bg-gradient-to-r from-kid-orange to-kid-yellow text-white px-4 py-3 rounded-2xl rounded-br-md max-w-[80%] text-sm font-bold shadow-lg">
-                Por que o céu é azul? 🌤️
+              <div className="bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground px-4 py-3 rounded-2xl rounded-br-md max-w-[80%] text-sm font-bold shadow-lg">
+                Pai, o que é morrer? 💭
               </div>
             </div>
-            {/* Bot response */}
+            {/* Response */}
             <div className="flex justify-start gap-2">
               <div className="w-8 h-8 rounded-full bg-kid-green/20 flex items-center justify-center text-lg flex-shrink-0">🦎</div>
-              <div className="bg-white/10 text-white px-4 py-3 rounded-2xl rounded-bl-md max-w-[85%] text-sm leading-relaxed">
-                O céu parece azul porque a luz do sol é feita de todas as cores! 🌈 Quando ela chega na nossa atmosfera, a cor azul se espalha mais que as outras. É como se o ar pintasse o céu de azul pra gente! ✨
+              <div className="bg-primary-foreground/10 text-primary-foreground px-4 py-3 rounded-2xl rounded-bl-md max-w-[85%] text-sm leading-relaxed">
+                Morrer é como quando uma vela termina de brilhar. A chama apaga, mas o calor que ela trouxe continua em quem estava perto. As pessoas que a gente ama deixam uma luz dentro da gente que nunca apaga. ✨
               </div>
             </div>
-            {/* Typing indicator */}
             <div className="flex items-center gap-1 pl-10 pt-1">
-              <span className="text-xs text-white/40">Resposta instantânea</span>
+              <span className="text-xs text-primary-foreground/40">Resposta adaptada para 3–5 anos</span>
               <Zap size={12} className="text-kid-yellow" />
             </div>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ===== 3 PASSOS ===== */}
-      <section className="px-5 py-20 bg-white/[0.03]">
-        <motion.div
-          className="max-w-lg mx-auto text-center"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-        >
-          <motion.h2 custom={0} variants={fadeUp} className="text-xl md:text-2xl font-extrabold mb-12">
-            Simples assim:
-          </motion.h2>
-          
-          <div className="space-y-8">
-            {[
-              { num: "1", icon: "🧒", text: "Seu filho pergunta" },
-              { num: "2", icon: "📱", text: "Você digita" },
-              { num: "3", icon: "💪", text: "Você responde com confiança" },
-            ].map((step, i) => (
-              <motion.div
-                key={step.num}
-                custom={i + 1}
-                variants={fadeUp}
-                className="flex items-center gap-5 text-left"
-              >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-kid-orange/20 to-kid-yellow/20 border border-kid-yellow/20 flex items-center justify-center text-3xl flex-shrink-0">
-                  {step.icon}
-                </div>
-                <div>
-                  <span className="text-kid-yellow text-sm font-bold">Passo {step.num}</span>
-                  <p className="text-lg font-bold">{step.text}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ===== BENEFÍCIOS EMOCIONAIS ===== */}
-      <section className="px-5 py-20">
-        <motion.div
-          className="max-w-lg mx-auto text-center"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-        >
-          <motion.h2 custom={0} variants={fadeUp} className="text-xl md:text-2xl font-extrabold mb-10">
-            O que muda na sua vida:
-          </motion.h2>
-          
-          <div className="grid gap-4">
-            {[
-              { icon: <Shield size={20} />, text: "Nunca mais travar diante de uma pergunta" },
-              { icon: <Heart size={20} />, text: "Mais segurança como pai ou mãe" },
-              { icon: <MessageCircle size={20} />, text: "Mais conexão com seu filho" },
-              { icon: <Zap size={20} />, text: "Respostas certas, na hora certa" },
-            ].map((b, i) => (
-              <motion.div
-                key={i}
-                custom={i + 1}
-                variants={fadeUp}
-                className="flex items-center gap-4 bg-white/[0.05] border border-white/10 rounded-2xl px-5 py-4 text-left"
-              >
-                <div className="text-kid-yellow flex-shrink-0">{b.icon}</div>
-                <p className="font-bold text-sm md:text-base">{b.text}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ===== PROVA SOCIAL ===== */}
-      <section className="px-5 py-20 bg-white/[0.03]">
+      {/* ===== 6. PROVA SOCIAL ===== */}
+      <section className="px-5 py-20 bg-primary-foreground/[0.03]">
         <motion.div
           className="max-w-lg mx-auto text-center space-y-8"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          <motion.div custom={0} variants={fadeUp} className="flex justify-center gap-1">
+          <motion.h2 custom={0} variants={fadeUp} className="text-xl md:text-2xl font-extrabold">
+            Pais já estão usando todos os dias
+          </motion.h2>
+
+          <motion.div custom={1} variants={fadeUp} className="flex justify-center gap-1">
             {[...Array(5)].map((_, i) => (
               <Star key={i} size={22} className="text-kid-yellow fill-kid-yellow" />
             ))}
           </motion.div>
-          <motion.p custom={1} variants={fadeUp} className="text-xl font-extrabold">
+
+          <motion.p custom={2} variants={fadeUp} className="text-primary-foreground/50 text-sm font-bold">
             +5.000 perguntas respondidas
           </motion.p>
-          <motion.p custom={2} variants={fadeUp} className="text-white/60 text-base">
-            Pais já estão usando para nunca mais ficarem sem resposta.
-          </motion.p>
-          
-          <motion.div custom={3} variants={fadeUp} className="space-y-4 pt-4">
+
+          {/* WhatsApp-style testimonials */}
+          <motion.div custom={3} variants={fadeUp} className="space-y-3 pt-4">
             {[
-              { name: "Ana, mãe do Pedro", text: "Salvou minhas noites antes de dormir. Meu filho ama!" },
-              { name: "Carlos, pai da Sofia", text: "Agora eu me sinto preparado. É incrível como é simples." },
-              { name: "Julia, mãe do Lucas", text: "Meu filho acha que eu sei tudo agora 😄" },
+              { name: "Ana, mãe do Pedro", text: "Meu filho perguntou sobre morte na hora de dormir. Abri o Kidzz e respondi com calma. Ele dormiu tranquilo. 🥹", time: "22:47" },
+              { name: "Carlos, pai da Sofia", text: "Agora eu me sinto preparado pra qualquer pergunta. É como ter um superpoder de pai. 💪", time: "19:12" },
+              { name: "Juliana, mãe do Lucas", text: "Meu filho acha que eu sei tudo agora 😄 O app salvou minhas noites!", time: "21:03" },
             ].map((t, i) => (
-              <div key={i} className="bg-white/[0.05] border border-white/10 rounded-2xl p-5 text-left">
-                <p className="text-sm text-white/80 italic mb-2">"{t.text}"</p>
-                <p className="text-xs text-kid-yellow font-bold">{t.name}</p>
+              <div key={i} className="bg-[hsl(145,60%,45%,0.08)] border border-kid-green/15 rounded-2xl p-4 text-left relative">
+                <p className="text-sm text-primary-foreground/80 leading-relaxed">{t.text}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-kid-yellow font-bold">{t.name}</p>
+                  <span className="text-[10px] text-primary-foreground/30">{t.time}</span>
+                </div>
               </div>
             ))}
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ===== OFERTA ===== */}
+      {/* ===== 7. CTA FORTE ===== */}
       <section className="px-5 py-20 text-center">
         <motion.div
           className="max-w-lg mx-auto space-y-6"
@@ -289,19 +243,15 @@ const Landing = () => {
           viewport={{ once: true, margin: "-50px" }}
         >
           <motion.h2 custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-extrabold">
-            Você pode testar agora.
+            Comece agora e nunca mais trave.
           </motion.h2>
-          <motion.div custom={1} variants={fadeUp} className="text-white/60 text-base space-y-1">
-            <p>Sem cadastro complicado.</p>
-            <p>Sem enrolação.</p>
-          </motion.div>
-          <motion.div custom={2} variants={fadeUp} className="flex items-center justify-center gap-6 text-sm text-white/50">
+          <motion.div custom={1} variants={fadeUp} className="flex items-center justify-center gap-6 text-sm text-primary-foreground/50">
             <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-kid-green" /> Grátis</span>
             <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-kid-green" /> Sem cartão</span>
             <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-kid-green" /> Seguro</span>
           </motion.div>
-          <motion.div custom={3} variants={fadeUp}>
-            <CtaButton text="TESTAR GRÁTIS AGORA" />
+          <motion.div custom={2} variants={fadeUp}>
+            <CtaButton text="COMEÇAR AGORA — É GRÁTIS" />
           </motion.div>
         </motion.div>
       </section>
@@ -317,21 +267,22 @@ const Landing = () => {
           <motion.h2 custom={0} variants={fadeUp} className="text-2xl md:text-3xl font-extrabold">
             Seu filho vai continuar perguntando.
           </motion.h2>
-          <motion.p custom={1} variants={fadeUp} className="text-lg text-white/70">
-            A diferença é se você vai <span className="text-white font-bold">travar…</span><br />
+          <motion.p custom={1} variants={fadeUp} className="text-lg text-primary-foreground/70">
+            A diferença é se você vai <span className="text-primary-foreground font-bold">travar…</span><br />
             ou <span className="text-kid-yellow font-bold">responder.</span>
           </motion.p>
           <motion.div custom={2} variants={fadeUp}>
-            <CtaButton text="COMEÇAR AGORA" className="shadow-[0_0_40px_hsl(var(--kid-orange)/0.3)]" />
+            <CtaButton text="QUERO NUNCA MAIS TRAVAR" className="shadow-[0_0_40px_hsl(var(--kid-orange)/0.3)]" />
           </motion.div>
         </motion.div>
       </section>
 
       {/* ===== FOOTER ===== */}
-      <footer className="px-5 py-10 text-center border-t border-white/10">
-        <p className="text-white/30 text-xs">
-          🔒 Seguro e feito para crianças • Sem anúncios • © {new Date().getFullYear()} Kidzz
-        </p>
+      <footer className="px-5 py-10 text-center border-t border-primary-foreground/10">
+        <div className="flex items-center justify-center gap-2 text-primary-foreground/30 text-xs">
+          <Shield size={12} />
+          <span>Seguro e feito para crianças • Sem anúncios • © {new Date().getFullYear()} Kidzz</span>
+        </div>
       </footer>
     </div>
   );
