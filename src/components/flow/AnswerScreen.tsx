@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Volume2, ArrowLeft, Heart, Sparkles, BookOpen } from "lucide-react";
+import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, BookOpen } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import ChameleonMascot from "../ChameleonMascot";
 import { useTTS } from "@/hooks/useTTS";
@@ -15,23 +15,26 @@ interface Props {
 }
 
 const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: Props) => {
-  const { speak } = useTTS();
+  const { speak, stop } = useTTS();
   const { profile, tier, handleCheckout } = useAuth();
   const [playing, setPlaying] = useState(false);
   const [showCTA, setShowCTA] = useState(false);
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "super_premium";
 
-  // Show CTA after 3 seconds
-  useState(() => {
+  useEffect(() => {
     if (!isPremium) {
       const t = setTimeout(() => setShowCTA(true), 3000);
       return () => clearTimeout(t);
     }
-  });
+  }, [isPremium]);
 
   const handleSpeak = useCallback(async () => {
-    if (playing) return;
+    if (playing) {
+      stop();
+      setPlaying(false);
+      return;
+    }
     setPlaying(true);
     try {
       await speak(answer);
@@ -40,7 +43,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
     } finally {
       setPlaying(false);
     }
-  }, [playing, speak, answer]);
+  }, [playing, speak, stop, answer]);
 
   return (
     <motion.div
@@ -105,10 +108,9 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </div>
         </motion.div>
 
-        {/* Audio button */}
+        {/* Audio button - toggle play/stop */}
         <motion.button
           onClick={handleSpeak}
-          disabled={playing}
           className={`w-full mt-4 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-base shadow-lg transition-all active:scale-[0.97] relative overflow-hidden ${
             playing
               ? "bg-kid-yellow/80 text-foreground"
@@ -128,20 +130,16 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           )}
           <span className="relative z-10 flex items-center gap-2">
             {playing ? (
-              <div className="flex items-center gap-0.5">
-                {[0, 1, 2, 3].map(i => (
-                  <motion.div
-                    key={i}
-                    className="w-1 bg-foreground rounded-full"
-                    animate={{ height: [4, 14, 4] }}
-                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                  />
-                ))}
-              </div>
+              <>
+                <VolumeX size={22} />
+                Parar narração
+              </>
             ) : (
-              <Volume2 size={22} />
+              <>
+                <Volume2 size={22} />
+                🔊 Ouvir resposta
+              </>
             )}
-            {playing ? "Reproduzindo..." : "🔊 Ouvir resposta"}
           </span>
         </motion.button>
 
@@ -180,15 +178,15 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="text-primary-foreground font-bold text-sm">
-              Quer respostas ilimitadas e histórias personalizadas? ✨
+            <p className="text-primary-foreground font-bold text-sm leading-relaxed">
+              Imagina ter isso disponível sempre que precisar... ✨
             </p>
             <motion.button
               onClick={() => handleCheckout("premium")}
-              className="mt-3 w-full py-3 rounded-xl bg-gradient-to-r from-kid-purple to-kid-blue text-primary-foreground font-extrabold text-sm shadow-lg"
+              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-blue text-primary-foreground font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
               whileTap={{ scale: 0.95 }}
             >
-              Desbloquear experiência completa
+              Desbloquear acesso completo
             </motion.button>
           </motion.div>
         )}

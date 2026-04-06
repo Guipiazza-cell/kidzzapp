@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Send, Mic, Star, Shield, BookOpen } from "lucide-react";
 import ChameleonMascot from "../ChameleonMascot";
@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AnimatePresence } from "framer-motion";
 
 const PHRASES = [
-  "Hoje você vai responder melhor do que ontem.",
+  "Você não precisa mais travar na resposta.",
   "Seu filho vai lembrar dessas respostas pra sempre.",
   "Cada pergunta é uma chance de conexão.",
 ];
@@ -35,6 +35,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory }: Props) => {
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "super_premium";
@@ -46,8 +48,17 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory }: Props) => {
   }, []);
 
   const submit = (text: string) => {
-    if (!text.trim() || isFreeLimitReached) return;
+    if (!text.trim() || isFreeLimitReached || submitting) return;
+    setSubmitting(true);
     onSubmit(text.trim());
+  };
+
+  const handleCtaClick = () => {
+    if (input.trim()) {
+      submit(input);
+    } else {
+      inputRef.current?.focus();
+    }
   };
 
   const onCheckout = async (plan: "premium" | "super_premium") => {
@@ -91,7 +102,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory }: Props) => {
           <ConversionScreen childName={profile?.child_name || "Explorador"} onSubscribe={onCheckout} loading={checkoutLoading} />
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center px-5">
+        <div className="flex-1 flex flex-col items-center justify-center px-5 overflow-y-auto">
           {/* Dynamic phrase */}
           <div className="h-14 flex items-center justify-center">
             <AnimatePresence mode="wait">
@@ -126,20 +137,22 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory }: Props) => {
             transition={{ delay: 0.4 }}
           >
             <div className="flex items-end gap-3">
-              <VoiceInput onResult={submit} disabled={false} />
+              <VoiceInput onResult={submit} disabled={submitting} />
               <div className="flex-1 relative">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && submit(input)}
                   placeholder='Ex: "Pai, o que é morrer?"'
                   className="w-full py-3.5 px-5 rounded-2xl glass-card text-primary-foreground text-sm placeholder:text-primary-foreground/30 focus:outline-none focus:ring-2 focus:ring-kid-orange/30 transition-all"
+                  disabled={submitting}
                 />
               </div>
               <motion.button
                 onClick={() => submit(input)}
-                disabled={!input.trim()}
+                disabled={!input.trim() || submitting}
                 className="w-12 h-12 rounded-xl kid-gradient-orange shadow-lg flex items-center justify-center disabled:opacity-30 transition-all"
                 whileTap={{ scale: 0.9 }}
               >
@@ -150,10 +163,9 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory }: Props) => {
 
           {/* CTA Button */}
           <motion.button
-            onClick={() => {
-              if (input.trim()) submit(input);
-            }}
-            className="w-full max-w-sm mt-5 py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform relative overflow-hidden"
+            onClick={handleCtaClick}
+            disabled={submitting}
+            className="w-full max-w-sm mt-5 py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform relative overflow-hidden disabled:opacity-60"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
@@ -179,7 +191,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory }: Props) => {
               <motion.button
                 key={q.text}
                 onClick={() => submit(q.text)}
-                className="w-full flex items-center gap-3 glass-card p-3.5 rounded-2xl text-left active:scale-[0.98] transition-transform"
+                disabled={submitting}
+                className="w-full flex items-center gap-3 glass-card p-3.5 rounded-2xl text-left active:scale-[0.98] transition-transform disabled:opacity-50"
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8 + i * 0.08 }}
