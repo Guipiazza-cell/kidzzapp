@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
+const TIMEOUT_MS = 30_000;
 
 interface Props {
   question: string;
@@ -21,6 +22,13 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
     if (calledRef.current) return;
     calledRef.current = true;
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+      toast.error("Demorou demais. Tente novamente.");
+      onError();
+    }, TIMEOUT_MS);
+
     const generate = async () => {
       try {
         await incrementQuestions();
@@ -35,6 +43,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
             messages: [{ role: "user", content: question }],
             ageRange,
           }),
+          signal: controller.signal,
         });
 
         if (!resp.ok) {
@@ -73,18 +82,27 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
           }
         }
 
+        clearTimeout(timeout);
+
         if (fullText.trim()) {
           onComplete(fullText);
         } else {
           throw new Error("Resposta vazia");
         }
       } catch (e: any) {
+        clearTimeout(timeout);
+        if (e.name === "AbortError") return; // already handled
         toast.error(e.message || "Ops, algo deu errado!");
         onError();
       }
     };
 
     generate();
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
   }, []);
 
   return (
@@ -108,7 +126,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        Criando a melhor resposta pra você...
+        Criando a melhor forma de explicar isso para seu filho...
       </motion.h2>
 
       <motion.p
@@ -117,7 +135,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        🤔 Pensando na forma mais simples e carinhosa de explicar
+        🤔 Adaptando para a idade certa, com carinho
       </motion.p>
 
       {/* Animated dots */}
