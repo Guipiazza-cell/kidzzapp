@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const FREE_LIMIT = 3;
+const DAILY_LIMIT = 10;
 
 const AGE_PROMPTS: Record<string, string> = {
   "0-3": `Você é o Kidzz, um camaleãozinho fofo e colorido que conversa com bebês e crianças de 0 a 3 anos.
@@ -51,9 +55,61 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, ageRange = "3-7" } = await req.json();
+    const { messages, ageRange = "3-7", userId } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Server-side quota validation
+    if (userId) {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } }
+      );
+
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .select("questions_used, is_premium, last_usage_date")
+        .eq("id", userId)
+        .single();
+
+      if (profileError) {
+        console.error("[KIDZZ-CHAT] Profile fetch error:", profileError.message);
+      }
+
+      if (profile) {
+        const today = new Date().toISOString().slice(0, 10);
+        let questionsUsed = profile.questions_used;
+
+        if (profile.is_premium) {
+          // Premium: daily reset
+          if (profile.last_usage_date !== today) {
+            questionsUsed = 0;
+          }
+          if (questionsUsed >= DAILY_LIMIT) {
+            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite diário atingido. Volte amanhã! 😊" }), {
+              status: 403,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+        } else {
+          // Free: lifetime limit, NO reset
+          if (questionsUsed >= FREE_LIMIT) {
+            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite de perguntas gratuitas atingido." }), {
+              status: 403,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+        }
+
+        // Increment server-side
+        const updateData: Record<string, unknown> = {
+          questions_used: questionsUsed + 1,
+          last_usage_date: today,
+        };
+        await supabaseAdmin.from("profiles").update(updateData).eq("id", userId);
+      }
+    }
 
     const systemPrompt = AGE_PROMPTS[ageRange] || AGE_PROMPTS["3-7"];
 
@@ -64,7 +120,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,

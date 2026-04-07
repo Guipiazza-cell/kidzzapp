@@ -97,7 +97,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [tier, setTier] = useState<SubscriptionTier>("free");
   const [loading, setLoading] = useState(true);
 
+  // For premium users: daily reset. For free: NO reset (lifetime limit)
   const resetDailyIfNeeded = useCallback((p: Profile): Profile => {
+    if (!p.is_premium) return p; // Free users: NEVER reset
     const today = todayStr();
     if (p.last_usage_date !== today) {
       return { ...p, questions_used: 0, stories_used: 0, last_usage_date: today };
@@ -114,12 +116,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (data) {
       const prof = resetDailyIfNeeded(data as Profile);
-      // If daily reset happened, persist it
       if (prof !== data) {
-        await supabase.from("profiles").update({ 
-          questions_used: prof.questions_used, 
-          stories_used: prof.stories_used, 
-          last_usage_date: prof.last_usage_date 
+        await supabase.from("profiles").update({
+          questions_used: prof.questions_used,
+          stories_used: prof.stories_used,
+          last_usage_date: prof.last_usage_date
         }).eq("id", userId);
       }
       setProfile(prof);
@@ -130,7 +131,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshSubscription = useCallback(async () => {
     if (!session?.access_token || !user) return;
-
     try {
       const resp = await fetch(CHECK_SUB_URL, {
         method: "POST",
@@ -143,10 +143,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.subscribed) {
         const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
         setTier(newTier);
-        // Re-fetch profile to get updated is_premium and reset questions_used
         setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
       } else {
-        // Respect manual premium grants from profile
         if (profile?.is_premium) {
           setTier("super_premium");
         } else {
@@ -160,12 +158,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const handleCheckout = useCallback(async (plan: "premium" | "super_premium") => {
     if (!session?.access_token) {
-      // Guest - need to create account first
       const { toast } = await import("sonner");
       toast.error("Crie uma conta para assinar! Acesse o controle parental para fazer login.");
       return;
     }
-
     try {
       const ref = sessionStorage.getItem("kidzz_ref") || undefined;
       const resp = await fetch(CHECKOUT_URL, {
@@ -217,39 +213,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
-
-    // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
       if (!mounted) return;
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
-
       if (nextSession?.user) {
         await fetchProfile(nextSession.user.id);
       } else {
         setProfile(getGuestProfile());
         setTier("free");
       }
-
       setLoading(false);
     });
 
-    // Then check for existing session with a race against timeout
     const sessionPromise = supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       if (!mounted) return;
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
-
       if (currentSession?.user) {
         fetchProfile(currentSession.user.id);
       } else {
         setProfile(getGuestProfile());
       }
-
       setLoading(false);
     });
 
-    // Safety: if getSession hangs (stale token refresh), force loading=false after 1.5s
     const safetyTimer = setTimeout(() => {
       if (mounted) setLoading(false);
     }, 1500);
@@ -283,12 +271,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    console.log("SignOut: starting...");
     clearGuestProfile();
     try {
       const { error } = await supabase.auth.signOut();
       if (error) console.error("SignOut error:", error.message);
-      else console.log("SignOut: success");
     } catch (e) {
       console.error("SignOut exception:", e);
     }
@@ -310,25 +296,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const { error } = await supabase.from("profiles").update(updates).eq("id", user.id);
         if (error) {
-          console.error("updateProfile DB error:", error.message);
-          // If update fails (e.g. row doesn't exist yet), try upsert
-          const { error: upsertErr } = await supabase.from("profiles").upsert({
-            id: user.id,
-            ...updates,
-          });
+          const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates });
           if (upsertErr) console.error("updateProfile upsert error:", upsertErr.message);
         }
       } catch (e) {
         console.error("updateProfile exception:", e);
       }
-      // Always update local state regardless of DB result to unblock navigation
       setProfile(prev => {
         const base = prev ?? createDefaultProfile();
         return { ...base, ...updates };
       });
       return;
     }
-    // Guest user
     setProfile(prev => {
       const next = normalizeProfile({ ...(prev ?? getGuestProfile()), ...updates });
       saveGuestProfile(next);
@@ -336,7 +315,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // Limits: Free=3 total once, KIDZZ=10/day, Premium=10/day
   const MAX_FREE_QUESTIONS = 3;
   const DAILY_QUESTION_LIMIT = 10;
   const DAILY_STORY_LIMIT = 3;
@@ -374,7 +352,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const newCount = p.questions_used + 1;
     const today = todayStr();
     if (user) {
-      await supabase.from("profiles").update({ questions_used: newCount, last_usage_date: today }).eq("id", user.id);
+      // Server-side increment is handled in the edge function
       setProfile(prev => (prev ? { ...prev, questions_used: newCount, last_usage_date: today } : prev));
       return;
     }

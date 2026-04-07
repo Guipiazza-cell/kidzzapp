@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import ChameleonMascot from "../ChameleonMascot";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,16 +7,30 @@ import { useAuth } from "@/contexts/AuthContext";
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
 const TIMEOUT_MS = 30_000;
 
+const LOADING_PHRASES = [
+  "Pensando na melhor forma de explicar isso para uma criança...",
+  "Adaptando a linguagem para a idade certa...",
+  "Criando uma resposta que conecta vocês...",
+  "Quase pronto! Isso pode marcar a vida do seu filho...",
+];
+
 interface Props {
   question: string;
   ageRange: string;
   onComplete: (answer: string) => void;
   onError: () => void;
+  onLimitReached?: () => void;
 }
 
-const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) => {
-  const { incrementQuestions } = useAuth();
+const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReached }: Props) => {
+  const { user, incrementQuestions } = useAuth();
   const calledRef = useRef(false);
+  const [phraseIdx, setPhraseIdx] = useState(0);
+
+  useEffect(() => {
+    const iv = setInterval(() => setPhraseIdx(i => (i + 1) % LOADING_PHRASES.length), 2500);
+    return () => clearInterval(iv);
+  }, []);
 
   useEffect(() => {
     if (calledRef.current) return;
@@ -31,6 +45,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
 
     const generate = async () => {
       try {
+        // Increment locally for guest tracking
         await incrementQuestions();
 
         const resp = await fetch(CHAT_URL, {
@@ -42,13 +57,19 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
           body: JSON.stringify({
             messages: [{ role: "user", content: question }],
             ageRange,
+            userId: user?.id || null,
           }),
           signal: controller.signal,
         });
 
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({ error: "Erro" }));
-          throw new Error(err.error || `Erro ${resp.status}`);
+          if (resp.status === 403 && err.error === "LIMIT_REACHED") {
+            clearTimeout(timeout);
+            if (onLimitReached) { onLimitReached(); } else { onError(); }
+            return;
+          }
+          throw new Error(err.error || err.message || `Erro ${resp.status}`);
         }
 
         if (!resp.body) throw new Error("Sem resposta");
@@ -91,7 +112,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
         }
       } catch (e: any) {
         clearTimeout(timeout);
-        if (e.name === "AbortError") return; // already handled
+        if (e.name === "AbortError") return;
         toast.error(e.message || "Ops, algo deu errado!");
         onError();
       }
@@ -120,26 +141,24 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
         <ChameleonMascot size="lg" mood="thinking" interactive={false} />
       </motion.div>
 
-      <motion.h2
-        className="text-xl font-black text-primary-foreground text-center mt-6"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        Criando a melhor forma de explicar isso para seu filho...
-      </motion.h2>
-
-      <motion.p
-        className="text-primary-foreground/40 text-center text-sm mt-2 max-w-xs"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        🤔 Adaptando para a idade certa, com carinho
-      </motion.p>
+      {/* Rotating emotional phrases */}
+      <div className="h-16 flex items-center justify-center mt-6">
+        <AnimatePresence mode="wait">
+          <motion.h2
+            key={phraseIdx}
+            className="text-lg font-black text-primary-foreground text-center max-w-xs leading-snug"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            {LOADING_PHRASES[phraseIdx]}
+          </motion.h2>
+        </AnimatePresence>
+      </div>
 
       {/* Animated dots */}
-      <motion.div className="flex gap-2 mt-8">
+      <motion.div className="flex gap-2 mt-6">
         {[0, 1, 2].map(i => (
           <motion.div
             key={i}
@@ -150,7 +169,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError }: Props) =>
         ))}
       </motion.div>
 
-      {/* Subtle question reminder */}
+      {/* Question reminder */}
       <motion.div
         className="mt-8 glass-card px-5 py-3 rounded-2xl max-w-xs"
         initial={{ opacity: 0 }}

@@ -6,9 +6,12 @@ import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
 import StoryFactory from "@/components/story/StoryFactory";
+import Paywall from "@/components/Paywall";
+import ParentalGate from "@/components/ParentalGate";
+import ParentalSettings from "@/components/ParentalSettings";
 import ChameleonMascot from "@/components/ChameleonMascot";
 
-type FlowStep = "home" | "age" | "generating" | "answer";
+type FlowStep = "home" | "age" | "generating" | "answer" | "paywall";
 
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 
@@ -18,12 +21,13 @@ const getCachedAgeRange = () => {
 };
 
 const Index = () => {
-  const { profile, loading, updateProfile } = useAuth();
+  const { profile, loading, updateProfile, canAskQuestion } = useAuth();
   const [step, setStep] = useState<FlowStep>("home");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [showStoryFactory, setShowStoryFactory] = useState(false);
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
+  const [showLoginGate, setShowLoginGate] = useState(false);
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -53,6 +57,12 @@ const Index = () => {
   }
 
   const handleQuestionSubmit = (q: string) => {
+    // Check limit BEFORE proceeding
+    if (!canAskQuestion()) {
+      setStep("paywall");
+      return;
+    }
+
     const resolvedAgeRange = profile?.age_range || selectedAgeRange || getCachedAgeRange();
     setQuestion(q);
 
@@ -76,9 +86,7 @@ const Index = () => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(AGE_STORAGE_KEY, range);
     }
-
     setStep("generating");
-
     void updateProfile({
       age_range: range,
       child_name: profile?.child_name || "Explorador",
@@ -94,6 +102,10 @@ const Index = () => {
     setQuestion("");
     setAnswer("");
     setStep("home");
+  };
+
+  const handleLoginFromPaywall = () => {
+    setShowLoginGate(true);
   };
 
   return (
@@ -121,6 +133,7 @@ const Index = () => {
             ageRange={selectedAgeRange || profile?.age_range || "3-7"}
             onComplete={handleAnswerReady}
             onError={() => setStep("home")}
+            onLimitReached={() => setStep("paywall")}
           />
         )}
         {step === "answer" && (
@@ -130,6 +143,21 @@ const Index = () => {
             answer={answer}
             onNewQuestion={handleNewQuestion}
             onOpenStoryFactory={() => setShowStoryFactory(true)}
+          />
+        )}
+        {step === "paywall" && (
+          <Paywall key="paywall" onLogin={handleLoginFromPaywall} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showLoginGate && (
+          <ParentalGate
+            onSuccess={() => {
+              setShowLoginGate(false);
+              // After login, show settings for account creation
+            }}
+            onCancel={() => setShowLoginGate(false)}
           />
         )}
       </AnimatePresence>
