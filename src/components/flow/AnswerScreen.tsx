@@ -171,22 +171,35 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           Nova pergunta
         </motion.button>
 
+        {/* Emotional impact message */}
+        <motion.p
+          className="text-center text-primary-foreground/30 text-xs font-bold mt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          💛 Isso pode marcar a vida do seu filho
+        </motion.p>
+
         {/* CTA after value delivery */}
         {showCTA && !isPremium && (
           <motion.div
-            className="mt-6 glass-card p-5 rounded-2xl text-center"
+            className="mt-4 glass-card p-5 rounded-2xl text-center border border-kid-purple/20"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="text-primary-foreground font-bold text-sm leading-relaxed">
-              Imagina ter isso disponível sempre que precisar... ✨
+            <p className="text-primary-foreground font-bold text-base leading-relaxed">
+              Quer ter respostas assim sempre que seu filho perguntar? ✨
+            </p>
+            <p className="text-primary-foreground/40 text-xs mt-1">
+              Nunca mais trave na frente do seu filho
             </p>
             <motion.button
               onClick={() => handleCheckout("premium")}
-              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-blue text-primary-foreground font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
+              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
               whileTap={{ scale: 0.95 }}
             >
-              Desbloquear acesso completo
+              🔓 Desbloquear acesso completo
             </motion.button>
           </motion.div>
         )}
