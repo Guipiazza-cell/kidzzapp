@@ -66,7 +66,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReac
           const err = await resp.json().catch(() => ({ error: "Erro" }));
           if (resp.status === 403 && err.error === "LIMIT_REACHED") {
             clearTimeout(timeout);
-            onLimitReached?.() || onError();
+            if (onLimitReached) { onLimitReached(); } else { onError(); }
             return;
           }
           throw new Error(err.error || err.message || `Erro ${resp.status}`);
