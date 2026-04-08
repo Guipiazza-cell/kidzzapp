@@ -54,10 +54,19 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
 
   const isFreeLimitReached = !canAskQuestion();
 
+  const [questionPage, setQuestionPage] = useState(0);
+  const totalPages = Math.ceil(ALL_QUESTIONS.length / VISIBLE_COUNT);
+  const visibleQuestions = ALL_QUESTIONS.slice(questionPage * VISIBLE_COUNT, questionPage * VISIBLE_COUNT + VISIBLE_COUNT);
+
   useEffect(() => {
     const iv = setInterval(() => setPhraseIdx(i => (i + 1) % PHRASES.length), 4000);
     return () => clearInterval(iv);
   }, []);
+
+  useEffect(() => {
+    const iv = setInterval(() => setQuestionPage(p => (p + 1) % totalPages), 20000);
+    return () => clearInterval(iv);
+  }, [totalPages]);
 
   const submit = (text: string) => {
     if (!text.trim() || submitting) return;
