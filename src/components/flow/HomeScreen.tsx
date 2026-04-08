@@ -15,14 +15,25 @@ const PHRASES = [
   "Cada pergunta é uma chance de conexão.",
 ];
 
-const QUICK = [
+const ALL_QUESTIONS = [
   { text: "Por que eu sou diferente de todo mundo?", emoji: "🌟" },
   { text: "Como era você quando era criança?", emoji: "💛" },
   { text: "Por que a gente sonha enquanto dorme?", emoji: "💭" },
   { text: "Se eu fosse um super-herói, qual poder eu teria?", emoji: "🦸" },
   { text: "Como nascem as ideias na nossa cabeça?", emoji: "💡" },
   { text: "O que faz alguém ser corajoso de verdade?", emoji: "🦁" },
+  { text: "Por que o céu muda de cor no pôr do sol?", emoji: "🌅" },
+  { text: "Como os animais conversam entre si?", emoji: "🐾" },
+  { text: "Por que a gente chora quando está feliz?", emoji: "🥹" },
+  { text: "O que tem dentro de um arco-íris?", emoji: "🌈" },
+  { text: "Como os pássaros sabem para onde voar?", emoji: "🕊️" },
+  { text: "Por que a lua muda de forma?", emoji: "🌙" },
+  { text: "O que acontece quando a gente fecha os olhos?", emoji: "😌" },
+  { text: "Como seria viver em outro planeta?", emoji: "🚀" },
+  { text: "Por que as estrelas brilham à noite?", emoji: "⭐" },
 ];
+
+const VISIBLE_COUNT = 5;
 
 interface Props {
   onSubmit: (question: string) => void;
@@ -43,10 +54,19 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
 
   const isFreeLimitReached = !canAskQuestion();
 
+  const [questionPage, setQuestionPage] = useState(0);
+  const totalPages = Math.ceil(ALL_QUESTIONS.length / VISIBLE_COUNT);
+  const visibleQuestions = ALL_QUESTIONS.slice(questionPage * VISIBLE_COUNT, questionPage * VISIBLE_COUNT + VISIBLE_COUNT);
+
   useEffect(() => {
     const iv = setInterval(() => setPhraseIdx(i => (i + 1) % PHRASES.length), 4000);
     return () => clearInterval(iv);
   }, []);
+
+  useEffect(() => {
+    const iv = setInterval(() => setQuestionPage(p => (p + 1) % totalPages), 20000);
+    return () => clearInterval(iv);
+  }, [totalPages]);
 
   const submit = (text: string) => {
     if (!text.trim() || submitting) return;
@@ -261,23 +281,29 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
           <p className="text-primary-foreground/30 text-[10px] font-bold text-center uppercase tracking-widest mb-2">
             Perguntas populares
           </p>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {QUICK.map((q, i) => (
-              <motion.button
-                key={q.text}
-                onClick={() => submit(q.text)}
-                disabled={submitting || isFreeLimitReached}
-                className="flex items-center gap-1.5 glass-card px-3 py-2 rounded-full text-left active:scale-[0.97] transition-transform disabled:opacity-40"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 + i * 0.06 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="text-sm">{q.emoji}</span>
-                <span className="text-[11px] font-bold text-primary-foreground/80 leading-tight">{q.text}</span>
-              </motion.button>
-            ))}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={questionPage}
+              className="flex flex-wrap gap-2 justify-center"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.4 }}
+            >
+              {visibleQuestions.map((q) => (
+                <motion.button
+                  key={q.text}
+                  onClick={() => submit(q.text)}
+                  disabled={submitting || isFreeLimitReached}
+                  className="flex items-center gap-1.5 glass-card px-3 py-2 rounded-full text-left active:scale-[0.97] transition-transform disabled:opacity-40"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="text-sm">{q.emoji}</span>
+                  <span className="text-[11px] font-bold text-primary-foreground/80 leading-tight">{q.text}</span>
+                </motion.button>
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </motion.div>
 
         {/* Bottom spacer */}
