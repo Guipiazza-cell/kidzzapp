@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Mic, Star, Shield, BookOpen, LogIn, LogOut, Crown } from "lucide-react";
+import { Send, Mic, LogIn, Shield, Crown, BookOpen, Heart, Sparkles } from "lucide-react";
 import ChameleonMascot from "../ChameleonMascot";
 import VoiceInput from "../VoiceInput";
 import ParentalGate from "../ParentalGate";
@@ -35,11 +35,11 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
   const [input, setInput] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [showParentalGate, setShowParentalGate] = useState(false);
+  const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const isSuperPremium = tier === "super_premium";
   const isFreeLimitReached = !canAskQuestion();
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
 
   const handleCtaClick = () => {
     if (isFreeLimitReached) {
-      onSubmit(""); // Will trigger paywall in Index
+      onSubmit("");
       return;
     }
     if (input.trim()) {
@@ -73,61 +73,50 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
-
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 pt-4 pb-2 relative z-10">
-        <div className="flex items-center gap-2">
+      {/* Header — safe area + breathable */}
+      <header className="flex items-center justify-between px-5 pb-2 relative z-10" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
+        <div className="flex items-center gap-2.5">
           <ChameleonMascot size="sm" mood="happy" interactive={false} />
           <span className="text-xl font-black text-primary-foreground tracking-tight">Kidzz</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {profile?.is_premium && (
-            <span className="text-[10px] text-kid-yellow font-extrabold glass-card px-2 py-1 rounded-full flex items-center gap-1">
-              <Crown size={10} /> Premium
+            <span className="text-[10px] text-kid-yellow font-extrabold glass-card px-2.5 py-1 rounded-full flex items-center gap-1">
+              <Crown size={11} /> Premium
             </span>
           )}
           <span className="text-xs text-primary-foreground font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
           </span>
-          {onOpenMoments && (
-            <motion.button onClick={onOpenMoments} className="p-2 rounded-xl glass-card text-primary-foreground" whileTap={{ scale: 0.9 }}>
-              <span className="text-sm">🎯</span>
-            </motion.button>
-          )}
-          {isSuperPremium && (
-            <motion.button onClick={onOpenStoryFactory} className="p-2 rounded-xl glass-card text-primary-foreground" whileTap={{ scale: 0.9 }}>
-              <BookOpen size={18} />
-            </motion.button>
-          )}
           {!user ? (
             <motion.button
               onClick={() => navigate("/auth")}
-              className="p-2 rounded-xl glass-card text-kid-green"
+              className="p-2.5 rounded-xl glass-card text-kid-green"
               whileTap={{ scale: 0.9 }}
             >
-              <LogIn size={18} />
+              <LogIn size={20} />
             </motion.button>
           ) : (
             <motion.button
-              onClick={() => setShowParentalGate(true)}
-              className="p-2 rounded-xl glass-card text-primary-foreground/50"
+              onClick={() => setShowParentalGateForSettings(true)}
+              className="p-2.5 rounded-xl glass-card text-primary-foreground/50"
               whileTap={{ scale: 0.9 }}
             >
-              <Shield size={18} />
+              <Shield size={20} />
             </motion.button>
           )}
         </div>
       </header>
 
-      <SubscribeBanner onOpenParentalGate={() => setShowParentalGate(true)} questionsRemaining={questionsRemaining()} isPremium={profile?.is_premium ?? false} />
+      <SubscribeBanner onOpenParentalGate={() => setShowParentalGateForSettings(true)} questionsRemaining={questionsRemaining()} isPremium={profile?.is_premium ?? false} />
 
-      <div className="flex-1 flex flex-col items-center justify-center px-5 overflow-y-auto">
+      <div className="flex-1 flex flex-col items-center px-5 pb-8 overflow-y-auto">
         {/* Dynamic phrase */}
-        <div className="h-14 flex items-center justify-center">
+        <div className="h-12 flex items-center justify-center mt-2">
           <AnimatePresence mode="wait">
             <motion.p
               key={phraseIdx}
-              className="text-center text-primary-foreground/80 text-lg font-bold max-w-[300px] leading-snug"
+              className="text-center text-primary-foreground/80 text-base font-bold max-w-[300px] leading-snug"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -138,24 +127,17 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
           </AnimatePresence>
         </div>
 
-        {/* Main question */}
-        <motion.p
-          className="text-primary-foreground/40 text-xs font-bold text-center mb-4 uppercase tracking-widest mt-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          Qual pergunta seu filho fez hoje?
-        </motion.p>
-
-        {/* Input area */}
+        {/* Input block */}
         <motion.div
-          className="w-full max-w-sm"
+          className="w-full max-w-sm mt-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.3 }}
         >
-          <div className="flex items-end gap-3">
+          <p className="text-primary-foreground/40 text-[11px] font-bold text-center mb-3 uppercase tracking-widest">
+            Qual pergunta seu filho fez hoje?
+          </p>
+          <div className="flex items-end gap-2.5">
             <VoiceInput onResult={submit} disabled={submitting || isFreeLimitReached} />
             <div className="flex-1 relative">
               <input
@@ -164,8 +146,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && submit(input)}
-                placeholder={isFreeLimitReached ? "Limite atingido" : "Pergunta qualquer coisa 😊"}
-                className="w-full py-3.5 px-5 rounded-2xl glass-card text-primary-foreground text-sm placeholder:text-primary-foreground/30 focus:outline-none focus:ring-2 focus:ring-kid-orange/30 transition-all disabled:opacity-40"
+                placeholder={isFreeLimitReached ? "Limite atingido" : "Pergunte qualquer coisa 😊"}
+                className="w-full py-3.5 px-4 rounded-2xl glass-card text-primary-foreground text-sm placeholder:text-primary-foreground/30 focus:outline-none focus:ring-2 focus:ring-kid-orange/30 transition-all disabled:opacity-40"
                 disabled={submitting || isFreeLimitReached}
               />
             </div>
@@ -180,18 +162,18 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
           </div>
         </motion.div>
 
-        {/* CTA Button */}
+        {/* CTA */}
         <motion.button
           onClick={handleCtaClick}
           disabled={submitting}
-          className={`w-full max-w-sm mt-5 py-4 rounded-2xl font-extrabold text-lg shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform relative overflow-hidden disabled:opacity-60 text-primary-foreground ${
+          className={`w-full max-w-sm mt-4 py-3.5 rounded-2xl font-extrabold text-base shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform relative overflow-hidden disabled:opacity-60 text-primary-foreground ${
             isFreeLimitReached
               ? "bg-gradient-to-r from-kid-purple to-kid-blue"
               : "bg-gradient-to-r from-kid-orange to-kid-yellow"
           }`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.5 }}
           whileTap={{ scale: 0.97 }}
         >
           <motion.div
@@ -203,66 +185,109 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             <span className="relative z-10">🔓 Desbloquear acesso completo</span>
           ) : (
             <>
-              <Mic size={20} className="relative z-10" />
+              <Mic size={18} className="relative z-10" />
               <span className="relative z-10">Responder agora</span>
             </>
           )}
         </motion.button>
 
-        {/* Quick questions */}
+        {/* Feature Cards */}
         <motion.div
-          className="w-full max-w-sm mt-6 space-y-2"
+          className="w-full max-w-sm mt-6 space-y-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <p className="text-primary-foreground/40 text-[11px] font-bold text-center uppercase tracking-widest mb-1">
+            Explore o Kidzz
+          </p>
+
+          {/* Story Factory */}
+          <motion.button
+            onClick={onOpenStoryFactory}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl glass-card border border-kid-purple/20 text-left active:scale-[0.98] transition-transform"
+            whileTap={{ scale: 0.97 }}
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-kid-purple to-kid-blue flex items-center justify-center flex-shrink-0 shadow-lg">
+              <BookOpen size={22} className="text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-extrabold text-primary-foreground leading-tight">Criar histórias mágicas</p>
+              <p className="text-xs text-primary-foreground/50 mt-0.5">Histórias personalizadas para seu filho</p>
+            </div>
+            <Sparkles size={16} className="text-kid-purple/60 flex-shrink-0" />
+          </motion.button>
+
+          {/* Moments Factory */}
+          <motion.button
+            onClick={() => onOpenMoments?.()}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl glass-card border border-kid-orange/20 text-left active:scale-[0.98] transition-transform"
+            whileTap={{ scale: 0.97 }}
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-kid-orange to-kid-yellow flex items-center justify-center flex-shrink-0 shadow-lg">
+              <Heart size={22} className="text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-extrabold text-primary-foreground leading-tight">Criar momentos especiais</p>
+              <p className="text-xs text-primary-foreground/50 mt-0.5">Conexões únicas entre pais e filhos</p>
+            </div>
+            <Sparkles size={16} className="text-kid-orange/60 flex-shrink-0" />
+          </motion.button>
+
+          {/* Parental Control */}
+          <motion.button
+            onClick={() => setShowParentalGateForSettings(true)}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl glass-card border border-kid-green/20 text-left active:scale-[0.98] transition-transform"
+            whileTap={{ scale: 0.97 }}
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-kid-green to-kid-blue flex items-center justify-center flex-shrink-0 shadow-lg">
+              <Shield size={22} className="text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-extrabold text-primary-foreground leading-tight">Controle dos pais</p>
+              <p className="text-xs text-primary-foreground/50 mt-0.5">Segurança e limites personalizados</p>
+            </div>
+          </motion.button>
+        </motion.div>
+
+        {/* Quick questions as chips */}
+        <motion.div
+          className="w-full max-w-sm mt-6"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
-          {QUICK.map((q, i) => (
-            <motion.button
-              key={q.text}
-              onClick={() => submit(q.text)}
-              disabled={submitting || isFreeLimitReached}
-              className="w-full flex items-center gap-3 glass-card p-3.5 rounded-2xl text-left active:scale-[0.98] transition-transform disabled:opacity-40"
-              initial={{ opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 + i * 0.08 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <span className="text-xl flex-shrink-0">{q.emoji}</span>
-              <span className="text-sm font-bold text-primary-foreground leading-tight flex-1">{q.text}</span>
-            </motion.button>
-          ))}
+          <p className="text-primary-foreground/30 text-[10px] font-bold text-center uppercase tracking-widest mb-2">
+            Perguntas populares
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {QUICK.map((q, i) => (
+              <motion.button
+                key={q.text}
+                onClick={() => submit(q.text)}
+                disabled={submitting || isFreeLimitReached}
+                className="flex items-center gap-1.5 glass-card px-3 py-2 rounded-full text-left active:scale-[0.97] transition-transform disabled:opacity-40"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 + i * 0.06 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-sm">{q.emoji}</span>
+                <span className="text-[11px] font-bold text-primary-foreground/80 leading-tight">{q.text}</span>
+              </motion.button>
+            ))}
+          </div>
         </motion.div>
 
-        {/* Social proof */}
-        <motion.div
-          className="mt-6 flex items-center gap-0.5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
-        >
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={12} className="text-kid-yellow fill-kid-yellow" />
-          ))}
-          <span className="text-primary-foreground/40 text-xs font-bold ml-2">+5.000 perguntas respondidas</span>
-        </motion.div>
-
-        {/* Trust */}
-        <motion.div
-          className="mt-3 mb-6 flex items-center gap-2 text-primary-foreground/25"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-        >
-          <Shield size={12} />
-          <span className="text-[10px] font-bold">Conteúdo baseado em comunicação infantil responsável</span>
-        </motion.div>
+        {/* Bottom spacer */}
+        <div className="mt-6" />
       </div>
 
       <AnimatePresence>
-        {showParentalGate && (
+        {showParentalGateForSettings && (
           <ParentalGate
-            onSuccess={() => { setShowParentalGate(false); setShowSettings(true); }}
-            onCancel={() => setShowParentalGate(false)}
+            onSuccess={() => { setShowParentalGateForSettings(false); setShowSettings(true); }}
+            onCancel={() => setShowParentalGateForSettings(false)}
           />
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
