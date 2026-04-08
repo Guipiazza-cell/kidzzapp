@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Mic, Star, Shield, BookOpen } from "lucide-react";
+import { Send, Mic, Star, Shield, BookOpen, LogIn, LogOut, Crown } from "lucide-react";
 import ChameleonMascot from "../ChameleonMascot";
 import VoiceInput from "../VoiceInput";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
 import SubscribeBanner from "../SubscribeBanner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const PHRASES = [
   "Você não precisa mais travar na resposta.",
@@ -29,7 +30,8 @@ interface Props {
 }
 
 const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
-  const { profile, canAskQuestion, questionsRemaining, tier } = useAuth();
+  const { user, profile, canAskQuestion, questionsRemaining, tier, signOut } = useAuth();
+  const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [showParentalGate, setShowParentalGate] = useState(false);
@@ -79,6 +81,11 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
           <span className="text-xl font-black text-primary-foreground tracking-tight">Kidzz</span>
         </div>
         <div className="flex items-center gap-2">
+          {profile?.is_premium && (
+            <span className="text-[10px] text-kid-yellow font-extrabold glass-card px-2 py-1 rounded-full flex items-center gap-1">
+              <Crown size={10} /> Premium
+            </span>
+          )}
           <span className="text-xs text-primary-foreground font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
           </span>
@@ -92,9 +99,23 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
               <BookOpen size={18} />
             </motion.button>
           )}
-          <motion.button onClick={() => setShowParentalGate(true)} className="p-2 rounded-xl glass-card text-primary-foreground/50" whileTap={{ scale: 0.9 }}>
-            <Shield size={18} />
-          </motion.button>
+          {!user ? (
+            <motion.button
+              onClick={() => navigate("/auth")}
+              className="p-2 rounded-xl glass-card text-kid-green"
+              whileTap={{ scale: 0.9 }}
+            >
+              <LogIn size={18} />
+            </motion.button>
+          ) : (
+            <motion.button
+              onClick={() => setShowParentalGate(true)}
+              className="p-2 rounded-xl glass-card text-primary-foreground/50"
+              whileTap={{ scale: 0.9 }}
+            >
+              <Shield size={18} />
+            </motion.button>
+          )}
         </div>
       </header>
 
