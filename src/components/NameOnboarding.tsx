@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import ChameleonMascot from "./ChameleonMascot";
 import { useAuth } from "@/contexts/AuthContext";
+import MagicalBackground from "./MagicalBackground";
 
 const NameOnboarding = () => {
   const { updateProfile } = useAuth();
@@ -31,8 +32,9 @@ const NameOnboarding = () => {
   const mascotMood = saving ? "happy" : name.trim() ? "curious" : "idle";
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative">
+      <MagicalBackground />
+      <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
