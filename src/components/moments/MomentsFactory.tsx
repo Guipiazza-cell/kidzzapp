@@ -46,8 +46,8 @@ const MomentsFactory = ({ onBack }: Props) => {
 
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pb-2 relative z-10" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
-        <motion.button onClick={onBack} className="p-2 rounded-xl glass-card text-primary-foreground/60" whileTap={{ scale: 0.9 }}>
-          <ArrowLeft size={20} />
+        <motion.button onClick={onBack} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl glass-card text-primary-foreground/60" whileTap={{ scale: 0.9 }}>
+          <ArrowLeft size={22} />
         </motion.button>
         <div className="flex-1">
           <h1 className="text-lg font-black text-primary-foreground">Fábrica de Momentos</h1>
