@@ -15,14 +15,25 @@ const PHRASES = [
   "Cada pergunta é uma chance de conexão.",
 ];
 
-const QUICK = [
+const ALL_QUESTIONS = [
   { text: "Por que eu sou diferente de todo mundo?", emoji: "🌟" },
   { text: "Como era você quando era criança?", emoji: "💛" },
   { text: "Por que a gente sonha enquanto dorme?", emoji: "💭" },
   { text: "Se eu fosse um super-herói, qual poder eu teria?", emoji: "🦸" },
   { text: "Como nascem as ideias na nossa cabeça?", emoji: "💡" },
   { text: "O que faz alguém ser corajoso de verdade?", emoji: "🦁" },
+  { text: "Por que o céu muda de cor no pôr do sol?", emoji: "🌅" },
+  { text: "Como os animais conversam entre si?", emoji: "🐾" },
+  { text: "Por que a gente chora quando está feliz?", emoji: "🥹" },
+  { text: "O que tem dentro de um arco-íris?", emoji: "🌈" },
+  { text: "Como os pássaros sabem para onde voar?", emoji: "🕊️" },
+  { text: "Por que a lua muda de forma?", emoji: "🌙" },
+  { text: "O que acontece quando a gente fecha os olhos?", emoji: "😌" },
+  { text: "Como seria viver em outro planeta?", emoji: "🚀" },
+  { text: "Por que as estrelas brilham à noite?", emoji: "⭐" },
 ];
+
+const VISIBLE_COUNT = 5;
 
 interface Props {
   onSubmit: (question: string) => void;
