@@ -6,6 +6,7 @@ import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
 import StoryFactory from "@/components/story/StoryFactory";
+import MomentsFactory from "@/components/moments/MomentsFactory";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
@@ -26,6 +27,7 @@ const Index = () => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [showStoryFactory, setShowStoryFactory] = useState(false);
+  const [showMoments, setShowMoments] = useState(false);
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
 
@@ -56,8 +58,11 @@ const Index = () => {
     return <StoryFactory onBack={() => setShowStoryFactory(false)} />;
   }
 
+  if (showMoments) {
+    return <MomentsFactory onBack={() => setShowMoments(false)} />;
+  }
+
   const handleQuestionSubmit = (q: string) => {
-    // Check limit BEFORE proceeding
     if (!canAskQuestion()) {
       setStep("paywall");
       return;
@@ -116,6 +121,7 @@ const Index = () => {
             key="home"
             onSubmit={handleQuestionSubmit}
             onOpenStoryFactory={() => setShowStoryFactory(true)}
+            onOpenMoments={() => setShowMoments(true)}
           />
         )}
         {step === "age" && (
@@ -155,7 +161,6 @@ const Index = () => {
           <ParentalGate
             onSuccess={() => {
               setShowLoginGate(false);
-              // After login, show settings for account creation
             }}
             onCancel={() => setShowLoginGate(false)}
           />

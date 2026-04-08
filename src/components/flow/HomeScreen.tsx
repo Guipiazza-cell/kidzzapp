@@ -25,9 +25,10 @@ const QUICK = [
 interface Props {
   onSubmit: (question: string) => void;
   onOpenStoryFactory: () => void;
+  onOpenMoments?: () => void;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
   const { profile, canAskQuestion, questionsRemaining, tier } = useAuth();
   const [input, setInput] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
