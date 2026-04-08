@@ -44,8 +44,11 @@ export type Database = {
           child_name: string
           created_at: string
           id: string
+          is_admin: boolean
           is_premium: boolean
           last_usage_date: string
+          plan_end_date: string | null
+          premium_source: string | null
           questions_used: number
           stories_used: number
           updated_at: string
@@ -56,8 +59,11 @@ export type Database = {
           child_name?: string
           created_at?: string
           id: string
+          is_admin?: boolean
           is_premium?: boolean
           last_usage_date?: string
+          plan_end_date?: string | null
+          premium_source?: string | null
           questions_used?: number
           stories_used?: number
           updated_at?: string
@@ -68,8 +74,11 @@ export type Database = {
           child_name?: string
           created_at?: string
           id?: string
+          is_admin?: boolean
           is_premium?: boolean
           last_usage_date?: string
+          plan_end_date?: string | null
+          premium_source?: string | null
           questions_used?: number
           stories_used?: number
           updated_at?: string
