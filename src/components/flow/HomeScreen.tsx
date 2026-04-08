@@ -16,11 +16,12 @@ const PHRASES = [
 ];
 
 const QUICK = [
-  { text: "Por que as pessoas morrem?", emoji: "💭" },
-  { text: "O que é Deus?", emoji: "✨" },
-  { text: "Por que os pais se separam?", emoji: "💔" },
-  { text: "O que é o universo?", emoji: "🌌" },
-  { text: "Por que temos medo?", emoji: "😨" },
+  { text: "Por que eu sou diferente de todo mundo?", emoji: "🌟" },
+  { text: "Como era você quando era criança?", emoji: "💛" },
+  { text: "Por que a gente sonha enquanto dorme?", emoji: "💭" },
+  { text: "Se eu fosse um super-herói, qual poder eu teria?", emoji: "🦸" },
+  { text: "Como nascem as ideias na nossa cabeça?", emoji: "💡" },
+  { text: "O que faz alguém ser corajoso de verdade?", emoji: "🦁" },
 ];
 
 interface Props {

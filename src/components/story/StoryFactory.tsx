@@ -110,13 +110,12 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center gap-3 px-4 pt-4 pb-2">
+      <header className="relative z-10 flex items-center gap-3 px-4 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
         <motion.button
           onClick={onBack}
-          className="p-2 rounded-xl bg-black/40 backdrop-blur-md text-white border border-white/20"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-black/40 backdrop-blur-md text-white border border-white/20"
           whileTap={{ scale: 0.9 }}>
-          
-          <ArrowLeft size={20} />
+          <ArrowLeft size={22} />
         </motion.button>
         <div className="flex items-center gap-2">
           <BookOpen size={18} className="text-kid-yellow" />
