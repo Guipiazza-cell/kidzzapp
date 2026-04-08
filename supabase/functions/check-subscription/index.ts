@@ -43,93 +43,116 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    // STEP 1: Always check the DB first as baseline
+    const { data: profileData } = await supabaseClient
+      .from("profiles")
+      .select("is_premium")
+      .eq("id", user.id)
+      .single();
 
-    if (customers.data.length === 0) {
-      logStep("No Stripe customer found");
-      return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const dbIsPremium = profileData?.is_premium === true;
+    logStep("DB is_premium check", { dbIsPremium });
 
-    const customerId = customers.data[0].id;
-    logStep("Found customer", { customerId });
-
-    // Fetch active and trialing subscriptions
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
-      limit: 10,
-    });
-
-    const trialingSubs = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "trialing",
-      limit: 10,
-    });
-
-    const allSubs = [...subscriptions.data, ...trialingSubs.data];
-
-    if (allSubs.length === 0) {
-      logStep("No active/trialing subscriptions");
-      return new Response(JSON.stringify({ subscribed: false, tier: "free" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Find highest tier
-    let bestTier = "premium";
+    // STEP 2: Try Stripe validation
+    let stripeSubscribed = false;
+    let bestTier = "free";
     let subscriptionEnd: string | null = null;
 
-    for (const sub of allSubs) {
-      // Get product ID from the subscription item
-      const priceObj = sub.items.data[0]?.price;
-      const productId = typeof priceObj?.product === "string"
-        ? priceObj.product
-        : (priceObj?.product as any)?.id ?? "";
-      
-      logStep("Checking subscription", { 
-        subId: sub.id, 
-        productId, 
-        status: sub.status,
-        currentPeriodEnd: sub.current_period_end,
-        currentPeriodEndType: typeof sub.current_period_end,
-      });
+    try {
+      const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
-      const tier = PRODUCT_TIERS[productId] || "premium";
-      if (tier === "super_premium") bestTier = "super_premium";
+      if (customers.data.length > 0) {
+        const customerId = customers.data[0].id;
+        logStep("Found customer", { customerId });
 
-      // Parse subscription end date
-      try {
-        const rawEnd = sub.current_period_end;
-        if (rawEnd) {
-          const timestamp = typeof rawEnd === "number" ? rawEnd : Number(rawEnd);
-          if (!isNaN(timestamp) && timestamp > 0) {
-            const end = new Date(timestamp * 1000).toISOString();
-            if (!subscriptionEnd || end > subscriptionEnd) subscriptionEnd = end;
+        const [activeSubs, trialingSubs] = await Promise.all([
+          stripe.subscriptions.list({ customer: customerId, status: "active", limit: 10 }),
+          stripe.subscriptions.list({ customer: customerId, status: "trialing", limit: 10 }),
+        ]);
+
+        const allSubs = [...activeSubs.data, ...trialingSubs.data];
+
+        if (allSubs.length > 0) {
+          stripeSubscribed = true;
+          bestTier = "premium";
+
+          for (const sub of allSubs) {
+            const priceObj = sub.items.data[0]?.price;
+            const productId = typeof priceObj?.product === "string"
+              ? priceObj.product
+              : (priceObj?.product as any)?.id ?? "";
+
+            const tier = PRODUCT_TIERS[productId] || "premium";
+            if (tier === "super_premium") bestTier = "super_premium";
+
+            try {
+              const rawEnd = sub.current_period_end;
+              if (rawEnd) {
+                const timestamp = typeof rawEnd === "number" ? rawEnd : Number(rawEnd);
+                if (!isNaN(timestamp) && timestamp > 0) {
+                  const end = new Date(timestamp * 1000).toISOString();
+                  if (!subscriptionEnd || end > subscriptionEnd) subscriptionEnd = end;
+                }
+              }
+            } catch {
+              // skip date parse errors
+            }
           }
+
+          // Sync premium status to DB
+          await supabaseClient
+            .from("profiles")
+            .update({ is_premium: true })
+            .eq("id", user.id);
         }
-      } catch (e) {
-        logStep("Date conversion error, skipping", { current_period_end: sub.current_period_end });
+      } else {
+        logStep("No Stripe customer found");
       }
+    } catch (stripeError) {
+      logStep("Stripe API error, falling back to DB", { 
+        error: stripeError instanceof Error ? stripeError.message : String(stripeError) 
+      });
     }
 
-    logStep("Subscription found", { bestTier, subscriptionEnd });
+    // STEP 3: CRITICAL - DB is_premium is the ultimate fallback
+    // If DB says premium but Stripe doesn't confirm, TRUST the DB
+    // This handles: manual overrides, Stripe email mismatches, API failures
+    if (!stripeSubscribed && dbIsPremium) {
+      logStep("DB override: user is premium via database flag");
+      return new Response(JSON.stringify({
+        subscribed: true,
+        tier: "premium",
+        subscription_end: null,
+        source: "database",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    // Sync premium status
-    await supabaseClient
-      .from("profiles")
-      .update({ is_premium: true })
-      .eq("id", user.id);
+    if (stripeSubscribed) {
+      logStep("Stripe confirmed subscription", { bestTier, subscriptionEnd });
+      return new Response(JSON.stringify({
+        subscribed: true,
+        tier: bestTier,
+        subscription_end: subscriptionEnd,
+        source: "stripe",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
+    // Neither Stripe nor DB says premium
+    logStep("User is free tier");
     return new Response(JSON.stringify({
-      subscribed: true,
-      tier: bestTier,
-      subscription_end: subscriptionEnd,
+      subscribed: false,
+      tier: "free",
+      subscription_end: null,
+      source: "none",
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("check-subscription error:", msg);
