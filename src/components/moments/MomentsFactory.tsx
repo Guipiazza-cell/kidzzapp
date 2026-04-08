@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap } from "lucide-react";
+import MagicalBackground from "../MagicalBackground";
 import ChameleonMascot from "../ChameleonMascot";
 import { useAuth } from "@/contexts/AuthContext";
 import { MISSIONS, type Mission } from "./MissionsData";
@@ -23,11 +24,12 @@ const MomentsFactory = ({ onBack }: Props) => {
 
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]"
+      className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      <MagicalBackground />
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pt-4 pb-2">
         <motion.button onClick={onBack} className="p-2 rounded-xl glass-card text-primary-foreground/60" whileTap={{ scale: 0.9 }}>

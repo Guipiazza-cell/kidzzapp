@@ -8,6 +8,7 @@ import ConversionScreen from "./ConversionScreen";
 import ParentalGate from "./ParentalGate";
 import ParentalSettings from "./ParentalSettings";
 import SubscribeBanner from "./SubscribeBanner";
+import MagicalBackground from "./MagicalBackground";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -169,7 +170,8 @@ const ChatScreen = ({
   const mascotMood = isTyping ? "thinking" : isSpeaking ? "talking" : messages.length === 0 ? "curious" : "happy";
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
+    <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative">
+      <MagicalBackground />
       {/* Header - clean, minimal */}
       <header className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2">
         <motion.div className="flex items-center gap-2" initial={{ y: -15, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>

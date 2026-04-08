@@ -5,6 +5,7 @@ import ChameleonMascot from "./ChameleonMascot";
 import ParentalGate from "./ParentalGate";
 import ParentalSettings from "./ParentalSettings";
 import { useAuth } from "@/contexts/AuthContext";
+import MagicalBackground from "./MagicalBackground";
 
 const AGE_OPTIONS = [
   { range: "0-3", emoji: "🧒", label: "3 – 5 anos", desc: "Respostas simples e carinhosas", accent: "from-emerald-400 to-teal-400" },
@@ -29,8 +30,9 @@ const AgeSelection = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative">
+      <MagicalBackground />
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 relative z-10">
         {/* Mascot */}
         <motion.div
           initial={{ scale: 0 }}

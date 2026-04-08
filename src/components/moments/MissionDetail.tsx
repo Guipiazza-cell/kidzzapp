@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, Users, Star, Heart, Lightbulb, Sparkles } from "lucide-react";
+import MagicalBackground from "../MagicalBackground";
 import type { Mission } from "./MissionsData";
 
 interface Props {
@@ -10,12 +11,13 @@ interface Props {
 const MissionDetail = ({ mission, onBack }: Props) => {
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]"
+      className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative"
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
+      <MagicalBackground />
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pt-4 pb-2">
         <motion.button onClick={onBack} className="p-2 rounded-xl glass-card text-primary-foreground/60" whileTap={{ scale: 0.9 }}>
