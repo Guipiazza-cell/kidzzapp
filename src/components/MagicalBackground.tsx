@@ -18,7 +18,7 @@ const MagicalBackground = () => (
       alt=""
       aria-hidden="true"
       className="absolute inset-0 w-full h-full object-cover"
-      style={{ filter: "brightness(0.55) saturate(0.85)" }}
+      style={{ filter: "brightness(0.75) saturate(0.9)" }}
       width={768}
       height={1344}
     />
