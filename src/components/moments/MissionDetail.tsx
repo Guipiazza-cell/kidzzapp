@@ -19,7 +19,7 @@ const MissionDetail = ({ mission, onBack }: Props) => {
     >
       <MagicalBackground />
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 pt-4 pb-2">
+      <header className="flex items-center gap-3 px-4 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
         <motion.button onClick={onBack} className="p-2 rounded-xl glass-card text-primary-foreground/60" whileTap={{ scale: 0.9 }}>
           <ArrowLeft size={20} />
         </motion.button>
