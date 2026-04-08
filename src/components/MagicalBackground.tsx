@@ -1,43 +1,71 @@
-import { motion } from "framer-motion";
+import forestBg from "@/assets/forest-bg.jpg";
+
+const FIREFLIES = Array.from({ length: 15 }, (_, i) => ({
+  id: i,
+  left: `${5 + ((i * 17 + 7) % 90)}%`,
+  top: `${10 + ((i * 23 + 11) % 75)}%`,
+  size: 2 + (i % 3),
+  delay: `${(i * 0.6).toFixed(1)}s`,
+  duration: `${3 + (i % 4)}s`,
+  drift: i % 2 === 0 ? "firefly-float-a" : "firefly-float-b",
+}));
 
 const MagicalBackground = () => (
   <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-    {/* Fireflies */}
-    {[...Array(8)].map((_, i) => (
-      <motion.div
-        key={`firefly-${i}`}
-        className="absolute w-1.5 h-1.5 rounded-full bg-kid-yellow/40"
+    {/* Forest image layer */}
+    <img
+      src={forestBg}
+      alt=""
+      aria-hidden="true"
+      className="absolute inset-0 w-full h-full object-cover"
+      style={{ filter: "brightness(0.55) saturate(0.85)" }}
+      width={768}
+      height={1344}
+    />
+
+    {/* Dark overlay for content legibility */}
+    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
+
+    {/* CSS-only fireflies */}
+    {FIREFLIES.map((f) => (
+      <span
+        key={f.id}
+        className="absolute rounded-full"
         style={{
-          left: `${10 + i * 11}%`,
-          top: `${15 + (i % 4) * 20}%`,
-        }}
-        animate={{
-          y: [0, -20, 0],
-          opacity: [0.15, 0.6, 0.15],
-          scale: [0.8, 1.3, 0.8],
-        }}
-        transition={{
-          duration: 3 + i * 0.5,
-          repeat: Infinity,
-          delay: i * 0.7,
+          left: f.left,
+          top: f.top,
+          width: f.size,
+          height: f.size,
+          background: `radial-gradient(circle, hsl(45 95% 70% / 0.9), hsl(45 95% 55% / 0))`,
+          boxShadow: `0 0 ${f.size * 2}px ${f.size}px hsl(45 95% 55% / 0.3)`,
+          animation: `${f.drift} ${f.duration} ease-in-out infinite`,
+          animationDelay: f.delay,
+          willChange: "transform, opacity",
         }}
       />
     ))}
-    {/* Ambient glow orbs */}
-    <motion.div
-      className="absolute -top-4 -right-6 w-32 h-32 rounded-full bg-kid-green/5 blur-2xl"
-      animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-      transition={{ duration: 6, repeat: Infinity }}
+
+    {/* Soft ambient glow orbs */}
+    <div
+      className="absolute -top-10 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl"
+      style={{
+        background: "radial-gradient(circle, hsl(45 90% 65% / 0.12), transparent 70%)",
+        animation: "glow-pulse 6s ease-in-out infinite",
+      }}
     />
-    <motion.div
-      className="absolute -bottom-10 -left-8 w-40 h-40 rounded-full bg-kid-purple/5 blur-3xl"
-      animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
-      transition={{ duration: 8, repeat: Infinity }}
+    <div
+      className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl"
+      style={{
+        background: "radial-gradient(circle, hsl(145 60% 45% / 0.08), transparent 70%)",
+        animation: "glow-pulse 8s ease-in-out infinite 2s",
+      }}
     />
-    <motion.div
-      className="absolute top-1/3 right-1/4 w-24 h-24 rounded-full bg-kid-orange/5 blur-2xl"
-      animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.3, 0.1] }}
-      transition={{ duration: 7, repeat: Infinity, delay: 2 }}
+    <div
+      className="absolute bottom-1/4 right-0 w-40 h-40 rounded-full blur-3xl"
+      style={{
+        background: "radial-gradient(circle, hsl(270 55% 58% / 0.06), transparent 70%)",
+        animation: "glow-pulse 7s ease-in-out infinite 4s",
+      }}
     />
   </div>
 );
