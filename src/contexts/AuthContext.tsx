@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -20,6 +20,7 @@ interface AuthContextType {
   profile: Profile | null;
   tier: SubscriptionTier;
   loading: boolean;
+  isReady: boolean;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -96,10 +97,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tier, setTier] = useState<SubscriptionTier>("free");
   const [loading, setLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
+  const initDone = useRef(false);
+  const subCheckInFlight = useRef(false);
 
-  // For premium users: daily reset. For free: NO reset (lifetime limit)
   const resetDailyIfNeeded = useCallback((p: Profile): Profile => {
-    if (!p.is_premium) return p; // Free users: NEVER reset
+    if (!p.is_premium) return p;
     const today = todayStr();
     if (p.last_usage_date !== today) {
       return { ...p, questions_used: 0, stories_used: 0, last_usage_date: today };
@@ -107,7 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return p;
   }, []);
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
     const { data } = await supabase
       .from("profiles")
       .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled")
@@ -117,44 +120,148 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (data) {
       const prof = resetDailyIfNeeded(data as Profile);
       if (prof !== data) {
-        await supabase.from("profiles").update({
+        supabase.from("profiles").update({
           questions_used: prof.questions_used,
           stories_used: prof.stories_used,
-          last_usage_date: prof.last_usage_date
-        }).eq("id", userId);
+          last_usage_date: prof.last_usage_date,
+        }).eq("id", userId).then(() => {});
       }
-      setProfile(prof);
-      return;
+      return prof;
     }
-    setProfile(getGuestProfile());
+    return getGuestProfile();
   }, [resetDailyIfNeeded]);
 
-  const refreshSubscription = useCallback(async () => {
-    if (!session?.access_token || !user) return;
+  const checkSubscription = useCallback(async (accessToken: string, currentProfile: Profile): Promise<{ tier: SubscriptionTier; isPremium: boolean }> => {
+    if (subCheckInFlight.current) return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
+    subCheckInFlight.current = true;
     try {
       const resp = await fetch(CHECK_SUB_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       const data = await resp.json();
       if (data.subscribed) {
         const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
-        setTier(newTier);
-        setProfile(prev => (prev ? { ...prev, is_premium: true } : prev));
-      } else {
-        if (profile?.is_premium) {
-          setTier("super_premium");
+        return { tier: newTier, isPremium: true };
+      }
+      // If DB says premium but Stripe doesn't → trust DB (manual override)
+      if (currentProfile.is_premium) {
+        return { tier: "premium", isPremium: true };
+      }
+      return { tier: "free", isPremium: false };
+    } catch {
+      // On error, trust what the DB says
+      return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
+    } finally {
+      subCheckInFlight.current = false;
+    }
+  }, []);
+
+  // Full init: getSession first, then onAuthStateChange for subsequent changes
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (!mounted) return;
+
+        if (currentSession?.user) {
+          setSession(currentSession);
+          setUser(currentSession.user);
+          const prof = await fetchProfile(currentSession.user.id);
+          if (!mounted) return;
+          setProfile(prof);
+
+          const subResult = await checkSubscription(currentSession.access_token, prof);
+          if (!mounted) return;
+          setTier(subResult.tier);
+          if (subResult.isPremium !== prof.is_premium) {
+            setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
+          }
         } else {
+          setSession(null);
+          setUser(null);
+          setProfile(getGuestProfile());
           setTier("free");
         }
+      } catch (err) {
+        console.error("Auth init error:", err);
+        // Security fallback: clear everything
+        setSession(null);
+        setUser(null);
+        setProfile(getGuestProfile());
+        setTier("free");
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          setIsReady(true);
+          initDone.current = true;
+        }
       }
-    } catch {
-      // silent fail
+    };
+
+    initializeAuth();
+
+    // Listen for subsequent auth changes (login/logout/token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!mounted || !initDone.current) return;
+
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+
+      if (nextSession?.user) {
+        // Fire and forget — no await in callback
+        fetchProfile(nextSession.user.id).then(prof => {
+          if (!mounted) return;
+          setProfile(prof);
+          checkSubscription(nextSession.access_token, prof).then(subResult => {
+            if (!mounted) return;
+            setTier(subResult.tier);
+            if (subResult.isPremium !== prof.is_premium) {
+              setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
+            }
+          });
+        });
+      } else {
+        setProfile(getGuestProfile());
+        setTier("free");
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [fetchProfile, checkSubscription]);
+
+  const refreshSubscription = useCallback(async () => {
+    if (!session?.access_token || !profile) return;
+    const subResult = await checkSubscription(session.access_token, profile);
+    setTier(subResult.tier);
+    if (subResult.isPremium !== profile.is_premium) {
+      setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
     }
-  }, [session, profile?.is_premium, user]);
+  }, [session, profile, checkSubscription]);
+
+  // Periodic subscription refresh
+  useEffect(() => {
+    if (!session) return;
+    const interval = setInterval(() => {
+      if (session?.access_token && profile) {
+        checkSubscription(session.access_token, profile).then(subResult => {
+          setTier(subResult.tier);
+          if (subResult.isPremium !== profile.is_premium) {
+            setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
+          }
+        });
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [session, profile, checkSubscription]);
 
   const handleCheckout = useCallback(async (plan: "premium" | "super_premium") => {
     if (!session?.access_token) {
@@ -210,53 +317,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       toast.error("Erro ao abrir gerenciamento de assinatura");
     }
   }, [session]);
-
-  useEffect(() => {
-    let mounted = true;
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
-      if (!mounted) return;
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
-      if (nextSession?.user) {
-        await fetchProfile(nextSession.user.id);
-      } else {
-        setProfile(getGuestProfile());
-        setTier("free");
-      }
-      setLoading(false);
-    });
-
-    const sessionPromise = supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      if (!mounted) return;
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      if (currentSession?.user) {
-        fetchProfile(currentSession.user.id);
-      } else {
-        setProfile(getGuestProfile());
-      }
-      setLoading(false);
-    });
-
-    const safetyTimer = setTimeout(() => {
-      if (mounted) setLoading(false);
-    }, 1500);
-
-    sessionPromise.finally(() => clearTimeout(safetyTimer));
-
-    return () => {
-      mounted = false;
-      clearTimeout(safetyTimer);
-      subscription.unsubscribe();
-    };
-  }, [fetchProfile]);
-
-  useEffect(() => {
-    if (!session) return;
-    refreshSubscription();
-    const interval = setInterval(refreshSubscription, 60000);
-    return () => clearInterval(interval);
-  }, [session, refreshSubscription]);
 
   const signUp = async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password });
@@ -322,8 +382,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const canAskQuestion = useCallback(() => {
     if (!profile) return false;
     const p = resetDailyIfNeeded(profile);
-    if (!p.is_premium) return p.questions_used < MAX_FREE_QUESTIONS;
-    return p.questions_used < DAILY_QUESTION_LIMIT;
+    if (p.is_premium) return p.questions_used < DAILY_QUESTION_LIMIT;
+    return p.questions_used < MAX_FREE_QUESTIONS;
   }, [profile, resetDailyIfNeeded]);
 
   const canGenerateStory = useCallback(() => {
@@ -336,8 +396,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const questionsRemaining = useCallback(() => {
     if (!profile) return 0;
     const p = resetDailyIfNeeded(profile);
-    if (!p.is_premium) return Math.max(0, MAX_FREE_QUESTIONS - p.questions_used);
-    return Math.max(0, DAILY_QUESTION_LIMIT - p.questions_used);
+    if (p.is_premium) return Math.max(0, DAILY_QUESTION_LIMIT - p.questions_used);
+    return Math.max(0, MAX_FREE_QUESTIONS - p.questions_used);
   }, [profile, resetDailyIfNeeded]);
 
   const storiesRemaining = useCallback(() => {
@@ -352,7 +412,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const newCount = p.questions_used + 1;
     const today = todayStr();
     if (user) {
-      // Server-side increment is handled in the edge function
       setProfile(prev => (prev ? { ...prev, questions_used: newCount, last_usage_date: today } : prev));
       return;
     }
@@ -378,7 +437,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, session, profile, tier, loading,
+      user, session, profile, tier, loading, isReady,
       signUp, signIn, signOut, resetPassword,
       updateProfile, incrementQuestions, incrementStories,
       canAskQuestion, canGenerateStory, questionsRemaining, storiesRemaining,
