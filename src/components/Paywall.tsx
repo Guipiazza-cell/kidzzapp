@@ -67,7 +67,7 @@ const Paywall = ({ onLogin }: PaywallProps) => {
           {[
             { icon: Sparkles, text: "Respostas instantâneas e certeiras", color: "text-kid-yellow" },
             { icon: MessageCircle, text: "Linguagem certa para cada idade", color: "text-kid-green" },
-            { icon: Heart, text: "Mais conexão com seu filho", color: "text-kid-pink" },
+            { icon: Heart, text: "Fábrica de Momentos — missões pai + filho", color: "text-kid-pink" },
             { icon: Shield, text: "Segurança para responder qualquer pergunta", color: "text-kid-blue" },
           ].map((b, i) => (
             <motion.div

@@ -47,7 +47,7 @@ const PLANS = [
   features: [
   "10 perguntas por dia",
   "Narração por voz amigável",
-  "3 personagens desbloqueados",
+  "🎯 Fábrica de Momentos (missões)",
   "Respostas adaptadas por idade",
   "Filtro de conteúdo avançado"],
 
@@ -67,9 +67,9 @@ const PLANS = [
       "Tudo do Plano KIDZZ +",
       "10 perguntas por dia",
       "🏭 3 histórias por dia",
+      "🎯 Fábrica de Momentos completa",
       "Avatar personalizado do seu filho",
       "Ilustrações exclusivas",
-      "Todos os personagens exclusivos",
       "Narração por voz Premium",
       "Suporte prioritário",
       "Novidades em primeira mão"],
