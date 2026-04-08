@@ -11,6 +11,7 @@ import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
 import ChameleonMascot from "@/components/ChameleonMascot";
+import MagicalBackground from "@/components/MagicalBackground";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "paywall";
 
@@ -115,6 +116,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
+      <MagicalBackground />
       <AnimatePresence mode="wait">
         {step === "home" && (
           <HomeScreen

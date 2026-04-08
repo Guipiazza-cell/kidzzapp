@@ -71,41 +71,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Magical forest background elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Floating fireflies */}
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={`firefly-${i}`}
-            className="absolute w-1.5 h-1.5 rounded-full bg-kid-yellow/40"
-            style={{
-              left: `${15 + i * 14}%`,
-              top: `${20 + (i % 3) * 25}%`,
-            }}
-            animate={{
-              y: [0, -15, 0],
-              opacity: [0.2, 0.7, 0.2],
-              scale: [0.8, 1.2, 0.8],
-            }}
-            transition={{
-              duration: 3 + i * 0.5,
-              repeat: Infinity,
-              delay: i * 0.7,
-            }}
-          />
-        ))}
-        {/* Subtle leaf shapes */}
-        <motion.div
-          className="absolute -top-4 -right-6 w-32 h-32 rounded-full bg-kid-green/5 blur-2xl"
-          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute -bottom-10 -left-8 w-40 h-40 rounded-full bg-kid-purple/5 blur-3xl"
-          animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ duration: 8, repeat: Infinity }}
-        />
-      </div>
 
       {/* Header */}
       <header className="flex items-center justify-between px-4 pt-4 pb-2 relative z-10">
