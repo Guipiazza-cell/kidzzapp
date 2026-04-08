@@ -142,18 +142,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
+      if (!resp.ok) {
+        // On HTTP error, trust DB — NEVER downgrade a paying user due to network issues
+        console.warn("[Auth] check-subscription HTTP error, trusting DB", resp.status);
+        return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
+      }
+
       const data = await resp.json();
+
       if (data.subscribed) {
         const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
         return { tier: newTier, isPremium: true };
       }
-      // If DB says premium but Stripe doesn't → trust DB (manual override)
-      if (currentProfile.is_premium) {
+
+      // CRITICAL: If backend says not subscribed but DB says premium, backend already handles this.
+      // This is a final safety net — never downgrade without explicit backend confirmation.
+      if (currentProfile.is_premium && !data.subscribed) {
+        console.warn("[Auth] Backend says free but DB profile is premium — trusting DB");
         return { tier: "premium", isPremium: true };
       }
+
       return { tier: "free", isPremium: false };
-    } catch {
-      // On error, trust what the DB says
+    } catch (err) {
+      // On ANY error (network, parse, etc), trust DB — protect paying users
+      console.error("[Auth] checkSubscription error, trusting DB:", err);
       return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
     } finally {
       subCheckInFlight.current = false;
