@@ -12,6 +12,9 @@ interface Profile {
   last_usage_date: string;
   is_premium: boolean;
   voice_enabled: boolean;
+  premium_source: string | null;
+  plan_end_date: string | null;
+  is_admin: boolean;
 }
 
 interface AuthContextType {
@@ -42,6 +45,8 @@ const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-s
 const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`;
 const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-portal`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
+const SUB_CACHE_KEY = "kidzz_sub_cache";
+const SUB_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -53,6 +58,9 @@ const createDefaultProfile = (): Profile => ({
   last_usage_date: todayStr(),
   is_premium: false,
   voice_enabled: false,
+  premium_source: null,
+  plan_end_date: null,
+  is_admin: false,
 });
 
 const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
@@ -63,6 +71,9 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   last_usage_date: value?.last_usage_date ?? todayStr(),
   is_premium: value?.is_premium ?? false,
   voice_enabled: value?.voice_enabled ?? false,
+  premium_source: value?.premium_source ?? null,
+  plan_end_date: value?.plan_end_date ?? null,
+  is_admin: value?.is_admin ?? false,
 });
 
 const getGuestProfile = (): Profile => {
@@ -84,6 +95,34 @@ const clearGuestProfile = () => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(GUEST_PROFILE_STORAGE_KEY);
 };
+
+// --- Subscription cache helpers ---
+interface SubCache {
+  tier: SubscriptionTier;
+  isPremium: boolean;
+  ts: number;
+}
+
+const getSubCache = (): SubCache | null => {
+  try {
+    const raw = localStorage.getItem(SUB_CACHE_KEY);
+    if (!raw) return null;
+    const cached: SubCache = JSON.parse(raw);
+    if (Date.now() - cached.ts > SUB_CACHE_TTL) {
+      localStorage.removeItem(SUB_CACHE_KEY);
+      return null;
+    }
+    return cached;
+  } catch {
+    return null;
+  }
+};
+
+const setSubCache = (tier: SubscriptionTier, isPremium: boolean) => {
+  localStorage.setItem(SUB_CACHE_KEY, JSON.stringify({ tier, isPremium, ts: Date.now() }));
+};
+
+const clearSubCache = () => localStorage.removeItem(SUB_CACHE_KEY);
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
@@ -113,12 +152,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled")
+      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin")
       .eq("id", userId)
       .single();
 
     if (data) {
-      const prof = resetDailyIfNeeded(data as Profile);
+      const prof = resetDailyIfNeeded(data as unknown as Profile);
       if (prof !== data) {
         supabase.from("profiles").update({
           questions_used: prof.questions_used,
@@ -131,9 +170,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return getGuestProfile();
   }, [resetDailyIfNeeded]);
 
-  const checkSubscription = useCallback(async (accessToken: string, currentProfile: Profile): Promise<{ tier: SubscriptionTier; isPremium: boolean }> => {
-    if (subCheckInFlight.current) return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
+  const checkSubscription = useCallback(async (
+    accessToken: string,
+    currentProfile: Profile,
+    forceRefresh = false
+  ): Promise<{ tier: SubscriptionTier; isPremium: boolean }> => {
+    // Manual users: trust DB, skip Stripe entirely
+    if (currentProfile.premium_source === "manual" && currentProfile.is_premium) {
+      const result = { tier: "premium" as SubscriptionTier, isPremium: true };
+      setSubCache(result.tier, result.isPremium);
+      return result;
+    }
+
+    // Check cache (unless forced)
+    if (!forceRefresh) {
+      const cached = getSubCache();
+      if (cached) return { tier: cached.tier, isPremium: cached.isPremium };
+    }
+
+    if (subCheckInFlight.current) {
+      return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
+    }
     subCheckInFlight.current = true;
+
     try {
       const resp = await fetch(CHECK_SUB_URL, {
         method: "POST",
@@ -144,36 +203,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (!resp.ok) {
-        // On HTTP error, trust DB — NEVER downgrade a paying user due to network issues
         console.warn("[Auth] check-subscription HTTP error, trusting DB", resp.status);
-        return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
+        const fallback = { tier: currentProfile.is_premium ? "premium" as SubscriptionTier : "free" as SubscriptionTier, isPremium: currentProfile.is_premium };
+        setSubCache(fallback.tier, fallback.isPremium);
+        return fallback;
       }
 
       const data = await resp.json();
 
       if (data.subscribed) {
         const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
-        return { tier: newTier, isPremium: true };
+        const result = { tier: newTier, isPremium: true };
+        setSubCache(result.tier, result.isPremium);
+        return result;
       }
 
-      // CRITICAL: If backend says not subscribed but DB says premium, backend already handles this.
-      // This is a final safety net — never downgrade without explicit backend confirmation.
+      // Backend says free but DB says premium — trust DB
       if (currentProfile.is_premium && !data.subscribed) {
         console.warn("[Auth] Backend says free but DB profile is premium — trusting DB");
-        return { tier: "premium", isPremium: true };
+        const result = { tier: "premium" as SubscriptionTier, isPremium: true };
+        setSubCache(result.tier, result.isPremium);
+        return result;
       }
 
-      return { tier: "free", isPremium: false };
+      const result = { tier: "free" as SubscriptionTier, isPremium: false };
+      setSubCache(result.tier, result.isPremium);
+      return result;
     } catch (err) {
-      // On ANY error (network, parse, etc), trust DB — protect paying users
       console.error("[Auth] checkSubscription error, trusting DB:", err);
-      return { tier: currentProfile.is_premium ? "premium" : "free", isPremium: currentProfile.is_premium };
+      const fallback = { tier: currentProfile.is_premium ? "premium" as SubscriptionTier : "free" as SubscriptionTier, isPremium: currentProfile.is_premium };
+      setSubCache(fallback.tier, fallback.isPremium);
+      return fallback;
     } finally {
       subCheckInFlight.current = false;
     }
   }, []);
 
-  // Full init: getSession first, then onAuthStateChange for subsequent changes
   useEffect(() => {
     let mounted = true;
 
@@ -189,6 +254,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (!mounted) return;
           setProfile(prof);
 
+          // On init, use cache if available, otherwise check
           const subResult = await checkSubscription(currentSession.access_token, prof);
           if (!mounted) return;
           setTier(subResult.tier);
@@ -203,7 +269,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } catch (err) {
         console.error("Auth init error:", err);
-        // Security fallback: clear everything
         setSession(null);
         setUser(null);
         setProfile(getGuestProfile());
@@ -219,7 +284,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     initializeAuth();
 
-    // Listen for subsequent auth changes (login/logout/token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!mounted || !initDone.current) return;
 
@@ -227,11 +291,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(nextSession?.user ?? null);
 
       if (nextSession?.user) {
-        // Fire and forget — no await in callback
+        // On login, force refresh subscription
+        clearSubCache();
         fetchProfile(nextSession.user.id).then(prof => {
           if (!mounted) return;
           setProfile(prof);
-          checkSubscription(nextSession.access_token, prof).then(subResult => {
+          checkSubscription(nextSession.access_token, prof, true).then(subResult => {
             if (!mounted) return;
             setTier(subResult.tier);
             if (subResult.isPremium !== prof.is_premium) {
@@ -240,6 +305,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           });
         });
       } else {
+        clearSubCache();
         setProfile(getGuestProfile());
         setTier("free");
       }
@@ -253,28 +319,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshSubscription = useCallback(async () => {
     if (!session?.access_token || !profile) return;
-    const subResult = await checkSubscription(session.access_token, profile);
+    clearSubCache();
+    const subResult = await checkSubscription(session.access_token, profile, true);
     setTier(subResult.tier);
     if (subResult.isPremium !== profile.is_premium) {
       setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
     }
   }, [session, profile, checkSubscription]);
 
-  // Periodic subscription refresh
-  useEffect(() => {
-    if (!session) return;
-    const interval = setInterval(() => {
-      if (session?.access_token && profile) {
-        checkSubscription(session.access_token, profile).then(subResult => {
-          setTier(subResult.tier);
-          if (subResult.isPremium !== profile.is_premium) {
-            setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
-          }
-        });
-      }
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [session, profile, checkSubscription]);
+  // No periodic refresh — only on login and manual refresh (cost optimization)
 
   const handleCheckout = useCallback(async (plan: "premium" | "super_premium") => {
     if (!session?.access_token) {
@@ -345,6 +398,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     clearGuestProfile();
+    clearSubCache();
     try {
       const { error } = await supabase.auth.signOut();
       if (error) console.error("SignOut error:", error.message);
@@ -367,9 +421,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateProfile = async (updates: Partial<Profile>) => {
     if (user) {
       try {
-        const { error } = await supabase.from("profiles").update(updates).eq("id", user.id);
+        const { error } = await supabase.from("profiles").update(updates as any).eq("id", user.id);
         if (error) {
-          const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates });
+          const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates } as any);
           if (upsertErr) console.error("updateProfile upsert error:", upsertErr.message);
         }
       } catch (e) {
