@@ -281,23 +281,29 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
           <p className="text-primary-foreground/30 text-[10px] font-bold text-center uppercase tracking-widest mb-2">
             Perguntas populares
           </p>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {QUICK.map((q, i) => (
-              <motion.button
-                key={q.text}
-                onClick={() => submit(q.text)}
-                disabled={submitting || isFreeLimitReached}
-                className="flex items-center gap-1.5 glass-card px-3 py-2 rounded-full text-left active:scale-[0.97] transition-transform disabled:opacity-40"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 + i * 0.06 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="text-sm">{q.emoji}</span>
-                <span className="text-[11px] font-bold text-primary-foreground/80 leading-tight">{q.text}</span>
-              </motion.button>
-            ))}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={questionPage}
+              className="flex flex-wrap gap-2 justify-center"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.4 }}
+            >
+              {visibleQuestions.map((q) => (
+                <motion.button
+                  key={q.text}
+                  onClick={() => submit(q.text)}
+                  disabled={submitting || isFreeLimitReached}
+                  className="flex items-center gap-1.5 glass-card px-3 py-2 rounded-full text-left active:scale-[0.97] transition-transform disabled:opacity-40"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="text-sm">{q.emoji}</span>
+                  <span className="text-[11px] font-bold text-primary-foreground/80 leading-tight">{q.text}</span>
+                </motion.button>
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </motion.div>
 
         {/* Bottom spacer */}
