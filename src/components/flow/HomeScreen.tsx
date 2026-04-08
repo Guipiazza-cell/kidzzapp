@@ -143,7 +143,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && submit(input)}
-                placeholder={isFreeLimitReached ? "Limite atingido" : 'Ex: "Pai, o que é morrer?"'}
+                placeholder={isFreeLimitReached ? "Limite atingido" : "Pergunta qualquer coisa 😊"}
                 className="w-full py-3.5 px-5 rounded-2xl glass-card text-primary-foreground text-sm placeholder:text-primary-foreground/30 focus:outline-none focus:ring-2 focus:ring-kid-orange/30 transition-all disabled:opacity-40"
                 disabled={submitting || isFreeLimitReached}
               />
