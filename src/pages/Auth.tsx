@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import ChameleonMascot from "@/components/ChameleonMascot";
-import jungleBg from "@/assets/jungle-bg.jpg";
+import MagicalBackground from "@/components/MagicalBackground";
 import { toast } from "sonner";
 
 type Mode = "login" | "signup" | "forgot";
@@ -60,19 +60,8 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden relative">
-      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
-
-      {[...Array(6)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="fixed rounded-full bg-kid-yellow/50"
-          style={{ width: 4, height: 4, left: `${15 + i * 14}%`, top: `${20 + (i % 3) * 25}%` }}
-          animate={{ y: [0, -20, 10, 0], opacity: [0.2, 0.8, 0.3, 0.2] }}
-          transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.4 }}
-        />
-      ))}
+    <div className="min-h-screen flex flex-col overflow-hidden relative bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)]">
+      <MagicalBackground />
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }}>
