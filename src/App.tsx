@@ -12,6 +12,7 @@ import Privacy from "./pages/Privacy";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
+import Admin from "./pages/Admin";
 import InstallPrompt from "./components/InstallPrompt";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/lp" element={<Landing />} />
               <Route path="/landing" element={<Landing />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <InstallPrompt />
