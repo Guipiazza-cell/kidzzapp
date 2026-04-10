@@ -103,8 +103,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   }, [speak]);
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden relative bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
-      <MagicalBackground />
+    <div className="flex-1 flex flex-col overflow-hidden relative">
 
       {/* Header */}
       <header className="relative z-10 flex items-center gap-3 px-4 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>

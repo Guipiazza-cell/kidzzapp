@@ -119,13 +119,12 @@ const AchievementsScreen = ({ onBack }: Props) => {
 
   return (
     <motion.div
-      className="flex-1 flex flex-col relative min-h-screen"
+      className="flex-1 flex flex-col relative"
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 30 }}
       transition={{ duration: 0.3 }}
     >
-      <MagicalBackground />
 
       {/* Header */}
       <header
@@ -175,7 +174,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
       </div>
 
       {/* Badges grid */}
-      <div className="flex-1 overflow-y-auto px-5 pb-8 relative z-10">
+      <div className="flex-1 overflow-y-auto px-5 pb-4 relative z-10">
         <div className="grid grid-cols-1 gap-3">
           {BADGES.map((badge, i) => {
             const unlocked = isUnlocked(badge);

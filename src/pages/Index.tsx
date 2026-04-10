@@ -13,6 +13,7 @@ import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
 import ChameleonMascot from "@/components/ChameleonMascot";
 import MagicalBackground from "@/components/MagicalBackground";
+import BottomNav from "@/components/flow/BottomNav";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "paywall";
 
@@ -28,11 +29,11 @@ const Index = () => {
   const [step, setStep] = useState<FlowStep>("home");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [showStoryFactory, setShowStoryFactory] = useState(false);
-  const [showMoments, setShowMoments] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
+  const [activeTab, setActiveTab] = useState("chat");
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
+  const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -55,18 +56,6 @@ const Index = () => {
         </div>
       </div>
     );
-  }
-
-  if (showStoryFactory) {
-    return <StoryFactory onBack={() => setShowStoryFactory(false)} />;
-  }
-
-  if (showMoments) {
-    return <MomentsFactory onBack={() => setShowMoments(false)} />;
-  }
-
-  if (showAchievements) {
-    return <AchievementsScreen onBack={() => setShowAchievements(false)} />;
   }
 
   const handleQuestionSubmit = (q: string) => {
@@ -114,23 +103,48 @@ const Index = () => {
     setQuestion("");
     setAnswer("");
     setStep("home");
+    setActiveTab("chat");
   };
 
   const handleLoginFromPaywall = () => {
     setShowLoginGate(true);
   };
 
-  return (
-    <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
-      <MagicalBackground />
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === "chat") {
+      setStep("home");
+    }
+    if (tab === "subscribe") {
+      setShowParentalGateForSettings(true);
+    }
+  };
+
+  const renderContent = () => {
+    // Sub-screens that live inside the tab layout
+    if (activeTab === "explore") {
+      return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+    }
+    if (activeTab === "moments") {
+      return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+    }
+    if (activeTab === "achievements") {
+      return <AchievementsScreen key="achievements" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+    }
+
+    // Main chat flow
+    return (
       <AnimatePresence mode="wait">
         {step === "home" && (
           <HomeScreen
             key="home"
             onSubmit={handleQuestionSubmit}
-            onOpenStoryFactory={() => setShowStoryFactory(true)}
-            onOpenMoments={() => setShowMoments(true)}
-            onOpenAchievements={() => setShowAchievements(true)}
+            onOpenStoryFactory={() => setActiveTab("explore")}
+            onOpenMoments={() => setActiveTab("moments")}
+            onOpenAchievements={() => setActiveTab("achievements")}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            hideBottomNav
           />
         )}
         {step === "age" && (
@@ -157,23 +171,44 @@ const Index = () => {
             question={question}
             answer={answer}
             onNewQuestion={handleNewQuestion}
-            onOpenStoryFactory={() => setShowStoryFactory(true)}
+            onOpenStoryFactory={() => setActiveTab("explore")}
           />
         )}
         {step === "paywall" && (
           <Paywall key="paywall" onLogin={handleLoginFromPaywall} />
         )}
       </AnimatePresence>
+    );
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
+      <MagicalBackground />
+      
+      <div className="flex-1 flex flex-col pb-[72px]">
+        {renderContent()}
+      </div>
+
+      {/* Persistent bottom nav across ALL tabs */}
+      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
 
       <AnimatePresence>
         {showLoginGate && (
           <ParentalGate
-            onSuccess={() => {
-              setShowLoginGate(false);
-            }}
+            onSuccess={() => setShowLoginGate(false)}
             onCancel={() => setShowLoginGate(false)}
           />
         )}
+        {showParentalGateForSettings && (
+          <ParentalGate
+            onSuccess={() => {
+              setShowParentalGateForSettings(false);
+              setShowSettings(true);
+            }}
+            onCancel={() => setShowParentalGateForSettings(false)}
+          />
+        )}
+        {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
     </div>
   );
