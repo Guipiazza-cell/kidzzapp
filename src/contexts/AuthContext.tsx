@@ -15,6 +15,10 @@ interface Profile {
   premium_source: string | null;
   plan_end_date: string | null;
   is_admin: boolean;
+  points: number;
+  streak_days: number;
+  last_streak_date: string | null;
+  level: string;
 }
 
 interface AuthContextType {
@@ -61,6 +65,10 @@ const createDefaultProfile = (): Profile => ({
   premium_source: null,
   plan_end_date: null,
   is_admin: false,
+  points: 0,
+  streak_days: 0,
+  last_streak_date: null,
+  level: "iniciante",
 });
 
 const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
@@ -74,6 +82,10 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   premium_source: value?.premium_source ?? null,
   plan_end_date: value?.plan_end_date ?? null,
   is_admin: value?.is_admin ?? false,
+  points: value?.points ?? 0,
+  streak_days: value?.streak_days ?? 0,
+  last_streak_date: value?.last_streak_date ?? null,
+  level: value?.level ?? "iniciante",
 });
 
 const getGuestProfile = (): Profile => {
@@ -152,7 +164,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin")
+      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level")
       .eq("id", userId)
       .single();
 
