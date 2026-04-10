@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Search, Shield, Crown, X, CalendarPlus } from "lucide-react";
+import { Search, Shield, Crown, X, CalendarPlus, Users, MessageCircle, BookOpen, Activity } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -14,6 +14,19 @@ interface UserProfile {
   premium_source: string | null;
   plan_end_date: string | null;
   created_at: string;
+  points?: number;
+  streak_days?: number;
+  level?: string;
+  questions_used?: number;
+}
+
+interface Metrics {
+  totalUsers: number;
+  premiumUsers: number;
+  totalQuestions: number;
+  totalStories: number;
+  activeToday: number;
+  recentSignups: number;
 }
 
 const Admin = () => {
@@ -23,12 +36,20 @@ const Admin = () => {
   const [results, setResults] = useState<(UserProfile & { email?: string })[]>([]);
   const [searching, setSearching] = useState(false);
   const [endDateInput, setEndDateInput] = useState<Record<string, string>>({});
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [loadingMetrics, setLoadingMetrics] = useState(true);
 
   useEffect(() => {
     if (isReady && !profile?.is_admin) {
       navigate("/");
     }
   }, [isReady, profile, navigate]);
+
+  useEffect(() => {
+    if (isReady && profile?.is_admin) {
+      loadMetrics();
+    }
+  }, [isReady, profile]);
 
   if (!isReady || !profile?.is_admin) {
     return (
@@ -37,6 +58,21 @@ const Admin = () => {
       </div>
     );
   }
+
+  const loadMetrics = async () => {
+    setLoadingMetrics(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-users", {
+        body: { action: "metrics" },
+      });
+      if (error) throw error;
+      setMetrics(data);
+    } catch (err: any) {
+      console.error("Metrics error:", err);
+    } finally {
+      setLoadingMetrics(false);
+    }
+  };
 
   const handleSearch = async () => {
     if (!searchEmail.trim()) return;
@@ -64,7 +100,6 @@ const Admin = () => {
       const { error } = await supabase.functions.invoke("admin-users", { body });
       if (error) throw error;
       toast.success(activate ? "Premium ativado!" : "Premium removido!");
-      // Refresh
       handleSearch();
     } catch (err: any) {
       toast.error(err.message || "Erro ao atualizar");
@@ -96,6 +131,46 @@ const Admin = () => {
         <h1 className="text-xl font-bold text-foreground">Painel Admin</h1>
       </div>
 
+      {/* Metrics Dashboard */}
+      {metrics && (
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="rounded-xl border border-border bg-card p-3 text-center">
+            <Users className="w-5 h-5 mx-auto mb-1 text-kid-blue" />
+            <p className="text-2xl font-black text-foreground">{metrics.totalUsers}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Usuários</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-3 text-center">
+            <Crown className="w-5 h-5 mx-auto mb-1 text-kid-purple" />
+            <p className="text-2xl font-black text-foreground">{metrics.premiumUsers}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Premium</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-3 text-center">
+            <MessageCircle className="w-5 h-5 mx-auto mb-1 text-kid-pink" />
+            <p className="text-2xl font-black text-foreground">{metrics.totalQuestions}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Perguntas</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-3 text-center">
+            <Activity className="w-5 h-5 mx-auto mb-1 text-kid-green" />
+            <p className="text-2xl font-black text-foreground">{metrics.activeToday}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Ativos Hoje</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-3 text-center">
+            <BookOpen className="w-5 h-5 mx-auto mb-1 text-kid-orange" />
+            <p className="text-2xl font-black text-foreground">{metrics.totalStories}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Histórias</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-3 text-center">
+            <Users className="w-5 h-5 mx-auto mb-1 text-kid-yellow" />
+            <p className="text-2xl font-black text-foreground">{metrics.recentSignups}</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Novos (7d)</p>
+          </div>
+        </div>
+      )}
+      {loadingMetrics && !metrics && (
+        <div className="text-center text-muted-foreground text-sm mb-6">Carregando métricas...</div>
+      )}
+
+      {/* Search */}
       <div className="flex gap-2 mb-6">
         <Input
           placeholder="Buscar por email..."
@@ -116,6 +191,9 @@ const Admin = () => {
                 <p className="font-medium text-foreground">{user.email || "—"}</p>
                 <p className="text-sm text-muted-foreground">
                   {user.child_name || "Sem nome"} · Desde {new Date(user.created_at).toLocaleDateString("pt-BR")}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {user.questions_used ?? 0} perguntas · {user.points ?? 0} pts · 🔥 {user.streak_days ?? 0} · Nível: {user.level ?? "iniciante"}
                 </p>
               </div>
               <div className={`px-2 py-1 rounded-full text-xs font-medium ${user.is_premium ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>

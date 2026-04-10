@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Lock } from "lucide-react";
+import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Lock, Flame, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
-import MagicalBackground from "@/components/MagicalBackground";
 
 interface Badge {
   id: string;
@@ -11,7 +10,7 @@ interface Badge {
   emoji: string;
   icon: typeof Trophy;
   threshold: number;
-  type: "questions" | "stories";
+  type: "questions" | "stories" | "streak" | "points";
   color: string;
   gradient: string;
 }
@@ -41,7 +40,7 @@ const BADGES: Badge[] = [
   },
   {
     id: "explorer",
-    title: "Explorador Incrível",
+    title: "Explorador Curioso",
     description: "Fez 10 perguntas! Uau!",
     emoji: "🚀",
     icon: Zap,
@@ -52,7 +51,7 @@ const BADGES: Badge[] = [
   },
   {
     id: "genius",
-    title: "Gênio Curioso",
+    title: "Mente Brilhante",
     description: "Fez 20 perguntas brilhantes",
     emoji: "🧠",
     icon: Star,
@@ -63,7 +62,7 @@ const BADGES: Badge[] = [
   },
   {
     id: "master",
-    title: "Mestre do Conhecimento",
+    title: "Perguntador Oficial",
     description: "Fez 50 perguntas! Incrível!",
     emoji: "👑",
     icon: Trophy,
@@ -94,7 +93,47 @@ const BADGES: Badge[] = [
     color: "text-kid-purple",
     gradient: "from-kid-purple/20 to-kid-purple/5",
   },
+  {
+    id: "streak-3",
+    title: "Fogo na Curiosidade",
+    description: "3 dias seguidos usando o app",
+    emoji: "🔥",
+    icon: Flame,
+    threshold: 3,
+    type: "streak",
+    color: "text-kid-orange",
+    gradient: "from-kid-orange/20 to-kid-orange/5",
+  },
+  {
+    id: "streak-7",
+    title: "Semana de Sabedoria",
+    description: "7 dias seguidos de descobertas",
+    emoji: "⭐",
+    icon: Flame,
+    threshold: 7,
+    type: "streak",
+    color: "text-kid-yellow",
+    gradient: "from-kid-yellow/20 to-kid-yellow/5",
+  },
+  {
+    id: "points-50",
+    title: "Coletor de Pontos",
+    description: "Acumulou 50 pontos de sabedoria",
+    emoji: "💎",
+    icon: Crown,
+    threshold: 50,
+    type: "points",
+    color: "text-kid-blue",
+    gradient: "from-kid-blue/20 to-kid-blue/5",
+  },
 ];
+
+const LEVEL_CONFIG: Record<string, { label: string; emoji: string; color: string; next: number }> = {
+  iniciante: { label: "Iniciante", emoji: "🌱", color: "text-kid-green", next: 15 },
+  curioso: { label: "Curioso", emoji: "🔍", color: "text-kid-blue", next: 50 },
+  explorador: { label: "Explorador", emoji: "🚀", color: "text-kid-orange", next: 100 },
+  pensador: { label: "Pensador", emoji: "🧠", color: "text-kid-purple", next: 999 },
+};
 
 interface Props {
   onBack: () => void;
@@ -104,17 +143,26 @@ const AchievementsScreen = ({ onBack }: Props) => {
   const { profile } = useAuth();
   const questionsUsed = profile?.questions_used ?? 0;
   const storiesUsed = profile?.stories_used ?? 0;
+  const streakDays = profile?.streak_days ?? 0;
+  const points = profile?.points ?? 0;
+  const level = profile?.level ?? "iniciante";
+  const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
+  const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
+
+  const getCount = (badge: Badge) => {
+    switch (badge.type) {
+      case "questions": return questionsUsed;
+      case "stories": return storiesUsed;
+      case "streak": return streakDays;
+      case "points": return points;
+    }
+  };
 
   const getProgress = (badge: Badge) => {
-    const count = badge.type === "questions" ? questionsUsed : storiesUsed;
-    return Math.min(100, (count / badge.threshold) * 100);
+    return Math.min(100, (getCount(badge) / badge.threshold) * 100);
   };
 
-  const isUnlocked = (badge: Badge) => {
-    const count = badge.type === "questions" ? questionsUsed : storiesUsed;
-    return count >= badge.threshold;
-  };
-
+  const isUnlocked = (badge: Badge) => getCount(badge) >= badge.threshold;
   const unlockedCount = BADGES.filter(isUnlocked).length;
 
   return (
@@ -125,7 +173,6 @@ const AchievementsScreen = ({ onBack }: Props) => {
       exit={{ opacity: 0, x: 30 }}
       transition={{ duration: 0.3 }}
     >
-
       {/* Header */}
       <header
         className="flex items-center gap-3 px-5 pb-3 relative z-10"
@@ -153,24 +200,45 @@ const AchievementsScreen = ({ onBack }: Props) => {
         </motion.div>
       </header>
 
-      {/* Stats summary */}
-      <div className="px-5 mb-4 relative z-10">
-        <div className="glass-card rounded-2xl p-4 flex gap-4">
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-black text-gray-800">{questionsUsed}</p>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Perguntas</p>
+      {/* Level progress card */}
+      <div className="px-5 mb-3 relative z-10">
+        <div className="glass-card rounded-2xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-2xl">{levelInfo.emoji}</span>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className={`text-sm font-black ${levelInfo.color}`}>Nível: {levelInfo.label}</span>
+                <span className="text-[11px] font-bold text-gray-400">{points} pts</span>
+              </div>
+              <Progress value={levelProgress} className="h-2 mt-1 bg-gray-200/50" />
+            </div>
           </div>
-          <div className="w-px bg-gray-200" />
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-black text-gray-800">{storiesUsed}</p>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Histórias</p>
-          </div>
-          <div className="w-px bg-gray-200" />
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-black text-gray-800">{unlockedCount}</p>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Badges</p>
+          <div className="flex gap-4 pt-2 border-t border-gray-200/30">
+            <div className="flex-1 text-center">
+              <p className="text-lg font-black text-gray-800">{questionsUsed}</p>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Perguntas</p>
+            </div>
+            <div className="flex-1 text-center">
+              <p className="text-lg font-black text-gray-800">{storiesUsed}</p>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Histórias</p>
+            </div>
+            <div className="flex-1 text-center">
+              <p className="text-lg font-black text-kid-orange">{streakDays}🔥</p>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Streak</p>
+            </div>
+            <div className="flex-1 text-center">
+              <p className="text-lg font-black text-gray-800">{unlockedCount}</p>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Badges</p>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Motivational message */}
+      <div className="px-5 mb-3 relative z-10">
+        <p className="text-[11px] text-gray-500 font-semibold text-center italic">
+          "Cada pergunta te aproxima do próximo nível. Continue explorando!" ✨
+        </p>
       </div>
 
       {/* Badges grid */}
@@ -179,7 +247,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
           {BADGES.map((badge, i) => {
             const unlocked = isUnlocked(badge);
             const progress = getProgress(badge);
-            const count = badge.type === "questions" ? questionsUsed : storiesUsed;
+            const count = getCount(badge);
             const Icon = badge.icon;
 
             return (
@@ -192,51 +260,47 @@ const AchievementsScreen = ({ onBack }: Props) => {
                 }`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08, type: "spring", stiffness: 200, damping: 20 }}
+                transition={{ delay: i * 0.06, type: "spring", stiffness: 200, damping: 20 }}
               >
                 <div className="flex items-center gap-3">
-                  {/* Badge icon */}
                   <motion.div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br ${badge.gradient} relative`}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br ${badge.gradient} relative`}
                     animate={unlocked ? { scale: [1, 1.05, 1] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
                     {unlocked ? (
-                      <span className="text-2xl">{badge.emoji}</span>
+                      <span className="text-xl">{badge.emoji}</span>
                     ) : (
-                      <Lock size={20} className="text-gray-400" />
+                      <Lock size={18} className="text-gray-400" />
                     )}
                     {unlocked && (
                       <motion.div
-                        className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-kid-green flex items-center justify-center"
+                        className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-kid-green flex items-center justify-center"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        transition={{ type: "spring", delay: i * 0.08 + 0.3 }}
+                        transition={{ type: "spring", delay: i * 0.06 + 0.3 }}
                       >
-                        <span className="text-[10px]">✓</span>
+                        <span className="text-[8px]">✓</span>
                       </motion.div>
                     )}
                   </motion.div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className={`text-sm font-black ${unlocked ? "text-gray-800" : "text-gray-500"}`}>
                         {badge.title}
                       </h3>
-                      {unlocked && (
-                        <Icon size={14} className={badge.color} />
-                      )}
+                      {unlocked && <Icon size={14} className={badge.color} />}
                     </div>
-                    <p className="text-[11px] text-gray-500 font-medium mt-0.5">
+                    <p className="text-[10px] text-gray-500 font-medium mt-0.5">
                       {badge.description}
                     </p>
-                    <div className="mt-2 flex items-center gap-2">
+                    <div className="mt-1.5 flex items-center gap-2">
                       <Progress
                         value={progress}
-                        className="h-2 flex-1 bg-gray-200/50"
+                        className="h-1.5 flex-1 bg-gray-200/50"
                       />
-                      <span className="text-[10px] font-bold text-gray-500 whitespace-nowrap">
+                      <span className="text-[9px] font-bold text-gray-500 whitespace-nowrap">
                         {Math.min(count, badge.threshold)}/{badge.threshold}
                       </span>
                     </div>

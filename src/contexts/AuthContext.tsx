@@ -15,6 +15,10 @@ interface Profile {
   premium_source: string | null;
   plan_end_date: string | null;
   is_admin: boolean;
+  points: number;
+  streak_days: number;
+  last_streak_date: string | null;
+  level: string;
 }
 
 interface AuthContextType {
@@ -61,6 +65,10 @@ const createDefaultProfile = (): Profile => ({
   premium_source: null,
   plan_end_date: null,
   is_admin: false,
+  points: 0,
+  streak_days: 0,
+  last_streak_date: null,
+  level: "iniciante",
 });
 
 const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
@@ -74,6 +82,10 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   premium_source: value?.premium_source ?? null,
   plan_end_date: value?.plan_end_date ?? null,
   is_admin: value?.is_admin ?? false,
+  points: value?.points ?? 0,
+  streak_days: value?.streak_days ?? 0,
+  last_streak_date: value?.last_streak_date ?? null,
+  level: value?.level ?? "iniciante",
 });
 
 const getGuestProfile = (): Profile => {
@@ -152,7 +164,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin")
+      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level")
       .eq("id", userId)
       .single();
 
@@ -473,16 +485,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
   }, [profile, resetDailyIfNeeded]);
 
+  const computeLevel = (pts: number): string => {
+    if (pts >= 100) return "pensador";
+    if (pts >= 50) return "explorador";
+    if (pts >= 15) return "curioso";
+    return "iniciante";
+  };
+
+  const updateStreak = (p: Profile): { streak_days: number; last_streak_date: string } => {
+    const today = todayStr();
+    if (p.last_streak_date === today) return { streak_days: p.streak_days, last_streak_date: today };
+    
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+    
+    if (p.last_streak_date === yesterdayStr) {
+      return { streak_days: p.streak_days + 1, last_streak_date: today };
+    }
+    return { streak_days: 1, last_streak_date: today };
+  };
+
   const incrementQuestions = async () => {
     if (!profile) return;
     const p = resetDailyIfNeeded(profile);
     const newCount = p.questions_used + 1;
     const today = todayStr();
+    const newPoints = p.points + 1;
+    const newLevel = computeLevel(newPoints);
+    const streakUpdate = updateStreak(p);
+    
+    const updates = {
+      questions_used: newCount,
+      last_usage_date: today,
+      points: newPoints,
+      level: newLevel,
+      ...streakUpdate,
+    };
+    
     if (user) {
-      setProfile(prev => (prev ? { ...prev, questions_used: newCount, last_usage_date: today } : prev));
+      setProfile(prev => (prev ? { ...prev, ...updates } : prev));
+      supabase.from("profiles").update(updates).eq("id", user.id).then(() => {});
       return;
     }
-    const next = normalizeProfile({ ...p, questions_used: newCount, last_usage_date: today });
+    const next = normalizeProfile({ ...p, ...updates });
     saveGuestProfile(next);
     setProfile(next);
   };
