@@ -45,7 +45,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
                 isActive
                   ? tab.color
                   : tab.highlight
-                  ? "text-kid-yellow/70"
+                  ? "text-kid-purple/70"
                   : "text-gray-400"
               }
             />
