@@ -6,6 +6,7 @@ import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
 import SubscribeBanner from "../SubscribeBanner";
 import BottomNav from "./BottomNav";
+import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import pixelImg from "@/assets/pixel-chameleon.png";
@@ -35,11 +36,13 @@ interface Props {
   onSubmit: (question: string) => void;
   onOpenStoryFactory: () => void;
   onOpenMoments?: () => void;
+  onOpenAchievements?: () => void;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining, signOut } = useAuth();
   const navigate = useNavigate();
+  const { particles, burst } = useCharacterParticles();
   const [input, setInput] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [showParentalGate, setShowParentalGate] = useState(false);
@@ -78,6 +81,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
     setActiveTab(tab);
     if (tab === "explore") onOpenStoryFactory();
     if (tab === "moments") onOpenMoments?.();
+    if (tab === "achievements") onOpenAchievements?.();
     if (tab === "subscribe") setShowParentalGateForSettings(true);
   };
 
