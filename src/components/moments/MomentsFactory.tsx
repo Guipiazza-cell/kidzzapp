@@ -37,7 +37,7 @@ const MomentsFactory = ({ onBack }: Props) => {
 
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)] relative"
+      className="flex-1 flex flex-col overflow-hidden relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

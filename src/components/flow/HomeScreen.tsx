@@ -5,7 +5,6 @@ import VoiceInput from "../VoiceInput";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
 import SubscribeBanner from "../SubscribeBanner";
-import BottomNav from "./BottomNav";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -30,13 +29,16 @@ const ALL_QUESTIONS = [
   { text: "O que faz algo ser justo ou injusto?", emoji: "⚖️" },
 ];
 
-const VISIBLE_COUNT = 4;
+const VISIBLE_COUNT = 6;
 
 interface Props {
   onSubmit: (question: string) => void;
   onOpenStoryFactory: () => void;
   onOpenMoments?: () => void;
   onOpenAchievements?: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  hideBottomNav?: boolean;
 }
 
 const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements }: Props) => {
@@ -49,7 +51,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("chat");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isFreeLimitReached = !canAskQuestion();
@@ -75,14 +76,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
     if (!text.trim() || submitting) return;
     setSubmitting(true);
     onSubmit(text.trim());
-  };
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    if (tab === "explore") onOpenStoryFactory();
-    if (tab === "moments") onOpenMoments?.();
-    if (tab === "achievements") onOpenAchievements?.();
-    if (tab === "subscribe") setShowParentalGateForSettings(true);
   };
 
   const questionsUsed = profile?.questions_used ?? 0;
@@ -117,11 +110,11 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         </div>
         <div className="flex items-center gap-3">
           {profile?.is_premium && (
-            <span className="text-[10px] text-kid-yellow font-extrabold glass-card px-2.5 py-1 rounded-full flex items-center gap-1">
+            <span className="text-[10px] text-white font-extrabold bg-gradient-to-r from-kid-purple to-kid-pink px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
               <Crown size={11} /> Premium
             </span>
           )}
-          <span className="text-xs text-gray-700 font-extrabold glass-card px-3 py-1.5 rounded-full">
+          <span className="text-xs text-gray-800 font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
           </span>
           {!user ? (
@@ -135,7 +128,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           ) : (
             <motion.button
               onClick={() => setShowParentalGateForSettings(true)}
-              className="p-2.5 rounded-xl glass-card text-primary-foreground/50"
+              className="p-2.5 rounded-xl glass-card text-gray-600"
               whileTap={{ scale: 0.9 }}
             >
               <Shield size={20} />
@@ -150,20 +143,20 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         isPremium={profile?.is_premium ?? false}
       />
 
-      <div className="flex-1 flex flex-col items-center px-5 pb-24 overflow-y-auto">
-        {/* Characters & greeting */}
-        <div className="flex items-end justify-center gap-3 mt-2 mb-1">
-          {/* Ane — slides in from left with bounce */}
+      <div className="flex-1 flex flex-col items-center px-5 overflow-y-auto">
+        {/* Characters & greeting — BIGGER */}
+        <div className="flex items-end justify-center gap-2 mt-2 mb-1">
+          {/* Ane — bigger, more imposing */}
           <motion.img
             src={aneImg}
             alt="Ane"
-            className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
+            className="w-24 h-24 object-contain drop-shadow-xl cursor-pointer"
             initial={{ opacity: 0, x: -60, rotate: -15 }}
             animate={{
               opacity: 1,
               x: 0,
               rotate: [0, -4, 4, -2, 0],
-              y: [0, -4, 0, -2, 0],
+              y: [0, -6, 0, -3, 0],
             }}
             transition={{
               opacity: { duration: 0.5 },
@@ -171,12 +164,12 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               rotate: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 },
               y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 },
             }}
-            whileHover={{ scale: 1.2, rotate: -8 }}
-            whileTap={{ scale: 0.8, rotate: 12 }}
+            whileHover={{ scale: 1.15, rotate: -8 }}
+            whileTap={{ scale: 0.85, rotate: 12 }}
             onClick={(e) => burst(e)}
           />
           <motion.div
-            className="glass-card rounded-2xl px-4 py-2.5 max-w-[220px]"
+            className="glass-card rounded-2xl px-4 py-2.5 max-w-[200px]"
             initial={{ opacity: 0, scale: 0.7, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.5 }}
@@ -194,20 +187,20 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               </motion.p>
             </AnimatePresence>
           </motion.div>
-          {/* Pixel — slides in from right with bounce */}
+          {/* Pixel — bigger, with blue glow */}
           <motion.img
             src={pixelImg}
             alt="Pixel"
-            className="w-16 h-16 object-contain cursor-pointer"
+            className="w-24 h-24 object-contain cursor-pointer"
             style={{
-              filter: "brightness(1.15) drop-shadow(0 0 8px rgba(100,160,255,0.6)) drop-shadow(0 4px 12px rgba(80,140,255,0.35))",
+              filter: "brightness(1.15) drop-shadow(0 0 10px rgba(100,160,255,0.7)) drop-shadow(0 4px 16px rgba(80,140,255,0.4))",
             }}
             initial={{ opacity: 0, x: 60, rotate: 15 }}
             animate={{
               opacity: 1,
               x: 0,
               rotate: [0, 5, -3, 2, 0],
-              y: [0, -3, 0, -5, 0],
+              y: [0, -5, 0, -7, 0],
             }}
             transition={{
               opacity: { duration: 0.5 },
@@ -215,15 +208,15 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               rotate: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
               y: { duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 },
             }}
-            whileHover={{ scale: 1.2, rotate: 8 }}
-            whileTap={{ scale: 0.8, rotate: -12 }}
+            whileHover={{ scale: 1.15, rotate: 8 }}
+            whileTap={{ scale: 0.85, rotate: -12 }}
             onClick={(e) => burst(e)}
           />
         </div>
 
         {/* Main CTA text */}
         <motion.h1
-          className="text-2xl font-black text-gray-800 text-center mt-3 mb-1"
+          className="text-2xl font-black text-gray-800 text-center mt-2 mb-1"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -234,18 +227,18 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         {/* Gamification badge */}
         {badge && (
           <motion.div
-            className="glass-card px-3 py-1 rounded-full mb-2"
+            className="glass-card px-3 py-1 rounded-full mb-1"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <span className="text-[11px] font-bold text-kid-yellow">{badge}</span>
+            <span className="text-[11px] font-bold text-kid-purple">{badge}</span>
           </motion.div>
         )}
 
         {questionsUsed > 0 && (
           <motion.p
-            className="text-[11px] text-gray-500 font-bold mb-3"
+            className="text-[11px] text-gray-500 font-bold mb-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.45 }}
@@ -288,14 +281,14 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           </div>
         </motion.div>
 
-        {/* Question chips — nature style */}
+        {/* Question chips — 6 visible, fill space */}
         <motion.div
-          className="w-full max-w-sm mt-5"
+          className="w-full max-w-sm mt-4 flex-1"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <p className="text-gray-500 text-[10px] font-bold text-center uppercase tracking-widest mb-2.5">
+          <p className="text-gray-500 text-[10px] font-bold text-center uppercase tracking-widest mb-2">
             Perguntas populares
           </p>
           <AnimatePresence mode="wait">
@@ -325,11 +318,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           </AnimatePresence>
         </motion.div>
 
-        <div className="mt-6" />
+        <div className="mt-4" />
       </div>
-
-      {/* Bottom Navigation */}
-      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
 
       <AnimatePresence>
         {showParentalGateForSettings && (

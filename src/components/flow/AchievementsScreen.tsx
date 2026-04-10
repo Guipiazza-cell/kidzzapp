@@ -175,7 +175,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
       </div>
 
       {/* Badges grid */}
-      <div className="flex-1 overflow-y-auto px-5 pb-8 relative z-10">
+      <div className="flex-1 overflow-y-auto px-5 pb-4 relative z-10">
         <div className="grid grid-cols-1 gap-3">
           {BADGES.map((badge, i) => {
             const unlocked = isUnlocked(badge);
