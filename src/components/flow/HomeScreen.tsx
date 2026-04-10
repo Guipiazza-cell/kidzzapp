@@ -154,10 +154,20 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             alt="Ane"
             className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
             initial={{ opacity: 0, x: -60, rotate: -15 }}
-            animate={{ opacity: 1, x: 0, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 180, damping: 14, delay: 0.3 }}
-            whileHover={{ scale: 1.15, rotate: -5 }}
-            whileTap={{ scale: 0.85, rotate: 10 }}
+            animate={{
+              opacity: 1,
+              x: 0,
+              rotate: [0, -4, 4, -2, 0],
+              y: [0, -4, 0, -2, 0],
+            }}
+            transition={{
+              opacity: { duration: 0.5 },
+              x: { type: "spring", stiffness: 180, damping: 14, delay: 0.3 },
+              rotate: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 },
+              y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 },
+            }}
+            whileHover={{ scale: 1.2, rotate: -8 }}
+            whileTap={{ scale: 0.8, rotate: 12 }}
           />
           <motion.div
             className="glass-card rounded-2xl px-4 py-2.5 max-w-[220px]"
