@@ -42,7 +42,7 @@ const MomentsFactory = ({ onBack }: Props) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <MagicalBackground />
+      
 
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pb-2 relative z-10" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
