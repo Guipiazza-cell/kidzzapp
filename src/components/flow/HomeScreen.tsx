@@ -198,10 +198,9 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           <motion.img
             src={pixelImg}
             alt="Pixel"
-            className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
+            className="w-16 h-16 object-contain cursor-pointer"
             style={{
-              filter: "brightness(1.3) saturate(1.2) hue-rotate(180deg)",
-              WebkitFilter: "brightness(1.3) saturate(1.2) hue-rotate(180deg)",
+              filter: "brightness(1.15) drop-shadow(0 0 8px rgba(100,160,255,0.6)) drop-shadow(0 4px 12px rgba(80,140,255,0.35))",
             }}
             initial={{ opacity: 0, x: 60, rotate: 15 }}
             animate={{
