@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MessageCircleHeart, BookOpen, Backpack, Crown, Shield } from "lucide-react";
+import { MessageCircleHeart, BookOpen, Backpack, Crown, Trophy } from "lucide-react";
 
 interface Props {
   activeTab: string;
@@ -10,6 +10,7 @@ const TABS = [
   { id: "chat", label: "Perguntas", icon: MessageCircleHeart, color: "text-kid-pink" },
   { id: "explore", label: "Histórias", icon: BookOpen, color: "text-kid-blue" },
   { id: "moments", label: "Momentos", icon: Backpack, color: "text-kid-orange" },
+  { id: "achievements", label: "Conquistas", icon: Trophy, color: "text-kid-yellow" },
   { id: "subscribe", label: "Assinar", icon: Crown, color: "text-kid-purple", highlight: true },
 ];
 

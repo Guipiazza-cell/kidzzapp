@@ -6,6 +6,7 @@ import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
 import SubscribeBanner from "../SubscribeBanner";
 import BottomNav from "./BottomNav";
+import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import pixelImg from "@/assets/pixel-chameleon.png";
@@ -35,11 +36,13 @@ interface Props {
   onSubmit: (question: string) => void;
   onOpenStoryFactory: () => void;
   onOpenMoments?: () => void;
+  onOpenAchievements?: () => void;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining, signOut } = useAuth();
   const navigate = useNavigate();
+  const { particles, burst } = useCharacterParticles();
   const [input, setInput] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [showParentalGate, setShowParentalGate] = useState(false);
@@ -78,6 +81,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
     setActiveTab(tab);
     if (tab === "explore") onOpenStoryFactory();
     if (tab === "moments") onOpenMoments?.();
+    if (tab === "achievements") onOpenAchievements?.();
     if (tab === "subscribe") setShowParentalGateForSettings(true);
   };
 
@@ -99,6 +103,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
+      <CharacterParticles particles={particles} />
       {/* Header */}
       <header
         className="flex items-center justify-between px-5 pb-2 relative z-10"
@@ -168,6 +173,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             }}
             whileHover={{ scale: 1.2, rotate: -8 }}
             whileTap={{ scale: 0.8, rotate: 12 }}
+            onClick={(e) => burst(e)}
           />
           <motion.div
             className="glass-card rounded-2xl px-4 py-2.5 max-w-[220px]"
@@ -193,6 +199,10 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             src={pixelImg}
             alt="Pixel"
             className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
+            style={{
+              filter: "brightness(1.3) saturate(1.2) hue-rotate(180deg)",
+              WebkitFilter: "brightness(1.3) saturate(1.2) hue-rotate(180deg)",
+            }}
             initial={{ opacity: 0, x: 60, rotate: 15 }}
             animate={{
               opacity: 1,
@@ -208,6 +218,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             }}
             whileHover={{ scale: 1.2, rotate: 8 }}
             whileTap={{ scale: 0.8, rotate: -12 }}
+            onClick={(e) => burst(e)}
           />
         </div>
 

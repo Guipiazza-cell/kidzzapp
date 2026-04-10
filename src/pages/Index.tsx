@@ -5,6 +5,7 @@ import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
+import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import StoryFactory from "@/components/story/StoryFactory";
 import MomentsFactory from "@/components/moments/MomentsFactory";
 import Paywall from "@/components/Paywall";
@@ -29,6 +30,7 @@ const Index = () => {
   const [answer, setAnswer] = useState("");
   const [showStoryFactory, setShowStoryFactory] = useState(false);
   const [showMoments, setShowMoments] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
 
@@ -61,6 +63,10 @@ const Index = () => {
 
   if (showMoments) {
     return <MomentsFactory onBack={() => setShowMoments(false)} />;
+  }
+
+  if (showAchievements) {
+    return <AchievementsScreen onBack={() => setShowAchievements(false)} />;
   }
 
   const handleQuestionSubmit = (q: string) => {
@@ -124,6 +130,7 @@ const Index = () => {
             onSubmit={handleQuestionSubmit}
             onOpenStoryFactory={() => setShowStoryFactory(true)}
             onOpenMoments={() => setShowMoments(true)}
+            onOpenAchievements={() => setShowAchievements(true)}
           />
         )}
         {step === "age" && (
