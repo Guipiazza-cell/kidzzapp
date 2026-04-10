@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import ChameleonMascot from "@/components/ChameleonMascot";
 import { useAuth } from "@/contexts/AuthContext";
-import jungleBg from "@/assets/jungle-bg.jpg";
 import { Sparkles } from "lucide-react";
+import MagicalBackground from "@/components/MagicalBackground";
+import pixelImg from "@/assets/pixel-chameleon.png";
+import aneImg from "@/assets/ane-chameleon.png";
 
 const Success = () => {
   const navigate = useNavigate();
@@ -15,9 +16,8 @@ const Success = () => {
   }, [refreshSubscription]);
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden relative">
-      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${jungleBg})` }} />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+    <div className="min-h-screen flex flex-col overflow-hidden relative bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
+      <MagicalBackground />
 
       {[...Array(12)].map((_, i) => (
         <motion.div
@@ -30,13 +30,24 @@ const Success = () => {
       ))}
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center">
-        <motion.div
-          initial={{ scale: 0, rotate: -20 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 200 }}
-        >
-          <ChameleonMascot size="xl" isTalking />
-        </motion.div>
+        <div className="flex items-end gap-4">
+          <motion.img
+            src={aneImg}
+            alt="Ane"
+            className="w-16 h-16 object-contain drop-shadow-xl"
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: [0, -5, 5, 0] }}
+            transition={{ type: "spring", stiffness: 200 }}
+          />
+          <motion.img
+            src={pixelImg}
+            alt="Pixel"
+            className="w-20 h-20 object-contain drop-shadow-xl"
+            initial={{ scale: 0, rotate: 20 }}
+            animate={{ scale: 1, rotate: [0, 5, -5, 0] }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+          />
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -44,13 +55,13 @@ const Success = () => {
           transition={{ delay: 0.5 }}
           className="mt-4 space-y-3"
         >
-          <h1 className="text-4xl font-extrabold text-white drop-shadow-xl">🎉</h1>
-          <h2 className="text-2xl font-extrabold text-white drop-shadow-lg">
+          <h1 className="text-4xl font-extrabold text-gray-800 drop-shadow-sm">🎉</h1>
+          <h2 className="text-2xl font-extrabold text-gray-800 drop-shadow-sm">
             Agora o Kidzz é seu amigo completo!
           </h2>
-           <p className="text-white/80 text-base max-w-xs mx-auto">
-             10 perguntas por dia, voz do Kidzz e personagens desbloqueados!
-           </p>
+          <p className="text-gray-600 text-base max-w-xs mx-auto">
+            10 perguntas por dia, voz do Kidzz e personagens desbloqueados!
+          </p>
         </motion.div>
 
         <motion.div
@@ -59,23 +70,21 @@ const Success = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md rounded-2xl p-4">
-            <span className="text-2xl">💬</span>
-            <span className="text-white font-bold text-sm">10 perguntas por dia desbloqueadas</span>
-          </div>
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md rounded-2xl p-4">
-            <span className="text-2xl">🎤</span>
-            <span className="text-white font-bold text-sm">Voz do Kidzz ativada</span>
-          </div>
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md rounded-2xl p-4">
-            <span className="text-2xl">🦎</span>
-            <span className="text-white font-bold text-sm">Todos os personagens liberados</span>
-          </div>
+          {[
+            { emoji: "💬", text: "10 perguntas por dia desbloqueadas" },
+            { emoji: "🎤", text: "Voz do Kidzz ativada" },
+            { emoji: "🦎", text: "Todos os personagens liberados" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-3 glass-card rounded-2xl p-4">
+              <span className="text-2xl">{item.emoji}</span>
+              <span className="text-gray-700 font-bold text-sm">{item.text}</span>
+            </div>
+          ))}
         </motion.div>
 
         <motion.button
           onClick={() => navigate("/")}
-          className="mt-8 w-full max-w-xs py-5 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-lg shadow-2xl active:scale-95 flex items-center justify-center gap-2"
+          className="mt-8 w-full max-w-xs py-5 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-pink text-white font-extrabold text-lg shadow-2xl active:scale-95 flex items-center justify-center gap-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.3 }}

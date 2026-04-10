@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen } from "lucide-react";
-import ChameleonMascot from "./ChameleonMascot";
 import { useAuth } from "@/contexts/AuthContext";
+import pixelImg from "@/assets/pixel-chameleon.png";
 
 interface PaywallProps {
   onLogin: () => void;
@@ -36,10 +36,16 @@ const Paywall = ({ onLogin }: PaywallProps) => {
       <div className="p-5 space-y-5 max-w-sm mx-auto w-full">
         {/* Emotional header */}
         <div className="text-center pt-2">
-          <ChameleonMascot size="md" className="mx-auto" mood="happy" />
+          <motion.img
+            src={pixelImg}
+            alt="Pixel"
+            className="w-20 h-20 object-contain drop-shadow-xl mx-auto"
+            animate={{ y: [0, -6, 0], rotate: [0, 3, -3, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          />
 
           <motion.h2
-            className="text-2xl font-black text-primary-foreground mt-4 leading-tight"
+            className="text-2xl font-black text-gray-800 mt-4 leading-tight"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -48,7 +54,7 @@ const Paywall = ({ onLogin }: PaywallProps) => {
           </motion.h2>
 
           <motion.p
-            className="text-primary-foreground/60 text-sm mt-2 leading-relaxed"
+            className="text-gray-500 text-sm mt-2 leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -78,7 +84,7 @@ const Paywall = ({ onLogin }: PaywallProps) => {
               transition={{ delay: 0.5 + i * 0.08 }}
             >
               <b.icon size={18} className={b.color} />
-              <span className="text-sm font-bold text-primary-foreground/80">{b.text}</span>
+              <span className="text-sm font-bold text-gray-700">{b.text}</span>
             </motion.div>
           ))}
         </motion.div>
@@ -90,7 +96,7 @@ const Paywall = ({ onLogin }: PaywallProps) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          <p className="text-primary-foreground/40 text-xs font-bold">
+          <p className="text-gray-400 text-xs font-bold">
             +5.000 pais já usam todos os dias ⭐⭐⭐⭐⭐
           </p>
         </motion.div>
@@ -110,25 +116,25 @@ const Paywall = ({ onLogin }: PaywallProps) => {
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
                 <Crown size={16} className="text-kid-yellow" />
-                <span className="font-extrabold text-primary-foreground text-sm">Plano KIDZZ</span>
-                <span className="text-[8px] font-black bg-kid-purple text-primary-foreground px-1.5 py-0.5 rounded-full">POPULAR</span>
+                <span className="font-extrabold text-gray-800 text-sm">Plano KIDZZ</span>
+                <span className="text-[8px] font-black bg-kid-purple text-white px-1.5 py-0.5 rounded-full">POPULAR</span>
               </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                selectedPlan === "premium" ? "bg-kid-purple border-kid-purple" : "border-primary-foreground/20"
+                selectedPlan === "premium" ? "bg-kid-purple border-kid-purple" : "border-gray-300"
               }`}>
-                {selectedPlan === "premium" && <Check size={12} className="text-primary-foreground" />}
+                {selectedPlan === "premium" && <Check size={12} className="text-white" />}
               </div>
             </div>
-            <p className="text-xl font-black text-primary-foreground">
-              R$ 14,90<span className="text-xs font-bold text-primary-foreground/40">/mês</span>
+            <p className="text-xl font-black text-gray-800">
+              R$ 14,90<span className="text-xs font-bold text-gray-400">/mês</span>
             </p>
-            <p className="text-xs text-primary-foreground/50 font-bold mt-1">10 perguntas/dia • Narração por voz</p>
+            <p className="text-xs text-gray-500 font-bold mt-1">10 perguntas/dia • Narração por voz</p>
           </motion.button>
 
           <motion.button
             onClick={() => setSelectedPlan("super_premium")}
             className={`w-full text-left rounded-2xl p-4 transition-all glass-card ${
-              selectedPlan === "super_premium" ? "ring-2 ring-kid-yellow/60" : ""
+              selectedPlan === "super_premium" ? "ring-2 ring-kid-orange/60" : ""
             }`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -137,20 +143,20 @@ const Paywall = ({ onLogin }: PaywallProps) => {
           >
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <Zap size={16} className="text-kid-yellow" />
-                <span className="font-extrabold text-primary-foreground text-sm">KIDZZ Premium</span>
-                <span className="text-[8px] font-black bg-kid-orange text-primary-foreground px-1.5 py-0.5 rounded-full">COMPLETO</span>
+                <Zap size={16} className="text-kid-orange" />
+                <span className="font-extrabold text-gray-800 text-sm">KIDZZ Premium</span>
+                <span className="text-[8px] font-black bg-kid-orange text-white px-1.5 py-0.5 rounded-full">COMPLETO</span>
               </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                selectedPlan === "super_premium" ? "bg-kid-yellow border-kid-yellow" : "border-primary-foreground/20"
+                selectedPlan === "super_premium" ? "bg-kid-orange border-kid-orange" : "border-gray-300"
               }`}>
-                {selectedPlan === "super_premium" && <Check size={12} className="text-foreground" />}
+                {selectedPlan === "super_premium" && <Check size={12} className="text-white" />}
               </div>
             </div>
-            <p className="text-xl font-black text-primary-foreground">
-              R$ 24,90<span className="text-xs font-bold text-primary-foreground/40">/mês</span>
+            <p className="text-xl font-black text-gray-800">
+              R$ 24,90<span className="text-xs font-bold text-gray-400">/mês</span>
             </p>
-            <p className="text-xs text-primary-foreground/50 font-bold mt-1">Tudo do KIDZZ + Histórias + Avatar</p>
+            <p className="text-xs text-gray-500 font-bold mt-1">Tudo do KIDZZ + Histórias + Avatar</p>
           </motion.button>
         </div>
 
@@ -158,14 +164,14 @@ const Paywall = ({ onLogin }: PaywallProps) => {
         <motion.button
           onClick={handleUnlock}
           disabled={loading}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-lg shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform relative overflow-hidden"
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-lg shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform relative overflow-hidden"
           whileTap={{ scale: 0.97 }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.1 }}
         >
           <motion.div
-            className="absolute inset-0 bg-primary-foreground/10 rounded-2xl"
+            className="absolute inset-0 bg-white/10 rounded-2xl"
             animate={{ opacity: [0, 0.2, 0] }}
             transition={{ duration: 2.5, repeat: Infinity }}
           />
@@ -184,7 +190,7 @@ const Paywall = ({ onLogin }: PaywallProps) => {
 
         {/* Urgency */}
         <motion.p
-          className="text-center text-primary-foreground/30 text-[10px] font-bold"
+          className="text-center text-gray-400 text-[10px] font-bold"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
