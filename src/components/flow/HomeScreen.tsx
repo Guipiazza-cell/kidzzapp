@@ -78,6 +78,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
     setActiveTab(tab);
     if (tab === "explore") onOpenStoryFactory();
     if (tab === "moments") onOpenMoments?.();
+    if (tab === "subscribe") setShowParentalGateForSettings(true);
   };
 
   const questionsUsed = profile?.questions_used ?? 0;
@@ -105,7 +106,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
       >
         <div className="flex items-center gap-2.5">
           <img src={pixelImg} alt="Pixel" className="w-9 h-9 object-contain drop-shadow-lg" />
-          <span className="text-xl font-black text-primary-foreground tracking-tight">
+          <span className="text-xl font-black text-gray-800 tracking-tight">
             Kidzz
           </span>
         </div>
@@ -115,7 +116,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
               <Crown size={11} /> Premium
             </span>
           )}
-          <span className="text-xs text-primary-foreground font-extrabold glass-card px-3 py-1.5 rounded-full">
+          <span className="text-xs text-gray-700 font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
           </span>
           {!user ? (
@@ -167,7 +168,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             <AnimatePresence mode="wait">
               <motion.p
                 key={phraseIdx}
-                className="text-center text-primary-foreground/90 text-sm font-bold leading-snug"
+                className="text-center text-gray-700 text-sm font-bold leading-snug"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -192,7 +193,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
 
         {/* Main CTA text */}
         <motion.h1
-          className="text-2xl font-black text-primary-foreground text-center mt-3 mb-1"
+          className="text-2xl font-black text-gray-800 text-center mt-3 mb-1"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -214,7 +215,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
 
         {questionsUsed > 0 && (
           <motion.p
-            className="text-[11px] text-primary-foreground/40 font-bold mb-3"
+            className="text-[11px] text-gray-500 font-bold mb-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.45 }}
@@ -242,7 +243,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
                 placeholder={
                   isFreeLimitReached ? "Limite atingido" : "Digite sua pergunta aqui 😊"
                 }
-                className="w-full py-4 px-5 rounded-2xl glass-card text-primary-foreground text-base placeholder:text-primary-foreground/30 focus:outline-none focus:ring-2 focus:ring-kid-orange/40 transition-all disabled:opacity-40"
+                className="w-full py-4 px-5 rounded-2xl glass-card text-gray-800 text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-kid-orange/40 transition-all disabled:opacity-40"
                 disabled={submitting || isFreeLimitReached}
               />
             </div>
@@ -252,7 +253,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
               className="w-13 h-13 rounded-xl kid-gradient-orange shadow-lg flex items-center justify-center disabled:opacity-30 transition-all"
               whileTap={{ scale: 0.9 }}
             >
-              <Send size={22} className="text-primary-foreground" />
+              <Send size={22} className="text-white" />
             </motion.button>
           </div>
         </motion.div>
@@ -264,7 +265,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <p className="text-primary-foreground/30 text-[10px] font-bold text-center uppercase tracking-widest mb-2.5">
+          <p className="text-gray-500 text-[10px] font-bold text-center uppercase tracking-widest mb-2.5">
             Perguntas populares
           </p>
           <AnimatePresence mode="wait">
@@ -281,11 +282,11 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
                   key={q.text}
                   onClick={() => submit(q.text)}
                   disabled={submitting || isFreeLimitReached}
-                  className="flex items-center gap-2 glass-card px-3 py-3 rounded-2xl text-left active:scale-[0.97] transition-transform disabled:opacity-40 border border-primary-foreground/5"
+                  className="flex items-center gap-2 glass-card px-3 py-3 rounded-2xl text-left active:scale-[0.97] transition-transform disabled:opacity-40 border border-white/30"
                   whileTap={{ scale: 0.95 }}
                 >
                   <span className="text-base flex-shrink-0">{q.emoji}</span>
-                  <span className="text-[11px] font-bold text-primary-foreground/80 leading-tight">
+                  <span className="text-[11px] font-bold text-gray-700 leading-tight">
                     {q.text}
                   </span>
                 </motion.button>
