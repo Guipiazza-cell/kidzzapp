@@ -10,7 +10,7 @@ const TABS = [
   { id: "chat", label: "Perguntas", icon: MessageCircleHeart, color: "text-kid-pink" },
   { id: "explore", label: "Histórias", icon: BookOpen, color: "text-kid-blue" },
   { id: "moments", label: "Momentos", icon: Backpack, color: "text-kid-orange" },
-  { id: "subscribe", label: "Assinar", icon: Crown, color: "text-kid-yellow", highlight: true },
+  { id: "subscribe", label: "Assinar", icon: Crown, color: "text-kid-purple", highlight: true },
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: Props) => (
@@ -37,7 +37,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
             whileTap={{ scale: 0.9 }}
           >
             {tab.highlight && !isActive && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-kid-yellow animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-kid-purple animate-pulse" />
             )}
             <Icon
               size={22}
@@ -54,7 +54,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
                 isActive
                   ? "text-gray-800"
                   : tab.highlight
-                  ? "text-kid-yellow font-extrabold"
+                  ? "text-kid-purple font-extrabold"
                   : "text-gray-400"
               }`}
             >
