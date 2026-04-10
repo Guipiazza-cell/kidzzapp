@@ -1,0 +1,5 @@
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS points integer NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS streak_days integer NOT NULL DEFAULT 0,
+ADD COLUMN IF NOT EXISTS last_streak_date date DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS level text NOT NULL DEFAULT 'iniciante';

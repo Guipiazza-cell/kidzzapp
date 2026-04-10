@@ -46,11 +46,15 @@ export type Database = {
           id: string
           is_admin: boolean
           is_premium: boolean
+          last_streak_date: string | null
           last_usage_date: string
+          level: string
           plan_end_date: string | null
+          points: number
           premium_source: string | null
           questions_used: number
           stories_used: number
+          streak_days: number
           updated_at: string
           voice_enabled: boolean
         }
@@ -61,11 +65,15 @@ export type Database = {
           id: string
           is_admin?: boolean
           is_premium?: boolean
+          last_streak_date?: string | null
           last_usage_date?: string
+          level?: string
           plan_end_date?: string | null
+          points?: number
           premium_source?: string | null
           questions_used?: number
           stories_used?: number
+          streak_days?: number
           updated_at?: string
           voice_enabled?: boolean
         }
@@ -76,11 +84,15 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_premium?: boolean
+          last_streak_date?: string | null
           last_usage_date?: string
+          level?: string
           plan_end_date?: string | null
+          points?: number
           premium_source?: string | null
           questions_used?: number
           stories_used?: number
+          streak_days?: number
           updated_at?: string
           voice_enabled?: boolean
         }
