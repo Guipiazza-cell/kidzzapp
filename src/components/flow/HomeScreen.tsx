@@ -146,18 +146,24 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
 
       <div className="flex-1 flex flex-col items-center px-5 pb-24 overflow-y-auto">
         {/* Characters & greeting */}
-        <motion.div
-          className="flex items-end justify-center gap-3 mt-2 mb-1"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <img
+        <div className="flex items-end justify-center gap-3 mt-2 mb-1">
+          {/* Ane — slides in from left with bounce */}
+          <motion.img
             src={aneImg}
             alt="Ane"
-            className="w-16 h-16 object-contain drop-shadow-xl"
+            className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
+            initial={{ opacity: 0, x: -60, rotate: -15 }}
+            animate={{ opacity: 1, x: 0, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 180, damping: 14, delay: 0.3 }}
+            whileHover={{ scale: 1.15, rotate: -5 }}
+            whileTap={{ scale: 0.85, rotate: 10 }}
           />
-          <div className="glass-card rounded-2xl px-4 py-2.5 max-w-[220px]">
+          <motion.div
+            className="glass-card rounded-2xl px-4 py-2.5 max-w-[220px]"
+            initial={{ opacity: 0, scale: 0.7, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.5 }}
+          >
             <AnimatePresence mode="wait">
               <motion.p
                 key={phraseIdx}
@@ -170,13 +176,19 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
                 {PHRASES[phraseIdx]}
               </motion.p>
             </AnimatePresence>
-          </div>
-          <img
+          </motion.div>
+          {/* Pixel — slides in from right with bounce */}
+          <motion.img
             src={pixelImg}
             alt="Pixel"
-            className="w-16 h-16 object-contain drop-shadow-xl"
+            className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
+            initial={{ opacity: 0, x: 60, rotate: 15 }}
+            animate={{ opacity: 1, x: 0, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 180, damping: 14, delay: 0.4 }}
+            whileHover={{ scale: 1.15, rotate: 5 }}
+            whileTap={{ scale: 0.85, rotate: -10 }}
           />
-        </motion.div>
+        </div>
 
         {/* Main CTA text */}
         <motion.h1
