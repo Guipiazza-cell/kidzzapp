@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ChameleonMascot from "../ChameleonMascot";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import pixelImg from "@/assets/pixel-chameleon.png";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
 const TIMEOUT_MS = 30_000;
@@ -45,7 +45,6 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReac
 
     const generate = async () => {
       try {
-        // Increment locally for guest tracking
         await incrementQuestions();
 
         const resp = await fetch(CHAT_URL, {
@@ -134,19 +133,20 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReac
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3 }}
     >
-      <motion.div
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <ChameleonMascot size="lg" mood="thinking" interactive={false} />
-      </motion.div>
+      <motion.img
+        src={pixelImg}
+        alt="Pixel pensando"
+        className="w-24 h-24 object-contain drop-shadow-xl"
+        animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       {/* Rotating emotional phrases */}
       <div className="h-16 flex items-center justify-center mt-6">
         <AnimatePresence mode="wait">
           <motion.h2
             key={phraseIdx}
-            className="text-lg font-black text-primary-foreground text-center max-w-xs leading-snug"
+            className="text-lg font-black text-gray-800 text-center max-w-xs leading-snug"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -176,8 +176,8 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReac
         animate={{ opacity: 1 }}
         transition={{ delay: 0.7 }}
       >
-        <p className="text-primary-foreground/30 text-xs font-bold text-center">Pergunta:</p>
-        <p className="text-primary-foreground/70 text-sm font-bold text-center mt-1">"{question}"</p>
+        <p className="text-gray-400 text-xs font-bold text-center">Pergunta:</p>
+        <p className="text-gray-600 text-sm font-bold text-center mt-1">"{question}"</p>
       </motion.div>
     </motion.div>
   );

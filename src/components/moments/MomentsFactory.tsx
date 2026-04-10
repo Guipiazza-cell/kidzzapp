@@ -2,16 +2,16 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap } from "lucide-react";
 import MagicalBackground from "../MagicalBackground";
-import ChameleonMascot from "../ChameleonMascot";
 import { useAuth } from "@/contexts/AuthContext";
 import { MISSIONS, type Mission } from "./MissionsData";
 import MissionDetail from "./MissionDetail";
+import aneImg from "@/assets/ane-chameleon.png";
 
 interface Props {
   onBack: () => void;
 }
 
-const FREE_MISSIONS = 1; // First mission is free
+const FREE_MISSIONS = 1;
 
 const MomentsFactory = ({ onBack }: Props) => {
   const { profile, tier, handleCheckout } = useAuth();
@@ -37,7 +37,7 @@ const MomentsFactory = ({ onBack }: Props) => {
 
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative"
+      className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)] relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -46,15 +46,15 @@ const MomentsFactory = ({ onBack }: Props) => {
 
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pb-2 relative z-10" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
-        <motion.button onClick={onBack} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl glass-card text-primary-foreground/60" whileTap={{ scale: 0.9 }}>
+        <motion.button onClick={onBack} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl glass-card text-gray-600" whileTap={{ scale: 0.9 }}>
           <ArrowLeft size={22} />
         </motion.button>
         <div className="flex-1">
-          <h1 className="text-lg font-black text-primary-foreground">Fábrica de Momentos</h1>
-          <p className="text-xs text-primary-foreground/40 font-bold">Missões que conectam</p>
+          <h1 className="text-lg font-black text-gray-800">Fábrica de Momentos</h1>
+          <p className="text-xs text-gray-500 font-bold">Missões que conectam</p>
         </div>
         {newCount > 0 && (
-          <span className="text-[10px] font-black bg-kid-orange text-primary-foreground px-2.5 py-1 rounded-full animate-pulse">
+          <span className="text-[10px] font-black bg-kid-orange text-white px-2.5 py-1 rounded-full animate-pulse">
             {newCount} novos
           </span>
         )}
@@ -68,21 +68,27 @@ const MomentsFactory = ({ onBack }: Props) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <ChameleonMascot size="md" mood="happy" className="mx-auto" />
-          <h2 className="text-primary-foreground font-black text-xl mt-3 leading-tight">
+          <motion.img
+            src={aneImg}
+            alt="Ane"
+            className="w-20 h-20 object-contain drop-shadow-xl mx-auto"
+            animate={{ y: [0, -6, 0], rotate: [0, -3, 3, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <h2 className="text-gray-800 font-black text-xl mt-3 leading-tight">
             10 minutos que mudam o seu dia com seu filho
           </h2>
-          <p className="text-primary-foreground/50 text-sm mt-2 font-bold">
+          <p className="text-gray-500 text-sm mt-2 font-bold">
             Missões simples e mágicas para criar memórias inesquecíveis
           </p>
           <div className="flex items-center justify-center gap-4 mt-3">
-            <div className="flex items-center gap-1 text-primary-foreground/40 text-xs font-bold">
+            <div className="flex items-center gap-1 text-gray-400 text-xs font-bold">
               <Clock size={12} /> 5–15 min
             </div>
-            <div className="flex items-center gap-1 text-primary-foreground/40 text-xs font-bold">
+            <div className="flex items-center gap-1 text-gray-400 text-xs font-bold">
               <Users size={12} /> 3–8 anos
             </div>
-            <div className="flex items-center gap-1 text-primary-foreground/40 text-xs font-bold">
+            <div className="flex items-center gap-1 text-gray-400 text-xs font-bold">
               <Heart size={12} /> Conexão
             </div>
           </div>
@@ -95,8 +101,8 @@ const MomentsFactory = ({ onBack }: Props) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <Sparkles size={14} className="text-kid-yellow" />
-          <span className="text-xs font-bold text-primary-foreground/50">Novos momentos todo mês</span>
+          <Sparkles size={14} className="text-kid-orange" />
+          <span className="text-xs font-bold text-gray-500">Novos momentos todo mês</span>
         </motion.div>
 
         {/* Mission cards */}
@@ -115,15 +121,14 @@ const MomentsFactory = ({ onBack }: Props) => {
                 transition={{ delay: 0.3 + i * 0.07 }}
                 whileTap={unlocked ? { scale: 0.97 } : {}}
               >
-                {/* Blur overlay for locked missions */}
                 {!unlocked && (
-                  <div className="absolute inset-0 bg-[hsl(220,20%,12%)]/60 backdrop-blur-[2px] z-10 rounded-2xl flex items-center justify-center">
-                    <Lock size={20} className="text-primary-foreground/30" />
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 rounded-2xl flex items-center justify-center">
+                    <Lock size={20} className="text-gray-400" />
                   </div>
                 )}
 
                 {mission.isNew && (
-                  <span className="absolute top-2 right-2 text-[8px] font-black bg-kid-orange text-primary-foreground px-2 py-0.5 rounded-full z-20">
+                  <span className="absolute top-2 right-2 text-[8px] font-black bg-kid-orange text-white px-2 py-0.5 rounded-full z-20">
                     NOVO
                   </span>
                 )}
@@ -133,26 +138,26 @@ const MomentsFactory = ({ onBack }: Props) => {
                     {mission.emoji}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-primary-foreground font-extrabold text-sm leading-tight">
+                    <h3 className="text-gray-800 font-extrabold text-sm leading-tight">
                       {mission.name}
                     </h3>
-                    <p className="text-primary-foreground/50 text-xs mt-0.5 font-bold leading-snug">
+                    <p className="text-gray-500 text-xs mt-0.5 font-bold leading-snug">
                       {mission.description}
                     </p>
                     <div className="flex items-center gap-3 mt-2">
-                      <span className="text-[10px] text-primary-foreground/30 font-bold flex items-center gap-1">
+                      <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
                         <Clock size={10} /> {mission.time}
                       </span>
-                      <span className="text-[10px] text-primary-foreground/30 font-bold">
+                      <span className="text-[10px] text-gray-400 font-bold">
                         {mission.ageRange}
                       </span>
-                      <span className="text-[10px] text-primary-foreground/30 font-bold">
+                      <span className="text-[10px] text-gray-400 font-bold">
                         {mission.level}
                       </span>
                     </div>
                   </div>
                   {unlocked ? (
-                    <ChevronRight size={16} className="text-primary-foreground/30 flex-shrink-0 mt-1" />
+                    <ChevronRight size={16} className="text-gray-400 flex-shrink-0 mt-1" />
                   ) : null}
                 </div>
               </motion.button>
@@ -168,16 +173,16 @@ const MomentsFactory = ({ onBack }: Props) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <Zap size={24} className="text-kid-yellow mx-auto" />
-            <p className="text-primary-foreground font-black text-base mt-2">
+            <Zap size={24} className="text-kid-purple mx-auto" />
+            <p className="text-gray-800 font-black text-base mt-2">
               Desbloqueie todos os momentos
             </p>
-            <p className="text-primary-foreground/40 text-xs mt-1 font-bold">
+            <p className="text-gray-500 text-xs mt-1 font-bold">
               Crie conexões reais todos os dias com seu filho
             </p>
             <motion.button
               onClick={() => handleCheckout("premium")}
-              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
+              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
               whileTap={{ scale: 0.95 }}
             >
               🔓 Quero desbloquear
@@ -198,7 +203,7 @@ const MomentsFactory = ({ onBack }: Props) => {
             exit={{ opacity: 0 }}
             onClick={() => setShowLockedMessage(false)}
           >
-            <div className="fixed inset-0 bg-black/60" />
+            <div className="fixed inset-0 bg-black/40" />
             <motion.div
               className="relative glass-card rounded-2xl p-6 max-w-sm w-full text-center border border-kid-purple/20"
               initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -206,11 +211,11 @@ const MomentsFactory = ({ onBack }: Props) => {
               exit={{ opacity: 0, y: 40, scale: 0.95 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <Lock size={28} className="text-kid-yellow mx-auto" />
-              <h3 className="text-primary-foreground font-black text-lg mt-3 leading-tight">
+              <Lock size={28} className="text-kid-purple mx-auto" />
+              <h3 className="text-gray-800 font-black text-lg mt-3 leading-tight">
                 Desbloqueie todos os momentos e crie conexões reais todos os dias
               </h3>
-              <p className="text-primary-foreground/40 text-xs mt-2 font-bold">
+              <p className="text-gray-500 text-xs mt-2 font-bold">
                 + novas missões todo mês para criar memórias inesquecíveis
               </p>
               <motion.button
@@ -218,14 +223,14 @@ const MomentsFactory = ({ onBack }: Props) => {
                   setShowLockedMessage(false);
                   handleCheckout("premium");
                 }}
-                className="mt-4 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-sm shadow-lg"
+                className="mt-4 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg"
                 whileTap={{ scale: 0.95 }}
               >
                 ✨ Quero desbloquear
               </motion.button>
               <button
                 onClick={() => setShowLockedMessage(false)}
-                className="mt-2 text-primary-foreground/30 text-xs font-bold"
+                className="mt-2 text-gray-400 text-xs font-bold"
               >
                 Agora não
               </button>

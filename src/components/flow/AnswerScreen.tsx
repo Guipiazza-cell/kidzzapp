@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, BookOpen } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import ChameleonMascot from "../ChameleonMascot";
 import { useTTS } from "@/hooks/useTTS";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import pixelImg from "@/assets/pixel-chameleon.png";
 
 interface Props {
   question: string;
@@ -57,14 +57,20 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
       <header className="flex items-center gap-3 px-4 pt-4 pb-2">
         <motion.button
           onClick={onNewQuestion}
-          className="p-2 rounded-xl glass-card text-primary-foreground/60"
+          className="p-2 rounded-xl glass-card text-gray-600"
           whileTap={{ scale: 0.9 }}
         >
           <ArrowLeft size={20} />
         </motion.button>
         <div className="flex-1 flex items-center gap-2">
-          <ChameleonMascot size="sm" mood="happy" interactive={false} />
-          <span className="text-lg font-black text-primary-foreground">Kidzz</span>
+          <motion.img
+            src={pixelImg}
+            alt="Pixel"
+            className="w-8 h-8 object-contain"
+            animate={{ rotate: [0, 3, -3, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <span className="text-lg font-black text-gray-800">Kidzz</span>
         </div>
         <motion.div
           className="flex items-center gap-1 glass-card px-3 py-1.5 rounded-full"
@@ -73,7 +79,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           transition={{ delay: 0.5, type: "spring" }}
         >
           <Heart size={12} className="text-kid-pink" />
-          <span className="text-[10px] text-primary-foreground/50 font-bold">+1 conexão</span>
+          <span className="text-[10px] text-gray-500 font-bold">+1 conexão</span>
         </motion.div>
       </header>
 
@@ -86,8 +92,8 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <p className="text-primary-foreground/30 text-xs font-bold">Pergunta:</p>
-          <p className="text-primary-foreground text-sm font-bold mt-1">{question}</p>
+          <p className="text-gray-400 text-xs font-bold">Pergunta:</p>
+          <p className="text-gray-800 text-sm font-bold mt-1">{question}</p>
         </motion.div>
 
         {/* Answer */}
@@ -99,21 +105,21 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
         >
           <div className="flex items-center gap-2 mb-3">
             <span className="text-2xl">🦎</span>
-            <span className="text-primary-foreground/40 text-xs font-bold uppercase tracking-wider">Resposta</span>
+            <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">Resposta</span>
           </div>
           <div className="glass-card p-5 rounded-2xl border-2 border-kid-green/20">
-            <div className="prose prose-sm max-w-none text-primary-foreground [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 [&>h1]:text-primary-foreground [&>h2]:text-primary-foreground [&>h3]:text-primary-foreground [&>p]:text-primary-foreground/90 [&>li]:text-primary-foreground/90">
+            <div className="prose prose-sm max-w-none text-gray-700 [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 [&>h1]:text-gray-800 [&>h2]:text-gray-800 [&>h3]:text-gray-800 [&>p]:text-gray-700 [&>li]:text-gray-700">
               <ReactMarkdown>{answer}</ReactMarkdown>
             </div>
           </div>
         </motion.div>
 
-        {/* Audio button - toggle play/stop */}
+        {/* Audio button */}
         <motion.button
           onClick={handleSpeak}
           className={`w-full mt-4 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-base shadow-lg transition-all active:scale-[0.97] relative overflow-hidden ${
             playing
-              ? "bg-kid-yellow/80 text-foreground"
+              ? "bg-kid-yellow/80 text-gray-800"
               : "bg-gradient-to-r from-kid-green to-kid-green/80 text-white"
           }`}
           initial={{ opacity: 0, y: 10 }}
@@ -147,7 +153,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
         {isSuperPremium && (
           <motion.button
             onClick={onOpenStoryFactory}
-            className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-2xl glass-card text-primary-foreground font-bold text-sm"
+            className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-2xl glass-card text-gray-700 font-bold text-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
@@ -161,7 +167,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
         {/* New question */}
         <motion.button
           onClick={onNewQuestion}
-          className="w-full mt-3 py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-base shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          className="w-full mt-3 py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-pink text-white font-extrabold text-base shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
@@ -173,7 +179,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
 
         {/* Emotional impact message */}
         <motion.p
-          className="text-center text-primary-foreground/30 text-xs font-bold mt-4"
+          className="text-center text-gray-400 text-xs font-bold mt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
@@ -188,15 +194,15 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="text-primary-foreground font-bold text-base leading-relaxed">
+            <p className="text-gray-800 font-bold text-base leading-relaxed">
               Quer ter respostas assim sempre que seu filho perguntar? ✨
             </p>
-            <p className="text-primary-foreground/40 text-xs mt-1">
+            <p className="text-gray-500 text-xs mt-1">
               Nunca mais trave na frente do seu filho
             </p>
             <motion.button
               onClick={() => handleCheckout("premium")}
-              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
+              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
               whileTap={{ scale: 0.95 }}
             >
               🔓 Desbloquear acesso completo
