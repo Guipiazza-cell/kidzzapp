@@ -194,10 +194,20 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             alt="Pixel"
             className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
             initial={{ opacity: 0, x: 60, rotate: 15 }}
-            animate={{ opacity: 1, x: 0, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 180, damping: 14, delay: 0.4 }}
-            whileHover={{ scale: 1.15, rotate: 5 }}
-            whileTap={{ scale: 0.85, rotate: -10 }}
+            animate={{
+              opacity: 1,
+              x: 0,
+              rotate: [0, 5, -3, 2, 0],
+              y: [0, -3, 0, -5, 0],
+            }}
+            transition={{
+              opacity: { duration: 0.5 },
+              x: { type: "spring", stiffness: 180, damping: 14, delay: 0.4 },
+              rotate: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
+              y: { duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 },
+            }}
+            whileHover={{ scale: 1.2, rotate: 8 }}
+            whileTap={{ scale: 0.8, rotate: -12 }}
           />
         </div>
 
