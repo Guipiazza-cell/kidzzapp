@@ -103,6 +103,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
+      <CharacterParticles particles={particles} />
       {/* Header */}
       <header
         className="flex items-center justify-between px-5 pb-2 relative z-10"
@@ -172,6 +173,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             }}
             whileHover={{ scale: 1.2, rotate: -8 }}
             whileTap={{ scale: 0.8, rotate: 12 }}
+            onClick={(e) => burst(e)}
           />
           <motion.div
             className="glass-card rounded-2xl px-4 py-2.5 max-w-[220px]"
@@ -197,6 +199,10 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             src={pixelImg}
             alt="Pixel"
             className="w-16 h-16 object-contain drop-shadow-xl cursor-pointer"
+            style={{
+              filter: "brightness(1.3) saturate(1.2) hue-rotate(180deg)",
+              WebkitFilter: "brightness(1.3) saturate(1.2) hue-rotate(180deg)",
+            }}
             initial={{ opacity: 0, x: 60, rotate: 15 }}
             animate={{
               opacity: 1,
@@ -212,6 +218,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             }}
             whileHover={{ scale: 1.2, rotate: 8 }}
             whileTap={{ scale: 0.8, rotate: -12 }}
+            onClick={(e) => burst(e)}
           />
         </div>
 
