@@ -78,6 +78,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
     setActiveTab(tab);
     if (tab === "explore") onOpenStoryFactory();
     if (tab === "moments") onOpenMoments?.();
+    if (tab === "subscribe") setShowParentalGateForSettings(true);
   };
 
   const questionsUsed = profile?.questions_used ?? 0;
@@ -105,7 +106,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
       >
         <div className="flex items-center gap-2.5">
           <img src={pixelImg} alt="Pixel" className="w-9 h-9 object-contain drop-shadow-lg" />
-          <span className="text-xl font-black text-primary-foreground tracking-tight">
+          <span className="text-xl font-black text-gray-800 tracking-tight">
             Kidzz
           </span>
         </div>
@@ -167,7 +168,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
             <AnimatePresence mode="wait">
               <motion.p
                 key={phraseIdx}
-                className="text-center text-primary-foreground/90 text-sm font-bold leading-snug"
+                className="text-center text-gray-700 text-sm font-bold leading-snug"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -192,7 +193,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments }: Props) => {
 
         {/* Main CTA text */}
         <motion.h1
-          className="text-2xl font-black text-primary-foreground text-center mt-3 mb-1"
+          className="text-2xl font-black text-gray-800 text-center mt-3 mb-1"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
