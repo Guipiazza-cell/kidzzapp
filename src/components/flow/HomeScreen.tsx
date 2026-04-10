@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, LogIn, Shield, Crown, Sparkles } from "lucide-react";
+import { Send, LogIn, Shield, Crown, Flame } from "lucide-react";
 import VoiceInput from "../VoiceInput";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
@@ -8,28 +8,45 @@ import SubscribeBanner from "../SubscribeBanner";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Progress } from "@/components/ui/progress";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
 
-const PHRASES = [
-  "Cada pergunta é uma chance de conexão.",
-  "Seu filho vai lembrar dessas respostas pra sempre.",
-  "Você não precisa mais travar na resposta.",
+const PIXEL_PHRASES = [
+  "Essa é boa... manda ver! 🔥",
+  "Opa, mais uma pergunta incrível!",
+  "Adoro quando você pergunta isso!",
 ];
 
-const ALL_QUESTIONS = [
-  { text: "Por que o céu muda de cor?", emoji: "🌅" },
-  { text: "Como os sonhos acontecem?", emoji: "💭" },
-  { text: "O que existia antes de tudo?", emoji: "🌌" },
-  { text: "Como os animais se comunicam?", emoji: "🐾" },
-  { text: "Por que sentimos medo?", emoji: "😨" },
-  { text: "Como o cérebro guarda memórias?", emoji: "🧠" },
-  { text: "Por que o universo é tão grande?", emoji: "🚀" },
-  { text: "Como surgem as ideias?", emoji: "💡" },
-  { text: "O que faz algo ser justo ou injusto?", emoji: "⚖️" },
+const ANE_PHRASES = [
+  "Posso te perguntar uma coisa depois? 💭",
+  "Vamos descobrir juntos!",
+  "Que curiosidade linda essa! ✨",
+];
+
+const CATEGORIZED_QUESTIONS = [
+  { text: "O que existia antes do universo?", emoji: "🌌", category: "Universo" },
+  { text: "Por que o tempo existe?", emoji: "⏳", category: "Universo" },
+  { text: "Como os pensamentos aparecem?", emoji: "🧠", category: "Mente" },
+  { text: "Por que lembramos de algumas coisas e esquecemos outras?", emoji: "💭", category: "Mente" },
+  { text: "Por que sentimos saudade?", emoji: "❤️", category: "Emoções" },
+  { text: "O que faz alguém ser feliz de verdade?", emoji: "😊", category: "Emoções" },
+  { text: "Como os animais sabem o que fazer?", emoji: "🐾", category: "Natureza" },
+  { text: "Por que a natureza é tão organizada?", emoji: "🌿", category: "Natureza" },
+  { text: "O que é certo e errado?", emoji: "⚖️", category: "Filosofia" },
+  { text: "Por que as pessoas pensam diferente?", emoji: "🤔", category: "Filosofia" },
+  { text: "Por que o céu muda de cor?", emoji: "🌅", category: "Universo" },
+  { text: "Como surgem as ideias?", emoji: "💡", category: "Mente" },
 ];
 
 const VISIBLE_COUNT = 6;
+
+const LEVEL_CONFIG: Record<string, { label: string; emoji: string; color: string; next: number }> = {
+  iniciante: { label: "Iniciante", emoji: "🌱", color: "text-kid-green", next: 15 },
+  curioso: { label: "Curioso", emoji: "🔍", color: "text-kid-blue", next: 50 },
+  explorador: { label: "Explorador", emoji: "🚀", color: "text-kid-orange", next: 100 },
+  pensador: { label: "Pensador", emoji: "🧠", color: "text-kid-purple", next: 999 },
+};
 
 interface Props {
   onSubmit: (question: string) => void;
@@ -46,7 +63,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const navigate = useNavigate();
   const { particles, burst } = useCharacterParticles();
   const [input, setInput] = useState("");
-  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [charPhraseIdx, setCharPhraseIdx] = useState(0);
+  const [showPixelSpeech, setShowPixelSpeech] = useState(true);
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -56,14 +74,17 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const isFreeLimitReached = !canAskQuestion();
 
   const [questionPage, setQuestionPage] = useState(0);
-  const totalPages = Math.ceil(ALL_QUESTIONS.length / VISIBLE_COUNT);
-  const visibleQuestions = ALL_QUESTIONS.slice(
+  const totalPages = Math.ceil(CATEGORIZED_QUESTIONS.length / VISIBLE_COUNT);
+  const visibleQuestions = CATEGORIZED_QUESTIONS.slice(
     questionPage * VISIBLE_COUNT,
     questionPage * VISIBLE_COUNT + VISIBLE_COUNT
   );
 
   useEffect(() => {
-    const iv = setInterval(() => setPhraseIdx((i) => (i + 1) % PHRASES.length), 4000);
+    const iv = setInterval(() => {
+      setCharPhraseIdx((i) => (i + 1) % PIXEL_PHRASES.length);
+      setShowPixelSpeech((prev) => !prev);
+    }, 5000);
     return () => clearInterval(iv);
   }, []);
 
@@ -78,15 +99,11 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
     onSubmit(text.trim());
   };
 
-  const questionsUsed = profile?.questions_used ?? 0;
-  const badge =
-    questionsUsed >= 20
-      ? "Gênio Curioso 🧠"
-      : questionsUsed >= 10
-      ? "Explorador Incrível 🚀"
-      : questionsUsed >= 3
-      ? "Conversador Iniciante 💬"
-      : null;
+  const points = profile?.points ?? 0;
+  const streakDays = profile?.streak_days ?? 0;
+  const level = profile?.level ?? "iniciante";
+  const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
+  const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
 
   return (
     <motion.div
@@ -108,10 +125,15 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             Kidzz
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {profile?.is_premium && (
             <span className="text-[10px] text-white font-extrabold bg-gradient-to-r from-kid-purple to-kid-pink px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
               <Crown size={11} /> Premium
+            </span>
+          )}
+          {streakDays > 1 && (
+            <span className="text-[10px] font-extrabold glass-card px-2 py-1 rounded-full flex items-center gap-1 text-kid-orange">
+              <Flame size={11} /> {streakDays}
             </span>
           )}
           <span className="text-xs text-gray-800 font-extrabold glass-card px-3 py-1.5 rounded-full">
@@ -144,112 +166,134 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
       />
 
       <div className="flex-1 flex flex-col items-center px-5 overflow-y-auto">
-        {/* Characters & greeting — BIGGER */}
-        <div className="flex items-end justify-center gap-2 mt-2 mb-1">
-          {/* Ane — bigger, more imposing */}
-          <motion.img
-            src={aneImg}
-            alt="Ane"
-            className="w-24 h-24 object-contain drop-shadow-xl cursor-pointer"
-            initial={{ opacity: 0, x: -60, rotate: -15 }}
-            animate={{
-              opacity: 1,
-              x: 0,
-              rotate: [0, -4, 4, -2, 0],
-              y: [0, -6, 0, -3, 0],
-            }}
-            transition={{
-              opacity: { duration: 0.5 },
-              x: { type: "spring", stiffness: 180, damping: 14, delay: 0.3 },
-              rotate: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 },
-              y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 },
-            }}
-            whileHover={{ scale: 1.15, rotate: -8 }}
-            whileTap={{ scale: 0.85, rotate: 12 }}
-            onClick={(e) => burst(e)}
-          />
-          <motion.div
-            className="glass-card rounded-2xl px-4 py-2.5 max-w-[200px]"
-            initial={{ opacity: 0, scale: 0.7, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.5 }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={phraseIdx}
-                className="text-center text-gray-700 text-sm font-bold leading-snug"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
-              >
-                {PHRASES[phraseIdx]}
-              </motion.p>
+        {/* Characters & speech bubbles */}
+        <div className="flex items-end justify-center gap-1 mt-2 mb-1">
+          {/* Ane */}
+          <div className="flex flex-col items-center">
+            <AnimatePresence>
+              {!showPixelSpeech && (
+                <motion.div
+                  className="glass-card rounded-xl px-3 py-1.5 mb-1 max-w-[130px]"
+                  initial={{ opacity: 0, scale: 0.7, y: 8 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.7, y: 8 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
+                    {ANE_PHRASES[charPhraseIdx]}
+                  </p>
+                </motion.div>
+              )}
             </AnimatePresence>
-          </motion.div>
-          {/* Pixel — bigger, with blue glow */}
-          <motion.img
-            src={pixelImg}
-            alt="Pixel"
-            className="w-24 h-24 object-contain cursor-pointer"
-            style={{
-              filter: "brightness(1.15) drop-shadow(0 0 10px rgba(100,160,255,0.7)) drop-shadow(0 4px 16px rgba(80,140,255,0.4))",
-            }}
-            initial={{ opacity: 0, x: 60, rotate: 15 }}
-            animate={{
-              opacity: 1,
-              x: 0,
-              rotate: [0, 5, -3, 2, 0],
-              y: [0, -5, 0, -7, 0],
-            }}
-            transition={{
-              opacity: { duration: 0.5 },
-              x: { type: "spring", stiffness: 180, damping: 14, delay: 0.4 },
-              rotate: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
-              y: { duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 },
-            }}
-            whileHover={{ scale: 1.15, rotate: 8 }}
-            whileTap={{ scale: 0.85, rotate: -12 }}
-            onClick={(e) => burst(e)}
-          />
+            <motion.img
+              src={aneImg}
+              alt="Ane"
+              className="w-24 h-24 object-contain drop-shadow-xl cursor-pointer"
+              initial={{ opacity: 0, x: -60, rotate: -15 }}
+              animate={{
+                opacity: 1,
+                x: 0,
+                rotate: [0, -4, 4, -2, 0],
+                y: [0, -6, 0, -3, 0],
+              }}
+              transition={{
+                opacity: { duration: 0.5 },
+                x: { type: "spring", stiffness: 180, damping: 14, delay: 0.3 },
+                rotate: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 },
+                y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 },
+              }}
+              whileHover={{ scale: 1.15, rotate: -8 }}
+              whileTap={{ scale: 0.85, rotate: 12 }}
+              onClick={(e) => burst(e)}
+            />
+          </div>
+
+          {/* Center text */}
+          <div className="flex flex-col items-center mx-1">
+            <motion.h1
+              className="text-xl font-black text-gray-800 text-center leading-tight"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              Me pergunte<br />qualquer coisa!
+            </motion.h1>
+            <motion.p
+              className="text-[10px] text-gray-500 font-semibold text-center mt-1 max-w-[180px] leading-tight"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              Descubra respostas e crie conversas incríveis juntos 💛
+            </motion.p>
+          </div>
+
+          {/* Pixel */}
+          <div className="flex flex-col items-center">
+            <AnimatePresence>
+              {showPixelSpeech && (
+                <motion.div
+                  className="glass-card rounded-xl px-3 py-1.5 mb-1 max-w-[130px]"
+                  initial={{ opacity: 0, scale: 0.7, y: 8 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.7, y: 8 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
+                    {PIXEL_PHRASES[charPhraseIdx]}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <motion.img
+              src={pixelImg}
+              alt="Pixel"
+              className="w-24 h-24 object-contain cursor-pointer"
+              style={{
+                filter: "brightness(1.15) drop-shadow(0 0 10px rgba(100,160,255,0.7)) drop-shadow(0 4px 16px rgba(80,140,255,0.4))",
+              }}
+              initial={{ opacity: 0, x: 60, rotate: 15 }}
+              animate={{
+                opacity: 1,
+                x: 0,
+                rotate: [0, 5, -3, 2, 0],
+                y: [0, -5, 0, -7, 0],
+              }}
+              transition={{
+                opacity: { duration: 0.5 },
+                x: { type: "spring", stiffness: 180, damping: 14, delay: 0.4 },
+                rotate: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
+                y: { duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 },
+              }}
+              whileHover={{ scale: 1.15, rotate: 8 }}
+              whileTap={{ scale: 0.85, rotate: -12 }}
+              onClick={(e) => burst(e)}
+            />
+          </div>
         </div>
 
-        {/* Main CTA text */}
-        <motion.h1
-          className="text-2xl font-black text-gray-800 text-center mt-2 mb-1"
-          initial={{ opacity: 0, y: 15 }}
+        {/* Level & Progress */}
+        <motion.div
+          className="w-full max-w-sm mt-1 mb-2"
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
         >
-          Me pergunte qualquer coisa!
-        </motion.h1>
-
-        {/* Gamification badge */}
-        {badge && (
-          <motion.div
-            className="glass-card px-3 py-1 rounded-full mb-1"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <span className="text-[11px] font-bold text-kid-purple">{badge}</span>
-          </motion.div>
-        )}
-
-        {questionsUsed > 0 && (
-          <motion.p
-            className="text-[11px] text-gray-500 font-bold mb-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.45 }}
-          >
-            Você já respondeu {questionsUsed} {questionsUsed === 1 ? "pergunta" : "perguntas"}! ✨
-          </motion.p>
-        )}
+          <div className="glass-card rounded-2xl px-4 py-2.5 flex items-center gap-3">
+            <span className="text-lg">{levelInfo.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className={`text-[11px] font-black ${levelInfo.color}`}>{levelInfo.label}</span>
+                <span className="text-[10px] font-bold text-gray-400">{points} pts</span>
+              </div>
+              <Progress value={levelProgress} className="h-1.5 bg-gray-200/50" />
+            </div>
+          </div>
+        </motion.div>
 
         {/* Input block */}
         <motion.div
-          className="w-full max-w-sm mt-1"
+          className="w-full max-w-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
@@ -281,15 +325,15 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           </div>
         </motion.div>
 
-        {/* Question chips — 6 visible, fill space */}
+        {/* Question chips — categorized */}
         <motion.div
-          className="w-full max-w-sm mt-4 flex-1"
+          className="w-full max-w-sm mt-3 flex-1"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
           <p className="text-gray-500 text-[10px] font-bold text-center uppercase tracking-widest mb-2">
-            Perguntas populares
+            Perguntas que mudam conversas ✨
           </p>
           <AnimatePresence mode="wait">
             <motion.div
@@ -309,16 +353,21 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                   whileTap={{ scale: 0.95 }}
                 >
                   <span className="text-base flex-shrink-0">{q.emoji}</span>
-                  <span className="text-[11px] font-bold text-gray-700 leading-tight">
-                    {q.text}
-                  </span>
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-bold text-gray-700 leading-tight block">
+                      {q.text}
+                    </span>
+                    <span className="text-[8px] text-gray-400 font-semibold uppercase tracking-wider">
+                      {q.category}
+                    </span>
+                  </div>
                 </motion.button>
               ))}
             </motion.div>
           </AnimatePresence>
         </motion.div>
 
-        <div className="mt-4" />
+        <div className="mt-3" />
       </div>
 
       <AnimatePresence>

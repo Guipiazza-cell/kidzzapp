@@ -42,11 +42,61 @@ serve(async (req) => {
     const body = await req.json();
     const { action } = body;
 
+    if (action === "metrics") {
+      // Get total users
+      const { count: totalUsers } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true });
+
+      // Get premium users
+      const { count: premiumUsers } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("is_premium", true);
+
+      // Get total questions asked (sum of questions_used)
+      const { data: questionStats } = await supabase
+        .from("profiles")
+        .select("questions_used, stories_used");
+
+      let totalQuestions = 0;
+      let totalStories = 0;
+      (questionStats || []).forEach((p: any) => {
+        totalQuestions += p.questions_used || 0;
+        totalStories += p.stories_used || 0;
+      });
+
+      // Get users active today
+      const today = new Date().toISOString().slice(0, 10);
+      const { count: activeToday } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("last_usage_date", today);
+
+      // Get recent signups (last 7 days)
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const { count: recentSignups } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo.toISOString());
+
+      return new Response(JSON.stringify({
+        totalUsers: totalUsers || 0,
+        premiumUsers: premiumUsers || 0,
+        totalQuestions,
+        totalStories,
+        activeToday: activeToday || 0,
+        recentSignups: recentSignups || 0,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "search") {
       const { email } = body;
       if (!email) throw new Error("Email required");
 
-      // Search users by email using admin API
       const { data: authUsers, error: listErr } = await supabase.auth.admin.listUsers({
         page: 1,
         perPage: 20,
@@ -66,7 +116,7 @@ serve(async (req) => {
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, child_name, is_premium, premium_source, plan_end_date, created_at")
+        .select("id, child_name, is_premium, premium_source, plan_end_date, created_at, points, streak_days, level, questions_used")
         .in("id", userIds);
 
       const users = (profiles || []).map((p: any) => {

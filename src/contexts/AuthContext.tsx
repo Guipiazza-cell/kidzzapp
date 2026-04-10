@@ -485,16 +485,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
   }, [profile, resetDailyIfNeeded]);
 
+  const computeLevel = (pts: number): string => {
+    if (pts >= 100) return "pensador";
+    if (pts >= 50) return "explorador";
+    if (pts >= 15) return "curioso";
+    return "iniciante";
+  };
+
+  const updateStreak = (p: Profile): { streak_days: number; last_streak_date: string } => {
+    const today = todayStr();
+    if (p.last_streak_date === today) return { streak_days: p.streak_days, last_streak_date: today };
+    
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+    
+    if (p.last_streak_date === yesterdayStr) {
+      return { streak_days: p.streak_days + 1, last_streak_date: today };
+    }
+    return { streak_days: 1, last_streak_date: today };
+  };
+
   const incrementQuestions = async () => {
     if (!profile) return;
     const p = resetDailyIfNeeded(profile);
     const newCount = p.questions_used + 1;
     const today = todayStr();
+    const newPoints = p.points + 1;
+    const newLevel = computeLevel(newPoints);
+    const streakUpdate = updateStreak(p);
+    
+    const updates = {
+      questions_used: newCount,
+      last_usage_date: today,
+      points: newPoints,
+      level: newLevel,
+      ...streakUpdate,
+    };
+    
     if (user) {
-      setProfile(prev => (prev ? { ...prev, questions_used: newCount, last_usage_date: today } : prev));
+      setProfile(prev => (prev ? { ...prev, ...updates } : prev));
+      supabase.from("profiles").update(updates).eq("id", user.id).then(() => {});
       return;
     }
-    const next = normalizeProfile({ ...p, questions_used: newCount, last_usage_date: today });
+    const next = normalizeProfile({ ...p, ...updates });
     saveGuestProfile(next);
     setProfile(next);
   };
