@@ -6,6 +6,7 @@ import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
+import DreamWorld from "@/components/dreams/DreamWorld";
 import StoryFactory from "@/components/story/StoryFactory";
 import MomentsFactory from "@/components/moments/MomentsFactory";
 import Paywall from "@/components/Paywall";
@@ -121,7 +122,6 @@ const Index = () => {
   };
 
   const renderContent = () => {
-    // Sub-screens that live inside the tab layout
     if (activeTab === "explore") {
       return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
@@ -130,6 +130,9 @@ const Index = () => {
     }
     if (activeTab === "achievements") {
       return <AchievementsScreen key="achievements" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+    }
+    if (activeTab === "dreams") {
+      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
 
     // Main chat flow
