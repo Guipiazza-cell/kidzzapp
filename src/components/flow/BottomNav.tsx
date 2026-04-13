@@ -11,7 +11,7 @@ const TABS = [
   { id: "explore", label: "Histórias", icon: BookOpen, color: "text-kid-blue" },
   { id: "moments", label: "Momentos", icon: Backpack, color: "text-kid-orange" },
   { id: "dreams", label: "Sonhos", icon: Moon, color: "text-indigo-400" },
-  { id: "subscribe", label: "Assinar", icon: Crown, color: "text-kid-purple", highlight: true },
+  { id: "achievements", label: "Conquistas", icon: Trophy, color: "text-kid-yellow" },
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: Props) => (

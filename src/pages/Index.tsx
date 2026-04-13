@@ -116,9 +116,6 @@ const Index = () => {
     if (tab === "chat") {
       setStep("home");
     }
-    if (tab === "subscribe") {
-      setShowParentalGateForSettings(true);
-    }
   };
 
   const renderContent = () => {
