@@ -34,29 +34,16 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
             onClick={() => onTabChange(tab.id)}
             className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors min-w-[60px] ${
               isActive ? "bg-primary/10" : ""
-            } ${tab.highlight && !isActive ? "relative" : ""}`}
+            }`}
             whileTap={{ scale: 0.9 }}
           >
-            {tab.highlight && !isActive && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-kid-purple animate-pulse" />
-            )}
             <Icon
               size={22}
-              className={
-                isActive
-                  ? tab.color
-                  : tab.highlight
-                  ? "text-kid-purple/70"
-                  : "text-gray-400"
-              }
+              className={isActive ? tab.color : "text-gray-400"}
             />
             <span
               className={`text-[10px] font-bold leading-tight ${
-                isActive
-                  ? "text-gray-800"
-                  : tab.highlight
-                  ? "text-kid-purple font-extrabold"
-                  : "text-gray-400"
+                isActive ? "text-gray-800" : "text-gray-400"
               }`}
             >
               {tab.label}
