@@ -54,12 +54,13 @@ interface Props {
   onOpenMoments?: () => void;
   onOpenAchievements?: () => void;
   onOpenLab?: () => void;
+  onOpenPlay?: () => void;
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   hideBottomNav?: boolean;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining, signOut } = useAuth();
   const navigate = useNavigate();
   const { particles, burst } = useCharacterParticles();
