@@ -17,7 +17,6 @@ export class DreamNarrator {
   private pickVoice() {
     if (typeof window === "undefined") return;
     const voices = window.speechSynthesis.getVoices();
-    // Prefer pt-BR female voices for a warm, soothing tone
     const ptBR = voices.filter(v => v.lang === "pt-BR");
     const female = ptBR.filter(v => /female|feminino|luciana|francisca|google/i.test(v.name));
     this.voice = female[0] || ptBR[0] || voices.filter(v => v.lang.startsWith("pt"))[0] || null;
@@ -36,8 +35,8 @@ export class DreamNarrator {
     this.utterances = sentences.map((sentence) => {
       const utt = new SpeechSynthesisUtterance(sentence);
       utt.lang = "pt-BR";
-      utt.rate = 0.78; // slower, calmer
-      utt.pitch = 0.95; // slightly lower for warmth
+      utt.rate = 0.82;
+      utt.pitch = 1.0;
       utt.volume = 1;
       if (this.voice) utt.voice = this.voice;
       return utt;
@@ -58,7 +57,7 @@ export class DreamNarrator {
     const utt = this.utterances[this.currentIndex];
     utt.onend = () => {
       this.currentIndex++;
-      // Longer pauses between sentences for breathing feel (400-700ms)
+      // Natural breathing pause between sentences (400-700ms)
       const pause = 400 + Math.random() * 300;
       setTimeout(() => this.speakNext(), pause);
     };
