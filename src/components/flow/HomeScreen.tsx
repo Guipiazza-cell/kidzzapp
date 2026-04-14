@@ -53,12 +53,13 @@ interface Props {
   onOpenStoryFactory: () => void;
   onOpenMoments?: () => void;
   onOpenAchievements?: () => void;
+  onOpenLab?: () => void;
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   hideBottomNav?: boolean;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining, signOut } = useAuth();
   const navigate = useNavigate();
   const { particles, burst } = useCharacterParticles();
@@ -272,6 +273,21 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           </div>
         </div>
 
+        {/* Lab entry button */}
+        {onOpenLab && (
+          <motion.button
+            onClick={onOpenLab}
+            className="mt-1 mb-1 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/20 flex items-center gap-1.5"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6 }}
+            whileTap={{ scale: 0.93 }}
+          >
+            <span className="text-sm">🧪</span>
+            <span className="text-[10px] font-bold text-purple-700">Kidzz Lab</span>
+            <span className="text-[9px] text-purple-400 ml-0.5">✨</span>
+          </motion.button>
+        )}
         {/* Level & Progress */}
         <motion.div
           className="w-full max-w-sm mt-1 mb-2"
