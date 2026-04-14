@@ -9,6 +9,7 @@ import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import DreamWorld from "@/components/dreams/DreamWorld";
 import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
+import KidzzPlay from "@/components/play/KidzzPlay";
 import MomentsFactory from "@/components/moments/MomentsFactory";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
@@ -33,6 +34,7 @@ const Index = () => {
   const [answer, setAnswer] = useState("");
   const [activeTab, setActiveTab] = useState("chat");
   const [showLab, setShowLab] = useState(false);
+  const [showPlay, setShowPlay] = useState(false);
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
@@ -145,6 +147,7 @@ const Index = () => {
             onOpenMoments={() => setActiveTab("moments")}
             onOpenAchievements={() => setActiveTab("achievements")}
             onOpenLab={() => setShowLab(true)}
+            onOpenPlay={() => setShowPlay(true)}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
@@ -197,6 +200,7 @@ const Index = () => {
 
       <AnimatePresence>
         {showLab && <KidzzLab onBack={() => setShowLab(false)} />}
+        {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} />}
         {showLoginGate && (
           <ParentalGate
             onSuccess={() => setShowLoginGate(false)}
