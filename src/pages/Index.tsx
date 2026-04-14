@@ -144,6 +144,7 @@ const Index = () => {
             onOpenStoryFactory={() => setActiveTab("explore")}
             onOpenMoments={() => setActiveTab("moments")}
             onOpenAchievements={() => setActiveTab("achievements")}
+            onOpenLab={() => setShowLab(true)}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
