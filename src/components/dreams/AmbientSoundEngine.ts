@@ -26,7 +26,6 @@ export class AmbientSoundEngine {
       audio.loop = true;
       audio.volume = volume;
       audio.preload = "metadata";
-      audio.playsInline = true;
       audio.crossOrigin = "anonymous";
 
       await new Promise<void>((resolve, reject) => {
