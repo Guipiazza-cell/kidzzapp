@@ -96,16 +96,16 @@ const Index = () => {
 
   const renderContent = () => {
     if (activeTab === "explore") {
-      return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); }} onStoryComplete={() => evolution.evolve("story")} />;
+      return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     if (activeTab === "moments") {
-      return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); }} onMomentComplete={() => evolution.evolve("moment")} />;
+      return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "achievements") {
       return <AchievementsScreen key="achievements" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "dreams") {
-      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); }} onStoryComplete={() => evolution.evolve("story")} />;
+      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
 
     return (
