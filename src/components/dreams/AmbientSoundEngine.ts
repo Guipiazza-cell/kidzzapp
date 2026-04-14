@@ -10,29 +10,46 @@ export class AmbientSoundEngine {
   private fadeInterval: ReturnType<typeof setInterval> | null = null;
 
   async start(id: string, url: string, volume: number = 0.5): Promise<boolean> {
-    if (this.players.has(id)) return true;
+    const existing = this.players.get(id);
+    if (existing) {
+      try {
+        existing.audio.currentTime = 0;
+        await existing.audio.play();
+        return true;
+      } catch (e) {
+        this.stop(id);
+      }
+    }
 
     try {
       const audio = new Audio(url);
       audio.loop = true;
       audio.volume = volume;
-      audio.preload = "auto";
+      audio.preload = "metadata";
+      audio.crossOrigin = "anonymous";
 
       await new Promise<void>((resolve, reject) => {
         const onCanPlay = () => { cleanup(); resolve(); };
         const onError = () => { cleanup(); reject(new Error("Failed to load audio")); };
         const cleanup = () => {
           audio.removeEventListener("canplaythrough", onCanPlay);
+          audio.removeEventListener("loadedmetadata", onCanPlay);
           audio.removeEventListener("error", onError);
         };
         audio.addEventListener("canplaythrough", onCanPlay, { once: true });
+        audio.addEventListener("loadedmetadata", onCanPlay, { once: true });
         audio.addEventListener("error", onError, { once: true });
         audio.load();
-        // Timeout fallback
-        setTimeout(() => { cleanup(); resolve(); }, 5000);
+        setTimeout(() => { cleanup(); reject(new Error("Audio load timeout")); }, 5000);
       });
 
-      await audio.play();
+      try {
+        await audio.play();
+      } catch {
+        audio.load();
+        await audio.play();
+      }
+
       this.players.set(id, { audio, volume });
       return true;
     } catch (e) {
