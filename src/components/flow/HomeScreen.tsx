@@ -58,6 +58,7 @@ interface Props {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   hideBottomNav?: boolean;
+  characterEvolution?: any;
 }
 
 const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay }: Props) => {
