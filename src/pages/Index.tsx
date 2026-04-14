@@ -147,6 +147,7 @@ const Index = () => {
             onOpenMoments={() => setActiveTab("moments")}
             onOpenAchievements={() => setActiveTab("achievements")}
             onOpenLab={() => setShowLab(true)}
+            onOpenPlay={() => setShowPlay(true)}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
@@ -199,6 +200,7 @@ const Index = () => {
 
       <AnimatePresence>
         {showLab && <KidzzLab onBack={() => setShowLab(false)} />}
+        {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} />}
         {showLoginGate && (
           <ParentalGate
             onSuccess={() => setShowLoginGate(false)}
