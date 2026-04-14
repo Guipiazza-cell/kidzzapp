@@ -122,7 +122,7 @@ const Index = () => {
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
-            characterEvolution={evolution}
+            characterEvolution={evolution as any}
           />
         )}
         {step === "age" && <AgePickerScreen key="age" question={question} onSelect={handleAgeSelected} onBack={() => setStep("home")} />}
