@@ -33,7 +33,8 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
 
   const handleScore = useCallback((pts: number) => {
     setSessionScore((s) => s + pts);
-  }, []);
+    onGameComplete?.();
+  }, [onGameComplete]);
 
   const handleReaction = useCallback((type: "happy" | "encourage") => {
     setMascotMood(type);
