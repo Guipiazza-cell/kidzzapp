@@ -196,6 +196,7 @@ const Index = () => {
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
 
       <AnimatePresence>
+        {showLab && <KidzzLab onBack={() => setShowLab(false)} />}
         {showLoginGate && (
           <ParentalGate
             onSuccess={() => setShowLoginGate(false)}
