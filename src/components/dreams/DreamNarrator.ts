@@ -5,6 +5,23 @@ export class DreamNarrator {
   private currentIndex = 0;
   private isSpeaking = false;
   private onEndCallback?: () => void;
+  private voice: SpeechSynthesisVoice | null = null;
+
+  constructor() {
+    this.pickVoice();
+    if (typeof window !== "undefined") {
+      window.speechSynthesis.onvoiceschanged = () => this.pickVoice();
+    }
+  }
+
+  private pickVoice() {
+    if (typeof window === "undefined") return;
+    const voices = window.speechSynthesis.getVoices();
+    // Prefer pt-BR female voices for a warm, soothing tone
+    const ptBR = voices.filter(v => v.lang === "pt-BR");
+    const female = ptBR.filter(v => /female|feminino|luciana|francisca|google/i.test(v.name));
+    this.voice = female[0] || ptBR[0] || voices.filter(v => v.lang.startsWith("pt"))[0] || null;
+  }
 
   speak(text: string, onEnd?: () => void) {
     this.stop();
@@ -19,9 +36,10 @@ export class DreamNarrator {
     this.utterances = sentences.map((sentence) => {
       const utt = new SpeechSynthesisUtterance(sentence);
       utt.lang = "pt-BR";
-      utt.rate = 0.82;
-      utt.pitch = 1.0;
+      utt.rate = 0.78; // slower, calmer
+      utt.pitch = 0.95; // slightly lower for warmth
       utt.volume = 1;
+      if (this.voice) utt.voice = this.voice;
       return utt;
     });
 
@@ -40,13 +58,13 @@ export class DreamNarrator {
     const utt = this.utterances[this.currentIndex];
     utt.onend = () => {
       this.currentIndex++;
-      // Natural pause between sentences (250-400ms)
-      const pause = 250 + Math.random() * 150;
+      // Longer pauses between sentences for breathing feel (400-700ms)
+      const pause = 400 + Math.random() * 300;
       setTimeout(() => this.speakNext(), pause);
     };
     utt.onerror = () => {
       this.currentIndex++;
-      setTimeout(() => this.speakNext(), 300);
+      setTimeout(() => this.speakNext(), 400);
     };
 
     window.speechSynthesis.speak(utt);
