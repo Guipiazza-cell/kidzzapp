@@ -1,160 +1,96 @@
-/* ── Ambient Sound Engine using Web Audio API ── */
+/* ── Ambient Sound Engine using HTML5 Audio with real MP3s ── */
+
+export interface SoundSource {
+  id: string;
+  url: string;
+}
 
 export class AmbientSoundEngine {
-  private ctx: AudioContext | null = null;
-  private nodes: Map<string, { source: AudioBufferSourceNode; gain: GainNode; filter?: BiquadFilterNode }> = new Map();
-  private masterGain: GainNode | null = null;
-  private resumePromise: Promise<void> | null = null;
+  private players: Map<string, { audio: HTMLAudioElement; volume: number }> = new Map();
+  private fadeInterval: ReturnType<typeof setInterval> | null = null;
 
-  async ensureContext(): Promise<AudioContext> {
-    if (!this.ctx) {
-      this.ctx = new AudioContext();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.connect(this.ctx.destination);
-    }
-    if (this.ctx.state === "suspended") {
-      this.resumePromise = this.ctx.resume();
-      await this.resumePromise;
-    }
-    return this.ctx;
-  }
-
-  private createNoise(ctx: AudioContext, type: "white" | "brown"): AudioBufferSourceNode {
-    const bufferSize = ctx.sampleRate * 4;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-
-    if (type === "white") {
-      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-    } else {
-      let last = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const w = Math.random() * 2 - 1;
-        data[i] = (last + 0.02 * w) / 1.02;
-        last = data[i];
-        data[i] *= 3.5;
-      }
-    }
-
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-    return source;
-  }
-
-  async start(soundId: string, volume: number = 0.5): Promise<boolean> {
-    if (this.nodes.has(soundId)) return true;
+  async start(id: string, url: string, volume: number = 0.5): Promise<boolean> {
+    if (this.players.has(id)) return true;
 
     try {
-      const ctx = await this.ensureContext();
-      const gain = ctx.createGain();
-      gain.connect(this.masterGain!);
+      const audio = new Audio(url);
+      audio.loop = true;
+      audio.volume = volume;
+      audio.preload = "auto";
 
-      let source: AudioBufferSourceNode;
-      let filter: BiquadFilterNode | undefined;
+      await new Promise<void>((resolve, reject) => {
+        const onCanPlay = () => { cleanup(); resolve(); };
+        const onError = () => { cleanup(); reject(new Error("Failed to load audio")); };
+        const cleanup = () => {
+          audio.removeEventListener("canplaythrough", onCanPlay);
+          audio.removeEventListener("error", onError);
+        };
+        audio.addEventListener("canplaythrough", onCanPlay, { once: true });
+        audio.addEventListener("error", onError, { once: true });
+        audio.load();
+        // Timeout fallback
+        setTimeout(() => { cleanup(); resolve(); }, 5000);
+      });
 
-      switch (soundId) {
-        case "rain":
-          source = this.createNoise(ctx, "white");
-          filter = ctx.createBiquadFilter();
-          filter.type = "bandpass";
-          filter.frequency.value = 3000;
-          filter.Q.value = 0.5;
-          source.connect(filter);
-          filter.connect(gain);
-          gain.gain.value = volume * 0.3;
-          break;
-        case "ocean":
-          source = this.createNoise(ctx, "brown");
-          filter = ctx.createBiquadFilter();
-          filter.type = "lowpass";
-          filter.frequency.value = 500;
-          source.connect(filter);
-          filter.connect(gain);
-          gain.gain.value = volume * 0.3;
-          break;
-        case "forest":
-          source = this.createNoise(ctx, "white");
-          filter = ctx.createBiquadFilter();
-          filter.type = "bandpass";
-          filter.frequency.value = 1500;
-          filter.Q.value = 2;
-          source.connect(filter);
-          filter.connect(gain);
-          gain.gain.value = volume * 0.15;
-          break;
-        case "wind":
-          source = this.createNoise(ctx, "brown");
-          filter = ctx.createBiquadFilter();
-          filter.type = "lowpass";
-          filter.frequency.value = 300;
-          source.connect(filter);
-          filter.connect(gain);
-          gain.gain.value = volume * 0.3;
-          break;
-        case "white":
-          source = this.createNoise(ctx, "white");
-          source.connect(gain);
-          gain.gain.value = volume * 0.15;
-          break;
-        case "brown":
-          source = this.createNoise(ctx, "brown");
-          source.connect(gain);
-          gain.gain.value = volume * 0.2;
-          break;
-        default:
-          source = this.createNoise(ctx, "white");
-          source.connect(gain);
-          gain.gain.value = volume * 0.3;
-      }
-
-      source.start();
-      this.nodes.set(soundId, { source, gain, filter });
+      await audio.play();
+      this.players.set(id, { audio, volume });
       return true;
     } catch (e) {
-      console.error("AmbientSoundEngine: failed to start", soundId, e);
+      console.error("AmbientSoundEngine: failed to start", id, e);
       return false;
     }
   }
 
-  stop(soundId: string) {
-    const node = this.nodes.get(soundId);
-    if (node) {
-      try { node.source.stop(); } catch {}
-      node.gain.disconnect();
-      node.filter?.disconnect();
-      this.nodes.delete(soundId);
+  stop(id: string) {
+    const player = this.players.get(id);
+    if (player) {
+      player.audio.pause();
+      player.audio.src = "";
+      this.players.delete(id);
     }
   }
 
-  setVolume(soundId: string, volume: number) {
-    const node = this.nodes.get(soundId);
-    if (!node) return;
-    // Recalculate based on sound type
-    const multiplier = soundId === "forest" ? 0.15 : soundId === "white" ? 0.15 : soundId === "brown" ? 0.2 : 0.3;
-    node.gain.gain.value = volume * multiplier;
+  setVolume(id: string, volume: number) {
+    const player = this.players.get(id);
+    if (player) {
+      player.audio.volume = Math.max(0, Math.min(1, volume));
+      player.volume = volume;
+    }
   }
 
-  fadeOut(durationMs: number = 5000) {
-    if (!this.masterGain || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-    this.masterGain.gain.linearRampToValueAtTime(0, now + durationMs / 1000);
+  fadeOut(durationMs: number = 8000) {
+    const steps = 40;
+    const interval = durationMs / steps;
+    let step = 0;
+
+    // Store initial volumes
+    const initials = new Map<string, number>();
+    this.players.forEach((p, id) => initials.set(id, p.audio.volume));
+
+    this.fadeInterval = setInterval(() => {
+      step++;
+      const factor = 1 - step / steps;
+      this.players.forEach((p, id) => {
+        const init = initials.get(id) || 0.5;
+        p.audio.volume = Math.max(0, init * factor);
+      });
+      if (step >= steps) {
+        if (this.fadeInterval) clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
+      }
+    }, interval);
   }
 
   stopAll() {
-    this.nodes.forEach((node) => {
-      try { node.source.stop(); } catch {}
-      node.gain.disconnect();
-      node.filter?.disconnect();
+    if (this.fadeInterval) clearInterval(this.fadeInterval);
+    this.players.forEach((player) => {
+      player.audio.pause();
+      player.audio.src = "";
     });
-    this.nodes.clear();
-    if (this.masterGain) {
-      this.masterGain.gain.value = 1;
-    }
+    this.players.clear();
   }
 
-  isPlaying(soundId: string) {
-    return this.nodes.has(soundId);
+  isPlaying(id: string) {
+    return this.players.has(id);
   }
 }

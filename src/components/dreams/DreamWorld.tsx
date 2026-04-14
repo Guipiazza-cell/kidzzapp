@@ -106,8 +106,10 @@ const DreamWorld = ({ onBack }: Props) => {
         setShowPremiumBlock(true);
         return;
       }
+      const sound = SOUND_PRESETS.find((s) => s.id === id);
+      if (!sound) return;
       setAudioLoading(true);
-      const ok = await engine.start(id, 0.5);
+      const ok = await engine.start(id, sound.url, 0.5);
       setAudioLoading(false);
       if (ok) {
         setActiveSounds((prev) => ({ ...prev, [id]: 0.5 }));

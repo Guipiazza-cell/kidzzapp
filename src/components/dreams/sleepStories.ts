@@ -1,4 +1,4 @@
-/* ── Sleep stories with proper 5-act structure ── */
+/* ── Sleep stories & sound config ── */
 
 export interface SleepStory {
   id: string;
@@ -120,13 +120,43 @@ para o sono mais gostoso e mais profundo do mundo.`,
   },
 ];
 
-export const SOUND_PRESETS = [
-  { id: "rain", label: "Chuva", emoji: "🌧️", free: true },
-  { id: "forest", label: "Floresta", emoji: "🌲", free: false },
-  { id: "ocean", label: "Oceano", emoji: "🌊", free: false },
-  { id: "wind", label: "Vento", emoji: "💨", free: false },
-  { id: "white", label: "Ruído Branco", emoji: "📻", free: false },
-  { id: "brown", label: "Ruído Marrom", emoji: "🟤", free: false },
+export interface SoundPreset {
+  id: string;
+  label: string;
+  emoji: string;
+  free: boolean;
+  url: string;
+}
+
+export const SOUND_PRESETS: SoundPreset[] = [
+  {
+    id: "rain",
+    label: "Chuva",
+    emoji: "🌧️",
+    free: true,
+    url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c1b1c0f6f3.mp3",
+  },
+  {
+    id: "forest",
+    label: "Floresta",
+    emoji: "🌲",
+    free: false,
+    url: "https://cdn.pixabay.com/download/audio/2022/02/23/audio_7c6c4c7a9f.mp3",
+  },
+  {
+    id: "ocean",
+    label: "Oceano",
+    emoji: "🌊",
+    free: false,
+    url: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_5e5c9e0c4d.mp3",
+  },
+  {
+    id: "white",
+    label: "Ruído Branco",
+    emoji: "📻",
+    free: false,
+    url: "https://cdn.pixabay.com/download/audio/2021/09/06/audio_3f6b1c2e8e.mp3",
+  },
 ];
 
 export const TIMER_OPTIONS = [
