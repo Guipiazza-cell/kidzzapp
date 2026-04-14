@@ -19,9 +19,10 @@ const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; pr
 
 interface Props {
   onBack: () => void;
+  onGameComplete?: () => void;
 }
 
-const KidzzPlay = ({ onBack }: Props) => {
+const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
   const { profile } = useAuth();
   const isPremium = profile?.is_premium ?? false;
 
@@ -32,7 +33,8 @@ const KidzzPlay = ({ onBack }: Props) => {
 
   const handleScore = useCallback((pts: number) => {
     setSessionScore((s) => s + pts);
-  }, []);
+    onGameComplete?.();
+  }, [onGameComplete]);
 
   const handleReaction = useCallback((type: "happy" | "encourage") => {
     setMascotMood(type);

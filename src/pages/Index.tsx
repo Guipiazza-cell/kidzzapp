@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
 import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
@@ -19,16 +20,12 @@ import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "paywall";
-
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
-
-const getCachedAgeRange = () => {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(AGE_STORAGE_KEY);
-};
+const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 
 const Index = () => {
   const { profile, loading, updateProfile, canAskQuestion } = useAuth();
+  const evolution = useCharacterEvolution();
   const [step, setStep] = useState<FlowStep>("home");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
@@ -51,11 +48,7 @@ const Index = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
         <div className="text-center space-y-3">
           <ChameleonMascot size="md" mood="thinking" interactive={false} />
-          <motion.p
-            className="text-primary-foreground/40 font-bold text-sm"
-            animate={{ opacity: [0.3, 0.8, 0.3] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
+          <motion.p className="text-primary-foreground/40 font-bold text-sm" animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
             Carregando...
           </motion.p>
         </div>
@@ -64,79 +57,57 @@ const Index = () => {
   }
 
   const handleQuestionSubmit = (q: string) => {
-    if (!canAskQuestion()) {
-      setStep("paywall");
-      return;
-    }
-
+    if (!canAskQuestion()) { setStep("paywall"); return; }
     const resolvedAgeRange = profile?.age_range || selectedAgeRange || getCachedAgeRange();
     setQuestion(q);
-
     if (resolvedAgeRange) {
       setSelectedAgeRange(resolvedAgeRange);
       if (!profile?.age_range) {
-        void updateProfile({
-          age_range: resolvedAgeRange,
-          child_name: profile?.child_name || "Explorador",
-        });
+        void updateProfile({ age_range: resolvedAgeRange, child_name: profile?.child_name || "Explorador" });
       }
       setStep("generating");
       return;
     }
-
     setStep("age");
   };
 
   const handleAgeSelected = (range: string) => {
     setSelectedAgeRange(range);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(AGE_STORAGE_KEY, range);
-    }
+    if (typeof window !== "undefined") window.localStorage.setItem(AGE_STORAGE_KEY, range);
     setStep("generating");
-    void updateProfile({
-      age_range: range,
-      child_name: profile?.child_name || "Explorador",
-    });
+    void updateProfile({ age_range: range, child_name: profile?.child_name || "Explorador" });
   };
 
   const handleAnswerReady = (text: string) => {
     setAnswer(text);
     setStep("answer");
+    // Evolve character on question answered
+    evolution.evolve("question");
   };
 
   const handleNewQuestion = () => {
-    setQuestion("");
-    setAnswer("");
-    setStep("home");
-    setActiveTab("chat");
-  };
-
-  const handleLoginFromPaywall = () => {
-    setShowLoginGate(true);
+    setQuestion(""); setAnswer(""); setStep("home"); setActiveTab("chat");
   };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    if (tab === "chat") {
-      setStep("home");
-    }
+    if (tab === "chat") setStep("home");
   };
 
   const renderContent = () => {
     if (activeTab === "explore") {
-      return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     if (activeTab === "moments") {
-      return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "achievements") {
       return <AchievementsScreen key="achievements" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "dreams") {
-      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
 
-    // Main chat flow
     return (
       <AnimatePresence mode="wait">
         {step === "home" && (
@@ -151,38 +122,13 @@ const Index = () => {
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
+            characterEvolution={evolution as any}
           />
         )}
-        {step === "age" && (
-          <AgePickerScreen
-            key="age"
-            question={question}
-            onSelect={handleAgeSelected}
-            onBack={() => setStep("home")}
-          />
-        )}
-        {step === "generating" && (
-          <GeneratingScreen
-            key="generating"
-            question={question}
-            ageRange={selectedAgeRange || profile?.age_range || "3-7"}
-            onComplete={handleAnswerReady}
-            onError={() => setStep("home")}
-            onLimitReached={() => setStep("paywall")}
-          />
-        )}
-        {step === "answer" && (
-          <AnswerScreen
-            key="answer"
-            question={question}
-            answer={answer}
-            onNewQuestion={handleNewQuestion}
-            onOpenStoryFactory={() => setActiveTab("explore")}
-          />
-        )}
-        {step === "paywall" && (
-          <Paywall key="paywall" onLogin={handleLoginFromPaywall} />
-        )}
+        {step === "age" && <AgePickerScreen key="age" question={question} onSelect={handleAgeSelected} onBack={() => setStep("home")} />}
+        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={selectedAgeRange || profile?.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setStep("paywall")} />}
+        {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
+        {step === "paywall" && <Paywall key="paywall" onLogin={() => setShowLoginGate(true)} />}
       </AnimatePresence>
     );
   };
@@ -190,31 +136,14 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
       <MagicalBackground />
-      
-      <div className="flex-1 flex flex-col pb-[72px]">
-        {renderContent()}
-      </div>
-
-      {/* Persistent bottom nav across ALL tabs */}
+      <div className="flex-1 flex flex-col pb-[72px]">{renderContent()}</div>
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
-
       <AnimatePresence>
-        {showLab && <KidzzLab onBack={() => setShowLab(false)} />}
-        {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} />}
-        {showLoginGate && (
-          <ParentalGate
-            onSuccess={() => setShowLoginGate(false)}
-            onCancel={() => setShowLoginGate(false)}
-          />
-        )}
+        {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
+        {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} onGameComplete={() => evolution.evolve("game")} />}
+        {showLoginGate && <ParentalGate onSuccess={() => setShowLoginGate(false)} onCancel={() => setShowLoginGate(false)} />}
         {showParentalGateForSettings && (
-          <ParentalGate
-            onSuccess={() => {
-              setShowParentalGateForSettings(false);
-              setShowSettings(true);
-            }}
-            onCancel={() => setShowParentalGateForSettings(false)}
-          />
+          <ParentalGate onSuccess={() => { setShowParentalGateForSettings(false); setShowSettings(true); }} onCancel={() => setShowParentalGateForSettings(false)} />
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>

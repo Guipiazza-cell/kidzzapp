@@ -38,6 +38,75 @@ export type Database = {
         }
         Relationships: []
       }
+      character_profiles: {
+        Row: {
+          color_from: string
+          color_to: string
+          created_at: string
+          dominant_trait: string
+          emotional_state: string
+          energy_mode: string
+          evolution_points: number
+          expression: string
+          games_count: number
+          id: string
+          last_feedback: string | null
+          level: number
+          moments_count: number
+          outfit: string
+          questions_count: number
+          stories_count: number
+          unlocked_colors: string[]
+          unlocked_outfits: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color_from?: string
+          color_to?: string
+          created_at?: string
+          dominant_trait?: string
+          emotional_state?: string
+          energy_mode?: string
+          evolution_points?: number
+          expression?: string
+          games_count?: number
+          id?: string
+          last_feedback?: string | null
+          level?: number
+          moments_count?: number
+          outfit?: string
+          questions_count?: number
+          stories_count?: number
+          unlocked_colors?: string[]
+          unlocked_outfits?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color_from?: string
+          color_to?: string
+          created_at?: string
+          dominant_trait?: string
+          emotional_state?: string
+          energy_mode?: string
+          evolution_points?: number
+          expression?: string
+          games_count?: number
+          id?: string
+          last_feedback?: string | null
+          level?: number
+          moments_count?: number
+          outfit?: string
+          questions_count?: number
+          stories_count?: number
+          unlocked_colors?: string[]
+          unlocked_outfits?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age_range: string | null
