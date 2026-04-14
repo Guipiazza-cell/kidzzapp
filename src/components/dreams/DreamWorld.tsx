@@ -366,7 +366,7 @@ const DreamWorld = ({ onBack }: Props) => {
   /* ── Main dream screen ── */
   return (
     <motion.div
-      className="flex-1 overflow-y-auto pb-4"
+      className="fixed inset-0 z-40 overflow-y-auto pb-20"
       style={{ background: "linear-gradient(180deg, #0f1535 0%, #1e1145 50%, #0d1b2a 100%)" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
