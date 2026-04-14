@@ -134,28 +134,28 @@ export const SOUND_PRESETS: SoundPreset[] = [
     label: "Chuva",
     emoji: "🌧️",
     free: true,
-    url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c1b1c0f6f3.mp3",
+    url: "/audio/rain-soft.mp3",
   },
   {
     id: "forest",
     label: "Floresta",
     emoji: "🌲",
     free: false,
-    url: "https://cdn.pixabay.com/download/audio/2022/02/23/audio_7c6c4c7a9f.mp3",
+    url: "/audio/forest-calm.mp3",
   },
   {
     id: "ocean",
     label: "Oceano",
     emoji: "🌊",
     free: false,
-    url: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_5e5c9e0c4d.mp3",
+    url: "/audio/ocean-waves.mp3",
   },
   {
     id: "white",
     label: "Ruído Branco",
     emoji: "📻",
     free: false,
-    url: "https://cdn.pixabay.com/download/audio/2021/09/06/audio_3f6b1c2e8e.mp3",
+    url: "/audio/white-noise.mp3",
   },
 ];
 

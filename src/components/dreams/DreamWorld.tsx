@@ -81,6 +81,7 @@ const DreamWorld = ({ onBack }: Props) => {
   const [isNarrating, setIsNarrating] = useState(false);
   const [showPremiumBlock, setShowPremiumBlock] = useState(false);
   const [audioLoading, setAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
 
   useEffect(() => {
     engineRef.current = new AmbientSoundEngine();
@@ -97,6 +98,7 @@ const DreamWorld = ({ onBack }: Props) => {
   const toggleSound = useCallback(async (id: string, free: boolean) => {
     if (!canAccess(free)) { setShowPremiumBlock(true); return; }
     const engine = engineRef.current!;
+    setAudioError(null);
 
     if (activeSounds[id] !== undefined) {
       engine.stop(id);
@@ -113,6 +115,8 @@ const DreamWorld = ({ onBack }: Props) => {
       setAudioLoading(false);
       if (ok) {
         setActiveSounds((prev) => ({ ...prev, [id]: 0.5 }));
+      } else {
+        setAudioError(`Não foi possível tocar ${sound.label.toLowerCase()}. Toque para tentar novamente.`);
       }
     }
   }, [canAccess, isPremium, activeSounds]);
@@ -519,6 +523,19 @@ const DreamWorld = ({ onBack }: Props) => {
             >
               Carregando som…
             </motion.p>
+          )}
+
+          {audioError && !audioLoading && (
+            <div
+              className="mb-3 rounded-xl px-3 py-2 text-center"
+              style={{
+                background: "rgba(127,29,29,0.25)",
+                border: "1px solid rgba(248,113,113,0.28)",
+                color: "hsl(var(--foreground))",
+              }}
+            >
+              <p className="text-xs font-medium">{audioError}</p>
+            </div>
           )}
 
           <div className="grid grid-cols-3 gap-2">
