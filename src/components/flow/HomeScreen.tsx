@@ -274,21 +274,35 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           </div>
         </div>
 
-        {/* Lab entry button */}
-        {onOpenLab && (
-          <motion.button
-            onClick={onOpenLab}
-            className="mt-1 mb-1 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/20 flex items-center gap-1.5"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6 }}
-            whileTap={{ scale: 0.93 }}
-          >
-            <span className="text-sm">🧪</span>
-            <span className="text-[10px] font-bold text-purple-700">Kidzz Lab</span>
-            <span className="text-[9px] text-purple-400 ml-0.5">✨</span>
-          </motion.button>
-        )}
+        {/* Quick access buttons */}
+        <div className="flex items-center gap-2 mt-1 mb-1">
+          {onOpenLab && (
+            <motion.button
+              onClick={onOpenLab}
+              className="px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/20 flex items-center gap-1.5"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6 }}
+              whileTap={{ scale: 0.93 }}
+            >
+              <span className="text-sm">🧪</span>
+              <span className="text-[10px] font-bold text-purple-700">Lab</span>
+            </motion.button>
+          )}
+          {onOpenPlay && (
+            <motion.button
+              onClick={onOpenPlay}
+              className="px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-600/20 to-sky-600/20 border border-emerald-400/20 flex items-center gap-1.5"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.7 }}
+              whileTap={{ scale: 0.93 }}
+            >
+              <span className="text-sm">🎮</span>
+              <span className="text-[10px] font-bold text-emerald-700">Play</span>
+            </motion.button>
+          )}
+        </div>
         {/* Level & Progress */}
         <motion.div
           className="w-full max-w-sm mt-1 mb-2"
