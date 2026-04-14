@@ -2,10 +2,7 @@ import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import pixelImg from "@/assets/pixel-chameleon.png";
-
-type Expression = "calm" | "happy" | "curious" | "sleepy";
-type EnergyMode = "low" | "medium" | "high" | "ultra";
+import DynamicCharacter, { type CharExpression, type CharEnergy } from "./DynamicCharacter";
 
 const COLORS = [
   { id: "emerald", from: "#10B981", to: "#059669", label: "Esmeralda" },
@@ -16,11 +13,11 @@ const COLORS = [
   { id: "cosmic", from: "#EC4899", to: "#8B5CF6", label: "Cósmico", locked: true },
 ];
 
-const EXPRESSIONS: { id: Expression; emoji: string; label: string; eyes: string; mouth: string }[] = [
-  { id: "calm", emoji: "😌", label: "Calmo", eyes: "◡ ◡", mouth: "‿" },
-  { id: "happy", emoji: "😄", label: "Feliz", eyes: "★ ★", mouth: "▽" },
-  { id: "curious", emoji: "🤔", label: "Curioso", eyes: "◉ ◎", mouth: "○" },
-  { id: "sleepy", emoji: "😴", label: "Sonolento", eyes: "– –", mouth: "～" },
+const EXPRESSIONS: { id: CharExpression; emoji: string; label: string }[] = [
+  { id: "calm", emoji: "😌", label: "Calmo" },
+  { id: "happy", emoji: "😄", label: "Feliz" },
+  { id: "curious", emoji: "🤔", label: "Curioso" },
+  { id: "sleepy", emoji: "😴", label: "Sonolento" },
 ];
 
 const OUTFITS = [
@@ -30,7 +27,7 @@ const OUTFITS = [
   { id: "space", label: "Astronauta", icon: "🚀", locked: true },
 ];
 
-const ENERGY_MODES: { id: EnergyMode; label: string; icon: string; locked?: boolean }[] = [
+const ENERGY_MODES: { id: CharEnergy; label: string; icon: string; locked?: boolean }[] = [
   { id: "low", label: "Zen", icon: "🧘" },
   { id: "medium", label: "Normal", icon: "⚡" },
   { id: "high", label: "Energia", icon: "🔥" },
@@ -46,9 +43,7 @@ const TABS: { id: TabId; icon: typeof Palette; label: string }[] = [
   { id: "energy", icon: Zap, label: "Energia" },
 ];
 
-interface Props {
-  onBack: () => void;
-}
+interface Props { onBack: () => void }
 
 const KidzzLab = ({ onBack }: Props) => {
   const { profile } = useAuth();
@@ -56,35 +51,18 @@ const KidzzLab = ({ onBack }: Props) => {
 
   const [activeTab, setActiveTab] = useState<TabId>("color");
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
-  const [expression, setExpression] = useState<Expression>("calm");
+  const [expression, setExpression] = useState<CharExpression>("calm");
   const [outfit, setOutfit] = useState("default");
-  const [energy, setEnergy] = useState<EnergyMode>("medium");
+  const [energy, setEnergy] = useState<CharEnergy>("medium");
   const [pulseKey, setPulseKey] = useState(0);
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);
 
   const triggerPulse = useCallback(() => setPulseKey((k) => k + 1), []);
+  const handleLockedItem = () => { if (!isPremium) setShowPremiumCTA(true); };
 
-  const handleLockedItem = () => {
-    if (!isPremium) setShowPremiumCTA(true);
-  };
-
-  // Expression-driven animation config
-  const expressionAnimation = {
-    calm: { rotate: [0, 1, -1, 0], y: [0, -2, 0], scale: [1, 1, 1] },
-    happy: { rotate: [0, -5, 5, -3, 0], y: [0, -10, 0], scale: [1, 1.08, 1] },
-    curious: { rotate: [0, -12, 0], y: [0, -6, 0], scale: [1, 1.02, 1] },
-    sleepy: { rotate: [0, 2, 0], y: [0, -1, 0], scale: [1, 0.96, 1] },
-  };
-
-  const expressionSpeed = { calm: 3, happy: 1, curious: 2, sleepy: 5 };
-
-  // Energy config
-  const energyParticleCount = { low: 2, medium: 5, high: 12, ultra: 20 };
-  const energyGlowIntensity = { low: 0.1, medium: 0.25, high: 0.5, ultra: 0.8 };
-  const energyBreathSpeed = { low: 5, medium: 3, high: 1.5, ultra: 0.8 };
-
-  // Expression face overlay
-  const exprData = EXPRESSIONS.find((e) => e.id === expression)!;
+  const energyParticleCount = { low: 3, medium: 6, high: 14, ultra: 24 };
+  const energyGlow = { low: 0.12, medium: 0.25, high: 0.5, ultra: 0.8 };
+  const energySpeed = { low: 6, medium: 4, high: 2.5, ultra: 1.5 };
 
   return (
     <motion.div
@@ -92,89 +70,86 @@ const KidzzLab = ({ onBack }: Props) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      style={{
-        background: "linear-gradient(160deg, #1a0a2e 0%, #16213e 40%, #0f3460 70%, #1a1a2e 100%)",
-      }}
+      style={{ background: "linear-gradient(160deg, #0d0618 0%, #121830 40%, #0a1628 70%, #0d0d1a 100%)" }}
     >
-      {/* Floating lab elements */}
+      {/* Floating lab panels */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(4)].map((_, i) => (
+        {[...Array(5)].map((_, i) => (
           <motion.div
             key={`panel-${i}`}
-            className="absolute rounded-2xl border border-white/5"
+            className="absolute rounded-2xl border border-white/[0.04]"
             style={{
-              width: 60 + i * 30,
-              height: 80 + i * 20,
-              top: `${15 + i * 20}%`,
-              left: `${5 + i * 22}%`,
-              background: `linear-gradient(135deg, rgba(139,92,246,${0.03 + i * 0.02}), rgba(59,130,246,${0.02 + i * 0.01}))`,
+              width: 50 + i * 25,
+              height: 70 + i * 18,
+              top: `${10 + i * 18}%`,
+              left: `${3 + i * 20}%`,
+              background: `linear-gradient(135deg, ${selectedColor.from}08, ${selectedColor.to}04)`,
             }}
-            animate={{ y: [0, -8 - i * 3, 0], rotate: [-2 + i, 2 + i, -2 + i], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.8 }}
+            animate={{ y: [0, -6 - i * 2, 0], rotate: [-1 + i * 0.5, 1 + i * 0.5, -1 + i * 0.5], opacity: [0.2, 0.5, 0.2] }}
+            transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.6 }}
           />
         ))}
-        {[...Array(6)].map((_, i) => (
+        {/* Rising bubbles */}
+        {[...Array(8)].map((_, i) => (
           <motion.div
-            key={`bubble-${i}`}
+            key={`bub-${i}`}
             className="absolute rounded-full"
             style={{
-              width: 4 + i * 2,
-              height: 4 + i * 2,
-              bottom: "5%",
-              left: `${12 + i * 14}%`,
+              width: 3 + i * 1.5,
+              height: 3 + i * 1.5,
+              bottom: 0,
+              left: `${8 + i * 11}%`,
               background: selectedColor.from,
               filter: "blur(1px)",
             }}
-            animate={{ y: [0, -(120 + i * 40)], opacity: [0.8, 0], scale: [1, 0.3] }}
-            transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }}
+            animate={{ y: [0, -(150 + i * 30)], opacity: [0.6, 0], scale: [1, 0.2] }}
+            transition={{ duration: 4 + i * 0.4, repeat: Infinity, delay: i * 0.5, ease: "easeOut" }}
           />
         ))}
       </div>
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2">
+      <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-1">
         <motion.button onClick={onBack} className="p-2 rounded-xl bg-white/5 border border-white/10" whileTap={{ scale: 0.9 }}>
           <ArrowLeft size={20} className="text-white/70" />
         </motion.button>
         <div className="text-center">
           <h1 className="text-base font-bold text-white/90 flex items-center gap-1.5">🧪 Kidzz Lab</h1>
-          <p className="text-[10px] text-purple-300/60">Câmara de Criação</p>
+          <p className="text-[10px] text-purple-300/50">Câmara de Criação</p>
         </div>
         <div className="w-9" />
       </div>
 
-      {/* === CHARACTER DISPLAY === */}
-      <div className="relative z-10 flex-shrink-0 flex items-center justify-center py-4">
+      {/* === CHARACTER HERO AREA === */}
+      <div className="relative z-10 flex-shrink-0 flex items-center justify-center" style={{ minHeight: 260 }}>
         <motion.div
           className="relative"
           key={`pulse-${pulseKey}`}
           initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.06, 1] }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          {/* Reactive color glow */}
+          {/* Spotlight */}
           <motion.div
-            className="absolute -inset-10 rounded-full pointer-events-none"
-            animate={{ scale: [1, 1.15, 1], opacity: [energyGlowIntensity[energy] * 0.6, energyGlowIntensity[energy], energyGlowIntensity[energy] * 0.6] }}
-            transition={{ duration: energyBreathSpeed[energy], repeat: Infinity, ease: "easeInOut" }}
-            style={{
-              background: `radial-gradient(circle, ${selectedColor.from}88, ${selectedColor.to}44 50%, transparent 70%)`,
-            }}
+            className="absolute -inset-16 rounded-full pointer-events-none"
+            animate={{ scale: [1, 1.12, 1], opacity: [energyGlow[energy] * 0.5, energyGlow[energy], energyGlow[energy] * 0.5] }}
+            transition={{ duration: energySpeed[energy], repeat: Infinity, ease: "easeInOut" }}
+            style={{ background: `radial-gradient(circle, ${selectedColor.from}55, ${selectedColor.to}22 50%, transparent 75%)` }}
           />
 
-          {/* Energy particles — orbit around character */}
+          {/* Energy particles */}
           {[...Array(energyParticleCount[energy])].map((_, i) => {
             const angle = (360 / energyParticleCount[energy]) * i;
-            const radius = 70 + (i % 3) * 15;
+            const radius = 90 + (i % 4) * 12;
             return (
               <motion.div
                 key={`ep-${energy}-${i}`}
                 className="absolute rounded-full pointer-events-none"
                 style={{
-                  width: 4 + (i % 3) * 2,
-                  height: 4 + (i % 3) * 2,
-                  background: selectedColor.from,
-                  boxShadow: `0 0 8px ${selectedColor.from}`,
+                  width: 3 + (i % 3) * 2,
+                  height: 3 + (i % 3) * 2,
+                  background: i % 2 === 0 ? selectedColor.from : selectedColor.to,
+                  boxShadow: `0 0 6px ${selectedColor.from}`,
                   top: "50%",
                   left: "50%",
                 }}
@@ -189,158 +164,36 @@ const KidzzLab = ({ onBack }: Props) => {
                     Math.sin(((angle + 180) * Math.PI) / 180) * radius,
                     Math.sin((angle * Math.PI) / 180) * radius,
                   ],
-                  opacity: [0.3, 0.9, 0.3],
-                  scale: [0.8, 1.4, 0.8],
+                  opacity: [0.2, 0.8, 0.2],
+                  scale: [0.6, 1.3, 0.6],
                 }}
-                transition={{
-                  duration: energyBreathSpeed[energy] * 2,
-                  repeat: Infinity,
-                  delay: i * 0.15,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: energySpeed[energy] * 2, repeat: Infinity, delay: i * 0.1, ease: "easeInOut" }}
               />
             );
           })}
 
-          {/* Character body with expression-driven animation */}
-          <motion.div
-            className="relative w-40 h-40"
-            animate={expressionAnimation[expression]}
-            transition={{ duration: expressionSpeed[expression], repeat: Infinity, ease: "easeInOut" }}
-          >
-            {/* Main image */}
-            <img
-              src={pixelImg}
-              alt="Personagem"
-              className="w-full h-full object-contain relative z-10"
-              style={{
-                filter: `drop-shadow(0 0 25px ${selectedColor.from}66) brightness(${energy === "ultra" ? 1.2 : energy === "high" ? 1.1 : 1})`,
-              }}
-            />
+          {/* Dynamic character */}
+          <DynamicCharacter state={{ color: selectedColor, expression, outfit, energy }} />
 
-            {/* Strong color tint — covers the character visibly */}
-            <motion.div
-              className="absolute inset-0 z-20 rounded-full pointer-events-none"
-              style={{ mixBlendMode: "color" }}
-              animate={{ opacity: [0.55, 0.7, 0.55] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <div
-                className="w-full h-full"
-                style={{
-                  background: `linear-gradient(135deg, ${selectedColor.from}, ${selectedColor.to})`,
-                }}
-              />
-            </motion.div>
-
-            {/* Face overlay — eyes & mouth driven by expression */}
-            <motion.div
-              className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none"
-              style={{ paddingTop: "15%", paddingBottom: "25%" }}
-            >
-              <motion.div
-                className="text-lg font-black tracking-widest select-none"
-                style={{
-                  color: "white",
-                  textShadow: `0 0 10px ${selectedColor.from}, 0 0 20px ${selectedColor.from}88`,
-                  letterSpacing: "0.3em",
-                }}
-                animate={
-                  expression === "sleepy"
-                    ? { opacity: [1, 0.4, 1] }
-                    : expression === "happy"
-                    ? { scale: [1, 1.15, 1] }
-                    : {}
-                }
-                transition={{ duration: expressionSpeed[expression], repeat: Infinity }}
-              >
-                {exprData.eyes}
-              </motion.div>
-              <motion.div
-                className="text-sm font-bold select-none mt-1"
-                style={{
-                  color: "white",
-                  textShadow: `0 0 8px ${selectedColor.from}`,
-                }}
-                animate={
-                  expression === "happy"
-                    ? { scale: [1, 1.3, 1] }
-                    : expression === "curious"
-                    ? { scale: [1, 1.1, 0.9, 1] }
-                    : {}
-                }
-                transition={{ duration: expressionSpeed[expression], repeat: Infinity }}
-              >
-                {exprData.mouth}
-              </motion.div>
-            </motion.div>
-
-            {/* Outfit visual overlay */}
-            {outfit !== "default" && (
-              <motion.div
-                className="absolute z-30 pointer-events-none"
-                initial={{ scale: 0, rotate: -30 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 15 }}
-              >
-                {outfit === "labcoat" && (
-                  <>
-                    <span className="absolute -top-3 -right-3 text-2xl drop-shadow-lg">🥼</span>
-                    <span className="absolute -bottom-2 left-1 text-lg">🔬</span>
-                  </>
-                )}
-                {outfit === "crown" && (
-                  <>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-3xl drop-shadow-lg">👑</span>
-                    <motion.div
-                      className="absolute -top-5 left-1/2 -translate-x-1/2 w-12 h-6"
-                      style={{ background: `radial-gradient(circle, ${selectedColor.from}44, transparent)` }}
-                      animate={{ opacity: [0.3, 0.8, 0.3] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    />
-                  </>
-                )}
-                {outfit === "space" && (
-                  <>
-                    <span className="absolute -top-3 -right-2 text-2xl">🚀</span>
-                    <span className="absolute -bottom-3 -left-2 text-lg">⭐</span>
-                    <motion.div
-                      className="absolute inset-0 rounded-full border-2 border-cyan-400/20"
-                      animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.5, 0.2] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </>
-                )}
-              </motion.div>
-            )}
-
-            {/* Blinking overlay */}
-            <motion.div
-              className="absolute inset-0 z-40 pointer-events-none bg-black/0"
-              animate={{ opacity: [0, 0, 0.15, 0] }}
-              transition={{ duration: 4, repeat: Infinity, times: [0, 0.94, 0.97, 1] }}
-            />
-          </motion.div>
-
-          {/* Status label below character */}
+          {/* Status label */}
           <motion.div
             key={`${expression}-${selectedColor.id}-${outfit}-${energy}`}
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap"
+            className="absolute -bottom-5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap"
             style={{
               background: `linear-gradient(135deg, ${selectedColor.from}33, ${selectedColor.to}33)`,
               color: selectedColor.from,
               border: `1px solid ${selectedColor.from}44`,
             }}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            {exprData.label} • {selectedColor.label} • {ENERGY_MODES.find(e => e.id === energy)?.label}
+            {EXPRESSIONS.find(e => e.id === expression)?.label} • {selectedColor.label} • {ENERGY_MODES.find(e => e.id === energy)?.label}
           </motion.div>
         </motion.div>
       </div>
 
       {/* Tab selector */}
-      <div className="relative z-10 flex gap-1 px-4 mb-2 mt-4">
+      <div className="relative z-10 flex gap-1 px-4 mb-2 mt-2">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -374,35 +227,21 @@ const KidzzLab = ({ onBack }: Props) => {
                   return (
                     <motion.button
                       key={c.id}
-                      onClick={() => {
-                        if (locked) return handleLockedItem();
-                        setSelectedColor(c);
-                        triggerPulse();
-                      }}
+                      onClick={() => { if (locked) return handleLockedItem(); setSelectedColor(c); triggerPulse(); }}
                       className={`relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border transition-all ${
-                        selected
-                          ? "border-white/40 bg-white/15 scale-105"
-                          : "border-white/8 bg-white/5 opacity-60"
+                        selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-60"
                       } ${locked ? "opacity-40" : ""}`}
                       whileTap={locked ? undefined : { scale: 0.9 }}
                       animate={selected ? { boxShadow: `0 0 20px ${c.from}44` } : { boxShadow: "0 0 0px transparent" }}
                     >
                       <motion.div
                         className="w-11 h-11 rounded-full border-2"
-                        style={{
-                          background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
-                          borderColor: selected ? "white" : "rgba(255,255,255,0.15)",
-                          filter: locked ? "blur(3px)" : "none",
-                        }}
+                        style={{ background: `linear-gradient(135deg, ${c.from}, ${c.to})`, borderColor: selected ? "white" : "rgba(255,255,255,0.15)", filter: locked ? "blur(3px)" : "none" }}
                         animate={selected ? { scale: [1, 1.1, 1] } : {}}
                         transition={{ duration: 1.5, repeat: Infinity }}
                       />
                       <span className={`text-[11px] font-semibold ${selected ? "text-white" : "text-white/50"}`}>{c.label}</span>
-                      {locked && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Lock size={16} className="text-white/50" />
-                        </div>
-                      )}
+                      {locked && <div className="absolute inset-0 flex items-center justify-center"><Lock size={16} className="text-white/50" /></div>}
                     </motion.button>
                   );
                 })}
@@ -420,18 +259,12 @@ const KidzzLab = ({ onBack }: Props) => {
                       key={e.id}
                       onClick={() => { setExpression(e.id); triggerPulse(); }}
                       className={`rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${
-                        selected
-                          ? "border-white/40 bg-white/15 scale-105"
-                          : "border-white/8 bg-white/5 opacity-55"
+                        selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-55"
                       }`}
                       whileTap={{ scale: 0.9 }}
                       animate={selected ? { boxShadow: `0 0 15px ${selectedColor.from}33` } : {}}
                     >
-                      <motion.span
-                        className="text-3xl"
-                        animate={selected ? { scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] } : {}}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      >
+                      <motion.span className="text-3xl" animate={selected ? { scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] } : {}} transition={{ duration: 1.5, repeat: Infinity }}>
                         {e.emoji}
                       </motion.span>
                       <span className={`text-xs font-semibold ${selected ? "text-white" : "text-white/50"}`}>{e.label}</span>
@@ -451,32 +284,17 @@ const KidzzLab = ({ onBack }: Props) => {
                   return (
                     <motion.button
                       key={o.id}
-                      onClick={() => {
-                        if (locked) return handleLockedItem();
-                        setOutfit(o.id);
-                        triggerPulse();
-                      }}
+                      onClick={() => { if (locked) return handleLockedItem(); setOutfit(o.id); triggerPulse(); }}
                       className={`relative rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${
-                        selected
-                          ? "border-white/40 bg-white/15 scale-105"
-                          : "border-white/8 bg-white/5 opacity-55"
+                        selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-55"
                       } ${locked ? "opacity-40" : ""}`}
                       whileTap={locked ? undefined : { scale: 0.9 }}
                     >
-                      <motion.span
-                        className="text-3xl"
-                        style={{ filter: locked ? "blur(3px)" : "none" }}
-                        animate={selected ? { y: [0, -4, 0] } : {}}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      >
+                      <motion.span className="text-3xl" style={{ filter: locked ? "blur(3px)" : "none" }} animate={selected ? { y: [0, -4, 0] } : {}} transition={{ duration: 1, repeat: Infinity }}>
                         {o.icon}
                       </motion.span>
                       <span className={`text-xs font-semibold ${selected ? "text-white" : "text-white/50"}`}>{o.label}</span>
-                      {locked && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Lock size={16} className="text-white/50" />
-                        </div>
-                      )}
+                      {locked && <div className="absolute inset-0 flex items-center justify-center"><Lock size={16} className="text-white/50" /></div>}
                     </motion.button>
                   );
                 })}
@@ -493,32 +311,17 @@ const KidzzLab = ({ onBack }: Props) => {
                   return (
                     <motion.button
                       key={e.id}
-                      onClick={() => {
-                        if (locked) return handleLockedItem();
-                        setEnergy(e.id);
-                        triggerPulse();
-                      }}
+                      onClick={() => { if (locked) return handleLockedItem(); setEnergy(e.id); triggerPulse(); }}
                       className={`relative rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${
-                        selected
-                          ? "border-white/40 bg-white/15 scale-105"
-                          : "border-white/8 bg-white/5 opacity-55"
+                        selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-55"
                       } ${locked ? "opacity-40" : ""}`}
                       whileTap={locked ? undefined : { scale: 0.9 }}
                     >
-                      <motion.span
-                        className="text-3xl"
-                        style={{ filter: locked ? "blur(3px)" : "none" }}
-                        animate={selected ? { scale: [1, 1.2, 1] } : {}}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      >
+                      <motion.span className="text-3xl" style={{ filter: locked ? "blur(3px)" : "none" }} animate={selected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 1, repeat: Infinity }}>
                         {e.icon}
                       </motion.span>
                       <span className={`text-xs font-semibold ${selected ? "text-white" : "text-white/50"}`}>{e.label}</span>
-                      {locked && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Lock size={16} className="text-white/50" />
-                        </div>
-                      )}
+                      {locked && <div className="absolute inset-0 flex items-center justify-center"><Lock size={16} className="text-white/50" /></div>}
                     </motion.button>
                   );
                 })}
@@ -528,31 +331,23 @@ const KidzzLab = ({ onBack }: Props) => {
         </AnimatePresence>
       </div>
 
-      {/* Premium CTA overlay */}
+      {/* Premium CTA */}
       <AnimatePresence>
         {showPremiumCTA && (
           <motion.div
             className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setShowPremiumCTA(false)}
           >
             <motion.div
               className="mx-6 p-6 rounded-3xl border border-purple-400/30 text-center"
               style={{ background: "linear-gradient(160deg, #1a0a2e, #16213e)" }}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <motion.div className="text-5xl mb-3" animate={{ rotate: [0, -10, 10, 0], y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-                ✨
-              </motion.div>
+              <motion.div className="text-5xl mb-3" animate={{ rotate: [0, -10, 10, 0], y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>✨</motion.div>
               <h3 className="text-lg font-bold text-white mb-2">Desbloqueie a criação completa</h3>
-              <p className="text-sm text-purple-200/60 mb-4">
-                Cores exclusivas, trajes especiais e o modo Ultra Energia esperam por você!
-              </p>
+              <p className="text-sm text-purple-200/60 mb-4">Cores exclusivas, trajes especiais e o modo Ultra Energia!</p>
               <motion.button
                 className="w-full py-3 rounded-2xl font-bold text-white text-sm"
                 style={{ background: "linear-gradient(135deg, #8B5CF6, #EC4899)" }}
@@ -562,9 +357,7 @@ const KidzzLab = ({ onBack }: Props) => {
                 <Sparkles size={16} className="inline mr-1.5 -mt-0.5" />
                 Desbloquear criação completa ✨
               </motion.button>
-              <button className="mt-3 text-xs text-white/30" onClick={() => setShowPremiumCTA(false)}>
-                Agora não
-              </button>
+              <button className="mt-3 text-xs text-white/30" onClick={() => setShowPremiumCTA(false)}>Agora não</button>
             </motion.div>
           </motion.div>
         )}
