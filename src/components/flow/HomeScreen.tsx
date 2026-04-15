@@ -218,6 +218,12 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
 
         {/* Streak Card */}
         <StreakCard streakDays={streakDays} childName={childName} onSubmit={onSubmit} />
+
+        {/* Daily Special Question */}
+        <div className="w-full flex justify-center mt-2 mb-1">
+          <DailyQuestionCard childName={childName} onSubmit={submit} disabled={submitting || isFreeLimitReached} />
+        </div>
+
         {/* Characters & speech bubbles */}
         <div className="flex items-end justify-center gap-1 mt-2 mb-1">
           {/* Ane */}
