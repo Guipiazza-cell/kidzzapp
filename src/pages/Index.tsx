@@ -24,7 +24,7 @@ import ChameleonMascot from "@/components/ChameleonMascot";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
 
-type FlowStep = "home" | "age" | "generating" | "answer" | "paywall";
+type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 
