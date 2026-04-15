@@ -10,11 +10,11 @@ import DailyChallengeGame from "./games/DailyChallengeGame";
 
 type GameId = "word" | "memory" | "hangman" | "daily";
 
-const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; premium?: boolean }[] = [
-  { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍" },
-  { id: "memory", label: "Memória", icon: Brain, emoji: "🧠" },
-  { id: "hangman", label: "Forca", icon: Type, emoji: "✏️" },
-  { id: "daily", label: "Desafio", icon: Zap, emoji: "🎯", premium: true },
+const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean }[] = [
+  { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍", sub: "Encontre palavras escondidas", bgColor: "rgba(45,90,61,0.6)" },
+  { id: "memory", label: "Memória", icon: Brain, emoji: "🧠", sub: "Treine sua memória", bgColor: "rgba(26,58,92,0.6)" },
+  { id: "hangman", label: "Forca", icon: Type, emoji: "✏️", sub: "Descubra a palavra secreta", bgColor: "rgba(92,58,26,0.6)" },
+  { id: "daily", label: "Desafio", icon: Zap, emoji: "🎯", sub: "Missão especial", bgColor: "rgba(58,26,92,0.6)", premium: true },
 ];
 
 interface Props {

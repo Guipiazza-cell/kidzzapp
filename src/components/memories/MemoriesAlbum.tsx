@@ -289,15 +289,67 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
           </div>
         ) : totalCount === 0 ? (
           <motion.div
-            className="flex flex-col items-center justify-center py-16 text-center"
+            className="flex flex-col items-center text-center px-2 py-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <span className="text-5xl mb-4">📝</span>
-            <h3 className="text-lg font-black text-gray-800">Nenhuma memória ainda</h3>
-            <p className="text-xs text-gray-500 font-semibold mt-1 max-w-[240px]">
-              Faça perguntas, crie histórias e complete missões para começar seu álbum! 💛
+            {/* Mascot */}
+            <motion.img
+              src={aneImg}
+              alt="Ane"
+              className="w-24 h-24 object-contain mb-3"
+              animate={{ y: [0, -6, 0], rotate: [0, 3, -3, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+
+            <h3 className="text-base font-black text-gray-800 leading-snug">
+              Aqui vão ficar as memórias mais preciosas de {childName} 💛
+            </h3>
+            <p className="text-xs text-gray-500 font-semibold mt-1.5 max-w-[280px] leading-relaxed">
+              Cada pergunta respondida, cada história criada, cada missão em família — tudo guardado para sempre aqui.
             </p>
+
+            {/* Preview cards */}
+            <div className="flex gap-2 mt-5 w-full max-w-[300px]">
+              {[
+                { emoji: "💬", label: "Pergunta", example: '"Por que sonhamos?"' },
+                { emoji: "📖", label: "História", example: `"A aventura de ${childName}"` },
+                { emoji: "🎯", label: "Missão", example: '"Caça às Emoções"' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  className="flex-1 rounded-xl bg-white/40 backdrop-blur-sm border border-white/30 p-2.5 text-center"
+                  style={{ opacity: 0.55, filter: "blur(0.3px)" }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 0.55, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                >
+                  <span className="text-xl">{item.emoji}</span>
+                  <p className="text-[9px] font-bold text-gray-600 mt-1">{item.label}</p>
+                  <p className="text-[8px] text-gray-400 font-semibold mt-0.5 leading-tight">{item.example}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* CTAs */}
+            <div className="flex flex-col gap-2 mt-5 w-full max-w-[280px]">
+              <motion.button
+                onClick={onNavigateToChat}
+                className="w-full py-3 rounded-2xl bg-primary/90 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <MessageCircle size={16} />
+                Fazer primeira pergunta →
+              </motion.button>
+              <motion.button
+                onClick={onNavigateToStories}
+                className="w-full py-2.5 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/40 text-gray-700 font-bold text-xs flex items-center justify-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <BookOpen size={14} />
+                Criar primeira história →
+              </motion.button>
+            </div>
           </motion.div>
         ) : (
           <>
