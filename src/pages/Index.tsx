@@ -19,6 +19,7 @@ import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
 import MomentsFactory from "@/components/moments/MomentsFactory";
+import TravelMode from "@/components/travel/TravelMode";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
@@ -40,6 +41,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("chat");
   const [showLab, setShowLab] = useState(false);
   const [showPlay, setShowPlay] = useState(false);
+  const [showTravel, setShowTravel] = useState(false);
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
@@ -140,6 +142,10 @@ const Index = () => {
             onOpenAchievements={() => setActiveTab("achievements")}
             onOpenLab={() => setShowLab(true)}
             onOpenPlay={() => setShowPlay(true)}
+            onOpenTravel={() => {
+              if (!profile?.is_premium) { setStep("paywall"); return; }
+              setShowTravel(true);
+            }}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
@@ -170,6 +176,7 @@ const Index = () => {
       <div className="flex-1 flex flex-col pb-[72px]">{renderContent()}</div>
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
       <AnimatePresence>
+        {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
         {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} onGameComplete={() => evolution.evolve("game")} />}
         {showLoginGate && <ParentalGate onSuccess={() => setShowLoginGate(false)} onCancel={() => setShowLoginGate(false)} />}
