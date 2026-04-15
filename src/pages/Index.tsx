@@ -19,6 +19,7 @@ import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
 import MomentsFactory from "@/components/moments/MomentsFactory";
+import TravelMode from "@/components/travel/TravelMode";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
