@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, LogIn, Shield, Crown, Flame } from "lucide-react";
+import StreakCard from "./StreakCard";
+import StreakCelebration from "./StreakCelebration";
 import VoiceInput from "../VoiceInput";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
@@ -156,11 +158,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <Crown size={11} /> Premium
             </span>
           )}
-          {streakDays > 1 && (
-            <span className="text-[10px] font-extrabold glass-card px-2 py-1 rounded-full flex items-center gap-1 text-kid-orange">
-              <Flame size={11} /> {streakDays}
-            </span>
-          )}
           <span className="text-xs text-gray-800 font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
           </span>
@@ -191,6 +188,11 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
       />
 
       <div className="flex-1 flex flex-col items-center px-5 overflow-y-auto">
+        {/* Streak Celebration overlay */}
+        <StreakCelebration streakDays={streakDays} childName={childName} previousRecord={streakDays} />
+
+        {/* Streak Card */}
+        <StreakCard streakDays={streakDays} childName={childName} onSubmit={onSubmit} />
         {/* Characters & speech bubbles */}
         <div className="flex items-end justify-center gap-1 mt-2 mb-1">
           {/* Ane */}
