@@ -142,6 +142,10 @@ const Index = () => {
             onOpenAchievements={() => setActiveTab("achievements")}
             onOpenLab={() => setShowLab(true)}
             onOpenPlay={() => setShowPlay(true)}
+            onOpenTravel={() => {
+              if (!profile?.is_premium) { setStep("paywall"); return; }
+              setShowTravel(true);
+            }}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
