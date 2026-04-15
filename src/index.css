@@ -196,3 +196,10 @@
   0% { transform: scaleY(1) rotate(0deg); }
   100% { transform: scaleY(0.6) rotate(8deg); }
 }
+
+/* Streak fire flicker */
+@keyframes flicker {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(-2deg); }
+  50% { opacity: 0.85; transform: scale(1.05) rotate(2deg); }
+}
+.streak-fire { animation: flicker 1.5s ease-in-out infinite; display: inline-block; }
