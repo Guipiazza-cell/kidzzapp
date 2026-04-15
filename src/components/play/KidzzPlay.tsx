@@ -173,20 +173,21 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
               transition={{ duration: mascotMood === "happy" ? 0.6 : 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
             {/* Speech bubble */}
-            <AnimatePresence>
-              {mascotMood !== "idle" && (
-                <motion.div
-                  className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-1 border border-white/20 whitespace-nowrap"
-                  initial={{ opacity: 0, y: 5, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 5, scale: 0.8 }}
-                >
-                  <p className="text-[10px] font-bold text-white/80">
-                    {mascotMood === "happy" ? "Muito bem! 🎉" : "Quase lá! 💪"}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Speech bubble - contextual */}
+            <motion.div
+              className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-1 border border-white/20 whitespace-nowrap"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <p className="text-[10px] font-bold text-white/80">
+                {mascotMood === "happy"
+                  ? "Muito bem! 🎉"
+                  : mascotMood === "encourage"
+                  ? "Quase lá! 💪"
+                  : `Escolha um jogo, ${childName}! 🔬`}
+              </p>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
