@@ -201,7 +201,6 @@ const AchievementsScreen = ({ onBack }: Props) => {
                         {badge.title}
                       </h3>
                     </div>
-                    </div>
                     <p className="text-[10px] text-gray-500 font-medium mt-0.5">
                       {badge.description}
                     </p>
