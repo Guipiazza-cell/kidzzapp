@@ -41,7 +41,7 @@ interface AuthContextType {
   questionsRemaining: () => number;
   storiesRemaining: () => number;
   refreshSubscription: () => Promise<void>;
-  handleCheckout: (plan: "premium" | "super_premium") => Promise<void>;
+  handleCheckout: (plan: "premium" | "premium_annual" | "super_premium") => Promise<void>;
   openCustomerPortal: () => Promise<void>;
 }
 
