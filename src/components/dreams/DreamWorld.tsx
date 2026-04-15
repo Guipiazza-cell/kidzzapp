@@ -65,8 +65,11 @@ interface Props {
 type DreamView = "main" | "story" | "playing";
 
 const DreamWorld = ({ onBack }: Props) => {
-  const { profile } = useAuth();
+  const { profile, handleCheckout } = useAuth();
   const isPremium = profile?.is_premium === true;
+  const childName = profile?.child_name || "Explorador";
+  const ageRange = profile?.age_range || "3-7";
+  const interests = (profile as any)?.child_interests as string[] | undefined;
 
   const engineRef = useRef<AmbientSoundEngine | null>(null);
   const narratorRef = useRef<DreamNarrator | null>(null);
@@ -80,6 +83,7 @@ const DreamWorld = ({ onBack }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
   const [showPremiumBlock, setShowPremiumBlock] = useState(false);
+  const [lockedStoryId, setLockedStoryId] = useState<string | null>(null);
   const [audioLoading, setAudioLoading] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
 
