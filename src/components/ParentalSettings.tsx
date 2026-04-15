@@ -34,6 +34,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [affInput, setAffInput] = useState("");
   const [copied, setCopied] = useState(false);
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("annual");
 
   const currentPlan = tier === "super_premium" ? "super_premium" : isPremium ? "premium" : "free";
 
@@ -77,7 +78,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
     }
     setCheckoutLoading(planId);
     try {
-      await handleCheckout(planId as "premium" | "super_premium");
+      await handleCheckout(planId as any);
     } finally {
       setCheckoutLoading(null);
     }
