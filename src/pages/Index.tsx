@@ -9,6 +9,8 @@ import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
+import CelebrationScreen from "@/components/flow/CelebrationScreen";
+import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import DreamWorld from "@/components/dreams/DreamWorld";
 import StoryFactory from "@/components/story/StoryFactory";
