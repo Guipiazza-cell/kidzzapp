@@ -23,6 +23,9 @@ import TravelMode from "@/components/travel/TravelMode";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
+import SevenDayChallenge from "@/components/viral/SevenDayChallenge";
+import ReferralProgram from "@/components/viral/ReferralProgram";
+import MonthlyRetrospective from "@/components/viral/MonthlyRetrospective";
 import ChameleonMascot from "@/components/ChameleonMascot";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
@@ -42,6 +45,9 @@ const Index = () => {
   const [showLab, setShowLab] = useState(false);
   const [showPlay, setShowPlay] = useState(false);
   const [showTravel, setShowTravel] = useState(false);
+  const [showChallenge, setShowChallenge] = useState(false);
+  const [showReferral, setShowReferral] = useState(false);
+  const [showRetrospective, setShowRetrospective] = useState(false);
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
@@ -146,6 +152,8 @@ const Index = () => {
               if (!profile?.is_premium) { setStep("paywall"); return; }
               setShowTravel(true);
             }}
+            onOpenChallenge={() => setShowChallenge(true)}
+            onOpenReferral={() => setShowReferral(true)}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
@@ -179,6 +187,9 @@ const Index = () => {
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
         {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} onGameComplete={() => evolution.evolve("game")} />}
+        {showChallenge && <SevenDayChallenge onClose={() => setShowChallenge(false)} />}
+        {showReferral && <ReferralProgram onBack={() => setShowReferral(false)} />}
+        {showRetrospective && <MonthlyRetrospective onClose={() => setShowRetrospective(false)} />}
         {showLoginGate && <ParentalGate onSuccess={() => setShowLoginGate(false)} onCancel={() => setShowLoginGate(false)} />}
         {showParentalGateForSettings && (
           <ParentalGate onSuccess={() => { setShowParentalGateForSettings(false); setShowSettings(true); }} onCancel={() => setShowParentalGateForSettings(false)} />

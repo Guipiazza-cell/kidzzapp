@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, LogIn, Shield, Crown } from "lucide-react";
+import { Send, LogIn, Shield, Crown, Gift } from "lucide-react";
 import StreakCard from "./StreakCard";
 import StreakCelebration from "./StreakCelebration";
 import VoiceInput from "../VoiceInput";
@@ -64,13 +64,15 @@ interface Props {
   onOpenLab?: () => void;
   onOpenPlay?: () => void;
   onOpenTravel?: () => void;
+  onOpenChallenge?: () => void;
+  onOpenReferral?: () => void;
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   hideBottomNav?: boolean;
   characterEvolution?: any;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay, onOpenTravel }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay, onOpenTravel, onOpenChallenge, onOpenReferral }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining, signOut } = useAuth();
   const navigate = useNavigate();
   const { particles, burst } = useCharacterParticles();
@@ -183,6 +185,15 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             <span className="text-[10px] text-white font-extrabold bg-gradient-to-r from-kid-purple to-kid-pink px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
               <Crown size={11} /> Premium
             </span>
+          )}
+          {onOpenReferral && user && (
+            <motion.button
+              onClick={onOpenReferral}
+              className="p-2.5 rounded-xl glass-card text-purple-500"
+              whileTap={{ scale: 0.9 }}
+            >
+              <Gift size={18} />
+            </motion.button>
           )}
           <span className="text-xs text-gray-800 font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
