@@ -359,6 +359,19 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <span className="text-[10px] font-bold text-emerald-700">Play</span>
             </motion.button>
           )}
+          {onOpenTravel && (
+            <motion.button
+              onClick={onOpenTravel}
+              className="px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/20 flex items-center gap-1.5"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 }}
+              whileTap={{ scale: 0.93 }}
+            >
+              <span className="text-sm">🚗</span>
+              <span className="text-[10px] font-bold text-amber-700">Viagem</span>
+            </motion.button>
+          )}
         </div>
         {/* Level & Progress */}
         <motion.div
