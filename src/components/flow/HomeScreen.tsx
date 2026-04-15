@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, LogIn, Shield, Crown, Flame } from "lucide-react";
+import { Send, LogIn, Shield, Crown } from "lucide-react";
 import StreakCard from "./StreakCard";
 import StreakCelebration from "./StreakCelebration";
 import VoiceInput from "../VoiceInput";
@@ -11,21 +11,10 @@ import CharacterParticles, { useCharacterParticles } from "./CharacterParticles"
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import DailyQuestionCard from "@/components/mascot/DailyQuestionCard";
+import { getTimeOfDay, getMascotDialogue, getMascotMood, type MascotState } from "@/components/mascot/MascotDialogueSystem";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
-
-const getPersonalizedPhrases = (name: string) => ({
-  pixel: [
-    `${name}, essa é boa... manda ver! 🔥`,
-    `Opa, mais uma pergunta incrível, ${name}!`,
-    `Adoro quando você pergunta isso, ${name}!`,
-  ],
-  ane: [
-    `${name}, posso te perguntar uma coisa depois? 💭`,
-    `Vamos descobrir juntos, ${name}!`,
-    `Que curiosidade linda essa, ${name}! ✨`,
-  ],
-});
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
