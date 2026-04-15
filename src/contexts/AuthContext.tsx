@@ -344,7 +344,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // No periodic refresh — only on login and manual refresh (cost optimization)
 
-  const handleCheckout = useCallback(async (plan: "premium" | "super_premium") => {
+  const handleCheckout = useCallback(async (plan: "premium" | "premium_annual" | "super_premium") => {
     if (!session?.access_token) {
       const { toast } = await import("sonner");
       toast.error("Crie uma conta para assinar! Acesse o controle parental para fazer login.");
