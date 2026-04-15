@@ -1,38 +1,55 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Zap } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Zap, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import DynamicCharacter, { type CharExpression, type CharEnergy } from "./DynamicCharacter";
-import type { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
+import aneImg from "@/assets/ane-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.png";
 
+// --- Types ---
+export type MascotId = "ane" | "pixel";
+export type LabExpression = "happy" | "curious" | "excited" | "thinking" | "loving" | "challenging";
+export type LabEnergy = "calm" | "curious" | "animated" | "powerful";
+
+export interface MascotConfig {
+  mascot: MascotId;
+  colorId: string;
+  expression: LabExpression;
+  outfitId: string;
+  energy: LabEnergy;
+}
+
+// --- Data ---
 const COLORS = [
-  { id: "purple", from: "#A855F7", to: "#7C3AED", label: "Ametista" },
-  { id: "emerald", from: "#10B981", to: "#059669", label: "Esmeralda" },
-  { id: "sapphire", from: "#3B82F6", to: "#1D4ED8", label: "Safira" },
-  { id: "ruby", from: "#EF4444", to: "#DC2626", label: "Rubi" },
-  { id: "gold", from: "#F59E0B", to: "#D97706", label: "Ouro" },
-  { id: "cosmic", from: "#EC4899", to: "#8B5CF6", label: "Cósmico" },
+  { id: "rosa-encantado", label: "Rosa Encantado", hueRotate: 0, desc: "Cor padrão da Ane" },
+  { id: "dourado-magico", label: "Dourado Mágico", hueRotate: -30, desc: "Brilho de ouro" },
+  { id: "verde-floresta", label: "Verde Floresta", hueRotate: 90, desc: "Tons da natureza" },
+  { id: "azul-oceano", label: "Azul Oceano", hueRotate: 180, desc: "Profundo e calmo" },
+  { id: "lilas-estrelado", label: "Lilás Estrelado", hueRotate: 240, desc: "Mistério cósmico" },
+  { id: "laranja-aventura", label: "Laranja Aventura", hueRotate: -60, desc: "Energia pura", locked: true, unlockText: "Alcance o nível Explorador" },
 ];
 
-const EXPRESSIONS: { id: CharExpression; emoji: string; label: string }[] = [
-  { id: "calm", emoji: "😌", label: "Calmo" },
-  { id: "happy", emoji: "😄", label: "Feliz" },
-  { id: "curious", emoji: "🤔", label: "Curioso" },
-  { id: "sleepy", emoji: "😴", label: "Sonolento" },
+const EXPRESSIONS: { id: LabExpression; emoji: string; label: string; desc: string; locked?: boolean; unlockText?: string }[] = [
+  { id: "happy", emoji: "😄", label: "Feliz", desc: "Sempre sorrindo" },
+  { id: "curious", emoji: "🤔", label: "Curiosa", desc: "Hmm..." },
+  { id: "excited", emoji: "🤩", label: "Animada", desc: "UAU!" },
+  { id: "thinking", emoji: "💭", label: "Pensativa", desc: "Refletindo..." },
+  { id: "loving", emoji: "😍", label: "Amorosa", desc: "Coração nos olhos", locked: true, unlockText: "Complete 5 missões em família" },
+  { id: "challenging", emoji: "😏", label: "Desafiadora", desc: "Aposto que não sabe!", locked: true, unlockText: "Responda 20 perguntas" },
 ];
 
 const OUTFITS = [
-  { id: "none", label: "Natural", icon: "🦎" },
-  { id: "labcoat", label: "Cientista", icon: "🥼" },
-  { id: "crown", label: "Realeza", icon: "👑" },
-  { id: "space", label: "Astronauta", icon: "🚀" },
+  { id: "scientist", label: "Cientista", icon: "🥼", desc: "Jaleco de cientista" },
+  { id: "superhero", label: "Super-herói", icon: "🦸", desc: "Capa e máscara" },
+  { id: "explorer", label: "Explorador", icon: "🎩", desc: "Chapéu de aventura" },
+  { id: "astronaut", label: "Astronauta", icon: "🚀", desc: "Fantasia espacial", locked: true, unlockText: "10 dias de streak 🔥" },
+  { id: "chef", label: "Chef", icon: "👨‍🍳", desc: "Avental gourmet", locked: true, unlockText: "Alcance o nível Curioso" },
 ];
 
-const ENERGY_MODES: { id: CharEnergy; label: string; icon: string }[] = [
-  { id: "low", label: "Zen", icon: "🧘" },
-  { id: "medium", label: "Normal", icon: "⚡" },
-  { id: "high", label: "Energia", icon: "🔥" },
-  { id: "ultra", label: "Ultra", icon: "💥" },
+const ENERGY_MODES: { id: LabEnergy; label: string; icon: string; speed: number }[] = [
+  { id: "calm", label: "Calma", icon: "🧘", speed: 4 },
+  { id: "curious", label: "Curiosa", icon: "🔍", speed: 2.5 },
+  { id: "animated", label: "Animada", icon: "🔥", speed: 1.5 },
+  { id: "powerful", label: "Poderosa", icon: "💥", speed: 0.8 },
 ];
 
 type TabId = "color" | "expression" | "outfit" | "energy";
@@ -44,166 +61,230 @@ const TABS: { id: TabId; icon: typeof Palette; label: string }[] = [
   { id: "energy", icon: Zap, label: "Energia" },
 ];
 
+const MASCOT_CONFIG_KEY = "mascotConfig";
+
+export function loadMascotConfig(): MascotConfig {
+  try {
+    const stored = localStorage.getItem(MASCOT_CONFIG_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return { mascot: "ane", colorId: "rosa-encantado", expression: "happy", outfitId: "scientist", energy: "calm" };
+}
+
 interface Props {
   onBack: () => void;
-  evolution?: ReturnType<typeof useCharacterEvolution>;
+  evolution?: any;
 }
 
 const KidzzLab = ({ onBack, evolution }: Props) => {
   const { profile } = useAuth();
   const isPremium = profile?.is_premium;
-  const char = evolution?.character;
+  const childName = profile?.child_name || "Explorador";
 
+  const [config, setConfig] = useState<MascotConfig>(loadMascotConfig);
   const [activeTab, setActiveTab] = useState<TabId>("color");
-  const selectedColor = COLORS.find(
-    (c) => c.from === (char?.color_from || "#A855F7")
-  ) || COLORS[0];
-  const expression = (char?.expression || "calm") as CharExpression;
-  const outfit = char?.outfit || "none";
-  const energy = (char?.energy_mode || "medium") as CharEnergy;
-
-  const [pulseKey, setPulseKey] = useState(0);
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [pulseKey, setPulseKey] = useState(0);
 
-  const triggerPulse = useCallback(() => setPulseKey((k) => k + 1), []);
+  const mascotSrc = config.mascot === "ane" ? aneImg : pixelImg;
+  const selectedColor = COLORS.find(c => c.id === config.colorId) || COLORS[0];
+  const selectedEnergy = ENERGY_MODES.find(e => e.id === config.energy) || ENERGY_MODES[0];
 
-  const isLocked = (type: "outfit" | "color", id: string) => {
-    if (isPremium) return false;
-    if (type === "outfit") return !(char?.unlocked_outfits || ["none", "labcoat"]).includes(id);
-    return !(char?.unlocked_colors || ["purple"]).includes(id);
+  const isLocked = (item: { locked?: boolean }) => !isPremium && item.locked;
+
+  const handleLockedItem = (unlockText: string) => {
+    if (!isPremium) setShowPremiumCTA(true);
   };
 
-  const handleLockedItem = () => { if (!isPremium) setShowPremiumCTA(true); };
-
-  const setColor = (c: typeof COLORS[0]) => {
-    evolution?.customize({ color_from: c.from, color_to: c.to });
-    triggerPulse();
-  };
-  const setExpression = (e: CharExpression) => {
-    evolution?.customize({ expression: e });
-    triggerPulse();
-  };
-  const setOutfit = (o: string) => {
-    evolution?.customize({ outfit: o });
-    triggerPulse();
-  };
-  const setEnergy = (e: CharEnergy) => {
-    evolution?.customize({ energy_mode: e });
-    triggerPulse();
+  const update = (partial: Partial<MascotConfig>) => {
+    setConfig(prev => ({ ...prev, ...partial }));
+    setPulseKey(k => k + 1);
   };
 
-  const energyParticleCount = { low: 3, medium: 6, high: 14, ultra: 24 };
-  const energyGlow = { low: 0.12, medium: 0.25, high: 0.5, ultra: 0.8 };
-  const energySpeed = { low: 6, medium: 4, high: 2.5, ultra: 1.5 };
+  const handleSave = () => {
+    localStorage.setItem(MASCOT_CONFIG_KEY, JSON.stringify(config));
+    if (evolution?.customize) {
+      const colorMap: Record<string, { from: string; to: string }> = {
+        "rosa-encantado": { from: "#EC4899", to: "#DB2777" },
+        "dourado-magico": { from: "#F59E0B", to: "#D97706" },
+        "verde-floresta": { from: "#10B981", to: "#059669" },
+        "azul-oceano": { from: "#3B82F6", to: "#1D4ED8" },
+        "lilas-estrelado": { from: "#A855F7", to: "#7C3AED" },
+        "laranja-aventura": { from: "#F97316", to: "#EA580C" },
+      };
+      const colors = colorMap[config.colorId] || colorMap["rosa-encantado"];
+      evolution.customize({ color_from: colors.from, color_to: colors.to, expression: config.expression, outfit: config.outfitId, energy_mode: config.energy });
+    }
+    setSaved(true);
+    setTimeout(() => { setSaved(false); onBack(); }, 2000);
+  };
 
-  const charLevel = char?.level || 1;
-  const charPoints = char?.evolution_points || 0;
+  // Expression-based animation for mascot preview
+  const expressionAnimations: Record<LabExpression, object> = {
+    happy: { y: [0, -8, 0], rotate: [0, -3, 3, 0], scale: [1, 1.05, 1] },
+    curious: { y: [0, -4, 0], rotate: [0, -8, 0] },
+    excited: { y: [0, -14, 0], rotate: [0, -6, 6, -3, 0], scale: [1, 1.08, 1] },
+    thinking: { y: [0, -3, 0], rotate: [0, 3, 0] },
+    loving: { y: [0, -6, 0], scale: [1, 1.06, 1] },
+    challenging: { y: [0, -5, 0], rotate: [0, 5, -5, 0] },
+  };
+
+  const mascotLabel = config.mascot === "ane" ? "Ane" : "Pixel";
 
   return (
     <motion.div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ background: "linear-gradient(160deg, #0d0618 0%, #121830 40%, #0a1628 70%, #0d0d1a 100%)" }}
     >
-      {/* Floating lab panels */}
+      {/* Background: dark + forest elements */}
+      <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, #0d0618 0%, #121830 40%, #0a1628 70%, #0d0d1a 100%)" }} />
+
+      {/* Forest overlay elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(5)].map((_, i) => (
+        {/* Subtle leaf/branch shapes at top */}
+        <svg className="absolute top-0 left-0 w-full h-32 opacity-10" viewBox="0 0 400 100" preserveAspectRatio="none">
+          <path d="M0,80 Q50,20 100,60 T200,40 T300,70 T400,30 L400,0 L0,0 Z" fill="url(#leafGrad)" />
+          <defs><linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#10B981" /><stop offset="100%" stopColor="#059669" /></linearGradient></defs>
+        </svg>
+
+        {/* Floating golden particles */}
+        {[...Array(12)].map((_, i) => (
           <motion.div
-            key={`panel-${i}`}
-            className="absolute rounded-2xl border border-white/[0.04]"
-            style={{ width: 50 + i * 25, height: 70 + i * 18, top: `${10 + i * 18}%`, left: `${3 + i * 20}%`, background: `linear-gradient(135deg, ${selectedColor.from}08, ${selectedColor.to}04)` }}
-            animate={{ y: [0, -6 - i * 2, 0], rotate: [-1 + i * 0.5, 1 + i * 0.5, -1 + i * 0.5], opacity: [0.2, 0.5, 0.2] }}
-            transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.6 }}
+            key={`gp-${i}`}
+            className="absolute rounded-full"
+            style={{
+              width: 2 + (i % 3) * 1.5,
+              height: 2 + (i % 3) * 1.5,
+              background: i % 2 === 0 ? "#FFD700" : "#10B981",
+              left: `${5 + i * 8}%`,
+              top: `${10 + (i % 5) * 18}%`,
+              filter: "blur(0.5px)",
+            }}
+            animate={{
+              y: [0, -(20 + i * 5), 0],
+              opacity: [0.2, 0.7, 0.2],
+              scale: [0.8, 1.3, 0.8],
+            }}
+            transition={{ duration: 4 + i * 0.3, repeat: Infinity, delay: i * 0.4, ease: "easeInOut" }}
           />
         ))}
+
+        {/* Small stars */}
         {[...Array(8)].map((_, i) => (
           <motion.div
-            key={`bub-${i}`}
-            className="absolute rounded-full"
-            style={{ width: 3 + i * 1.5, height: 3 + i * 1.5, bottom: 0, left: `${8 + i * 11}%`, background: selectedColor.from, filter: "blur(1px)" }}
-            animate={{ y: [0, -(150 + i * 30)], opacity: [0.6, 0], scale: [1, 0.2] }}
-            transition={{ duration: 4 + i * 0.4, repeat: Infinity, delay: i * 0.5, ease: "easeOut" }}
+            key={`star-${i}`}
+            className="absolute rounded-full bg-white"
+            style={{ width: 1.5, height: 1.5, left: `${10 + i * 12}%`, top: `${5 + (i % 4) * 8}%` }}
+            animate={{ opacity: [0.1, 0.6, 0.1] }}
+            transition={{ duration: 2 + i * 0.5, repeat: Infinity, delay: i * 0.3 }}
           />
         ))}
       </div>
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-1">
+      <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-1" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
         <motion.button onClick={onBack} className="p-2 rounded-xl bg-white/5 border border-white/10" whileTap={{ scale: 0.9 }}>
           <ArrowLeft size={20} className="text-white/70" />
         </motion.button>
         <div className="text-center">
-          <h1 className="text-base font-bold text-white/90 flex items-center gap-1.5">🧪 Kidzz Lab</h1>
-          <p className="text-[10px] text-purple-300/50">Nível {charLevel} • {charPoints} pts</p>
+          <h1 className="text-base font-bold text-white/90 flex items-center gap-1.5">
+            Personalize sua {mascotLabel} ✨
+          </h1>
+          <p className="text-[10px] text-emerald-300/50">Deixe {childName} criar o companheiro perfeito</p>
         </div>
         <div className="w-9" />
       </div>
 
-      {/* CHARACTER HERO AREA */}
-      <div className="relative z-10 flex-shrink-0 flex items-center justify-center" style={{ minHeight: 260 }}>
-        <motion.div className="relative" key={`pulse-${pulseKey}`} initial={{ scale: 1 }} animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 0.3, ease: "easeOut" }}>
-          {/* Spotlight */}
+      {/* Mascot toggle (Ane / Pixel) */}
+      <div className="relative z-10 flex justify-center gap-3 px-4 mt-1 mb-1">
+        {(["ane", "pixel"] as MascotId[]).map((id) => (
+          <motion.button
+            key={id}
+            onClick={() => update({ mascot: id })}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+              config.mascot === id
+                ? "bg-emerald-500/25 text-emerald-200 border border-emerald-400/40"
+                : "bg-white/5 text-white/35 border border-transparent"
+            }`}
+            whileTap={{ scale: 0.93 }}
+          >
+            {id === "ane" ? "🌸 Ane" : "🔬 Pixel"}
+          </motion.button>
+        ))}
+      </div>
+
+      {/* CHARACTER HERO */}
+      <div className="relative z-10 flex-shrink-0 flex items-center justify-center" style={{ minHeight: 220 }}>
+        <motion.div className="relative" key={`pulse-${pulseKey}`} initial={{ scale: 1 }} animate={{ scale: [1, 1.04, 1] }} transition={{ duration: 0.3 }}>
+          {/* Glow behind */}
           <motion.div
-            className="absolute -inset-16 rounded-full pointer-events-none"
-            animate={{ scale: [1, 1.12, 1], opacity: [energyGlow[energy] * 0.5, energyGlow[energy], energyGlow[energy] * 0.5] }}
-            transition={{ duration: energySpeed[energy], repeat: Infinity, ease: "easeInOut" }}
-            style={{ background: `radial-gradient(circle, ${selectedColor.from}55, ${selectedColor.to}22 50%, transparent 75%)` }}
+            className="absolute -inset-12 rounded-full pointer-events-none"
+            animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: selectedEnergy.speed * 2, repeat: Infinity, ease: "easeInOut" }}
+            style={{ background: `radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%)` }}
           />
 
-          {/* Energy particles */}
-          {[...Array(energyParticleCount[energy])].map((_, i) => {
-            const angle = (360 / energyParticleCount[energy]) * i;
-            const radius = 90 + (i % 4) * 12;
-            return (
-              <motion.div
-                key={`ep-${energy}-${i}`}
-                className="absolute rounded-full pointer-events-none"
-                style={{ width: 3 + (i % 3) * 2, height: 3 + (i % 3) * 2, background: i % 2 === 0 ? selectedColor.from : selectedColor.to, boxShadow: `0 0 6px ${selectedColor.from}`, top: "50%", left: "50%" }}
-                animate={{
-                  x: [Math.cos((angle * Math.PI) / 180) * radius, Math.cos(((angle + 180) * Math.PI) / 180) * radius, Math.cos((angle * Math.PI) / 180) * radius],
-                  y: [Math.sin((angle * Math.PI) / 180) * radius, Math.sin(((angle + 180) * Math.PI) / 180) * radius, Math.sin((angle * Math.PI) / 180) * radius],
-                  opacity: [0.2, 0.8, 0.2], scale: [0.6, 1.3, 0.6],
-                }}
-                transition={{ duration: energySpeed[energy] * 2, repeat: Infinity, delay: i * 0.1, ease: "easeInOut" }}
-              />
-            );
-          })}
+          {/* Mascot image with hue-rotate */}
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={`${config.mascot}-${config.colorId}-${config.expression}`}
+              src={mascotSrc}
+              alt={mascotLabel}
+              className="w-44 h-44 object-contain drop-shadow-2xl relative z-10"
+              style={{ filter: `hue-rotate(${selectedColor.hueRotate}deg) drop-shadow(0 0 20px rgba(16,185,129,0.4))` }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                ...expressionAnimations[config.expression],
+              }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: selectedEnergy.speed, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </AnimatePresence>
 
-          <DynamicCharacter state={{ color: selectedColor, expression, outfit, energy }} />
-
-          {/* Feedback bubble */}
-          {char?.last_feedback && (
-            <motion.div
-              className="absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 whitespace-nowrap"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: [0, 1, 1, 0], y: [8, 0, 0, -8] }}
-              transition={{ duration: 4, ease: "easeInOut" }}
-            >
-              <p className="text-[10px] text-white/80 font-semibold">{char.last_feedback}</p>
-            </motion.div>
+          {/* Expression overlay emoji */}
+          {config.expression === "loving" && (
+            <motion.span className="absolute top-2 right-2 text-xl" animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1, repeat: Infinity }}>❤️</motion.span>
+          )}
+          {config.expression === "thinking" && (
+            <div className="absolute -top-2 right-0 flex gap-1">
+              {[0, 1, 2].map((i) => (
+                <motion.div key={i} className="w-1.5 h-1.5 rounded-full bg-white/70" animate={{ y: [0, -5, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }} />
+              ))}
+            </div>
+          )}
+          {config.expression === "excited" && (
+            <>
+              <motion.span className="absolute -top-1 -left-2 text-sm" animate={{ scale: [0, 1.5, 0], rotate: [0, 20, 0] }} transition={{ duration: 1.2, repeat: Infinity }}>✨</motion.span>
+              <motion.span className="absolute top-0 -right-2 text-sm" animate={{ scale: [0, 1.5, 0], rotate: [0, -20, 0] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}>⭐</motion.span>
+            </>
           )}
 
           {/* Status label */}
           <motion.div
-            key={`${expression}-${selectedColor.id}-${outfit}-${energy}`}
-            className="absolute -bottom-5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap"
-            style={{ background: `linear-gradient(135deg, ${selectedColor.from}33, ${selectedColor.to}33)`, color: selectedColor.from, border: `1px solid ${selectedColor.from}44` }}
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap bg-emerald-500/20 text-emerald-300 border border-emerald-400/30"
             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
           >
-            {EXPRESSIONS.find(e => e.id === expression)?.label} • {selectedColor.label} • {ENERGY_MODES.find(e => e.id === energy)?.label}
+            {EXPRESSIONS.find(e => e.id === config.expression)?.label} • {selectedColor.label}
           </motion.div>
         </motion.div>
       </div>
 
       {/* Tab selector */}
-      <div className="relative z-10 flex gap-1 px-4 mb-2 mt-2">
+      <div className="relative z-10 flex gap-1 px-4 mb-2 mt-3">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <motion.button
               key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl text-[10px] font-bold transition-all ${isActive ? "bg-purple-500/25 text-purple-200 border border-purple-400/40 shadow-lg shadow-purple-500/10" : "bg-white/5 text-white/35 border border-transparent"}`}
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl text-[10px] font-bold transition-all ${
+                isActive
+                  ? "bg-emerald-500/25 text-emerald-200 border border-emerald-400/40 shadow-lg shadow-emerald-500/10"
+                  : "bg-white/5 text-white/35 border border-transparent"
+              }`}
               whileTap={{ scale: 0.93 }}
             >
               <Icon size={16} />{tab.label}
@@ -213,89 +294,161 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
       </div>
 
       {/* Customization panel */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-24">
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-32">
         <AnimatePresence mode="wait">
           {activeTab === "color" && (
             <TabPanel key="color" title="Escolha a cor">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {COLORS.map((c) => {
-                  const locked = isLocked("color", c.id);
-                  const selected = selectedColor.id === c.id;
+                  const locked = isLocked(c);
+                  const selected = config.colorId === c.id;
                   return (
-                    <motion.button key={c.id} onClick={() => { if (locked) return handleLockedItem(); setColor(c); }}
-                      className={`relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border transition-all ${selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-60"} ${locked ? "opacity-40" : ""}`}
-                      whileTap={locked ? undefined : { scale: 0.9 }}
-                      animate={selected ? { boxShadow: `0 0 20px ${c.from}44` } : { boxShadow: "0 0 0px transparent" }}
+                    <motion.button
+                      key={c.id}
+                      onClick={() => { if (locked) return handleLockedItem(c.unlockText || ""); update({ colorId: c.id }); }}
+                      className={`relative rounded-2xl p-3 flex flex-col items-center gap-1 border transition-all ${
+                        selected ? "border-emerald-400/50 bg-emerald-500/15 scale-105" : "border-white/8 bg-white/5 opacity-60"
+                      } ${locked ? "opacity-40" : ""}`}
+                      whileTap={locked ? undefined : { scale: 0.93 }}
                     >
-                      <motion.div className="w-11 h-11 rounded-full border-2"
-                        style={{ background: `linear-gradient(135deg, ${c.from}, ${c.to})`, borderColor: selected ? "white" : "rgba(255,255,255,0.15)", filter: locked ? "blur(3px)" : "none" }}
-                        animate={selected ? { scale: [1, 1.1, 1] } : {}} transition={{ duration: 1.5, repeat: Infinity }}
+                      {/* Preview mini-mascot with this color */}
+                      <img
+                        src={mascotSrc}
+                        alt={c.label}
+                        className="w-12 h-12 object-contain"
+                        style={{ filter: `hue-rotate(${c.hueRotate}deg)${locked ? " blur(3px)" : ""}` }}
                       />
-                      <span className={`text-[11px] font-semibold ${selected ? "text-white" : "text-white/50"}`}>{c.label}</span>
-                      {locked && <div className="absolute inset-0 flex items-center justify-center"><Lock size={16} className="text-white/50" /></div>}
+                      <span className={`text-[11px] font-semibold ${selected ? "text-emerald-200" : "text-white/50"}`}>{c.label}</span>
+                      <span className="text-[9px] text-white/30">{c.desc}</span>
+                      {locked && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <Lock size={16} className="text-white/50" />
+                          <span className="text-[8px] text-white/40 mt-1 px-2 text-center">{c.unlockText}</span>
+                        </div>
+                      )}
+                      {selected && <Check size={14} className="absolute top-2 right-2 text-emerald-400" />}
                     </motion.button>
                   );
                 })}
               </div>
             </TabPanel>
           )}
+
           {activeTab === "expression" && (
             <TabPanel key="expression" title="Como está se sentindo?">
               <div className="grid grid-cols-2 gap-3">
                 {EXPRESSIONS.map((e) => {
-                  const selected = expression === e.id;
+                  const locked = isLocked(e);
+                  const selected = config.expression === e.id;
                   return (
-                    <motion.button key={e.id} onClick={() => setExpression(e.id)}
-                      className={`rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-55"}`}
-                      whileTap={{ scale: 0.9 }}
+                    <motion.button
+                      key={e.id}
+                      onClick={() => { if (locked) return handleLockedItem(e.unlockText || ""); update({ expression: e.id }); }}
+                      className={`relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border transition-all ${
+                        selected ? "border-emerald-400/50 bg-emerald-500/15 scale-105" : "border-white/8 bg-white/5 opacity-55"
+                      } ${locked ? "opacity-40" : ""}`}
+                      whileTap={locked ? undefined : { scale: 0.93 }}
                     >
-                      <motion.span className="text-3xl" animate={selected ? { scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] } : {}} transition={{ duration: 1.5, repeat: Infinity }}>{e.emoji}</motion.span>
-                      <span className={`text-xs font-semibold ${selected ? "text-white" : "text-white/50"}`}>{e.label}</span>
+                      <motion.span className="text-2xl" style={{ filter: locked ? "blur(3px)" : "none" }} animate={selected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 1.5, repeat: Infinity }}>{e.emoji}</motion.span>
+                      <span className={`text-xs font-semibold ${selected ? "text-emerald-200" : "text-white/50"}`}>{e.label}</span>
+                      <span className="text-[9px] text-white/30">{e.desc}</span>
+                      {locked && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <Lock size={14} className="text-white/50" />
+                          <span className="text-[8px] text-white/40 mt-1 px-2 text-center">🔒 {e.unlockText}</span>
+                        </div>
+                      )}
+                      {selected && <Check size={14} className="absolute top-2 right-2 text-emerald-400" />}
                     </motion.button>
                   );
                 })}
               </div>
             </TabPanel>
           )}
+
           {activeTab === "outfit" && (
             <TabPanel key="outfit" title="Escolha o traje">
               <div className="grid grid-cols-2 gap-3">
                 {OUTFITS.map((o) => {
-                  const locked = isLocked("outfit", o.id);
-                  const selected = outfit === o.id;
+                  const locked = isLocked(o);
+                  const selected = config.outfitId === o.id;
                   return (
-                    <motion.button key={o.id} onClick={() => { if (locked) return handleLockedItem(); setOutfit(o.id); }}
-                      className={`relative rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-55"} ${locked ? "opacity-40" : ""}`}
-                      whileTap={locked ? undefined : { scale: 0.9 }}
+                    <motion.button
+                      key={o.id}
+                      onClick={() => { if (locked) return handleLockedItem(o.unlockText || ""); update({ outfitId: o.id }); }}
+                      className={`relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border transition-all ${
+                        selected ? "border-emerald-400/50 bg-emerald-500/15 scale-105" : "border-white/8 bg-white/5 opacity-55"
+                      } ${locked ? "opacity-40" : ""}`}
+                      whileTap={locked ? undefined : { scale: 0.93 }}
                     >
-                      <motion.span className="text-3xl" style={{ filter: locked ? "blur(3px)" : "none" }} animate={selected ? { y: [0, -4, 0] } : {}} transition={{ duration: 1, repeat: Infinity }}>{o.icon}</motion.span>
-                      <span className={`text-xs font-semibold ${selected ? "text-white" : "text-white/50"}`}>{o.label}</span>
-                      {locked && <div className="absolute inset-0 flex items-center justify-center"><Lock size={16} className="text-white/50" /></div>}
+                      <motion.span className="text-2xl" style={{ filter: locked ? "blur(3px)" : "none" }} animate={selected ? { y: [0, -4, 0] } : {}} transition={{ duration: 1, repeat: Infinity }}>{o.icon}</motion.span>
+                      <span className={`text-xs font-semibold ${selected ? "text-emerald-200" : "text-white/50"}`}>{o.label}</span>
+                      <span className="text-[9px] text-white/30">{o.desc}</span>
+                      {locked && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <Lock size={14} className="text-white/50" />
+                          <span className="text-[8px] text-white/40 mt-1 px-2 text-center">🔒 {o.unlockText}</span>
+                        </div>
+                      )}
+                      {selected && <Check size={14} className="absolute top-2 right-2 text-emerald-400" />}
                     </motion.button>
                   );
                 })}
               </div>
             </TabPanel>
           )}
+
           {activeTab === "energy" && (
             <TabPanel key="energy" title="Nível de energia">
               <div className="grid grid-cols-2 gap-3">
                 {ENERGY_MODES.map((e) => {
-                  const locked = isLocked("outfit", "ultra_check") && e.id === "ultra";
-                  const selected = energy === e.id;
+                  const selected = config.energy === e.id;
                   return (
-                    <motion.button key={e.id} onClick={() => { if (locked) return handleLockedItem(); setEnergy(e.id); }}
-                      className={`relative rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${selected ? "border-white/40 bg-white/15 scale-105" : "border-white/8 bg-white/5 opacity-55"} ${locked ? "opacity-40" : ""}`}
-                      whileTap={locked ? undefined : { scale: 0.9 }}
+                    <motion.button
+                      key={e.id}
+                      onClick={() => update({ energy: e.id })}
+                      className={`rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${
+                        selected ? "border-emerald-400/50 bg-emerald-500/15 scale-105" : "border-white/8 bg-white/5 opacity-55"
+                      }`}
+                      whileTap={{ scale: 0.93 }}
                     >
-                      <motion.span className="text-3xl" style={{ filter: locked ? "blur(3px)" : "none" }} animate={selected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 1, repeat: Infinity }}>{e.icon}</motion.span>
-                      <span className={`text-xs font-semibold ${selected ? "text-white" : "text-white/50"}`}>{e.label}</span>
-                      {locked && <div className="absolute inset-0 flex items-center justify-center"><Lock size={16} className="text-white/50" /></div>}
+                      <motion.span className="text-2xl" animate={selected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 1, repeat: Infinity }}>{e.icon}</motion.span>
+                      <span className={`text-xs font-semibold ${selected ? "text-emerald-200" : "text-white/50"}`}>{e.label}</span>
+                      {selected && <Check size={14} className="text-emerald-400" />}
                     </motion.button>
                   );
                 })}
               </div>
             </TabPanel>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Save button */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-3" style={{ background: "linear-gradient(to top, #0d0d1a 60%, transparent)" }}>
+        <AnimatePresence mode="wait">
+          {saved ? (
+            <motion.div
+              key="saved"
+              className="w-full py-4 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-center"
+              initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
+            >
+              <p className="text-emerald-200 font-bold text-sm">
+                {childName} criou {config.mascot === "ane" ? "a Ane" : "o Pixel"} perfeita! 🎉
+              </p>
+            </motion.div>
+          ) : (
+            <motion.button
+              key="save-btn"
+              onClick={handleSave}
+              className="w-full py-4 rounded-2xl font-extrabold text-white text-sm shadow-2xl flex items-center justify-center gap-2"
+              style={{ background: "linear-gradient(135deg, #10B981, #059669)" }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            >
+              <Sparkles size={18} />
+              ✨ Salvar minha {mascotLabel}!
+            </motion.button>
           )}
         </AnimatePresence>
       </div>
@@ -306,19 +459,18 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
           <motion.div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowPremiumCTA(false)}
           >
-            <motion.div className="mx-6 p-6 rounded-3xl border border-purple-400/30 text-center"
-              style={{ background: "linear-gradient(160deg, #1a0a2e, #16213e)" }}
+            <motion.div className="mx-6 p-6 rounded-3xl border border-emerald-400/30 text-center"
+              style={{ background: "linear-gradient(160deg, #0d1a0a, #0a1628)" }}
               initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
               <motion.div className="text-5xl mb-3" animate={{ rotate: [0, -10, 10, 0], y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>✨</motion.div>
               <h3 className="text-lg font-bold text-white mb-2">Desbloqueie a criação completa</h3>
-              <p className="text-sm text-purple-200/60 mb-4">Use o app para desbloquear itens ou desbloqueie tudo com o Premium!</p>
-              <p className="text-xs text-purple-300/40 mb-3">🎯 Nível {charLevel} — {charPoints} pontos de evolução</p>
+              <p className="text-sm text-emerald-200/60 mb-4">Use o app para desbloquear itens ou desbloqueie tudo com o Premium!</p>
               <motion.button className="w-full py-3 rounded-2xl font-bold text-white text-sm"
-                style={{ background: "linear-gradient(135deg, #8B5CF6, #EC4899)" }} whileTap={{ scale: 0.95 }} onClick={() => setShowPremiumCTA(false)}
+                style={{ background: "linear-gradient(135deg, #10B981, #059669)" }} whileTap={{ scale: 0.95 }} onClick={() => setShowPremiumCTA(false)}
               >
-                <Sparkles size={16} className="inline mr-1.5 -mt-0.5" />Desbloquear criação completa ✨
+                <Sparkles size={16} className="inline mr-1.5 -mt-0.5" />Desbloquear tudo ✨
               </motion.button>
               <button className="mt-3 text-xs text-white/30" onClick={() => setShowPremiumCTA(false)}>Agora não</button>
             </motion.div>

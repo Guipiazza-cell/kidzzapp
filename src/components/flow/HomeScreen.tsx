@@ -15,6 +15,7 @@ import DailyQuestionCard from "@/components/mascot/DailyQuestionCard";
 import { getTimeOfDay, getMascotDialogue, getMascotMood, type MascotState } from "@/components/mascot/MascotDialogueSystem";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
+import { loadMascotConfig } from "@/components/lab/KidzzLab";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
@@ -90,6 +91,14 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const streakDays = profile?.streak_days ?? 0;
   const interests = (profile as any)?.child_interests as string[] | undefined;
   const ageQuestions = CATEGORIZED_QUESTIONS[ageRange] || CATEGORIZED_QUESTIONS["3-7"];
+  const mascotConfig = useMemo(() => loadMascotConfig(), []);
+  
+  // Color hue-rotate map
+  const HUE_MAP: Record<string, number> = {
+    "rosa-encantado": 0, "dourado-magico": -30, "verde-floresta": 90,
+    "azul-oceano": 180, "lilas-estrelado": 240, "laranja-aventura": -60,
+  };
+  const mascotHue = HUE_MAP[mascotConfig.colorId] || 0;
 
   // Filter questions by child interests when possible
   const filteredQuestions = useMemo(() => {
@@ -259,6 +268,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               src={aneImg}
               alt="Ane"
               className="w-24 h-24 object-contain drop-shadow-xl cursor-pointer"
+              style={{ filter: mascotHue !== 0 ? `hue-rotate(${mascotHue}deg)` : undefined }}
               initial={{ opacity: 0, x: -60, rotate: -15 }}
               animate={{
                 opacity: 1,
@@ -320,7 +330,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               alt="Pixel"
               className="w-24 h-24 object-contain cursor-pointer"
               style={{
-                filter: "brightness(1.15) drop-shadow(0 0 10px rgba(100,160,255,0.7)) drop-shadow(0 4px 16px rgba(80,140,255,0.4))",
+                filter: `brightness(1.15) ${mascotHue !== 0 ? `hue-rotate(${mascotHue}deg) ` : ""}drop-shadow(0 0 10px rgba(100,160,255,0.7)) drop-shadow(0 4px 16px rgba(80,140,255,0.4))`,
               }}
               initial={{ opacity: 0, x: 60, rotate: 15 }}
               animate={{
