@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, LogIn, Shield, Crown } from "lucide-react";
+import { Send, LogIn, Shield, Crown, Gift } from "lucide-react";
 import StreakCard from "./StreakCard";
 import StreakCelebration from "./StreakCelebration";
 import VoiceInput from "../VoiceInput";
@@ -64,13 +64,15 @@ interface Props {
   onOpenLab?: () => void;
   onOpenPlay?: () => void;
   onOpenTravel?: () => void;
+  onOpenChallenge?: () => void;
+  onOpenReferral?: () => void;
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   hideBottomNav?: boolean;
   characterEvolution?: any;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay, onOpenTravel }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay, onOpenTravel, onOpenChallenge, onOpenReferral }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining, signOut } = useAuth();
   const navigate = useNavigate();
   const { particles, burst } = useCharacterParticles();
