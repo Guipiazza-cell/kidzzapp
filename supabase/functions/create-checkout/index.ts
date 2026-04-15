@@ -9,11 +9,13 @@ const corsHeaders = {
 
 const PRICES: Record<string, string> = {
   premium: "price_1TFEfW8nR9x8D1BWr4RCvV84",
+  premium_annual: "price_1TMJ0c8nR9x8D1BWVLXAtxM6",
   super_premium: "price_1TFEgH8nR9x8D1BWguQ8xu0w",
 };
 
 const PLAN_AMOUNTS: Record<string, number> = {
   premium: 14.90,
+  premium_annual: 119.90,
   super_premium: 24.90,
 };
 
@@ -58,7 +60,6 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://kidzzapp.lovable.app";
 
-    // Store ref code in metadata for tracking
     const metadata: Record<string, string> = { user_id: user.id, plan };
     if (refCode) metadata.ref = refCode;
 
@@ -73,7 +74,6 @@ serve(async (req) => {
       metadata,
     });
 
-    // If there's a referral code, record the referral
     if (refCode && session.id) {
       try {
         const { data: affiliate } = await supabaseAdmin
