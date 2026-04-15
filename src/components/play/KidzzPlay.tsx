@@ -215,20 +215,23 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
                     <motion.button
                       key={game.id}
                       onClick={() => handleGameSelect(game.id)}
-                      className={`relative rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${
+                      className={`relative rounded-2xl p-4 flex flex-col items-center gap-1.5 border transition-all ${
                         locked
-                          ? "bg-white/3 border-white/5 opacity-70"
-                          : "bg-white/5 border-white/10 hover:bg-white/10"
+                          ? "border-white/5 opacity-70"
+                          : "border-white/10 hover:border-white/20"
                       }`}
+                      style={{ background: locked ? "rgba(255,255,255,0.03)" : game.bgColor }}
                       whileTap={locked ? undefined : { scale: 0.95 }}
                     >
                       <span className="text-3xl" style={{ filter: locked ? "blur(2px)" : "none" }}>
                         {game.emoji}
                       </span>
-                      <span className="text-xs font-bold text-white/70">{game.label}</span>
+                      <span className="text-xs font-bold text-white/80">{game.label}</span>
+                      <span className="text-[9px] text-white/40 font-semibold leading-tight">{game.sub}</span>
                       {locked && (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-black/20">
                           <Lock size={18} className="text-white/40" />
+                          <span className="text-[8px] text-white/30 font-bold mt-1">Premium</span>
                         </div>
                       )}
                     </motion.button>
