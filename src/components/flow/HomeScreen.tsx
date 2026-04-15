@@ -15,6 +15,7 @@ import DailyQuestionCard from "@/components/mascot/DailyQuestionCard";
 import { getTimeOfDay, getMascotDialogue, getMascotMood, type MascotState } from "@/components/mascot/MascotDialogueSystem";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
+import { loadMascotConfig } from "@/components/lab/KidzzLab";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
