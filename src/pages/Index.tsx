@@ -83,8 +83,12 @@ const Index = () => {
 
   const handleAnswerReady = (text: string) => {
     setAnswer(text);
-    setStep("answer");
+    setStep("celebrating");
     evolution.evolve("question");
+  };
+
+  const handleCelebrationDone = () => {
+    setStep("answer");
   };
 
   const handleNewQuestion = () => {
