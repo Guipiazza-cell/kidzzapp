@@ -163,6 +163,10 @@ const Index = () => {
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
+      <WeeklySurpriseBox
+        childName={childName}
+        streakDays={profile.streak_days ?? 0}
+      />
     </div>
   );
 };
