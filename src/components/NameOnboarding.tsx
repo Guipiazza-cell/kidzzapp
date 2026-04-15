@@ -32,7 +32,7 @@ const NameOnboarding = () => {
   const mascotMood = saving ? "happy" : name.trim() ? "curious" : "idle";
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)] relative">
       <MagicalBackground />
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         <motion.div
@@ -44,7 +44,7 @@ const NameOnboarding = () => {
         </motion.div>
 
         <motion.h1
-          className="text-2xl font-black text-primary-foreground text-center mt-4"
+          className="text-2xl font-black text-gray-900 text-center mt-4"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -53,7 +53,7 @@ const NameOnboarding = () => {
         </motion.h1>
 
         <motion.p
-          className="text-primary-foreground/50 text-center text-base mt-2 max-w-xs"
+          className="text-gray-600 text-center text-base mt-2 max-w-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -77,7 +77,7 @@ const NameOnboarding = () => {
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="Digite o nome aqui ✨"
-              className="w-full py-4 px-6 rounded-2xl glass-card text-primary-foreground text-lg font-bold text-center placeholder:text-primary-foreground/30 focus:outline-none focus:ring-2 focus:ring-kid-yellow/40 transition-all"
+              className="w-full py-4 px-6 rounded-2xl glass-card text-gray-900 text-lg font-bold text-center placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-kid-orange/40 transition-all"
               autoFocus
               maxLength={20}
             />
@@ -95,7 +95,7 @@ const NameOnboarding = () => {
 
           {error && (
             <motion.p
-              className="text-kid-yellow text-center text-sm font-bold"
+              className="text-kid-orange text-center text-sm font-bold"
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -106,12 +106,12 @@ const NameOnboarding = () => {
           <motion.button
             onClick={handleSubmit}
             disabled={saving}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-primary-foreground font-extrabold text-lg shadow-xl disabled:opacity-50 active:scale-[0.98] transition-transform relative overflow-hidden"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-lg shadow-xl disabled:opacity-50 active:scale-[0.98] transition-transform relative overflow-hidden"
             whileTap={{ scale: 0.97 }}
           >
             <motion.div
-              className="absolute inset-0 bg-primary-foreground/10 rounded-2xl"
-              animate={{ opacity: [0, 0.2, 0] }}
+              className="absolute inset-0 bg-white/20 rounded-2xl"
+              animate={{ opacity: [0, 0.3, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
             <span className="relative z-10">
@@ -121,7 +121,7 @@ const NameOnboarding = () => {
         </motion.div>
 
         <motion.p
-          className="text-primary-foreground/20 text-[10px] mt-8 text-center"
+          className="text-gray-500 text-[10px] mt-8 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
