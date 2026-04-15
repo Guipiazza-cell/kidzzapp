@@ -33,6 +33,7 @@ const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStor
 const Index = () => {
   const { profile, loading, updateProfile, canAskQuestion } = useAuth();
   const evolution = useCharacterEvolution();
+  const { addMemory } = useMemories();
   const [step, setStep] = useState<FlowStep>("home");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
