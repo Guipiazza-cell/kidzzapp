@@ -116,6 +116,13 @@ const Index = () => {
   };
 
   const handleTabChange = (tab: string) => {
+    // Close all overlays when switching tabs
+    setShowLab(false);
+    setShowPlay(false);
+    setShowTravel(false);
+    setShowChallenge(false);
+    setShowReferral(false);
+    setShowRetrospective(false);
     setActiveTab(tab);
     if (tab === "chat") setStep("home");
   };
