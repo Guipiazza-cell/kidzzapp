@@ -91,6 +91,14 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const streakDays = profile?.streak_days ?? 0;
   const interests = (profile as any)?.child_interests as string[] | undefined;
   const ageQuestions = CATEGORIZED_QUESTIONS[ageRange] || CATEGORIZED_QUESTIONS["3-7"];
+  const mascotConfig = useMemo(() => loadMascotConfig(), []);
+  
+  // Color hue-rotate map
+  const HUE_MAP: Record<string, number> = {
+    "rosa-encantado": 0, "dourado-magico": -30, "verde-floresta": 90,
+    "azul-oceano": 180, "lilas-estrelado": 240, "laranja-aventura": -60,
+  };
+  const mascotHue = HUE_MAP[mascotConfig.colorId] || 0;
 
   // Filter questions by child interests when possible
   const filteredQuestions = useMemo(() => {
