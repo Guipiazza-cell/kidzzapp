@@ -137,7 +137,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               animate={{ y: [0, -8, 0], rotate: [0, 3, -3, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
-            <h2 className="text-2xl font-extrabold text-gray-800 drop-shadow-sm">Fábrica de Histórias</h2>
+            <h2 className="text-2xl font-extrabold text-gray-800 drop-shadow-sm">Uma história especial para {childName} 📖</h2>
             <p className="text-gray-500 text-sm max-w-[280px]">
               Crie histórias personalizadas com ilustrações exclusivas!
             </p>
