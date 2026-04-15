@@ -1,12 +1,15 @@
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, Filter } from "lucide-react";
+import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, Filter, MessageCircle, Sparkles } from "lucide-react";
 import { useMemories, type Memory } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import aneImg from "@/assets/pixel-chameleon-pink.png";
 
 interface MemoriesAlbumProps {
   onBack: () => void;
+  onNavigateToChat?: () => void;
+  onNavigateToStories?: () => void;
 }
 
 const FILTER_OPTIONS = [
@@ -184,7 +187,7 @@ const MonthlyRetroCard = ({ memories, childName }: { memories: Memory[]; childNa
   );
 };
 
-const MemoriesAlbum = ({ onBack }: MemoriesAlbumProps) => {
+const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: MemoriesAlbumProps) => {
   const { profile, handleCheckout } = useAuth();
   const {
     memories,
