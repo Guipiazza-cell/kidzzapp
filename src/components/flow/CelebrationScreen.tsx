@@ -60,13 +60,9 @@ const CelebrationScreen = ({
     const t1 = setTimeout(() => setShowContent(true), 400);
     const t2 = setTimeout(() => celebrate(newAchievement ? "achievement" : "normal"), 600);
 
-    // Auto-continue after 5s if no interaction
-    const t3 = setTimeout(onContinue, 5000);
-
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
   }, []);
 
@@ -196,7 +192,7 @@ const CelebrationScreen = ({
                   className="w-full py-3.5 rounded-2xl kid-gradient-orange text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
                   whileTap={{ scale: 0.95 }}
                 >
-                  Próxima exploração
+                  Explorar mais 🚀
                   <ArrowRight size={16} />
                 </motion.button>
 
