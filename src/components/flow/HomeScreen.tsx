@@ -74,35 +74,72 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const navigate = useNavigate();
   const { particles, burst } = useCharacterParticles();
   const [input, setInput] = useState("");
-  const [charPhraseIdx, setCharPhraseIdx] = useState(0);
   const [showPixelSpeech, setShowPixelSpeech] = useState(true);
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [mascotState, setMascotState] = useState<MascotState>(getTimeOfDay());
   const inputRef = useRef<HTMLInputElement>(null);
 
   const childName = profile?.child_name || "Explorador";
   const ageRange = profile?.age_range || "3-7";
-  const phrases = getPersonalizedPhrases(childName);
+  const streakDays = profile?.streak_days ?? 0;
+  const interests = (profile as any)?.child_interests as string[] | undefined;
   const ageQuestions = CATEGORIZED_QUESTIONS[ageRange] || CATEGORIZED_QUESTIONS["3-7"];
+
+  // Filter questions by child interests when possible
+  const filteredQuestions = useMemo(() => {
+    if (!interests || interests.length === 0) return ageQuestions;
+    const interestCategoryMap: Record<string, string[]> = {
+      "Espaço": ["Universo"],
+      "Natureza": ["Natureza"],
+      "Ciência": ["Mente", "Universo"],
+      "Arte": ["Emoções"],
+      "Animais": ["Natureza", "Animais"],
+    };
+    const relevantCategories = interests.flatMap(i => interestCategoryMap[i] || []);
+    if (relevantCategories.length === 0) return ageQuestions;
+    // Boost interest-matched questions to the top, keep all
+    const matched = ageQuestions.filter(q => relevantCategories.includes(q.category));
+    const rest = ageQuestions.filter(q => !relevantCategories.includes(q.category));
+    return [...matched, ...rest];
+  }, [ageQuestions, interests]);
 
   const isFreeLimitReached = !canAskQuestion();
 
   const [questionPage, setQuestionPage] = useState(0);
-  const totalPages = Math.ceil(ageQuestions.length / VISIBLE_COUNT);
-  const visibleQuestions = ageQuestions.slice(
+  const totalPages = Math.ceil(filteredQuestions.length / VISIBLE_COUNT);
+  const visibleQuestions = filteredQuestions.slice(
     questionPage * VISIBLE_COUNT,
     questionPage * VISIBLE_COUNT + VISIBLE_COUNT
   );
 
+  // Contextual dialogue — regenerates on state change
+  const [anePhrase, setAnePhrase] = useState("");
+  const [pixelPhrase, setPixelPhrase] = useState("");
+
+  const regenerateDialogues = (state: MascotState) => {
+    setAnePhrase(getMascotDialogue(state, "ane", childName, streakDays, interests));
+    setPixelPhrase(getMascotDialogue(state, "pixel", childName, streakDays, interests));
+  };
+
+  // Set time-based state + streak override
+  useEffect(() => {
+    const timeState = getTimeOfDay();
+    // If streak is notable, show that first
+    const effectiveState = streakDays >= 3 && Math.random() < 0.4 ? "streak_milestone" : timeState;
+    setMascotState(effectiveState);
+    regenerateDialogues(effectiveState);
+  }, [childName, streakDays]);
+
+  // Toggle speech bubbles
   useEffect(() => {
     const iv = setInterval(() => {
-      setCharPhraseIdx((i) => (i + 1) % phrases.pixel.length);
       setShowPixelSpeech((prev) => !prev);
     }, 5000);
     return () => clearInterval(iv);
-  }, [phrases.pixel.length]);
+  }, []);
 
   useEffect(() => {
     const iv = setInterval(() => setQuestionPage((p) => (p + 1) % totalPages), 20000);
