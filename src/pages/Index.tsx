@@ -132,6 +132,17 @@ const Index = () => {
           />
         )}
         {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setStep("paywall")} />}
+        {step === "celebrating" && (
+          <CelebrationScreen
+            key="celebrating"
+            childName={childName}
+            pointsEarned={1}
+            streakDays={profile.streak_days ?? 0}
+            interests={(profile as any)?.child_interests as string[] | undefined}
+            onContinue={handleCelebrationDone}
+            type="answer"
+          />
+        )}
         {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
         {step === "paywall" && <Paywall key="paywall" onLogin={() => setShowLoginGate(true)} />}
       </AnimatePresence>
