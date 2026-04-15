@@ -112,8 +112,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
     }, 5000);
     return () => clearInterval(iv);
   }, [phrases.pixel.length]);
-    return () => clearInterval(iv);
-  }, []);
 
   useEffect(() => {
     const iv = setInterval(() => setQuestionPage((p) => (p + 1) % totalPages), 20000);
