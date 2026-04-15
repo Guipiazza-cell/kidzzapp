@@ -30,7 +30,7 @@ const AgeSelection = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(220,25%,8%)] via-[hsl(220,20%,12%)] to-[hsl(220,25%,8%)] relative">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)] relative">
       <MagicalBackground />
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 relative z-10">
         {/* Mascot */}
@@ -43,7 +43,7 @@ const AgeSelection = () => {
         </motion.div>
 
         <motion.h1
-          className="text-2xl font-black text-primary-foreground text-center mt-4"
+          className="text-2xl font-black text-gray-900 text-center mt-4"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -52,7 +52,7 @@ const AgeSelection = () => {
         </motion.h1>
 
         <motion.p
-          className="text-primary-foreground/50 text-center text-sm mt-1 max-w-xs"
+          className="text-gray-600 text-center text-sm mt-1 max-w-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -88,8 +88,8 @@ const AgeSelection = () => {
                 
                 <span className="text-4xl">{opt.emoji}</span>
                 <div className="text-left flex-1">
-                  <p className="font-extrabold text-primary-foreground text-lg">{opt.label}</p>
-                  <p className="text-sm text-primary-foreground/50">{opt.desc}</p>
+                  <p className="font-extrabold text-gray-900 text-lg">{opt.label}</p>
+                  <p className="text-sm text-gray-600">{opt.desc}</p>
                 </div>
                 {isSelected && (
                   <motion.div
@@ -97,7 +97,7 @@ const AgeSelection = () => {
                     animate={{ scale: 1 }}
                     className="w-7 h-7 rounded-full bg-kid-green flex items-center justify-center"
                   >
-                    <Check size={16} className="text-primary-foreground" />
+                    <Check size={16} className="text-white" />
                   </motion.div>
                 )}
               </motion.button>
@@ -108,7 +108,7 @@ const AgeSelection = () => {
         {/* Parental control */}
         <motion.button
           onClick={() => setShowParentalGate(true)}
-          className="mt-8 flex items-center gap-2 text-primary-foreground/30 hover:text-primary-foreground/60 transition-colors text-xs font-bold"
+          className="mt-8 flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors text-xs font-bold"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
