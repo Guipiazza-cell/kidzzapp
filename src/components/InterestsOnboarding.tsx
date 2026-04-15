@@ -68,36 +68,31 @@ const InterestsOnboarding = () => {
           Escolha pelo menos 1 interesse
         </motion.p>
 
-        <motion.div
-          className="w-full max-w-sm mt-6 grid grid-cols-2 gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          {INTEREST_OPTIONS.map((opt, i) => {
+        <div className="w-full max-w-sm mt-6 grid grid-cols-2 gap-3 relative z-20">
+          {INTEREST_OPTIONS.map((opt) => {
             const isSelected = selected.includes(opt.id);
             return (
-              <motion.button
+              <button
                 key={opt.id}
+                type="button"
                 onClick={() => toggle(opt.id)}
-                className={`flex items-center gap-3 p-4 rounded-2xl transition-all active:scale-[0.97] ${
+                className={`flex items-center gap-3 p-4 rounded-2xl transition-all active:scale-[0.97] border-2 ${
                   isSelected
-                    ? "glass-card-light ring-2 ring-kid-orange/60"
-                    : "glass-card opacity-70"
+                    ? "bg-white/80 border-kid-orange shadow-lg scale-[1.03]"
+                    : "bg-white/50 border-transparent"
                 }`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 + i * 0.06 }}
-                whileTap={{ scale: 0.95 }}
               >
                 <span className="text-2xl">{opt.emoji}</span>
                 <span className="text-sm font-extrabold text-gray-900">
                   {opt.label}
                 </span>
-              </motion.button>
+                {isSelected && (
+                  <span className="ml-auto text-kid-orange font-bold">✓</span>
+                )}
+              </button>
             );
           })}
-        </motion.div>
+        </div>
 
         <motion.button
           onClick={handleSubmit}
