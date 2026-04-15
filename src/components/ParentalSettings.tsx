@@ -15,67 +15,7 @@ const AGE_RANGES = [
 { range: "3-7", label: "3 a 7 anos", emoji: "🧒", description: "Historinhas e exemplos do dia a dia." },
 { range: "7-10", label: "7 a 10 anos", emoji: "🧑‍🎓", description: "Curiosidades e desafios científicos." }];
 
-
-const PLANS = [
-{
-  id: "free",
-  name: "Gratuito",
-  price: "R$ 0",
-  period: "",
-  icon: MessageCircle,
-  color: "bg-muted",
-  textColor: "text-foreground",
-  borderColor: "border-border",
-  features: [
-  "3 perguntas de teste (única vez)",
-  "1 personagem",
-  "Respostas em texto",
-  "Filtro de conteúdo ativo"],
-
-  limitations: ["Sem narração por voz", "Sem personagens extras"]
-},
-{
-  id: "premium",
-  name: "Plano KIDZZ",
-  price: "R$ 14,90",
-  period: "/mês",
-  icon: Crown,
-  color: "kid-gradient-premium",
-  textColor: "text-white",
-  borderColor: "border-kid-purple/40",
-  badge: "POPULAR",
-  features: [
-  "10 perguntas por dia",
-  "Narração por voz amigável",
-  "🎯 Fábrica de Momentos (missões)",
-  "Respostas adaptadas por idade",
-  "Filtro de conteúdo avançado"],
-
-  limitations: []
-},
-{
-  id: "super_premium",
-  name: "KIDZZ Premium",
-  price: "R$ 24,90",
-  period: "/mês",
-  icon: Zap,
-  color: "bg-gradient-to-br from-kid-yellow via-kid-orange to-kid-red",
-  textColor: "text-white",
-  borderColor: "border-kid-yellow/40",
-  badge: "COMPLETO",
-    features: [
-      "Tudo do Plano KIDZZ +",
-      "10 perguntas por dia",
-      "🏭 3 histórias por dia",
-      "🎯 Fábrica de Momentos completa",
-      "Avatar personalizado do seu filho",
-      "Ilustrações exclusivas",
-      "Narração por voz Premium",
-      "Suporte prioritário",
-      "Novidades em primeira mão"],
-
-  limitations: []
-}];
+type BillingPeriod = "monthly" | "annual";
 
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
