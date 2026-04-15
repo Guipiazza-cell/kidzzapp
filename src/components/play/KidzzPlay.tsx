@@ -63,6 +63,10 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
       exit={{ opacity: 0 }}
       style={{
         background: "linear-gradient(160deg, #064E3B 0%, #065F46 30%, #047857 60%, #0F766E 100%)",
+        backgroundImage: `
+          linear-gradient(160deg, rgba(6,78,59,0.95) 0%, rgba(6,95,70,0.92) 30%, rgba(4,120,87,0.9) 60%, rgba(15,118,110,0.95) 100%),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath d='M20,180 Q40,160 30,140 Q20,120 40,100' stroke='rgba(255,255,255,0.03)' fill='none' stroke-width='2'/%3E%3Cpath d='M160,20 Q180,40 170,60 Q160,80 180,100' stroke='rgba(255,255,255,0.03)' fill='none' stroke-width='2'/%3E%3Ccircle cx='100' cy='50' r='1.5' fill='rgba(255,255,255,0.04)'/%3E%3Ccircle cx='150' cy='150' r='1' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E")
+        `,
       }}
     >
       {/* Floating decorative elements */}
