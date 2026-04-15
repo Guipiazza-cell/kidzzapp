@@ -153,7 +153,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   };
 
   const points = profile?.points ?? 0;
-  const streakDays = profile?.streak_days ?? 0;
+  const level = profile?.level ?? "iniciante";
   const level = profile?.level ?? "iniciante";
   const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
   const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
@@ -233,7 +233,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                   transition={{ duration: 0.3 }}
                 >
                   <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
-                    {phrases.ane[charPhraseIdx % phrases.ane.length]}
+                    {anePhrase}
                   </p>
                 </motion.div>
               )}
@@ -293,7 +293,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                   transition={{ duration: 0.3 }}
                 >
                   <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
-                    {phrases.pixel[charPhraseIdx % phrases.pixel.length]}
+                    {pixelPhrase}
                   </p>
                 </motion.div>
               )}
