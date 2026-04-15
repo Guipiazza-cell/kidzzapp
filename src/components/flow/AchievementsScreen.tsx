@@ -167,14 +167,21 @@ const AchievementsScreen = ({ onBack }: Props) => {
               >
                 <div className="flex items-center gap-3">
                   <motion.div
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br ${badge.gradient} relative`}
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center relative"
+                    style={{ background: badge.bgColor }}
                     animate={unlocked ? { scale: [1, 1.05, 1] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    {unlocked ? (
-                      <span className="text-xl">{badge.emoji}</span>
-                    ) : (
-                      <Lock size={18} className="text-gray-400" />
+                    <span
+                      className="text-xl"
+                      style={unlocked ? {} : { opacity: 0.35, filter: "blur(1px)" }}
+                    >
+                      {badge.emoji}
+                    </span>
+                    {!unlocked && (
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-gray-400/80 flex items-center justify-center">
+                        <Lock size={8} className="text-white" />
+                      </div>
                     )}
                     {unlocked && (
                       <motion.div
@@ -193,7 +200,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
                       <h3 className={`text-sm font-black ${unlocked ? "text-gray-800" : "text-gray-500"}`}>
                         {badge.title}
                       </h3>
-                      {unlocked && <Icon size={14} className={badge.color} />}
+                    </div>
                     </div>
                     <p className="text-[10px] text-gray-500 font-medium mt-0.5">
                       {badge.description}
