@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Lock, Flame, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
+import confetti from "canvas-confetti";
+import { useEffect, useRef } from "react";
 
 interface Badge {
   id: string;
@@ -11,143 +13,22 @@ interface Badge {
   icon: typeof Trophy;
   threshold: number;
   type: "questions" | "stories" | "streak" | "points";
-  color: string;
-  gradient: string;
+  bgColor: string;
 }
 
 const BADGES: Badge[] = [
-  {
-    id: "first-question",
-    title: "Primeira Pergunta",
-    description: "Fez sua primeira pergunta!",
-    emoji: "🌱",
-    icon: MessageCircle,
-    threshold: 1,
-    type: "questions",
-    color: "text-kid-green",
-    gradient: "from-kid-green/20 to-kid-green/5",
-  },
-  {
-    id: "curious-starter",
-    title: "Conversador Iniciante",
-    description: "Fez 3 perguntas incríveis",
-    emoji: "💬",
-    icon: MessageCircle,
-    threshold: 3,
-    type: "questions",
-    color: "text-kid-blue",
-    gradient: "from-kid-blue/20 to-kid-blue/5",
-  },
-  {
-    id: "explorer",
-    title: "Explorador Curioso",
-    description: "Fez 10 perguntas! Uau!",
-    emoji: "🚀",
-    icon: Zap,
-    threshold: 10,
-    type: "questions",
-    color: "text-kid-orange",
-    gradient: "from-kid-orange/20 to-kid-orange/5",
-  },
-  {
-    id: "genius",
-    title: "Mente Brilhante",
-    description: "Fez 20 perguntas brilhantes",
-    emoji: "🧠",
-    icon: Star,
-    threshold: 20,
-    type: "questions",
-    color: "text-kid-purple",
-    gradient: "from-kid-purple/20 to-kid-purple/5",
-  },
-  {
-    id: "master",
-    title: "Perguntador Oficial",
-    description: "Fez 50 perguntas! Incrível!",
-    emoji: "👑",
-    icon: Trophy,
-    threshold: 50,
-    type: "questions",
-    color: "text-kid-yellow",
-    gradient: "from-kid-yellow/20 to-kid-yellow/5",
-  },
-  {
-    id: "first-story",
-    title: "Contador de Histórias",
-    description: "Criou sua primeira história",
-    emoji: "📖",
-    icon: BookOpen,
-    threshold: 1,
-    type: "stories",
-    color: "text-kid-pink",
-    gradient: "from-kid-pink/20 to-kid-pink/5",
-  },
-  {
-    id: "storyteller",
-    title: "Autor Criativo",
-    description: "Criou 5 histórias mágicas",
-    emoji: "✨",
-    icon: Sparkles,
-    threshold: 5,
-    type: "stories",
-    color: "text-kid-purple",
-    gradient: "from-kid-purple/20 to-kid-purple/5",
-  },
-  {
-    id: "streak-3",
-    title: "Fogo na Curiosidade",
-    description: "3 dias seguidos usando o app",
-    emoji: "🔥",
-    icon: Flame,
-    threshold: 3,
-    type: "streak",
-    color: "text-kid-orange",
-    gradient: "from-kid-orange/20 to-kid-orange/5",
-  },
-  {
-    id: "streak-7",
-    title: "Semana de Sabedoria",
-    description: "7 dias seguidos de descobertas",
-    emoji: "⭐",
-    icon: Flame,
-    threshold: 7,
-    type: "streak",
-    color: "text-kid-yellow",
-    gradient: "from-kid-yellow/20 to-kid-yellow/5",
-  },
-  {
-    id: "streak-14",
-    title: "Família Curiosa",
-    description: "14 dias seguidos de aventura",
-    emoji: "🏅",
-    icon: Flame,
-    threshold: 14,
-    type: "streak",
-    color: "text-kid-pink",
-    gradient: "from-kid-pink/20 to-kid-pink/5",
-  },
-  {
-    id: "streak-30",
-    title: "Mês de Descobertas",
-    description: "30 dias seguidos! Incrível!",
-    emoji: "🏆",
-    icon: Flame,
-    threshold: 30,
-    type: "streak",
-    color: "text-kid-purple",
-    gradient: "from-kid-purple/20 to-kid-purple/5",
-  },
-  {
-    id: "points-50",
-    title: "Coletor de Pontos",
-    description: "Acumulou 50 pontos de sabedoria",
-    emoji: "💎",
-    icon: Crown,
-    threshold: 50,
-    type: "points",
-    color: "text-kid-blue",
-    gradient: "from-kid-blue/20 to-kid-blue/5",
-  },
+  { id: "first-question", title: "Primeira Pergunta", description: "Fez sua primeira pergunta!", emoji: "💬", icon: MessageCircle, threshold: 1, type: "questions", bgColor: "rgba(34,197,94,0.15)" },
+  { id: "curious-starter", title: "Conversador Iniciante", description: "Fez 3 perguntas incríveis", emoji: "🗣️", icon: MessageCircle, threshold: 3, type: "questions", bgColor: "rgba(34,197,94,0.2)" },
+  { id: "explorer", title: "Explorador Curioso", description: "Fez 10 perguntas! Uau!", emoji: "🔍", icon: Zap, threshold: 10, type: "questions", bgColor: "rgba(59,130,246,0.15)" },
+  { id: "genius", title: "Mente Brilhante", description: "Fez 20 perguntas brilhantes", emoji: "🧠", icon: Star, threshold: 20, type: "questions", bgColor: "rgba(147,51,234,0.15)" },
+  { id: "master", title: "Perguntador Oficial", description: "Fez 50 perguntas! Incrível!", emoji: "⭐", icon: Trophy, threshold: 50, type: "questions", bgColor: "rgba(212,168,71,0.2)" },
+  { id: "first-story", title: "Contador de Histórias", description: "Criou sua primeira história", emoji: "📖", icon: BookOpen, threshold: 1, type: "stories", bgColor: "rgba(249,115,22,0.15)" },
+  { id: "storyteller", title: "Autor Criativo", description: "Criou 5 histórias mágicas", emoji: "✍️", icon: Sparkles, threshold: 5, type: "stories", bgColor: "rgba(236,72,153,0.15)" },
+  { id: "streak-3", title: "Fogo na Curiosidade", description: "3 dias seguidos usando o app", emoji: "🔥", icon: Flame, threshold: 3, type: "streak", bgColor: "rgba(249,115,22,0.2)" },
+  { id: "streak-7", title: "Semana de Sabedoria", description: "7 dias seguidos de descobertas", emoji: "🌟", icon: Flame, threshold: 7, type: "streak", bgColor: "rgba(245,158,11,0.2)" },
+  { id: "streak-14", title: "Família Curiosa", description: "14 dias seguidos de aventura", emoji: "💛", icon: Flame, threshold: 14, type: "streak", bgColor: "rgba(212,168,71,0.2)" },
+  { id: "streak-30", title: "Mês de Descobertas", description: "30 dias seguidos! Incrível!", emoji: "🏆", icon: Flame, threshold: 30, type: "streak", bgColor: "rgba(147,51,234,0.2)" },
+  { id: "points-50", title: "Coletor de Pontos", description: "Acumulou 50 pontos de sabedoria", emoji: "💎", icon: Crown, threshold: 50, type: "points", bgColor: "rgba(59,130,246,0.2)" },
 ];
 
 const LEVEL_CONFIG: Record<string, { label: string; emoji: string; color: string; next: number }> = {
