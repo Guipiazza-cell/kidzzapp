@@ -154,7 +154,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
 
   const points = profile?.points ?? 0;
   const level = profile?.level ?? "iniciante";
-  const level = profile?.level ?? "iniciante";
   const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
   const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
 
