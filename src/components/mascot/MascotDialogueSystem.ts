@@ -82,14 +82,18 @@ const dialogues: Record<string, DialogueEntry> = {
   },
   after_answer: {
     ane: [
-      "Que resposta linda, [Nome]! Eu nunca tinha pensado assim 💛",
+      "Que resposta incrível, [Nome]! Nunca tinha pensado assim 💛",
       "[Nome], adorei descobrir isso com você! 🌟",
       "Uau, [Nome]! Que pergunta inteligente foi essa! ✨",
+      "Esse momento vai ficar guardado para sempre nas nossas memórias 🌟",
+      "[Nome], cada pergunta sua me surpreende mais! 💛",
     ],
     pixel: [
-      "Fascinante! [Nome] acabou de descobrir algo importante 🧠",
+      "Fascinante! [Nome] acabou de descobrir algo que poucos adultos sabem! 🧠",
       "Dados processados! [Nome], isso foi brilhante! 🔬✨",
       "[Nome], meus sensores nunca viram uma pergunta tão boa! ⚡",
+      "[Nome], você é mais curioso que eu! E olha que eu li MUITO 📚",
+      "Incrível, [Nome]! Meu banco de dados ficou impressionado! 🤯",
     ],
   },
   after_story: {
