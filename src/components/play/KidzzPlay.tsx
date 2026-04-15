@@ -10,11 +10,11 @@ import DailyChallengeGame from "./games/DailyChallengeGame";
 
 type GameId = "word" | "memory" | "hangman" | "daily";
 
-const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; premium?: boolean }[] = [
-  { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍" },
-  { id: "memory", label: "Memória", icon: Brain, emoji: "🧠" },
-  { id: "hangman", label: "Forca", icon: Type, emoji: "✏️" },
-  { id: "daily", label: "Desafio", icon: Zap, emoji: "🎯", premium: true },
+const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean }[] = [
+  { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍", sub: "Encontre palavras escondidas", bgColor: "rgba(45,90,61,0.6)" },
+  { id: "memory", label: "Memória", icon: Brain, emoji: "🧠", sub: "Treine sua memória", bgColor: "rgba(26,58,92,0.6)" },
+  { id: "hangman", label: "Forca", icon: Type, emoji: "✏️", sub: "Descubra a palavra secreta", bgColor: "rgba(92,58,26,0.6)" },
+  { id: "daily", label: "Desafio", icon: Zap, emoji: "🎯", sub: "Missão especial", bgColor: "rgba(58,26,92,0.6)", premium: true },
 ];
 
 interface Props {
@@ -25,6 +25,7 @@ interface Props {
 const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
   const { profile } = useAuth();
   const isPremium = profile?.is_premium ?? false;
+  const childName = profile?.child_name || "Explorador";
 
   const [activeGame, setActiveGame] = useState<GameId | null>(null);
   const [sessionScore, setSessionScore] = useState(0);
@@ -63,6 +64,10 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
       exit={{ opacity: 0 }}
       style={{
         background: "linear-gradient(160deg, #064E3B 0%, #065F46 30%, #047857 60%, #0F766E 100%)",
+        backgroundImage: `
+          linear-gradient(160deg, rgba(6,78,59,0.95) 0%, rgba(6,95,70,0.92) 30%, rgba(4,120,87,0.9) 60%, rgba(15,118,110,0.95) 100%),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath d='M20,180 Q40,160 30,140 Q20,120 40,100' stroke='rgba(255,255,255,0.03)' fill='none' stroke-width='2'/%3E%3Cpath d='M160,20 Q180,40 170,60 Q160,80 180,100' stroke='rgba(255,255,255,0.03)' fill='none' stroke-width='2'/%3E%3Ccircle cx='100' cy='50' r='1.5' fill='rgba(255,255,255,0.04)'/%3E%3Ccircle cx='150' cy='150' r='1' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E")
+        `,
       }}
     >
       {/* Floating decorative elements */}
@@ -169,20 +174,21 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
               transition={{ duration: mascotMood === "happy" ? 0.6 : 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
             {/* Speech bubble */}
-            <AnimatePresence>
-              {mascotMood !== "idle" && (
-                <motion.div
-                  className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-1 border border-white/20 whitespace-nowrap"
-                  initial={{ opacity: 0, y: 5, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 5, scale: 0.8 }}
-                >
-                  <p className="text-[10px] font-bold text-white/80">
-                    {mascotMood === "happy" ? "Muito bem! 🎉" : "Quase lá! 💪"}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Speech bubble - contextual */}
+            <motion.div
+              className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-1 border border-white/20 whitespace-nowrap"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <p className="text-[10px] font-bold text-white/80">
+                {mascotMood === "happy"
+                  ? "Muito bem! 🎉"
+                  : mascotMood === "encourage"
+                  ? "Quase lá! 💪"
+                  : `Escolha um jogo, ${childName}! 🔬`}
+              </p>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
@@ -209,20 +215,23 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
                     <motion.button
                       key={game.id}
                       onClick={() => handleGameSelect(game.id)}
-                      className={`relative rounded-2xl p-4 flex flex-col items-center gap-2 border transition-all ${
+                      className={`relative rounded-2xl p-4 flex flex-col items-center gap-1.5 border transition-all ${
                         locked
-                          ? "bg-white/3 border-white/5 opacity-70"
-                          : "bg-white/5 border-white/10 hover:bg-white/10"
+                          ? "border-white/5 opacity-70"
+                          : "border-white/10 hover:border-white/20"
                       }`}
+                      style={{ background: locked ? "rgba(255,255,255,0.03)" : game.bgColor }}
                       whileTap={locked ? undefined : { scale: 0.95 }}
                     >
                       <span className="text-3xl" style={{ filter: locked ? "blur(2px)" : "none" }}>
                         {game.emoji}
                       </span>
-                      <span className="text-xs font-bold text-white/70">{game.label}</span>
+                      <span className="text-xs font-bold text-white/80">{game.label}</span>
+                      <span className="text-[9px] text-white/40 font-semibold leading-tight">{game.sub}</span>
                       {locked && (
-                        <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-black/20">
                           <Lock size={18} className="text-white/40" />
+                          <span className="text-[8px] text-white/30 font-bold mt-1">Premium</span>
                         </div>
                       )}
                     </motion.button>

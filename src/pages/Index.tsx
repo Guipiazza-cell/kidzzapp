@@ -132,7 +132,7 @@ const Index = () => {
       return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     if (activeTab === "memories") {
-      return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
     }
     if (activeTab === "moments") {
       return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
