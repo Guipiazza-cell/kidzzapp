@@ -152,6 +152,8 @@ const Index = () => {
               if (!profile?.is_premium) { setStep("paywall"); return; }
               setShowTravel(true);
             }}
+            onOpenChallenge={() => setShowChallenge(true)}
+            onOpenReferral={() => setShowReferral(true)}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             hideBottomNav
@@ -185,6 +187,9 @@ const Index = () => {
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
         {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} onGameComplete={() => evolution.evolve("game")} />}
+        {showChallenge && <SevenDayChallenge onClose={() => setShowChallenge(false)} />}
+        {showReferral && <ReferralProgram onBack={() => setShowReferral(false)} />}
+        {showRetrospective && <MonthlyRetrospective onClose={() => setShowRetrospective(false)} />}
         {showLoginGate && <ParentalGate onSuccess={() => setShowLoginGate(false)} onCancel={() => setShowLoginGate(false)} />}
         {showParentalGateForSettings && (
           <ParentalGate onSuccess={() => { setShowParentalGateForSettings(false); setShowSettings(true); }} onCancel={() => setShowParentalGateForSettings(false)} />
