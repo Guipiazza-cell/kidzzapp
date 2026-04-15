@@ -11,12 +11,14 @@ const PRICES: Record<string, string> = {
   premium: "price_1TFEfW8nR9x8D1BWr4RCvV84",
   premium_annual: "price_1TMJ0c8nR9x8D1BWVLXAtxM6",
   super_premium: "price_1TFEgH8nR9x8D1BWguQ8xu0w",
+  super_premium_annual: "price_1TMRUt8nR9x8D1BWIIkQUrnf",
 };
 
 const PLAN_AMOUNTS: Record<string, number> = {
   premium: 14.90,
   premium_annual: 119.90,
   super_premium: 24.90,
+  super_premium_annual: 238.80,
 };
 
 serve(async (req) => {

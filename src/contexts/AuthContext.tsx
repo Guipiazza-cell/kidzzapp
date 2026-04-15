@@ -41,7 +41,7 @@ interface AuthContextType {
   questionsRemaining: () => number;
   storiesRemaining: () => number;
   refreshSubscription: () => Promise<void>;
-  handleCheckout: (plan: "premium" | "premium_annual" | "super_premium") => Promise<void>;
+  handleCheckout: (plan: "premium" | "premium_annual" | "super_premium" | "super_premium_annual") => Promise<void>;
   openCustomerPortal: () => Promise<void>;
 }
 
@@ -344,7 +344,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // No periodic refresh — only on login and manual refresh (cost optimization)
 
-  const handleCheckout = useCallback(async (plan: "premium" | "premium_annual" | "super_premium") => {
+  const handleCheckout = useCallback(async (plan: "premium" | "premium_annual" | "super_premium" | "super_premium_annual") => {
     if (!session?.access_token) {
       const { toast } = await import("sonner");
       toast.error("Crie uma conta para assinar! Acesse o controle parental para fazer login.");
