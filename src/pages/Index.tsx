@@ -9,6 +9,8 @@ import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
+import CelebrationScreen from "@/components/flow/CelebrationScreen";
+import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import DreamWorld from "@/components/dreams/DreamWorld";
 import StoryFactory from "@/components/story/StoryFactory";
@@ -22,7 +24,7 @@ import ChameleonMascot from "@/components/ChameleonMascot";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
 
-type FlowStep = "home" | "age" | "generating" | "answer" | "paywall";
+type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 
@@ -81,8 +83,12 @@ const Index = () => {
 
   const handleAnswerReady = (text: string) => {
     setAnswer(text);
-    setStep("answer");
+    setStep("celebrating");
     evolution.evolve("question");
+  };
+
+  const handleCelebrationDone = () => {
+    setStep("answer");
   };
 
   const handleNewQuestion = () => {
@@ -126,6 +132,17 @@ const Index = () => {
           />
         )}
         {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setStep("paywall")} />}
+        {step === "celebrating" && (
+          <CelebrationScreen
+            key="celebrating"
+            childName={childName}
+            pointsEarned={1}
+            streakDays={profile.streak_days ?? 0}
+            interests={(profile as any)?.child_interests as string[] | undefined}
+            onContinue={handleCelebrationDone}
+            type="answer"
+          />
+        )}
         {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
         {step === "paywall" && <Paywall key="paywall" onLogin={() => setShowLoginGate(true)} />}
       </AnimatePresence>
@@ -146,6 +163,10 @@ const Index = () => {
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
+      <WeeklySurpriseBox
+        childName={childName}
+        streakDays={profile.streak_days ?? 0}
+      />
     </div>
   );
 };
