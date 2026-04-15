@@ -107,6 +107,45 @@ export type Database = {
         }
         Relationships: []
       }
+      memories: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_special: boolean
+          metadata: Json | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_special?: boolean
+          metadata?: Json | null
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_special?: boolean
+          metadata?: Json | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age_range: string | null

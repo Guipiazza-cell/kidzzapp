@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
+import { useMemories } from "@/hooks/useMemories";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
@@ -12,6 +13,7 @@ import AnswerScreen from "@/components/flow/AnswerScreen";
 import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
+import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
 import DreamWorld from "@/components/dreams/DreamWorld";
 import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
@@ -31,6 +33,7 @@ const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStor
 const Index = () => {
   const { profile, loading, updateProfile, canAskQuestion } = useAuth();
   const evolution = useCharacterEvolution();
+  const { addMemory } = useMemories();
   const [step, setStep] = useState<FlowStep>("home");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
@@ -85,6 +88,15 @@ const Index = () => {
     setAnswer(text);
     setStep("celebrating");
     evolution.evolve("question");
+    // Auto-save as memory
+    addMemory({
+      type: "question",
+      title: question,
+      content: text.slice(0, 500),
+      is_special: false,
+      image_url: null,
+      metadata: {},
+    });
   };
 
   const handleCelebrationDone = () => {
@@ -103,6 +115,9 @@ const Index = () => {
   const renderContent = () => {
     if (activeTab === "explore") {
       return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
+    }
+    if (activeTab === "memories") {
+      return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "moments") {
       return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
