@@ -65,8 +65,11 @@ interface Props {
 type DreamView = "main" | "story" | "playing";
 
 const DreamWorld = ({ onBack }: Props) => {
-  const { profile } = useAuth();
+  const { profile, handleCheckout } = useAuth();
   const isPremium = profile?.is_premium === true;
+  const childName = profile?.child_name || "Explorador";
+  const ageRange = profile?.age_range || "3-7";
+  const interests = (profile as any)?.child_interests as string[] | undefined;
 
   const engineRef = useRef<AmbientSoundEngine | null>(null);
   const narratorRef = useRef<DreamNarrator | null>(null);
@@ -80,6 +83,7 @@ const DreamWorld = ({ onBack }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
   const [showPremiumBlock, setShowPremiumBlock] = useState(false);
+  const [lockedStoryId, setLockedStoryId] = useState<string | null>(null);
   const [audioLoading, setAudioLoading] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
 
@@ -455,7 +459,7 @@ const DreamWorld = ({ onBack }: Props) => {
                 <motion.button
                   key={story.id}
                   onClick={() => {
-                    if (locked) { setShowPremiumBlock(true); return; }
+                    if (locked) { setLockedStoryId(story.id); setShowPremiumBlock(true); return; }
                     setSelectedStory(isSelected ? null : story.id);
                   }}
                   className="w-full flex items-center gap-3 p-3.5 rounded-xl text-left transition-all"
@@ -645,17 +649,17 @@ const DreamWorld = ({ onBack }: Props) => {
 
       {/* Premium block modal */}
       <AnimatePresence>
-        {showPremiumBlock && (
+      {showPremiumBlock && (
           <motion.div
             className="fixed inset-0 z-[60] flex items-center justify-center p-6"
             style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowPremiumBlock(false)}
+            onClick={() => { setShowPremiumBlock(false); setLockedStoryId(null); }}
           >
             <motion.div
-              className="rounded-2xl p-6 max-w-sm w-full text-center space-y-4"
+              className="rounded-2xl p-6 max-w-sm w-full text-center space-y-3"
               style={{
                 background: "linear-gradient(180deg, #1a1040 0%, #0f1535 100%)",
                 border: "1px solid rgba(129,140,248,0.2)",
@@ -665,33 +669,53 @@ const DreamWorld = ({ onBack }: Props) => {
               exit={{ scale: 0.9 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div
-                className="w-14 h-14 rounded-xl mx-auto flex items-center justify-center"
-                style={{
-                  background: "rgba(129,140,248,0.15)",
-                  border: "1px solid rgba(129,140,248,0.3)",
-                  boxShadow: "0 0 24px rgba(129,140,248,0.2)",
-                }}
-              >
-                <Crown size={28} className="text-indigo-400" />
-              </div>
-              <h3 style={{ color: "#F5F5F5", fontSize: "18px", fontWeight: 700 }}>Conteúdo Premium</h3>
-              <p style={{ color: "rgba(200,195,225,0.55)", fontSize: "14px" }}>
-                Desbloqueie todas as histórias, sons e o mix completo com o plano Premium.
-              </p>
-              <p style={{ color: "rgba(165,180,252,0.5)", fontSize: "12px", fontStyle: "italic" }}>
-                "Transforme a hora de dormir no melhor momento do dia"
-              </p>
-              <button
-                onClick={() => setShowPremiumBlock(false)}
-                className="w-full py-3 rounded-xl font-bold text-sm"
-                style={{
-                  background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                  color: "#F5F5F5",
-                }}
-              >
-                Entendi
-              </button>
+              {(() => {
+                const lockedStory = lockedStoryId ? SLEEP_STORIES.find(s => s.id === lockedStoryId) : null;
+                const freeStory = SLEEP_STORIES.find(s => s.free);
+                const interestText = interests && interests.length > 0 ? interests[0].toLowerCase() : "aventuras";
+                return (
+                  <>
+                    <motion.span
+                      className="text-5xl block"
+                      animate={{ y: [0, -5, 0] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    >
+                      🌙
+                    </motion.span>
+                    {lockedStory && (
+                      <p style={{ color: "#F0EEF6", fontSize: "16px", fontWeight: 700 }}>
+                        "{lockedStory.title}" está esperando por {childName}
+                      </p>
+                    )}
+                    <p style={{ color: "rgba(200,195,225,0.55)", fontSize: "13px", lineHeight: "1.5" }}>
+                      Esta história foi criada especialmente para crianças de {ageRange} anos que amam {interestText}.
+                    </p>
+                    <button
+                      onClick={() => { setShowPremiumBlock(false); setLockedStoryId(null); handleCheckout("premium"); }}
+                      className="w-full py-3 rounded-xl font-bold text-sm"
+                      style={{
+                        background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                        color: "#F5F5F5",
+                      }}
+                    >
+                      ✨ Desbloquear Sonhos Completos
+                    </button>
+                    {freeStory && (
+                      <button
+                        onClick={() => {
+                          setShowPremiumBlock(false);
+                          setLockedStoryId(null);
+                          setSelectedStory(freeStory.id);
+                        }}
+                        className="w-full py-2 text-xs font-semibold"
+                        style={{ color: "rgba(200,195,225,0.45)" }}
+                      >
+                        Continuar com "{freeStory.title}" →
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
             </motion.div>
           </motion.div>
         )}
