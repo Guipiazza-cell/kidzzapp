@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
-import pixelImg from "@/assets/pixel-chameleon.png";
 
 const STREAK_MILESTONES = [
   { days: 3, label: "Fogo na Curiosidade", emoji: "🔥" },
-  { days: 7, label: "Semana Mágica", emoji: "⭐" },
+  { days: 7, label: "Semana de Sabedoria", emoji: "🏅" },
   { days: 14, label: "Família Curiosa", emoji: "🏅" },
   { days: 30, label: "Mês de Descobertas", emoji: "🏆" },
   { days: 60, label: "Super Explorador", emoji: "💎" },
@@ -26,51 +25,35 @@ const StreakCard = ({ streakDays, childName, onSubmit }: Props) => {
     : 100;
   const daysToNext = Math.max(0, nextMilestone.days - streakDays);
 
-  // Streak broken or day 0-1
-  if (streakDays <= 1) {
+  // Streak = 0: encouraging start message
+  if (streakDays === 0) {
     return (
       <motion.div
         className="w-full max-w-sm"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
+        transition={{ delay: 0.2 }}
       >
-        <div className="rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 px-4 py-3 flex items-center gap-3 relative overflow-hidden">
-          <motion.img
-            src={pixelImg}
-            alt="Pixel"
-            className="w-10 h-10 object-contain"
-            animate={{ rotate: [0, -5, 5, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
+        <div
+          className="rounded-2xl px-4 py-3 flex items-center gap-3 relative overflow-hidden"
+          style={{ background: "rgba(212,120,40,0.12)", border: "1px solid rgba(212,120,40,0.25)" }}
+        >
+          <span className="text-2xl streak-fire">🌟</span>
           <div className="flex-1 min-w-0">
-            {streakDays === 0 ? (
-              <>
-                <p className="text-sm font-black text-amber-800 leading-tight">
-                  {childName} está esperando por você hoje 💛
-                </p>
-                <p className="text-[10px] text-amber-600 font-bold mt-0.5">
-                  Vamos retomar a aventura?
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-sm font-black text-amber-800 leading-tight">
-                  🌟 Dia 1 da aventura com {childName}!
-                </p>
-                <p className="text-[10px] text-amber-600 font-bold mt-0.5">
-                  Mais {daysToNext} dias = Badge "{nextMilestone.label}" {nextMilestone.emoji}
-                </p>
-              </>
-            )}
+            <p className="text-sm font-black text-amber-800 leading-tight">
+              Hoje é o Dia 1 com {childName}! 🌟
+            </p>
+            <p className="text-[10px] text-amber-600/80 font-bold mt-0.5">
+              Faça uma pergunta para começar sua jornada
+            </p>
           </div>
-          {streakDays === 0 && onSubmit && (
+          {onSubmit && (
             <motion.button
               onClick={() => onSubmit("")}
               className="text-[10px] font-black text-white bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1.5 rounded-full whitespace-nowrap shadow-sm"
               whileTap={{ scale: 0.95 }}
             >
-              Recomeçar →
+              Começar →
             </motion.button>
           )}
         </div>
@@ -78,30 +61,35 @@ const StreakCard = ({ streakDays, childName, onSubmit }: Props) => {
     );
   }
 
-  // Active streak ≥ 2
+  // Active streak ≥ 1
   return (
     <motion.div
       className="w-full max-w-sm"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.35 }}
+      transition={{ delay: 0.2 }}
     >
-      <div className="rounded-2xl bg-gradient-to-r from-amber-100/80 to-orange-100/80 border border-amber-300/40 px-4 py-3 relative overflow-hidden">
-        {/* Subtle glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-200/20 to-orange-200/20 rounded-2xl" />
-        
+      <div
+        className="rounded-2xl px-4 py-3 relative overflow-hidden"
+        style={{ background: "rgba(212,120,40,0.15)", border: "1px solid rgba(212,120,40,0.3)" }}
+      >
         <div className="relative flex items-center gap-3">
           <span className="text-[28px] streak-fire">🔥</span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-black text-amber-900 leading-tight">
-              {streakDays} dias seguidos com {childName}!
+              {streakDays} {streakDays === 1 ? "dia" : "dias"} seguidos com {childName}!
             </p>
-            <p className="text-[10px] text-amber-700/80 font-bold mt-0.5">
-              Mais {daysToNext} dias = Badge "{nextMilestone.label}" {nextMilestone.emoji}
-            </p>
-            <div className="mt-1.5">
-              <Progress value={progress} className="h-1.5 bg-amber-200/60" />
+            <div className="flex items-center gap-1.5 mt-1">
+              <div className="flex-1">
+                <Progress value={progress} className="h-2 bg-amber-200/60" />
+              </div>
+              <span className="text-[10px] text-amber-700 font-bold whitespace-nowrap">
+                {streakDays}/{nextMilestone.days}
+              </span>
             </div>
+            <p className="text-[10px] text-amber-700/80 font-bold mt-0.5">
+              → "{nextMilestone.label}" {nextMilestone.emoji} — Mais {daysToNext} {daysToNext === 1 ? "dia" : "dias"}!
+            </p>
           </div>
         </div>
       </div>

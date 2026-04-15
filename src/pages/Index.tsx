@@ -176,6 +176,16 @@ const Index = () => {
             streakDays={profile.streak_days ?? 0}
             interests={(profile as any)?.child_interests as string[] | undefined}
             onContinue={handleCelebrationDone}
+            onSave={() => {
+              addMemory({
+                type: "question",
+                title: question,
+                content: answer.slice(0, 500),
+                is_special: true,
+                image_url: null,
+                metadata: { saved_from: "celebration" },
+              });
+            }}
             type="answer"
           />
         )}

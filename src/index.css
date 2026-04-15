@@ -199,7 +199,8 @@
 
 /* Streak fire flicker */
 @keyframes flicker {
-  0%, 100% { opacity: 1; transform: scale(1) rotate(-2deg); }
-  50% { opacity: 0.85; transform: scale(1.05) rotate(2deg); }
+  0%, 100% { transform: scale(1) rotate(-1deg); opacity: 1; }
+  33% { transform: scale(1.08) rotate(1deg); opacity: 0.9; }
+  66% { transform: scale(0.96) rotate(-2deg); opacity: 0.95; }
 }
-.streak-fire { animation: flicker 1.5s ease-in-out infinite; display: inline-block; }
+.streak-fire { animation: flicker 1.8s ease-in-out infinite; display: inline-block; }
