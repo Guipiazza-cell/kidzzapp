@@ -76,7 +76,7 @@ const MomentsFactory = ({ onBack }: Props) => {
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           />
           <h2 className="text-gray-800 font-black text-xl mt-3 leading-tight">
-            10 minutos que mudam o seu dia com seu filho
+            Missão para {profile?.child_name || "seu filho"} e família 💛
           </h2>
           <p className="text-gray-500 text-sm mt-2 font-bold">
             Missões simples e mágicas para criar memórias inesquecíveis

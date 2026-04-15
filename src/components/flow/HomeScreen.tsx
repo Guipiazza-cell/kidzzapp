@@ -12,32 +12,49 @@ import { Progress } from "@/components/ui/progress";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
 
-const PIXEL_PHRASES = [
-  "Essa é boa... manda ver! 🔥",
-  "Opa, mais uma pergunta incrível!",
-  "Adoro quando você pergunta isso!",
-];
+const getPersonalizedPhrases = (name: string) => ({
+  pixel: [
+    `${name}, essa é boa... manda ver! 🔥`,
+    `Opa, mais uma pergunta incrível, ${name}!`,
+    `Adoro quando você pergunta isso, ${name}!`,
+  ],
+  ane: [
+    `${name}, posso te perguntar uma coisa depois? 💭`,
+    `Vamos descobrir juntos, ${name}!`,
+    `Que curiosidade linda essa, ${name}! ✨`,
+  ],
+});
 
-const ANE_PHRASES = [
-  "Posso te perguntar uma coisa depois? 💭",
-  "Vamos descobrir juntos!",
-  "Que curiosidade linda essa! ✨",
-];
-
-const CATEGORIZED_QUESTIONS = [
-  { text: "O que existia antes do universo?", emoji: "🌌", category: "Universo" },
-  { text: "Por que o tempo existe?", emoji: "⏳", category: "Universo" },
-  { text: "Como os pensamentos aparecem?", emoji: "🧠", category: "Mente" },
-  { text: "Por que lembramos de algumas coisas e esquecemos outras?", emoji: "💭", category: "Mente" },
-  { text: "Por que sentimos saudade?", emoji: "❤️", category: "Emoções" },
-  { text: "O que faz alguém ser feliz de verdade?", emoji: "😊", category: "Emoções" },
-  { text: "Como os animais sabem o que fazer?", emoji: "🐾", category: "Natureza" },
-  { text: "Por que a natureza é tão organizada?", emoji: "🌿", category: "Natureza" },
-  { text: "O que é certo e errado?", emoji: "⚖️", category: "Filosofia" },
-  { text: "Por que as pessoas pensam diferente?", emoji: "🤔", category: "Filosofia" },
-  { text: "Por que o céu muda de cor?", emoji: "🌅", category: "Universo" },
-  { text: "Como surgem as ideias?", emoji: "💡", category: "Mente" },
-];
+const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
+  "0-3": [
+    { text: "Por que o céu é azul?", emoji: "🌤️", category: "Natureza" },
+    { text: "Que som o gato faz?", emoji: "🐱", category: "Animais" },
+    { text: "De que cor é o sol?", emoji: "☀️", category: "Cores" },
+    { text: "Onde moram os peixes?", emoji: "🐠", category: "Natureza" },
+    { text: "Por que a chuva cai?", emoji: "🌧️", category: "Natureza" },
+    { text: "Como o arco-íris aparece?", emoji: "🌈", category: "Cores" },
+  ],
+  "3-7": [
+    { text: "Por que sentimos saudade?", emoji: "❤️", category: "Emoções" },
+    { text: "Como os animais sabem o que fazer?", emoji: "🐾", category: "Natureza" },
+    { text: "Por que o céu muda de cor?", emoji: "🌅", category: "Universo" },
+    { text: "O que faz alguém ser feliz de verdade?", emoji: "😊", category: "Emoções" },
+    { text: "Por que a natureza é tão organizada?", emoji: "🌿", category: "Natureza" },
+    { text: "Como surgem as ideias?", emoji: "💡", category: "Mente" },
+    { text: "Por que as pessoas pensam diferente?", emoji: "🤔", category: "Filosofia" },
+    { text: "Por que lembramos de algumas coisas e esquecemos outras?", emoji: "💭", category: "Mente" },
+  ],
+  "7-10": [
+    { text: "O que existia antes do universo?", emoji: "🌌", category: "Universo" },
+    { text: "Por que o tempo existe?", emoji: "⏳", category: "Universo" },
+    { text: "Como os pensamentos aparecem?", emoji: "🧠", category: "Mente" },
+    { text: "O que é certo e errado?", emoji: "⚖️", category: "Filosofia" },
+    { text: "Por que as pessoas pensam diferente?", emoji: "🤔", category: "Filosofia" },
+    { text: "Por que sentimos saudade?", emoji: "❤️", category: "Emoções" },
+    { text: "Como surgem as ideias?", emoji: "💡", category: "Mente" },
+    { text: "Por que a natureza é tão organizada?", emoji: "🌿", category: "Natureza" },
+  ],
+};
 
 const VISIBLE_COUNT = 6;
 
@@ -74,22 +91,27 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const childName = profile?.child_name || "Explorador";
+  const ageRange = profile?.age_range || "3-7";
+  const phrases = getPersonalizedPhrases(childName);
+  const ageQuestions = CATEGORIZED_QUESTIONS[ageRange] || CATEGORIZED_QUESTIONS["3-7"];
+
   const isFreeLimitReached = !canAskQuestion();
 
   const [questionPage, setQuestionPage] = useState(0);
-  const totalPages = Math.ceil(CATEGORIZED_QUESTIONS.length / VISIBLE_COUNT);
-  const visibleQuestions = CATEGORIZED_QUESTIONS.slice(
+  const totalPages = Math.ceil(ageQuestions.length / VISIBLE_COUNT);
+  const visibleQuestions = ageQuestions.slice(
     questionPage * VISIBLE_COUNT,
     questionPage * VISIBLE_COUNT + VISIBLE_COUNT
   );
 
   useEffect(() => {
     const iv = setInterval(() => {
-      setCharPhraseIdx((i) => (i + 1) % PIXEL_PHRASES.length);
+      setCharPhraseIdx((i) => (i + 1) % phrases.pixel.length);
       setShowPixelSpeech((prev) => !prev);
     }, 5000);
     return () => clearInterval(iv);
-  }, []);
+  }, [phrases.pixel.length]);
 
   useEffect(() => {
     const iv = setInterval(() => setQuestionPage((p) => (p + 1) % totalPages), 20000);
@@ -183,7 +205,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                   transition={{ duration: 0.3 }}
                 >
                   <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
-                    {ANE_PHRASES[charPhraseIdx]}
+                    {phrases.ane[charPhraseIdx % phrases.ane.length]}
                   </p>
                 </motion.div>
               )}
@@ -211,7 +233,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             />
           </div>
 
-          {/* Center text */}
           <div className="flex flex-col items-center mx-1">
             <motion.h1
               className="text-xl font-black text-gray-800 text-center leading-tight"
@@ -219,7 +240,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              Me pergunte<br />qualquer coisa!
+              Oi, {childName}! 👋<br />
+              <span className="text-base font-bold text-gray-600">Me pergunte qualquer coisa!</span>
             </motion.h1>
             <motion.p
               className="text-[10px] text-gray-500 font-semibold text-center mt-1 max-w-[180px] leading-tight"
@@ -243,7 +265,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                   transition={{ duration: 0.3 }}
                 >
                   <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
-                    {PIXEL_PHRASES[charPhraseIdx]}
+                    {phrases.pixel[charPhraseIdx % phrases.pixel.length]}
                   </p>
                 </motion.div>
               )}

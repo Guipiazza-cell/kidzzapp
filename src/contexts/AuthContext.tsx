@@ -7,6 +7,7 @@ export type SubscriptionTier = "free" | "premium" | "super_premium";
 interface Profile {
   child_name: string;
   age_range: string | null;
+  child_interests: string[];
   questions_used: number;
   stories_used: number;
   last_usage_date: string;
@@ -57,6 +58,7 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const createDefaultProfile = (): Profile => ({
   child_name: "",
   age_range: null,
+  child_interests: [],
   questions_used: 0,
   stories_used: 0,
   last_usage_date: todayStr(),
@@ -74,6 +76,7 @@ const createDefaultProfile = (): Profile => ({
 const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   child_name: value?.child_name ?? "",
   age_range: value?.age_range ?? null,
+  child_interests: (value as any)?.child_interests ?? [],
   questions_used: value?.questions_used ?? 0,
   stories_used: value?.stories_used ?? 0,
   last_usage_date: value?.last_usage_date ?? todayStr(),
@@ -164,7 +167,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level")
+      .select("child_name, age_range, child_interests, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level")
       .eq("id", userId)
       .single();
 

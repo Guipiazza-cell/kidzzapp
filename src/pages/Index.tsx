@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
+import NameOnboarding from "@/components/NameOnboarding";
+import AgeSelection from "@/components/AgeSelection";
+import InterestsOnboarding from "@/components/InterestsOnboarding";
 import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
@@ -56,32 +59,29 @@ const Index = () => {
     );
   }
 
+  // Onboarding gates: name → age → interests
+  if (!profile?.child_name) {
+    return <NameOnboarding />;
+  }
+  if (!profile?.age_range) {
+    return <AgeSelection />;
+  }
+  const interests = (profile as any)?.child_interests as string[] | undefined;
+  if (!interests || interests.length === 0) {
+    return <InterestsOnboarding />;
+  }
+
+  const childName = profile.child_name;
+
   const handleQuestionSubmit = (q: string) => {
     if (!canAskQuestion()) { setStep("paywall"); return; }
-    const resolvedAgeRange = profile?.age_range || selectedAgeRange || getCachedAgeRange();
     setQuestion(q);
-    if (resolvedAgeRange) {
-      setSelectedAgeRange(resolvedAgeRange);
-      if (!profile?.age_range) {
-        void updateProfile({ age_range: resolvedAgeRange, child_name: profile?.child_name || "Explorador" });
-      }
-      setStep("generating");
-      return;
-    }
-    setStep("age");
-  };
-
-  const handleAgeSelected = (range: string) => {
-    setSelectedAgeRange(range);
-    if (typeof window !== "undefined") window.localStorage.setItem(AGE_STORAGE_KEY, range);
     setStep("generating");
-    void updateProfile({ age_range: range, child_name: profile?.child_name || "Explorador" });
   };
 
   const handleAnswerReady = (text: string) => {
     setAnswer(text);
     setStep("answer");
-    // Evolve character on question answered
     evolution.evolve("question");
   };
 
@@ -125,8 +125,7 @@ const Index = () => {
             characterEvolution={evolution as any}
           />
         )}
-        {step === "age" && <AgePickerScreen key="age" question={question} onSelect={handleAgeSelected} onBack={() => setStep("home")} />}
-        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={selectedAgeRange || profile?.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setStep("paywall")} />}
+        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setStep("paywall")} />}
         {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
         {step === "paywall" && <Paywall key="paywall" onLogin={() => setShowLoginGate(true)} />}
       </AnimatePresence>

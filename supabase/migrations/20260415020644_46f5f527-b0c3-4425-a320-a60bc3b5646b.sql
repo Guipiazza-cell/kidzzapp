@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN child_interests TEXT[] NOT NULL DEFAULT '{}';
