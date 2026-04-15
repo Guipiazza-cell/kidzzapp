@@ -88,6 +88,15 @@ const Index = () => {
     setAnswer(text);
     setStep("celebrating");
     evolution.evolve("question");
+    // Auto-save as memory
+    addMemory({
+      type: "question",
+      title: question,
+      content: text.slice(0, 500),
+      is_special: false,
+      image_url: null,
+      metadata: {},
+    });
   };
 
   const handleCelebrationDone = () => {
@@ -106,6 +115,9 @@ const Index = () => {
   const renderContent = () => {
     if (activeTab === "explore") {
       return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
+    }
+    if (activeTab === "memories") {
+      return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "moments") {
       return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
