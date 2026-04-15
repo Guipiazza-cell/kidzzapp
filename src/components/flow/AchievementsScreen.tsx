@@ -186,7 +186,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
           <ArrowLeft size={20} />
         </motion.button>
         <div className="flex-1">
-          <h1 className="text-xl font-black text-gray-800">Conquistas</h1>
+          <h1 className="text-xl font-black text-gray-800">Conquistas de {profile?.child_name || "Explorador"}</h1>
           <p className="text-[11px] text-gray-500 font-bold">
             {unlockedCount}/{BADGES.length} desbloqueadas
           </p>
