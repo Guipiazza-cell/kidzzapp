@@ -41,6 +41,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("chat");
   const [showLab, setShowLab] = useState(false);
   const [showPlay, setShowPlay] = useState(false);
+  const [showTravel, setShowTravel] = useState(false);
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
@@ -171,6 +172,7 @@ const Index = () => {
       <div className="flex-1 flex flex-col pb-[72px]">{renderContent()}</div>
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
       <AnimatePresence>
+        {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
         {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} onGameComplete={() => evolution.evolve("game")} />}
         {showLoginGate && <ParentalGate onSuccess={() => setShowLoginGate(false)} onCancel={() => setShowLoginGate(false)} />}
