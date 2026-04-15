@@ -38,6 +38,45 @@ export type Database = {
         }
         Relationships: []
       }
+      challenges: {
+        Row: {
+          challenge_code: string
+          challenged_id: string | null
+          challenged_progress: boolean[]
+          challenger_id: string
+          challenger_progress: boolean[]
+          created_at: string
+          id: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          challenge_code: string
+          challenged_id?: string | null
+          challenged_progress?: boolean[]
+          challenger_id: string
+          challenger_progress?: boolean[]
+          created_at?: string
+          id?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          challenge_code?: string
+          challenged_id?: string | null
+          challenged_progress?: boolean[]
+          challenger_id?: string
+          challenger_progress?: boolean[]
+          created_at?: string
+          id?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       character_profiles: {
         Row: {
           color_from: string
@@ -206,6 +245,36 @@ export type Database = {
           streak_days?: number
           updated_at?: string
           voice_enabled?: boolean
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          created_at: string
+          id: string
+          months_earned: number
+          months_used: number
+          referred_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          months_earned?: number
+          months_used?: number
+          referred_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          months_earned?: number
+          months_used?: number
+          referred_count?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
