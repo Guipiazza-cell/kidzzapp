@@ -4,7 +4,7 @@ import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Tro
 import { useMemories, type Memory } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import aneImg from "@/assets/pixel-chameleon-pink.png";
+import aneImg from "@/assets/ane-chameleon.png";
 
 interface MemoriesAlbumProps {
   onBack: () => void;
