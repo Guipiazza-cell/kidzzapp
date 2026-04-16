@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Lock, Flame, Crown } from "lucide-react";
+import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
 import confetti from "canvas-confetti";
@@ -51,6 +51,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
   const level = profile?.level ?? "iniciante";
   const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
   const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
+  const celebratedRef = useRef<Set<string>>(new Set());
 
   const getCount = (badge: Badge) => {
     switch (badge.type) {
@@ -61,12 +62,17 @@ const AchievementsScreen = ({ onBack }: Props) => {
     }
   };
 
-  const getProgress = (badge: Badge) => {
-    return Math.min(100, (getCount(badge) / badge.threshold) * 100);
-  };
-
+  const getProgress = (badge: Badge) => Math.min(100, (getCount(badge) / badge.threshold) * 100);
   const isUnlocked = (badge: Badge) => getCount(badge) >= badge.threshold;
   const unlockedCount = BADGES.filter(isUnlocked).length;
+
+  const getRemainingText = (badge: Badge) => {
+    const remaining = badge.threshold - getCount(badge);
+    if (remaining <= 0) return null;
+    const unit = badge.type === "questions" ? "pergunta" : badge.type === "stories" ? "história" : badge.type === "streak" ? "dia" : "ponto";
+    const plural = remaining > 1 ? "s" : "";
+    return `Faltam ${remaining} ${unit}${plural} para desbloquear`;
+  };
 
   return (
     <motion.div
@@ -90,9 +96,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
         </motion.button>
         <div className="flex-1">
           <h1 className="text-xl font-black text-gray-800">Conquistas de {profile?.child_name || "Explorador"}</h1>
-          <p className="text-[11px] text-gray-500 font-bold">
-            {unlockedCount}/{BADGES.length} desbloqueadas
-          </p>
+          <p className="text-[11px] text-gray-500 font-bold">{unlockedCount}/{BADGES.length} desbloqueadas</p>
         </div>
         <motion.div
           className="text-3xl"
@@ -137,13 +141,6 @@ const AchievementsScreen = ({ onBack }: Props) => {
         </div>
       </div>
 
-      {/* Motivational message */}
-      <div className="px-5 mb-3 relative z-10">
-        <p className="text-[11px] text-gray-500 font-semibold text-center italic">
-          "Cada pergunta te aproxima do próximo nível. Continue explorando!" ✨
-        </p>
-      </div>
-
       {/* Badges grid */}
       <div className="flex-1 overflow-y-auto px-5 pb-4 relative z-10">
         <div className="grid grid-cols-1 gap-3">
@@ -151,44 +148,47 @@ const AchievementsScreen = ({ onBack }: Props) => {
             const unlocked = isUnlocked(badge);
             const progress = getProgress(badge);
             const count = getCount(badge);
-            const Icon = badge.icon;
+            const remaining = getRemainingText(badge);
 
             return (
               <motion.div
                 key={badge.id}
                 className={`glass-card rounded-2xl p-4 border transition-all ${
-                  unlocked
-                    ? "border-white/40 shadow-lg"
-                    : "border-white/20 opacity-75"
+                  unlocked ? "border-white/40 shadow-lg" : "border-white/20"
                 }`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06, type: "spring", stiffness: 200, damping: 20 }}
+                transition={{ delay: i * 0.05, type: "spring", stiffness: 200, damping: 20 }}
               >
                 <div className="flex items-center gap-3">
                   <motion.div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center relative"
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center relative overflow-hidden"
                     style={{ background: badge.bgColor }}
                     animate={unlocked ? { scale: [1, 1.05, 1] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
+                    {/* Emoji with blur overlay for locked */}
                     <span
-                      className="text-xl"
-                      style={unlocked ? {} : { opacity: 0.35, filter: "blur(1px)" }}
+                      className="text-2xl relative z-10"
+                      style={unlocked ? {} : { opacity: 0.35, filter: "blur(1.5px)" }}
                     >
                       {badge.emoji}
                     </span>
-                    {!unlocked && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-gray-400/80 flex items-center justify-center">
-                        <Lock size={8} className="text-white" />
-                      </div>
+                    {/* Shimmer for unlocked */}
+                    {unlocked && (
+                      <motion.div
+                        className="absolute inset-0 rounded-2xl"
+                        style={{ background: "linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)" }}
+                        animate={{ x: [-60, 60] }}
+                        transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3 }}
+                      />
                     )}
                     {unlocked && (
                       <motion.div
-                        className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-kid-green flex items-center justify-center"
+                        className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-kid-green flex items-center justify-center z-20"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        transition={{ type: "spring", delay: i * 0.06 + 0.3 }}
+                        transition={{ type: "spring", delay: i * 0.05 + 0.3 }}
                       >
                         <span className="text-[8px]">✓</span>
                       </motion.div>
@@ -196,23 +196,23 @@ const AchievementsScreen = ({ onBack }: Props) => {
                   </motion.div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className={`text-sm font-black ${unlocked ? "text-gray-800" : "text-gray-500"}`}>
-                        {badge.title}
-                      </h3>
-                    </div>
+                    <h3 className={`text-sm font-black ${unlocked ? "text-gray-800" : "text-gray-500"}`}>
+                      {badge.title}
+                    </h3>
                     <p className="text-[10px] text-gray-500 font-medium mt-0.5">
                       {badge.description}
                     </p>
                     <div className="mt-1.5 flex items-center gap-2">
-                      <Progress
-                        value={progress}
-                        className="h-1.5 flex-1 bg-gray-200/50"
-                      />
+                      <Progress value={progress} className="h-1.5 flex-1 bg-gray-200/50" />
                       <span className="text-[9px] font-bold text-gray-500 whitespace-nowrap">
                         {Math.min(count, badge.threshold)}/{badge.threshold}
                       </span>
                     </div>
+                    {!unlocked && remaining && (
+                      <p className="text-[9px] text-amber-600/70 font-semibold mt-1 italic">
+                        {remaining}
+                      </p>
+                    )}
                   </div>
                 </div>
               </motion.div>
