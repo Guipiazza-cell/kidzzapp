@@ -258,7 +258,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
               filter: `hue-rotate(${selectedColor.hueRotate}deg) drop-shadow(0 0 24px ${glowColor})`,
               transition: "filter 400ms ease",
             }}
-            animate={expressionAnimations[config.expression]}
+            animate={expressionAnimations[config.expression] as any}
             transition={{ duration: selectedEnergy.speed, repeat: Infinity, ease: "easeInOut" }}
             key={config.mascot}
           />
