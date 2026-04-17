@@ -6,6 +6,7 @@ import { useMemories } from "@/hooks/useMemories";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
+import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
 import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
@@ -82,6 +83,19 @@ const Index = () => {
   const interests = (profile as any)?.child_interests as string[] | undefined;
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
+  }
+  // Notification time step (local-only, skippable)
+  const notifSet = typeof window !== "undefined"
+    ? window.localStorage.getItem("kidzz_notification_set")
+    : "1";
+  const [notifDone, setNotifDone] = useState<boolean>(!!notifSet);
+  if (!notifDone) {
+    return (
+      <NotificationTimeOnboarding
+        childName={profile.child_name}
+        onComplete={() => setNotifDone(true)}
+      />
+    );
   }
 
   const childName = profile.child_name;
