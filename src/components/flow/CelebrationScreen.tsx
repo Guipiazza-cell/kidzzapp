@@ -3,8 +3,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowRight, Bookmark } from "lucide-react";
 import confetti from "canvas-confetti";
 import { getMascotDialogue } from "@/components/mascot/MascotDialogueSystem";
+import { addXP, incrementDailyStreak } from "@/lib/habitLoop";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
+
+// Emotional, varied phrases — never repeat the same one twice in a row.
+const EMOTIONAL_PHRASES = (name: string) => [
+  `Isso foi incrível, ${name} 💛`,
+  `Vocês estão criando algo especial ✨`,
+  `Que momento lindo com ${name} 🌟`,
+  `Mais uma memória pra guardar pra sempre 💫`,
+  `${name} vai lembrar disso 💛`,
+  `Sabedoria + amor = momento perfeito 🌈`,
+];
+const LAST_PHRASE_KEY = "kidzz_last_celebration_phrase";
 
 interface CelebrationScreenProps {
   childName: string;
@@ -52,11 +64,21 @@ const CelebrationScreen = ({
   }, []);
 
   useEffect(() => {
-    const state = type === "answer" ? "after_answer" : type === "story" ? "after_story" : "celebrating";
-    const character = Math.random() > 0.5 ? "ane" : "pixel";
-    setMascotPhrase(getMascotDialogue(state as any, character, childName, streakDays, interests));
+    // 1. Pick a varied emotional phrase (never identical to previous one)
+    const pool = EMOTIONAL_PHRASES(childName);
+    const last = (() => {
+      try { return localStorage.getItem(LAST_PHRASE_KEY); } catch { return null; }
+    })();
+    const candidates = pool.filter((p) => p !== last);
+    const picked = candidates[Math.floor(Math.random() * candidates.length)] ?? pool[0];
+    try { localStorage.setItem(LAST_PHRASE_KEY, picked); } catch { /* noop */ }
+    setMascotPhrase(picked);
 
-    // Delay content for dramatic effect
+    // 2. Award XP locally (symbolic reward) and register today's visit.
+    addXP(pointsEarned * 5);
+    incrementDailyStreak();
+
+    // 3. Animation timing
     const t1 = setTimeout(() => setShowContent(true), 400);
     const t2 = setTimeout(() => celebrate(newAchievement ? "achievement" : "normal"), 600);
 
@@ -64,6 +86,7 @@ const CelebrationScreen = ({
       clearTimeout(t1);
       clearTimeout(t2);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const typeLabels = {
