@@ -53,6 +53,10 @@ const Index = () => {
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [notifDone, setNotifDone] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return !!window.localStorage.getItem("kidzz_notification_set");
+  });
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -84,11 +88,6 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
   }
-  // Notification time step (local-only, skippable)
-  const notifSet = typeof window !== "undefined"
-    ? window.localStorage.getItem("kidzz_notification_set")
-    : "1";
-  const [notifDone, setNotifDone] = useState<boolean>(!!notifSet);
   if (!notifDone) {
     return (
       <NotificationTimeOnboarding
