@@ -53,6 +53,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
   const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
   const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
   const celebratedRef = useRef<Set<string>>(new Set());
+  const [shareBadge, setShareBadge] = useState<Badge | null>(null);
 
   const getCount = (badge: Badge) => {
     switch (badge.type) {
