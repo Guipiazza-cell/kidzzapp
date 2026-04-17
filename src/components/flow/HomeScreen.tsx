@@ -86,7 +86,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const [mascotState, setMascotState] = useState<MascotState>(getTimeOfDay());
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
   const streakDays = profile?.streak_days ?? 0;
   const interests = (profile as any)?.child_interests as string[] | undefined;

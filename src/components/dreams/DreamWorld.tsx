@@ -67,7 +67,7 @@ type DreamView = "main" | "story" | "playing";
 const DreamWorld = ({ onBack }: Props) => {
   const { profile, handleCheckout } = useAuth();
   const isPremium = profile?.is_premium === true;
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
   const interests = (profile as any)?.child_interests as string[] | undefined;
 

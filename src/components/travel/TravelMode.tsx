@@ -63,7 +63,7 @@ interface Props {
 const TravelMode = ({ onBack }: Props) => {
   const { profile } = useAuth();
   const { addMemory } = useMemories();
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
 
   const [phase, setPhase] = useState<TravelPhase>("setup");
   const [questionCount, setQuestionCount] = useState(5);

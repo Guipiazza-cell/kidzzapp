@@ -18,7 +18,7 @@ interface Props {
 
 const MonthlyRetrospective = ({ onClose, stats }: Props) => {
   const { profile } = useAuth();
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
   const cardRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
 

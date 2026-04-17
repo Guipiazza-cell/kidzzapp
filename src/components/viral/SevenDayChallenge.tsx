@@ -13,7 +13,7 @@ interface Props {
 const SevenDayChallenge = ({ onClose }: Props) => {
   const { profile } = useAuth();
   const { activeChallenge, createChallenge, joinChallenge, shouldShowInvite } = useChallenges();
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
   const [view, setView] = useState<"invite" | "progress" | "complete">("invite");
   const [challengeCode, setChallengeCode] = useState("");
   const [joinCode, setJoinCode] = useState("");

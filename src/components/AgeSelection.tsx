@@ -18,14 +18,12 @@ const AgeSelection = () => {
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
 
   const handleSelectAge = async (range: string) => {
     setSelected(range);
     setTimeout(async () => {
-      const updates: Record<string, string> = { age_range: range };
-      if (!profile?.child_name) updates.child_name = "Explorador";
-      await updateProfile(updates);
+      await updateProfile({ age_range: range });
     }, 500);
   };
 

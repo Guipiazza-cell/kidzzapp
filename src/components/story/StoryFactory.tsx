@@ -19,7 +19,7 @@ type Step = "intro" | "avatar" | "form" | "display";
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const { profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
 
   const [step, setStep] = useState<Step>("intro");
   const [avatar, setAvatar] = useState<ChildAvatar | null>(null);

@@ -52,7 +52,7 @@ const ChatScreen = ({
   const { speak, stop: stopTTS } = useTTS();
   const lastAssistantTextRef = useRef("");
 
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "super_premium";

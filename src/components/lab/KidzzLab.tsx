@@ -88,7 +88,7 @@ interface Props {
 const KidzzLab = ({ onBack, evolution }: Props) => {
   const { profile } = useAuth();
   const isPremium = profile?.is_premium;
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
 
   const [config, setConfig] = useState<MascotConfig>(loadMascotConfig);
   const [activeTab, setActiveTab] = useState<TabId>("color");
