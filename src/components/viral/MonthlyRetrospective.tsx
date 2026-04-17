@@ -1,8 +1,11 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { X, Share2, Download, MessageCircle, Copy, Check } from "lucide-react";
+import { MessageCircle, Copy, Check, Share2, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import pixelImg from "@/assets/pixel-chameleon.png";
+import ShareableRetroCard from "./ShareableRetroCard";
+import { captureAndShare } from "@/lib/viralShare";
+import { toast } from "sonner";
 
 interface Props {
   onClose: () => void;
@@ -19,8 +22,9 @@ interface Props {
 const MonthlyRetrospective = ({ onClose, stats }: Props) => {
   const { profile } = useAuth();
   const childName = profile?.child_name || "amigo";
-  const cardRef = useRef<HTMLDivElement>(null);
+  const shareCardRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const now = new Date();
   const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -28,21 +32,30 @@ const MonthlyRetrospective = ({ onClose, stats }: Props) => {
   const year = prevMonth.getFullYear();
 
   const s = stats || {
-    questions: profile?.questions_used ?? 0,
-    stories: profile?.stories_used ?? 0,
+    questions: parseInt(localStorage.getItem("kidzz_total_questions") || "0", 10) || (profile?.questions_used ?? 0),
+    stories: parseInt(localStorage.getItem("kidzz_total_stories") || "0", 10) || (profile?.stories_used ?? 0),
     missions: 0,
     achievements: 0,
-    maxStreak: profile?.streak_days ?? 0,
+    maxStreak: parseInt(localStorage.getItem("kidzz_max_streak") || "0", 10) || (profile?.streak_days ?? 0),
     topQuestion: "Por que o céu muda de cor?",
   };
 
   const shareText = `${childName} em ${monthName} de ${year}: ${s.questions} perguntas, ${s.stories} histórias, streak de ${s.maxStreak} dias! 🔥 Nosso mês em família 💛 #KIDZZ`;
 
-  const shareWhatsApp = () => {
-    if (navigator.share) {
-      navigator.share({ text: shareText, url: "https://kidzzapp.lovable.app" });
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`);
+  const shareImage = async () => {
+    if (!shareCardRef.current || sharing) return;
+    setSharing(true);
+    try {
+      const ok = await captureAndShare(shareCardRef.current, {
+        title: `Retrospectiva ${monthName} - ${childName}`,
+        text: shareText,
+        filename: `kidzz-retrospectiva-${monthName.toLowerCase()}.png`,
+      });
+      if (ok) toast.success("Retrospectiva compartilhada! ✨");
+    } catch {
+      toast.error("Não foi possível compartilhar agora");
+    } finally {
+      setSharing(false);
     }
   };
 
