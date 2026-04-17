@@ -13,7 +13,7 @@ interface Props {
 const ReferralProgram = ({ onBack }: Props) => {
   const { user, profile } = useAuth();
   const { affiliateCode, generateCode } = useAffiliate();
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
   const [copied, setCopied] = useState(false);
   const [monthsEarned, setMonthsEarned] = useState(0);
   const [referredCount, setReferredCount] = useState(0);

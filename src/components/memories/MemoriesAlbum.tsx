@@ -201,7 +201,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
     isPremium,
   } = useMemories();
 
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
 
   const handleShare = useCallback(async (memory: Memory) => {
     const shareText = `${memory.title}\n\n${memory.content || ""}\n\n💛 Criado com KIDZZ — kidzzapp.lovable.app`;

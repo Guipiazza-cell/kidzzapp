@@ -26,7 +26,7 @@ interface Props {
 const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
   const { profile } = useAuth();
   const isPremium = profile?.is_premium ?? false;
-  const childName = profile?.child_name || "Explorador";
+  const childName = profile?.child_name || "amigo";
 
   const [activeGame, setActiveGame] = useState<GameId | null>(null);
   const [sessionScore, setSessionScore] = useState(0);
