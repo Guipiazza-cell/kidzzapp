@@ -1,32 +1,46 @@
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
-
-const STREAK_MILESTONES = [
-  { days: 3, label: "Fogo na Curiosidade", emoji: "🔥" },
-  { days: 7, label: "Semana de Sabedoria", emoji: "🏅" },
-  { days: 14, label: "Família Curiosa", emoji: "🏅" },
-  { days: 30, label: "Mês de Descobertas", emoji: "🏆" },
-  { days: 60, label: "Super Explorador", emoji: "💎" },
-  { days: 100, label: "Lenda Kidzz", emoji: "👑" },
-];
+import {
+  getStreak,
+  incrementDailyStreak,
+  getMilestoneProgress,
+  setStoredChildName,
+} from "@/lib/habitLoop";
 
 interface Props {
+  /** Streak from server profile — used as fallback when localStorage is empty. */
   streakDays: number;
   childName: string;
   onSubmit?: (text: string) => void;
 }
 
-const StreakCard = ({ streakDays, childName, onSubmit }: Props) => {
-  const nextMilestone = STREAK_MILESTONES.find((m) => m.days > streakDays) || STREAK_MILESTONES[STREAK_MILESTONES.length - 1];
-  const prevMilestone = [...STREAK_MILESTONES].reverse().find((m) => m.days <= streakDays);
-  const prevDays = prevMilestone?.days || 0;
-  const progress = nextMilestone.days > prevDays
-    ? Math.min(100, ((streakDays - prevDays) / (nextMilestone.days - prevDays)) * 100)
-    : 100;
-  const daysToNext = Math.max(0, nextMilestone.days - streakDays);
+const StreakCard = ({ streakDays: serverStreak, childName, onSubmit }: Props) => {
+  // Hydrate from localStorage on mount, then increment for today's visit.
+  const [streak, setStreak] = useState<number>(() => {
+    const local = getStreak();
+    return local > 0 ? local : serverStreak;
+  });
 
-  // Streak = 0: encouraging start message
-  if (streakDays === 0) {
+  useEffect(() => {
+    setStoredChildName(childName);
+    const result = incrementDailyStreak();
+    setStreak(result.streak);
+    // notify the rest of the app once per visit
+    if (result.changed) {
+      window.dispatchEvent(
+        new CustomEvent("kidzz:streak", { detail: result }),
+      );
+    }
+  }, [childName]);
+
+  const { next, progress, daysToNext } = useMemo(
+    () => getMilestoneProgress(streak),
+    [streak],
+  );
+
+  // Streak = 0: encouraging start
+  if (streak === 0) {
     return (
       <motion.div
         className="w-full max-w-sm"
@@ -61,7 +75,6 @@ const StreakCard = ({ streakDays, childName, onSubmit }: Props) => {
     );
   }
 
-  // Active streak ≥ 1
   return (
     <motion.div
       className="w-full max-w-sm"
@@ -77,18 +90,18 @@ const StreakCard = ({ streakDays, childName, onSubmit }: Props) => {
           <span className="text-[28px] streak-fire">🔥</span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-black text-amber-900 leading-tight">
-              {streakDays} {streakDays === 1 ? "dia" : "dias"} seguidos com {childName}!
+              {streak} {streak === 1 ? "dia" : "dias"} seguidos com {childName}!
             </p>
             <div className="flex items-center gap-1.5 mt-1">
               <div className="flex-1">
                 <Progress value={progress} className="h-2 bg-amber-200/60" />
               </div>
               <span className="text-[10px] text-amber-700 font-bold whitespace-nowrap">
-                {streakDays}/{nextMilestone.days}
+                {streak}/{next.days}
               </span>
             </div>
             <p className="text-[10px] text-amber-700/80 font-bold mt-0.5">
-              → "{nextMilestone.label}" {nextMilestone.emoji} — Mais {daysToNext} {daysToNext === 1 ? "dia" : "dias"}!
+              → "{next.title}" {next.emoji} — Faltam {daysToNext} {daysToNext === 1 ? "dia" : "dias"}!
             </p>
           </div>
         </div>
