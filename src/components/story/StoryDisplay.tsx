@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
-import { RotateCcw, Volume2 } from "lucide-react";
-import { useState } from "react";
+import { RotateCcw, Volume2, Share2, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
 import ChameleonMascot from "../ChameleonMascot";
+import ShareableStoryCard from "../viral/ShareableStoryCard";
+import { captureAndShare, getChildName } from "@/lib/viralShare";
+import { toast } from "sonner";
 
 interface StoryDisplayProps {
   story: string;
@@ -13,6 +16,35 @@ interface StoryDisplayProps {
 const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) => {
   const scenes = story.split(/\[CENA \d+\]/).filter((s) => s.trim());
   const [playingScene, setPlayingScene] = useState<number | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
+  const childName = getChildName();
+
+  // Extract title from first sentence (max ~60 chars)
+  const storyTitle = (() => {
+    const firstScene = scenes[0]?.trim() || "";
+    const firstSentence = firstScene.split(/[.!?\n]/)[0]?.trim() || "Aventura Mágica";
+    return firstSentence.length > 60
+      ? firstSentence.slice(0, 57) + "..."
+      : firstSentence || "Aventura Mágica";
+  })();
+
+  const handleShare = async () => {
+    if (!shareCardRef.current || sharing) return;
+    setSharing(true);
+    try {
+      const ok = await captureAndShare(shareCardRef.current, {
+        title: `Uma história mágica para ${childName}`,
+        text: `Acabamos de criar "${storyTitle}" para ${childName} no KIDZZ! 📖✨ Histórias personalizadas que viram memória 💛`,
+        filename: `kidzz-historia-${childName.toLowerCase()}.png`,
+      });
+      if (ok) toast.success("História compartilhada! ✨");
+    } catch {
+      toast.error("Não foi possível compartilhar agora");
+    } finally {
+      setSharing(false);
+    }
+  };
 
   const handleSpeak = async (scene: string, index: number) => {
     if (!onSpeak || playingScene !== null) return;
