@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowRight, Bookmark } from "lucide-react";
 import confetti from "canvas-confetti";
-import { getMascotDialogue } from "@/components/mascot/MascotDialogueSystem";
+// getMascotDialogue intentionally unused — phrases come from the local pool for variety
 import { addXP, incrementDailyStreak } from "@/lib/habitLoop";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
@@ -188,7 +188,7 @@ const CelebrationScreen = ({
               >
                 <Sparkles size={14} className="text-kid-orange" />
                 <span className="text-sm font-black text-gray-800">
-                  +{pointsEarned} pontos de {typeLabels[type]}! ✨
+                  +{pointsEarned * 5} pontos de sabedoria ✨
                 </span>
               </motion.div>
 
