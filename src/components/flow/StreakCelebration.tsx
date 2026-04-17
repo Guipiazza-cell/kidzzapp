@@ -1,8 +1,17 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import pixelImg from "@/assets/pixel-chameleon.png";
+import { getMilestoneProgress } from "@/lib/habitLoop";
+
+interface StreakEventDetail {
+  streak: number;
+  changed: boolean;
+  isNewRecord: boolean;
+  bestStreak: number;
+}
 
 interface Props {
+  /** Initial streak (from profile) — overlay also listens for live updates. */
   streakDays: number;
   childName: string;
   previousRecord: number;
@@ -10,23 +19,28 @@ interface Props {
 
 const StreakCelebration = ({ streakDays, childName, previousRecord }: Props) => {
   const [show, setShow] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const isNewRecord = streakDays > previousRecord && streakDays >= 3;
+  const [streak, setStreak] = useState(streakDays);
+  const [isNewRecord, setIsNewRecord] = useState(false);
 
   useEffect(() => {
-    if (streakDays >= 3) {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<StreakEventDetail>).detail;
+      // Only celebrate when the streak actually advanced today and reached a milestone-worthy mark
+      if (!detail || !detail.changed) return;
+      if (detail.streak < 3) return;
+      setStreak(detail.streak);
+      setIsNewRecord(detail.isNewRecord || detail.streak > previousRecord);
       setShow(true);
-      if (isNewRecord) setShowConfetti(true);
-      const t = setTimeout(() => {
-        setShow(false);
-        setShowConfetti(false);
-      }, isNewRecord ? 2500 : 1800);
+      const t = setTimeout(() => setShow(false), detail.isNewRecord ? 2600 : 1800);
       return () => clearTimeout(t);
-    }
-  }, []);
+    };
+    window.addEventListener("kidzz:streak", handler);
+    return () => window.removeEventListener("kidzz:streak", handler);
+  }, [previousRecord]);
 
   if (!show) return null;
 
+  const milestone = getMilestoneProgress(streak).previous;
   const confettiEmojis = ["🎉", "⭐", "✨", "🎊", "💫", "🌟"];
 
   return (
@@ -39,35 +53,25 @@ const StreakCelebration = ({ streakDays, childName, previousRecord }: Props) => 
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Confetti particles for new record */}
-          {showConfetti && confettiEmojis.map((emoji, i) => (
-            <motion.span
-              key={i}
-              className="absolute text-2xl pointer-events-none"
-              initial={{
-                x: 0,
-                y: 0,
-                opacity: 1,
-                scale: 0,
-              }}
-              animate={{
-                x: (Math.random() - 0.5) * 300,
-                y: (Math.random() - 0.5) * 400,
-                opacity: [0, 1, 1, 0],
-                scale: [0, 1.2, 1, 0.5],
-                rotate: Math.random() * 360,
-              }}
-              transition={{
-                duration: 2,
-                delay: i * 0.1,
-                ease: "easeOut",
-              }}
-            >
-              {emoji}
-            </motion.span>
-          ))}
+          {isNewRecord &&
+            confettiEmojis.map((emoji, i) => (
+              <motion.span
+                key={i}
+                className="absolute text-2xl"
+                initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
+                animate={{
+                  x: (Math.random() - 0.5) * 300,
+                  y: (Math.random() - 0.5) * 400,
+                  opacity: [0, 1, 1, 0],
+                  scale: [0, 1.2, 1, 0.5],
+                  rotate: Math.random() * 360,
+                }}
+                transition={{ duration: 2, delay: i * 0.1, ease: "easeOut" }}
+              >
+                {emoji}
+              </motion.span>
+            ))}
 
-          {/* Mascot thumbs up */}
           <motion.div
             className="flex flex-col items-center gap-2"
             initial={{ scale: 0, y: 50 }}
@@ -90,8 +94,10 @@ const StreakCelebration = ({ streakDays, childName, previousRecord }: Props) => 
             >
               <p className="text-sm font-black text-amber-800 text-center">
                 {isNewRecord
-                  ? `🎉 Novo recorde! ${streakDays} dias com ${childName}!`
-                  : `👍 ${streakDays} dias seguidos! Incrível, ${childName}!`}
+                  ? `🎉 Novo recorde! ${streak} dias com ${childName}!`
+                  : milestone
+                    ? `${milestone.emoji} ${milestone.title}! ${streak} dias com ${childName}`
+                    : `👍 ${streak} dias seguidos com ${childName}!`}
               </p>
             </motion.div>
           </motion.div>
