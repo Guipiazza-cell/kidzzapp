@@ -115,15 +115,40 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
         ))}
       </div>
 
-      <div className="flex gap-3 justify-center">
+      <div className="flex flex-col gap-2 pt-2">
+        <motion.button
+          onClick={handleShare}
+          disabled={sharing}
+          className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95 disabled:opacity-60"
+          whileTap={{ scale: 0.97 }}
+        >
+          {sharing ? (
+            <><Loader2 size={18} className="animate-spin" /> Gerando imagem...</>
+          ) : (
+            <><Share2 size={18} /> 📤 Compartilhar esta história</>
+          )}
+        </motion.button>
         <motion.button
           onClick={onReset}
-          className="py-3 px-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-sm flex items-center gap-2 active:scale-95"
+          className="w-full py-3 px-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95"
           whileTap={{ scale: 0.97 }}
         >
           <RotateCcw size={16} />
           Nova História
         </motion.button>
+      </div>
+
+      {/* Off-screen capture target */}
+      <div
+        style={{ position: "fixed", left: "-9999px", top: 0, pointerEvents: "none" }}
+        aria-hidden
+      >
+        <ShareableStoryCard
+          ref={shareCardRef}
+          childName={childName}
+          title={storyTitle}
+          emoji="📖"
+        />
       </div>
     </motion.div>
   );
