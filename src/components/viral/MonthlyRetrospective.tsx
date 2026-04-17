@@ -82,7 +82,6 @@ const MonthlyRetrospective = ({ onClose, stats }: Props) => {
       >
         {/* Visual card */}
         <div
-          ref={cardRef}
           className="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700 p-6 text-white relative overflow-hidden"
         >
           {/* Decorative circles */}
@@ -139,11 +138,16 @@ const MonthlyRetrospective = ({ onClose, stats }: Props) => {
         {/* Actions */}
         <div className="p-4 space-y-2">
           <motion.button
-            onClick={shareWhatsApp}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-green-500 text-white font-bold text-sm"
+            onClick={shareImage}
+            disabled={sharing}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-sm disabled:opacity-60"
             whileTap={{ scale: 0.97 }}
           >
-            <MessageCircle size={18} /> Compartilhar
+            {sharing ? (
+              <><Loader2 size={18} className="animate-spin" /> Gerando imagem...</>
+            ) : (
+              <><Share2 size={18} /> 📤 Compartilhar imagem</>
+            )}
           </motion.button>
 
           <motion.button
@@ -163,6 +167,22 @@ const MonthlyRetrospective = ({ onClose, stats }: Props) => {
           </button>
         </div>
       </motion.div>
+
+      {/* Off-screen capture target */}
+      <div
+        style={{ position: "fixed", left: "-9999px", top: 0, pointerEvents: "none" }}
+        aria-hidden
+      >
+        <ShareableRetroCard
+          ref={shareCardRef}
+          childName={childName}
+          monthName={monthName}
+          year={year}
+          questions={s.questions}
+          stories={s.stories}
+          maxStreak={s.maxStreak}
+        />
+      </div>
     </motion.div>
   );
 };
