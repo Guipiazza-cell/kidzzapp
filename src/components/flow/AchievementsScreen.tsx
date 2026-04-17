@@ -1,9 +1,10 @@
-import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
 import confetti from "canvas-confetti";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import AchievementShareModal from "@/components/viral/AchievementShareModal";
 
 interface Badge {
   id: string;
