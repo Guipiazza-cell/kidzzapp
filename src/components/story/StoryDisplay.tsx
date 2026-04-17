@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
-import { RotateCcw, Volume2 } from "lucide-react";
-import { useState } from "react";
+import { RotateCcw, Volume2, Share2, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
 import ChameleonMascot from "../ChameleonMascot";
+import ShareableStoryCard from "../viral/ShareableStoryCard";
+import { captureAndShare, getChildName } from "@/lib/viralShare";
+import { toast } from "sonner";
 
 interface StoryDisplayProps {
   story: string;
@@ -13,6 +16,35 @@ interface StoryDisplayProps {
 const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) => {
   const scenes = story.split(/\[CENA \d+\]/).filter((s) => s.trim());
   const [playingScene, setPlayingScene] = useState<number | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
+  const childName = getChildName();
+
+  // Extract title from first sentence (max ~60 chars)
+  const storyTitle = (() => {
+    const firstScene = scenes[0]?.trim() || "";
+    const firstSentence = firstScene.split(/[.!?\n]/)[0]?.trim() || "Aventura Mágica";
+    return firstSentence.length > 60
+      ? firstSentence.slice(0, 57) + "..."
+      : firstSentence || "Aventura Mágica";
+  })();
+
+  const handleShare = async () => {
+    if (!shareCardRef.current || sharing) return;
+    setSharing(true);
+    try {
+      const ok = await captureAndShare(shareCardRef.current, {
+        title: `Uma história mágica para ${childName}`,
+        text: `Acabamos de criar "${storyTitle}" para ${childName} no KIDZZ! 📖✨ Histórias personalizadas que viram memória 💛`,
+        filename: `kidzz-historia-${childName.toLowerCase()}.png`,
+      });
+      if (ok) toast.success("História compartilhada! ✨");
+    } catch {
+      toast.error("Não foi possível compartilhar agora");
+    } finally {
+      setSharing(false);
+    }
+  };
 
   const handleSpeak = async (scene: string, index: number) => {
     if (!onSpeak || playingScene !== null) return;
@@ -83,15 +115,40 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
         ))}
       </div>
 
-      <div className="flex gap-3 justify-center">
+      <div className="flex flex-col gap-2 pt-2">
+        <motion.button
+          onClick={handleShare}
+          disabled={sharing}
+          className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95 disabled:opacity-60"
+          whileTap={{ scale: 0.97 }}
+        >
+          {sharing ? (
+            <><Loader2 size={18} className="animate-spin" /> Gerando imagem...</>
+          ) : (
+            <><Share2 size={18} /> 📤 Compartilhar esta história</>
+          )}
+        </motion.button>
         <motion.button
           onClick={onReset}
-          className="py-3 px-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-sm flex items-center gap-2 active:scale-95"
+          className="w-full py-3 px-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95"
           whileTap={{ scale: 0.97 }}
         >
           <RotateCcw size={16} />
           Nova História
         </motion.button>
+      </div>
+
+      {/* Off-screen capture target */}
+      <div
+        style={{ position: "fixed", left: "-9999px", top: 0, pointerEvents: "none" }}
+        aria-hidden
+      >
+        <ShareableStoryCard
+          ref={shareCardRef}
+          childName={childName}
+          title={storyTitle}
+          emoji="📖"
+        />
       </div>
     </motion.div>
   );

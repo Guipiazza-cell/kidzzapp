@@ -64,6 +64,25 @@ const Index = () => {
     window.localStorage.setItem(AGE_STORAGE_KEY, profile.age_range);
   }, [profile?.age_range]);
 
+  // Auto monthly retrospective: day 1 + activity + not seen this month
+  useEffect(() => {
+    if (typeof window === "undefined" || !profile?.child_name) return;
+    const now = new Date();
+    if (now.getDate() !== 1) return;
+    const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+    const lastRetro = window.localStorage.getItem("kidzz_last_retro");
+    if (lastRetro === monthKey) return;
+    const totalQuestions =
+      parseInt(window.localStorage.getItem("kidzz_total_questions") || "0", 10) ||
+      (profile?.questions_used ?? 0);
+    if (totalQuestions <= 0) return;
+    const t = setTimeout(() => {
+      setShowRetrospective(true);
+      window.localStorage.setItem("kidzz_last_retro", monthKey);
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [profile?.child_name, profile?.questions_used]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">

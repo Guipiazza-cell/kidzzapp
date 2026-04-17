@@ -1,9 +1,10 @@
-import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
 import confetti from "canvas-confetti";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import AchievementShareModal from "@/components/viral/AchievementShareModal";
 
 interface Badge {
   id: string;
@@ -52,6 +53,7 @@ const AchievementsScreen = ({ onBack }: Props) => {
   const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
   const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
   const celebratedRef = useRef<Set<string>>(new Set());
+  const [shareBadge, setShareBadge] = useState<Badge | null>(null);
 
   const getCount = (badge: Badge) => {
     switch (badge.type) {
@@ -214,12 +216,33 @@ const AchievementsScreen = ({ onBack }: Props) => {
                       </p>
                     )}
                   </div>
+                  {unlocked && (
+                    <motion.button
+                      onClick={(e) => { e.stopPropagation(); setShareBadge(badge); }}
+                      className="ml-1 w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md flex-shrink-0"
+                      whileTap={{ scale: 0.9 }}
+                      aria-label={`Compartilhar ${badge.title}`}
+                    >
+                      <Share2 size={14} />
+                    </motion.button>
+                  )}
                 </div>
               </motion.div>
             );
           })}
         </div>
       </div>
+
+      <AnimatePresence>
+        {shareBadge && (
+          <AchievementShareModal
+            achievementTitle={shareBadge.title}
+            achievementEmoji={shareBadge.emoji}
+            customMessage={`${profile?.child_name || "amigo"} desbloqueou "${shareBadge.title}"! 🌟`}
+            onClose={() => setShareBadge(null)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

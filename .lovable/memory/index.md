@@ -53,3 +53,4 @@
 - [Avatar Evolution System](mem://features/avatar-evolution-system) — character_profiles table tracks evolution_points and dominant_trait
 - [Memories Album](mem://features/memories-album) — Family memory album with polaroid cards, filters, time capsule, monthly retrospective, and freemium paywall
 - [Travel Mode](mem://features/travel-mode) — Screen-off audio adventure with TTS, 60s timer, theme selectors, premium-only
+- [Viral Share System](mem://features/viral-share-system) — html2canvas image cards (story/achievement/retro) shared via Web Share API + download fallback
