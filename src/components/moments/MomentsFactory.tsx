@@ -182,79 +182,102 @@ const MomentsFactory = ({ onBack }: Props) => {
           })}
         </div>
 
-        {/* Paywall CTA for free users */}
+        {/* Mission Packs — transactional one-off purchases */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-2 px-1">
+            <h3 className="text-gray-800 font-black text-sm">🎁 Packs Especiais</h3>
+            <span className="text-[10px] text-gray-400 font-bold">Compra única</span>
+          </div>
+          <div className="space-y-3">
+            {MISSION_PACKS.filter((p) => p.missions.length > 0).map((pack, i) => {
+              const purchased = isPackPurchased(pack.id);
+              const isLoading = purchasing === pack.id;
+              return (
+                <motion.div
+                  key={pack.id}
+                  className="glass-card rounded-2xl p-4 relative overflow-hidden"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + i * 0.08 }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${pack.color} flex items-center justify-center text-3xl flex-shrink-0 shadow-md`}>
+                      {pack.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-gray-800 font-extrabold text-sm leading-tight">{pack.name}</h4>
+                      <p className="text-gray-500 text-xs mt-0.5 font-bold leading-snug">{pack.description}</p>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">⏱ {pack.duration}</p>
+                    </div>
+                  </div>
+
+                  {pack.missions.length > 0 && (
+                    <div className="mt-3 grid grid-cols-2 gap-1.5">
+                      {pack.missions.slice(0, 4).map((m) => (
+                        <div key={m.name} className="flex items-center gap-1.5 text-[10px] text-gray-600 font-bold">
+                          <span>{m.emoji}</span>
+                          <span className="truncate">{m.name}</span>
+                        </div>
+                      ))}
+                      {pack.missions.length > 4 && (
+                        <div className="text-[10px] text-gray-400 font-bold col-span-2">
+                          + {pack.missions.length - 4} surpresas
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {purchased ? (
+                    <div className="mt-3 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-extrabold text-sm">
+                      <Check size={16} /> Pack Desbloqueado
+                    </div>
+                  ) : (
+                    <motion.button
+                      onClick={() => handlePackPurchase(pack.id)}
+                      disabled={isLoading}
+                      whileTap={{ scale: 0.97 }}
+                      className={`mt-3 w-full py-3 rounded-xl bg-gradient-to-r ${pack.color} text-white font-extrabold text-sm shadow-md disabled:opacity-60`}
+                    >
+                      {isLoading ? "Processando..." : `✨ Desbloquear — ${pack.priceLabel}`}
+                    </motion.button>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Subscription CTA for free users */}
         {!isPremium && (
-          <motion.div
-            className="mt-5 glass-card rounded-2xl p-5 text-center border border-kid-purple/20"
+          <motion.button
+            onClick={() => setShowPaywall(true)}
+            className="mt-5 w-full glass-card rounded-2xl p-5 text-center border border-kid-purple/20 active:scale-[0.98] transition-transform"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
+            whileTap={{ scale: 0.97 }}
           >
             <Zap size={24} className="text-kid-purple mx-auto" />
             <p className="text-gray-800 font-black text-base mt-2">
-              Desbloqueie todos os momentos
+              Ou assine e desbloqueie todos os momentos
             </p>
             <p className="text-gray-500 text-xs mt-1 font-bold">
               Crie conexões reais todos os dias com seu filho
             </p>
-            <motion.button
-              onClick={() => handleCheckout("premium")}
-              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
-              whileTap={{ scale: 0.95 }}
-            >
-              🔓 Quero desbloquear
-            </motion.button>
-          </motion.div>
+            <span className="mt-3 inline-block py-2.5 px-5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg">
+              🔓 Ver planos
+            </span>
+          </motion.button>
         )}
 
         <div className="h-6" />
       </div>
 
-      {/* Locked mission overlay modal */}
-      <AnimatePresence>
-        {showLockedMessage && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-end justify-center pb-8 px-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowLockedMessage(false)}
-          >
-            <div className="fixed inset-0 bg-black/40" />
-            <motion.div
-              className="relative glass-card rounded-2xl p-6 max-w-sm w-full text-center border border-kid-purple/20"
-              initial={{ opacity: 0, y: 40, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 40, scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Lock size={28} className="text-kid-purple mx-auto" />
-              <h3 className="text-gray-800 font-black text-lg mt-3 leading-tight">
-                Desbloqueie todos os momentos e crie conexões reais todos os dias
-              </h3>
-              <p className="text-gray-500 text-xs mt-2 font-bold">
-                + novas missões todo mês para criar memórias inesquecíveis
-              </p>
-              <motion.button
-                onClick={() => {
-                  setShowLockedMessage(false);
-                  handleCheckout("premium");
-                }}
-                className="mt-4 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg"
-                whileTap={{ scale: 0.95 }}
-              >
-                ✨ Quero desbloquear
-              </motion.button>
-              <button
-                onClick={() => setShowLockedMessage(false)}
-                className="mt-2 text-gray-400 text-xs font-bold"
-              >
-                Agora não
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ContextualPaywallModal
+        open={showPaywall}
+        context="moments"
+        onClose={() => setShowPaywall(false)}
+      />
     </motion.div>
   );
 };
