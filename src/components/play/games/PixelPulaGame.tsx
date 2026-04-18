@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { addXP } from "@/lib/habitLoop";
+import pixelImg from "@/assets/pixel-chameleon.png";
 
 interface Obstacle {
   id: number;
@@ -98,12 +99,6 @@ const PixelPulaGame = ({ onScore, onReaction }: Props) => {
         setHighScore(finalScore);
         localStorage.setItem("kidzz_pixel_pula_high", String(finalScore));
         setIsNewRecord(true);
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.55 },
-          colors: ["#A78BFA", "#FBBF24", "#34D399", "#fff"],
-        });
         onReaction("happy");
       } else {
         onReaction("encourage");
@@ -226,12 +221,20 @@ const PixelPulaGame = ({ onScore, onReaction }: Props) => {
         });
       }
 
-      // Score & difficulty
+      // Score & difficulty (record celebration WITHOUT ending game)
       setScore((s) => {
         const next = s + 1 + starGain;
-        // ramp speed every ~150 score
         const targetSpeed = 6 + Math.floor(next / 150) * 1.2;
         speedRef.current = Math.min(14, targetSpeed);
+        // celebrate new record live (only once per run)
+        if (highScore > 0 && s <= highScore && next > highScore) {
+          confetti({
+            particleCount: 60,
+            spread: 80,
+            origin: { y: 0.4 },
+            colors: ["#FBBF24", "#A78BFA", "#34D399", "#fff"],
+          });
+        }
         return next;
       });
 
@@ -370,7 +373,7 @@ const PixelPulaGame = ({ onScore, onReaction }: Props) => {
 
         {/* Pixel character */}
         <div
-          className="absolute flex items-center justify-center"
+          className="absolute"
           style={{
             left: PIXEL_X,
             bottom: GROUND_Y + pixelY,
@@ -378,11 +381,10 @@ const PixelPulaGame = ({ onScore, onReaction }: Props) => {
             height: PIXEL_SIZE,
             transform: `rotate(${pixelRot}deg)`,
             transition: "transform 50ms linear",
-            fontSize: 44,
             filter: "drop-shadow(0 4px 8px rgba(167,139,250,0.6))",
           }}
         >
-          🦎
+          <img src={pixelImg} alt="Pixel" className="w-full h-full object-contain" draggable={false} />
         </div>
 
         {/* Obstacles */}
@@ -445,13 +447,13 @@ const PixelPulaGame = ({ onScore, onReaction }: Props) => {
               exit={{ opacity: 0 }}
               className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm z-10"
             >
-              <motion.div
+              <motion.img
+                src={pixelImg}
+                alt="Pixel"
                 animate={{ y: [0, -10, 0], rotate: [0, -5, 5, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="text-6xl mb-3 drop-shadow-[0_0_20px_rgba(167,139,250,0.6)]"
-              >
-                🦎
-              </motion.div>
+                className="w-20 h-20 mb-3 drop-shadow-[0_0_20px_rgba(167,139,250,0.6)]"
+              />
               <h2 className="text-2xl font-black text-white mb-1">Pixel Pula!</h2>
               <p className="text-xs text-white/60 text-center px-6 mb-4 max-w-[260px]">
                 Toque para pular os obstáculos e coletar estrelas ⭐
