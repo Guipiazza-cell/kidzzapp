@@ -7,6 +7,8 @@ import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
 import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
+import ContextualPaywallModal from "@/components/ContextualPaywallModal";
+import type { PaywallContext } from "@/lib/contextualPaywall";
 import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
@@ -53,10 +55,12 @@ const Index = () => {
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [notifDone, setNotifDone] = useState<boolean>(() => {
+  const [notifPromptDismissed, setNotifPromptDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     return !!window.localStorage.getItem("kidzz_notification_set");
   });
+  const [showNotifPrompt, setShowNotifPrompt] = useState(false);
+  const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -107,19 +111,15 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
   }
-  if (!notifDone) {
-    return (
-      <NotificationTimeOnboarding
-        childName={profile.child_name}
-        onComplete={() => setNotifDone(true)}
-      />
-    );
-  }
+  // Notification time prompt is now contextual (after first answer), not blocking onboarding
 
   const childName = profile.child_name;
 
   const handleQuestionSubmit = (q: string) => {
-    if (!canAskQuestion()) { setStep("paywall"); return; }
+    if (!canAskQuestion()) {
+      setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } });
+      return;
+    }
     setQuestion(q);
     setStep("generating");
   };
@@ -141,6 +141,10 @@ const Index = () => {
 
   const handleCelebrationDone = () => {
     setStep("answer");
+    // Strategic moment: trigger notification setup AFTER first emotional success
+    if (!notifPromptDismissed) {
+      setTimeout(() => setShowNotifPrompt(true), 800);
+    }
   };
 
   const handleNewQuestion = () => {
@@ -188,7 +192,10 @@ const Index = () => {
             onOpenLab={() => setShowLab(true)}
             onOpenPlay={() => setShowPlay(true)}
             onOpenTravel={() => {
-              if (!profile?.is_premium) { setStep("paywall"); return; }
+              if (!profile?.is_premium) {
+                setContextualPaywall({ open: true, context: "travel" });
+                return;
+              }
               setShowTravel(true);
             }}
             onOpenChallenge={() => setShowChallenge(true)}
@@ -199,7 +206,7 @@ const Index = () => {
             characterEvolution={evolution as any}
           />
         )}
-        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setStep("paywall")} />}
+        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } })} />}
         {step === "celebrating" && (
           <CelebrationScreen
             key="celebrating"
@@ -248,6 +255,38 @@ const Index = () => {
       <WeeklySurpriseBox
         childName={childName}
         streakDays={profile.streak_days ?? 0}
+      />
+
+      {/* Contextual notification prompt — appears after first answer */}
+      <AnimatePresence>
+        {showNotifPrompt && (
+          <motion.div
+            className="fixed inset-0 z-[55] flex items-end justify-center px-4 pb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/50" onClick={() => { setShowNotifPrompt(false); setNotifPromptDismissed(true); try { localStorage.setItem("kidzz_notification_set", "1"); } catch { /* noop */ } }} />
+            <motion.div
+              className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl"
+              initial={{ y: 60 }} animate={{ y: 0 }} exit={{ y: 60 }}
+              transition={{ type: "spring", stiffness: 240, damping: 24 }}
+            >
+              <NotificationTimeOnboarding
+                childName={childName}
+                onComplete={() => { setShowNotifPrompt(false); setNotifPromptDismissed(true); }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <ContextualPaywallModal
+        open={contextualPaywall.open}
+        context={contextualPaywall.context}
+        meta={contextualPaywall.meta}
+        onClose={() => setContextualPaywall((p) => ({ ...p, open: false }))}
+        onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); setShowLoginGate(true); }}
       />
     </div>
   );
