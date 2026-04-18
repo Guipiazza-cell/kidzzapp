@@ -1,17 +1,19 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Flame } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Flame, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import WordSearchGame from "./games/WordSearchGame";
 import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
 import DailyChallengeGame from "./games/DailyChallengeGame";
+import PixelPulaGame from "./games/PixelPulaGame";
 import confetti from "canvas-confetti";
 
-type GameId = "word" | "memory" | "hangman" | "daily";
+type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
 
-const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean }[] = [
+const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean; isNew?: boolean }[] = [
+  { id: "pixel-pula", label: "Pixel Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o Pixel a pular!", bgColor: "rgba(124,58,237,0.7)", isNew: true },
   { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍", sub: "Encontre palavras escondidas", bgColor: "rgba(45,90,61,0.7)" },
   { id: "memory", label: "Memória", icon: Brain, emoji: "🧠", sub: "Treine sua memória", bgColor: "rgba(26,58,92,0.7)" },
   { id: "hangman", label: "Forca", icon: Type, emoji: "✏️", sub: "Descubra a palavra secreta", bgColor: "rgba(92,58,26,0.7)" },
@@ -217,6 +219,11 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
                           <span className="text-[8px] text-white/30 font-bold mt-1">Premium</span>
                         </div>
                       )}
+                      {game.isNew && !locked && (
+                        <div className="absolute -top-1.5 -right-1.5 bg-gradient-to-br from-purple-400 to-pink-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white/30">
+                          NOVO
+                        </div>
+                      )}
                     </motion.button>
                   );
                 })}
@@ -241,6 +248,7 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
             >
+              {activeGame === "pixel-pula" && <PixelPulaGame onScore={handleScore} onReaction={handleReaction} />}
               {activeGame === "word" && <WordSearchGame onScore={handleScore} onReaction={handleReaction} />}
               {activeGame === "memory" && <MemoryGame onScore={handleScore} onReaction={handleReaction} />}
               {activeGame === "hangman" && <HangmanGame onScore={handleScore} onReaction={handleReaction} />}
