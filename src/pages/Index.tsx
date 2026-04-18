@@ -7,6 +7,8 @@ import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
 import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
+import ContextualPaywallModal from "@/components/ContextualPaywallModal";
+import type { PaywallContext } from "@/lib/contextualPaywall";
 import HomeScreen from "@/components/flow/HomeScreen";
 import AgePickerScreen from "@/components/flow/AgePickerScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
