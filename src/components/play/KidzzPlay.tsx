@@ -219,6 +219,11 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
                           <span className="text-[8px] text-white/30 font-bold mt-1">Premium</span>
                         </div>
                       )}
+                      {game.isNew && !locked && (
+                        <div className="absolute -top-1.5 -right-1.5 bg-gradient-to-br from-purple-400 to-pink-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white/30">
+                          NOVO
+                        </div>
+                      )}
                     </motion.button>
                   );
                 })}
