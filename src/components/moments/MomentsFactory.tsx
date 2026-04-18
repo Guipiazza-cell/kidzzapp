@@ -17,10 +17,12 @@ interface Props {
 const FREE_MISSIONS = 1;
 
 const MomentsFactory = ({ onBack }: Props) => {
-  const { profile, tier, handleCheckout } = useAuth();
+  const { profile } = useAuth();
   const isPremium = profile?.is_premium ?? false;
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-  const [showLockedMessage, setShowLockedMessage] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [purchasing, setPurchasing] = useState<string | null>(null);
+  const [, setPurchasedTick] = useState(0);
 
   const newCount = MISSIONS.filter(m => m.isNew).length;
 
@@ -34,7 +36,19 @@ const MomentsFactory = ({ onBack }: Props) => {
     if (isMissionUnlocked(index)) {
       setSelectedMission(mission);
     } else {
-      setShowLockedMessage(true);
+      setShowPaywall(true);
+    }
+  };
+
+  const handlePackPurchase = async (packId: string) => {
+    setPurchasing(packId);
+    const result = await openMissionPackCheckout(packId);
+    setPurchasing(null);
+    if (result.success) {
+      setPurchasedTick((t) => t + 1);
+      toast.success("✅ Pack desbloqueado! Aproveite as missões 💛");
+    } else {
+      toast.error("Não foi possível concluir a compra. Tente novamente.");
     }
   };
 
