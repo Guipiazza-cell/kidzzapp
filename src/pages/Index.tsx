@@ -192,7 +192,10 @@ const Index = () => {
             onOpenLab={() => setShowLab(true)}
             onOpenPlay={() => setShowPlay(true)}
             onOpenTravel={() => {
-              if (!profile?.is_premium) { setStep("paywall"); return; }
+              if (!profile?.is_premium) {
+                setContextualPaywall({ open: true, context: "travel" });
+                return;
+              }
               setShowTravel(true);
             }}
             onOpenChallenge={() => setShowChallenge(true)}
