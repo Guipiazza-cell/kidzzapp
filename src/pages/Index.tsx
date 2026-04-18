@@ -55,10 +55,12 @@ const Index = () => {
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [notifDone, setNotifDone] = useState<boolean>(() => {
+  const [notifPromptDismissed, setNotifPromptDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     return !!window.localStorage.getItem("kidzz_notification_set");
   });
+  const [showNotifPrompt, setShowNotifPrompt] = useState(false);
+  const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -109,19 +111,15 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
   }
-  if (!notifDone) {
-    return (
-      <NotificationTimeOnboarding
-        childName={profile.child_name}
-        onComplete={() => setNotifDone(true)}
-      />
-    );
-  }
+  // Notification time prompt is now contextual (after first answer), not blocking onboarding
 
   const childName = profile.child_name;
 
   const handleQuestionSubmit = (q: string) => {
-    if (!canAskQuestion()) { setStep("paywall"); return; }
+    if (!canAskQuestion()) {
+      setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } });
+      return;
+    }
     setQuestion(q);
     setStep("generating");
   };
