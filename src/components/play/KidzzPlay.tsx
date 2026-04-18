@@ -248,6 +248,7 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
             >
+              {activeGame === "pixel-pula" && <PixelPulaGame onScore={handleScore} onReaction={handleReaction} />}
               {activeGame === "word" && <WordSearchGame onScore={handleScore} onReaction={handleReaction} />}
               {activeGame === "memory" && <MemoryGame onScore={handleScore} onReaction={handleReaction} />}
               {activeGame === "hangman" && <HangmanGame onScore={handleScore} onReaction={handleReaction} />}
