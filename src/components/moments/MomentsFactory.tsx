@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap, Check } from "lucide-react";
 import MagicalBackground from "../MagicalBackground";
 import { useAuth } from "@/contexts/AuthContext";
 import { MISSIONS, type Mission } from "./MissionsData";
 import MissionDetail from "./MissionDetail";
+import ContextualPaywallModal from "../ContextualPaywallModal";
+import { MISSION_PACKS, isPackPurchased, openMissionPackCheckout } from "@/lib/missionPacks";
 import aneImg from "@/assets/ane-chameleon.png";
+import { toast } from "sonner";
 
 interface Props {
   onBack: () => void;
