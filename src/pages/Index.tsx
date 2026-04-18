@@ -141,6 +141,10 @@ const Index = () => {
 
   const handleCelebrationDone = () => {
     setStep("answer");
+    // Strategic moment: trigger notification setup AFTER first emotional success
+    if (!notifPromptDismissed) {
+      setTimeout(() => setShowNotifPrompt(true), 800);
+    }
   };
 
   const handleNewQuestion = () => {
@@ -199,7 +203,7 @@ const Index = () => {
             characterEvolution={evolution as any}
           />
         )}
-        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setStep("paywall")} />}
+        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } })} />}
         {step === "celebrating" && (
           <CelebrationScreen
             key="celebrating"
@@ -248,6 +252,38 @@ const Index = () => {
       <WeeklySurpriseBox
         childName={childName}
         streakDays={profile.streak_days ?? 0}
+      />
+
+      {/* Contextual notification prompt — appears after first answer */}
+      <AnimatePresence>
+        {showNotifPrompt && (
+          <motion.div
+            className="fixed inset-0 z-[55] flex items-end justify-center px-4 pb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/50" onClick={() => { setShowNotifPrompt(false); setNotifPromptDismissed(true); try { localStorage.setItem("kidzz_notification_set", "1"); } catch { /* noop */ } }} />
+            <motion.div
+              className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl"
+              initial={{ y: 60 }} animate={{ y: 0 }} exit={{ y: 60 }}
+              transition={{ type: "spring", stiffness: 240, damping: 24 }}
+            >
+              <NotificationTimeOnboarding
+                childName={childName}
+                onComplete={() => { setShowNotifPrompt(false); setNotifPromptDismissed(true); }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <ContextualPaywallModal
+        open={contextualPaywall.open}
+        context={contextualPaywall.context}
+        meta={contextualPaywall.meta}
+        onClose={() => setContextualPaywall((p) => ({ ...p, open: false }))}
+        onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); setShowLoginGate(true); }}
       />
     </div>
   );
