@@ -51,6 +51,7 @@
 - [Kidzz Lab](mem://features/kidzz-lab) — 🧪 dynamic layered SVG avatar customization via Framer Motion
 - [Kidzz Play](mem://features/kidzz-play) — 🎮 mini-games (word search, memory, hangman) to earn avatar energy
 - [Avatar Evolution System](mem://features/avatar-evolution-system) — character_profiles table tracks evolution_points and dominant_trait
+- [Floresta dos Sons](mem://features/sound-forest) — Tab musical premium: Web Audio sintetizado, Ane Melodia mascot, onboarding cinematográfico, 4 colecionáveis, Cantar Juntos com MediaRecorder local
 - [Memories Album](mem://features/memories-album) — Family memory album with polaroid cards, filters, time capsule, monthly retrospective, and freemium paywall
 - [Travel Mode](mem://features/travel-mode) — Screen-off audio adventure with TTS, 60s timer, theme selectors, premium-only
 - [Viral Share System](mem://features/viral-share-system) — html2canvas image cards (story/achievement/retro) shared via Web Share API + download fallback
