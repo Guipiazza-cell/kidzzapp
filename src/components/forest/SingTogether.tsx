@@ -205,10 +205,11 @@ const SingTogether = ({ onBack, childName, onCollectibleUnlocked }: Props) => {
                     ? "linear-gradient(135deg, hsl(210 90% 60%), hsl(220 80% 55%))"
                     : "linear-gradient(135deg, hsl(340 90% 65%), hsl(320 80% 60%))",
                 }}
-                animate={recording ? { scale: [1, 1.08, 1] } : {}}
+                animate={recording ? { scale: [1, 1.08, 1], opacity: 1 } : { opacity: 1 }}
                 transition={{ duration: 0.8, repeat: Infinity }}
                 whileTap={{ scale: 0.92 }}
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                initial={{ opacity: 0 }}
+                exit={{ opacity: 0 }}
               >
                 {recording ? <Square size={28} className="text-white" fill="white" /> : <Mic size={32} className="text-white" />}
               </motion.button>
