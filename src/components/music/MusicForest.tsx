@@ -6,6 +6,9 @@ import LivingForest from "./LivingForest";
 import PixelMusical from "./PixelMusical";
 import AneMusical from "./AneMusical";
 import MorningKaraoke from "./MorningKaraoke";
+import DanceWithAne from "./DanceWithAne";
+import SungStories from "./SungStories";
+import CreateMusic from "./CreateMusic";
 import { getMusicXp, getMusicStreak, type MusicAchievement } from "@/lib/musicXp";
 
 interface Props {
@@ -53,6 +56,33 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
   if (activePillar === "morning") {
     return (
       <MorningKaraoke
+        onBack={() => { setActivePillar(null); onXpEarned?.(); }}
+        childName={childName}
+        onAchievement={handleAchievement}
+      />
+    );
+  }
+  if (activePillar === "dance") {
+    return (
+      <DanceWithAne
+        onBack={() => { setActivePillar(null); onXpEarned?.(); }}
+        childName={childName}
+        onAchievement={handleAchievement}
+      />
+    );
+  }
+  if (activePillar === "stories") {
+    return (
+      <SungStories
+        onBack={() => { setActivePillar(null); onXpEarned?.(); }}
+        childName={childName}
+        onAchievement={handleAchievement}
+      />
+    );
+  }
+  if (activePillar === "create") {
+    return (
+      <CreateMusic
         onBack={() => { setActivePillar(null); onXpEarned?.(); }}
         childName={childName}
         onAchievement={handleAchievement}
@@ -126,23 +156,26 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
             <PillarCard
               emoji="💃"
               title="Dance com Ane"
-              subtitle="Em breve"
+              subtitle="Mini-game de palmas"
               gradient="from-pink-400 to-rose-500"
-              onClick={() => {}}
+              onClick={() => setActivePillar("dance")}
+              available
             />
             <PillarCard
               emoji="📖"
               title="Histórias Cantadas"
-              subtitle="Em breve"
+              subtitle="4 livros mágicos"
               gradient="from-purple-400 to-indigo-500"
-              onClick={() => {}}
+              onClick={() => setActivePillar("stories")}
+              available
             />
             <PillarCard
               emoji="🎼"
               title="Crie Sua Música"
-              subtitle="Em breve"
+              subtitle="Laboratório sonoro"
               gradient="from-emerald-400 to-teal-500"
-              onClick={() => {}}
+              onClick={() => setActivePillar("create")}
+              available
             />
           </div>
 

@@ -13,12 +13,16 @@ A "Floresta Musical" (tab `music` no BottomNav, ícone Music2 verde) é o motor 
 - `LivingForest.tsx` — Pseudo-3D com 3 camadas (back/mid/front) com parallax baseado em mouse/touch (springs). Eventos ambientes aleatórios a cada 8-15s: folha caindo 🍂, pássaro cruzando 🐦, burst de vagalumes. Sempre 14 vagalumes pulsando.
 - `PixelMusical.tsx` — Pixel SVG inline (camaleão escuro, glow azul). Estados: idle/sing/happy. Notas ♪♫♩ orbitam quando canta.
 - `AneMusical.tsx` — Ane SVG inline (camaleoa rosa, coroa de 3 folhas verdes, coração luminoso pulsando no peito). Estados: idle/dance/sing/happy.
-- `MorningKaraoke.tsx` — **Pilar 1**: Karaokê com Pixel. Letras com sílaba dourada highlighted no tempo real (sincronizada via callback do MusicEngine). +12 XP, salva em Memórias (type=achievement, kind=karaoke).
-- `MusicForest.tsx` — Hub principal. 4 pilares (só Pilar 1 implementado nesta fase, outros 3 marcados "Em breve"). Card noturno aparece SÓ após 19h ("Hora de descansar? 🌙 Ir para Sonhos →"). Efeitos raros 5% (chuva de estrelas, borboletas, coral).
+- `MorningKaraoke.tsx` — **Pilar 1**: Karaokê com Pixel. Letras com sílaba dourada highlighted em tempo real (callback `onStep` do MusicEngine). +12 XP, salva em Memórias (kind=karaoke).
+- `DanceWithAne.tsx` — **Pilar 2**: Mini-game timing. 6 rodadas, 4 movimentos (palma/giro/pulo/abraço). Janela 2.5s → perfeito (<1.2s) / bom (<2.2s) / quase. Pontuação visível, beat de drum sintetizado a 500ms, +10 XP, salva em Memórias (kind=dance).
+- `sungBooks.ts` — 4 livros: Floresta Mágica de Ane 🌿, Pixel e Canção das Estrelas ⭐, Rio que Cantava 🌊, Ilha dos Sons 🏝️. Cada um com 4 capítulos + Song procedural ~8s.
+- `SungStories.tsx` — **Pilar 3**: Biblioteca em grid 2x2 → leitura com efeito virar página (rotateY -90/+90), trecho musical 8s tocável, notas ♪ subindo no fundo enquanto toca. +15 XP no fim, salva em Memórias (kind=sung_story).
+- `CreateMusic.tsx` — **Pilar 4**: Laboratório com 3 escolhas: Semente (Sol/Lua/Rio/Floresta — escala única), Humor (Feliz/Calmo/Brincalhão/Sonhador — BPM), Ritmo (Suave/Marcha/Balanço — pattern). `buildSong()` gera intro com nome silabificado → corpo escala+ritmo → outro nome → acorde final. Tela resultado com play, salvar (kind=composition, is_special=true), compartilhar (Web Share API + clipboard fallback). +25 XP create / +20 share.
+- `MusicForest.tsx` — Hub principal. 4 pilares ativos. Card noturno aparece SÓ após 19h ("Hora de descansar? 🌙 Ir para Sonhos →"). Efeitos raros 5% (chuva de estrelas, borboletas, coral).
 
 **XP Musical** (`src/lib/musicXp.ts`): Sistema separado em localStorage:
 - `kidzz_music_xp`, `kidzz_music_streak`, `kidzz_music_last_date`, `kidzz_music_counters`, `kidzz_music_achievements`.
 - Valores: listen=10, karaoke=12, dance=10, story=15, create=25, share=20.
 - 6 conquistas musicais: Primeira Canção, Estrela do Karaokê, Compositor, Semana Musical, Dançarino da Floresta, Contador de Histórias.
 
-**Status fases**: Fase 1 ✅ (parallax, mascotes, Pilar 1 Karaokê, tab bar, XP, card noturno, efeitos raros). Fase 2 pendente: Dance com Ane, Histórias Cantadas, Crie Sua Música. Fase 3 pendente: Pré-Sono em Sonhos, Conquistas musicais visíveis em Memórias.
+**Status fases**: Fase 1 ✅ + Fase 2 ✅ (4 pilares ativos). Fase 3 pendente: Pré-Sono em Sonhos (Respiração + Canção desacelerar), Conquistas musicais visíveis em Memórias.
