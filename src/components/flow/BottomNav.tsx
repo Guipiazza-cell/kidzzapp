@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MessageCircleHeart, BookOpen, Heart, Moon, Trees } from "lucide-react";
+import { MessageCircleHeart, BookOpen, Music2, Moon, Image as ImageIcon } from "lucide-react";
 
 interface Props {
   activeTab: string;
@@ -9,9 +9,9 @@ interface Props {
 const TABS = [
   { id: "chat", label: "Perguntas", icon: MessageCircleHeart, color: "text-kid-pink" },
   { id: "explore", label: "Histórias", icon: BookOpen, color: "text-kid-blue" },
-  { id: "forest", label: "Floresta", icon: Trees, color: "text-kid-green" },
-  { id: "memories", label: "Memórias", icon: Heart, color: "text-kid-orange" },
+  { id: "music", label: "Música", icon: Music2, color: "text-kid-green" },
   { id: "dreams", label: "Sonhos", icon: Moon, color: "text-indigo-400" },
+  { id: "memories", label: "Memórias", icon: ImageIcon, color: "text-kid-orange" },
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: Props) => (
