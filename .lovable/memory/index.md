@@ -1,3 +1,6 @@
+# Memory: index.md
+Updated: now
+
 # Project Memory
 
 ## Core
@@ -8,8 +11,10 @@
 - **Quotas:** 3 free lifetime. Kidzz plan: 10 daily Qs. Premium: 10 Qs, 3 stories. Validated in backend Edge Function `kidzz-chat`.
 - **UX Rules:** 30s timeout for generation (AbortController). 2s timeout for auth. Optimistic local persistence (`kidzz_guest_profile`, `kidzz_last_age_range`).
 - **Payment:** Stripe checkout via `window.location.href` (same tab). Requires authentication first.
+- **Música ≠ Sonhos:** Floresta Musical = ATIVO (canta/dança/cria). Mundo dos Sonhos = PASSIVO (escuta/relaxa). NUNCA fundir.
 
 ## Memories
+- [Floresta Musical](mem://features/music-forest) — Tab Música ATIVA com parallax pseudo-3D, mascotes reativos, 4 pilares, XP musical separado
 - [Parental Control](mem://features/parental-control) — PIN 1234, plan comparisons, child profile management
 - [Monetization Model](mem://business/monetization-model) — Stripe price IDs, product IDs, live mode only
 - [Story Factory](mem://features/story-factory) — Gemini 3.1 Flash (8192 tokens), 4 scenes, asymptotic progress bar
@@ -45,13 +50,9 @@
 - [Global Background Continuity](mem://style/global-background-continuity) — forest-bg-light.jpg, animated SVG fireflies/dragonflies
 - [Achievements](mem://features/achievements) — Stats, current level card, and 10 collectable badges
 - [Home Screen Layout](mem://ux/home-screen-layout) — VoiceInput, mascots w-24, exactly 6 suggestion cards grid
-- [Bottom Nav](mem://ux/navigation/bottom-nav) — 5 tabs: Chat, Stories, Dreams, Moments, Achievements (No Assinar tab)
+- [Bottom Nav](mem://ux/navigation/bottom-nav) — 5 tabs: Perguntas, Histórias, Música, Sonhos, Memórias
 - [Conversion Flow](mem://ux/conversion-flow) — Contextual paywall triggers across premium features
 - [Dream World](mem://features/dream-world) — Local MP3s (/public/audio/), Web Speech API narration at 0.82x
 - [Kidzz Lab](mem://features/kidzz-lab) — 🧪 dynamic layered SVG avatar customization via Framer Motion
 - [Kidzz Play](mem://features/kidzz-play) — 🎮 mini-games (word search, memory, hangman) to earn avatar energy
 - [Avatar Evolution System](mem://features/avatar-evolution-system) — character_profiles table tracks evolution_points and dominant_trait
-- [Floresta dos Sons](mem://features/sound-forest) — Tab musical premium: Web Audio sintetizado, Ane Melodia mascot, onboarding cinematográfico, 4 colecionáveis, Cantar Juntos com MediaRecorder local
-- [Memories Album](mem://features/memories-album) — Family memory album with polaroid cards, filters, time capsule, monthly retrospective, and freemium paywall
-- [Travel Mode](mem://features/travel-mode) — Screen-off audio adventure with TTS, 60s timer, theme selectors, premium-only
-- [Viral Share System](mem://features/viral-share-system) — html2canvas image cards (story/achievement/retro) shared via Web Share API + download fallback
