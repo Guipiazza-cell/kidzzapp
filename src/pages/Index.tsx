@@ -23,7 +23,7 @@ import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
 import MomentsFactory from "@/components/moments/MomentsFactory";
 import TravelMode from "@/components/travel/TravelMode";
-import SoundForest from "@/components/forest/SoundForest";
+import MusicForest from "@/components/music/MusicForest";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
@@ -180,8 +180,15 @@ const Index = () => {
     if (activeTab === "dreams") {
       return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
-    if (activeTab === "forest") {
-      return <SoundForest key="forest" onBack={() => { setActiveTab("chat"); setStep("home"); }} onXpEarned={() => evolution.evolve("game")} />;
+    if (activeTab === "music") {
+      return (
+        <MusicForest
+          key="music"
+          onBack={() => { setActiveTab("chat"); setStep("home"); }}
+          onNavigateToDreams={() => setActiveTab("dreams")}
+          onXpEarned={() => evolution.evolve("game")}
+        />
+      );
     }
 
     return (
