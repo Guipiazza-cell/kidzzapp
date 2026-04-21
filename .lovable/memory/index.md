@@ -12,8 +12,10 @@ Updated: now
 - **UX Rules:** 30s timeout for generation (AbortController). 2s timeout for auth. Optimistic local persistence (`kidzz_guest_profile`, `kidzz_last_age_range`).
 - **Payment:** Stripe checkout via `window.location.href` (same tab). Requires authentication first.
 - **Música ≠ Sonhos:** Floresta Musical = ATIVO (canta/dança/cria). Mundo dos Sonhos = PASSIVO (escuta/relaxa). NUNCA fundir.
+- **KIDZZ é UM personagem só:** 4 estados visuais (cosmic/moon/explorer/music) que metamorfoseiam via crossfade. Nunca trocar imagem bruscamente. Nunca usar emoji 🦎 ou cartoon genérico.
 
 ## Memories
+- [KIDZZ Chameleon System](mem://features/kidzz-chameleon-system) — Personagem único com 4 estados, morph crossfade, eye-follow, memória contextual, tab bar viva
 - [Floresta Musical](mem://features/music-forest) — Tab Música ATIVA com parallax pseudo-3D, mascotes reativos, 4 pilares, XP musical separado
 - [Parental Control](mem://features/parental-control) — PIN 1234, plan comparisons, child profile management
 - [Monetization Model](mem://business/monetization-model) — Stripe price IDs, product IDs, live mode only
