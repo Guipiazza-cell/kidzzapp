@@ -1,11 +1,15 @@
-import { useState, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, BookOpen } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, BookOpen, Bookmark, Share2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import confetti from "canvas-confetti";
 import { useTTS } from "@/hooks/useTTS";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import { useMemories } from "@/hooks/useMemories";
+import { useAchievementSync } from "@/hooks/useAchievementSync";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import ShareCardModal from "@/components/viral/ShareCardModal";
 
 interface Props {
   question: string;
@@ -17,17 +21,45 @@ interface Props {
 const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: Props) => {
   const { speak, stop } = useTTS();
   const { profile, tier, handleCheckout } = useAuth();
+  const { addMemory } = useMemories();
+  const { trackEvent } = useAchievementSync();
   const [playing, setPlaying] = useState(false);
   const [showCTA, setShowCTA] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(true);
+  const [memorySaved, setMemorySaved] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "super_premium";
+  const trackedRef = useRef(false);
 
+  // Reward loop: 2.5s celebration + confetti + XP toast on mount
   useEffect(() => {
-    if (!isPremium) {
-      const t = setTimeout(() => setShowCTA(true), 3000);
-      return () => clearTimeout(t);
+    // fire confetti once per answer
+    try {
+      confetti({
+        particleCount: 60,
+        spread: 70,
+        startVelocity: 32,
+        origin: { y: 0.4 },
+        colors: ["#FFD700", "#FFA500", "#FF6B9D", "#A855F7", "#7BB6FF"],
+        scalar: 1,
+      });
+    } catch { /* noop */ }
+
+    // GeneratingScreen already incremented questions — only check badges here
+    if (!trackedRef.current) {
+      trackedRef.current = true;
+      trackEvent("question-checkonly");
+      toast.success("+1 ponto — sabedoria desbloqueada! ✨", { duration: 2500 });
     }
-  }, [isPremium]);
+
+    const tCelebration = setTimeout(() => setShowCelebration(false), 2500);
+    if (!isPremium) {
+      const tCTA = setTimeout(() => setShowCTA(true), 3000);
+      return () => { clearTimeout(tCelebration); clearTimeout(tCTA); };
+    }
+    return () => clearTimeout(tCelebration);
+  }, [isPremium, trackEvent]);
 
   const handleSpeak = useCallback(async () => {
     if (playing) {
@@ -45,14 +77,64 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
     }
   }, [playing, speak, stop, answer]);
 
+  const handleSaveMemory = useCallback(async () => {
+    if (memorySaved) return;
+    const saved = await addMemory({
+      type: "question",
+      title: question,
+      content: answer,
+      is_special: false,
+      image_url: null,
+      metadata: { saved_from: "answer_screen" },
+    });
+    if (saved) {
+      setMemorySaved(true);
+      toast.success("💾 Salvo em Memórias!", { duration: 2000 });
+      try {
+        confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 }, colors: ["#FF6B9D", "#FFD700"] });
+      } catch { /* noop */ }
+    } else {
+      toast.error("Faça login para salvar memórias 💛");
+    }
+  }, [memorySaved, addMemory, question, answer]);
+
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-hidden"
+      className="flex-1 flex flex-col overflow-hidden relative"
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Celebration overlay (2.5s) */}
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <motion.div
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: [0, 1.3, 1], rotate: [0, 8, -8, 0] }}
+              transition={{ duration: 0.8, type: "spring" }}
+            >
+              <KidzzChameleon state="cosmic" mood="happy" size="lg" interactive={false} showParticles />
+            </motion.div>
+            <motion.p
+              className="mt-3 text-base font-black text-white drop-shadow-lg bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full"
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              ✨ +5 XP de sabedoria!
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pt-4 pb-2">
         <motion.button
@@ -63,13 +145,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           <ArrowLeft size={20} />
         </motion.button>
         <div className="flex-1 flex items-center gap-2">
-          <motion.img
-            src={pixelImg}
-            alt="Pixel"
-            className="w-8 h-8 object-contain"
-            animate={{ rotate: [0, 3, -3, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
+          <KidzzChameleon state="cosmic" mood="happy" size="sm" interactive={false} showParticles={false} />
           <span className="text-lg font-black text-gray-800">Kidzz</span>
         </div>
         <motion.div
@@ -135,19 +211,38 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             />
           )}
           <span className="relative z-10 flex items-center gap-2">
-            {playing ? (
-              <>
-                <VolumeX size={22} />
-                Parar narração
-              </>
-            ) : (
-              <>
-                <Volume2 size={22} />
-                🔊 Ouvir resposta
-              </>
-            )}
+            {playing ? (<><VolumeX size={22} /> Parar narração</>) : (<><Volume2 size={22} /> 🔊 Ouvir resposta</>)}
           </span>
         </motion.button>
+
+        {/* Reward actions: Save to Memories + Share — primary CTAs */}
+        <motion.div
+          className="mt-3 grid grid-cols-2 gap-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+        >
+          <motion.button
+            onClick={handleSaveMemory}
+            disabled={memorySaved}
+            className={`flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm shadow-md transition-all ${
+              memorySaved
+                ? "bg-kid-green/30 text-kid-green border-2 border-kid-green/40"
+                : "bg-gradient-to-r from-kid-pink to-kid-purple text-white"
+            }`}
+            whileTap={memorySaved ? undefined : { scale: 0.95 }}
+          >
+            <Bookmark size={16} fill={memorySaved ? "currentColor" : "none"} />
+            {memorySaved ? "Salvo! ✨" : "Salvar memória"}
+          </motion.button>
+          <motion.button
+            onClick={() => setShowShare(true)}
+            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/80 backdrop-blur text-gray-700 font-bold text-sm shadow-md border border-white/40"
+            whileTap={{ scale: 0.95 }}
+          >
+            <Share2 size={16} /> Compartilhar
+          </motion.button>
+        </motion.div>
 
         {/* Story factory button for super premium */}
         {isSuperPremium && (
@@ -177,7 +272,6 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           Nova pergunta
         </motion.button>
 
-        {/* Emotional impact message */}
         <motion.p
           className="text-center text-gray-400 text-xs font-bold mt-4"
           initial={{ opacity: 0 }}
@@ -210,6 +304,18 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </motion.div>
         )}
       </div>
+
+      {/* Share modal */}
+      <AnimatePresence>
+        {showShare && (
+          <ShareCardModal
+            template="memory"
+            question={question}
+            answer={answer}
+            onClose={() => setShowShare(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
