@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Car, Play, Pause, SkipForward, X, Volume2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
+import { useAchievementSync } from "@/hooks/useAchievementSync";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
 import confetti from "canvas-confetti";
