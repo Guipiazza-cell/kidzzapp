@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Flame, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAchievementSync } from "@/hooks/useAchievementSync";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import WordSearchGame from "./games/WordSearchGame";
 import MemoryGame from "./games/MemoryGame";
@@ -27,6 +28,7 @@ interface Props {
 
 const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
   const { profile } = useAuth();
+  const { trackEvent } = useAchievementSync();
   const isPremium = profile?.is_premium ?? false;
   const childName = profile?.child_name || "amigo";
 
@@ -38,10 +40,11 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
   const handleScore = useCallback((pts: number) => {
     setSessionScore((s) => s + pts);
     onGameComplete?.();
+    trackEvent("game");
     if (pts >= 15) {
       confetti({ particleCount: 35, spread: 45, origin: { y: 0.65 }, colors: ["#10B981", "#FFD700", "#fff"], scalar: 0.85 });
     }
-  }, [onGameComplete]);
+  }, [onGameComplete, trackEvent]);
 
   const handleReaction = useCallback((type: "happy" | "encourage") => {
     setMascotMood(type);
