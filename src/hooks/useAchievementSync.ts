@@ -139,6 +139,7 @@ export function useAchievementSync() {
         if (user) {
           const colMap: Record<AchievementEvent, string | null> = {
             question: "questions_count",
+            "question-checkonly": null,
             travel: "questions_count",
             karaoke: "questions_count",
             music: "questions_count",
