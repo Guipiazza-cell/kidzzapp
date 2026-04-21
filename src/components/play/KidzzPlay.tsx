@@ -258,16 +258,46 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
         </AnimatePresence>
       </div>
 
-      {/* Back button — fixed bottom for active games */}
+      {/* Back button — fixed bottom-left for active games (audit: bottom 90px, left 20px) */}
       {activeGame && (
-        <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-3" style={{ background: "linear-gradient(to top, #042f2e 60%, transparent)" }}>
-          <motion.button
-            onClick={() => setActiveGame(null)}
-            className="w-full py-3 rounded-2xl font-bold text-white/80 text-sm border border-white/10 bg-white/5"
-            whileTap={{ scale: 0.95 }}
+        <motion.button
+          onClick={() => setActiveGame(null)}
+          className="absolute z-30 px-4 py-3 rounded-2xl font-bold text-white text-sm border border-white/20 bg-black/50 backdrop-blur-md shadow-xl flex items-center gap-2"
+          style={{ bottom: 90, left: 20 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <ArrowLeft size={16} /> Voltar
+        </motion.button>
+      )}
+
+      {/* Lower-half stats panel when no game active (audit: highscores + mini badges) */}
+      {!activeGame && (
+        <div className="absolute bottom-24 left-4 right-4 z-10 pointer-events-none">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-black/30 backdrop-blur-md rounded-2xl p-3 border border-white/10 pointer-events-auto"
           >
-            ← Voltar aos jogos
-          </motion.button>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1 text-center">
+                <p className="text-[9px] font-black text-emerald-300/70 uppercase tracking-wider">Hoje</p>
+                <p className="text-base font-black text-white">{sessionScore}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
+              </div>
+              <div className="w-px h-8 bg-white/10" />
+              <div className="flex-1 text-center">
+                <p className="text-[9px] font-black text-orange-300/70 uppercase tracking-wider">Streak</p>
+                <p className="text-base font-black text-white">{profile?.streak_days ?? 0}<span className="text-[10px] text-white/50 ml-0.5">🔥</span></p>
+              </div>
+              <div className="w-px h-8 bg-white/10" />
+              <div className="flex-1 text-center">
+                <p className="text-[9px] font-black text-yellow-300/70 uppercase tracking-wider">Total</p>
+                <p className="text-base font-black text-white">{profile?.points ?? 0}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       )}
 
