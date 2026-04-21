@@ -31,6 +31,8 @@ import SevenDayChallenge from "@/components/viral/SevenDayChallenge";
 import ReferralProgram from "@/components/viral/ReferralProgram";
 import MonthlyRetrospective from "@/components/viral/MonthlyRetrospective";
 import ChameleonMascot from "@/components/ChameleonMascot";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
 
