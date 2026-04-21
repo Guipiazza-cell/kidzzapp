@@ -64,6 +64,7 @@ interface Props {
 const TravelMode = ({ onBack }: Props) => {
   const { profile } = useAuth();
   const { addMemory } = useMemories();
+  const { trackEvent } = useAchievementSync();
   const childName = profile?.child_name || "amigo";
 
   const [phase, setPhase] = useState<TravelPhase>("setup");
@@ -160,6 +161,11 @@ const TravelMode = ({ onBack }: Props) => {
     if (phase === "playing" && currentIndex >= questions.length && questions.length > 0) {
       setPhase("finished");
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 }, colors: ["#D4A847", "#F0C85A", "#fff"] });
+
+      // Sync achievements: count travel as engagement events
+      for (let i = 0; i < questions.length; i++) {
+        setTimeout(() => trackEvent("travel"), i * 80);
+      }
 
       // Save as memory
       addMemory({
