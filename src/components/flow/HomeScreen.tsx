@@ -17,6 +17,7 @@ import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
 import cosmicImg from "@/assets/kidzz/cosmic.png";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import KidzzHero from "@/components/kidzz/KidzzHero";
 import { kidzzMemory, getContextualGreeting } from "@/components/kidzz/kidzzMemory";
 import { loadMascotConfig } from "@/components/lab/KidzzLab";
 
