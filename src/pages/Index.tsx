@@ -31,6 +31,8 @@ import SevenDayChallenge from "@/components/viral/SevenDayChallenge";
 import ReferralProgram from "@/components/viral/ReferralProgram";
 import MonthlyRetrospective from "@/components/viral/MonthlyRetrospective";
 import ChameleonMascot from "@/components/ChameleonMascot";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
 
@@ -91,9 +93,9 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
-        <div className="text-center space-y-3">
-          <ChameleonMascot size="md" mood="thinking" interactive={false} />
-          <motion.p className="text-primary-foreground/40 font-bold text-sm" animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
+        <div className="text-center space-y-3 flex flex-col items-center">
+          <KidzzChameleon size="md" mood="thinking" state="cosmic" interactive={false} />
+          <motion.p className="text-gray-700 font-bold text-sm" animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>
             Carregando...
           </motion.p>
         </div>
@@ -129,6 +131,7 @@ const Index = () => {
     setAnswer(text);
     setStep("celebrating");
     evolution.evolve("question");
+    kidzzMemory.recordQuestion(question);
     // Auto-save as memory
     addMemory({
       type: "question",
