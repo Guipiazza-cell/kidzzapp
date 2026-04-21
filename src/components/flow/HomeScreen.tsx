@@ -187,7 +187,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
       >
         <div className="flex items-center gap-2.5">
-          <img src={pixelImg} alt="Pixel" className="w-9 h-9 object-contain drop-shadow-lg" />
+          <img src={cosmicImg} alt="Kidzz" className="w-9 h-9 object-contain drop-shadow-lg" />
           <span className="text-xl font-black text-gray-800 tracking-tight">
             Kidzz
           </span>
@@ -248,112 +248,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           <DailyQuestionCard childName={childName} onSubmit={submit} disabled={submitting || isFreeLimitReached} />
         </div>
 
-        {/* Characters & speech bubbles */}
-        <div className="flex items-end justify-center gap-1 mt-2 mb-1">
-          {/* Ane */}
-          <div className="flex flex-col items-center">
-            <AnimatePresence>
-              {!showPixelSpeech && (
-                <motion.div
-                  className="glass-card rounded-xl px-3 py-1.5 mb-1 max-w-[130px]"
-                  initial={{ opacity: 0, scale: 0.7, y: 8 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.7, y: 8 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
-                    {anePhrase}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <motion.img
-              src={aneImg}
-              alt="Ane"
-              className="w-24 h-24 object-contain drop-shadow-xl cursor-pointer"
-              style={{ filter: mascotHue !== 0 ? `hue-rotate(${mascotHue}deg)` : undefined }}
-              initial={{ opacity: 0, x: -60, rotate: -15 }}
-              animate={{
-                opacity: 1,
-                x: 0,
-                rotate: [0, -4, 4, -2, 0],
-                y: [0, -6, 0, -3, 0],
-              }}
-              transition={{
-                opacity: { duration: 0.5 },
-                x: { type: "spring", stiffness: 180, damping: 14, delay: 0.3 },
-                rotate: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 },
-                y: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 },
-              }}
-              whileHover={{ scale: 1.15, rotate: -8 }}
-              whileTap={{ scale: 0.85, rotate: 12 }}
-              onClick={(e) => burst(e)}
-            />
-          </div>
-
-          <div className="flex flex-col items-center mx-1">
-            <motion.h1
-              className="text-xl font-black text-gray-800 text-center leading-tight"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              Oi, {childName}! 👋<br />
-              <span className="text-base font-bold text-gray-600">Me pergunte qualquer coisa!</span>
-            </motion.h1>
-            <motion.p
-              className="text-[10px] text-gray-500 font-semibold text-center mt-1 max-w-[180px] leading-tight"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              Descubra respostas e crie conversas incríveis juntos 💛
-            </motion.p>
-          </div>
-
-          {/* Pixel */}
-          <div className="flex flex-col items-center">
-            <AnimatePresence>
-              {showPixelSpeech && (
-                <motion.div
-                  className="glass-card rounded-xl px-3 py-1.5 mb-1 max-w-[130px]"
-                  initial={{ opacity: 0, scale: 0.7, y: 8 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.7, y: 8 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <p className="text-[10px] text-gray-600 font-bold text-center leading-tight">
-                    {pixelPhrase}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <motion.img
-              src={pixelImg}
-              alt="Pixel"
-              className="w-24 h-24 object-contain cursor-pointer"
-              style={{
-                filter: `brightness(1.15) ${mascotHue !== 0 ? `hue-rotate(${mascotHue}deg) ` : ""}drop-shadow(0 0 10px rgba(100,160,255,0.7)) drop-shadow(0 4px 16px rgba(80,140,255,0.4))`,
-              }}
-              initial={{ opacity: 0, x: 60, rotate: 15 }}
-              animate={{
-                opacity: 1,
-                x: 0,
-                rotate: [0, 5, -3, 2, 0],
-                y: [0, -5, 0, -7, 0],
-              }}
-              transition={{
-                opacity: { duration: 0.5 },
-                x: { type: "spring", stiffness: 180, damping: 14, delay: 0.4 },
-                rotate: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 },
-                y: { duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 },
-              }}
-              whileHover={{ scale: 1.15, rotate: 8 }}
-              whileTap={{ scale: 0.85, rotate: -12 }}
-              onClick={(e) => burst(e)}
-            />
-          </div>
-        </div>
+        {/* KIDZZ Hero — personagem único, vivo, contextual */}
+        <KidzzHero childName={childName} streakDays={streakDays} ageRange={profile?.age_range ?? null} />
 
         {/* Quick access buttons */}
         <div className="flex items-center gap-2 mt-1 mb-1">
