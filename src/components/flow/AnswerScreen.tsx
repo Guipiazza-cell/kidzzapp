@@ -46,11 +46,11 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
       });
     } catch { /* noop */ }
 
-    // sync achievement counters once
+    // GeneratingScreen already incremented questions — only check badges here
     if (!trackedRef.current) {
       trackedRef.current = true;
-      trackEvent("question");
-      toast.success("+5 XP — sabedoria desbloqueada! ✨", { duration: 2500 });
+      trackEvent("question-checkonly");
+      toast.success("+1 ponto — sabedoria desbloqueada! ✨", { duration: 2500 });
     }
 
     const tCelebration = setTimeout(() => setShowCelebration(false), 2500);

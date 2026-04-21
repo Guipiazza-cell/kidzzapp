@@ -15,14 +15,15 @@ import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
 export type AchievementEvent =
-  | "question"      // a question was answered
-  | "story"         // a story was generated
-  | "mission"       // a connection mission was completed
-  | "game"          // a mini-game ended
-  | "karaoke"       // sang a karaoke verse
-  | "travel"        // travel mode question
-  | "music"         // music creation
-  | "dream";        // dream story listened
+  | "question"          // a question was answered (increments)
+  | "question-checkonly"// already-incremented elsewhere, just check badges
+  | "story"             // a story was generated
+  | "mission"           // a connection mission was completed
+  | "game"              // a mini-game ended
+  | "karaoke"           // sang a karaoke verse
+  | "travel"            // travel mode question
+  | "music"             // music creation
+  | "dream";            // dream story listened
 
 const UNLOCK_KEY = "kidzz_unlocked_badges";
 
@@ -122,6 +123,8 @@ export function useAchievementSync() {
         if (event === "question" || event === "travel" || event === "karaoke" || event === "music") {
           // these all count as "engagement events" — drive points + streak
           await incrementQuestions();
+        } else if (event === "question-checkonly") {
+          // GeneratingScreen already incremented; just re-check badges below
         } else if (event === "story" || event === "dream") {
           await incrementStories();
         } else if (event === "mission" || event === "game") {
