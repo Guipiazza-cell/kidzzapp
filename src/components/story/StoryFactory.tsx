@@ -12,6 +12,8 @@ import { useMemories } from "@/hooks/useMemories";
 import { toast } from "sonner";
 import { ChildAvatar } from "@/types/story";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
+import { showXpGained } from "@/components/flow/XpToast";
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-story`;
 
@@ -97,6 +99,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       }
 
       setStep("display");
+      // Daily mission + XP
+      const { newlyMarked } = completeMissionStep("story");
+      if (newlyMarked) {
+        const { gained } = addXp("story");
+        showXpGained(gained, "história");
+      }
+      bumpSessionActions();
       toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
     } catch (e: any) {
       console.error("Story generation error:", e);
