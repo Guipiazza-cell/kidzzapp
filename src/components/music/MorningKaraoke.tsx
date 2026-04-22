@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Mic, Play, Pause, Sparkles } from "lucide-react";
 import { MusicEngine, getTodaysSong, type Song, type SongStep } from "./MusicEngine";
-import PixelMusical from "./PixelMusical";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { addMusicXp, bumpCounter, type MusicAchievement } from "@/lib/musicXp";
 import { useMemories } from "@/hooks/useMemories";
 
@@ -101,9 +101,11 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-between px-4 py-6 overflow-y-auto">
-        {/* Pixel */}
+        {/* Kidzz Music */}
         <div className="flex flex-col items-center gap-3 mt-2">
-          <PixelMusical mood={playing ? "sing" : completed ? "happy" : "idle"} size="xl" onTap={handlePlay} />
+          <div onClick={handlePlay} className="cursor-pointer">
+            <KidzzChameleon state="music" mood={playing ? "talking" : completed ? "happy" : "idle"} size="xl" interactive showParticles />
+          </div>
           <div className="text-center">
             <p className="text-amber-200 text-[11px] font-bold uppercase tracking-wider">Música de hoje</p>
             <h2 className="text-white text-2xl font-extrabold mt-1">{song.emoji} {song.title}</h2>

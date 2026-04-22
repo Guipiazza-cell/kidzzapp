@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { MusicEngine } from "./MusicEngine";
-import AneMusical from "./AneMusical";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { addMusicXp, bumpCounter, type MusicAchievement } from "@/lib/musicXp";
 import { useMemories } from "@/hooks/useMemories";
 
@@ -175,7 +175,7 @@ const DanceWithAne = ({ onBack, childName, onAchievement }: Props) => {
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
-        <AneMusical mood={phase === "play" || phase === "feedback" ? "dance" : phase === "done" ? "happy" : "idle"} size="xl" />
+        <KidzzChameleon state="music" mood={phase === "play" || phase === "feedback" ? "talking" : phase === "done" ? "happy" : "idle"} size="xl" interactive showParticles />
 
         <AnimatePresence mode="wait">
           {phase === "intro" && (
