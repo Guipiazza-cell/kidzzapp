@@ -469,6 +469,8 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
           </>
         )}
       </div>
+      </>
+      )}
     </motion.div>
   );
 };
