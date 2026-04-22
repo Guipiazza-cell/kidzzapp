@@ -235,17 +235,30 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
                 })}
               </div>
 
-              {/* Stats bar */}
-              <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-white/5">
-                <div className="flex items-center gap-1.5 text-white/40">
-                  <Flame size={14} className="text-orange-400" />
-                  <span className="text-xs font-bold">{profile?.streak_days ?? 0} dias</span>
+              {/* Stats panel — highscores + streak inline (não bloqueia cards) */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-black/30 backdrop-blur-md rounded-2xl p-3 border border-white/10 mt-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 text-center">
+                    <p className="text-[9px] font-black text-emerald-300/70 uppercase tracking-wider">Hoje</p>
+                    <p className="text-base font-black text-white">{sessionScore}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
+                  </div>
+                  <div className="w-px h-8 bg-white/10" />
+                  <div className="flex-1 text-center">
+                    <p className="text-[9px] font-black text-orange-300/70 uppercase tracking-wider">Streak</p>
+                    <p className="text-base font-black text-white">{profile?.streak_days ?? 0}<span className="text-[10px] text-white/50 ml-0.5">🔥</span></p>
+                  </div>
+                  <div className="w-px h-8 bg-white/10" />
+                  <div className="flex-1 text-center">
+                    <p className="text-[9px] font-black text-yellow-300/70 uppercase tracking-wider">Total</p>
+                    <p className="text-base font-black text-white">{profile?.points ?? 0}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-white/40">
-                  <Trophy size={14} className="text-yellow-400" />
-                  <span className="text-xs font-bold">{profile?.points ?? 0} pts</span>
-                </div>
-              </div>
+              </motion.div>
             </motion.div>
           ) : (
             <motion.div
