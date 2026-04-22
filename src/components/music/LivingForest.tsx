@@ -62,10 +62,13 @@ const LivingForest = ({ children, variant = "light" }: { children?: React.ReactN
         animate={{ x: mouse.x * -8, y: mouse.y * -4 }}
         transition={{ type: "spring", stiffness: 40, damping: 20 }}
         style={{
-          background:
-            "radial-gradient(ellipse at 20% 80%, hsl(160 40% 12% / 0.7) 0%, transparent 35%)," +
-            "radial-gradient(ellipse at 80% 75%, hsl(150 45% 14% / 0.7) 0%, transparent 38%)," +
-            "radial-gradient(ellipse at 50% 90%, hsl(155 50% 10% / 0.85) 0%, transparent 50%)",
+          background: variant === "dark"
+            ? "radial-gradient(ellipse at 20% 80%, hsl(160 40% 12% / 0.7) 0%, transparent 35%)," +
+              "radial-gradient(ellipse at 80% 75%, hsl(150 45% 14% / 0.7) 0%, transparent 38%)," +
+              "radial-gradient(ellipse at 50% 90%, hsl(155 50% 10% / 0.85) 0%, transparent 50%)"
+            : "radial-gradient(ellipse at 20% 80%, hsl(140 50% 35% / 0.45) 0%, transparent 35%)," +
+              "radial-gradient(ellipse at 80% 75%, hsl(150 55% 32% / 0.45) 0%, transparent 38%)," +
+              "radial-gradient(ellipse at 50% 95%, hsl(140 50% 28% / 0.55) 0%, transparent 50%)",
           filter: "blur(8px)",
         }}
       />
