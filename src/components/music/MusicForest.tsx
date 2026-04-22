@@ -131,7 +131,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
               <KidzzChameleon state="music" mood="happy" size="hero" interactive showParticles />
             </motion.div>
             <motion.p
-              className="text-center text-amber-100 text-sm font-extrabold mt-2 drop-shadow"
+              className="text-center text-amber-900 text-sm font-extrabold mt-2 drop-shadow-sm bg-amber-100/80 backdrop-blur rounded-full px-4 py-1.5 border border-amber-300/60 shadow"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -167,16 +167,15 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           {/* Streak hint */}
           {streak >= 1 && (
             <motion.div
-              className="rounded-2xl px-4 py-3 backdrop-blur border border-pink-300/30 text-center"
-              style={{ background: "linear-gradient(135deg, hsl(340 50% 30% / 0.4), hsl(280 40% 25% / 0.4))" }}
+              className="rounded-2xl px-4 py-3 backdrop-blur border border-pink-400/40 text-center bg-white/70 shadow"
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <p className="text-white text-sm font-extrabold">🎵 {streak} {streak === 1 ? "dia" : "dias"} cantando juntos!</p>
+              <p className="text-pink-700 text-sm font-extrabold">🎵 {streak} {streak === 1 ? "dia" : "dias"} cantando juntos!</p>
             </motion.div>
           )}
 
-          <p className="text-center text-white/60 text-[11px] font-bold uppercase tracking-widest pt-2">
+          <p className="text-center text-gray-700 text-[11px] font-bold uppercase tracking-widest pt-2 drop-shadow-sm">
             Mais maneiras de brincar com música
           </p>
 
