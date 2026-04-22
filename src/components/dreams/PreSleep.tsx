@@ -193,51 +193,91 @@ const PreSleep = ({ onBack }: Props) => {
         </button>
       </div>
 
-      {/* Breathing orb */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <motion.div className="relative" style={{ width: 240, height: 240 }}>
+      {/* Conteúdo: gate antes de iniciar (gesto necessário p/ Web Audio em mobile) */}
+      {!started ? (
+        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
           <motion.div
-            className="absolute inset-0 rounded-full"
+            className="w-32 h-32 rounded-full mb-8 flex items-center justify-center"
             style={{
               background:
-                "radial-gradient(circle, hsl(240 70% 75% / 0.45) 0%, hsl(265 70% 60% / 0.25) 60%, transparent 100%)",
-              filter: "blur(20px)",
+                "radial-gradient(circle, hsl(240 70% 75% / 0.45) 0%, hsl(265 70% 60% / 0.2) 60%, transparent 100%)",
             }}
-            animate={{ scale: phase.scale, opacity: phase.id === "out" ? 0.5 : 0.9 }}
-            transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute inset-6 rounded-full border-2 border-indigo-300/40 backdrop-blur-md"
-            style={{
-              background:
-                "radial-gradient(circle, hsl(240 50% 40% / 0.5), hsl(265 60% 25% / 0.4))",
-            }}
-            animate={{ scale: phase.scale }}
-            transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={phase.id}
-                className="text-white text-2xl font-extrabold drop-shadow-lg"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-              >
-                {phase.label}
-              </motion.p>
-            </AnimatePresence>
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Wind size={42} className="text-indigo-200/90" />
+          </motion.div>
+          <h2 className="text-white text-2xl font-extrabold mb-3">
+            Vamos respirar juntos
+          </h2>
+          <p className="text-indigo-200/80 text-sm font-semibold max-w-xs mb-8">
+            Toque em começar para ouvir uma canção lenta e seguir o ritmo da respiração 💜
+          </p>
+          <button
+            onClick={handleStart}
+            className="min-h-[52px] px-8 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-extrabold flex items-center gap-2 shadow-lg shadow-indigo-900/40 active:scale-95 transition-transform"
+          >
+            <Play size={18} fill="currentColor" />
+            Começar
+          </button>
+          <p className="mt-6 text-white/40 text-[11px] font-bold">
+            Use fones para uma experiência mais calma 🎧
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="flex-1 flex flex-col items-center justify-center px-6">
+            <motion.div className="relative" style={{ width: 240, height: 240 }}>
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background:
+                    "radial-gradient(circle, hsl(240 70% 75% / 0.45) 0%, hsl(265 70% 60% / 0.25) 60%, transparent 100%)",
+                  filter: "blur(20px)",
+                }}
+                animate={{ scale: phase.scale, opacity: phase.id === "out" ? 0.5 : 0.9 }}
+                transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute inset-6 rounded-full border-2 border-indigo-300/40 backdrop-blur-md"
+                style={{
+                  background:
+                    "radial-gradient(circle, hsl(240 50% 40% / 0.5), hsl(265 60% 25% / 0.4))",
+                }}
+                animate={{ scale: phase.scale }}
+                transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={phase.id}
+                    className="text-white text-2xl font-extrabold drop-shadow-lg"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                  >
+                    {phase.label}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+            </motion.div>
+
+            <p className="mt-10 text-indigo-200/70 text-sm font-semibold text-center max-w-xs">
+              Acompanhe o círculo. {cycle === 0 ? "Vamos começar com calma." : `Ciclo ${cycle + 1} • respire fundo 💜`}
+            </p>
+            {musicOn && !audioReady && (
+              <p className="mt-3 text-indigo-200/50 text-[11px] font-bold">
+                Música indisponível neste navegador — siga só a respiração 🌙
+              </p>
+            )}
           </div>
-        </motion.div>
 
-        <p className="mt-10 text-indigo-200/70 text-sm font-semibold text-center max-w-xs">
-          Acompanhe o círculo. {cycle === 0 ? "Vamos começar com calma." : `Ciclo ${cycle + 1} • respire fundo 💜`}
-        </p>
-      </div>
+          <p className="text-center text-white/40 text-[11px] font-bold pb-6 px-4">
+            Toque em voltar quando estiver com sono 🌙
+          </p>
+        </>
+      )}
 
-      <p className="text-center text-white/40 text-[11px] font-bold pb-6 px-4">
-        Toque em voltar quando estiver com sono 🌙
-      </p>
     </motion.div>
   );
 };
