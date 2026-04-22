@@ -35,6 +35,10 @@ import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
+import XpToast from "@/components/flow/XpToast";
+import ConversionNudgeCard from "@/components/viral/ConversionNudgeCard";
+import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCard, markConversionCardShown } from "@/lib/dailyMission";
+import { showXpGained } from "@/components/flow/XpToast";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
