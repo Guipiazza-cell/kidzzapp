@@ -184,15 +184,15 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           <div className="grid grid-cols-2 gap-3">
             <PillarCard
               emoji="☀️"
-              title="Bom Dia com Pixel"
-              subtitle="Karaokê do dia"
+              title="Karaokê do Dia"
+              subtitle="Cante com o Kidzz"
               gradient="from-amber-400 to-orange-500"
               onClick={() => setActivePillar("morning")}
               available
             />
             <PillarCard
               emoji="💃"
-              title="Dance com Ane"
+              title="Dance com Kidzz"
               subtitle="Mini-game de palmas"
               gradient="from-pink-400 to-rose-500"
               onClick={() => setActivePillar("dance")}
