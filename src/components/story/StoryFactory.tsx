@@ -78,6 +78,24 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setStory(data.story);
       setImages(data.images || []);
       await incrementStories();
+
+      // Auto-save story to memories (galeria)
+      try {
+        const firstScene = (data.story || "").split(/\[CENA \d+\]/).filter((s: string) => s.trim())[0] || "";
+        const firstSentence = firstScene.split(/[.!?\n]/)[0]?.trim() || "Aventura Mágica";
+        const title = firstSentence.length > 60 ? firstSentence.slice(0, 57) + "..." : firstSentence;
+        await addMemory({
+          type: "story",
+          title,
+          content: data.story,
+          is_special: false,
+          image_url: data.images?.[0] || null,
+          metadata: { age, interests, scenes: data.images?.length ?? 0 },
+        });
+      } catch (e) {
+        console.warn("Could not save story to memories", e);
+      }
+
       setStep("display");
       toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
     } catch (e: any) {
