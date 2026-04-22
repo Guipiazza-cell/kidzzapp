@@ -1,10 +1,12 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Zap, Check } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Zap, Check, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import aneImg from "@/assets/ane-chameleon.png";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import confetti from "canvas-confetti";
+import html2canvas from "html2canvas";
+import { toast } from "sonner";
 
 // --- Types ---
 export type MascotId = "ane" | "pixel";
