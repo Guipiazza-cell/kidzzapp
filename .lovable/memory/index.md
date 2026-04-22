@@ -58,4 +58,5 @@ Updated: now
 - [Kidzz Lab](mem://features/kidzz-lab) — 🧪 dynamic layered SVG avatar customization via Framer Motion
 - [Kidzz Play](mem://features/kidzz-play) — 🎮 mini-games (word search, memory, hangman) to earn avatar energy
 - [Avatar Evolution System](mem://features/avatar-evolution-system) — character_profiles table tracks evolution_points and dominant_trait
+- [Kidzz Pré-sono](mem://features/kidzz-pre-sleep) — Respiração 4-2-6 + canção lenta sintetizada Web Audio dentro do Mundo dos Sonhos
 - [Daily Mission Loop](mem://features/daily-mission-loop) — 3 daily goals + XP toast + confetti reward + parent conversion nudge after 2-3 actions
