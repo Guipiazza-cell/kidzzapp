@@ -6,7 +6,7 @@
  * Pure localStorage. Resets on day change.
  */
 
-export type MissionAction = "music" | "question" | "story" | "create";
+export type MissionAction = "music" | "question" | "story" | "create" | "activity";
 
 const MISSION_KEY = "kidzz_daily_mission";
 const TOTAL_XP_KEY = "kidzz_total_xp";
@@ -17,6 +17,7 @@ export const XP_VALUES: Record<MissionAction, number> = {
   question: 10,
   story: 15,
   create: 25,
+  activity: 15, // valor padrão; passe override no addXp(action, override)
 };
 
 export interface MissionState {
@@ -97,8 +98,8 @@ export function getTotalXp(): number {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
-export function addXp(action: MissionAction): { total: number; gained: number } {
-  const gained = XP_VALUES[action];
+export function addXp(action: MissionAction, override?: number): { total: number; gained: number } {
+  const gained = typeof override === "number" && override > 0 ? override : XP_VALUES[action];
   const total = getTotalXp() + gained;
   safeWrite(TOTAL_XP_KEY, String(total));
   return { total, gained };
