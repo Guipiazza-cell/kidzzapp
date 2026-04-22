@@ -9,7 +9,7 @@ import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
 import DailyChallengeGame from "./games/DailyChallengeGame";
 import PixelPulaGame from "./games/PixelPulaGame";
-import KidzzLab from "@/components/lab/KidzzLab";
+import MyKidzz from "./MyKidzz";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
@@ -369,12 +369,9 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
-              className="flex-1 overflow-hidden"
+              className="flex-1 overflow-hidden relative"
             >
-              {/* KidzzLab é fixed inset-0 — wrappamos para se comportar inline */}
-              <div className="relative w-full h-full">
-                <KidzzLab onBack={() => setView("menu")} />
-              </div>
+              <MyKidzz onBack={() => setView("menu")} />
             </motion.div>
           )}
           {view === "activities" && <MyActivities key="activities" onBack={() => setView("menu")} />}
