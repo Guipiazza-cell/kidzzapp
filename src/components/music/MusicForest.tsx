@@ -91,7 +91,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
 
   return (
     <motion.div
-      className="absolute inset-0 z-10 flex flex-col overflow-hidden pb-[72px]"
+      className="flex-1 flex flex-col overflow-hidden relative"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
       <LivingForest variant="light">
