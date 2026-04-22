@@ -91,30 +91,30 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-40 flex flex-col overflow-hidden"
+      className="absolute inset-0 z-10 flex flex-col overflow-hidden pb-[72px]"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
-      <LivingForest>
+      <LivingForest variant="light">
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 pb-3 border-b border-white/10"
+        <div className="flex items-center gap-3 px-4 pb-3 border-b border-white/30 bg-white/30 backdrop-blur-md"
           style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
-          <button onClick={onBack} className="w-11 h-11 rounded-full bg-white/10 backdrop-blur flex items-center justify-center" aria-label="Voltar">
-            <ArrowLeft size={20} className="text-white" />
+          <button onClick={onBack} className="w-11 h-11 rounded-full bg-white/60 backdrop-blur flex items-center justify-center shadow" aria-label="Voltar">
+            <ArrowLeft size={20} className="text-gray-700" />
           </button>
           <div className="flex-1">
-            <h1 className="text-white text-lg font-extrabold leading-tight flex items-center gap-2">
-              <Music2 size={18} className="text-amber-300" /> Floresta Musical
+            <h1 className="text-gray-800 text-lg font-extrabold leading-tight flex items-center gap-2 drop-shadow-sm">
+              <Music2 size={18} className="text-amber-600" /> Floresta Musical
             </h1>
-            <p className="text-white/60 text-xs font-semibold">Onde a música nasce 🌿</p>
+            <p className="text-gray-700 text-xs font-semibold">Onde a música nasce 🌿</p>
           </div>
           {/* XP & streak chips */}
           <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-1 bg-amber-400/20 backdrop-blur rounded-full px-2.5 py-1 border border-amber-300/30">
-              <span className="text-amber-200 text-[10px] font-extrabold">✨ {xp}</span>
+            <div className="flex items-center gap-1 bg-amber-400/80 backdrop-blur rounded-full px-2.5 py-1 border border-amber-500/40 shadow">
+              <span className="text-amber-900 text-[10px] font-extrabold">✨ {xp}</span>
             </div>
             {streak > 0 && (
-              <div className="flex items-center gap-1 bg-pink-400/20 backdrop-blur rounded-full px-2.5 py-1 border border-pink-300/30">
-                <span className="text-pink-200 text-[10px] font-extrabold">🎵 {streak}d</span>
+              <div className="flex items-center gap-1 bg-pink-400/80 backdrop-blur rounded-full px-2.5 py-1 border border-pink-500/40 shadow">
+                <span className="text-pink-900 text-[10px] font-extrabold">🎵 {streak}d</span>
               </div>
             )}
           </div>
