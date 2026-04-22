@@ -20,6 +20,8 @@ import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import KidzzHero from "@/components/kidzz/KidzzHero";
 import { kidzzMemory, getContextualGreeting } from "@/components/kidzz/kidzzMemory";
 import { loadMascotConfig } from "@/components/lab/KidzzLab";
+import DailyMissionCard from "@/components/flow/DailyMissionCard";
+import { getTotalXp } from "@/lib/dailyMission";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
