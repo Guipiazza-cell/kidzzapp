@@ -68,7 +68,7 @@ const InstallPrompt = () => {
         </button>
 
         <div className="flex items-center gap-3 mb-3">
-          <img src="/icon-192.png?v=2" alt="Kidzz" className="w-12 h-12 rounded-xl shadow-md" />
+          <img src="/icon-192.png?v=3" alt="Kidzz" className="w-12 h-12 rounded-xl shadow-md" />
           <div>
             <p className="font-bold text-foreground text-sm">Instale o Kidzz</p>
             <p className="text-xs text-muted-foreground">Acesse rápido pela tela inicial</p>
