@@ -236,7 +236,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
             </motion.button>
           )}
 
-          <p className="text-center text-white/40 text-[10px] font-semibold pb-4">
+          <p className="text-center text-gray-700/80 text-[10px] font-semibold pb-4 drop-shadow-sm">
             🍃 Mais maravilhas em breve
           </p>
         </div>
@@ -309,24 +309,21 @@ const PillarCard = ({
   <motion.button
     onClick={onClick}
     whileTap={{ scale: available ? 0.97 : 1 }}
-    className={`relative rounded-3xl p-4 text-left border ${available ? "border-amber-300/40" : "border-white/10 opacity-60"}`}
+    className={`relative rounded-3xl p-4 text-left border ${available ? "border-amber-400/50" : "border-white/20 opacity-60"} bg-white/75 backdrop-blur-md shadow-lg`}
     style={{
-      background: available
-        ? "linear-gradient(135deg, hsl(220 30% 18% / 0.7), hsl(220 35% 10% / 0.8))"
-        : "linear-gradient(135deg, hsl(220 20% 15% / 0.5), hsl(220 25% 8% / 0.6))",
-      boxShadow: available ? "0 0 24px hsl(50 80% 50% / 0.15)" : "none",
+      boxShadow: available ? "0 6px 20px hsl(45 80% 50% / 0.15)" : "none",
     }}
   >
     {available && (
       <motion.div
-        className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-amber-900"
+        className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-amber-900 shadow"
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
       >NOVO</motion.div>
     )}
     <div className={`text-4xl mb-2 bg-gradient-to-br ${gradient} bg-clip-text drop-shadow`}>{emoji}</div>
-    <p className="text-white text-sm font-extrabold leading-tight">{title}</p>
-    <p className="text-white/60 text-[11px] font-semibold leading-tight mt-0.5">{subtitle}</p>
+    <p className="text-gray-800 text-sm font-extrabold leading-tight">{title}</p>
+    <p className="text-gray-600 text-[11px] font-semibold leading-tight mt-0.5">{subtitle}</p>
   </motion.button>
 );
 
