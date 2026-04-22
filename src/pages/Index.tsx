@@ -136,6 +136,13 @@ const Index = () => {
     setStep("celebrating");
     evolution.evolve("question");
     kidzzMemory.recordQuestion(question);
+    // Daily mission + XP
+    const { newlyMarked } = completeMissionStep("question");
+    if (newlyMarked) {
+      const { gained } = addXp("question");
+      showXpGained(gained, "pergunta");
+    }
+    bumpSessionActions();
     // Auto-save as memory
     addMemory({
       type: "question",
