@@ -1,8 +1,8 @@
 /* Pré-sono: respiração guiada (4-7-8 simplificado) + canção lenta de embalo.
    Compacto, calmo, sem paywall. */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Wind, Music as MusicIcon } from "lucide-react";
+import { ArrowLeft, Wind, Music as MusicIcon, Play } from "lucide-react";
 
 type Phase = "in" | "hold" | "out";
 const PHASES: { id: Phase; label: string; duration: number; scale: number }[] = [
@@ -18,14 +18,17 @@ interface Props {
 const PreSleep = ({ onBack }: Props) => {
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [cycle, setCycle] = useState(0);
+  const [started, setStarted] = useState(false); // gate: só após gesto do usuário
   const [musicOn, setMusicOn] = useState(true);
+  const [audioReady, setAudioReady] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const stopRef = useRef<(() => void) | null>(null);
   const phase = PHASES[phaseIdx];
 
-  // Cycle through phases
+  // Cycle through phases — só roda após "started"
   useEffect(() => {
+    if (!started) return;
     const t = setTimeout(() => {
       setPhaseIdx((i) => {
         const next = (i + 1) % PHASES.length;
@@ -34,70 +37,124 @@ const PreSleep = ({ onBack }: Props) => {
       });
     }, phase.duration);
     return () => clearTimeout(t);
-  }, [phaseIdx, phase.duration]);
+  }, [phaseIdx, phase.duration, started]);
 
-  // Lullaby — slow, sparse, descending notes (Web Audio sintetizado, leve)
-  useEffect(() => {
-    if (!musicOn) {
-      stopRef.current?.();
-      return;
-    }
+  // Inicia/para a canção. Só monta AudioContext após gesto do usuário (started=true).
+  // Em iOS/Android o AudioContext nasce "suspended" — chamamos resume() de forma síncrona ao toque.
+  const startLullaby = useCallback(async () => {
     if (typeof window === "undefined") return;
     const Ctx: typeof AudioContext =
       (window as any).AudioContext || (window as any).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
+    if (!Ctx) {
+      setAudioReady(false);
+      return;
+    }
+    let ctx: AudioContext;
+    try {
+      ctx = new Ctx();
+    } catch {
+      setAudioReady(false);
+      return;
+    }
     audioCtxRef.current = ctx;
+
+    // iOS/Safari: resume é obrigatório dentro do gesto, e timeout para não travar
+    try {
+      if (ctx.state === "suspended") {
+        await Promise.race([
+          ctx.resume(),
+          new Promise((_, rej) => setTimeout(() => rej(new Error("resume-timeout")), 1500)),
+        ]);
+      }
+    } catch {
+      // se resume falhar, segue sem áudio — UI não trava
+      try { ctx.close(); } catch { /* noop */ }
+      audioCtxRef.current = null;
+      setAudioReady(false);
+      return;
+    }
+
     const master = ctx.createGain();
     master.gain.value = 0.0;
     master.connect(ctx.destination);
     masterGainRef.current = master;
-    // fade in
     master.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 2);
 
-    // Notes A3 C4 E4 G4 (calm pentatonic-ish), slow tempo
     const notes = [220, 261.63, 329.63, 392, 329.63, 261.63];
     let cancelled = false;
 
     const playNote = (freq: number, when: number, dur: number) => {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      g.gain.value = 0;
-      g.gain.linearRampToValueAtTime(0.18, when + 0.4);
-      g.gain.exponentialRampToValueAtTime(0.001, when + dur);
-      osc.connect(g);
-      g.connect(master);
-      osc.start(when);
-      osc.stop(when + dur + 0.05);
+      try {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        g.gain.value = 0;
+        g.gain.linearRampToValueAtTime(0.18, when + 0.4);
+        g.gain.exponentialRampToValueAtTime(0.001, when + dur);
+        osc.connect(g);
+        g.connect(master);
+        osc.start(when);
+        osc.stop(when + dur + 0.05);
+      } catch { /* noop */ }
     };
 
     let i = 0;
-    const beat = 2.6; // segundos por nota — bem lento
+    const beat = 2.6;
+    let scheduleTimer: ReturnType<typeof setTimeout> | null = null;
     const schedule = () => {
-      if (cancelled) return;
+      if (cancelled || ctx.state === "closed") return;
       const start = ctx.currentTime + 0.05;
       for (let n = 0; n < 8; n++) {
         playNote(notes[(i + n) % notes.length], start + n * beat, beat * 0.95);
       }
       i = (i + 8) % notes.length;
-      setTimeout(schedule, 8 * beat * 1000 - 400);
+      scheduleTimer = setTimeout(schedule, 8 * beat * 1000 - 400);
     };
     schedule();
+    setAudioReady(true);
 
     stopRef.current = () => {
       cancelled = true;
+      if (scheduleTimer) clearTimeout(scheduleTimer);
       try {
         master.gain.cancelScheduledValues(ctx.currentTime);
         master.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.2);
-        setTimeout(() => ctx.close(), 1300);
+        setTimeout(() => {
+          try { ctx.close(); } catch { /* noop */ }
+        }, 1300);
       } catch { /* noop */ }
+      audioCtxRef.current = null;
+      masterGainRef.current = null;
+      setAudioReady(false);
     };
+  }, []);
+
+  // Liga/desliga música conforme toggle, mas SOMENTE depois de started
+  useEffect(() => {
+    if (!started) return;
+    if (musicOn && !audioCtxRef.current) {
+      void startLullaby();
+    } else if (!musicOn && audioCtxRef.current) {
+      stopRef.current?.();
+    }
+  }, [musicOn, started, startLullaby]);
+
+  // Cleanup geral ao desmontar
+  useEffect(() => {
     return () => {
       stopRef.current?.();
     };
-  }, [musicOn]);
+  }, []);
+
+  // Handler do botão "Começar" — gesto do usuário; inicia áudio se musicOn
+  const handleStart = async () => {
+    setStarted(true);
+    if (musicOn) {
+      await startLullaby();
+    }
+  };
+
 
   return (
     <motion.div
@@ -136,51 +193,91 @@ const PreSleep = ({ onBack }: Props) => {
         </button>
       </div>
 
-      {/* Breathing orb */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <motion.div className="relative" style={{ width: 240, height: 240 }}>
+      {/* Conteúdo: gate antes de iniciar (gesto necessário p/ Web Audio em mobile) */}
+      {!started ? (
+        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
           <motion.div
-            className="absolute inset-0 rounded-full"
+            className="w-32 h-32 rounded-full mb-8 flex items-center justify-center"
             style={{
               background:
-                "radial-gradient(circle, hsl(240 70% 75% / 0.45) 0%, hsl(265 70% 60% / 0.25) 60%, transparent 100%)",
-              filter: "blur(20px)",
+                "radial-gradient(circle, hsl(240 70% 75% / 0.45) 0%, hsl(265 70% 60% / 0.2) 60%, transparent 100%)",
             }}
-            animate={{ scale: phase.scale, opacity: phase.id === "out" ? 0.5 : 0.9 }}
-            transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute inset-6 rounded-full border-2 border-indigo-300/40 backdrop-blur-md"
-            style={{
-              background:
-                "radial-gradient(circle, hsl(240 50% 40% / 0.5), hsl(265 60% 25% / 0.4))",
-            }}
-            animate={{ scale: phase.scale }}
-            transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={phase.id}
-                className="text-white text-2xl font-extrabold drop-shadow-lg"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-              >
-                {phase.label}
-              </motion.p>
-            </AnimatePresence>
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Wind size={42} className="text-indigo-200/90" />
+          </motion.div>
+          <h2 className="text-white text-2xl font-extrabold mb-3">
+            Vamos respirar juntos
+          </h2>
+          <p className="text-indigo-200/80 text-sm font-semibold max-w-xs mb-8">
+            Toque em começar para ouvir uma canção lenta e seguir o ritmo da respiração 💜
+          </p>
+          <button
+            onClick={handleStart}
+            className="min-h-[52px] px-8 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-extrabold flex items-center gap-2 shadow-lg shadow-indigo-900/40 active:scale-95 transition-transform"
+          >
+            <Play size={18} fill="currentColor" />
+            Começar
+          </button>
+          <p className="mt-6 text-white/40 text-[11px] font-bold">
+            Use fones para uma experiência mais calma 🎧
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="flex-1 flex flex-col items-center justify-center px-6">
+            <motion.div className="relative" style={{ width: 240, height: 240 }}>
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background:
+                    "radial-gradient(circle, hsl(240 70% 75% / 0.45) 0%, hsl(265 70% 60% / 0.25) 60%, transparent 100%)",
+                  filter: "blur(20px)",
+                }}
+                animate={{ scale: phase.scale, opacity: phase.id === "out" ? 0.5 : 0.9 }}
+                transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute inset-6 rounded-full border-2 border-indigo-300/40 backdrop-blur-md"
+                style={{
+                  background:
+                    "radial-gradient(circle, hsl(240 50% 40% / 0.5), hsl(265 60% 25% / 0.4))",
+                }}
+                animate={{ scale: phase.scale }}
+                transition={{ duration: phase.duration / 1000, ease: "easeInOut" }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={phase.id}
+                    className="text-white text-2xl font-extrabold drop-shadow-lg"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                  >
+                    {phase.label}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+            </motion.div>
+
+            <p className="mt-10 text-indigo-200/70 text-sm font-semibold text-center max-w-xs">
+              Acompanhe o círculo. {cycle === 0 ? "Vamos começar com calma." : `Ciclo ${cycle + 1} • respire fundo 💜`}
+            </p>
+            {musicOn && !audioReady && (
+              <p className="mt-3 text-indigo-200/50 text-[11px] font-bold">
+                Música indisponível neste navegador — siga só a respiração 🌙
+              </p>
+            )}
           </div>
-        </motion.div>
 
-        <p className="mt-10 text-indigo-200/70 text-sm font-semibold text-center max-w-xs">
-          Acompanhe o círculo. {cycle === 0 ? "Vamos começar com calma." : `Ciclo ${cycle + 1} • respire fundo 💜`}
-        </p>
-      </div>
+          <p className="text-center text-white/40 text-[11px] font-bold pb-6 px-4">
+            Toque em voltar quando estiver com sono 🌙
+          </p>
+        </>
+      )}
 
-      <p className="text-center text-white/40 text-[11px] font-bold pb-6 px-4">
-        Toque em voltar quando estiver com sono 🌙
-      </p>
     </motion.div>
   );
 };
