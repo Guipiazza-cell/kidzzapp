@@ -139,6 +139,39 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     setTimeout(() => { setSaved(false); onBack(); }, 2000);
   };
 
+  const handleShare = useCallback(async () => {
+    if (!heroRef.current) return;
+    setSharing(true);
+    try {
+      const canvas = await html2canvas(heroRef.current, {
+        backgroundColor: "#0d0618",
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), "image/png"));
+      if (!blob) throw new Error("blob_failed");
+      const file = new File([blob], `kidzz-${config.mascot}.png`, { type: "image/png" });
+      const shareText = `Olha a ${config.mascot === "ane" ? "minha Ane" : "meu Pixel"} no Kidzz! ✨`;
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Meu Kidzz", text: shareText });
+        toast.success("Compartilhado! 💛");
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `kidzz-${config.mascot}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("Imagem baixada! 📸");
+      }
+    } catch (e) {
+      toast.error("Não foi possível compartilhar agora");
+    } finally {
+      setSharing(false);
+    }
+  }, [config.mascot]);
+
   // Expression-based animation for mascot preview
   const expressionAnimations: Record<LabExpression, object> = {
     happy: { y: [0, -8, 0], rotate: [0, -3, 3, 0], scale: [1, 1.05, 1] },
