@@ -121,32 +121,33 @@ describe("MyKidzz — botões SALVAR e COMPARTILHAR", () => {
     expect(revokeUrl).toHaveBeenCalled();
   });
 
-  it("usuário FREE NÃO consegue selecionar expressão bloqueada — mostra aviso premium", () => {
+  it("usuário FREE NÃO consegue selecionar expressão bloqueada — mostra aviso premium", async () => {
     mockProfile = { is_premium: false, child_name: "Lia" };
     render(<MyKidzz onBack={() => {}} />);
 
     // Vai para a aba Expressão
-    fireEvent.click(screen.getByRole("button", { name: /expressão/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Expressão$/ }));
 
-    // "Amoroso" está bloqueado para free (index 4 nas EXPRESSIONS de MyKidzz)
-    const lockedBtn = screen.getByRole("button", { name: /amoroso/i });
+    // "Amoroso" está bloqueado para free — aguarda animação do AnimatePresence
+    const lockedBtn = await screen.findByRole("button", { name: /Amoroso/i }, { timeout: 2000 });
     fireEvent.click(lockedBtn);
 
     expect(toastMock.info).toHaveBeenCalledWith(expect.stringMatching(/Premium/i));
 
     // Salvar agora — config NÃO deve ter sido alterada para "loving"
-    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Salvar$/ }));
     const saved = JSON.parse(localStorage.getItem(KEY)!);
     expect(saved.expression).not.toBe("loving");
   });
 
-  it("usuário PREMIUM consegue selecionar itens bloqueados normalmente", () => {
+  it("usuário PREMIUM consegue selecionar itens bloqueados normalmente", async () => {
     mockProfile = { is_premium: true, child_name: "Lia" };
     render(<MyKidzz onBack={() => {}} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /expressão/i }));
-    fireEvent.click(screen.getByRole("button", { name: /amoroso/i }));
-    fireEvent.click(screen.getByRole("button", { name: /salvar/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Expressão$/ }));
+    const lovingBtn = await screen.findByRole("button", { name: /Amoroso/i }, { timeout: 2000 });
+    fireEvent.click(lovingBtn);
+    fireEvent.click(screen.getByRole("button", { name: /^Salvar$/ }));
 
     const saved = JSON.parse(localStorage.getItem(KEY)!);
     expect(saved.expression).toBe("loving");
