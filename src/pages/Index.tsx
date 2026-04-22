@@ -181,7 +181,7 @@ const Index = () => {
   };
 
   const handleTabChange = (tab: string) => {
-    // Close all overlays when switching tabs
+    // Fecha overlays ao trocar de aba
     setShowLab(false);
     setShowPlay(false);
     setShowTravel(false);
@@ -193,9 +193,21 @@ const Index = () => {
   };
 
   const renderContent = () => {
+    // ABA: Histórias (📖)
     if (activeTab === "explore") {
       return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
+    // ABA: Brincar (🎮 — core do app, inline em vez de overlay)
+    if (activeTab === "play") {
+      return (
+        <KidzzPlay
+          key="play"
+          onBack={() => { setActiveTab("chat"); setStep("home"); }}
+          onGameComplete={() => evolution.evolve("game")}
+        />
+      );
+    }
+    // ABA: Memórias (acessada via botão da Home, não está na tab bar)
     if (activeTab === "memories") {
       return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
     }
@@ -203,13 +215,15 @@ const Index = () => {
       return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "achievements") {
-      // Redireciona para Memórias > Conquistas (subaba)
+      // Conquistas vivem dentro de Memórias
       setActiveTab("memories");
       return null;
     }
+    // ABA: Sonhos (🌙 — fundo próprio escuro)
     if (activeTab === "dreams") {
       return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
+    // ABA: Música (🌿)
     if (activeTab === "music") {
       return (
         <MusicForest
