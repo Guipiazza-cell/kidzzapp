@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star } from "lucide-react";
+import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star, Music2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
+import musicKidzz from "@/assets/kidzz/music.png";
 
 interface PaywallProps {
   onLogin: () => void;
@@ -294,6 +295,79 @@ const Paywall = ({ onLogin }: PaywallProps) => {
             </p>
             <p className="text-[10px] text-gray-500 font-bold mt-1">Tudo do KIDZZ + Histórias + Avatar</p>
           </motion.button>
+
+          {/* Teaser — Floresta Musical em breve */}
+          <motion.div
+            className="w-full rounded-2xl p-4 relative overflow-hidden border border-emerald-300/40"
+            style={{
+              background:
+                "linear-gradient(135deg, hsl(155 50% 22%) 0%, hsl(170 45% 18%) 50%, hsl(180 40% 14%) 100%)",
+            }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            {/* Floresta sutil — folhas decorativas */}
+            <div className="absolute inset-0 pointer-events-none opacity-30">
+              {["🌿", "🍃", "🌱"].map((leaf, i) => (
+                <motion.span
+                  key={i}
+                  className="absolute text-xl"
+                  style={{
+                    top: `${20 + i * 25}%`,
+                    left: `${10 + i * 30}%`,
+                  }}
+                  animate={{ y: [0, -4, 0], rotate: [0, 8, -8, 0] }}
+                  transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
+                >
+                  {leaf}
+                </motion.span>
+              ))}
+            </div>
+
+            <div className="relative flex items-center gap-3">
+              {/* Music Soul KIDZZ */}
+              <motion.div
+                className="relative flex-shrink-0"
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <div
+                  className="absolute inset-0 rounded-full blur-xl"
+                  style={{ background: "radial-gradient(circle, hsl(35 90% 60% / 0.5), transparent 70%)" }}
+                />
+                <img
+                  src={musicKidzz}
+                  alt="Music Soul KIDZZ"
+                  className="relative w-16 h-16 object-contain"
+                  style={{ filter: "drop-shadow(0 4px 12px hsl(35 90% 50% / 0.4))" }}
+                />
+                {/* Notas musicais flutuando */}
+                <motion.span
+                  className="absolute -top-1 -right-1 text-xs"
+                  animate={{ y: [-2, -10, -2], opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  🎵
+                </motion.span>
+              </motion.div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Music2 size={12} className="text-amber-300" />
+                  <span className="text-[9px] font-black text-amber-300 uppercase tracking-widest">
+                    Em breve
+                  </span>
+                </div>
+                <p className="text-white text-sm font-black leading-tight">
+                  🌿 Floresta Musical
+                </p>
+                <p className="text-emerald-100/80 text-[11px] font-semibold leading-snug mt-0.5">
+                  Karaokê, dança e histórias cantadas com {childName}
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Free */}
           <motion.div

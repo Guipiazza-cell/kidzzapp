@@ -1,13 +1,14 @@
 import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, BookOpen, Zap, Library } from "lucide-react";
 import AvatarCustomization from "./AvatarCustomization";
 import StoryForm from "./StoryForm";
 import StoryDisplay from "./StoryDisplay";
 import GeneratingOverlay from "./GeneratingOverlay";
-import MagicalBackground from "../MagicalBackground";
+import StoryGallery from "./StoryGallery";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMemories } from "@/hooks/useMemories";
 import { toast } from "sonner";
 import { ChildAvatar } from "@/types/story";
 import pixelImg from "@/assets/pixel-chameleon.png";
@@ -19,6 +20,7 @@ type Step = "intro" | "avatar" | "form" | "display";
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const { profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
+  const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
 
   const [step, setStep] = useState<Step>("intro");
@@ -27,6 +29,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const [images, setImages] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   const handleAvatarComplete = useCallback((a: ChildAvatar) => {
     setAvatar(a);
@@ -75,6 +78,24 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setStory(data.story);
       setImages(data.images || []);
       await incrementStories();
+
+      // Auto-save story to memories (galeria)
+      try {
+        const firstScene = (data.story || "").split(/\[CENA \d+\]/).filter((s: string) => s.trim())[0] || "";
+        const firstSentence = firstScene.split(/[.!?\n]/)[0]?.trim() || "Aventura Mágica";
+        const title = firstSentence.length > 60 ? firstSentence.slice(0, 57) + "..." : firstSentence;
+        await addMemory({
+          type: "story",
+          title,
+          content: data.story,
+          is_special: false,
+          image_url: data.images?.[0] || null,
+          metadata: { age, interests, scenes: data.images?.length ?? 0 },
+        });
+      } catch (e) {
+        console.warn("Could not save story to memories", e);
+      }
+
       setStep("display");
       toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
     } catch (e: any) {
@@ -85,7 +106,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(100);
       setTimeout(() => setIsGenerating(false), 500);
     }
-  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining]);
+  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining, addMemory]);
 
   const handleReset = useCallback(() => {
     setStep("intro");
@@ -113,13 +134,21 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           whileTap={{ scale: 0.9 }}>
           <ArrowLeft size={22} />
         </motion.button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1">
           <BookOpen size={18} className="text-kid-orange" />
           <h1 className="text-lg font-extrabold text-gray-800 drop-shadow-sm">Fábrica de Histórias</h1>
-          <span className="text-[10px] font-extrabold bg-gradient-to-r from-kid-orange to-kid-pink text-white px-2 py-0.5 rounded-full">
-            SUPER PREMIUM
+          <span className="text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-0.5 rounded-full">
+            EXCLUSIVO
           </span>
         </div>
+        <motion.button
+          onClick={() => setGalleryOpen(true)}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl glass-card text-amber-600"
+          whileTap={{ scale: 0.9 }}
+          aria-label="Galeria de histórias"
+        >
+          <Library size={20} />
+        </motion.button>
       </header>
 
       {/* Content */}
@@ -183,6 +212,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       </div>
 
       <GeneratingOverlay open={isGenerating} progress={progress} />
+
+      <AnimatePresence>
+        {galleryOpen && <StoryGallery onClose={() => setGalleryOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
 };
