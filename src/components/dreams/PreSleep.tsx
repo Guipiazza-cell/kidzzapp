@@ -18,14 +18,17 @@ interface Props {
 const PreSleep = ({ onBack }: Props) => {
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [cycle, setCycle] = useState(0);
+  const [started, setStarted] = useState(false); // gate: só após gesto do usuário
   const [musicOn, setMusicOn] = useState(true);
+  const [audioReady, setAudioReady] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const stopRef = useRef<(() => void) | null>(null);
   const phase = PHASES[phaseIdx];
 
-  // Cycle through phases
+  // Cycle through phases — só roda após "started"
   useEffect(() => {
+    if (!started) return;
     const t = setTimeout(() => {
       setPhaseIdx((i) => {
         const next = (i + 1) % PHASES.length;
@@ -34,70 +37,124 @@ const PreSleep = ({ onBack }: Props) => {
       });
     }, phase.duration);
     return () => clearTimeout(t);
-  }, [phaseIdx, phase.duration]);
+  }, [phaseIdx, phase.duration, started]);
 
-  // Lullaby — slow, sparse, descending notes (Web Audio sintetizado, leve)
-  useEffect(() => {
-    if (!musicOn) {
-      stopRef.current?.();
-      return;
-    }
+  // Inicia/para a canção. Só monta AudioContext após gesto do usuário (started=true).
+  // Em iOS/Android o AudioContext nasce "suspended" — chamamos resume() de forma síncrona ao toque.
+  const startLullaby = useCallback(async () => {
     if (typeof window === "undefined") return;
     const Ctx: typeof AudioContext =
       (window as any).AudioContext || (window as any).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
+    if (!Ctx) {
+      setAudioReady(false);
+      return;
+    }
+    let ctx: AudioContext;
+    try {
+      ctx = new Ctx();
+    } catch {
+      setAudioReady(false);
+      return;
+    }
     audioCtxRef.current = ctx;
+
+    // iOS/Safari: resume é obrigatório dentro do gesto, e timeout para não travar
+    try {
+      if (ctx.state === "suspended") {
+        await Promise.race([
+          ctx.resume(),
+          new Promise((_, rej) => setTimeout(() => rej(new Error("resume-timeout")), 1500)),
+        ]);
+      }
+    } catch {
+      // se resume falhar, segue sem áudio — UI não trava
+      try { ctx.close(); } catch { /* noop */ }
+      audioCtxRef.current = null;
+      setAudioReady(false);
+      return;
+    }
+
     const master = ctx.createGain();
     master.gain.value = 0.0;
     master.connect(ctx.destination);
     masterGainRef.current = master;
-    // fade in
     master.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 2);
 
-    // Notes A3 C4 E4 G4 (calm pentatonic-ish), slow tempo
     const notes = [220, 261.63, 329.63, 392, 329.63, 261.63];
     let cancelled = false;
 
     const playNote = (freq: number, when: number, dur: number) => {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      g.gain.value = 0;
-      g.gain.linearRampToValueAtTime(0.18, when + 0.4);
-      g.gain.exponentialRampToValueAtTime(0.001, when + dur);
-      osc.connect(g);
-      g.connect(master);
-      osc.start(when);
-      osc.stop(when + dur + 0.05);
+      try {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        g.gain.value = 0;
+        g.gain.linearRampToValueAtTime(0.18, when + 0.4);
+        g.gain.exponentialRampToValueAtTime(0.001, when + dur);
+        osc.connect(g);
+        g.connect(master);
+        osc.start(when);
+        osc.stop(when + dur + 0.05);
+      } catch { /* noop */ }
     };
 
     let i = 0;
-    const beat = 2.6; // segundos por nota — bem lento
+    const beat = 2.6;
+    let scheduleTimer: ReturnType<typeof setTimeout> | null = null;
     const schedule = () => {
-      if (cancelled) return;
+      if (cancelled || ctx.state === "closed") return;
       const start = ctx.currentTime + 0.05;
       for (let n = 0; n < 8; n++) {
         playNote(notes[(i + n) % notes.length], start + n * beat, beat * 0.95);
       }
       i = (i + 8) % notes.length;
-      setTimeout(schedule, 8 * beat * 1000 - 400);
+      scheduleTimer = setTimeout(schedule, 8 * beat * 1000 - 400);
     };
     schedule();
+    setAudioReady(true);
 
     stopRef.current = () => {
       cancelled = true;
+      if (scheduleTimer) clearTimeout(scheduleTimer);
       try {
         master.gain.cancelScheduledValues(ctx.currentTime);
         master.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.2);
-        setTimeout(() => ctx.close(), 1300);
+        setTimeout(() => {
+          try { ctx.close(); } catch { /* noop */ }
+        }, 1300);
       } catch { /* noop */ }
+      audioCtxRef.current = null;
+      masterGainRef.current = null;
+      setAudioReady(false);
     };
+  }, []);
+
+  // Liga/desliga música conforme toggle, mas SOMENTE depois de started
+  useEffect(() => {
+    if (!started) return;
+    if (musicOn && !audioCtxRef.current) {
+      void startLullaby();
+    } else if (!musicOn && audioCtxRef.current) {
+      stopRef.current?.();
+    }
+  }, [musicOn, started, startLullaby]);
+
+  // Cleanup geral ao desmontar
+  useEffect(() => {
     return () => {
       stopRef.current?.();
     };
-  }, [musicOn]);
+  }, []);
+
+  // Handler do botão "Começar" — gesto do usuário; inicia áudio se musicOn
+  const handleStart = async () => {
+    setStarted(true);
+    if (musicOn) {
+      await startLullaby();
+    }
+  };
+
 
   return (
     <motion.div
