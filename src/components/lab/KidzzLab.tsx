@@ -98,6 +98,8 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
   const [saved, setSaved] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   const mascotSrc = config.mascot === "ane" ? aneImg : pixelImg;
   const selectedColor = COLORS.find(c => c.id === config.colorId) || COLORS[0];
