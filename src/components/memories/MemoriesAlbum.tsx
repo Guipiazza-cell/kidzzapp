@@ -1,10 +1,11 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, Filter, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, MessageCircle } from "lucide-react";
 import { useMemories, type Memory } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import aneImg from "@/assets/ane-chameleon.png";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import AchievementsScreen from "@/components/flow/AchievementsScreen";
 
 interface MemoriesAlbumProps {
   onBack: () => void;
@@ -201,6 +202,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
     isPremium,
   } = useMemories();
 
+  const [section, setSection] = useState<"memories" | "achievements">("memories");
   const childName = profile?.child_name || "amigo";
 
   const handleShare = useCallback(async (memory: Memory) => {
