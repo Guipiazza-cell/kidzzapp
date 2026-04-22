@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { addXp } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
+import ActivityDetailModal from "./ActivityDetailModal";
 import {
   Activity,
   ActivityCategory,
@@ -51,6 +52,7 @@ const MyActivities = ({ onBack }: Props) => {
   );
   const [completed, setCompleted] = useState<Set<string>>(() => loadCompletedSet(weekKey));
   const [refreshingAi, setRefreshingAi] = useState(false);
+  const [selected, setSelected] = useState<Activity | null>(null);
 
   // 1x por semana, tenta puxar versão IA personalizada (background, não bloqueia)
   useEffect(() => {
@@ -223,7 +225,7 @@ const MyActivities = ({ onBack }: Props) => {
         {/* Atividade do dia (destaque) */}
         {dailyHighlight && (
           <motion.div
-            className="relative mb-4 p-4 rounded-3xl border-2 border-amber-300 overflow-hidden"
+            className="relative mb-4 p-4 rounded-3xl border-2 border-amber-300 overflow-hidden cursor-pointer"
             style={{
               background:
                 "linear-gradient(135deg, hsl(45 95% 88%) 0%, hsl(45 95% 75%) 100%)",
@@ -231,6 +233,10 @@ const MyActivities = ({ onBack }: Props) => {
             }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setSelected(dailyHighlight)}
+            role="button"
+            aria-label={`Ver detalhes: ${dailyHighlight.title}`}
           >
             <div className="absolute -top-2 -right-2 px-2 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md">
               <Sparkles size={10} /> HOJE
@@ -247,10 +253,16 @@ const MyActivities = ({ onBack }: Props) => {
                 <p className="text-xs text-gray-700 mt-1 leading-snug">
                   {dailyHighlight.description}
                 </p>
+                <p className="text-[10px] font-bold text-amber-800/80 mt-1.5">
+                  Toque para ver como fazer →
+                </p>
               </div>
             </div>
             <motion.button
-              onClick={() => handleComplete(dailyHighlight)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelected(dailyHighlight);
+              }}
               className="mt-3 w-full py-3 rounded-2xl font-extrabold text-white text-sm flex items-center justify-center gap-2 min-h-[44px] shadow-md"
               style={{
                 background:
@@ -258,7 +270,7 @@ const MyActivities = ({ onBack }: Props) => {
               }}
               whileTap={{ scale: 0.96 }}
             >
-              <Check size={18} /> Concluir +{dailyHighlight.xp} XP
+              <Sparkles size={16} /> Ver atividade do dia
             </motion.button>
           </motion.div>
         )}
@@ -271,12 +283,23 @@ const MyActivities = ({ onBack }: Props) => {
             return (
               <motion.div
                 key={a.id}
-                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelected(a)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelected(a);
+                  }
+                }}
+                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-sm ${
                   done
                     ? "bg-emerald-50/80 border-emerald-200 opacity-70"
                     : "bg-white/70 border-white/60"
                 }`}
                 layout
+                whileTap={{ scale: 0.98 }}
+                aria-label={`Ver detalhes de ${a.title}`}
               >
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -297,7 +320,11 @@ const MyActivities = ({ onBack }: Props) => {
                   </p>
                 </div>
                 <motion.button
-                  onClick={() => handleComplete(a)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (done) return;
+                    setSelected(a);
+                  }}
                   disabled={done}
                   className={`min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all ${
                     done
@@ -305,9 +332,9 @@ const MyActivities = ({ onBack }: Props) => {
                       : "bg-gray-100 text-gray-700 active:scale-90"
                   }`}
                   whileTap={done ? undefined : { scale: 0.9 }}
-                  aria-label={done ? "Concluído" : "Concluir"}
+                  aria-label={done ? "Concluído" : "Ver atividade"}
                 >
-                  {done ? <Check size={18} /> : "Feito"}
+                  {done ? <Check size={18} /> : "Ver"}
                 </motion.button>
               </motion.div>
             );
@@ -328,6 +355,15 @@ const MyActivities = ({ onBack }: Props) => {
           />
         </div>
       </div>
+
+      {/* Modal de detalhe — explica como fazer + exemplo prático */}
+      <ActivityDetailModal
+        activity={selected}
+        childName={childName}
+        done={selected ? completed.has(selected.id) : false}
+        onComplete={handleComplete}
+        onClose={() => setSelected(null)}
+      />
     </motion.div>
   );
 };
