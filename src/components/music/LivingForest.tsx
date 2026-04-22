@@ -11,7 +11,7 @@ interface AmbientEvent {
   x: number;
 }
 
-const LivingForest = ({ children }: { children?: React.ReactNode }) => {
+const LivingForest = ({ children, variant = "light" }: { children?: React.ReactNode; variant?: "light" | "dark" }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [events, setEvents] = useState<AmbientEvent[]>([]);
@@ -52,7 +52,9 @@ const LivingForest = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden" style={{
-      background: "radial-gradient(ellipse at 50% 40%, hsl(150 35% 22%), hsl(220 40% 8%) 75%)",
+      background: variant === "dark"
+        ? "radial-gradient(ellipse at 50% 40%, hsl(150 35% 22%), hsl(220 40% 8%) 75%)"
+        : "radial-gradient(ellipse at 50% 35%, hsl(95 45% 78%), hsl(140 35% 65%) 75%)",
     }}>
       {/* BACK LAYER — distant trees silhouette */}
       <motion.div
