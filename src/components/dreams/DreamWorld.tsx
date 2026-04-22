@@ -1,11 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Play, Pause, Lock, Crown, Timer, BookOpen, Music, ChevronRight, Volume2, Headphones } from "lucide-react";
+import { Moon, Play, Pause, Lock, Crown, Timer, BookOpen, Music, ChevronRight, Volume2, Headphones, Wind } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Slider } from "@/components/ui/slider";
 import { AmbientSoundEngine } from "./AmbientSoundEngine";
 import { DreamNarrator } from "./DreamNarrator";
 import { SLEEP_STORIES, SOUND_PRESETS, TIMER_OPTIONS } from "./sleepStories";
+import PreSleep from "./PreSleep";
 
 /* ── Floating particles ── */
 const DreamParticles = () => (
