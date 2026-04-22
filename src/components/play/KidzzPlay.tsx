@@ -126,24 +126,27 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
         ))}
       </div>
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
+      {/* Header — Voltar SEMPRE vai pra home; sair do jogo é o botão dedicado abaixo */}
+      <div className="relative z-20 flex items-center justify-between px-4 pt-3 pb-2" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
         <motion.button
-          onClick={activeGame ? () => setActiveGame(null) : onBack}
-          className="p-2 rounded-xl bg-white/5 border border-white/10"
+          onClick={onBack}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/10 border border-white/20 backdrop-blur"
           whileTap={{ scale: 0.9 }}
+          aria-label="Voltar para a home"
         >
-          <ArrowLeft size={20} className="text-white/70" />
+          <ArrowLeft size={20} className="text-white" />
         </motion.button>
         <div className="text-center">
           <h1 className="text-base font-bold text-white/90 flex items-center gap-1.5">
             🎮 Kidzz Play
           </h1>
-          <p className="text-[10px] text-emerald-300/50">Smart Fun World</p>
+          <p className="text-[10px] text-emerald-300/60">
+            {activeGame ? "Jogando…" : "Smart Fun World"}
+          </p>
         </div>
-        <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1.5 rounded-xl">
+        <div className="flex items-center gap-1.5 bg-white/10 border border-white/20 px-2.5 py-1.5 rounded-xl backdrop-blur">
           <Trophy size={14} className="text-yellow-400" />
-          <span className="text-xs font-bold text-white/70">{sessionScore}</span>
+          <span className="text-xs font-bold text-white/80">{sessionScore}</span>
         </div>
       </div>
 
