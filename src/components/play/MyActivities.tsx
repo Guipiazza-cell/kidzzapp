@@ -283,12 +283,23 @@ const MyActivities = ({ onBack }: Props) => {
             return (
               <motion.div
                 key={a.id}
-                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelected(a)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelected(a);
+                  }
+                }}
+                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-sm ${
                   done
                     ? "bg-emerald-50/80 border-emerald-200 opacity-70"
                     : "bg-white/70 border-white/60"
                 }`}
                 layout
+                whileTap={{ scale: 0.98 }}
+                aria-label={`Ver detalhes de ${a.title}`}
               >
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -309,7 +320,11 @@ const MyActivities = ({ onBack }: Props) => {
                   </p>
                 </div>
                 <motion.button
-                  onClick={() => handleComplete(a)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (done) return;
+                    setSelected(a);
+                  }}
                   disabled={done}
                   className={`min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all ${
                     done
@@ -317,9 +332,9 @@ const MyActivities = ({ onBack }: Props) => {
                       : "bg-gray-100 text-gray-700 active:scale-90"
                   }`}
                   whileTap={done ? undefined : { scale: 0.9 }}
-                  aria-label={done ? "Concluído" : "Concluir"}
+                  aria-label={done ? "Concluído" : "Ver atividade"}
                 >
-                  {done ? <Check size={18} /> : "Feito"}
+                  {done ? <Check size={18} /> : "Ver"}
                 </motion.button>
               </motion.div>
             );
