@@ -106,7 +106,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(100);
       setTimeout(() => setIsGenerating(false), 500);
     }
-  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining]);
+  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining, addMemory]);
 
   const handleReset = useCallback(() => {
     setStep("intro");
@@ -134,13 +134,21 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           whileTap={{ scale: 0.9 }}>
           <ArrowLeft size={22} />
         </motion.button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1">
           <BookOpen size={18} className="text-kid-orange" />
           <h1 className="text-lg font-extrabold text-gray-800 drop-shadow-sm">Fábrica de Histórias</h1>
           <span className="text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-0.5 rounded-full">
             EXCLUSIVO
           </span>
         </div>
+        <motion.button
+          onClick={() => setGalleryOpen(true)}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl glass-card text-amber-600"
+          whileTap={{ scale: 0.9 }}
+          aria-label="Galeria de histórias"
+        >
+          <Library size={20} />
+        </motion.button>
       </header>
 
       {/* Content */}
