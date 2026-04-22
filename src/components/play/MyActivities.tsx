@@ -41,11 +41,14 @@ const MyActivities = ({ onBack }: Props) => {
   const interests = (profile as any)?.child_interests as string[] | undefined;
 
   const weekKey = useMemo(() => getWeekKey(), []);
+  const profileId = (profile as any)?.id ?? "guest";
   const [activities, setActivities] = useState<Activity[]>(() => {
     const cached = loadWeeklyCache(weekKey);
-    return cached?.activities ?? pickWeeklyFromPool(`${weekKey}-${profile?.id ?? "guest"}`);
+    return cached?.activities ?? pickWeeklyFromPool(`${weekKey}-${profileId}`);
   });
-  const [source, setSource] = useState<"pool" | "ai">(() => loadWeeklyCache(weekKey)?.source ?? "pool");
+  const [source, setSource] = useState<"pool" | "ai">(
+    () => loadWeeklyCache(weekKey)?.source ?? "pool"
+  );
   const [completed, setCompleted] = useState<Set<string>>(() => loadCompletedSet(weekKey));
   const [refreshingAi, setRefreshingAi] = useState(false);
 
@@ -90,15 +93,15 @@ const MyActivities = ({ onBack }: Props) => {
       saveCompletedSet(weekKey, next);
 
       // XP + memória + confetti
-      const { gained } = addXp("activity" as any, activity.xp);
-      showXpGained(gained || activity.xp, activity.title);
+      const { gained } = addXp("activity", activity.xp);
+      showXpGained(gained, activity.title);
       addMemory({
-        type: "activity",
+        type: "mission",
         title: `✅ ${activity.title}`,
         content: activity.description,
         is_special: false,
         image_url: null,
-        metadata: { category: activity.category, emoji: activity.emoji },
+        metadata: { source: "weekly_activity", category: activity.category, emoji: activity.emoji },
       });
       const meta = getCategoryMeta(activity.category);
       const colorHsl = meta.color
