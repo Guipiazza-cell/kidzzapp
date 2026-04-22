@@ -17,11 +17,11 @@ const TABS: {
   color: string;
   kidzzImg?: string;
 }[] = [
-  { id: "chat",      label: "Perguntas", icon: MessageCircleHeart, color: "text-kid-pink",  kidzzImg: cosmicImg },
-  { id: "explore",   label: "Histórias", icon: BookOpen,           color: "text-kid-blue",  kidzzImg: explorerImg },
-  { id: "music",     label: "Música",    icon: Music2,             color: "text-kid-green", kidzzImg: musicImg },
-  { id: "dreams",    label: "Sonhos",    icon: Moon,               color: "text-indigo-400",kidzzImg: moonImg },
-  { id: "memories",  label: "Memórias",  icon: ImageIcon,          color: "text-kid-orange" },
+  { id: "chat",     label: "Perguntas", icon: MessageCircleHeart, color: "text-kid-pink",   kidzzImg: cosmicImg },
+  { id: "explore",  label: "Histórias", icon: BookOpen,           color: "text-kid-blue",   kidzzImg: explorerImg },
+  { id: "music",    label: "Música",    icon: Music2,             color: "text-kid-yellow", kidzzImg: musicImg },
+  { id: "dreams",   label: "Sonhos",    icon: Moon,               color: "text-indigo-400", kidzzImg: moonImg },
+  { id: "memories", label: "Memórias",  icon: ImageIcon,          color: "text-kid-orange" },
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: Props) => (
@@ -47,7 +47,6 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
             }`}
             whileTap={{ scale: 0.85 }}
           >
-            {/* Pulse ripple when active */}
             {isActive && (
               <motion.span
                 className="absolute inset-0 rounded-xl pointer-events-none"
@@ -58,7 +57,6 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
               />
             )}
 
-            {/* Icon morphs into mini KIDZZ when active */}
             <div className="w-7 h-7 flex items-center justify-center">
               <AnimatePresence mode="popLayout">
                 {isActive && tab.kidzzImg ? (

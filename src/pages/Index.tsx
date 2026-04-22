@@ -178,7 +178,9 @@ const Index = () => {
       return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "achievements") {
-      return <AchievementsScreen key="achievements" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      // Redireciona para Memórias > Conquistas (subaba)
+      setActiveTab("memories");
+      return null;
     }
     if (activeTab === "dreams") {
       return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;

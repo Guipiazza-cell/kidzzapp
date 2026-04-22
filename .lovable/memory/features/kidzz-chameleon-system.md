@@ -1,38 +1,46 @@
 ---
 name: KIDZZ Chameleon System
-description: Sistema unificado do mascote KIDZZ — 1 personagem com 4 estados visuais que metamorfoseiam (cosmic/moon/explorer/music) usando crossfade morph e memória contextual via localStorage
+description: Sistema unificado do mascote KIDZZ — 1 personagem com 4 estados visuais (cosmic/moon/explorer/music) usado como HERO em todas as telas principais (~40% da tela). Pixel/Ane/ChameleonMascot foram aposentados.
 type: feature
 ---
 
 # KIDZZ Chameleon System
 
 ## Conceito Central
-**É UM PERSONAGEM SÓ.** Os 4 visuais (cosmic, moon, explorer, music) são estados/cores do mesmo camaleão. Nunca trocar imagem bruscamente — sempre **morph crossfade 600-700ms**.
+**É UM PERSONAGEM SÓ.** Os 4 visuais são estados/cores do mesmo camaleão. Sempre **morph crossfade 600-700ms**. KIDZZ é o protagonista único — não usar mais Pixel, Ane ou ChameleonMascot em telas novas.
 
-## Assets
-- `src/assets/kidzz/cosmic.png` — Azul estrelado, curioso (Perguntas)
-- `src/assets/kidzz/moon.png` — Roxo lunar, calmo (Sonhos)
-- `src/assets/kidzz/explorer.png` — Verde-dourado apontando, guia (Histórias/Viagem)
-- `src/assets/kidzz/music.png` — Dourado headphones (futura aba Música, hoje teaser Premium)
+## Mapa de Estados por Aba/Tela
+- **cosmic** (azul) — Perguntas, Home Hero, Memórias empty state, Onboarding "Nome"
+- **explorer** (verde-dourado) — Histórias (StoryFactory intro), Play hero, Onboarding "Idade", Travel
+- **moon** (roxo) — Sonhos
+- **music** (amarelo headphones) — Música (hero hero-size dominante), Onboarding "Interesses"
 
-Gerados via Nano Banana Pro a partir da grade 2x2 enviada pelo usuário, com fundo branco removido via PIL alpha matting.
+## Escala (regra global)
+- HERO em todas as telas principais: size `xl` ou `hero` (35-50% da tela)
+- Tab bar mini icons: 28px (transformação do ícone Lucide quando ativo)
+- NUNCA usar como ícone pequeno fora da tab bar
+
+## Tab Bar (5 abas, sem Conquistas)
+Perguntas | Histórias | Música | Sonhos | Memórias.
+**Conquistas** virou subaba dentro de Memórias (toggle "💛 Conteúdos" / "🏆 Conquistas").
+
+## Onboarding (3 telas)
+Nome → Idade → Interesses. Cada tela tem:
+- `OnboardingProgress` no topo (●○○ → ●●○ → ●●●)
+- KIDZZ HERO size `xl`/`lg` com mood específico (cosmic/curious, explorer/curious, music/happy)
+- Background floresta clara com leve variação de luz
+- Botão Continuar grande (min-h 56px) sempre visível
 
 ## Componentes
-- `src/components/kidzz/KidzzChameleon.tsx` — Componente core: 4 estados, mood (idle/curious/calm/guide/happy/talking/thinking), morph crossfade, eye-follow touch, tap ripple+bounce, particle trails coloridos por estado, heart pulse glow, breathing idle
-- `src/components/kidzz/KidzzHero.tsx` — Wrapper para Home com greeting contextual
-- `src/components/kidzz/kidzzMemory.ts` — Engine de memória: bumpVisit, recordQuestion, markMet, getContextualGreeting
+- `src/components/kidzz/KidzzChameleon.tsx` — Core (4 estados, mood, morph, eye-follow, ripple, particles)
+- `src/components/kidzz/KidzzHero.tsx` — Wrapper Home com greeting contextual
+- `src/components/onboarding/OnboardingProgress.tsx` — Indicador ●○○ animado
+- `src/components/kidzz/kidzzMemory.ts` — Memória contextual
 
-## Memória Contextual (kidzz_memory_v1)
-- Detecta horário (manhã/tarde/noite) → muda saudação e mood
-- Streak ≥5 → "X dias juntos! Você está incrível!"
-- Streak ≥3 + noite → "Hora das estrelas…"
-- Última pergunta foi ontem → "Ontem sua pergunta foi incrível… vamos continuar?"
-
-## Tab Bar Viva (BottomNav)
-Quando uma aba fica ativa, o ícone Lucide morfa para o KIDZZ mini correspondente (cosmic/explorer/music/moon). Memórias mantém ícone Lucide. Inclui pulse ripple no toque e leve floating bob.
+## Música — HERO amarelo dominante
+KIDZZ music size `hero` central. CTA principal "🎤 Cantar junto" (gradient amarelo grande). 4 pilares secundários abaixo. Cards renomeados: "Karaokê do Dia" / "Dance com Kidzz" (Pixel/Ane removidos do nome).
 
 ## Regras
-- NUNCA usar emoji 🦎 ou cartoon genérico para representar KIDZZ
+- NUNCA usar Pixel, Ane ou ChameleonMascot em telas novas
 - NUNCA trocar visual sem AnimatePresence morph
 - Heart glow é parte da identidade — mantido em todos os estados
-- music.png está integrado mas NÃO ativa aba Música ainda — usar apenas como teaser Premium "🌿 Floresta Musical em breve"

@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Moon, Music2 } from "lucide-react";
+import { ArrowLeft, Moon, Music2, Mic } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import LivingForest from "./LivingForest";
-import PixelMusical from "./PixelMusical";
-import AneMusical from "./AneMusical";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import MorningKaraoke from "./MorningKaraoke";
 import DanceWithAne from "./DanceWithAne";
 import SungStories from "./SungStories";
@@ -121,15 +120,49 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-5">
-          {/* Mascots stage */}
-          <div className="flex items-center justify-center gap-6 py-2">
-            <PixelMusical mood="idle" size="lg" onTap={() => setActivePillar("morning")} />
-            <AneMusical mood="idle" size="lg" />
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          {/* KIDZZ HERO — amarelo dominante (Music Soul), interface orbita */}
+          <div className="flex flex-col items-center justify-center pt-2">
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 180, damping: 14 }}
+            >
+              <KidzzChameleon state="music" mood="happy" size="hero" interactive showParticles />
+            </motion.div>
+            <motion.p
+              className="text-center text-amber-100 text-sm font-extrabold mt-2 drop-shadow"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {childName}, vamos cantar juntos? 🎵
+            </motion.p>
           </div>
-          <p className="text-center text-white/80 text-xs font-bold">
-            Pixel e Ane esperam você, {childName} ✨
-          </p>
+
+          {/* CTA Principal: Cantar junto */}
+          <motion.button
+            onClick={() => setActivePillar("morning")}
+            whileTap={{ scale: 0.96 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="w-full rounded-3xl py-5 px-6 flex items-center justify-center gap-3 shadow-2xl border-2 border-amber-300/40 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, hsl(45 95% 55%), hsl(35 95% 50%))",
+              boxShadow: "0 10px 40px hsl(45 95% 55% / 0.5)",
+            }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-white/20"
+              animate={{ x: ["-100%", "100%"] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+            />
+            <Mic size={24} className="text-white drop-shadow relative z-10" />
+            <span className="text-white text-lg font-black drop-shadow relative z-10">
+              🎤 Cantar junto
+            </span>
+          </motion.button>
 
           {/* Streak hint */}
           {streak >= 1 && (
@@ -143,19 +176,23 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
             </motion.div>
           )}
 
+          <p className="text-center text-white/60 text-[11px] font-bold uppercase tracking-widest pt-2">
+            Mais maneiras de brincar com música
+          </p>
+
           {/* 4 Pilares */}
           <div className="grid grid-cols-2 gap-3">
             <PillarCard
               emoji="☀️"
-              title="Bom Dia com Pixel"
-              subtitle="Karaokê do dia"
+              title="Karaokê do Dia"
+              subtitle="Cante com o Kidzz"
               gradient="from-amber-400 to-orange-500"
               onClick={() => setActivePillar("morning")}
               available
             />
             <PillarCard
               emoji="💃"
-              title="Dance com Ane"
+              title="Dance com Kidzz"
               subtitle="Mini-game de palmas"
               gradient="from-pink-400 to-rose-500"
               onClick={() => setActivePillar("dance")}

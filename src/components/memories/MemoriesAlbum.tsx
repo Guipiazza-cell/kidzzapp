@@ -1,10 +1,11 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, Filter, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, MessageCircle } from "lucide-react";
 import { useMemories, type Memory } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import aneImg from "@/assets/ane-chameleon.png";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import AchievementsScreen from "@/components/flow/AchievementsScreen";
 
 interface MemoriesAlbumProps {
   onBack: () => void;
@@ -201,6 +202,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
     isPremium,
   } = useMemories();
 
+  const [section, setSection] = useState<"memories" | "achievements">("memories");
   const childName = profile?.child_name || "amigo";
 
   const handleShare = useCallback(async (memory: Memory) => {
@@ -250,6 +252,40 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         </div>
       </header>
 
+      {/* Section toggle: Memórias / Conquistas (subaba) */}
+      <div className="px-4 pb-2 relative z-10">
+        <div className="flex gap-2 p-1 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/40 max-w-sm">
+          {([
+            { id: "memories", label: "💛 Conteúdos" },
+            { id: "achievements", label: "🏆 Conquistas" },
+          ] as const).map((opt) => {
+            const isActive = section === opt.id;
+            return (
+              <motion.button
+                key={opt.id}
+                onClick={() => setSection(opt.id)}
+                className={`flex-1 py-2 rounded-xl text-xs font-extrabold transition-colors ${
+                  isActive
+                    ? "bg-white text-gray-800 shadow-sm"
+                    : "text-gray-500"
+                }`}
+                whileTap={{ scale: 0.97 }}
+              >
+                {opt.label}
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {section === "achievements" ? (
+        <div className="flex-1 overflow-y-auto -mt-2">
+          <AchievementsScreen onBack={() => setSection("memories")} />
+        </div>
+      ) : (
+      <>
+
+
       {/* Filters */}
       <div className="px-4 pb-2">
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
@@ -293,14 +329,10 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            {/* Mascot */}
-            <motion.img
-              src={aneImg}
-              alt="Ane"
-              className="w-24 h-24 object-contain mb-3"
-              animate={{ y: [0, -6, 0], rotate: [0, 3, -3, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
+            {/* KIDZZ HERO — empty state */}
+            <div className="mb-3">
+              <KidzzChameleon state="cosmic" mood="curious" size="lg" interactive showParticles />
+            </div>
 
             <h3 className="text-base font-black text-gray-800 leading-snug">
               Aqui vão ficar as memórias mais preciosas de {childName} 💛
@@ -437,6 +469,8 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
           </>
         )}
       </div>
+      </>
+      )}
     </motion.div>
   );
 };
