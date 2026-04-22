@@ -89,7 +89,7 @@ describe("MyKidzz — botões SALVAR e COMPARTILHAR", () => {
     fireEvent.click(screen.getByRole("button", { name: /compartilhar/i }));
 
     await waitFor(() => expect(shareSpy).toHaveBeenCalled());
-    const arg = shareSpy.mock.calls[0][0] as { files: File[]; title: string };
+    const arg = (shareSpy.mock.calls as any[])[0][0] as { files: File[]; title: string };
     expect(arg.files[0]).toBeInstanceOf(File);
     expect(arg.title).toMatch(/KIDZZ/i);
     expect(toastMock.success).toHaveBeenCalled();
