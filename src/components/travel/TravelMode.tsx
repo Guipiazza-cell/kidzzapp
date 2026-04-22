@@ -79,6 +79,23 @@ const TravelMode = ({ onBack }: Props) => {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const speakingRef = useRef(false);
+  const lockedVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
+
+  // Lock TTS voice once for consistency across all phases (setup preview, playing, finished)
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    const pickVoice = () => {
+      if (lockedVoiceRef.current) return;
+      const voices = window.speechSynthesis.getVoices();
+      const ptBR = voices.find(v => v.lang === "pt-BR" && /female|mulher|luciana|joana|fernanda|maria|ana/i.test(v.name))
+        || voices.find(v => v.lang === "pt-BR")
+        || voices.find(v => v.lang.startsWith("pt"));
+      if (ptBR) lockedVoiceRef.current = ptBR;
+    };
+    pickVoice();
+    window.speechSynthesis.onvoiceschanged = pickVoice;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   // Preview de pergunta no setup — rotaciona a cada 4s
   useEffect(() => {
@@ -98,7 +115,7 @@ const TravelMode = ({ onBack }: Props) => {
     setPhase("playing");
   }, [theme, questionCount]);
 
-  // TTS speak
+  // TTS speak — voz/pitch/rate IDÊNTICOS em todas as fases
   const speak = useCallback((text: string): Promise<void> => {
     return new Promise((resolve) => {
       if (!("speechSynthesis" in window)) { resolve(); return; }
@@ -107,19 +124,31 @@ const TravelMode = ({ onBack }: Props) => {
 
       const utt = new SpeechSynthesisUtterance(text);
       utt.lang = "pt-BR";
-      utt.pitch = 1.0;
+      utt.pitch = 1.05;
       utt.rate = 0.92;
       utt.volume = 0.95;
-
-      const voices = window.speechSynthesis.getVoices();
-      const ptVoice = voices.find(v => v.lang === "pt-BR") || voices.find(v => v.lang.startsWith("pt"));
-      if (ptVoice) utt.voice = ptVoice;
+      if (lockedVoiceRef.current) utt.voice = lockedVoiceRef.current;
 
       utt.onend = () => { speakingRef.current = false; resolve(); };
       utt.onerror = () => { speakingRef.current = false; resolve(); };
       window.speechSynthesis.speak(utt);
     });
   }, []);
+
+  // Cleanup TTS ao desmontar (ex: voltar à home)
+  useEffect(() => {
+    return () => {
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  // Falar a pergunta do preview (sincroniza com o texto exibido no chip)
+  const speakPreview = useCallback(() => {
+    const q = TRAVEL_QUESTIONS[theme]?.[previewIndex];
+    if (!q) return;
+    speak(`${childName}... ${q.text}`);
+  }, [theme, previewIndex, childName, speak]);
 
   // Play current question
   useEffect(() => {
@@ -246,14 +275,17 @@ const TravelMode = ({ onBack }: Props) => {
             />
 
             {/* Preview de pergunta — alto-falante */}
-            <motion.div
-              className="w-full max-w-xs rounded-2xl px-4 py-3 backdrop-blur-md border border-amber-300/30 flex items-start gap-3"
+            <motion.button
+              onClick={speakPreview}
+              className="w-full max-w-xs rounded-2xl px-4 py-3 backdrop-blur-md border border-amber-300/30 flex items-start gap-3 text-left active:scale-[0.98] transition-transform"
               style={{
                 background: "linear-gradient(135deg, hsl(280 50% 25% / 0.55), hsl(250 50% 18% / 0.55))",
               }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
+              whileTap={{ scale: 0.98 }}
+              aria-label="Tocar prévia da pergunta"
             >
               <motion.div
                 className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center flex-shrink-0"
@@ -264,22 +296,22 @@ const TravelMode = ({ onBack }: Props) => {
               </motion.div>
               <div className="flex-1 min-w-0">
                 <p className="text-amber-200 text-[10px] font-black uppercase tracking-wider mb-0.5">
-                  Pixel pergunta…
+                  KIDZZ pergunta… <span className="font-bold normal-case tracking-normal text-amber-200/70">(toque para ouvir)</span>
                 </p>
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={previewIndex}
-                    className="text-white text-sm font-bold leading-snug truncate"
+                    className="text-white text-sm font-bold leading-snug"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.4 }}
                   >
-                    "{childName.slice(0, 8)}{childName.length > 8 ? "…" : ""} — {previewQuestion?.text}"
+                    "{childName}, {previewQuestion?.text}"
                   </motion.p>
                 </AnimatePresence>
               </div>
-            </motion.div>
+            </motion.button>
 
             <p className="text-white/85 text-center text-sm font-bold leading-relaxed max-w-xs">
               <span className="text-amber-300">{questionCount} perguntas</span> mágicas pra{" "}

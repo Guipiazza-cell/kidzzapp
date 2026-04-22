@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Flame, Sparkles } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import pixelImg from "@/assets/pixel-chameleon.png";
@@ -126,24 +126,27 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
         ))}
       </div>
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
+      {/* Header — Voltar SEMPRE vai pra home; sair do jogo é o botão dedicado abaixo */}
+      <div className="relative z-20 flex items-center justify-between px-4 pt-3 pb-2" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
         <motion.button
-          onClick={activeGame ? () => setActiveGame(null) : onBack}
-          className="p-2 rounded-xl bg-white/5 border border-white/10"
+          onClick={onBack}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/10 border border-white/20 backdrop-blur"
           whileTap={{ scale: 0.9 }}
+          aria-label="Voltar para a home"
         >
-          <ArrowLeft size={20} className="text-white/70" />
+          <ArrowLeft size={20} className="text-white" />
         </motion.button>
         <div className="text-center">
           <h1 className="text-base font-bold text-white/90 flex items-center gap-1.5">
             🎮 Kidzz Play
           </h1>
-          <p className="text-[10px] text-emerald-300/50">Smart Fun World</p>
+          <p className="text-[10px] text-emerald-300/60">
+            {activeGame ? "Jogando…" : "Smart Fun World"}
+          </p>
         </div>
-        <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1.5 rounded-xl">
+        <div className="flex items-center gap-1.5 bg-white/10 border border-white/20 px-2.5 py-1.5 rounded-xl backdrop-blur">
           <Trophy size={14} className="text-yellow-400" />
-          <span className="text-xs font-bold text-white/70">{sessionScore}</span>
+          <span className="text-xs font-bold text-white/80">{sessionScore}</span>
         </div>
       </div>
 
@@ -232,17 +235,30 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
                 })}
               </div>
 
-              {/* Stats bar */}
-              <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-white/5">
-                <div className="flex items-center gap-1.5 text-white/40">
-                  <Flame size={14} className="text-orange-400" />
-                  <span className="text-xs font-bold">{profile?.streak_days ?? 0} dias</span>
+              {/* Stats panel — highscores + streak inline (não bloqueia cards) */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-black/30 backdrop-blur-md rounded-2xl p-3 border border-white/10 mt-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 text-center">
+                    <p className="text-[9px] font-black text-emerald-300/70 uppercase tracking-wider">Hoje</p>
+                    <p className="text-base font-black text-white">{sessionScore}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
+                  </div>
+                  <div className="w-px h-8 bg-white/10" />
+                  <div className="flex-1 text-center">
+                    <p className="text-[9px] font-black text-orange-300/70 uppercase tracking-wider">Streak</p>
+                    <p className="text-base font-black text-white">{profile?.streak_days ?? 0}<span className="text-[10px] text-white/50 ml-0.5">🔥</span></p>
+                  </div>
+                  <div className="w-px h-8 bg-white/10" />
+                  <div className="flex-1 text-center">
+                    <p className="text-[9px] font-black text-yellow-300/70 uppercase tracking-wider">Total</p>
+                    <p className="text-base font-black text-white">{profile?.points ?? 0}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-white/40">
-                  <Trophy size={14} className="text-yellow-400" />
-                  <span className="text-xs font-bold">{profile?.points ?? 0} pts</span>
-                </div>
-              </div>
+              </motion.div>
             </motion.div>
           ) : (
             <motion.div
@@ -261,47 +277,19 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
         </AnimatePresence>
       </div>
 
-      {/* Back button — fixed bottom-left for active games (audit: bottom 90px, left 20px) */}
+      {/* Botão "Sair do jogo" — flutuante apenas dentro de um jogo (audit: bottom 90px, left 20px) */}
       {activeGame && (
         <motion.button
           onClick={() => setActiveGame(null)}
-          className="absolute z-30 px-4 py-3 rounded-2xl font-bold text-white text-sm border border-white/20 bg-black/50 backdrop-blur-md shadow-xl flex items-center gap-2"
+          className="absolute z-30 px-4 py-3 rounded-2xl font-bold text-white text-sm border border-white/30 bg-black/60 backdrop-blur-md shadow-xl flex items-center gap-2 min-h-[44px]"
           style={{ bottom: 90, left: 20 }}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileTap={{ scale: 0.95 }}
+          aria-label="Sair do jogo"
         >
-          <ArrowLeft size={16} /> Voltar
+          <ArrowLeft size={16} /> Sair do jogo
         </motion.button>
-      )}
-
-      {/* Lower-half stats panel when no game active (audit: highscores + mini badges) */}
-      {!activeGame && (
-        <div className="absolute bottom-24 left-4 right-4 z-10 pointer-events-none">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-black/30 backdrop-blur-md rounded-2xl p-3 border border-white/10 pointer-events-auto"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex-1 text-center">
-                <p className="text-[9px] font-black text-emerald-300/70 uppercase tracking-wider">Hoje</p>
-                <p className="text-base font-black text-white">{sessionScore}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
-              </div>
-              <div className="w-px h-8 bg-white/10" />
-              <div className="flex-1 text-center">
-                <p className="text-[9px] font-black text-orange-300/70 uppercase tracking-wider">Streak</p>
-                <p className="text-base font-black text-white">{profile?.streak_days ?? 0}<span className="text-[10px] text-white/50 ml-0.5">🔥</span></p>
-              </div>
-              <div className="w-px h-8 bg-white/10" />
-              <div className="flex-1 text-center">
-                <p className="text-[9px] font-black text-yellow-300/70 uppercase tracking-wider">Total</p>
-                <p className="text-base font-black text-white">{profile?.points ?? 0}<span className="text-[10px] text-white/50 ml-0.5">pts</span></p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
       )}
 
       {/* Premium CTA overlay */}
