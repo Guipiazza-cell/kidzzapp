@@ -374,6 +374,11 @@ const DreamWorld = ({ onBack }: Props) => {
     );
   }
 
+  /* ── Pré-sono ── */
+  if (view === "presleep") {
+    return <PreSleep onBack={() => setView("main")} />;
+  }
+
   /* ── Main dream screen ── */
   return (
     <motion.div
