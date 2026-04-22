@@ -9,6 +9,8 @@ import DanceWithAne from "./DanceWithAne";
 import SungStories from "./SungStories";
 import CreateMusic from "./CreateMusic";
 import { getMusicXp, getMusicStreak, type MusicAchievement } from "@/lib/musicXp";
+import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
+import { showXpGained } from "@/components/flow/XpToast";
 
 interface Props {
   onBack: () => void;
@@ -27,11 +29,19 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
   const [rareEffect, setRareEffect] = useState<"stars" | "butterflies" | "choir" | null>(null);
   const [achievementToast, setAchievementToast] = useState<MusicAchievement | null>(null);
 
-  // Refresh XP/streak after pillar visits
+  // Refresh XP/streak after pillar visits + mark daily mission step + global XP
   useEffect(() => {
     if (activePillar === null) {
       setXp(getMusicXp());
       setStreak(getMusicStreak());
+    } else {
+      // Entering an activity counts as a music interaction for the daily loop
+      const { newlyMarked } = completeMissionStep("music");
+      if (newlyMarked) {
+        const { gained } = addXp("music");
+        showXpGained(gained, "música");
+        bumpSessionActions();
+      }
     }
   }, [activePillar]);
 

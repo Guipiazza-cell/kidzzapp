@@ -20,6 +20,8 @@ import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import KidzzHero from "@/components/kidzz/KidzzHero";
 import { kidzzMemory, getContextualGreeting } from "@/components/kidzz/kidzzMemory";
 import { loadMascotConfig } from "@/components/lab/KidzzLab";
+import DailyMissionCard from "@/components/flow/DailyMissionCard";
+import { getTotalXp } from "@/lib/dailyMission";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
@@ -77,7 +79,7 @@ interface Props {
   characterEvolution?: any;
 }
 
-const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay, onOpenTravel, onOpenChallenge, onOpenReferral }: Props) => {
+const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchievements, onOpenLab, onOpenPlay, onOpenTravel, onOpenChallenge, onOpenReferral, onTabChange }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining, signOut } = useAuth();
   const navigate = useNavigate();
   const { particles, burst } = useCharacterParticles();
@@ -208,6 +210,9 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <Gift size={18} />
             </motion.button>
           )}
+          <span className="text-xs text-amber-700 font-extrabold glass-card px-3 py-1.5 rounded-full flex items-center gap-1" title="Pontos de sabedoria">
+            ✨ {getTotalXp()}
+          </span>
           <span className="text-xs text-gray-800 font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
           </span>
@@ -243,6 +248,18 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
 
         {/* Streak Card */}
         <StreakCard streakDays={streakDays} childName={childName} onSubmit={onSubmit} />
+
+        {/* Daily mission loop — drives retention */}
+        <div className="w-full flex justify-center mt-2 mb-1">
+          <DailyMissionCard
+            childName={childName}
+            onAction={(target) => {
+              if (target === "music") onTabChange?.("music");
+              else if (target === "story") onTabChange?.("explore");
+              else inputRef.current?.focus();
+            }}
+          />
+        </div>
 
         {/* Daily Special Question */}
         <div className="w-full flex justify-center mt-2 mb-1">

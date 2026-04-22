@@ -35,6 +35,10 @@ import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
+import XpToast from "@/components/flow/XpToast";
+import ConversionNudgeCard from "@/components/viral/ConversionNudgeCard";
+import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCard, markConversionCardShown } from "@/lib/dailyMission";
+import { showXpGained } from "@/components/flow/XpToast";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
@@ -64,6 +68,7 @@ const Index = () => {
   });
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
+  const [showConversionNudge, setShowConversionNudge] = useState(false);
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -89,6 +94,19 @@ const Index = () => {
     }, 1500);
     return () => clearTimeout(t);
   }, [profile?.child_name, profile?.questions_used]);
+
+  // Conversion nudge (parent-facing): poll session actions, surface when threshold met
+  useEffect(() => {
+    if (profile?.is_premium) return;
+    const check = () => {
+      if (shouldShowConversionCard(false)) {
+        setShowConversionNudge(true);
+        markConversionCardShown();
+      }
+    };
+    const iv = setInterval(check, 4000);
+    return () => clearInterval(iv);
+  }, [profile?.is_premium]);
 
   if (loading) {
     return (
@@ -132,6 +150,13 @@ const Index = () => {
     setStep("celebrating");
     evolution.evolve("question");
     kidzzMemory.recordQuestion(question);
+    // Daily mission + XP
+    const { newlyMarked } = completeMissionStep("question");
+    if (newlyMarked) {
+      const { gained } = addXp("question");
+      showXpGained(gained, "pergunta");
+    }
+    bumpSessionActions();
     // Auto-save as memory
     addMemory({
       type: "question",
@@ -303,6 +328,20 @@ const Index = () => {
         meta={contextualPaywall.meta}
         onClose={() => setContextualPaywall((p) => ({ ...p, open: false }))}
         onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); setShowLoginGate(true); }}
+      />
+
+      {/* Floating XP gain toasts */}
+      <XpToast />
+
+      {/* Parent conversion nudge — appears after 2-3 child actions */}
+      <ConversionNudgeCard
+        open={showConversionNudge && !profile?.is_premium}
+        childName={childName}
+        onUpgrade={() => {
+          setShowConversionNudge(false);
+          setContextualPaywall({ open: true, context: "question_limit" });
+        }}
+        onClose={() => setShowConversionNudge(false)}
       />
     </div>
   );
