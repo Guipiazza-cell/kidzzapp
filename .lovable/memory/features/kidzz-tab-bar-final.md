@@ -1,33 +1,44 @@
 ---
-name: KIDZZ Tab Bar Final (5 abas)
-description: Tab bar final com 5 abas — Explorar (chat) | Brincar ⭐ (core inline) | Histórias | Música | Sonhos. Memórias e Conquistas saíram da nav. KidzzChameleon ganhou estado "play" verde vibrante.
+name: KIDZZ Tab Bar 6 abas + Meu KIDZZ funcional
+description: Tab bar final com 6 abas (Explorar | Brincar | Histórias | Música | Sonhos | Memórias). Meu KIDZZ refatorado para componente próprio MyKidzz que personaliza o KidzzChameleon único em tempo real.
 type: feature
 ---
-# KIDZZ Tab Bar Final
+# KIDZZ Tab Bar Final (6 abas) + Meu KIDZZ funcional
 
-## Estrutura (5 abas, sem rolagem horizontal)
-1. **Explorar** (`chat`) — azul cosmic — Perguntas/Home
-2. **Brincar** (`play`) ⭐ — verde vibrante — CORE do app, ícone maior + halo verde permanente, abre `KidzzPlay` inline (não mais overlay)
-3. **Histórias** (`explore`) — laranja explorer — StoryFactory
+## Tab bar (6 abas, sem scroll horizontal)
+1. **Explorar** (`chat`) — azul cosmic — Home/Perguntas
+2. **Brincar** (`play`) ⭐ — verde vibrante (CORE) — KidzzPlay hub inline
+3. **Histórias** (`explore`) — laranja — StoryFactory
 4. **Música** (`music`) — amarelo — MusicForest
-5. **Sonhos** (`dreams`) — roxo moon — DreamWorld (fundo escuro próprio)
+5. **Sonhos** (`dreams`) — roxo — DreamWorld (fundo escuro próprio)
+6. **Memórias** (`memories`) — pink — MemoriesAlbum + Conquistas (subaba)
 
-## Removido da nav
-- **Memórias** — agora acessível via botão na Home (`onOpenAchievements` rota → `memories`)
-- **Conquistas** — vivem como subaba dentro de Memórias
-- **Moments** — acessível via Home
+Ícones reduzidos (size 18 / 22 destaque) para caber 6 sem scroll.
+Underline com `layoutId="kidzz-tab-underline"` morpha entre abas.
+Brincar tem halo verde pulsante permanente.
 
-## Estado "play" do KidzzChameleon
-- Reusa `explorer.png` com `filter: hue-rotate(50deg) saturate(1.45) brightness(1.05)` → camaleão verde vibrante
-- Glow verde `hsl(140 75% 55%)`
-- Quando o user pedir asset próprio, criar `src/assets/kidzz/play.png` e remover o filter
+## Meu KIDZZ (`src/components/play/MyKidzz.tsx`)
+Substitui KidzzLab dentro do hub Brincar. Componente leve e FUNCIONAL:
+- Personaliza o **KidzzChameleon único** (não Ane/Pixel separados)
+- Cor (hue-rotate aplicado no wrapper), Expressão (emoji overlay + mood), Traje (emoji overlay), Energia (mood do KidzzChameleon)
+- Mudança IMEDIATA visual ao clicar + bounce do hero + feedback flutuante
+- **Salvar**: localStorage `mascotConfig` (mesma chave do KidzzLab → compatível com HomeScreen que já lê via `loadMascotConfig`)
+- **Compartilhar**: html2canvas → web share API ou download PNG
+- Premium gates: 3 trajes finais e 2 expressões (loving/challenging) com `Lock`
 
-## Aba ativa
-- Underline colorido (com `layoutId="kidzz-tab-underline"` para morph entre abas)
-- Ícone Lucide morpha para imagem KIDZZ correspondente
-- Brincar tem halo verde pulsante mesmo inativo (CTA visual)
+## Modo Viagem restaurado
+- Removido grupo de quick-buttons pequenos (Lab/Play/Viagem) da Home
+- Adicionado **card grande gradiente cosmic** "🌍 Modo Viagem" como destaque na Home (Explorar)
+- Lab continua acessível como pílula compacta
+
+## Memórias
+- Já existente em `MemoriesAlbum.tsx` com subaba "Conquistas" (toggle Conteúdos / Conquistas)
+- Acessível agora via tab bar dedicada (não só pela Home)
+- Aba `achievements` redireciona para Memórias mantendo backward compat
 
 ## Arquivos
-- `src/components/flow/BottomNav.tsx` — reescrito do zero
-- `src/components/kidzz/KidzzChameleon.tsx` — adicionado estado "play"
-- `src/pages/Index.tsx` — `play` rota inline; `onOpenPlay` agora muda aba
+- `src/components/flow/BottomNav.tsx` — 6 abas, ícones menores
+- `src/components/play/MyKidzz.tsx` — NOVO (substitui uso de KidzzLab no hub)
+- `src/components/play/KidzzPlay.tsx` — usa MyKidzz no view "kidzz"
+- `src/components/flow/HomeScreen.tsx` — card grande Modo Viagem
+- `src/pages/Index.tsx` — tab `achievements` agora renderiza MemoriesAlbum

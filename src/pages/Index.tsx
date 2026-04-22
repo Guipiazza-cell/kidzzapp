@@ -215,9 +215,8 @@ const Index = () => {
       return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "achievements") {
-      // Conquistas vivem dentro de Memórias
-      setActiveTab("memories");
-      return null;
+      // Conquistas vivem como subaba dentro de Memórias
+      return <MemoriesAlbum key="memories-ach" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
     }
     // ABA: Sonhos (🌙 — fundo próprio escuro)
     if (activeTab === "dreams") {

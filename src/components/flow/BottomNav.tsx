@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircleHeart, Gamepad2, BookOpen, Music2, Moon } from "lucide-react";
+import { MessageCircleHeart, Gamepad2, BookOpen, Music2, Moon, Heart } from "lucide-react";
 import cosmicImg from "@/assets/kidzz/cosmic.png";
 import explorerImg from "@/assets/kidzz/explorer.png";
 import musicImg from "@/assets/kidzz/music.png";
@@ -11,11 +11,11 @@ interface Props {
 }
 
 /**
- * KIDZZ Tab Bar — 5 abas finais
- * Explorar 💬 | Brincar 🎮 (destaque) | Histórias 📖 | Música 🌿 | Sonhos 🌙
+ * KIDZZ Tab Bar — 6 abas finais
+ * Explorar 💬 | Brincar 🎮 (destaque) | Histórias 📖 | Música 🌿 | Sonhos 🌙 | Memórias 📸
  *
  * Regras:
- *  - máximo 5 abas, sem rolagem horizontal
+ *  - 6 abas sem rolagem horizontal (ícones reduzidos para caber)
  *  - aba ativa com underline colorido + KIDZZ correspondente como ícone
  *  - "Brincar" é o CORE → ícone maior, anel destacado
  */
@@ -26,7 +26,6 @@ const TABS: {
   color: string;
   underline: string;
   kidzzImg?: string;
-  /** Tint CSS para Brincar (verde vibrante usando explorer.png) */
   kidzzTint?: string;
   highlight?: boolean;
 }[] = [
@@ -72,6 +71,14 @@ const TABS: {
     underline: "hsl(var(--kid-purple))",
     kidzzImg: moonImg,
   },
+  {
+    id: "memories",
+    label: "Memórias",
+    icon: Heart,
+    color: "text-kid-pink",
+    underline: "hsl(var(--kid-pink))",
+    // sem KIDZZ alternativo — ícone Heart se mantém ao ativar
+  },
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: Props) => (
@@ -84,7 +91,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
       WebkitBackdropFilter: "blur(22px)",
     }}
   >
-    <div className="flex items-center justify-around px-1 pt-1.5">
+    <div className="flex items-center justify-around px-0.5 pt-1.5">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         const Icon = tab.icon;
@@ -93,17 +100,17 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
           <motion.button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`relative flex flex-col items-center gap-0.5 px-2 py-1 rounded-2xl transition-colors min-w-[58px] ${
-              isHighlight ? "min-w-[68px]" : ""
+            className={`relative flex flex-col items-center gap-0.5 px-1 py-1 rounded-2xl transition-colors min-w-[48px] ${
+              isHighlight ? "min-w-[58px]" : ""
             }`}
             whileTap={{ scale: 0.88 }}
             aria-label={tab.label}
             aria-current={isActive ? "page" : undefined}
           >
-            {/* Halo destacado para Brincar (sempre, não só quando ativo) */}
+            {/* Halo destacado para Brincar */}
             {isHighlight && (
               <motion.span
-                className="absolute -top-1 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full pointer-events-none"
+                className="absolute -top-1 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full pointer-events-none"
                 style={{
                   background:
                     "radial-gradient(circle, hsl(145 70% 55% / 0.35), transparent 70%)",
@@ -126,7 +133,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
 
             <div
               className={`flex items-center justify-center ${
-                isHighlight ? "w-9 h-9" : "w-7 h-7"
+                isHighlight ? "w-8 h-8" : "w-6 h-6"
               }`}
             >
               <AnimatePresence mode="popLayout">
@@ -137,7 +144,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
                     alt=""
                     aria-hidden="true"
                     className={`object-contain drop-shadow ${
-                      isHighlight ? "w-9 h-9" : "w-7 h-7"
+                      isHighlight ? "w-8 h-8" : "w-6 h-6"
                     }`}
                     style={tab.kidzzTint ? { filter: tab.kidzzTint } : undefined}
                     initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
@@ -165,9 +172,10 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
                     transition={{ duration: 0.2 }}
                   >
                     <Icon
-                      size={isHighlight ? 26 : 22}
+                      size={isHighlight ? 22 : 18}
                       className={isActive ? tab.color : "text-gray-400"}
                       strokeWidth={isHighlight ? 2.4 : 2}
+                      fill={isActive && tab.id === "memories" ? "currentColor" : "none"}
                     />
                   </motion.div>
                 )}
@@ -175,7 +183,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
             </div>
 
             <span
-              className={`text-[10px] font-extrabold leading-tight tracking-tight ${
+              className={`text-[9px] font-extrabold leading-tight tracking-tight ${
                 isActive ? "text-gray-800" : "text-gray-400"
               }`}
             >
@@ -190,7 +198,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
                   className="absolute -bottom-0.5 h-1 rounded-full"
                   style={{
                     background: tab.underline,
-                    width: isHighlight ? 28 : 22,
+                    width: isHighlight ? 22 : 18,
                     boxShadow: `0 0 8px ${tab.underline}`,
                   }}
                   initial={{ opacity: 0, scaleX: 0 }}
