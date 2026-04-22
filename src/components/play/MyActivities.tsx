@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { addXp } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
+import ActivityDetailModal from "./ActivityDetailModal";
 import {
   Activity,
   ActivityCategory,
@@ -51,6 +52,7 @@ const MyActivities = ({ onBack }: Props) => {
   );
   const [completed, setCompleted] = useState<Set<string>>(() => loadCompletedSet(weekKey));
   const [refreshingAi, setRefreshingAi] = useState(false);
+  const [selected, setSelected] = useState<Activity | null>(null);
 
   // 1x por semana, tenta puxar versão IA personalizada (background, não bloqueia)
   useEffect(() => {
