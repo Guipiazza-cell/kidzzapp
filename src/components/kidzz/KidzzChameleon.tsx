@@ -12,7 +12,7 @@ import moonImg from "@/assets/kidzz/moon.png";
 import explorerImg from "@/assets/kidzz/explorer.png";
 import musicImg from "@/assets/kidzz/music.png";
 
-export type KidzzState = "cosmic" | "moon" | "explorer" | "music";
+export type KidzzState = "cosmic" | "moon" | "explorer" | "music" | "play";
 export type KidzzMood = "idle" | "curious" | "calm" | "guide" | "happy" | "talking" | "thinking";
 
 interface KidzzChameleonProps {
@@ -46,6 +46,12 @@ const stateAssets: Record<KidzzState, string> = {
   moon: moonImg,
   explorer: explorerImg,
   music: musicImg,
+  // "play" reusa explorer.png aplicando hue-rotate verde via CSS filter (ver stateImageFilter)
+  play: explorerImg,
+};
+
+const stateImageFilter: Partial<Record<KidzzState, string>> = {
+  play: "hue-rotate(50deg) saturate(1.45) brightness(1.05)",
 };
 
 const stateGlow: Record<KidzzState, string> = {
@@ -53,6 +59,7 @@ const stateGlow: Record<KidzzState, string> = {
   moon: "radial-gradient(circle, hsl(265 70% 70% / 0.4), transparent 70%)",
   explorer: "radial-gradient(circle, hsl(45 90% 60% / 0.45), transparent 70%)",
   music: "radial-gradient(circle, hsl(35 90% 60% / 0.5), transparent 70%)",
+  play: "radial-gradient(circle, hsl(140 75% 55% / 0.5), transparent 70%)",
 };
 
 const stateParticleColors: Record<KidzzState, string[]> = {
@@ -60,6 +67,7 @@ const stateParticleColors: Record<KidzzState, string[]> = {
   moon: ["#C5A8FF", "#E0CCFF", "#FFE48A", "#FFFFFF"],
   explorer: ["#FFD86E", "#FF9A6E", "#9EE493", "#FFFFFF"],
   music: ["#FFD86E", "#FF9ECF", "#7BC5FF", "#FFFFFF"],
+  play: ["#7CE495", "#FFE48A", "#9EE493", "#FFFFFF"],
 };
 
 const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
@@ -187,6 +195,9 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
               alt={`KIDZZ - ${state}`}
               className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
               draggable={false}
+              loading="lazy"
+              decoding="async"
+              style={stateImageFilter[state] ? { filter: stateImageFilter[state] } : undefined}
             />
           </motion.div>
         </AnimatePresence>
