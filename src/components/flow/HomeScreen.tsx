@@ -325,26 +325,84 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           </motion.button>
         )}
 
-        {/* Lab quick access (compacto) */}
-        {onOpenLab && (
-          <motion.button
-            onClick={onOpenLab}
-            className="px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/20 flex items-center gap-1.5 mb-1"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.7 }}
-            whileTap={{ scale: 0.93 }}
-          >
-            <span className="text-sm">🧪</span>
-            <span className="text-[10px] font-bold text-purple-700">Lab</span>
-          </motion.button>
-        )}
-        {/* Level & Progress */}
+        {/* Input block — DESTAQUE: barra de pergunta + microfone (animada) */}
         <motion.div
-          className="w-full max-w-sm mt-1 mb-2"
+          className="w-full max-w-sm relative mt-2"
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.5, type: "spring", stiffness: 180, damping: 18 }}
+        >
+          {/* Halo pulsante atrás da barra para chamar atenção */}
+          <motion.div
+            aria-hidden
+            className="absolute -inset-2 rounded-3xl pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(60% 80% at 50% 50%, hsl(var(--kid-orange) / 0.35), transparent 70%)",
+              filter: "blur(14px)",
+            }}
+            animate={{ opacity: [0.55, 0.95, 0.55], scale: [1, 1.04, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          <div className="relative flex items-end gap-2.5">
+            <motion.div
+              animate={{ scale: [1, 1.06, 1] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <VoiceInput onResult={submit} disabled={submitting || isFreeLimitReached} large />
+            </motion.div>
+            <motion.div
+              className="flex-1 relative"
+              animate={{
+                boxShadow: [
+                  "0 0 0 0 hsl(var(--kid-orange) / 0)",
+                  "0 0 0 6px hsl(var(--kid-orange) / 0.18)",
+                  "0 0 0 0 hsl(var(--kid-orange) / 0)",
+                ],
+              }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              style={{ borderRadius: 20 }}
+            >
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit(input)}
+                placeholder={
+                  isFreeLimitReached ? "Limite atingido" : "Pergunta qualquer coisa ✨"
+                }
+                className="w-full py-5 px-6 rounded-2xl glass-card text-gray-800 text-lg font-semibold placeholder:text-gray-500 placeholder:font-bold focus:outline-none focus:ring-4 focus:ring-kid-orange/50 transition-all disabled:opacity-40 shadow-lg border-2 border-white/60"
+                disabled={submitting || isFreeLimitReached}
+              />
+            </motion.div>
+            <motion.button
+              onClick={() => submit(input)}
+              disabled={!input.trim() || submitting || isFreeLimitReached}
+              aria-label="Enviar pergunta"
+              className="w-14 h-14 rounded-2xl kid-gradient-orange shadow-xl flex items-center justify-center disabled:opacity-30 transition-all"
+              whileTap={{ scale: 0.88 }}
+              animate={{
+                boxShadow: [
+                  "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
+                  "0 12px 28px -4px hsl(var(--kid-orange) / 0.65)",
+                  "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
+                ],
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Send size={24} className="text-white" />
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Level & Progress — agora ABAIXO da barra de pergunta */}
+        <motion.div
+          className="w-full max-w-sm mt-3 mb-2"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.7 }}
         >
           <div className="glass-card rounded-2xl px-4 py-2.5 flex items-center gap-3">
             <span className="text-lg">{levelInfo.emoji}</span>
@@ -355,40 +413,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               </div>
               <Progress value={levelProgress} className="h-1.5 bg-gray-200/50" />
             </div>
-          </div>
-        </motion.div>
-
-        {/* Input block */}
-        <motion.div
-          className="w-full max-w-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div className="flex items-end gap-2.5">
-            <VoiceInput onResult={submit} disabled={submitting || isFreeLimitReached} />
-            <div className="flex-1 relative">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && submit(input)}
-                placeholder={
-                  isFreeLimitReached ? "Limite atingido" : "Digite sua pergunta aqui 😊"
-                }
-                className="w-full py-4 px-5 rounded-2xl glass-card text-gray-800 text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-kid-orange/40 transition-all disabled:opacity-40"
-                disabled={submitting || isFreeLimitReached}
-              />
-            </div>
-            <motion.button
-              onClick={() => submit(input)}
-              disabled={!input.trim() || submitting || isFreeLimitReached}
-              className="w-13 h-13 rounded-xl kid-gradient-orange shadow-lg flex items-center justify-center disabled:opacity-30 transition-all"
-              whileTap={{ scale: 0.9 }}
-            >
-              <Send size={22} className="text-white" />
-            </motion.button>
           </div>
         </motion.div>
 
