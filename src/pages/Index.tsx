@@ -329,6 +329,20 @@ const Index = () => {
         onClose={() => setContextualPaywall((p) => ({ ...p, open: false }))}
         onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); setShowLoginGate(true); }}
       />
+
+      {/* Floating XP gain toasts */}
+      <XpToast />
+
+      {/* Parent conversion nudge — appears after 2-3 child actions */}
+      <ConversionNudgeCard
+        open={showConversionNudge && !profile?.is_premium}
+        childName={childName}
+        onUpgrade={() => {
+          setShowConversionNudge(false);
+          setContextualPaywall({ open: true, context: "question_limit" });
+        }}
+        onClose={() => setShowConversionNudge(false)}
+      />
     </div>
   );
 };
