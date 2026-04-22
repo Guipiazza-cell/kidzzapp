@@ -74,7 +74,7 @@ export default function KidzzHero({ childName, streakDays, ageRange }: Props) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
-        Descubra respostas e crie conversas incríveis comigo 💛
+        Descubra respostas e crie conversas incríveis comigo 
       </motion.p>
     </div>
   );
