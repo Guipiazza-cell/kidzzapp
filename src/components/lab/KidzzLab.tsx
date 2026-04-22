@@ -284,7 +284,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
       </motion.p>
 
       {/* CHARACTER HERO — LARGE & CENTERED */}
-      <div className="relative z-10 flex-shrink-0 flex flex-col items-center justify-center" style={{ minHeight: 240 }}>
+      <div ref={heroRef} className="relative z-10 flex-shrink-0 flex flex-col items-center justify-center" style={{ minHeight: 240 }}>
         <motion.div className="relative">
           {/* Dynamic color glow behind */}
           <motion.div
