@@ -212,6 +212,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       </div>
 
       <GeneratingOverlay open={isGenerating} progress={progress} />
+
+      <AnimatePresence>
+        {galleryOpen && <StoryGallery onClose={() => setGalleryOpen(false)} />}
+      </AnimatePresence>
     </div>
   );
 };
