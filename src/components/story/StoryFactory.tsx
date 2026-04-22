@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import { toast } from "sonner";
 import { ChildAvatar } from "@/types/story";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-story`;
 
@@ -159,13 +159,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
           
-            <motion.img
-              src={pixelImg}
-              alt="Pixel"
-              className="w-24 h-24 object-contain drop-shadow-xl"
-              animate={{ y: [0, -8, 0], rotate: [0, 3, -3, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 16 }}
+            >
+              <KidzzChameleon state="explorer" mood="happy" size="xl" interactive showParticles />
+            </motion.div>
             <h2 className="text-2xl font-extrabold text-gray-800 drop-shadow-sm">Uma história especial para {childName} 📖</h2>
             <p className="text-gray-500 text-sm max-w-[280px]">
               Crie histórias personalizadas com ilustrações exclusivas!
