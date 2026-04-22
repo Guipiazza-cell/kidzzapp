@@ -210,6 +210,9 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <Gift size={18} />
             </motion.button>
           )}
+          <span className="text-xs text-amber-700 font-extrabold glass-card px-3 py-1.5 rounded-full flex items-center gap-1" title="Pontos de sabedoria">
+            ✨ {getTotalXp()}
+          </span>
           <span className="text-xs text-gray-800 font-extrabold glass-card px-3 py-1.5 rounded-full">
             {questionsRemaining()} 💬
           </span>
@@ -245,6 +248,18 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
 
         {/* Streak Card */}
         <StreakCard streakDays={streakDays} childName={childName} onSubmit={onSubmit} />
+
+        {/* Daily mission loop — drives retention */}
+        <div className="w-full flex justify-center mt-2 mb-1">
+          <DailyMissionCard
+            childName={childName}
+            onAction={(target) => {
+              if (target === "music") onTabChange?.("music");
+              else if (target === "story") onTabChange?.("explore");
+              else inputRef.current?.focus();
+            }}
+          />
+        </div>
 
         {/* Daily Special Question */}
         <div className="w-full flex justify-center mt-2 mb-1">
