@@ -267,14 +267,17 @@ const TravelMode = ({ onBack }: Props) => {
             />
 
             {/* Preview de pergunta — alto-falante */}
-            <motion.div
-              className="w-full max-w-xs rounded-2xl px-4 py-3 backdrop-blur-md border border-amber-300/30 flex items-start gap-3"
+            <motion.button
+              onClick={speakPreview}
+              className="w-full max-w-xs rounded-2xl px-4 py-3 backdrop-blur-md border border-amber-300/30 flex items-start gap-3 text-left active:scale-[0.98] transition-transform"
               style={{
                 background: "linear-gradient(135deg, hsl(280 50% 25% / 0.55), hsl(250 50% 18% / 0.55))",
               }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
+              whileTap={{ scale: 0.98 }}
+              aria-label="Tocar prévia da pergunta"
             >
               <motion.div
                 className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center flex-shrink-0"
@@ -285,22 +288,22 @@ const TravelMode = ({ onBack }: Props) => {
               </motion.div>
               <div className="flex-1 min-w-0">
                 <p className="text-amber-200 text-[10px] font-black uppercase tracking-wider mb-0.5">
-                  Pixel pergunta…
+                  KIDZZ pergunta… <span className="font-bold normal-case tracking-normal text-amber-200/70">(toque para ouvir)</span>
                 </p>
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={previewIndex}
-                    className="text-white text-sm font-bold leading-snug truncate"
+                    className="text-white text-sm font-bold leading-snug"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.4 }}
                   >
-                    "{childName.slice(0, 8)}{childName.length > 8 ? "…" : ""} — {previewQuestion?.text}"
+                    "{childName}, {previewQuestion?.text}"
                   </motion.p>
                 </AnimatePresence>
               </div>
-            </motion.div>
+            </motion.button>
 
             <p className="text-white/85 text-center text-sm font-bold leading-relaxed max-w-xs">
               <span className="text-amber-300">{questionCount} perguntas</span> mágicas pra{" "}
