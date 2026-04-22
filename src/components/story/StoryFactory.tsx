@@ -1,13 +1,14 @@
 import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, BookOpen, Zap, Library } from "lucide-react";
 import AvatarCustomization from "./AvatarCustomization";
 import StoryForm from "./StoryForm";
 import StoryDisplay from "./StoryDisplay";
 import GeneratingOverlay from "./GeneratingOverlay";
-import MagicalBackground from "../MagicalBackground";
+import StoryGallery from "./StoryGallery";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMemories } from "@/hooks/useMemories";
 import { toast } from "sonner";
 import { ChildAvatar } from "@/types/story";
 import pixelImg from "@/assets/pixel-chameleon.png";
@@ -19,6 +20,7 @@ type Step = "intro" | "avatar" | "form" | "display";
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const { profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
+  const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
 
   const [step, setStep] = useState<Step>("intro");
@@ -27,6 +29,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const [images, setImages] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   const handleAvatarComplete = useCallback((a: ChildAvatar) => {
     setAvatar(a);
