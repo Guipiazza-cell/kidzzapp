@@ -52,7 +52,7 @@ Updated: now
 - [Global Background Continuity](mem://style/global-background-continuity) — forest-bg-light.jpg, animated SVG fireflies/dragonflies
 - [Achievements](mem://features/achievements) — Stats, current level card, and 10 collectable badges
 - [Home Screen Layout](mem://ux/home-screen-layout) — VoiceInput, mascots w-24, exactly 6 suggestion cards grid
-- [Bottom Nav](mem://ux/navigation/bottom-nav) — 5 tabs: Perguntas, Histórias, Música, Sonhos, Memórias
+- [Tab Bar Final](mem://features/kidzz-tab-bar-final) — 5 tabs: Explorar, Brincar⭐, Histórias, Música, Sonhos. Memórias removida da nav.
 - [Conversion Flow](mem://ux/conversion-flow) — Contextual paywall triggers across premium features
 - [Dream World](mem://features/dream-world) — Local MP3s (/public/audio/), Web Speech API narration at 0.82x
 - [Kidzz Lab](mem://features/kidzz-lab) — 🧪 dynamic layered SVG avatar customization via Framer Motion
