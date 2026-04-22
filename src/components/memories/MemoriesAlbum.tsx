@@ -280,7 +280,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
 
       {section === "achievements" ? (
         <div className="flex-1 overflow-y-auto -mt-2">
-          <AchievementsScreen onBack={onBack} />
+          <AchievementsScreen onBack={() => setSection("memories")} />
         </div>
       ) : (
       <>
