@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import WordSearchGame from "./games/WordSearchGame";
 import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
@@ -59,11 +59,12 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
     setActiveGame(id);
   };
 
-  const mascotAnimation = {
-    idle: { y: [0, -4, 0], rotate: [0, 2, -2, 0] },
-    happy: { y: [0, -12, 0], rotate: [0, -8, 8, 0], scale: [1, 1.1, 1] },
-    encourage: { y: [0, -3, 0], rotate: [0, 5, 0] },
-  };
+  const mascotMood = mascotMood_state();
+  function mascotMood_state(): "idle" | "happy" | "curious" {
+    if (mascotMood === "happy") return "happy";
+    if (mascotMood === "encourage") return "curious";
+    return "idle";
+  }
 
   const mascotSpeech = mascotMood === "happy"
     ? "Muito bem! 🎉"
