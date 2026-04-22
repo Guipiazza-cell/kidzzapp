@@ -269,48 +269,76 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         {/* KIDZZ Hero — personagem único, vivo, contextual */}
         <KidzzHero childName={childName} streakDays={streakDays} ageRange={profile?.age_range ?? null} />
 
-        {/* Quick access buttons */}
-        <div className="flex items-center gap-2 mt-1 mb-1">
-          {onOpenLab && (
-            <motion.button
-              onClick={onOpenLab}
-              className="px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/20 flex items-center gap-1.5"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6 }}
-              whileTap={{ scale: 0.93 }}
+        {/* MODO VIAGEM — card grande de destaque */}
+        {onOpenTravel && (
+          <motion.button
+            onClick={onOpenTravel}
+            className="w-full max-w-sm mt-2 mb-1 relative overflow-hidden rounded-3xl p-4 flex items-center gap-3 text-left shadow-lg border border-white/40"
+            style={{
+              background:
+                "linear-gradient(135deg, hsl(220 75% 35%) 0%, hsl(265 65% 40%) 50%, hsl(35 90% 55%) 110%)",
+            }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            whileTap={{ scale: 0.97 }}
+            aria-label="Abrir Modo Viagem"
+          >
+            {/* Stars background */}
+            <div className="absolute inset-0 pointer-events-none opacity-50">
+              {[...Array(6)].map((_, i) => (
+                <motion.span
+                  key={i}
+                  className="absolute rounded-full bg-white"
+                  style={{
+                    width: 2 + (i % 2) * 1.5,
+                    height: 2 + (i % 2) * 1.5,
+                    top: `${10 + i * 12}%`,
+                    left: `${20 + i * 13}%`,
+                  }}
+                  animate={{ opacity: [0.2, 0.9, 0.2] }}
+                  transition={{ duration: 2 + i * 0.4, repeat: Infinity, delay: i * 0.3 }}
+                />
+              ))}
+            </div>
+
+            <motion.div
+              className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
+              style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)" }}
+              animate={{ rotate: [0, -6, 6, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-              <span className="text-sm">🧪</span>
-              <span className="text-[10px] font-bold text-purple-700">Lab</span>
-            </motion.button>
-          )}
-          {onOpenPlay && (
-            <motion.button
-              onClick={onOpenPlay}
-              className="px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-600/20 to-sky-600/20 border border-emerald-400/20 flex items-center gap-1.5"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.7 }}
-              whileTap={{ scale: 0.93 }}
-            >
-              <span className="text-sm">🎮</span>
-              <span className="text-[10px] font-bold text-emerald-700">Play</span>
-            </motion.button>
-          )}
-          {onOpenTravel && (
-            <motion.button
-              onClick={onOpenTravel}
-              className="px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/20 flex items-center gap-1.5"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8 }}
-              whileTap={{ scale: 0.93 }}
-            >
-              <span className="text-sm">🚗</span>
-              <span className="text-[10px] font-bold text-amber-700">Viagem</span>
-            </motion.button>
-          )}
-        </div>
+              🌍
+            </motion.div>
+
+            <div className="relative flex-1 min-w-0">
+              <p className="text-[9px] font-black uppercase tracking-wider text-amber-200 mb-0.5">
+                ⭐ Aventura sonora
+              </p>
+              <h3 className="text-sm font-black text-white leading-tight">
+                Modo Viagem
+              </h3>
+              <p className="text-[11px] font-semibold text-white/85 leading-tight mt-0.5">
+                Explore o mundo com o KIDZZ →
+              </p>
+            </div>
+          </motion.button>
+        )}
+
+        {/* Lab quick access (compacto) */}
+        {onOpenLab && (
+          <motion.button
+            onClick={onOpenLab}
+            className="px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-400/20 flex items-center gap-1.5 mb-1"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7 }}
+            whileTap={{ scale: 0.93 }}
+          >
+            <span className="text-sm">🧪</span>
+            <span className="text-[10px] font-bold text-purple-700">Lab</span>
+          </motion.button>
+        )}
         {/* Level & Progress */}
         <motion.div
           className="w-full max-w-sm mt-1 mb-2"
