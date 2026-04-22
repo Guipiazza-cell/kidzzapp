@@ -91,30 +91,30 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-40 flex flex-col overflow-hidden"
+      className="flex-1 flex flex-col overflow-hidden relative"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
-      <LivingForest>
+      <LivingForest variant="light">
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 pb-3 border-b border-white/10"
+        <div className="flex items-center gap-3 px-4 pb-3 border-b border-white/30 bg-white/30 backdrop-blur-md"
           style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
-          <button onClick={onBack} className="w-11 h-11 rounded-full bg-white/10 backdrop-blur flex items-center justify-center" aria-label="Voltar">
-            <ArrowLeft size={20} className="text-white" />
+          <button onClick={onBack} className="w-11 h-11 rounded-full bg-white/60 backdrop-blur flex items-center justify-center shadow" aria-label="Voltar">
+            <ArrowLeft size={20} className="text-gray-700" />
           </button>
           <div className="flex-1">
-            <h1 className="text-white text-lg font-extrabold leading-tight flex items-center gap-2">
-              <Music2 size={18} className="text-amber-300" /> Floresta Musical
+            <h1 className="text-gray-800 text-lg font-extrabold leading-tight flex items-center gap-2 drop-shadow-sm">
+              <Music2 size={18} className="text-amber-600" /> Floresta Musical
             </h1>
-            <p className="text-white/60 text-xs font-semibold">Onde a música nasce 🌿</p>
+            <p className="text-gray-700 text-xs font-semibold">Onde a música nasce 🌿</p>
           </div>
           {/* XP & streak chips */}
           <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-1 bg-amber-400/20 backdrop-blur rounded-full px-2.5 py-1 border border-amber-300/30">
-              <span className="text-amber-200 text-[10px] font-extrabold">✨ {xp}</span>
+            <div className="flex items-center gap-1 bg-amber-400/80 backdrop-blur rounded-full px-2.5 py-1 border border-amber-500/40 shadow">
+              <span className="text-amber-900 text-[10px] font-extrabold">✨ {xp}</span>
             </div>
             {streak > 0 && (
-              <div className="flex items-center gap-1 bg-pink-400/20 backdrop-blur rounded-full px-2.5 py-1 border border-pink-300/30">
-                <span className="text-pink-200 text-[10px] font-extrabold">🎵 {streak}d</span>
+              <div className="flex items-center gap-1 bg-pink-400/80 backdrop-blur rounded-full px-2.5 py-1 border border-pink-500/40 shadow">
+                <span className="text-pink-900 text-[10px] font-extrabold">🎵 {streak}d</span>
               </div>
             )}
           </div>
@@ -131,7 +131,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
               <KidzzChameleon state="music" mood="happy" size="hero" interactive showParticles />
             </motion.div>
             <motion.p
-              className="text-center text-amber-100 text-sm font-extrabold mt-2 drop-shadow"
+              className="text-center text-amber-900 text-sm font-extrabold mt-2 drop-shadow-sm bg-amber-100/80 backdrop-blur rounded-full px-4 py-1.5 border border-amber-300/60 shadow"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -167,16 +167,15 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           {/* Streak hint */}
           {streak >= 1 && (
             <motion.div
-              className="rounded-2xl px-4 py-3 backdrop-blur border border-pink-300/30 text-center"
-              style={{ background: "linear-gradient(135deg, hsl(340 50% 30% / 0.4), hsl(280 40% 25% / 0.4))" }}
+              className="rounded-2xl px-4 py-3 backdrop-blur border border-pink-400/40 text-center bg-white/70 shadow"
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <p className="text-white text-sm font-extrabold">🎵 {streak} {streak === 1 ? "dia" : "dias"} cantando juntos!</p>
+              <p className="text-pink-700 text-sm font-extrabold">🎵 {streak} {streak === 1 ? "dia" : "dias"} cantando juntos!</p>
             </motion.div>
           )}
 
-          <p className="text-center text-white/60 text-[11px] font-bold uppercase tracking-widest pt-2">
+          <p className="text-center text-gray-700 text-[11px] font-bold uppercase tracking-widest pt-2 drop-shadow-sm">
             Mais maneiras de brincar com música
           </p>
 
@@ -237,7 +236,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
             </motion.button>
           )}
 
-          <p className="text-center text-white/40 text-[10px] font-semibold pb-4">
+          <p className="text-center text-gray-700/80 text-[10px] font-semibold pb-4 drop-shadow-sm">
             🍃 Mais maravilhas em breve
           </p>
         </div>
@@ -310,24 +309,21 @@ const PillarCard = ({
   <motion.button
     onClick={onClick}
     whileTap={{ scale: available ? 0.97 : 1 }}
-    className={`relative rounded-3xl p-4 text-left border ${available ? "border-amber-300/40" : "border-white/10 opacity-60"}`}
+    className={`relative rounded-3xl p-4 text-left border ${available ? "border-amber-400/50" : "border-white/20 opacity-60"} bg-white/75 backdrop-blur-md shadow-lg`}
     style={{
-      background: available
-        ? "linear-gradient(135deg, hsl(220 30% 18% / 0.7), hsl(220 35% 10% / 0.8))"
-        : "linear-gradient(135deg, hsl(220 20% 15% / 0.5), hsl(220 25% 8% / 0.6))",
-      boxShadow: available ? "0 0 24px hsl(50 80% 50% / 0.15)" : "none",
+      boxShadow: available ? "0 6px 20px hsl(45 80% 50% / 0.15)" : "none",
     }}
   >
     {available && (
       <motion.div
-        className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-amber-900"
+        className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-amber-900 shadow"
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
       >NOVO</motion.div>
     )}
     <div className={`text-4xl mb-2 bg-gradient-to-br ${gradient} bg-clip-text drop-shadow`}>{emoji}</div>
-    <p className="text-white text-sm font-extrabold leading-tight">{title}</p>
-    <p className="text-white/60 text-[11px] font-semibold leading-tight mt-0.5">{subtitle}</p>
+    <p className="text-gray-800 text-sm font-extrabold leading-tight">{title}</p>
+    <p className="text-gray-600 text-[11px] font-semibold leading-tight mt-0.5">{subtitle}</p>
   </motion.button>
 );
 

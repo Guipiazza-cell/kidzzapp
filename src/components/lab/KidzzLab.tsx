@@ -1,10 +1,12 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Zap, Check } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Zap, Check, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import aneImg from "@/assets/ane-chameleon.png";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import confetti from "canvas-confetti";
+import html2canvas from "html2canvas";
+import { toast } from "sonner";
 
 // --- Types ---
 export type MascotId = "ane" | "pixel";
@@ -96,6 +98,8 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
   const [saved, setSaved] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   const mascotSrc = config.mascot === "ane" ? aneImg : pixelImg;
   const selectedColor = COLORS.find(c => c.id === config.colorId) || COLORS[0];
@@ -135,6 +139,39 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     setTimeout(() => { setSaved(false); onBack(); }, 2000);
   };
 
+  const handleShare = useCallback(async () => {
+    if (!heroRef.current) return;
+    setSharing(true);
+    try {
+      const canvas = await html2canvas(heroRef.current, {
+        backgroundColor: "#0d0618",
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), "image/png"));
+      if (!blob) throw new Error("blob_failed");
+      const file = new File([blob], `kidzz-${config.mascot}.png`, { type: "image/png" });
+      const shareText = `Olha a ${config.mascot === "ane" ? "minha Ane" : "meu Pixel"} no Kidzz! ✨`;
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Meu Kidzz", text: shareText });
+        toast.success("Compartilhado! 💛");
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `kidzz-${config.mascot}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("Imagem baixada! 📸");
+      }
+    } catch (e) {
+      toast.error("Não foi possível compartilhar agora");
+    } finally {
+      setSharing(false);
+    }
+  }, [config.mascot]);
+
   // Expression-based animation for mascot preview
   const expressionAnimations: Record<LabExpression, object> = {
     happy: { y: [0, -8, 0], rotate: [0, -3, 3, 0], scale: [1, 1.05, 1] },
@@ -159,7 +196,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden"
+      className="fixed inset-0 z-40 flex flex-col overflow-hidden pb-[72px]"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
       {/* Background */}
@@ -198,7 +235,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
 
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-1" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
-        <motion.button onClick={onBack} className="p-2 rounded-xl bg-white/5 border border-white/10" whileTap={{ scale: 0.9 }}>
+        <motion.button onClick={onBack} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/5 border border-white/10" whileTap={{ scale: 0.9 }} aria-label="Voltar">
           <ArrowLeft size={20} className="text-white/70" />
         </motion.button>
         <div className="text-center">
@@ -207,7 +244,15 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
           </h1>
           <p className="text-[10px] text-emerald-300/50">Deixe {childName} criar o companheiro perfeito</p>
         </div>
-        <div className="w-9" />
+        <motion.button
+          onClick={handleShare}
+          disabled={sharing}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-400/30 disabled:opacity-50"
+          whileTap={{ scale: 0.9 }}
+          aria-label="Compartilhar"
+        >
+          <Share2 size={18} className="text-emerald-300" />
+        </motion.button>
       </div>
 
       {/* Mascot toggle */}
@@ -239,7 +284,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
       </motion.p>
 
       {/* CHARACTER HERO — LARGE & CENTERED */}
-      <div className="relative z-10 flex-shrink-0 flex flex-col items-center justify-center" style={{ minHeight: 240 }}>
+      <div ref={heroRef} className="relative z-10 flex-shrink-0 flex flex-col items-center justify-center" style={{ minHeight: 240 }}>
         <motion.div className="relative">
           {/* Dynamic color glow behind */}
           <motion.div
