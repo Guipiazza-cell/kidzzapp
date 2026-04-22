@@ -164,7 +164,7 @@ describe("Aba Memórias — empty state e exibição de conteúdo", () => {
 
   it("SUBABA Conquistas: alterna para tela de conquistas sem quebrar", () => {
     render(<MemoriesAlbum onBack={() => {}} />);
-    fireEvent.click(screen.getByRole("button", { name: /Conquistas/i }));
+    fireEvent.click(screen.getByRole("button", { name: /🏆 Conquistas/i }));
     expect(screen.getByTestId("achievements-stub")).toBeInTheDocument();
   });
 });

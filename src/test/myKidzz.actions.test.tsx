@@ -27,11 +27,13 @@ vi.mock("html2canvas", () => ({
   }),
 }));
 
-const toastMock = {
-  success: vi.fn(),
-  error: vi.fn(),
-  info: vi.fn(),
-};
+const { toastMock } = vi.hoisted(() => ({
+  toastMock: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}));
 vi.mock("sonner", () => ({ toast: toastMock, Toaster: () => null }));
 
 // useAuth mock — controlado por variável externa
