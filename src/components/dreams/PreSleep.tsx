@@ -1,8 +1,8 @@
 /* Pré-sono: respiração guiada (4-7-8 simplificado) + canção lenta de embalo.
    Compacto, calmo, sem paywall. */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Wind, Music as MusicIcon } from "lucide-react";
+import { ArrowLeft, Wind, Music as MusicIcon, Play } from "lucide-react";
 
 type Phase = "in" | "hold" | "out";
 const PHASES: { id: Phase; label: string; duration: number; scale: number }[] = [
