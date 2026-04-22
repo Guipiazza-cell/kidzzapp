@@ -59,12 +59,8 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
     setActiveGame(id);
   };
 
-  const mascotMood = mascotMood_state();
-  function mascotMood_state(): "idle" | "happy" | "curious" {
-    if (mascotMood === "happy") return "happy";
-    if (mascotMood === "encourage") return "curious";
-    return "idle";
-  }
+  const kidzzMood: "idle" | "happy" | "curious" =
+    mascotMood === "happy" ? "happy" : mascotMood === "encourage" ? "curious" : "idle";
 
   const mascotSpeech = mascotMood === "happy"
     ? "Muito bem! 🎉"
