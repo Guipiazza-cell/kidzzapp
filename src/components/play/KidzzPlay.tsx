@@ -147,36 +147,28 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
         </div>
       </div>
 
-      {/* Mascot with contextual speech */}
-      <div className="relative z-10 flex justify-center py-2">
+      {/* KIDZZ HERO — explorer guiando */}
+      <div className="relative z-10 flex justify-center py-3">
         <motion.div className="relative">
           <motion.div
-            className="absolute inset-0 rounded-full -m-4"
+            className="absolute inset-0 rounded-full -m-6"
             style={{
               background: mascotMood === "happy"
-                ? "radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%)"
-                : "radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%)",
+                ? "radial-gradient(circle, rgba(255,216,110,0.35), transparent 70%)"
+                : "radial-gradient(circle, rgba(16,185,129,0.18), transparent 70%)",
             }}
             animate={{ scale: [1, 1.15, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
-          <motion.div className="relative">
-            <motion.img
-              src={pixelImg}
-              alt="Pixel"
-              className="w-20 h-20 object-contain drop-shadow-xl"
-              animate={mascotAnimation[mascotMood]}
-              transition={{ duration: mascotMood === "happy" ? 0.6 : 2.5, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-1 border border-white/20 whitespace-nowrap"
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              key={mascotSpeech}
-              transition={{ delay: 0.3 }}
-            >
-              <p className="text-[10px] font-bold text-white/80">{mascotSpeech}</p>
-            </motion.div>
+          <KidzzChameleon state="explorer" mood={kidzzMood} size="lg" interactive showParticles />
+          <motion.div
+            className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white/15 backdrop-blur-md rounded-xl px-3 py-1.5 border border-white/30 whitespace-nowrap shadow-lg"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            key={mascotSpeech}
+            transition={{ delay: 0.3 }}
+          >
+            <p className="text-[11px] font-extrabold text-white">{mascotSpeech}</p>
           </motion.div>
         </motion.div>
       </div>
