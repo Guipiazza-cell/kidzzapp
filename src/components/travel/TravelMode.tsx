@@ -135,6 +135,14 @@ const TravelMode = ({ onBack }: Props) => {
     });
   }, []);
 
+  // Cleanup TTS ao desmontar (ex: voltar à home)
+  useEffect(() => {
+    return () => {
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
   // Falar a pergunta do preview (sincroniza com o texto exibido no chip)
   const speakPreview = useCallback(() => {
     const q = TRAVEL_QUESTIONS[theme]?.[previewIndex];
