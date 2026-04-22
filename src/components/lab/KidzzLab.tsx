@@ -196,11 +196,11 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-40 flex flex-col overflow-hidden pb-[72px]"
+      className="absolute inset-0 flex flex-col overflow-hidden"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
-      {/* Background */}
-      <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, #0d0618 0%, #121830 40%, #0a1628 70%, #0d0d1a 100%)" }} />
+      {/* Background — escuro próprio do Lab, mas contido inline */}
+      <div className="absolute inset-0 -z-0" style={{ background: "linear-gradient(160deg, #0d0618 0%, #121830 40%, #0a1628 70%, #0d0d1a 100%)" }} />
 
       {/* Ambient particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

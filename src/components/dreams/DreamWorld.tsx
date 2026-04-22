@@ -1,11 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Play, Pause, Lock, Crown, Timer, BookOpen, Music, ChevronRight, Volume2, Headphones } from "lucide-react";
+import { Moon, Play, Pause, Lock, Crown, Timer, BookOpen, Music, ChevronRight, Volume2, Headphones, Wind } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Slider } from "@/components/ui/slider";
 import { AmbientSoundEngine } from "./AmbientSoundEngine";
 import { DreamNarrator } from "./DreamNarrator";
 import { SLEEP_STORIES, SOUND_PRESETS, TIMER_OPTIONS } from "./sleepStories";
+import PreSleep from "./PreSleep";
 
 /* ── Floating particles ── */
 const DreamParticles = () => (
@@ -62,7 +63,7 @@ interface Props {
   onBack: () => void;
 }
 
-type DreamView = "main" | "story" | "playing";
+type DreamView = "main" | "story" | "playing" | "presleep";
 
 const DreamWorld = ({ onBack }: Props) => {
   const { profile, handleCheckout } = useAuth();
@@ -373,6 +374,11 @@ const DreamWorld = ({ onBack }: Props) => {
     );
   }
 
+  /* ── Pré-sono ── */
+  if (view === "presleep") {
+    return <PreSleep onBack={() => setView("main")} />;
+  }
+
   /* ── Main dream screen ── */
   return (
     <motion.div
@@ -405,7 +411,24 @@ const DreamWorld = ({ onBack }: Props) => {
           </p>
         </div>
 
-        {/* CTA */}
+        {/* Pré-sono — respiração + canção lenta */}
+        <motion.button
+          onClick={() => setView("presleep")}
+          className="w-full py-4 rounded-2xl font-bold text-base shadow-lg flex items-center justify-center gap-2 border"
+          style={{
+            background: "linear-gradient(135deg, hsl(240 60% 35%), hsl(265 65% 30%))",
+            color: "#F5F5F5",
+            borderColor: "rgba(165,180,252,0.3)",
+            textShadow: "0 1px 4px rgba(0,0,0,0.3)",
+          }}
+          whileTap={{ scale: 0.97 }}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Wind size={18} /> Pré-sono guiado · respire e relaxe
+        </motion.button>
+
+        {/* CTA principal */}
         <motion.button
           onClick={handleStart}
           className="w-full py-4 rounded-2xl font-bold text-lg shadow-lg"
