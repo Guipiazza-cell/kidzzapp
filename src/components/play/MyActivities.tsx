@@ -355,6 +355,15 @@ const MyActivities = ({ onBack }: Props) => {
           />
         </div>
       </div>
+
+      {/* Modal de detalhe — explica como fazer + exemplo prático */}
+      <ActivityDetailModal
+        activity={selected}
+        childName={childName}
+        done={selected ? completed.has(selected.id) : false}
+        onComplete={handleComplete}
+        onClose={() => setSelected(null)}
+      />
     </motion.div>
   );
 };
