@@ -42,7 +42,7 @@ const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; categ
   ],
   "7-10": [
     { text: "O que existia antes do universo?", emoji: "🌌", category: "Universo" },
-    { text: "Por que o tempo existe?", emoji: "⏳", category: "Universo" },
+    { text: "Por que o tempo existe?", emoji: "\n", category: "Universo" },
     { text: "Como os pensamentos aparecem?", emoji: "🧠", category: "Mente" },
     { text: "O que é certo e errado?", emoji: "⚖️", category: "Filosofia" },
     { text: "Por que as pessoas pensam diferente?", emoji: "🤔", category: "Filosofia" },
