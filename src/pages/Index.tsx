@@ -68,6 +68,7 @@ const Index = () => {
   });
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
+  const [showConversionNudge, setShowConversionNudge] = useState(false);
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -93,6 +94,19 @@ const Index = () => {
     }, 1500);
     return () => clearTimeout(t);
   }, [profile?.child_name, profile?.questions_used]);
+
+  // Conversion nudge (parent-facing): poll session actions, surface when threshold met
+  useEffect(() => {
+    if (profile?.is_premium) return;
+    const check = () => {
+      if (shouldShowConversionCard(false)) {
+        setShowConversionNudge(true);
+        markConversionCardShown();
+      }
+    };
+    const iv = setInterval(check, 4000);
+    return () => clearInterval(iv);
+  }, [profile?.is_premium]);
 
   if (loading) {
     return (
