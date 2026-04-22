@@ -196,7 +196,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden"
+      className="fixed inset-0 z-40 flex flex-col overflow-hidden pb-[72px]"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
       {/* Background */}
@@ -235,7 +235,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
 
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-1" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>
-        <motion.button onClick={onBack} className="p-2 rounded-xl bg-white/5 border border-white/10" whileTap={{ scale: 0.9 }}>
+        <motion.button onClick={onBack} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/5 border border-white/10" whileTap={{ scale: 0.9 }} aria-label="Voltar">
           <ArrowLeft size={20} className="text-white/70" />
         </motion.button>
         <div className="text-center">
@@ -244,7 +244,15 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
           </h1>
           <p className="text-[10px] text-emerald-300/50">Deixe {childName} criar o companheiro perfeito</p>
         </div>
-        <div className="w-9" />
+        <motion.button
+          onClick={handleShare}
+          disabled={sharing}
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-400/30 disabled:opacity-50"
+          whileTap={{ scale: 0.9 }}
+          aria-label="Compartilhar"
+        >
+          <Share2 size={18} className="text-emerald-300" />
+        </motion.button>
       </div>
 
       {/* Mascot toggle */}
