@@ -225,7 +225,7 @@ const MyActivities = ({ onBack }: Props) => {
         {/* Atividade do dia (destaque) */}
         {dailyHighlight && (
           <motion.div
-            className="relative mb-4 p-4 rounded-3xl border-2 border-amber-300 overflow-hidden"
+            className="relative mb-4 p-4 rounded-3xl border-2 border-amber-300 overflow-hidden cursor-pointer"
             style={{
               background:
                 "linear-gradient(135deg, hsl(45 95% 88%) 0%, hsl(45 95% 75%) 100%)",
@@ -233,6 +233,10 @@ const MyActivities = ({ onBack }: Props) => {
             }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setSelected(dailyHighlight)}
+            role="button"
+            aria-label={`Ver detalhes: ${dailyHighlight.title}`}
           >
             <div className="absolute -top-2 -right-2 px-2 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md">
               <Sparkles size={10} /> HOJE
@@ -249,10 +253,16 @@ const MyActivities = ({ onBack }: Props) => {
                 <p className="text-xs text-gray-700 mt-1 leading-snug">
                   {dailyHighlight.description}
                 </p>
+                <p className="text-[10px] font-bold text-amber-800/80 mt-1.5">
+                  Toque para ver como fazer →
+                </p>
               </div>
             </div>
             <motion.button
-              onClick={() => handleComplete(dailyHighlight)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelected(dailyHighlight);
+              }}
               className="mt-3 w-full py-3 rounded-2xl font-extrabold text-white text-sm flex items-center justify-center gap-2 min-h-[44px] shadow-md"
               style={{
                 background:
@@ -260,7 +270,7 @@ const MyActivities = ({ onBack }: Props) => {
               }}
               whileTap={{ scale: 0.96 }}
             >
-              <Check size={18} /> Concluir +{dailyHighlight.xp} XP
+              <Sparkles size={16} /> Ver atividade do dia
             </motion.button>
           </motion.div>
         )}
