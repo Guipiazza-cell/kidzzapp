@@ -116,8 +116,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         <div className="flex items-center gap-2">
           <BookOpen size={18} className="text-kid-orange" />
           <h1 className="text-lg font-extrabold text-gray-800 drop-shadow-sm">Fábrica de Histórias</h1>
-          <span className="text-[10px] font-extrabold bg-gradient-to-r from-kid-orange to-kid-pink text-white px-2 py-0.5 rounded-full">
-            SUPER PREMIUM
+          <span className="text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-0.5 rounded-full">
+            EXCLUSIVO
           </span>
         </div>
       </header>
