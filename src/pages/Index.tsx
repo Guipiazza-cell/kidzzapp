@@ -245,7 +245,7 @@ const Index = () => {
             onOpenMoments={() => setActiveTab("moments")}
             onOpenAchievements={() => setActiveTab("achievements")}
             onOpenLab={() => setShowLab(true)}
-            onOpenPlay={() => setShowPlay(true)}
+            onOpenPlay={() => setActiveTab("play")}
             onOpenTravel={() => {
               if (!profile?.is_premium) {
                 setContextualPaywall({ open: true, context: "travel" });
@@ -297,7 +297,7 @@ const Index = () => {
       <AnimatePresence>
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
-        {showPlay && <KidzzPlay onBack={() => setShowPlay(false)} onGameComplete={() => evolution.evolve("game")} />}
+        {/* showPlay overlay descontinuado: Brincar agora é aba inline */}
         {showChallenge && <SevenDayChallenge onClose={() => setShowChallenge(false)} />}
         {showReferral && <ReferralProgram onBack={() => setShowReferral(false)} />}
         {showRetrospective && <MonthlyRetrospective onClose={() => setShowRetrospective(false)} />}
