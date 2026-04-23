@@ -21,12 +21,27 @@ const FILTER_OPTIONS = [
   { id: "achievement" as const, label: "Conquistas", icon: Trophy },
 ];
 
-const TYPE_CONFIG: Record<string, { emoji: string; color: string; label: string }> = {
-  question: { emoji: "❓", color: "from-kid-blue/20 to-kid-blue/5", label: "Pergunta" },
-  story: { emoji: "📖", color: "from-kid-purple/20 to-kid-pink/5", label: "História" },
-  mission: { emoji: "🎯", color: "from-kid-orange/20 to-kid-yellow/5", label: "Missão" },
-  achievement: { emoji: "🏆", color: "from-kid-yellow/20 to-kid-orange/5", label: "Conquista" },
+const TYPE_CONFIG: Record<string, { emoji: string; color: string; label: string; summary: string }> = {
+  question: { emoji: "❓", color: "from-kid-blue/20 to-kid-blue/5", label: "Pergunta", summary: "Curiosidade respondida" },
+  story: { emoji: "📖", color: "from-kid-purple/20 to-kid-pink/5", label: "História", summary: "História mágica criada" },
+  mission: { emoji: "🎯", color: "from-kid-orange/20 to-kid-yellow/5", label: "Missão", summary: "Missão concluída em família" },
+  achievement: { emoji: "🏆", color: "from-kid-yellow/20 to-kid-orange/5", label: "Conquista", summary: "Conquista desbloqueada" },
 };
+
+function getMemorySummary(memory: Memory): string {
+  const meta = memory.metadata || {};
+  // Music-specific
+  if (meta.kind === "music" || meta.subtype === "music") return "🎵 Música criada";
+  if (meta.kind === "karaoke") return "🎤 Karaokê cantado";
+  if (meta.kind === "dance") return "💃 Dança completada";
+  if (meta.kind === "sung_story") return "🎼 História cantada";
+  // Game-specific
+  if (meta.kind === "game" || meta.subtype === "game") return `🎮 Jogo: ${meta.game_name || "concluído"}`;
+  // Activity completion
+  if (meta.kind === "activity") return "✨ Atividade concluída";
+  // Default by type
+  return TYPE_CONFIG[memory.type]?.summary || "Memória guardada";
+}
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
