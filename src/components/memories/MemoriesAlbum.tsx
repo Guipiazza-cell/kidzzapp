@@ -116,8 +116,12 @@ const MemoryCard = ({
         <p className="text-xs font-black text-gray-800 leading-snug line-clamp-2">
           {memory.title}
         </p>
+        {/* Summary line — what was created */}
+        <p className="text-[10px] text-primary font-bold mt-1">
+          {getMemorySummary(memory)}
+        </p>
         {memory.content && (
-          <p className="text-[10px] text-gray-500 font-semibold mt-1.5 leading-relaxed line-clamp-3">
+          <p className="text-[10px] text-gray-500 font-semibold mt-1 leading-relaxed line-clamp-2">
             {memory.content}
           </p>
         )}
