@@ -204,6 +204,13 @@ const Index = () => {
           key="play"
           onBack={() => { setActiveTab("chat"); setStep("home"); }}
           onGameComplete={() => evolution.evolve("game")}
+          onOpenTravel={() => {
+            if (!profile?.is_premium) {
+              setContextualPaywall({ open: true, context: "travel" });
+              return;
+            }
+            setShowTravel(true);
+          }}
         />
       );
     }

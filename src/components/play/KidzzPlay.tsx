@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Palette, Target } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Palette, Target, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
@@ -27,9 +27,10 @@ const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; su
 interface Props {
   onBack: () => void;
   onGameComplete?: () => void;
+  onOpenTravel?: () => void;
 }
 
-const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
+const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel }: Props) => {
   const { profile } = useAuth();
   const { trackEvent } = useAchievementSync();
   const isPremium = profile?.is_premium ?? false;
@@ -183,6 +184,16 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
           gradient="linear-gradient(135deg, hsl(35 95% 60%), hsl(25 90% 55%))"
           highlight
         />
+        {onOpenTravel && (
+          <HubCard
+            onClick={onOpenTravel}
+            icon={<Plane size={28} className="text-white" />}
+            emoji="✈️"
+            title="Modo Viagem"
+            subtitle="Brincadeiras offline para o caminho"
+            gradient="linear-gradient(135deg, hsl(200 80% 55%), hsl(220 75% 45%))"
+          />
+        )}
       </div>
 
       {/* Stats compactos */}
