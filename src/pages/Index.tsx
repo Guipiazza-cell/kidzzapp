@@ -298,7 +298,20 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
       <MagicalBackground />
-      <div className="flex-1 flex flex-col pb-[72px]">{renderContent()}</div>
+      <div className="flex-1 flex flex-col pb-[72px]">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeTab}
+            className="flex-1 flex flex-col"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+          >
+            {renderContent()}
+          </motion.div>
+        </AnimatePresence>
+      </div>
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
       <AnimatePresence>
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
