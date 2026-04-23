@@ -348,14 +348,7 @@ const KidzzPlay = ({ onBack, onGameComplete }: Props) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Fundo claro 3D consistente com o resto do app */}
-      <div
-        className="absolute inset-0 pointer-events-none -z-10"
-        style={{
-          background:
-            "radial-gradient(120% 80% at 50% 0%, hsl(140 55% 92%) 0%, hsl(140 35% 88%) 35%, hsl(45 35% 90%) 70%, hsl(200 30% 90%) 100%)",
-        }}
-      />
+      {/* Fundo transparente — usa MagicalBackground global para continuidade entre abas */}
 
       {Header}
 
