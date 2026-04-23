@@ -52,9 +52,12 @@ const LivingForest = ({ children, variant = "light" }: { children?: React.ReactN
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden" style={{
+      // Light variant: transparent so the global MagicalBackground (forest-bg-light)
+      // shows through, keeping background continuity across tabs.
+      // Dark variant keeps its own night sky for the night card preview only.
       background: variant === "dark"
         ? "radial-gradient(ellipse at 50% 40%, hsl(150 35% 22%), hsl(220 40% 8%) 75%)"
-        : "radial-gradient(ellipse at 50% 35%, hsl(95 45% 78%), hsl(140 35% 65%) 75%)",
+        : "transparent",
     }}>
       {/* BACK LAYER — distant trees silhouette */}
       <motion.div
