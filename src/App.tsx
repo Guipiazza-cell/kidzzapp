@@ -75,6 +75,7 @@ const AppShell = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <InstallPrompt />
+          <OfflineIndicator />
         </AuthProvider>
       </BrowserRouter>
     </>
