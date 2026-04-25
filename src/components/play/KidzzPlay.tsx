@@ -28,9 +28,10 @@ interface Props {
   onBack: () => void;
   onGameComplete?: () => void;
   onOpenTravel?: () => void;
+  onOpenAchievements?: () => void;
 }
 
-const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel }: Props) => {
+const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }: Props) => {
   const { profile } = useAuth();
   const { trackEvent } = useAchievementSync();
   const isPremium = profile?.is_premium ?? false;
@@ -331,6 +332,14 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel }: Props) => {
                 onScore={handleScore}
                 onReaction={handleReaction}
                 isPremium={isPremium}
+                onOpenAchievements={() => {
+                  setActiveGame(null);
+                  onOpenAchievements?.();
+                }}
+                onHome={() => {
+                  setActiveGame(null);
+                  onBack();
+                }}
               />
             )}
           </motion.div>
