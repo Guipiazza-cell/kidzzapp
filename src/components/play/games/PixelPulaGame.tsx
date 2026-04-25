@@ -502,47 +502,7 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           )}
         </AnimatePresence>
 
-        {/* Game Over overlay */}
-        <AnimatePresence>
-          {phase === "gameover" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm z-10"
-            >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 220 }}
-                className="text-5xl mb-2"
-              >
-                💥
-              </motion.div>
-              <h2 className="text-xl font-black text-white mb-1">Fim de jogo!</h2>
-              <p className="text-3xl font-black text-yellow-300 mb-1">{score}</p>
-              {isNewRecord && (
-                <motion.p
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-xs font-bold text-emerald-300 mb-3"
-                >
-                  🏆 NOVO RECORDE!
-                </motion.p>
-              )}
-              {!isNewRecord && (
-                <p className="text-[10px] text-white/50 mb-3">Recorde: {highScore}</p>
-              )}
-              <motion.button
-                onClick={startGame}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 rounded-2xl font-bold text-white text-sm shadow-lg"
-                style={{
-                  background: "linear-gradient(135deg, #A78BFA, #7C3AED)",
-                  boxShadow: "0 6px 20px rgba(167,139,250,0.5)",
-                }}
-              >
-                🔄 Jogar de novo
+        {/* Game Over is rendered as full GameResultScreen above (early return). */}
               </motion.button>
             </motion.div>
           )}
