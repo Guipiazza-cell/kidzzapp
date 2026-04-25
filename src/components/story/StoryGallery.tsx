@@ -13,9 +13,19 @@ interface StoryGalleryProps {
 
 const StoryGallery = ({ onClose }: StoryGalleryProps) => {
   const { allMemories, loading } = useMemories();
+  const { profile } = useAuth();
   const [selected, setSelected] = useState<typeof allMemories[number] | null>(null);
+  const [reading, setReading] = useState(false);
 
   const stories = allMemories.filter((m) => m.type === "story");
+  const childName = profile?.child_name || "amigo";
+
+  // Reading time estimate: ~150 words per minute for kids reading aloud.
+  const estimateMinutes = (text: string | null | undefined) => {
+    if (!text) return 1;
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 150));
+  };
 
   return (
     <motion.div
