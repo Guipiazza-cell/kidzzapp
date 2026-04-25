@@ -28,9 +28,10 @@ interface Props {
   onBack: () => void;
   onGameComplete?: () => void;
   onOpenTravel?: () => void;
+  onOpenAchievements?: () => void;
 }
 
-const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel }: Props) => {
+const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }: Props) => {
   const { profile } = useAuth();
   const { trackEvent } = useAchievementSync();
   const isPremium = profile?.is_premium ?? false;
