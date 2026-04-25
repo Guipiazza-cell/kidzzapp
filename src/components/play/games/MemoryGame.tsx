@@ -83,6 +83,31 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
     }
   };
 
+  if (completed) {
+    const totalPairs = cards.length / 2;
+    // Stars: 3 if moves <= totalPairs+2, 2 if <= totalPairs+5, else 1
+    const stars: 1 | 2 | 3 =
+      moves <= totalPairs + 2 ? 3 : moves <= totalPairs + 5 ? 2 : 1;
+    const xp = 30 + (stars === 3 ? 20 : stars === 2 ? 10 : 0);
+    const efficiency = Math.max(0, Math.min(100, Math.round((totalPairs / Math.max(1, moves)) * 100)));
+    return (
+      <GameResultScreen
+        correct={totalPairs}
+        total={0}
+        starsOverride={stars}
+        percentOverride={efficiency}
+        xp={xp}
+        childName={childName}
+        activityLabel="Jogo da Memória"
+        subtype="memory"
+        subtitle={`Concluído em ${moves} jogadas`}
+        onReplay={initGame}
+        onOpenAchievements={onOpenAchievements ?? (() => {})}
+        onHome={onHome ?? (() => {})}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="flex items-center gap-4 text-xs text-white/50 font-bold">
@@ -109,24 +134,6 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
           </motion.button>
         ))}
       </div>
-
-      {completed && (
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-        >
-          <p className="text-lg font-bold text-emerald-300">Incrível! 🧠✨</p>
-          <p className="text-xs text-white/40">Em {moves} jogadas</p>
-          <motion.button
-            onClick={initGame}
-            className="mt-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-sm font-bold"
-            whileTap={{ scale: 0.95 }}
-          >
-            Jogar novamente
-          </motion.button>
-        </motion.div>
-      )}
     </div>
   );
 };
