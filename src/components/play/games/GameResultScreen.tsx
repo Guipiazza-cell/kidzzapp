@@ -173,6 +173,10 @@ const GameResultScreen = ({
   xp,
   childName,
   activityLabel = "Desafio Diário",
+  subtype = "daily-challenge",
+  starsOverride,
+  percentOverride,
+  subtitle,
   onReplay,
   onOpenAchievements,
   onHome,
@@ -180,10 +184,18 @@ const GameResultScreen = ({
   const { user } = useAuth();
   const persisted = useRef(false);
 
-  const percent = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const stars = percent >= 80 ? 3 : percent >= 50 ? 2 : 1;
+  const computedPercent =
+    typeof percentOverride === "number"
+      ? Math.max(0, Math.min(100, Math.round(percentOverride)))
+      : total > 0
+      ? Math.round((correct / total) * 100)
+      : 0;
+
+  const stars: 1 | 2 | 3 =
+    starsOverride ?? (computedPercent >= 80 ? 3 : computedPercent >= 50 ? 2 : 1);
+
   const tone: "high" | "mid" | "low" =
-    percent >= 80 ? "high" : percent >= 50 ? "mid" : "low";
+    stars === 3 ? "high" : stars === 2 ? "mid" : "low";
 
   const headline = useMemo(() => {
     if (tone === "high") return { text: `INCRÍVEL, ${childName}! 🌟`, color: "#FFD700", size: 36 };
@@ -198,21 +210,22 @@ const GameResultScreen = ({
 
     if (persisted.current || !user) return;
     persisted.current = true;
-    // Save a memory entry so the activity shows up in the Memories album.
+    const detail =
+      subtitle ?? (total > 0 ? `${childName} acertou ${correct} de ${total} (${computedPercent}%)` : `${childName} fez ${correct} pontos`);
     supabase
       .from("memories")
       .insert({
         user_id: user.id,
         type: "achievement",
         title: `${activityLabel} concluído`,
-        content: `${childName} acertou ${correct} de ${total} (${percent}%)`,
+        content: detail,
         is_special: tone === "high",
         metadata: {
           kind: "game",
-          subtype: "daily-challenge",
+          subtype,
           correct,
           total,
-          percent,
+          percent: computedPercent,
           stars,
           xp,
         },
