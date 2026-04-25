@@ -129,7 +129,7 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
               style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
             >
               <motion.button
-                onClick={() => setSelected(null)}
+                onClick={() => { setReading(false); setSelected(null); }}
                 className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/70 text-gray-600"
                 whileTap={{ scale: 0.9 }}
               >
