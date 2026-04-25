@@ -77,7 +77,7 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
               {stories.map((s) => (
                 <motion.button
                   key={s.id}
-                  onClick={() => setSelected(s)}
+                  onClick={() => { haptic("light"); setSelected(s); }}
                   className="text-left rounded-2xl bg-white/90 border border-amber-200/60 p-3 shadow-sm active:scale-95 transition-transform"
                   whileTap={{ scale: 0.97 }}
                 >
@@ -95,13 +95,19 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
                   <p className="text-xs font-extrabold text-gray-800 line-clamp-2 leading-snug">
                     {s.title}
                   </p>
-                  <p className="text-[10px] font-bold text-gray-400 mt-1 flex items-center gap-1">
-                    <Calendar size={10} />
-                    {new Date(s.created_at).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "short",
-                    })}
-                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
+                      <Calendar size={10} />
+                      {new Date(s.created_at).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "short",
+                      })}
+                    </p>
+                    <p className="text-[10px] font-bold text-amber-700 flex items-center gap-0.5">
+                      <Clock size={10} />
+                      {estimateMinutes(s.content)} min
+                    </p>
+                  </div>
                 </motion.button>
               ))}
             </div>
