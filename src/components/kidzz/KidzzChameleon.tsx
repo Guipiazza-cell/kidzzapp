@@ -160,20 +160,12 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
         onPointerDown={handleTap}
         style={{ touchAction: "manipulation" }}
       >
-        {/* Ambient glow — morphs by state */}
-        <motion.div
-          key={`glow-${state}`}
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${glowMap[size]} rounded-full pointer-events-none -z-10`}
-          style={{ background: stateGlow[state] }}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-        />
+        {/* Ambient glow — single layer, gentle pulse */}
         <motion.div
           className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${glowMap[size]} rounded-full pointer-events-none -z-10`}
           style={{ background: stateGlow[state] }}
-          animate={{ scale: [1, 1.18, 1], opacity: [0.5, 0.9, 0.5] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ scale: [1, 1.12, 1], opacity: [0.55, 0.85, 0.55] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
 
         {/* Character image — single layer, no AnimatePresence (avoid forwardRef warning + heavy remounts) */}
