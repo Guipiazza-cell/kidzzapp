@@ -22,8 +22,6 @@ const TABS: {
   icon: typeof MessageCircleHeart;
   color: string;
   underline: string;
-  kidzzImg?: string;
-  kidzzTint?: string;
   highlight?: boolean;
 }[] = [
   {
@@ -32,7 +30,6 @@ const TABS: {
     icon: MessageCircleHeart,
     color: "text-kid-blue",
     underline: "hsl(var(--kid-blue))",
-    kidzzImg: cosmicImg,
   },
   {
     id: "play",
@@ -40,8 +37,6 @@ const TABS: {
     icon: Gamepad2,
     color: "text-kid-green",
     underline: "hsl(var(--kid-green))",
-    kidzzImg: explorerImg,
-    kidzzTint: "hue-rotate(50deg) saturate(1.4) brightness(1.05)",
     highlight: true,
   },
   {
@@ -50,7 +45,6 @@ const TABS: {
     icon: BookOpen,
     color: "text-kid-orange",
     underline: "hsl(var(--kid-orange))",
-    kidzzImg: explorerImg,
   },
   {
     id: "music",
@@ -58,7 +52,6 @@ const TABS: {
     icon: Music2,
     color: "text-kid-yellow",
     underline: "hsl(var(--kid-yellow))",
-    kidzzImg: musicImg,
   },
   {
     id: "dreams",
@@ -66,7 +59,6 @@ const TABS: {
     icon: Moon,
     color: "text-kid-purple",
     underline: "hsl(var(--kid-purple))",
-    kidzzImg: moonImg,
   },
   {
     id: "memories",
@@ -74,7 +66,6 @@ const TABS: {
     icon: Heart,
     color: "text-kid-pink",
     underline: "hsl(var(--kid-pink))",
-    // sem KIDZZ alternativo — ícone Heart se mantém ao ativar
   },
 ];
 
