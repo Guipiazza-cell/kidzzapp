@@ -58,11 +58,28 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
 
   const handleSpeak = async (scene: string, index: number) => {
     if (!onSpeak || playingScene !== null) return;
+    haptic("medium");
     setPlayingScene(index);
     try {
       await onSpeak(scene);
     } finally {
       setPlayingScene(null);
+    }
+  };
+
+  const handleExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    haptic("medium");
+    try {
+      await exportStoryPDF({ title: storyTitle, childName, scenes, images });
+      toast.success("PDF baixado! 📚");
+      haptic("success");
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível gerar o PDF");
+    } finally {
+      setExporting(false);
     }
   };
 
