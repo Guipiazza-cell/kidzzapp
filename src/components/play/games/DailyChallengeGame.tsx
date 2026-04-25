@@ -29,7 +29,9 @@ interface Props {
   onHome?: () => void;
 }
 
-const DailyChallengeGame = ({ onScore, onReaction, isPremium }: Props) => {
+const DailyChallengeGame = ({ onScore, onReaction, isPremium, onOpenAchievements, onHome }: Props) => {
+  const { profile } = useAuth();
+  const childName = profile?.child_name || "amigo";
   const today = new Date().toDateString();
   const dailyIdx = useMemo(() => {
     let hash = 0;
