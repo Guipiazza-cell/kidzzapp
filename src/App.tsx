@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import SplashScreen from "@/components/SplashScreen";
+import { useEffect, useState } from "react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Success from "./pages/Success";
