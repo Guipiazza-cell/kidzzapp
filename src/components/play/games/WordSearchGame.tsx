@@ -56,9 +56,13 @@ function buildGrid(words: string[], size: number): string[][] {
 interface Props {
   onScore: (pts: number) => void;
   onReaction: (type: "happy" | "encourage") => void;
+  onOpenAchievements?: () => void;
+  onHome?: () => void;
 }
 
-const WordSearchGame = ({ onScore, onReaction }: Props) => {
+const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
+  const { profile } = useAuth();
+  const childName = profile?.child_name || "amigo";
   const [setIdx, setSetIdx] = useState(() => Math.floor(Math.random() * WORD_SETS.length));
   const wordSet = WORD_SETS[setIdx];
   const [grid, setGrid] = useState<string[][]>([]);
