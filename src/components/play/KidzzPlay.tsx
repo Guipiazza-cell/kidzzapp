@@ -316,7 +316,12 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
             className="flex-1 overflow-y-auto pb-24"
           >
             {activeGame === "pixel-pula" && (
-              <PixelPulaGame onScore={handleScore} onReaction={handleReaction} />
+              <PixelPulaGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
             )}
             {activeGame === "word" && (
               <WordSearchGame
