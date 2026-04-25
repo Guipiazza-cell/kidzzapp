@@ -96,50 +96,69 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
         </h2>
       </div>
 
+      {/* CTA Modo Leitura imersivo */}
+      <motion.button
+        onClick={() => { haptic("medium"); setReading(true); }}
+        whileTap={{ scale: 0.97 }}
+        className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2"
+      >
+        <BookOpen size={18} />
+        📖 Modo leitura imersivo
+      </motion.button>
+
       <div className="space-y-4">
-        {scenes.map((scene, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.2 }}
-            className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10"
-          >
-            {images[i] && (
-              <img
-                src={images[i]}
-                alt={`Cena ${i + 1}`}
-                className="w-full rounded-2xl mb-3 shadow-lg"
-              />
-            )}
-            {scene
-              .split("\n")
-              .filter((p) => p.trim())
-              .map((paragraph, pi) => (
-                <p
-                  key={pi}
-                  className="text-white/90 text-sm leading-relaxed mb-2"
+        {scenes.map((scene, i) => {
+          // First scene reveals with a typewriter effect for delight.
+          const isFirst = i === 0;
+          const sceneText = isFirst ? typedFirst : scene;
+          return (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.2 }}
+              className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10"
+              onClick={isFirst && !typedDone ? skipType : undefined}
+            >
+              {images[i] && (
+                <img
+                  src={images[i]}
+                  alt={`Cena ${i + 1}`}
+                  className="w-full rounded-2xl mb-3 shadow-lg"
+                />
+              )}
+              {sceneText
+                .split("\n")
+                .filter((p) => p.trim())
+                .map((paragraph, pi) => (
+                  <p
+                    key={pi}
+                    className="text-white/90 text-sm leading-relaxed mb-2"
+                  >
+                    {paragraph}
+                    {isFirst && !typedDone && pi === sceneText.split("\n").filter((x) => x.trim()).length - 1 && (
+                      <span className="inline-block w-[2px] h-[1em] bg-white/80 ml-0.5 align-middle animate-pulse" />
+                    )}
+                  </p>
+                ))}
+              {onSpeak && (
+                <motion.button
+                  onClick={() => handleSpeak(scene, i)}
+                  disabled={playingScene !== null}
+                  className={`mt-3 w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-sm shadow-lg transition-all active:scale-95 ${
+                    playingScene === i
+                      ? "bg-kid-yellow/80 text-foreground"
+                      : "bg-gradient-to-r from-kid-purple to-kid-purple/80 text-white hover:from-kid-purple/90 hover:to-kid-purple/70"
+                  }`}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {paragraph}
-                </p>
-              ))}
-            {onSpeak && (
-              <motion.button
-                onClick={() => handleSpeak(scene, i)}
-                disabled={playingScene !== null}
-                className={`mt-3 w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-sm shadow-lg transition-all active:scale-95 ${
-                  playingScene === i
-                    ? "bg-kid-yellow/80 text-foreground"
-                    : "bg-gradient-to-r from-kid-purple to-kid-purple/80 text-white hover:from-kid-purple/90 hover:to-kid-purple/70"
-                }`}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Volume2 size={20} />
-                {playingScene === i ? "Reproduzindo..." : `🔊 Ouvir Cena ${i + 1}`}
-              </motion.button>
-            )}
-          </motion.div>
-        ))}
+                  <Volume2 size={20} />
+                  {playingScene === i ? "Reproduzindo..." : `🔊 Ouvir Cena ${i + 1}`}
+                </motion.button>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
 
       <div className="flex flex-col gap-2 pt-2">
