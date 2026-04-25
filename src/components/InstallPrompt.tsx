@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Download, Share } from "lucide-react";
+import { haptic } from "@/lib/haptics";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -40,13 +41,18 @@ const InstallPrompt = () => {
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
+    haptic("medium");
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") setDeferredPrompt(null);
+    if (outcome === "accepted") {
+      haptic("success");
+      setDeferredPrompt(null);
+    }
     handleDismiss();
   };
 
   const handleDismiss = () => {
+    haptic("light");
     setDismissed(true);
     setShowIOSPrompt(false);
     setDeferredPrompt(null);

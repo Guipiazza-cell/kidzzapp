@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { haptic } from "@/lib/haptics";
 
 interface Props {
   /** Number of correct answers (or main score for endless games) */
@@ -205,9 +206,13 @@ const GameResultScreen = ({
 
   // Sound + persistence (runs once on mount)
   useEffect(() => {
-    if (tone === "high") playVictoryTone();
-    else playEncouragementTone();
-
+    if (tone === "high") {
+      playVictoryTone();
+      haptic("success");
+    } else {
+      playEncouragementTone();
+      haptic(tone === "mid" ? "medium" : "light");
+    }
     if (persisted.current || !user) return;
     persisted.current = true;
     const detail =
@@ -313,7 +318,7 @@ const GameResultScreen = ({
       {/* Actions */}
       <div className="flex flex-col gap-2 w-full max-w-xs mt-2">
         <motion.button
-          onClick={onReplay}
+          onClick={() => { haptic("medium"); onReplay(); }}
           whileTap={{ scale: 0.96 }}
           className="px-5 py-3 rounded-2xl font-extrabold text-white text-sm shadow-lg min-h-[48px]"
           style={{ background: "linear-gradient(135deg, #10B981, #059669)" }}
@@ -321,14 +326,14 @@ const GameResultScreen = ({
           Jogar de novo 🔄
         </motion.button>
         <motion.button
-          onClick={onOpenAchievements}
+          onClick={() => { haptic("light"); onOpenAchievements(); }}
           whileTap={{ scale: 0.96 }}
           className="px-5 py-3 rounded-2xl font-extrabold text-sm border-2 border-white/30 text-white/90 min-h-[48px] backdrop-blur-md bg-white/5"
         >
           Ver conquistas 🏆
         </motion.button>
         <motion.button
-          onClick={onHome}
+          onClick={() => { haptic("light"); onHome(); }}
           whileTap={{ scale: 0.96 }}
           className="px-5 py-2 rounded-2xl font-bold text-sm text-white/60 min-h-[40px]"
         >
