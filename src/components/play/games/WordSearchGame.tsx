@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import GameResultScreen from "./GameResultScreen";
 
 const WORD_SETS = [
   { words: ["SOL", "LUA", "MAR", "CÉU"], gridSize: 6, theme: "Natureza 🌿" },
@@ -54,9 +56,13 @@ function buildGrid(words: string[], size: number): string[][] {
 interface Props {
   onScore: (pts: number) => void;
   onReaction: (type: "happy" | "encourage") => void;
+  onOpenAchievements?: () => void;
+  onHome?: () => void;
 }
 
-const WordSearchGame = ({ onScore, onReaction }: Props) => {
+const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
+  const { profile } = useAuth();
+  const childName = profile?.child_name || "amigo";
   const [setIdx, setSetIdx] = useState(() => Math.floor(Math.random() * WORD_SETS.length));
   const wordSet = WORD_SETS[setIdx];
   const [grid, setGrid] = useState<string[][]>([]);
@@ -112,6 +118,23 @@ const WordSearchGame = ({ onScore, onReaction }: Props) => {
 
   if (!grid.length) return null;
 
+  if (completed) {
+    return (
+      <GameResultScreen
+        correct={found.length}
+        total={wordSet.words.length}
+        xp={25 + found.length * 10}
+        childName={childName}
+        activityLabel="Caça-Palavras"
+        subtype="word-search"
+        subtitle={`Encontrou todas as ${wordSet.words.length} palavras`}
+        onReplay={resetGame}
+        onOpenAchievements={onOpenAchievements ?? (() => {})}
+        onHome={onHome ?? (() => {})}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-3">
       <p className="text-xs font-bold text-emerald-300/70">{wordSet.theme}</p>
@@ -143,10 +166,6 @@ const WordSearchGame = ({ onScore, onReaction }: Props) => {
           row.map((letter, c) => {
             const key = cellKey(r, c);
             const isSel = selected.includes(key);
-            const isFound = found.some((w) => {
-              // simplified check
-              return false; // visual only via line-through on word list
-            });
             return (
               <motion.button
                 key={key}
@@ -164,27 +183,6 @@ const WordSearchGame = ({ onScore, onReaction }: Props) => {
           })
         )}
       </div>
-
-      <AnimatePresence>
-        {completed && (
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <p className="text-lg font-bold text-emerald-300">
-              Parabéns! 🎉
-            </p>
-            <motion.button
-              onClick={resetGame}
-              className="mt-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-sm font-bold"
-              whileTap={{ scale: 0.95 }}
-            >
-              Jogar novamente
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

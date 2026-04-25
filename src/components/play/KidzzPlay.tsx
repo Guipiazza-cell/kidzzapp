@@ -319,13 +319,28 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
               <PixelPulaGame onScore={handleScore} onReaction={handleReaction} />
             )}
             {activeGame === "word" && (
-              <WordSearchGame onScore={handleScore} onReaction={handleReaction} />
+              <WordSearchGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
             )}
             {activeGame === "memory" && (
-              <MemoryGame onScore={handleScore} onReaction={handleReaction} />
+              <MemoryGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
             )}
             {activeGame === "hangman" && (
-              <HangmanGame onScore={handleScore} onReaction={handleReaction} />
+              <HangmanGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
             )}
             {activeGame === "daily" && (
               <DailyChallengeGame
