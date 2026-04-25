@@ -35,7 +35,9 @@ const GRAVITY = 1.2;
 const JUMP_VELOCITY = -16;
 const TICK_MS = 30;
 
-const PixelPulaGame = ({ onScore, onReaction }: Props) => {
+const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
+  const { profile } = useAuth();
+  const childName = profile?.child_name || "amigo";
   const [phase, setPhase] = useState<"intro" | "playing" | "gameover">("intro");
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
