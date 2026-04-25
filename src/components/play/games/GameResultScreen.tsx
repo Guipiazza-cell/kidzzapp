@@ -4,15 +4,23 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
-  /** Number of correct answers */
+  /** Number of correct answers (or main score for endless games) */
   correct: number;
-  /** Total questions in the round */
+  /** Total questions in the round. Pass 0 for endless/score-based games. */
   total: number;
   /** XP awarded for this run */
   xp: number;
   childName: string;
   /** Friendly label for the activity (e.g. "Desafio Diário") */
   activityLabel?: string;
+  /** Used in Memories metadata + persistence key. */
+  subtype?: string;
+  /** Override stars (1-3) when total=0 (endless games). */
+  starsOverride?: 1 | 2 | 3;
+  /** Override the percent shown in the ring (0-100). Defaults to correct/total. */
+  percentOverride?: number;
+  /** Custom detail line below stars. Defaults to "X de Y acertos". */
+  subtitle?: string;
   onReplay: () => void;
   onOpenAchievements: () => void;
   onHome: () => void;
