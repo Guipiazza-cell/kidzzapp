@@ -16,7 +16,9 @@ interface Props {
   onHome?: () => void;
 }
 
-const MemoryGame = ({ onScore, onReaction }: Props) => {
+const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
+  const { profile } = useAuth();
+  const childName = profile?.child_name || "amigo";
   const [cards, setCards] = useState<{ id: number; emoji: string; flipped: boolean; matched: boolean }[]>([]);
   const [flippedIds, setFlippedIds] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
