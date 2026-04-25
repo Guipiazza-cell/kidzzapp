@@ -332,6 +332,14 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
                 onScore={handleScore}
                 onReaction={handleReaction}
                 isPremium={isPremium}
+                onOpenAchievements={() => {
+                  setActiveGame(null);
+                  onOpenAchievements?.();
+                }}
+                onHome={() => {
+                  setActiveGame(null);
+                  onBack();
+                }}
               />
             )}
           </motion.div>
