@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import GameResultScreen from "./GameResultScreen";
 
 interface Challenge {
   type: "quiz" | "emoji" | "math";
