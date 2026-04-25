@@ -5,8 +5,8 @@
    - Touch reactive: olho segue toque, tap = bounce + ripple
 */
 
-import { forwardRef, useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { forwardRef, useRef, useState, useCallback, useMemo } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import cosmicImg from "@/assets/kidzz/cosmic.png";
 import moonImg from "@/assets/kidzz/moon.png";
 import explorerImg from "@/assets/kidzz/explorer.png";
@@ -176,31 +176,24 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
           transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Character image — crossfade morph */}
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={state}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 0.85, filter: "blur(8px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 1.1, filter: "blur(8px)" }}
-            transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-            style={{
-              x: eyeX,
-              y: eyeY,
-            }}
-          >
-            <img
-              src={stateAssets[state]}
-              alt={`KIDZZ - ${state}`}
-              className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
-              draggable={false}
-              loading="lazy"
-              decoding="async"
-              style={stateImageFilter[state] ? { filter: stateImageFilter[state] } : undefined}
-            />
-          </motion.div>
-        </AnimatePresence>
+        {/* Character image — single layer, no AnimatePresence (avoid forwardRef warning + heavy remounts) */}
+        <motion.div
+          key={state}
+          className="absolute inset-0"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          style={{ x: eyeX, y: eyeY }}
+        >
+          <img
+            src={stateAssets[state]}
+            alt={`KIDZZ - ${state}`}
+            className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
+            draggable={false}
+            decoding="async"
+            style={stateImageFilter[state] ? { filter: stateImageFilter[state] } : undefined}
+          />
+        </motion.div>
 
         {/* Heart pulse (always visible since heart is on chest in all states) */}
         <motion.div
