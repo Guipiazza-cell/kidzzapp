@@ -12,6 +12,7 @@ const PARTICLE_COLORS = ["#FFD700", "#FF8C00", "#7C3AED", "#4CAF50"];
 const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
   const [fadingOut, setFadingOut] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
 
   // Generate stable randomized particles once.
   const particles = useMemo(
