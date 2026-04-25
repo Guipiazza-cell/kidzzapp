@@ -148,36 +148,6 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
         })}
       </div>
 
-      {/* Result */}
-      <AnimatePresence>
-        {(won || lost) && (
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <p className="text-lg font-bold">
-              {won ? (
-                <span className="text-emerald-300">Acertou! 🎉</span>
-              ) : (
-                <span className="text-sky-300">
-                  A palavra era: <span className="text-white">{word}</span> 💪
-                </span>
-              )}
-            </p>
-            <p className="text-[10px] text-white/30 mt-1">
-              {won ? "Você é demais!" : "Tente de novo, você consegue!"}
-            </p>
-            <motion.button
-              onClick={reset}
-              className="mt-2 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-sm font-bold"
-              whileTap={{ scale: 0.95 }}
-            >
-              Nova palavra
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
