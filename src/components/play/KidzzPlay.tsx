@@ -267,8 +267,11 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
       exit={{ opacity: 0, x: -30 }}
       className="flex-1 flex flex-col px-4"
     >
-      {/* KIDZZ menor no topo */}
-      <div className="relative flex justify-center pt-1 pb-2">
+      {/* KIDZZ menor no topo — reflete a customização salva */}
+      <div
+        className="relative flex justify-center pt-1 pb-2"
+        style={{ filter: `hue-rotate(${savedHue}deg)`, transition: "filter 350ms ease" }}
+      >
         <KidzzChameleon
           state="play"
           mood={kidzzMood}
