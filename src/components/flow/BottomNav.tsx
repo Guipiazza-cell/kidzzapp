@@ -1,9 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircleHeart, Gamepad2, BookOpen, Music2, Moon, Heart } from "lucide-react";
-import cosmicImg from "@/assets/kidzz/cosmic.png";
-import explorerImg from "@/assets/kidzz/explorer.png";
-import musicImg from "@/assets/kidzz/music.png";
-import moonImg from "@/assets/kidzz/moon.png";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
