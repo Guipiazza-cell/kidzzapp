@@ -1,10 +1,14 @@
-import { motion } from "framer-motion";
-import { RotateCcw, Volume2, Share2, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { RotateCcw, Volume2, Share2, Loader2, BookOpen, Download } from "lucide-react";
 import { useRef, useState } from "react";
 import ChameleonMascot from "../ChameleonMascot";
 import ShareableStoryCard from "../viral/ShareableStoryCard";
 import { captureAndShare, getChildName } from "@/lib/viralShare";
 import { toast } from "sonner";
+import { useTypewriter } from "@/hooks/useTypewriter";
+import ReadingMode from "./ReadingMode";
+import { exportStoryPDF } from "@/lib/exportStoryPDF";
+import { haptic } from "@/lib/haptics";
 
 interface StoryDisplayProps {
   story: string;
