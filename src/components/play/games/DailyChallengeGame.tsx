@@ -105,20 +105,27 @@ const DailyChallengeGame = ({ onScore, onReaction, isPremium, onOpenAchievements
     );
   }
 
+  const handleReplay = () => {
+    setQuestionIdx(0);
+    setAnswered(null);
+    setScore(0);
+    setTotalAnswered(0);
+  };
+
   if (isFinished) {
+    // XP earned this round = 20 per correct (matches onScore awards above)
+    const xpEarned = score * 20;
     return (
-      <motion.div
-        className="flex flex-col items-center gap-3 py-4"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-      >
-        <span className="text-4xl">🏆</span>
-        <p className="text-lg font-bold text-emerald-300">Desafio completo!</p>
-        <p className="text-sm text-white/50">
-          {score}/{questions.length} acertos
-        </p>
-        <p className="text-xs text-white/30">Volte amanhã para um novo desafio!</p>
-      </motion.div>
+      <GameResultScreen
+        correct={score}
+        total={questions.length}
+        xp={xpEarned}
+        childName={childName}
+        activityLabel="Desafio Diário"
+        onReplay={handleReplay}
+        onOpenAchievements={onOpenAchievements ?? (() => {})}
+        onHome={onHome ?? (() => {})}
+      />
     );
   }
 
