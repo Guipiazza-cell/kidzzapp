@@ -21,8 +21,14 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
   const scenes = story.split(/\[CENA \d+\]/).filter((s) => s.trim());
   const [playingScene, setPlayingScene] = useState<number | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [reading, setReading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
   const childName = getChildName();
+
+  // Typewriter only on the FIRST scene as a delight effect after generation.
+  const firstScene = scenes[0] || "";
+  const { shown: typedFirst, done: typedDone, skip: skipType } = useTypewriter(firstScene, 14);
 
   // Extract title from first sentence (max ~60 chars)
   const storyTitle = (() => {
