@@ -64,6 +64,14 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
   const [mascotMood, setMascotMood] = useState<"idle" | "happy" | "encourage">("idle");
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);
 
+  // Saved KIDZZ config (cor + expressão) — recarregada ao voltar de "Meu KIDZZ"
+  const [mascotConfig, setMascotConfig] = useState(() => loadMascotConfig());
+  useEffect(() => {
+    if (view !== "kidzz") setMascotConfig(loadMascotConfig());
+  }, [view]);
+  const savedHue = HUE_MAP[mascotConfig.colorId] ?? 0;
+  const savedMood: KidzzMood = EXPR_TO_MOOD[mascotConfig.expression] ?? "happy";
+
   const handleScore = useCallback((pts: number) => {
     setSessionScore((s) => s + pts);
     onGameComplete?.();
@@ -92,8 +100,9 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
     setActiveGame(id);
   };
 
-  const kidzzMood: "idle" | "happy" | "curious" =
-    mascotMood === "happy" ? "happy" : mascotMood === "encourage" ? "curious" : "idle";
+  // Reaction (happy/encourage) wins; otherwise use the saved expression
+  const kidzzMood: KidzzMood =
+    mascotMood === "happy" ? "happy" : mascotMood === "encourage" ? "curious" : savedMood;
 
   const heroSpeech =
     view === "games"
