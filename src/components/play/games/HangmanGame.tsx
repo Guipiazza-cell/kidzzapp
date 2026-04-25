@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import GameResultScreen from "./GameResultScreen";
 
 const POSITIVE_WORDS = [
   { word: "AMIZADE", hint: "Algo que nos faz sorrir quando estamos juntos" },
@@ -18,6 +20,8 @@ const MAX_ERRORS = 6;
 interface Props {
   onScore: (pts: number) => void;
   onReaction: (type: "happy" | "encourage") => void;
+  onOpenAchievements?: () => void;
+  onHome?: () => void;
 }
 
 const HangmanGame = ({ onScore, onReaction }: Props) => {
