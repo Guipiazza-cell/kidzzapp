@@ -24,7 +24,9 @@ interface Props {
   onHome?: () => void;
 }
 
-const HangmanGame = ({ onScore, onReaction }: Props) => {
+const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
+  const { profile } = useAuth();
+  const childName = profile?.child_name || "amigo";
   const pickWord = () => POSITIVE_WORDS[Math.floor(Math.random() * POSITIVE_WORDS.length)];
 
   const [current, setCurrent] = useState(pickWord);
@@ -60,6 +62,28 @@ const HangmanGame = ({ onScore, onReaction }: Props) => {
   }, []);
 
   const hearts = MAX_ERRORS - errors;
+
+  if (won || lost) {
+    // Stars: 3 if won w/ all hearts, 2 if won, 1 if lost
+    const stars: 1 | 2 | 3 = won ? (hearts >= MAX_ERRORS - 1 ? 3 : 2) : 1;
+    const xp = won ? 25 + hearts * 2 : 5;
+    return (
+      <GameResultScreen
+        correct={won ? 1 : 0}
+        total={0}
+        starsOverride={stars}
+        percentOverride={won ? Math.round((hearts / MAX_ERRORS) * 100) : 0}
+        xp={xp}
+        childName={childName}
+        activityLabel="Forca"
+        subtype="hangman"
+        subtitle={won ? `Acertou "${word}" com ${hearts}/${MAX_ERRORS} ❤` : `A palavra era "${word}"`}
+        onReplay={reset}
+        onOpenAchievements={onOpenAchievements ?? (() => {})}
+        onHome={onHome ?? (() => {})}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col items-center gap-4">
