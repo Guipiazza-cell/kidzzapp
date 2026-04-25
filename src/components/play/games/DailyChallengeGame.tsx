@@ -25,6 +25,8 @@ interface Props {
   onScore: (pts: number) => void;
   onReaction: (type: "happy" | "encourage") => void;
   isPremium: boolean;
+  onOpenAchievements?: () => void;
+  onHome?: () => void;
 }
 
 const DailyChallengeGame = ({ onScore, onReaction, isPremium }: Props) => {
