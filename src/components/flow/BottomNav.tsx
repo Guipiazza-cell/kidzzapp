@@ -124,50 +124,12 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
                 isHighlight ? "w-8 h-8" : "w-6 h-6"
               }`}
             >
-              <AnimatePresence mode="popLayout">
-                {isActive && tab.kidzzImg ? (
-                  <motion.img
-                    key={`kidzz-${tab.id}`}
-                    src={tab.kidzzImg}
-                    alt=""
-                    aria-hidden="true"
-                    className={`object-contain drop-shadow ${
-                      isHighlight ? "w-8 h-8" : "w-6 h-6"
-                    }`}
-                    style={tab.kidzzTint ? { filter: tab.kidzzTint } : undefined}
-                    initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      rotate: 0,
-                      y: [0, -2, 0],
-                    }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{
-                      opacity: { duration: 0.25 },
-                      scale: { type: "spring", stiffness: 280, damping: 18 },
-                      y: { duration: 1.6, repeat: Infinity, ease: "easeInOut" },
-                    }}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <motion.div
-                    key={`icon-${tab.id}`}
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.7 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Icon
-                      size={isHighlight ? 22 : 18}
-                      className={isActive ? tab.color : "text-gray-400"}
-                      strokeWidth={isHighlight ? 2.4 : 2}
-                      fill={isActive && tab.id === "memories" ? "currentColor" : "none"}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <Icon
+                size={isHighlight ? 22 : 18}
+                className={isActive ? tab.color : "text-gray-400"}
+                strokeWidth={isHighlight ? 2.4 : 2}
+                fill={isActive && tab.id === "memories" ? "currentColor" : "none"}
+              />
             </div>
 
             <span
