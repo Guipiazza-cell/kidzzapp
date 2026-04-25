@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Admin from "./pages/Admin";
 import InstallPrompt from "./components/InstallPrompt";
+import OfflineIndicator from "./components/OfflineIndicator";
 
 const queryClient = new QueryClient();
 
