@@ -175,7 +175,19 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
           )}
         </motion.button>
         <motion.button
-          onClick={onReset}
+          onClick={handleExport}
+          disabled={exporting}
+          className="w-full py-3.5 px-6 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 text-white font-extrabold text-sm flex items-center justify-center gap-2 active:scale-95 disabled:opacity-60"
+          whileTap={{ scale: 0.97 }}
+        >
+          {exporting ? (
+            <><Loader2 size={18} className="animate-spin" /> Montando livrinho...</>
+          ) : (
+            <><Download size={18} /> 📚 Exportar como PDF</>
+          )}
+        </motion.button>
+        <motion.button
+          onClick={() => { haptic("light"); onReset(); }}
           className="w-full py-3 px-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95"
           whileTap={{ scale: 0.97 }}
         >
@@ -196,6 +208,19 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
           emoji="📖"
         />
       </div>
+
+      {/* Modo Leitura imersivo */}
+      <AnimatePresence>
+        {reading && (
+          <ReadingMode
+            title={storyTitle}
+            childName={childName}
+            story={story}
+            images={images}
+            onClose={() => setReading(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
