@@ -192,7 +192,9 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
               borderRadius: "8px",
               background:
                 "linear-gradient(90deg, #FF8C00 0%, #FFB347 50%, #FFD700 100%)",
-              animation: "splash-progress 2000ms ease-out forwards",
+              // Sync progress bar exactly with `duration` so it reaches 100% the
+              // moment the fade-out begins.
+              animation: `splash-progress ${duration}ms ease-out forwards`,
               boxShadow: "0 0 10px rgba(255,180,0,0.55)",
             }}
           />
