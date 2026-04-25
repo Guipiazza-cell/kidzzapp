@@ -309,7 +309,6 @@ const GameResultScreen = ({
       <p className="text-sm text-white/60">
         {subtitle ?? (total > 0 ? `${correct} de ${total} acertos` : `${correct} pontos`)}
       </p>
-      </p>
 
       {/* Actions */}
       <div className="flex flex-col gap-2 w-full max-w-xs mt-2">
