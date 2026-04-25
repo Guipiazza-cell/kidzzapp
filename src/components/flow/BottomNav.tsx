@@ -1,9 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircleHeart, Gamepad2, BookOpen, Music2, Moon, Heart } from "lucide-react";
-import cosmicImg from "@/assets/kidzz/cosmic.png";
-import explorerImg from "@/assets/kidzz/explorer.png";
-import musicImg from "@/assets/kidzz/music.png";
-import moonImg from "@/assets/kidzz/moon.png";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
@@ -26,8 +22,6 @@ const TABS: {
   icon: typeof MessageCircleHeart;
   color: string;
   underline: string;
-  kidzzImg?: string;
-  kidzzTint?: string;
   highlight?: boolean;
 }[] = [
   {
@@ -36,7 +30,6 @@ const TABS: {
     icon: MessageCircleHeart,
     color: "text-kid-blue",
     underline: "hsl(var(--kid-blue))",
-    kidzzImg: cosmicImg,
   },
   {
     id: "play",
@@ -44,8 +37,6 @@ const TABS: {
     icon: Gamepad2,
     color: "text-kid-green",
     underline: "hsl(var(--kid-green))",
-    kidzzImg: explorerImg,
-    kidzzTint: "hue-rotate(50deg) saturate(1.4) brightness(1.05)",
     highlight: true,
   },
   {
@@ -54,7 +45,6 @@ const TABS: {
     icon: BookOpen,
     color: "text-kid-orange",
     underline: "hsl(var(--kid-orange))",
-    kidzzImg: explorerImg,
   },
   {
     id: "music",
@@ -62,7 +52,6 @@ const TABS: {
     icon: Music2,
     color: "text-kid-yellow",
     underline: "hsl(var(--kid-yellow))",
-    kidzzImg: musicImg,
   },
   {
     id: "dreams",
@@ -70,7 +59,6 @@ const TABS: {
     icon: Moon,
     color: "text-kid-purple",
     underline: "hsl(var(--kid-purple))",
-    kidzzImg: moonImg,
   },
   {
     id: "memories",
@@ -78,7 +66,6 @@ const TABS: {
     icon: Heart,
     color: "text-kid-pink",
     underline: "hsl(var(--kid-pink))",
-    // sem KIDZZ alternativo — ícone Heart se mantém ao ativar
   },
 ];
 
@@ -137,50 +124,12 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
                 isHighlight ? "w-8 h-8" : "w-6 h-6"
               }`}
             >
-              <AnimatePresence mode="popLayout">
-                {isActive && tab.kidzzImg ? (
-                  <motion.img
-                    key={`kidzz-${tab.id}`}
-                    src={tab.kidzzImg}
-                    alt=""
-                    aria-hidden="true"
-                    className={`object-contain drop-shadow ${
-                      isHighlight ? "w-8 h-8" : "w-6 h-6"
-                    }`}
-                    style={tab.kidzzTint ? { filter: tab.kidzzTint } : undefined}
-                    initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      rotate: 0,
-                      y: [0, -2, 0],
-                    }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{
-                      opacity: { duration: 0.25 },
-                      scale: { type: "spring", stiffness: 280, damping: 18 },
-                      y: { duration: 1.6, repeat: Infinity, ease: "easeInOut" },
-                    }}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <motion.div
-                    key={`icon-${tab.id}`}
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.7 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Icon
-                      size={isHighlight ? 22 : 18}
-                      className={isActive ? tab.color : "text-gray-400"}
-                      strokeWidth={isHighlight ? 2.4 : 2}
-                      fill={isActive && tab.id === "memories" ? "currentColor" : "none"}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <Icon
+                size={isHighlight ? 22 : 18}
+                className={isActive ? tab.color : "text-gray-400"}
+                strokeWidth={isHighlight ? 2.4 : 2}
+                fill={isActive && tab.id === "memories" ? "currentColor" : "none"}
+              />
             </div>
 
             <span

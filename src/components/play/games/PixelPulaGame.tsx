@@ -217,13 +217,13 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           starGain += 5;
         }
       });
-      if (starGain > 0) {
+      if (starGain > 0 && tickRef.current % 4 === 0) {
         confetti({
-          particleCount: 12,
-          spread: 30,
+          particleCount: 8,
+          spread: 25,
           origin: { y: 0.5 },
           colors: ["#FBBF24", "#fff"],
-          scalar: 0.7,
+          scalar: 0.6,
         });
       }
 

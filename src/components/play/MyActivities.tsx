@@ -55,17 +55,23 @@ const MyActivities = ({ onBack }: Props) => {
   const [selected, setSelected] = useState<Activity | null>(null);
 
   // 1x por semana, tenta puxar versão IA personalizada (background, não bloqueia)
+  // Atrasa 1.5s para não competir com a renderização inicial.
   useEffect(() => {
     const cached = loadWeeklyCache(weekKey);
     if (cached?.source === "ai") return; // já tem IA dessa semana
     let cancelled = false;
-    (async () => {
+    const timer = setTimeout(async () => {
       try {
-        const { data, error } = await supabase.functions.invoke("generate-activities", {
+        const aiPromise = supabase.functions.invoke("generate-activities", {
           body: { childName, ageRange, interests },
         });
+        // Timeout de segurança 12s para não deixar a Promise pendente indefinidamente
+        const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: new Error("ai-timeout") }), 12000)
+        );
+        const { data, error } = (await Promise.race([aiPromise, timeoutPromise])) as any;
         if (cancelled) return;
-        if (error) throw error;
+        if (error) return; // fallback silencioso no pool
         const aiActivities = (data?.activities ?? []) as Activity[];
         if (aiActivities.length === 10) {
           setActivities(aiActivities);
@@ -75,9 +81,10 @@ const MyActivities = ({ onBack }: Props) => {
       } catch {
         /* fallback silencioso no pool */
       }
-    })();
+    }, 1500);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
   }, [weekKey, childName, ageRange, interests]);
 

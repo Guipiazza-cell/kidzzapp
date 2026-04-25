@@ -5,8 +5,8 @@
    - Touch reactive: olho segue toque, tap = bounce + ripple
 */
 
-import { forwardRef, useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { forwardRef, useRef, useState, useCallback } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import cosmicImg from "@/assets/kidzz/cosmic.png";
 import moonImg from "@/assets/kidzz/moon.png";
 import explorerImg from "@/assets/kidzz/explorer.png";
@@ -160,47 +160,32 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
         onPointerDown={handleTap}
         style={{ touchAction: "manipulation" }}
       >
-        {/* Ambient glow — morphs by state */}
-        <motion.div
-          key={`glow-${state}`}
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${glowMap[size]} rounded-full pointer-events-none -z-10`}
-          style={{ background: stateGlow[state] }}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-        />
+        {/* Ambient glow — single layer, gentle pulse */}
         <motion.div
           className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${glowMap[size]} rounded-full pointer-events-none -z-10`}
           style={{ background: stateGlow[state] }}
-          animate={{ scale: [1, 1.18, 1], opacity: [0.5, 0.9, 0.5] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ scale: [1, 1.12, 1], opacity: [0.55, 0.85, 0.55] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Character image — crossfade morph */}
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={state}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 0.85, filter: "blur(8px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 1.1, filter: "blur(8px)" }}
-            transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-            style={{
-              x: eyeX,
-              y: eyeY,
-            }}
-          >
-            <img
-              src={stateAssets[state]}
-              alt={`KIDZZ - ${state}`}
-              className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
-              draggable={false}
-              loading="lazy"
-              decoding="async"
-              style={stateImageFilter[state] ? { filter: stateImageFilter[state] } : undefined}
-            />
-          </motion.div>
-        </AnimatePresence>
+        {/* Character image — single layer, no AnimatePresence (avoid forwardRef warning + heavy remounts) */}
+        <motion.div
+          key={state}
+          className="absolute inset-0"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+          style={{ x: eyeX, y: eyeY }}
+        >
+          <img
+            src={stateAssets[state]}
+            alt={`KIDZZ - ${state}`}
+            className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
+            draggable={false}
+            decoding="async"
+            style={stateImageFilter[state] ? { filter: stateImageFilter[state] } : undefined}
+          />
+        </motion.div>
 
         {/* Heart pulse (always visible since heart is on chest in all states) */}
         <motion.div
@@ -212,31 +197,30 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
           transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Floating particles */}
+        {/* Floating particles — reduced count + memoized for mobile perf */}
         {showParticles && (
           <>
-            {[...Array(6)].map((_, i) => (
+            {[...Array(3)].map((_, i) => (
               <motion.div
                 key={`p-${state}-${i}`}
                 className="absolute rounded-full pointer-events-none"
                 style={{
-                  width: 3 + (i % 3) * 2,
-                  height: 3 + (i % 3) * 2,
+                  width: 4 + (i % 2) * 2,
+                  height: 4 + (i % 2) * 2,
                   background: particleColors[i % particleColors.length],
-                  boxShadow: `0 0 8px ${particleColors[i % particleColors.length]}`,
-                  top: `${15 + (i * 13) % 70}%`,
-                  left: `${5 + (i * 17) % 90}%`,
+                  boxShadow: `0 0 6px ${particleColors[i % particleColors.length]}`,
+                  top: `${20 + (i * 25) % 70}%`,
+                  left: `${10 + (i * 30) % 80}%`,
+                  willChange: "transform, opacity",
                 }}
                 animate={{
-                  y: [0, -15 - (i % 3) * 5, 0],
-                  x: [0, (i % 2 ? 8 : -8), 0],
+                  y: [0, -14, 0],
                   opacity: [0.3, 1, 0.3],
-                  scale: [0.8, 1.3, 0.8],
                 }}
                 transition={{
-                  duration: 3 + (i % 3),
+                  duration: 3.2 + i * 0.6,
                   repeat: Infinity,
-                  delay: i * 0.4,
+                  delay: i * 0.5,
                   ease: "easeInOut",
                 }}
               />
