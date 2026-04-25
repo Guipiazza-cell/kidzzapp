@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { addXP } from "@/lib/habitLoop";
+import { useAuth } from "@/contexts/AuthContext";
 import pixelImg from "@/assets/pixel-chameleon.png";
+import GameResultScreen from "./GameResultScreen";
 
 interface Obstacle {
   id: number;
@@ -21,6 +23,8 @@ interface Star {
 interface Props {
   onScore: (pts: number) => void;
   onReaction: (type: "happy" | "encourage") => void;
+  onOpenAchievements?: () => void;
+  onHome?: () => void;
 }
 
 const OBSTACLE_EMOJIS = ["🍄", "🪨", "🌵", "🪵", "🌿"];
