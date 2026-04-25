@@ -206,9 +206,13 @@ const GameResultScreen = ({
 
   // Sound + persistence (runs once on mount)
   useEffect(() => {
-    if (tone === "high") playVictoryTone();
-    else playEncouragementTone();
-
+    if (tone === "high") {
+      playVictoryTone();
+      haptic("success");
+    } else {
+      playEncouragementTone();
+      haptic(tone === "mid" ? "medium" : "light");
+    }
     if (persisted.current || !user) return;
     persisted.current = true;
     const detail =
