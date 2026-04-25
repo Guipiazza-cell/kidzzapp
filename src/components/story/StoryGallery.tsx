@@ -1,8 +1,11 @@
 /* Galeria de histórias criadas — busca memórias type=story do usuário */
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { BookOpen, X, Calendar } from "lucide-react";
+import { BookOpen, X, Calendar, Clock } from "lucide-react";
 import { useMemories } from "@/hooks/useMemories";
+import { useAuth } from "@/contexts/AuthContext";
+import ReadingMode from "./ReadingMode";
+import { haptic } from "@/lib/haptics";
 
 interface StoryGalleryProps {
   onClose: () => void;
@@ -10,9 +13,19 @@ interface StoryGalleryProps {
 
 const StoryGallery = ({ onClose }: StoryGalleryProps) => {
   const { allMemories, loading } = useMemories();
+  const { profile } = useAuth();
   const [selected, setSelected] = useState<typeof allMemories[number] | null>(null);
+  const [reading, setReading] = useState(false);
 
   const stories = allMemories.filter((m) => m.type === "story");
+  const childName = profile?.child_name || "amigo";
+
+  // Reading time estimate: ~150 words per minute for kids reading aloud.
+  const estimateMinutes = (text: string | null | undefined) => {
+    if (!text) return 1;
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 150));
+  };
 
   return (
     <motion.div
@@ -64,7 +77,7 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
               {stories.map((s) => (
                 <motion.button
                   key={s.id}
-                  onClick={() => setSelected(s)}
+                  onClick={() => { haptic("light"); setSelected(s); }}
                   className="text-left rounded-2xl bg-white/90 border border-amber-200/60 p-3 shadow-sm active:scale-95 transition-transform"
                   whileTap={{ scale: 0.97 }}
                 >
@@ -82,13 +95,19 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
                   <p className="text-xs font-extrabold text-gray-800 line-clamp-2 leading-snug">
                     {s.title}
                   </p>
-                  <p className="text-[10px] font-bold text-gray-400 mt-1 flex items-center gap-1">
-                    <Calendar size={10} />
-                    {new Date(s.created_at).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "short",
-                    })}
-                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
+                      <Calendar size={10} />
+                      {new Date(s.created_at).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "short",
+                      })}
+                    </p>
+                    <p className="text-[10px] font-bold text-amber-700 flex items-center gap-0.5">
+                      <Clock size={10} />
+                      {estimateMinutes(s.content)} min
+                    </p>
+                  </div>
                 </motion.button>
               ))}
             </div>
@@ -110,7 +129,7 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
               style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
             >
               <motion.button
-                onClick={() => setSelected(null)}
+                onClick={() => { setReading(false); setSelected(null); }}
                 className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/70 text-gray-600"
                 whileTap={{ scale: 0.9 }}
               >
@@ -128,6 +147,15 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
                   className="w-full rounded-2xl shadow-md"
                 />
               )}
+              <motion.button
+                onClick={() => { haptic("medium"); setReading(true); }}
+                whileTap={{ scale: 0.97 }}
+                className="w-full py-3.5 px-5 rounded-2xl font-extrabold text-white text-sm shadow-lg flex items-center justify-center gap-2"
+                style={{ background: "linear-gradient(135deg, #FF8C00, #F59E0B)" }}
+              >
+                <BookOpen size={18} />
+                Abrir modo leitura
+              </motion.button>
               {selected.content && (
                 <div className="prose prose-sm max-w-none">
                   {selected.content.split("\n").filter(p => p.trim()).map((p, i) => (
@@ -138,6 +166,19 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
                 </div>
               )}
             </div>
+
+            {/* Modo leitura imersivo (sobre o detalhe) */}
+            <AnimatePresence>
+              {reading && (
+                <ReadingMode
+                  title={selected.title}
+                  childName={childName}
+                  story={selected.content || ""}
+                  images={selected.image_url ? [selected.image_url] : []}
+                  onClose={() => setReading(false)}
+                />
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
