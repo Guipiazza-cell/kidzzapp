@@ -503,10 +503,6 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
         </AnimatePresence>
 
         {/* Game Over is rendered as full GameResultScreen above (early return). */}
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <p className="text-center text-[10px] text-white/40 mt-2">
