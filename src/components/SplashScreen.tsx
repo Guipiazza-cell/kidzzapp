@@ -129,13 +129,31 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
             }}
           />
           <div style={{ animation: "splash-float 2s ease-in-out infinite 600ms" }}>
-            <img
-              src={chameleonHappy}
-              alt="KIDZZ"
-              className="w-40 h-40 sm:w-48 sm:h-48 object-contain drop-shadow-[0_10px_24px_rgba(255,140,0,0.45)]"
-              decoding="async"
-              loading="eager"
-            />
+            {imgFailed ? (
+              // Graceful fallback: a stylized mascot circle that keeps the splash
+              // visually intact even if the asset fails to load.
+              <div
+                role="img"
+                aria-label="KIDZZ"
+                className="w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center drop-shadow-[0_10px_24px_rgba(255,140,0,0.45)]"
+                style={{
+                  background:
+                    "radial-gradient(circle at 35% 30%, #FFE08A 0%, #FF8C00 60%, #C2410C 100%)",
+                  boxShadow: "inset 0 -8px 18px rgba(0,0,0,0.15), 0 8px 24px rgba(255,140,0,0.35)",
+                }}
+              >
+                <span style={{ fontSize: "72px", lineHeight: 1 }}>🦎</span>
+              </div>
+            ) : (
+              <img
+                src={chameleonHappy}
+                alt="KIDZZ"
+                className="w-40 h-40 sm:w-48 sm:h-48 object-contain drop-shadow-[0_10px_24px_rgba(255,140,0,0.45)]"
+                decoding="async"
+                loading="eager"
+                onError={() => setImgFailed(true)}
+              />
+            )}
           </div>
         </div>
 
