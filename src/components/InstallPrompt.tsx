@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Download, Share } from "lucide-react";
+import { haptic } from "@/lib/haptics";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
