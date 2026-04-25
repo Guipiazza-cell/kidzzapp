@@ -29,19 +29,36 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const AppShell = () => {
-  // Splash always shows on first mount, regardless of route, before auth check.
-  const [splashDone, setSplashDone] = useState(false);
+// Module-level flag: ensures splash only shows on the very first app render
+// of a session — never on internal navigations, route changes, or re-mounts.
+let SPLASH_SHOWN = false;
+try {
+  if (typeof window !== "undefined" && sessionStorage.getItem("kidzz_splash_shown") === "1") {
+    SPLASH_SHOWN = true;
+  }
+} catch {
+  /* sessionStorage may be unavailable (private mode) — fall back to module flag */
+}
 
-  // Safety net: never block UI for more than 3s if onFinish callback is missed.
+const AppShell = () => {
+  const [splashDone, setSplashDone] = useState(SPLASH_SHOWN);
+
+  const handleSplashFinish = () => {
+    SPLASH_SHOWN = true;
+    try { sessionStorage.setItem("kidzz_splash_shown", "1"); } catch { /* noop */ }
+    setSplashDone(true);
+  };
+
+  // Safety net: ensure we never block UI longer than 2.5s + 300ms fade + buffer.
   useEffect(() => {
-    const t = setTimeout(() => setSplashDone(true), 3000);
+    if (splashDone) return;
+    const t = setTimeout(handleSplashFinish, 3200);
     return () => clearTimeout(t);
-  }, []);
+  }, [splashDone]);
 
   return (
     <>
-      {!splashDone && <SplashScreen onFinish={() => setSplashDone(true)} />}
+      {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       <BrowserRouter>
         <AuthProvider>
           <Routes>
