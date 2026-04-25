@@ -197,31 +197,30 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
           transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Floating particles */}
+        {/* Floating particles — reduced count + memoized for mobile perf */}
         {showParticles && (
           <>
-            {[...Array(6)].map((_, i) => (
+            {[...Array(3)].map((_, i) => (
               <motion.div
                 key={`p-${state}-${i}`}
                 className="absolute rounded-full pointer-events-none"
                 style={{
-                  width: 3 + (i % 3) * 2,
-                  height: 3 + (i % 3) * 2,
+                  width: 4 + (i % 2) * 2,
+                  height: 4 + (i % 2) * 2,
                   background: particleColors[i % particleColors.length],
-                  boxShadow: `0 0 8px ${particleColors[i % particleColors.length]}`,
-                  top: `${15 + (i * 13) % 70}%`,
-                  left: `${5 + (i * 17) % 90}%`,
+                  boxShadow: `0 0 6px ${particleColors[i % particleColors.length]}`,
+                  top: `${20 + (i * 25) % 70}%`,
+                  left: `${10 + (i * 30) % 80}%`,
+                  willChange: "transform, opacity",
                 }}
                 animate={{
-                  y: [0, -15 - (i % 3) * 5, 0],
-                  x: [0, (i % 2 ? 8 : -8), 0],
+                  y: [0, -14, 0],
                   opacity: [0.3, 1, 0.3],
-                  scale: [0.8, 1.3, 0.8],
                 }}
                 transition={{
-                  duration: 3 + (i % 3),
+                  duration: 3.2 + i * 0.6,
                   repeat: Infinity,
-                  delay: i * 0.4,
+                  delay: i * 0.5,
                   ease: "easeInOut",
                 }}
               />
