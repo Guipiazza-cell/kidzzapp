@@ -1,8 +1,11 @@
 /* Galeria de histórias criadas — busca memórias type=story do usuário */
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { BookOpen, X, Calendar } from "lucide-react";
+import { BookOpen, X, Calendar, Clock } from "lucide-react";
 import { useMemories } from "@/hooks/useMemories";
+import { useAuth } from "@/contexts/AuthContext";
+import ReadingMode from "./ReadingMode";
+import { haptic } from "@/lib/haptics";
 
 interface StoryGalleryProps {
   onClose: () => void;
