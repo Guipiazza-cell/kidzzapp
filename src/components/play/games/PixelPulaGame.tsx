@@ -278,6 +278,29 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
     if (phase === "playing") jump();
   };
 
+  // Endless score → stars (1-3) based on milestones
+  const computeStars = (s: number): 1 | 2 | 3 => (s >= 300 ? 3 : s >= 150 ? 2 : 1);
+  const xpEarned = Math.max(1, Math.floor(score / 10));
+
+  if (phase === "gameover") {
+    return (
+      <GameResultScreen
+        correct={score}
+        total={0}
+        xp={xpEarned}
+        childName={childName}
+        activityLabel="Kidzz Pula"
+        subtype="pixel-pula"
+        starsOverride={computeStars(score)}
+        percentOverride={Math.min(100, Math.round((score / Math.max(highScore, 100)) * 100))}
+        subtitle={`${score} pontos${isNewRecord ? " • 🏆 Novo recorde!" : ` • Recorde: ${highScore}`}`}
+        onReplay={startGame}
+        onOpenAchievements={onOpenAchievements ?? (() => {})}
+        onHome={onHome ?? (() => {})}
+      />
+    );
+  }
+
   return (
     <div className="w-full">
       {/* HUD */}
