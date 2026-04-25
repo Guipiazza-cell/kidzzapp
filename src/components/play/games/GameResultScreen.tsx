@@ -287,7 +287,7 @@ const GameResultScreen = ({
 
       {/* Progress ring + XP */}
       <div className="relative">
-        <ProgressRing percent={percent} />
+        <ProgressRing percent={computedPercent} />
         <AnimatePresence>
           <motion.span
             key="xp"
@@ -307,7 +307,8 @@ const GameResultScreen = ({
 
       {/* Detail line */}
       <p className="text-sm text-white/60">
-        {correct} de {total} acertos
+        {subtitle ?? (total > 0 ? `${correct} de ${total} acertos` : `${correct} pontos`)}
+      </p>
       </p>
 
       {/* Actions */}
