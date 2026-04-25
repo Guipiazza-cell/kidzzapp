@@ -22,15 +22,45 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isReady } = useAuth();
 
-  if (!isReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-5xl animate-bounce">🦎</div>
-      </div>
-    );
-  }
+  // The global SplashScreen handles the initial loading visual.
+  // While auth is hydrating we render nothing (splash overlays everything).
+  if (!isReady) return null;
 
   return <>{children}</>;
+};
+
+const AppShell = () => {
+  // Splash always shows on first mount, regardless of route, before auth check.
+  const [splashDone, setSplashDone] = useState(false);
+
+  // Safety net: never block UI for more than 3s if onFinish callback is missed.
+  useEffect(() => {
+    const t = setTimeout(() => setSplashDone(true), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <>
+      {!splashDone && <SplashScreen onFinish={() => setSplashDone(true)} />}
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/lp" element={<Landing />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <InstallPrompt />
+        </AuthProvider>
+      </BrowserRouter>
+    </>
+  );
 };
 
 const App = () => (
@@ -39,23 +69,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/lp" element={<Landing />} />
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <InstallPrompt />
-          </AuthProvider>
-        </BrowserRouter>
+        <AppShell />
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>
