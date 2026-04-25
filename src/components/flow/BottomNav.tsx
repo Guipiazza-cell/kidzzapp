@@ -4,6 +4,7 @@ import cosmicImg from "@/assets/kidzz/cosmic.png";
 import explorerImg from "@/assets/kidzz/explorer.png";
 import musicImg from "@/assets/kidzz/music.png";
 import moonImg from "@/assets/kidzz/moon.png";
+import { haptic } from "@/lib/haptics";
 
 interface Props {
   activeTab: string;
@@ -99,7 +100,7 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
         return (
           <motion.button
             key={tab.id}
-            onClick={() => onTabChange(tab.id)}
+            onClick={() => { haptic("light"); onTabChange(tab.id); }}
             className={`relative flex flex-col items-center gap-0.5 px-1 py-1 rounded-2xl transition-colors min-w-[48px] ${
               isHighlight ? "min-w-[58px]" : ""
             }`}
