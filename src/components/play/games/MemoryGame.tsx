@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import GameResultScreen from "./GameResultScreen";
 
 const EMOJI_SETS = [
   ["🌟", "🦋", "🌈", "🎈", "🌻", "🍀"],
@@ -10,6 +12,8 @@ const EMOJI_SETS = [
 interface Props {
   onScore: (pts: number) => void;
   onReaction: (type: "happy" | "encourage") => void;
+  onOpenAchievements?: () => void;
+  onHome?: () => void;
 }
 
 const MemoryGame = ({ onScore, onReaction }: Props) => {
