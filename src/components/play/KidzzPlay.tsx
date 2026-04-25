@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Palette, Target, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
+import { loadMascotConfig, type LabExpression } from "@/components/lab/KidzzLab";
 import WordSearchGame from "./games/WordSearchGame";
 import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
@@ -12,6 +13,26 @@ import PixelPulaGame from "./games/PixelPulaGame";
 import MyKidzz from "./MyKidzz";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
+
+// Hue values per saved color id — matches KidzzLab/HomeScreen
+const HUE_MAP: Record<string, number> = {
+  "rosa-encantado": 0,
+  "dourado-magico": -30,
+  "verde-floresta": 90,
+  "azul-oceano": 180,
+  "lilas-estrelado": 240,
+  "laranja-aventura": -60,
+};
+
+// Map saved expression → KidzzMood for the chameleon component
+const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
+  happy: "happy",
+  curious: "curious",
+  excited: "happy",
+  thinking: "thinking",
+  loving: "calm",
+  challenging: "guide",
+};
 
 type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
 type View = "menu" | "games" | "kidzz" | "activities";
