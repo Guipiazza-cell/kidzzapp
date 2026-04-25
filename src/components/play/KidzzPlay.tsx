@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Palette, Target, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -513,7 +513,7 @@ interface HubCardProps {
   gradient: string;
   highlight?: boolean;
 }
-const HubCard = ({ onClick, icon, emoji, title, subtitle, gradient, highlight }: HubCardProps) => (
+const HubCard = memo(({ onClick, icon, emoji, title, subtitle, gradient, highlight }: HubCardProps) => (
   <motion.button
     onClick={onClick}
     className="relative w-full rounded-3xl p-4 text-left flex items-center gap-3 shadow-lg border border-white/30 overflow-hidden min-h-[80px]"
@@ -521,6 +521,7 @@ const HubCard = ({ onClick, icon, emoji, title, subtitle, gradient, highlight }:
     whileTap={{ scale: 0.97 }}
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.25 }}
   >
     {highlight && (
       <motion.span
@@ -544,7 +545,8 @@ const HubCard = ({ onClick, icon, emoji, title, subtitle, gradient, highlight }:
     </div>
     <div className="opacity-90 flex-shrink-0">{icon}</div>
   </motion.button>
-);
+));
+HubCard.displayName = "HubCard";
 
 const Stat = ({
   label,
