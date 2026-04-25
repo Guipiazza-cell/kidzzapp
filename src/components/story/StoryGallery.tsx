@@ -147,6 +147,15 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
                   className="w-full rounded-2xl shadow-md"
                 />
               )}
+              <motion.button
+                onClick={() => { haptic("medium"); setReading(true); }}
+                whileTap={{ scale: 0.97 }}
+                className="w-full py-3.5 px-5 rounded-2xl font-extrabold text-white text-sm shadow-lg flex items-center justify-center gap-2"
+                style={{ background: "linear-gradient(135deg, #FF8C00, #F59E0B)" }}
+              >
+                <BookOpen size={18} />
+                Abrir modo leitura
+              </motion.button>
               {selected.content && (
                 <div className="prose prose-sm max-w-none">
                   {selected.content.split("\n").filter(p => p.trim()).map((p, i) => (
@@ -157,6 +166,19 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
                 </div>
               )}
             </div>
+
+            {/* Modo leitura imersivo (sobre o detalhe) */}
+            <AnimatePresence>
+              {reading && (
+                <ReadingMode
+                  title={selected.title}
+                  childName={childName}
+                  story={selected.content || ""}
+                  images={selected.image_url ? [selected.image_url] : []}
+                  onClose={() => setReading(false)}
+                />
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
