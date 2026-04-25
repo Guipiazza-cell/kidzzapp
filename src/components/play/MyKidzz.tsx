@@ -17,12 +17,13 @@ import html2canvas from "html2canvas";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 
+// Hue values must match KidzzLab + HomeScreen for consistency across the app
 const COLORS = [
   { id: "rosa-encantado", label: "Rosa", hue: 0, dot: "hsl(330 80% 65%)" },
   { id: "dourado-magico", label: "Dourado", hue: -30, dot: "hsl(45 90% 60%)" },
-  { id: "verde-floresta", label: "Verde", hue: 50, dot: "hsl(140 70% 50%)" },
-  { id: "azul-oceano", label: "Azul", hue: 130, dot: "hsl(210 80% 55%)" },
-  { id: "lilas-estrelado", label: "Lilás", hue: 200, dot: "hsl(280 70% 65%)" },
+  { id: "verde-floresta", label: "Verde", hue: 90, dot: "hsl(140 70% 50%)" },
+  { id: "azul-oceano", label: "Azul", hue: 180, dot: "hsl(210 80% 55%)" },
+  { id: "lilas-estrelado", label: "Lilás", hue: 240, dot: "hsl(280 70% 65%)" },
   { id: "laranja-aventura", label: "Laranja", hue: -60, dot: "hsl(20 90% 55%)" },
 ];
 

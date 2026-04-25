@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Palette, Target, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
+import { loadMascotConfig, type LabExpression } from "@/components/lab/KidzzLab";
 import WordSearchGame from "./games/WordSearchGame";
 import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
@@ -12,6 +13,26 @@ import PixelPulaGame from "./games/PixelPulaGame";
 import MyKidzz from "./MyKidzz";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
+
+// Hue values per saved color id — matches KidzzLab/HomeScreen
+const HUE_MAP: Record<string, number> = {
+  "rosa-encantado": 0,
+  "dourado-magico": -30,
+  "verde-floresta": 90,
+  "azul-oceano": 180,
+  "lilas-estrelado": 240,
+  "laranja-aventura": -60,
+};
+
+// Map saved expression → KidzzMood for the chameleon component
+const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
+  happy: "happy",
+  curious: "curious",
+  excited: "happy",
+  thinking: "thinking",
+  loving: "calm",
+  challenging: "guide",
+};
 
 type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
 type View = "menu" | "games" | "kidzz" | "activities";
@@ -43,6 +64,14 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
   const [mascotMood, setMascotMood] = useState<"idle" | "happy" | "encourage">("idle");
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);
 
+  // Saved KIDZZ config (cor + expressão) — recarregada ao voltar de "Meu KIDZZ"
+  const [mascotConfig, setMascotConfig] = useState(() => loadMascotConfig());
+  useEffect(() => {
+    if (view !== "kidzz") setMascotConfig(loadMascotConfig());
+  }, [view]);
+  const savedHue = HUE_MAP[mascotConfig.colorId] ?? 0;
+  const savedMood: KidzzMood = EXPR_TO_MOOD[mascotConfig.expression] ?? "happy";
+
   const handleScore = useCallback((pts: number) => {
     setSessionScore((s) => s + pts);
     onGameComplete?.();
@@ -71,8 +100,9 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
     setActiveGame(id);
   };
 
-  const kidzzMood: "idle" | "happy" | "curious" =
-    mascotMood === "happy" ? "happy" : mascotMood === "encourage" ? "curious" : "idle";
+  // Reaction (happy/encourage) wins; otherwise use the saved expression
+  const kidzzMood: KidzzMood =
+    mascotMood === "happy" ? "happy" : mascotMood === "encourage" ? "curious" : savedMood;
 
   const heroSpeech =
     view === "games"
@@ -137,9 +167,12 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
       exit={{ opacity: 0, y: -20 }}
       className="flex-1 flex flex-col px-4"
     >
-      {/* KIDZZ HERO grande (verde vibrante = state "play") */}
+      {/* KIDZZ HERO grande — reflete a cor/expressão escolhidas em "Meu KIDZZ" */}
       <div className="relative flex justify-center pt-2 pb-3">
-        <motion.div className="relative">
+        <motion.div
+          className="relative"
+          style={{ filter: `hue-rotate(${savedHue}deg)`, transition: "filter 350ms ease" }}
+        >
           <KidzzChameleon
             state="play"
             mood={kidzzMood}
@@ -234,8 +267,11 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
       exit={{ opacity: 0, x: -30 }}
       className="flex-1 flex flex-col px-4"
     >
-      {/* KIDZZ menor no topo */}
-      <div className="relative flex justify-center pt-1 pb-2">
+      {/* KIDZZ menor no topo — reflete a customização salva */}
+      <div
+        className="relative flex justify-center pt-1 pb-2"
+        style={{ filter: `hue-rotate(${savedHue}deg)`, transition: "filter 350ms ease" }}
+      >
         <KidzzChameleon
           state="play"
           mood={kidzzMood}
@@ -316,7 +352,12 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
             className="flex-1 overflow-y-auto pb-24"
           >
             {activeGame === "pixel-pula" && (
-              <PixelPulaGame onScore={handleScore} onReaction={handleReaction} />
+              <PixelPulaGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
             )}
             {activeGame === "word" && (
               <WordSearchGame
