@@ -167,9 +167,12 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
       exit={{ opacity: 0, y: -20 }}
       className="flex-1 flex flex-col px-4"
     >
-      {/* KIDZZ HERO grande (verde vibrante = state "play") */}
+      {/* KIDZZ HERO grande — reflete a cor/expressão escolhidas em "Meu KIDZZ" */}
       <div className="relative flex justify-center pt-2 pb-3">
-        <motion.div className="relative">
+        <motion.div
+          className="relative"
+          style={{ filter: `hue-rotate(${savedHue}deg)`, transition: "filter 350ms ease" }}
+        >
           <KidzzChameleon
             state="play"
             mood={kidzzMood}
