@@ -52,6 +52,10 @@ const ChatScreen = ({
   const chatRef = useRef<HTMLDivElement>(null);
   const { speak, stop: stopTTS } = useTTS();
   const lastAssistantTextRef = useRef("");
+  // Track the most recent log row so we can flag it as narrated when the
+  // parent presses "speak". One log row per Q&A pair.
+  const lastLogIdRef = useRef<string | null>(null);
+  const lastUserQuestionRef = useRef<string>("");
 
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
