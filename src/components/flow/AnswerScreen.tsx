@@ -56,13 +56,33 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
       toast.success("+1 ponto — sabedoria desbloqueada! ✨", { duration: 2500 });
     }
 
+    // Persist Q&A to parent log (one row per answer rendered).
+    if (!loggedRef.current && user && question && answer) {
+      loggedRef.current = true;
+      supabase
+        .from("kidzz_questions_log")
+        .insert({
+          user_id: user.id,
+          question,
+          answer,
+          age_range: profile?.age_range ?? null,
+          was_narrated: false,
+        })
+        .select("id")
+        .single()
+        .then(({ data, error }) => {
+          if (error) console.warn("[Kidzz] log insert failed:", error.message);
+          else logIdRef.current = data?.id ?? null;
+        });
+    }
+
     const tCelebration = setTimeout(() => setShowCelebration(false), 2500);
     if (!isPremium) {
       const tCTA = setTimeout(() => setShowCTA(true), 3000);
       return () => { clearTimeout(tCelebration); clearTimeout(tCTA); };
     }
     return () => clearTimeout(tCelebration);
-  }, [isPremium, trackEvent]);
+  }, [isPremium, trackEvent, user, question, answer, profile?.age_range]);
 
   const handleSpeak = useCallback(async () => {
     if (playing) {
@@ -73,12 +93,22 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
     setPlaying(true);
     try {
       await speak(answer);
+      // Mark answer as narrated in parent log (best-effort).
+      if (logIdRef.current && user) {
+        supabase
+          .from("kidzz_questions_log")
+          .update({ was_narrated: true })
+          .eq("id", logIdRef.current)
+          .then(({ error }) => {
+            if (error) console.warn("[Kidzz] narration flag failed:", error.message);
+          });
+      }
     } catch {
       toast.error("Erro na narração 🔊");
     } finally {
       setPlaying(false);
     }
-  }, [playing, speak, stop, answer]);
+  }, [playing, speak, stop, answer, user]);
 
   const handleSaveMemory = useCallback(async () => {
     if (memorySaved) return;
