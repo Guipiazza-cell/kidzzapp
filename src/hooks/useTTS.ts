@@ -17,6 +17,13 @@ const cleanText = (text: string): string =>
     .replace(/[*_~`#>]/g, "")
     // remove links markdown [texto](url) → texto
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    // remove TODOS os emojis e símbolos pictográficos (Unicode "Extended Pictographic")
+    // — voz lê texto puro, mais limpo e amigo, sem "rosto sorridente" etc.
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    // remove variation selectors / zero-width joiners deixados pelos emojis
+    .replace(/[\u200D\uFE0F\u20E3]/g, "")
+    // colapsa espaços extras gerados pela remoção
+    .replace(/\s{2,}/g, " ")
     .trim();
 
 /** Quebra em frases para pausa natural entre orações. */
