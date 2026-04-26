@@ -6,6 +6,7 @@ import confetti from "canvas-confetti";
 import { useTTS } from "@/hooks/useTTS";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
