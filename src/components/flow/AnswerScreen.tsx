@@ -21,7 +21,7 @@ interface Props {
 
 const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: Props) => {
   const { speak, stop } = useTTS();
-  const { profile, tier, handleCheckout } = useAuth();
+  const { profile, tier, handleCheckout, user } = useAuth();
   const { addMemory } = useMemories();
   const { trackEvent } = useAchievementSync();
   const [playing, setPlaying] = useState(false);
@@ -32,6 +32,8 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "super_premium";
   const trackedRef = useRef(false);
+  const logIdRef = useRef<string | null>(null);
+  const loggedRef = useRef(false);
 
   // Reward loop: 2.5s celebration + confetti + XP toast on mount
   useEffect(() => {
