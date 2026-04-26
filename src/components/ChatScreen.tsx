@@ -160,10 +160,13 @@ const ChatScreen = ({
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isTyping || !canAskQuestion()) return;
-    const userMsg: Message = { id: Date.now(), text: text.trim(), isUser: true };
+    const trimmed = text.trim();
+    const userMsg: Message = { id: Date.now(), text: trimmed, isUser: true };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
+    lastUserQuestionRef.current = trimmed;
+    lastLogIdRef.current = null;
     await incrementQuestions();
     const allMessages = [...messages, userMsg].map((m) => ({
       role: m.isUser ? ("user" as const) : ("assistant" as const),
@@ -172,6 +175,24 @@ const ChatScreen = ({
     try {
       await streamChat(allMessages);
       setConnectionCount((c) => c + 1);
+
+      // Persist Q&A in the parent log (RLS protected, only the parent sees it).
+      const answer = lastAssistantTextRef.current?.trim();
+      if (user && answer) {
+        const { data, error } = await supabase
+          .from("kidzz_questions_log")
+          .insert({
+            user_id: user.id,
+            question: trimmed,
+            answer,
+            age_range: ageRange,
+            was_narrated: false,
+          })
+          .select("id")
+          .single();
+        if (error) console.warn("[Kidzz] log insert failed:", error.message);
+        else lastLogIdRef.current = data?.id ?? null;
+      }
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
       setMessages((prev) => [
@@ -181,7 +202,7 @@ const ChatScreen = ({
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping, canAskQuestion, messages, streamChat, incrementQuestions]);
+  }, [isTyping, canAskQuestion, messages, streamChat, incrementQuestions, user, ageRange]);
 
   const handleVoiceResult = useCallback((text: string) => {
     setInput(text);
