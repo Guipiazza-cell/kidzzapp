@@ -8,29 +8,30 @@ import { DreamNarrator } from "./DreamNarrator";
 import { SLEEP_STORIES, SOUND_PRESETS, TIMER_OPTIONS } from "./sleepStories";
 import PreSleep from "./PreSleep";
 
-/* ── Floating particles ── */
+/* ── Floating particles (lightweight: 10 instead of 25) ── */
 const DreamParticles = () => (
   <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-    {Array.from({ length: 25 }).map((_, i) => {
+    {Array.from({ length: 10 }).map((_, i) => {
       const size = Math.random() * 3 + 1;
-      const isGlow = i < 6;
+      const isGlow = i < 3;
       return (
         <motion.div
           key={i}
-          className={`absolute rounded-full ${isGlow ? "bg-indigo-300/40" : "bg-white/50"}`}
+          className={`absolute rounded-full ${isGlow ? "bg-indigo-300/40" : "bg-white/45"}`}
           style={{
             width: isGlow ? size + 2 : size,
             height: isGlow ? size + 2 : size,
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
             boxShadow: isGlow ? `0 0 ${size * 4}px ${size}px rgba(165,180,252,0.3)` : undefined,
+            willChange: "transform, opacity",
           }}
           animate={{
             opacity: [0.15, 0.7, 0.15],
-            scale: [0.8, 1.2, 0.8],
+            scale: [0.85, 1.15, 0.85],
             y: [0, -8, 0],
           }}
-          transition={{ duration: 3 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3 }}
+          transition={{ duration: 4 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3 }}
         />
       );
     })}
