@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAffiliate } from "@/hooks/useAffiliate";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import QuestionHistoryPanel from "@/components/parental/QuestionHistoryPanel";
 
 interface ParentalSettingsProps {
   onClose: () => void;
