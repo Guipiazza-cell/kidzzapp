@@ -231,7 +231,24 @@ const Index = () => {
     }
     // ABA: Sonhos (🌙 — fundo próprio escuro)
     if (activeTab === "dreams") {
-      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
+      return (
+        <Suspense
+          key="dreams"
+          fallback={
+            <div
+              className="fixed inset-0 z-40 flex items-center justify-center"
+              style={{ background: "linear-gradient(180deg,#0f1535 0%,#1e1145 50%,#0d1b2a 100%)" }}
+            >
+              <div className="text-center text-white/70">
+                <div className="text-5xl mb-3">🌙</div>
+                <p className="text-sm">Preparando o Mundo dos Sonhos…</p>
+              </div>
+            </div>
+          }
+        >
+          <DreamWorld onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />
+        </Suspense>
+      );
     }
     // ABA: Música (🌿)
     if (activeTab === "music") {
