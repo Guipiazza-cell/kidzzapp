@@ -83,8 +83,24 @@ const ChatScreen = ({
 
   const speakText = useCallback(async (text: string) => {
     setIsSpeaking(true);
-    try { await speak(text); } catch { toast.error("Erro na narração. Tente novamente! 🔊"); } finally { setIsSpeaking(false); }
-  }, [speak]);
+    try {
+      await speak(text);
+      // Mark this Q&A as narrated in the parent log (best-effort, non-blocking).
+      if (lastLogIdRef.current && user) {
+        supabase
+          .from("kidzz_questions_log")
+          .update({ was_narrated: true })
+          .eq("id", lastLogIdRef.current)
+          .then(({ error }) => {
+            if (error) console.warn("[Kidzz] log narration flag failed:", error.message);
+          });
+      }
+    } catch {
+      toast.error("Erro na narração. Tente novamente! 🔊");
+    } finally {
+      setIsSpeaking(false);
+    }
+  }, [speak, user]);
 
   const streamChat = useCallback(async (userMessages: { role: string; content: string }[]) => {
     const resp = await fetch(CHAT_URL, {
