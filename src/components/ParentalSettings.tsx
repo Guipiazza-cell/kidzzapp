@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAffiliate } from "@/hooks/useAffiliate";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import QuestionHistoryPanel from "@/components/parental/QuestionHistoryPanel";
 
 interface ParentalSettingsProps {
   onClose: () => void;
@@ -448,6 +449,9 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             <p className="font-bold text-sm text-foreground">👧 Nome da criança</p>
             <p className="text-sm text-muted-foreground">{profile?.child_name || "Não definido"}</p>
           </div>
+
+          {/* Question history (parent panel) */}
+          <QuestionHistoryPanel />
 
           {/* Affiliate program */}
           <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 space-y-3">

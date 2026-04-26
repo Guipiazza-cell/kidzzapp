@@ -17,6 +17,13 @@ const cleanText = (text: string): string =>
     .replace(/[*_~`#>]/g, "")
     // remove links markdown [texto](url) → texto
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    // remove TODOS os emojis e símbolos pictográficos (Unicode "Extended Pictographic")
+    // — voz lê texto puro, mais limpo e amigo, sem "rosto sorridente" etc.
+    .replace(/\p{Extended_Pictographic}/gu, "")
+    // remove variation selectors / zero-width joiners deixados pelos emojis
+    .replace(/[\u200D\uFE0F\u20E3]/g, "")
+    // colapsa espaços extras gerados pela remoção
+    .replace(/\s{2,}/g, " ")
     .trim();
 
 /** Quebra em frases para pausa natural entre orações. */
@@ -111,9 +118,11 @@ export const useTTS = () => {
       await new Promise<void>((resolve) => {
         const utt = new SpeechSynthesisUtterance(sentences[i]);
         utt.lang = "pt-BR";
-        utt.rate = 0.95;   // ligeiramente mais rápido = soa mais natural
-        utt.pitch = 1.05;  // pitch suave para soar acolhedor
-        utt.volume = 1.0;
+        // Tom suave e amigo: ritmo levemente mais lento que o normal,
+        // pitch quase neutro para parecer "tia que conta história".
+        utt.rate = 0.88;
+        utt.pitch = 1.0;
+        utt.volume = 0.95;
         if (voiceRef.current) utt.voice = voiceRef.current;
 
         let settled = false;

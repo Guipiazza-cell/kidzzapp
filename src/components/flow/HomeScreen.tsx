@@ -186,51 +186,54 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
       <CharacterParticles particles={particles} />
       {/* Header */}
       <header
-        className="flex items-center justify-between px-5 pb-2 relative z-10"
+        className="flex items-center justify-between gap-2 px-3 pb-2 relative z-10"
         style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
       >
-        <div className="flex items-center gap-2.5">
-          <img src={cosmicImg} alt="Kidzz" className="w-9 h-9 object-contain drop-shadow-lg" />
-          <span className="text-xl font-black text-gray-800 tracking-tight">
+        <div className="flex items-center gap-2 min-w-0 flex-shrink">
+          <img src={cosmicImg} alt="Kidzz" className="w-8 h-8 object-contain drop-shadow-lg flex-shrink-0" />
+          <span className="text-lg font-black text-gray-800 tracking-tight">
             Kidzz
           </span>
-        </div>
-        <div className="flex items-center gap-2">
           {profile?.is_premium && (
-            <span className="text-[10px] text-white font-extrabold bg-gradient-to-r from-kid-purple to-kid-pink px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
-              <Crown size={11} /> Premium
+            <span className="text-[9px] text-white font-extrabold bg-gradient-to-r from-kid-purple to-kid-pink px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm flex-shrink-0">
+              <Crown size={9} /> Premium
             </span>
           )}
+        </div>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           {onOpenReferral && user && (
             <motion.button
               onClick={onOpenReferral}
-              className="p-2.5 rounded-xl glass-card text-purple-500"
+              className="p-2 rounded-xl glass-card text-purple-500"
               whileTap={{ scale: 0.9 }}
+              aria-label="Programa de indicação"
             >
-              <Gift size={18} />
+              <Gift size={16} />
             </motion.button>
           )}
-          <span className="text-xs text-amber-700 font-extrabold glass-card px-3 py-1.5 rounded-full flex items-center gap-1" title="Pontos de sabedoria">
+          <span className="text-[11px] text-amber-700 font-extrabold glass-card px-2 py-1 rounded-full flex items-center gap-0.5" title="Pontos de sabedoria">
             ✨ {getTotalXp()}
           </span>
-          <span className="text-xs text-gray-800 font-extrabold glass-card px-3 py-1.5 rounded-full">
+          <span className="text-[11px] text-gray-800 font-extrabold glass-card px-2 py-1 rounded-full">
             {questionsRemaining()} 💬
           </span>
           {!user ? (
             <motion.button
               onClick={() => navigate("/auth")}
-              className="p-2.5 rounded-xl glass-card text-kid-green"
+              className="p-2 rounded-xl glass-card text-kid-green"
               whileTap={{ scale: 0.9 }}
+              aria-label="Entrar"
             >
-              <LogIn size={20} />
+              <LogIn size={18} />
             </motion.button>
           ) : (
             <motion.button
               onClick={() => setShowParentalGateForSettings(true)}
-              className="p-2.5 rounded-xl glass-card text-gray-600"
+              className="p-2 rounded-xl glass-card text-gray-600"
               whileTap={{ scale: 0.9 }}
+              aria-label="Controle parental"
             >
-              <Shield size={20} />
+              <Shield size={18} />
             </motion.button>
           )}
         </div>

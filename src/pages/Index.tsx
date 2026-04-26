@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
@@ -17,7 +17,10 @@ import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
-import DreamWorld from "@/components/dreams/DreamWorld";
+// Dream world is heavy (audio engine + 25 animated particles).
+// Lazy-load so it only ships when the parent opens the Dreams tab —
+// makes first paint of that tab much faster.
+const DreamWorld = lazy(() => import("@/components/dreams/DreamWorld"));
 import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
@@ -228,7 +231,24 @@ const Index = () => {
     }
     // ABA: Sonhos (🌙 — fundo próprio escuro)
     if (activeTab === "dreams") {
-      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
+      return (
+        <Suspense
+          key="dreams"
+          fallback={
+            <div
+              className="fixed inset-0 z-40 flex items-center justify-center"
+              style={{ background: "linear-gradient(180deg,#0f1535 0%,#1e1145 50%,#0d1b2a 100%)" }}
+            >
+              <div className="text-center text-white/70">
+                <div className="text-5xl mb-3">🌙</div>
+                <p className="text-sm">Preparando o Mundo dos Sonhos…</p>
+              </div>
+            </div>
+          }
+        >
+          <DreamWorld onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />
+        </Suspense>
+      );
     }
     // ABA: Música (🌿)
     if (activeTab === "music") {

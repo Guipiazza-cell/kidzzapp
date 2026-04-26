@@ -26,8 +26,17 @@ export class DreamNarrator {
     this.stop();
     this.onEndCallback = onEnd;
 
+    // Limpa markdown e remove emojis para uma narração de sono limpa.
+    const clean = text
+      .replace(/[*_~`#>]/g, "")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/\p{Extended_Pictographic}/gu, "")
+      .replace(/[\u200D\uFE0F\u20E3]/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+
     // Split into sentences for natural pauses
-    const sentences = text
+    const sentences = clean
       .split(/(?<=[.!?…])\s+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
@@ -35,9 +44,10 @@ export class DreamNarrator {
     this.utterances = sentences.map((sentence) => {
       const utt = new SpeechSynthesisUtterance(sentence);
       utt.lang = "pt-BR";
-      utt.rate = 0.82;
-      utt.pitch = 1.0;
-      utt.volume = 1;
+      // Voz de embalo: ritmo lento, pitch neutro, volume suave.
+      utt.rate = 0.78;
+      utt.pitch = 0.98;
+      utt.volume = 0.9;
       if (this.voice) utt.voice = this.voice;
       return utt;
     });

@@ -11,6 +11,7 @@ import SubscribeBanner from "./SubscribeBanner";
 import MagicalBackground from "./MagicalBackground";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface Message {
@@ -51,6 +52,10 @@ const ChatScreen = ({
   const chatRef = useRef<HTMLDivElement>(null);
   const { speak, stop: stopTTS } = useTTS();
   const lastAssistantTextRef = useRef("");
+  // Track the most recent log row so we can flag it as narrated when the
+  // parent presses "speak". One log row per Q&A pair.
+  const lastLogIdRef = useRef<string | null>(null);
+  const lastUserQuestionRef = useRef<string>("");
 
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
@@ -78,8 +83,24 @@ const ChatScreen = ({
 
   const speakText = useCallback(async (text: string) => {
     setIsSpeaking(true);
-    try { await speak(text); } catch { toast.error("Erro na narração. Tente novamente! 🔊"); } finally { setIsSpeaking(false); }
-  }, [speak]);
+    try {
+      await speak(text);
+      // Mark this Q&A as narrated in the parent log (best-effort, non-blocking).
+      if (lastLogIdRef.current && user) {
+        supabase
+          .from("kidzz_questions_log")
+          .update({ was_narrated: true })
+          .eq("id", lastLogIdRef.current)
+          .then(({ error }) => {
+            if (error) console.warn("[Kidzz] log narration flag failed:", error.message);
+          });
+      }
+    } catch {
+      toast.error("Erro na narração. Tente novamente! 🔊");
+    } finally {
+      setIsSpeaking(false);
+    }
+  }, [speak, user]);
 
   const streamChat = useCallback(async (userMessages: { role: string; content: string }[]) => {
     const resp = await fetch(CHAT_URL, {
@@ -139,10 +160,13 @@ const ChatScreen = ({
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isTyping || !canAskQuestion()) return;
-    const userMsg: Message = { id: Date.now(), text: text.trim(), isUser: true };
+    const trimmed = text.trim();
+    const userMsg: Message = { id: Date.now(), text: trimmed, isUser: true };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
+    lastUserQuestionRef.current = trimmed;
+    lastLogIdRef.current = null;
     await incrementQuestions();
     const allMessages = [...messages, userMsg].map((m) => ({
       role: m.isUser ? ("user" as const) : ("assistant" as const),
@@ -151,6 +175,24 @@ const ChatScreen = ({
     try {
       await streamChat(allMessages);
       setConnectionCount((c) => c + 1);
+
+      // Persist Q&A in the parent log (RLS protected, only the parent sees it).
+      const answer = lastAssistantTextRef.current?.trim();
+      if (user && answer) {
+        const { data, error } = await supabase
+          .from("kidzz_questions_log")
+          .insert({
+            user_id: user.id,
+            question: trimmed,
+            answer,
+            age_range: ageRange,
+            was_narrated: false,
+          })
+          .select("id")
+          .single();
+        if (error) console.warn("[Kidzz] log insert failed:", error.message);
+        else lastLogIdRef.current = data?.id ?? null;
+      }
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
       setMessages((prev) => [
@@ -160,7 +202,7 @@ const ChatScreen = ({
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping, canAskQuestion, messages, streamChat, incrementQuestions]);
+  }, [isTyping, canAskQuestion, messages, streamChat, incrementQuestions, user, ageRange]);
 
   const handleVoiceResult = useCallback((text: string) => {
     setInput(text);
