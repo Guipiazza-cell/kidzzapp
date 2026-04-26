@@ -450,6 +450,9 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             <p className="text-sm text-muted-foreground">{profile?.child_name || "Não definido"}</p>
           </div>
 
+          {/* Question history (parent panel) */}
+          <QuestionHistoryPanel />
+
           {/* Affiliate program */}
           <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 space-y-3">
             <div className="flex items-center gap-2">
