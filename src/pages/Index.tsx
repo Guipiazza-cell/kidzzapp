@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
@@ -17,7 +17,10 @@ import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
-import DreamWorld from "@/components/dreams/DreamWorld";
+// Dream world is heavy (audio engine + 25 animated particles).
+// Lazy-load so it only ships when the parent opens the Dreams tab —
+// makes first paint of that tab much faster.
+const DreamWorld = lazy(() => import("@/components/dreams/DreamWorld"));
 import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
