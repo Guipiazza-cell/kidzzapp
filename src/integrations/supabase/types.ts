@@ -146,6 +146,36 @@ export type Database = {
         }
         Relationships: []
       }
+      kidzz_questions_log: {
+        Row: {
+          age_range: string | null
+          answer: string
+          created_at: string
+          id: string
+          question: string
+          user_id: string
+          was_narrated: boolean
+        }
+        Insert: {
+          age_range?: string | null
+          answer: string
+          created_at?: string
+          id?: string
+          question: string
+          user_id: string
+          was_narrated?: boolean
+        }
+        Update: {
+          age_range?: string | null
+          answer?: string
+          created_at?: string
+          id?: string
+          question?: string
+          user_id?: string
+          was_narrated?: boolean
+        }
+        Relationships: []
+      }
       memories: {
         Row: {
           content: string | null
