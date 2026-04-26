@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import chameleonHappy from "@/assets/chameleon-happy.png";
+import splashMascot from "@/assets/splash-mascot.png";
 
 interface SplashScreenProps {
   onFinish?: () => void;
@@ -146,9 +146,9 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
               </div>
             ) : (
               <img
-                src={chameleonHappy}
+                src={splashMascot}
                 alt="KIDZZ"
-                className="w-40 h-40 sm:w-48 sm:h-48 object-contain drop-shadow-[0_10px_24px_rgba(255,140,0,0.45)]"
+                className="w-52 h-52 sm:w-64 sm:h-64 object-contain drop-shadow-[0_14px_32px_rgba(56,189,248,0.55)]"
                 decoding="async"
                 loading="eager"
                 onError={() => setImgFailed(true)}
