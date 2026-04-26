@@ -118,9 +118,11 @@ export const useTTS = () => {
       await new Promise<void>((resolve) => {
         const utt = new SpeechSynthesisUtterance(sentences[i]);
         utt.lang = "pt-BR";
-        utt.rate = 0.95;   // ligeiramente mais rápido = soa mais natural
-        utt.pitch = 1.05;  // pitch suave para soar acolhedor
-        utt.volume = 1.0;
+        // Tom suave e amigo: ritmo levemente mais lento que o normal,
+        // pitch quase neutro para parecer "tia que conta história".
+        utt.rate = 0.88;
+        utt.pitch = 1.0;
+        utt.volume = 0.95;
         if (voiceRef.current) utt.voice = voiceRef.current;
 
         let settled = false;
