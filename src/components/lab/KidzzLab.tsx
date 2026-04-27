@@ -33,7 +33,7 @@ export function loadMascotConfig(): MascotConfig {
     const stored = localStorage.getItem(MASCOT_CONFIG_KEY);
     if (stored) return JSON.parse(stored);
   } catch {}
-  return { mascot: "ane", colorId: "rosa", expression: "feliz", outfitId: "nenhum", energy: "calm" };
+  return { mascot: "ane", colorId: "rosa-encantado", expression: "happy", outfitId: "scientist", energy: "calm" };
 }
 
 // Premium-locked items
