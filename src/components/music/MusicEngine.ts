@@ -31,16 +31,39 @@ export class MusicEngine {
   private playbackTimers: number[] = [];
   private onStepCallback?: (index: number, step: SongStep) => void;
   private onEndCallback?: () => void;
+  private playingFlag = false;
 
   private ensureCtx(): AudioContext {
     if (!this.ctx || this.ctx.state === "closed") {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      try {
+        this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      } catch (e) {
+        console.warn("MusicEngine: AudioContext indisponível", e);
+        throw e;
+      }
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.value = 0.5;
       this.masterGain.connect(this.ctx.destination);
     }
-    if (this.ctx.state === "suspended") this.ctx.resume();
+    // iOS Safari precisa de resume() dentro do gesto. Chamamos sem await — o navegador
+    // libera no próximo tick se vier de evento de toque.
+    if (this.ctx.state === "suspended") {
+      try { this.ctx.resume().catch(() => {}); } catch { /* noop */ }
+    }
     return this.ctx;
+  }
+
+  /** Garante contexto pronto. Deve ser chamado dentro de um onClick para destravar mobile. */
+  async unlock(): Promise<boolean> {
+    try {
+      const ctx = this.ensureCtx();
+      if (ctx.state === "suspended") {
+        await ctx.resume();
+      }
+      return ctx.state === "running";
+    } catch {
+      return false;
+    }
   }
 
   setVolume(v: number) {
