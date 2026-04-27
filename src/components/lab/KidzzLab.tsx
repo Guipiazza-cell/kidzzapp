@@ -17,8 +17,10 @@ import KidzzAvatar, {
   saveAvatar,
 } from "@/components/kidzz/KidzzAvatar";
 
-// Legacy mascot config kept for evolution.customize compatibility
+// Legacy mascot config kept for evolution.customize + downstream consumer compatibility
 const MASCOT_CONFIG_KEY = "mascotConfig";
+export type LabExpression = "happy" | "curious" | "excited" | "thinking" | "loving" | "challenging";
+export type LabEnergy = "calm" | "curious" | "animated" | "powerful";
 export interface MascotConfig {
   mascot: AvatarBase;
   colorId: string;
