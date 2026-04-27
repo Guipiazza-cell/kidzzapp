@@ -161,7 +161,16 @@ const DanceWithAne = ({ onBack, childName, onAchievement }: Props) => {
       {/* Header */}
       <div className="relative z-10 flex items-center gap-3 px-4 pb-3 border-b border-white/10"
         style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
-        <button onClick={onBack} className="w-11 h-11 rounded-full bg-white/10 backdrop-blur flex items-center justify-center" aria-label="Voltar">
+        <button
+          onClick={() => {
+            if (beatTimerRef.current) clearInterval(beatTimerRef.current);
+            if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+            engineRef.current?.stopSong();
+            onBack();
+          }}
+          className="w-11 h-11 rounded-full bg-white/10 backdrop-blur flex items-center justify-center"
+          aria-label="Voltar"
+        >
           <ArrowLeft size={20} className="text-white" />
         </button>
         <div className="flex-1">
