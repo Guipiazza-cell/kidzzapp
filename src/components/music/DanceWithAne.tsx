@@ -44,7 +44,10 @@ const DanceWithAne = ({ onBack, childName, onAchievement }: Props) => {
     };
   }, []);
 
-  const startGame = () => {
+  const startGame = async () => {
+    if (!engineRef.current) return;
+    // Destrava AudioContext dentro do gesto
+    await engineRef.current.unlock();
     setPhase("countdown");
     setCountdown(3);
     setRound(0);
