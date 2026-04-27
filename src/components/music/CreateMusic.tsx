@@ -89,11 +89,17 @@ const CreateMusic = ({ onBack, childName, onAchievement }: Props) => {
     if (ach) onAchievement?.(ach);
   };
 
-  const play = () => {
+  const play = async () => {
     if (!song || !engineRef.current) return;
     if (playing) {
       engineRef.current.stopSong();
       setPlaying(false);
+      setStepIdx(-1);
+      return;
+    }
+    const ok = await engineRef.current.unlock();
+    if (!ok) {
+      console.warn("Áudio bloqueado pelo navegador");
       return;
     }
     setPlaying(true);

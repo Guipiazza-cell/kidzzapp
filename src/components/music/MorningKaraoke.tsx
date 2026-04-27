@@ -26,11 +26,19 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
     return () => engineRef.current?.dispose();
   }, []);
 
-  const handlePlay = () => {
+  const handlePlay = async () => {
     if (!engineRef.current) return;
     if (playing) {
       engineRef.current.stopSong();
       setPlaying(false);
+      setStepIndex(-1);
+      return;
+    }
+    // Destrava AudioContext (iOS) — chamada dentro do gesto de toque
+    const ok = await engineRef.current.unlock();
+    if (!ok) {
+      // Fallback silencioso — sem quebrar
+      console.warn("Áudio bloqueado pelo navegador");
       return;
     }
     setPlaying(true);
