@@ -683,4 +683,30 @@ const PreviewButton = ({
   </motion.button>
 );
 
+const ShareOptionButton = ({
+  icon: Icon,
+  label,
+  color,
+  onClick,
+}: {
+  icon: typeof Share2;
+  label: string;
+  color: string;
+  onClick: () => void;
+}) => (
+  <motion.button
+    onClick={onClick}
+    className="flex items-center gap-2 px-3 py-3 rounded-2xl border border-white/10 bg-white/5"
+    whileTap={{ scale: 0.94 }}
+  >
+    <div
+      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+      style={{ background: `${color}25`, border: `1px solid ${color}55` }}
+    >
+      <Icon size={16} style={{ color }} />
+    </div>
+    <span className="text-xs font-bold text-white/85 truncate">{label}</span>
+  </motion.button>
+);
+
 export default KidzzLab;
