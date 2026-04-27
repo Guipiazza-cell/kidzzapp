@@ -72,46 +72,56 @@ export class MusicEngine {
 
   /* Single warm note with envelope */
   playNote(note: string, duration = 0.6, type: OscType = "triangle", gainAmt = 0.28) {
-    const ctx = this.ensureCtx();
-    const freq = NOTE_FREQ[note] ?? 440;
-    const now = ctx.currentTime;
+    try {
+      const ctx = this.ensureCtx();
+      if (!this.masterGain) return;
+      const freq = NOTE_FREQ[note] ?? 440;
+      const now = ctx.currentTime;
 
-    const osc = ctx.createOscillator();
-    osc.type = type;
-    osc.frequency.value = freq;
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = freq;
 
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0, now);
-    g.gain.linearRampToValueAtTime(gainAmt, now + 0.025);
-    g.gain.exponentialRampToValueAtTime(0.001, now + duration);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(gainAmt, now + 0.025);
+      g.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-    const lp = ctx.createBiquadFilter();
-    lp.type = "lowpass";
-    lp.frequency.value = 2600;
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = 2600;
 
-    osc.connect(lp);
-    lp.connect(g);
-    g.connect(this.masterGain!);
-    osc.start(now);
-    osc.stop(now + duration + 0.05);
+      osc.connect(lp);
+      lp.connect(g);
+      g.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + duration + 0.05);
+    } catch (e) {
+      console.warn("MusicEngine.playNote falhou", e);
+    }
   }
 
   /* Soft kick drum */
   playDrum(intensity = 1) {
-    const ctx = this.ensureCtx();
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(140 * intensity, now);
-    osc.frequency.exponentialRampToValueAtTime(45, now + 0.18);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, now);
-    g.gain.exponentialRampToValueAtTime(0.55, now + 0.005);
-    g.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
-    osc.connect(g);
-    g.connect(this.masterGain!);
-    osc.start(now);
-    osc.stop(now + 0.4);
+    try {
+      const ctx = this.ensureCtx();
+      if (!this.masterGain) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(140 * intensity, now);
+      osc.frequency.exponentialRampToValueAtTime(45, now + 0.18);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.55, now + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+      osc.connect(g);
+      g.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } catch (e) {
+      console.warn("MusicEngine.playDrum falhou", e);
+    }
   }
 
   /* Sparkle (pluck arpeggio) */
@@ -122,16 +132,23 @@ export class MusicEngine {
     });
   }
 
-  /* Play a Song with optional sync callbacks (for karaoke) */
-  playSong(song: Song, onStep?: (index: number, step: SongStep) => void, onEnd?: () => void) {
+  /* Play a Song with optional sync callbacks (for karaoke).
+     Aguarda unlock() para garantir que iOS Safari libere o AudioContext. */
+  async playSong(song: Song, onStep?: (index: number, step: SongStep) => void, onEnd?: () => void) {
     this.stopSong();
+    const ok = await this.unlock();
+    if (!ok) {
+      console.warn("MusicEngine: AudioContext não pôde ser destravado");
+      onEnd?.();
+      return;
+    }
     this.onStepCallback = onStep;
     this.onEndCallback = onEnd;
+    this.playingFlag = true;
     let cumMs = 0;
     song.steps.forEach((step, i) => {
       const t = window.setTimeout(() => {
         this.playNote(step.note, step.dur * 0.95, "triangle", 0.3);
-        // Light percussion every 2nd step to create groove
         if (i % 2 === 0) this.playDrum(0.6);
         this.onStepCallback?.(i, step);
       }, cumMs);
@@ -139,8 +156,9 @@ export class MusicEngine {
       cumMs += step.dur * 1000;
     });
     const endT = window.setTimeout(() => {
-      this.onEndCallback?.();
+      this.playingFlag = false;
       this.playbackTimers = [];
+      this.onEndCallback?.();
     }, cumMs + 200);
     this.playbackTimers.push(endT);
   }
@@ -148,10 +166,11 @@ export class MusicEngine {
   stopSong() {
     this.playbackTimers.forEach((t) => clearTimeout(t));
     this.playbackTimers = [];
+    this.playingFlag = false;
   }
 
   isPlaying() {
-    return this.playbackTimers.length > 0;
+    return this.playingFlag;
   }
 
   startLoop(id: string, pattern: () => void, intervalMs: number) {
