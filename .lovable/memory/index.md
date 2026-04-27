@@ -56,6 +56,7 @@ Updated: now
 - [Conversion Flow](mem://ux/conversion-flow) — Contextual paywall triggers across premium features
 - [Dream World](mem://features/dream-world) — Local MP3s (/public/audio/), Web Speech API narration at 0.82x
 - [Kidzz Lab](mem://features/kidzz-lab) — 🧪 dynamic layered SVG avatar customization via Framer Motion
+- [KIDZZ Avatar Layers](mem://features/kidzz-avatar-layers) — Sistema de camadas reais (PNG base + SVG olhos/boca/traje), substitui emojis, persistido em `kidzz_avatar`
 - [Kidzz Play](mem://features/kidzz-play) — 🎮 mini-games (word search, memory, hangman) to earn avatar energy
 - [Avatar Evolution System](mem://features/avatar-evolution-system) — character_profiles table tracks evolution_points and dominant_trait
 - [Kidzz Pré-sono](mem://features/kidzz-pre-sleep) — Respiração 4-2-6 + canção lenta sintetizada Web Audio dentro do Mundo dos Sonhos
