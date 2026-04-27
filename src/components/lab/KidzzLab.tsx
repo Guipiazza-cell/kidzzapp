@@ -500,6 +500,83 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
         </AnimatePresence>
       </div>
 
+      {/* Share Modal */}
+      <AnimatePresence>
+        {shareModalOpen && (
+          <motion.div
+            className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeShareModal}
+          >
+            <motion.div
+              className="w-full sm:max-w-sm mx-0 sm:mx-6 p-5 rounded-t-3xl sm:rounded-3xl border border-emerald-400/30"
+              style={{ background: "linear-gradient(160deg, #0d1a14, #0a1628)" }}
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 60, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-white">Compartilhar meu KIDZZ</h3>
+                <button
+                  onClick={closeShareModal}
+                  className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center"
+                  aria-label="Fechar"
+                >
+                  <X size={16} className="text-white/60" />
+                </button>
+              </div>
+
+              {sharePreview && (
+                <div className="rounded-2xl overflow-hidden border border-white/10 mb-4 bg-black/30">
+                  <img
+                    src={sharePreview}
+                    alt="Pré-visualização do card KIDZZ"
+                    className="w-full h-auto"
+                  />
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <ShareOptionButton
+                  icon={MessageCircle}
+                  label="WhatsApp"
+                  color="#25D366"
+                  onClick={shareToWhatsApp}
+                />
+                <ShareOptionButton
+                  icon={Camera}
+                  label="Stories"
+                  color="#E1306C"
+                  onClick={shareToStories}
+                />
+                <ShareOptionButton
+                  icon={Share2}
+                  label="Mais apps"
+                  color="#10B981"
+                  onClick={shareToSystem}
+                />
+                <ShareOptionButton
+                  icon={Download}
+                  label="Salvar imagem"
+                  color="#6366F1"
+                  onClick={() => {
+                    downloadCard();
+                    toast.success("Imagem salva!");
+                  }}
+                />
+              </div>
+
+              <p className="mt-3 text-[10px] text-center text-white/40">
+                A imagem fica no seu dispositivo. Nada é enviado sem você.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Premium CTA */}
       <AnimatePresence>
         {showPremiumCTA && (
