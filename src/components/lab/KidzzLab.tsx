@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Check, Share2 } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Check, Share2, Download, MessageCircle, Camera, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import confetti from "canvas-confetti";
 import html2canvas from "html2canvas";
