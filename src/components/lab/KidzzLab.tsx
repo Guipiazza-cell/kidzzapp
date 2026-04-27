@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Check, Share2 } from "lucide-react";
+import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Check, Share2, Download, MessageCircle, Camera, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import confetti from "canvas-confetti";
 import html2canvas from "html2canvas";
@@ -74,6 +74,9 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
   const [feedbackMsg, setFeedbackMsg] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareBlob, setShareBlob] = useState<Blob | null>(null);
+  const [sharePreview, setSharePreview] = useState<string | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
@@ -124,39 +127,116 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     }, 1800);
   };
 
+  const APP_URL = "https://kidzzapp.lovable.app";
+  const SHARE_TEXT = `Esse é meu KIDZZ! 🦎✨ Conheça em ${APP_URL}`;
+
+  const generateCardBlob = useCallback(async (): Promise<Blob | null> => {
+    const target = shareCardRef.current;
+    if (!target) return null;
+    const canvas = await html2canvas(target, {
+      backgroundColor: "#0d0618",
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+    return await new Promise((res) => canvas.toBlob((b) => res(b), "image/png", 0.95));
+  }, []);
+
   const handleShare = useCallback(async () => {
-    const target = shareCardRef.current || heroRef.current;
-    if (!target) return;
     setSharing(true);
     try {
-      const canvas = await html2canvas(target, {
-        backgroundColor: "#0d0618",
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      });
-      const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), "image/png"));
+      const blob = await generateCardBlob();
       if (!blob) throw new Error("blob_failed");
-      const file = new File([blob], `meu-kidzz.png`, { type: "image/png" });
-      const shareText = "Esse é meu KIDZZ!";
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "Meu KIDZZ", text: shareText });
-        toast.success("Compartilhado!");
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "meu-kidzz.png";
-        a.click();
-        URL.revokeObjectURL(url);
-        toast.success("Imagem baixada!");
-      }
+      setShareBlob(blob);
+      setSharePreview(URL.createObjectURL(blob));
+      setShareModalOpen(true);
     } catch {
-      toast.error("Não foi possível compartilhar agora");
+      toast.error("Não foi possível gerar a imagem");
     } finally {
       setSharing(false);
     }
-  }, []);
+  }, [generateCardBlob]);
+
+  const shareToSystem = useCallback(async () => {
+    if (!shareBlob) return;
+    const file = new File([shareBlob], "meu-kidzz.png", { type: "image/png" });
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Meu KIDZZ", text: SHARE_TEXT });
+        toast.success("Compartilhado!");
+        setShareModalOpen(false);
+      } else {
+        downloadCard();
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") toast.error("Falha ao compartilhar");
+    }
+  }, [shareBlob]);
+
+  const shareToWhatsApp = useCallback(async () => {
+    if (!shareBlob) return;
+    const file = new File([shareBlob], "meu-kidzz.png", { type: "image/png" });
+    // Tenta Web Share com arquivo (WhatsApp aparece como opção nativa)
+    if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+      try {
+        await navigator.share({ files: [file], title: "Meu KIDZZ", text: SHARE_TEXT });
+        toast.success("Aberto no WhatsApp!");
+        setShareModalOpen(false);
+        return;
+      } catch (e: any) {
+        if (e?.name === "AbortError") return;
+      }
+    }
+    // Fallback: baixa imagem + abre WhatsApp com texto
+    downloadCard();
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(SHARE_TEXT)}`;
+    window.open(waUrl, "_blank", "noopener");
+    toast.success("Imagem baixada — anexe no WhatsApp aberto");
+    setShareModalOpen(false);
+  }, [shareBlob]);
+
+  const shareToStories = useCallback(async () => {
+    if (!shareBlob) return;
+    const file = new File([shareBlob], "meu-kidzz-story.png", { type: "image/png" });
+    // Web Share com arquivo permite escolher Instagram/Stories no mobile
+    if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Meu KIDZZ",
+          text: "Esse é meu KIDZZ! ✨",
+        });
+        toast.success("Pronto para o Stories!");
+        setShareModalOpen(false);
+        return;
+      } catch (e: any) {
+        if (e?.name === "AbortError") return;
+      }
+    }
+    // Fallback: baixa para postar manualmente
+    downloadCard();
+    toast.success("Imagem salva — abra Instagram/Facebook Stories e poste");
+    setShareModalOpen(false);
+  }, [shareBlob]);
+
+  const downloadCard = useCallback(() => {
+    if (!shareBlob) return;
+    const url = URL.createObjectURL(shareBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "meu-kidzz.png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, [shareBlob]);
+
+  const closeShareModal = useCallback(() => {
+    setShareModalOpen(false);
+    if (sharePreview) URL.revokeObjectURL(sharePreview);
+    setSharePreview(null);
+    setShareBlob(null);
+  }, [sharePreview]);
 
   const baseLabel = config.base === "ane" ? "Ane" : "Pixel";
 
@@ -420,6 +500,83 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
         </AnimatePresence>
       </div>
 
+      {/* Share Modal */}
+      <AnimatePresence>
+        {shareModalOpen && (
+          <motion.div
+            className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeShareModal}
+          >
+            <motion.div
+              className="w-full sm:max-w-sm mx-0 sm:mx-6 p-5 rounded-t-3xl sm:rounded-3xl border border-emerald-400/30"
+              style={{ background: "linear-gradient(160deg, #0d1a14, #0a1628)" }}
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 60, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-white">Compartilhar meu KIDZZ</h3>
+                <button
+                  onClick={closeShareModal}
+                  className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center"
+                  aria-label="Fechar"
+                >
+                  <X size={16} className="text-white/60" />
+                </button>
+              </div>
+
+              {sharePreview && (
+                <div className="rounded-2xl overflow-hidden border border-white/10 mb-4 bg-black/30">
+                  <img
+                    src={sharePreview}
+                    alt="Pré-visualização do card KIDZZ"
+                    className="w-full h-auto"
+                  />
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <ShareOptionButton
+                  icon={MessageCircle}
+                  label="WhatsApp"
+                  color="#25D366"
+                  onClick={shareToWhatsApp}
+                />
+                <ShareOptionButton
+                  icon={Camera}
+                  label="Stories"
+                  color="#E1306C"
+                  onClick={shareToStories}
+                />
+                <ShareOptionButton
+                  icon={Share2}
+                  label="Mais apps"
+                  color="#10B981"
+                  onClick={shareToSystem}
+                />
+                <ShareOptionButton
+                  icon={Download}
+                  label="Salvar imagem"
+                  color="#6366F1"
+                  onClick={() => {
+                    downloadCard();
+                    toast.success("Imagem salva!");
+                  }}
+                />
+              </div>
+
+              <p className="mt-3 text-[10px] text-center text-white/40">
+                A imagem fica no seu dispositivo. Nada é enviado sem você.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Premium CTA */}
       <AnimatePresence>
         {showPremiumCTA && (
@@ -523,6 +680,32 @@ const PreviewButton = ({
     {selected && !locked && (
       <Check size={12} className="absolute top-1.5 right-1.5 text-emerald-400" />
     )}
+  </motion.button>
+);
+
+const ShareOptionButton = ({
+  icon: Icon,
+  label,
+  color,
+  onClick,
+}: {
+  icon: typeof Share2;
+  label: string;
+  color: string;
+  onClick: () => void;
+}) => (
+  <motion.button
+    onClick={onClick}
+    className="flex items-center gap-2 px-3 py-3 rounded-2xl border border-white/10 bg-white/5"
+    whileTap={{ scale: 0.94 }}
+  >
+    <div
+      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+      style={{ background: `${color}25`, border: `1px solid ${color}55` }}
+    >
+      <Icon size={16} style={{ color }} />
+    </div>
+    <span className="text-xs font-bold text-white/85 truncate">{label}</span>
   </motion.button>
 );
 
