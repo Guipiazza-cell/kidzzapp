@@ -127,39 +127,116 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     }, 1800);
   };
 
+  const APP_URL = "https://kidzzapp.lovable.app";
+  const SHARE_TEXT = `Esse é meu KIDZZ! 🦎✨ Conheça em ${APP_URL}`;
+
+  const generateCardBlob = useCallback(async (): Promise<Blob | null> => {
+    const target = shareCardRef.current;
+    if (!target) return null;
+    const canvas = await html2canvas(target, {
+      backgroundColor: "#0d0618",
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+    return await new Promise((res) => canvas.toBlob((b) => res(b), "image/png", 0.95));
+  }, []);
+
   const handleShare = useCallback(async () => {
-    const target = shareCardRef.current || heroRef.current;
-    if (!target) return;
     setSharing(true);
     try {
-      const canvas = await html2canvas(target, {
-        backgroundColor: "#0d0618",
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      });
-      const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), "image/png"));
+      const blob = await generateCardBlob();
       if (!blob) throw new Error("blob_failed");
-      const file = new File([blob], `meu-kidzz.png`, { type: "image/png" });
-      const shareText = "Esse é meu KIDZZ!";
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "Meu KIDZZ", text: shareText });
-        toast.success("Compartilhado!");
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "meu-kidzz.png";
-        a.click();
-        URL.revokeObjectURL(url);
-        toast.success("Imagem baixada!");
-      }
+      setShareBlob(blob);
+      setSharePreview(URL.createObjectURL(blob));
+      setShareModalOpen(true);
     } catch {
-      toast.error("Não foi possível compartilhar agora");
+      toast.error("Não foi possível gerar a imagem");
     } finally {
       setSharing(false);
     }
-  }, []);
+  }, [generateCardBlob]);
+
+  const shareToSystem = useCallback(async () => {
+    if (!shareBlob) return;
+    const file = new File([shareBlob], "meu-kidzz.png", { type: "image/png" });
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Meu KIDZZ", text: SHARE_TEXT });
+        toast.success("Compartilhado!");
+        setShareModalOpen(false);
+      } else {
+        downloadCard();
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") toast.error("Falha ao compartilhar");
+    }
+  }, [shareBlob]);
+
+  const shareToWhatsApp = useCallback(async () => {
+    if (!shareBlob) return;
+    const file = new File([shareBlob], "meu-kidzz.png", { type: "image/png" });
+    // Tenta Web Share com arquivo (WhatsApp aparece como opção nativa)
+    if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+      try {
+        await navigator.share({ files: [file], title: "Meu KIDZZ", text: SHARE_TEXT });
+        toast.success("Aberto no WhatsApp!");
+        setShareModalOpen(false);
+        return;
+      } catch (e: any) {
+        if (e?.name === "AbortError") return;
+      }
+    }
+    // Fallback: baixa imagem + abre WhatsApp com texto
+    downloadCard();
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(SHARE_TEXT)}`;
+    window.open(waUrl, "_blank", "noopener");
+    toast.success("Imagem baixada — anexe no WhatsApp aberto");
+    setShareModalOpen(false);
+  }, [shareBlob]);
+
+  const shareToStories = useCallback(async () => {
+    if (!shareBlob) return;
+    const file = new File([shareBlob], "meu-kidzz-story.png", { type: "image/png" });
+    // Web Share com arquivo permite escolher Instagram/Stories no mobile
+    if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Meu KIDZZ",
+          text: "Esse é meu KIDZZ! ✨",
+        });
+        toast.success("Pronto para o Stories!");
+        setShareModalOpen(false);
+        return;
+      } catch (e: any) {
+        if (e?.name === "AbortError") return;
+      }
+    }
+    // Fallback: baixa para postar manualmente
+    downloadCard();
+    toast.success("Imagem salva — abra Instagram/Facebook Stories e poste");
+    setShareModalOpen(false);
+  }, [shareBlob]);
+
+  const downloadCard = useCallback(() => {
+    if (!shareBlob) return;
+    const url = URL.createObjectURL(shareBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "meu-kidzz.png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, [shareBlob]);
+
+  const closeShareModal = useCallback(() => {
+    setShareModalOpen(false);
+    if (sharePreview) URL.revokeObjectURL(sharePreview);
+    setSharePreview(null);
+    setShareBlob(null);
+  }, [sharePreview]);
 
   const baseLabel = config.base === "ane" ? "Ane" : "Pixel";
 
