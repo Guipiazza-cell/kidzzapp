@@ -25,11 +25,16 @@ const SungStories = ({ onBack, childName, onAchievement }: Props) => {
     return () => engineRef.current?.dispose();
   }, []);
 
-  const playChapterMusic = () => {
+  const playChapterMusic = async () => {
     if (!book || !engineRef.current) return;
     if (playing) {
       engineRef.current.stopSong();
       setPlaying(false);
+      return;
+    }
+    const ok = await engineRef.current.unlock();
+    if (!ok) {
+      console.warn("Áudio bloqueado pelo navegador");
       return;
     }
     setPlaying(true);
