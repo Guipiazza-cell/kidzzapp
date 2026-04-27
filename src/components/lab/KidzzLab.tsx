@@ -74,6 +74,9 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
   const [feedbackMsg, setFeedbackMsg] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareBlob, setShareBlob] = useState<Blob | null>(null);
+  const [sharePreview, setSharePreview] = useState<string | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
