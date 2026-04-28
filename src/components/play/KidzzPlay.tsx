@@ -191,16 +191,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
           highlight
         />
-        {onOpenLab && (
-          <HubCard
-            onClick={onOpenLab}
-            icon={<FlaskConical size={28} className="text-white" />}
-            emoji="🧠"
-            title="Explorar"
-            subtitle="Criar, testar e descobrir"
-            gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
-          />
-        )}
         {onOpenTravel && (
           <HubCard
             onClick={onOpenTravel}
