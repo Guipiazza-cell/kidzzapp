@@ -24,6 +24,8 @@ const DreamWorld = lazy(() => import("@/components/dreams/DreamWorld"));
 import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
+import RoutineScreen from "@/components/routine/RoutineScreen";
+import { completeByIntegration } from "@/lib/routine";
 import MomentsFactory from "@/components/moments/MomentsFactory";
 import TravelMode from "@/components/travel/TravelMode";
 import MusicForest from "@/components/music/MusicForest";
