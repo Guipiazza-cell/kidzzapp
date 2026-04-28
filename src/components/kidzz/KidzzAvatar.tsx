@@ -441,12 +441,12 @@ const KidzzAvatar = forwardRef<HTMLDivElement, Props>(
         <div className="absolute inset-0 transition-opacity duration-200">
           {/* Acessório atrás dos olhos quando aplicável (capacete, festa) */}
           {(config.outfit === "astronauta" || config.outfit === "festa" || config.outfit === "explorador" || config.outfit === "musica" || config.outfit === "super-heroi") && (
-            <Outfit outfit={config.outfit} anchors={anchors} />
+            <Outfit outfit={config.outfit} anchors={anchors} base={config.base} />
           )}
           <Eyes expression={config.expression} anchors={anchors} />
-          <Mouth expression={config.expression} anchors={anchors} />
+          <Mouth expression={config.expression} anchors={anchors} base={config.base} />
           {/* Cientista (óculos) à frente para alinhar perfeitamente sobre olhos */}
-          {config.outfit === "cientista" && <Outfit outfit={config.outfit} anchors={anchors} />}
+          {config.outfit === "cientista" && <Outfit outfit={config.outfit} anchors={anchors} base={config.base} />}
         </div>
       </motion.div>
     );
