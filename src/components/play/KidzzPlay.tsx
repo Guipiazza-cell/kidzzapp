@@ -112,8 +112,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           ? "Quase lá! 💪"
           : "Você consegue! 💚"
         : "Escolha um jogo!"
-      : view === "activities"
-      ? "Vamos brincar de verdade! 🎯"
       : `O que vamos fazer, ${childName}? 💚`;
 
   /* ── HEADER comum ── */
