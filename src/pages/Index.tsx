@@ -202,7 +202,11 @@ const Index = () => {
     if (activeTab === "explore") {
       return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
-    // ABA: Brincar (🎮 — core do app, inline em vez de overlay)
+    // ABA: Rotina (🎯 — substitui "Brincar" na tab bar; pilar de hábito)
+    if (activeTab === "routine") {
+      return <RoutineScreen key="routine" />;
+    }
+    // Brincar permanece acessível via Home (botão), apenas removido da tab bar
     if (activeTab === "play") {
       return (
         <KidzzPlay
