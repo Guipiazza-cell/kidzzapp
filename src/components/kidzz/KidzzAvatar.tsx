@@ -98,22 +98,24 @@ const ANCHORS: Record<AvatarBase, Anchors> = {
     rightEye: { cx: 62, cy: 23 },
     eyeRx: 6.5,
     eyeRy: 7,
-    mouth: { cx: 50, cy: 30 },
+    // Boca real da Ane fica logo abaixo dos olhos, na linha do focinho rosado
+    mouth: { cx: 50, cy: 36 },
     headTop: { cx: 50, cy: 6 },
     headCenter: { cx: 50, cy: 19 },
     faceWidth: 44,
-    collar: { cx: 50, cy: 46 },
+    collar: { cx: 50, cy: 50 },
   },
   pixel: {
     leftEye: { cx: 38, cy: 24 },
     rightEye: { cx: 60, cy: 25 },
     eyeRx: 5.5,
     eyeRy: 6,
-    mouth: { cx: 50, cy: 32 },
+    // Boca do Pixel é menor e mais próxima dos olhos
+    mouth: { cx: 49, cy: 37 },
     headTop: { cx: 48, cy: 6 },
     headCenter: { cx: 48, cy: 21 },
     faceWidth: 40,
-    collar: { cx: 50, cy: 47 },
+    collar: { cx: 50, cy: 51 },
   },
 };
 
