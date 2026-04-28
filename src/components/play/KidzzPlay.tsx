@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, FlaskConical, Plane } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
