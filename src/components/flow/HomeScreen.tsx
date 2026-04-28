@@ -493,30 +493,5 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   );
 };
 
-/* Atalho rápido pequeno usado no topo da Home */
-const QuickShortcut = ({
-  onClick,
-  emoji,
-  label,
-  gradient,
-}: {
-  onClick: () => void;
-  emoji: string;
-  label: string;
-  gradient: string;
-}) => (
-  <motion.button
-    onClick={onClick}
-    whileTap={{ scale: 0.92 }}
-    className="relative rounded-2xl flex flex-col items-center justify-center gap-1 py-2.5 border border-white/40 shadow-md min-h-[64px]"
-    style={{ background: gradient }}
-    aria-label={label}
-  >
-    <span className="text-xl leading-none drop-shadow-sm">{emoji}</span>
-    <span className="text-[10px] font-extrabold text-white drop-shadow-sm">
-      {label}
-    </span>
-  </motion.button>
-);
 
 export default HomeScreen;
