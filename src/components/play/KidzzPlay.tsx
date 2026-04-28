@@ -415,7 +415,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
         <AnimatePresence mode="wait">
           {view === "menu" && renderMenu()}
           {view === "games" && renderGames()}
-          {view === "activities" && <MyActivities key="activities" onBack={() => setView("menu")} />}
         </AnimatePresence>
       </div>
 
