@@ -33,7 +33,7 @@ const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
 };
 
 type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
-type View = "menu" | "games" | "activities";
+type View = "menu" | "games";
 
 const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean; isNew?: boolean }[] = [
   { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o KIDZZ a pular!", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", isNew: true },
