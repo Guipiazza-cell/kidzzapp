@@ -271,14 +271,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                 gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
               />
             )}
-            {onOpenLab && (
-              <QuickShortcut
-                onClick={onOpenLab}
-                emoji="🧪"
-                label="Lab"
-                gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
-              />
-            )}
             {onOpenPlay && (
               <QuickShortcut
                 onClick={onOpenPlay}
