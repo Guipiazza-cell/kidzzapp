@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Check, Share2, Download, MessageCircle, Camera, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
