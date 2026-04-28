@@ -137,11 +137,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           🎮 Brincar
         </h1>
         <p className="text-[11px] text-gray-500 font-semibold">
-          {view === "menu"
-            ? "Escolha sua aventura"
-            : view === "games"
-            ? "Jogos rápidos"
-            : "Atividades da semana"}
+          {view === "menu" ? "Escolha sua aventura" : "Jogos rápidos"}
         </p>
       </div>
       <div className="flex items-center gap-1.5 bg-white/70 border border-white/40 px-2.5 py-1.5 rounded-xl backdrop-blur min-w-[44px] min-h-[36px]">
