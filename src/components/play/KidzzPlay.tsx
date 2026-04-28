@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Palette, Target, Plane } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, FlaskConical, Target, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
@@ -10,7 +10,6 @@ import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
 import DailyChallengeGame from "./games/DailyChallengeGame";
 import PixelPulaGame from "./games/PixelPulaGame";
-import MyKidzz from "./MyKidzz";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
