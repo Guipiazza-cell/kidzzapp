@@ -180,42 +180,34 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
         </motion.div>
       </div>
 
-      {/* 3 BLOCOS PRINCIPAIS */}
+      {/* 3 CARDS PRINCIPAIS — sem submenus, abrem direto o conteúdo */}
       <div className="flex-1 flex flex-col gap-3">
         <HubCard
           onClick={() => setView("games")}
           icon={<Gamepad2 size={28} className="text-white" />}
-          emoji="🎲"
-          title="Jogar"
-          subtitle="Mini jogos rápidos e divertidos"
+          emoji="🎮"
+          title="Atividades"
+          subtitle="Jogos e desafios divertidos"
           gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
+          highlight
         />
         {onOpenLab && (
           <HubCard
             onClick={onOpenLab}
             icon={<FlaskConical size={28} className="text-white" />}
-            emoji="🧪"
-            title="Lab"
-            subtitle="Experimentos e descobertas"
+            emoji="🧠"
+            title="Explorar"
+            subtitle="Criar, testar e descobrir"
             gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
           />
         )}
-        <HubCard
-          onClick={() => setView("activities")}
-          icon={<Target size={28} className="text-white" />}
-          emoji="🎯"
-          title="Atividades"
-          subtitle="10 missões da semana com seu KIDZZ"
-          gradient="linear-gradient(135deg, hsl(35 95% 60%), hsl(25 90% 55%))"
-          highlight
-        />
         {onOpenTravel && (
           <HubCard
             onClick={onOpenTravel}
             icon={<Plane size={28} className="text-white" />}
             emoji="✈️"
-            title="Modo Viagem"
-            subtitle="Brincadeiras offline para o caminho"
+            title="Viagem"
+            subtitle="Modo fora de casa"
             gradient="linear-gradient(135deg, hsl(200 80% 55%), hsl(220 75% 45%))"
           />
         )}
