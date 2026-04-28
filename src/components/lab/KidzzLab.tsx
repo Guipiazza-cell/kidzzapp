@@ -238,6 +238,32 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     setShareBlob(null);
   }, [sharePreview]);
 
+  // Live preview: enquanto o modal está aberto, regerar o card automaticamente
+  // ao mudar cor, expressão ou traje (debounce 220ms para evitar trabalho excessivo)
+  useEffect(() => {
+    if (!shareModalOpen) return;
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      try {
+        const blob = await generateCardBlob();
+        if (cancelled || !blob) return;
+        const url = URL.createObjectURL(blob);
+        setSharePreview((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return url;
+        });
+        setShareBlob(blob);
+      } catch {
+        /* silencioso — mantém preview anterior */
+      }
+    }, 220);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.base, config.expression, config.outfit, config.hueRotate, shareModalOpen]);
+
   const baseLabel = config.base === "ane" ? "Ane" : "Pixel";
 
   return (
