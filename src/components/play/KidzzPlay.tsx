@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
@@ -10,6 +10,7 @@ import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
 import DailyChallengeGame from "./games/DailyChallengeGame";
 import PixelPulaGame from "./games/PixelPulaGame";
+import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
 // Hue values per saved color id — matches KidzzLab/HomeScreen
@@ -33,7 +34,7 @@ const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
 };
 
 type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
-type View = "menu" | "games";
+type View = "menu" | "games" | "activities";
 
 const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean; isNew?: boolean }[] = [
   { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o KIDZZ a pular!", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", isNew: true },
@@ -180,16 +181,24 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
         </motion.div>
       </div>
 
-      {/* 3 CARDS PRINCIPAIS — sem submenus, abrem direto o conteúdo */}
+      {/* 3 CARDS PRINCIPAIS — Atividades, Jogos, Viagem */}
       <div className="flex-1 flex flex-col gap-3">
+        <HubCard
+          onClick={() => setView("activities")}
+          icon={<Target size={28} className="text-white" />}
+          emoji="🎯"
+          title="Atividades"
+          subtitle="Missões da semana"
+          gradient="linear-gradient(135deg, hsl(35 95% 55%), hsl(25 90% 45%))"
+          highlight
+        />
         <HubCard
           onClick={() => setView("games")}
           icon={<Gamepad2 size={28} className="text-white" />}
           emoji="🎮"
-          title="Atividades"
-          subtitle="Jogos e desafios divertidos"
+          title="Jogos"
+          subtitle="Diversão rápida e desafios"
           gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
-          highlight
         />
         {onOpenTravel && (
           <HubCard
@@ -405,6 +414,17 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
         <AnimatePresence mode="wait">
           {view === "menu" && renderMenu()}
           {view === "games" && renderGames()}
+          {view === "activities" && (
+            <motion.div
+              key="activities"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              className="flex-1 flex flex-col overflow-hidden"
+            >
+              <MyActivities onBack={() => setView("menu")} />
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
