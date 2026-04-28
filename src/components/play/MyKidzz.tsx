@@ -1,17 +1,24 @@
 /**
  * MEU KIDZZ — Personalização real e funcional do camaleão único.
  *
- * - Aplica hue-rotate, expressão, traje e energia ao KidzzChameleon (personagem único do app)
- * - Persiste em localStorage (`mascotConfig`) — mesma chave do KidzzLab (compatível)
- * - Botão SALVAR + COMPARTILHAR (gera card com html2canvas → web share / download)
- * - Cada clique muda visual IMEDIATAMENTE + micro feedback do camaleão
+ * - Renderiza o KidzzAvatar real (camadas SVG anatômicas: olhos + boca + traje)
+ * - Sem emojis no preview do personagem (apenas como ícones nos botões legados)
+ * - Mudanças aplicadas IMEDIATAMENTE — cor (hue-rotate), expressão e traje reais
+ * - Persiste em localStorage (`mascotConfig` legado + `kidzz_avatar` novo)
+ * - Compartilhar gera card via html2canvas e usa Web Share API
  */
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Palette, Smile, Shirt, Zap, Check, Share2, Save, Sparkles, Lock } from "lucide-react";
+import { Palette, Smile, Shirt, Zap, Check, Share2, Save, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
+import KidzzAvatar, {
+  loadAvatar,
+  saveAvatar,
+  type AvatarExpression,
+  type AvatarOutfit,
+  type KidzzAvatarConfig,
+} from "@/components/kidzz/KidzzAvatar";
 import { loadMascotConfig, type MascotConfig, type LabExpression, type LabEnergy } from "@/components/lab/KidzzLab";
 import html2canvas from "html2canvas";
 import confetti from "canvas-confetti";
@@ -27,22 +34,42 @@ const COLORS = [
   { id: "laranja-aventura", label: "Laranja", hue: -60, dot: "hsl(20 90% 55%)" },
 ];
 
-const EXPRESSIONS: { id: LabExpression; emoji: string; label: string; mood: KidzzMood }[] = [
-  { id: "happy", emoji: "😄", label: "Feliz", mood: "happy" },
-  { id: "curious", emoji: "🤔", label: "Curioso", mood: "curious" },
-  { id: "excited", emoji: "🤩", label: "Animado", mood: "happy" },
-  { id: "thinking", emoji: "💭", label: "Pensativo", mood: "thinking" },
-  { id: "loving", emoji: "🥰", label: "Amoroso", mood: "calm" },
-  { id: "challenging", emoji: "😏", label: "Confiante", mood: "guide" },
+// Mapa legacy expression -> AvatarExpression (renderização real anatômica)
+const EXPR_TO_AVATAR: Record<string, AvatarExpression> = {
+  happy: "feliz",
+  curious: "curioso",
+  excited: "surpreso",
+  thinking: "curioso",
+  loving: "feliz",
+  challenging: "bravo",
+};
+
+// Mapa legacy outfit -> AvatarOutfit (renderização real anatômica)
+const OUTFIT_TO_AVATAR: Record<string, AvatarOutfit> = {
+  scientist: "cientista",
+  superhero: "super-heroi",
+  explorer: "explorador",
+  astronaut: "astronauta",
+  chef: "festa", // fallback visual (sem chef SVG anatômico ainda)
+  wizard: "musica", // fallback visual
+};
+
+const EXPRESSIONS: { id: LabExpression; label: string }[] = [
+  { id: "happy", label: "Feliz" },
+  { id: "curious", label: "Curioso" },
+  { id: "excited", label: "Animado" },
+  { id: "thinking", label: "Pensativo" },
+  { id: "loving", label: "Amoroso" },
+  { id: "challenging", label: "Confiante" },
 ];
 
-const OUTFITS = [
-  { id: "scientist", icon: "🥼", label: "Cientista" },
-  { id: "superhero", icon: "🦸", label: "Herói" },
-  { id: "explorer", icon: "🎩", label: "Explorador" },
-  { id: "astronaut", icon: "🚀", label: "Astronauta" },
-  { id: "chef", icon: "👨‍🍳", label: "Chef" },
-  { id: "wizard", icon: "🧙", label: "Mago" },
+const OUTFITS: { id: string; label: string }[] = [
+  { id: "scientist", label: "Cientista" },
+  { id: "superhero", label: "Herói" },
+  { id: "explorer", label: "Explorador" },
+  { id: "astronaut", label: "Astronauta" },
+  { id: "chef", label: "Festa" },
+  { id: "wizard", label: "Música" },
 ];
 
 const ENERGY: { id: LabEnergy; icon: string; label: string }[] = [
@@ -82,12 +109,34 @@ const MyKidzz = ({ onBack }: Props) => {
   const exprObj = EXPRESSIONS.find((e) => e.id === config.expression) || EXPRESSIONS[0];
   const outfitObj = OUTFITS.find((o) => o.id === config.outfitId) || OUTFITS[0];
 
+  // Constrói config real do KidzzAvatar a partir do MascotConfig legado
+  const avatarConfig: KidzzAvatarConfig = useMemo(() => {
+    const stored = loadAvatar();
+    return {
+      base: stored.base, // mantém ane/pixel definido em outro fluxo
+      expression: EXPR_TO_AVATAR[config.expression] || "feliz",
+      outfit: OUTFIT_TO_AVATAR[config.outfitId] || "nenhum",
+      hueRotate: colorObj.hue,
+    };
+  }, [config.expression, config.outfitId, colorObj.hue]);
+
   const update = useCallback((partial: Partial<MascotConfig>) => {
-    setConfig((prev) => ({ ...prev, ...partial }));
+    setConfig((prev) => {
+      const next = { ...prev, ...partial };
+      // Espelha no kidzz_avatar para sincronizar com KidzzLab e Home
+      const hue = COLORS.find((c) => c.id === next.colorId)?.hue ?? 0;
+      saveAvatar({
+        base: loadAvatar().base,
+        expression: EXPR_TO_AVATAR[next.expression] || "feliz",
+        outfit: OUTFIT_TO_AVATAR[next.outfitId] || "nenhum",
+        hueRotate: hue,
+      });
+      return next;
+    });
     setBouncing(true);
     setTimeout(() => setBouncing(false), 400);
 
-    const messages = ["Que estilo! ✨", "Adorei! 💚", "Ficou lindo!", "Legal! 🌟", "Uau!"];
+    const messages = ["Que estilo!", "Adorei!", "Ficou lindo!", "Legal!", "Uau!"];
     setFeedback(messages[Math.floor(Math.random() * messages.length)]);
     setTimeout(() => setFeedback(null), 1500);
   }, []);
@@ -101,7 +150,7 @@ const MyKidzz = ({ onBack }: Props) => {
         origin: { y: 0.6 },
         colors: ["#10B981", "#FFD700", "#fff"],
       });
-      toast.success(`KIDZZ de ${childName} salvo! 💚`);
+      toast.success(`KIDZZ de ${childName} salvo!`);
     } catch {
       toast.error("Não foi possível salvar agora");
     }
@@ -122,11 +171,11 @@ const MyKidzz = ({ onBack }: Props) => {
       );
       if (!blob) throw new Error("blob");
       const file = new File([blob], `kidzz-${childName}.png`, { type: "image/png" });
-      const text = `Olha o KIDZZ d${childName.endsWith("a") ? "a" : "o"} ${childName}! ✨ Crie o seu em kidzzapp.lovable.app`;
+      const text = `Olha o KIDZZ d${childName.endsWith("a") ? "a" : "o"} ${childName}! Crie o seu em kidzzapp.lovable.app`;
 
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: "Meu KIDZZ", text });
-        toast.success("Compartilhado! 💚");
+        toast.success("Compartilhado!");
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -134,7 +183,7 @@ const MyKidzz = ({ onBack }: Props) => {
         a.download = `meu-kidzz.png`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success("Imagem baixada! 📸");
+        toast.success("Imagem baixada!");
       }
     } catch {
       toast.error("Não foi possível compartilhar agora");
@@ -143,9 +192,6 @@ const MyKidzz = ({ onBack }: Props) => {
     }
   }, [childName]);
 
-  // Estado visual do KidzzChameleon: usa "play" (verde base) + hue-rotate adicional via wrapper
-  const kidzzMood: KidzzMood = exprObj.mood;
-
   return (
     <motion.div
       className="flex-1 flex flex-col overflow-hidden"
@@ -153,64 +199,28 @@ const MyKidzz = ({ onBack }: Props) => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
     >
-      {/* HERO PREVIEW — sempre visível, muda em tempo real */}
+      {/* HERO PREVIEW — KidzzAvatar real, muda em tempo real */}
       <div
         ref={heroRef}
         className="relative flex-shrink-0 flex flex-col items-center justify-center pt-2 pb-3 px-4"
       >
         <motion.div
-          className="relative"
-          animate={bouncing ? { scale: [1, 0.92, 1.08, 1], rotate: [0, -4, 4, 0] } : {}}
+          animate={bouncing ? { scale: [1, 0.92, 1.08, 1], rotate: [0, -3, 3, 0] } : {}}
           transition={{ duration: 0.4 }}
-          style={{
-            // Aplica hue-rotate no camaleão inteiro
-            filter: `hue-rotate(${colorObj.hue}deg)`,
-            transition: "filter 350ms ease",
-          }}
         >
-          <KidzzChameleon
-            state="play"
-            mood={kidzzMood}
-            size="xl"
-            interactive
-            showParticles
-          />
+          <KidzzAvatar config={avatarConfig} size="xl" interactive={false} />
         </motion.div>
-
-        {/* Outfit emoji overlay — flutua ao lado */}
-        <motion.span
-          key={outfitObj.id}
-          className="absolute top-4 right-1/3 text-3xl pointer-events-none"
-          initial={{ opacity: 0, scale: 0.5, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        >
-          {outfitObj.icon}
-        </motion.span>
-
-        {/* Expression overlay */}
-        <motion.span
-          key={exprObj.id}
-          className="absolute top-4 left-1/3 text-2xl pointer-events-none"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          {exprObj.emoji}
-        </motion.span>
 
         {/* Status chip */}
         <motion.div
           className="mt-2 px-3 py-1 rounded-full bg-white/80 backdrop-blur border border-white/60 flex items-center gap-1.5"
-          key={`${config.colorId}-${config.expression}`}
+          key={`${config.colorId}-${config.expression}-${config.outfitId}`}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <span className="w-2 h-2 rounded-full" style={{ background: colorObj.dot }} />
           <span className="text-[11px] font-extrabold text-gray-700">
-            {colorObj.label} • {exprObj.label}
+            {colorObj.label} • {exprObj.label} • {outfitObj.label}
           </span>
         </motion.div>
 
@@ -270,16 +280,17 @@ const MyKidzz = ({ onBack }: Props) => {
                   <motion.button
                     key={c.id}
                     onClick={() => update({ colorId: c.id })}
-                    className={`rounded-2xl p-3 flex flex-col items-center gap-1.5 border-2 transition-all min-h-[88px] ${
+                    className={`relative rounded-2xl p-2 flex flex-col items-center gap-1 border-2 transition-all min-h-[110px] ${
                       selected
                         ? "border-emerald-500 bg-white shadow-lg scale-[1.03]"
                         : "border-white/50 bg-white/60"
                     }`}
                     whileTap={{ scale: 0.93 }}
                   >
-                    <div
-                      className="w-9 h-9 rounded-full border-2 border-white shadow-inner"
-                      style={{ background: c.dot }}
+                    <KidzzAvatar
+                      config={{ ...avatarConfig, hueRotate: c.hue }}
+                      size="sm"
+                      interactive={false}
                     />
                     <span className={`text-[10px] font-extrabold ${selected ? "text-emerald-700" : "text-gray-600"}`}>
                       {c.label}
@@ -307,24 +318,31 @@ const MyKidzz = ({ onBack }: Props) => {
                     key={e.id}
                     onClick={() => {
                       if (locked) {
-                        toast.info("Disponível no Premium ✨");
+                        toast.info("Disponível no Premium");
                         return;
                       }
                       update({ expression: e.id });
                     }}
-                    className={`relative rounded-2xl p-3 flex flex-col items-center gap-1 border-2 transition-all min-h-[88px] ${
+                    className={`relative rounded-2xl p-2 flex flex-col items-center gap-1 border-2 transition-all min-h-[110px] ${
                       selected
                         ? "border-emerald-500 bg-white shadow-lg scale-[1.03]"
                         : "border-white/50 bg-white/60"
                     } ${locked ? "opacity-60" : ""}`}
                     whileTap={locked ? undefined : { scale: 0.93 }}
                   >
-                    <span className="text-2xl">{e.emoji}</span>
+                    <KidzzAvatar
+                      config={{
+                        ...avatarConfig,
+                        expression: EXPR_TO_AVATAR[e.id] || "feliz",
+                      }}
+                      size="sm"
+                      interactive={false}
+                    />
                     <span className={`text-[10px] font-extrabold ${selected ? "text-emerald-700" : "text-gray-600"}`}>
                       {e.label}
                     </span>
                     {locked && <Lock size={10} className="absolute top-1.5 right-1.5 text-gray-400" />}
-                    {selected && <Check size={12} className="text-emerald-500 absolute top-1 right-1" />}
+                    {selected && !locked && <Check size={12} className="text-emerald-500 absolute top-1 right-1" />}
                   </motion.button>
                 );
               })}
@@ -347,24 +365,31 @@ const MyKidzz = ({ onBack }: Props) => {
                     key={o.id}
                     onClick={() => {
                       if (locked) {
-                        toast.info("Disponível no Premium ✨");
+                        toast.info("Disponível no Premium");
                         return;
                       }
                       update({ outfitId: o.id });
                     }}
-                    className={`relative rounded-2xl p-3 flex flex-col items-center gap-1 border-2 transition-all min-h-[88px] ${
+                    className={`relative rounded-2xl p-2 flex flex-col items-center gap-1 border-2 transition-all min-h-[110px] ${
                       selected
                         ? "border-emerald-500 bg-white shadow-lg scale-[1.03]"
                         : "border-white/50 bg-white/60"
                     } ${locked ? "opacity-60" : ""}`}
                     whileTap={locked ? undefined : { scale: 0.93 }}
                   >
-                    <span className="text-2xl">{o.icon}</span>
+                    <KidzzAvatar
+                      config={{
+                        ...avatarConfig,
+                        outfit: OUTFIT_TO_AVATAR[o.id] || "nenhum",
+                      }}
+                      size="sm"
+                      interactive={false}
+                    />
                     <span className={`text-[10px] font-extrabold ${selected ? "text-emerald-700" : "text-gray-600"}`}>
                       {o.label}
                     </span>
                     {locked && <Lock size={10} className="absolute top-1.5 right-1.5 text-gray-400" />}
-                    {selected && <Check size={12} className="text-emerald-500 absolute top-1 right-1" />}
+                    {selected && !locked && <Check size={12} className="text-emerald-500 absolute top-1 right-1" />}
                   </motion.button>
                 );
               })}
@@ -385,14 +410,14 @@ const MyKidzz = ({ onBack }: Props) => {
                   <motion.button
                     key={e.id}
                     onClick={() => update({ energy: e.id })}
-                    className={`rounded-2xl p-3 flex flex-col items-center gap-1.5 border-2 transition-all min-h-[88px] ${
+                    className={`relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border-2 transition-all min-h-[88px] ${
                       selected
                         ? "border-emerald-500 bg-white shadow-lg scale-[1.03]"
                         : "border-white/50 bg-white/60"
                     }`}
                     whileTap={{ scale: 0.93 }}
                   >
-                    <span className="text-3xl">{e.icon}</span>
+                    <span className="text-3xl" aria-hidden>{e.icon}</span>
                     <span className={`text-[10px] font-extrabold ${selected ? "text-emerald-700" : "text-gray-600"}`}>
                       {e.label}
                     </span>
