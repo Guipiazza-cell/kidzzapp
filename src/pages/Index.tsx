@@ -24,6 +24,7 @@ const DreamWorld = lazy(() => import("@/components/dreams/DreamWorld"));
 import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
+import RoutineScreen from "@/components/routine/RoutineScreen";
 import MomentsFactory from "@/components/moments/MomentsFactory";
 import TravelMode from "@/components/travel/TravelMode";
 import MusicForest from "@/components/music/MusicForest";
@@ -200,7 +201,11 @@ const Index = () => {
     if (activeTab === "explore") {
       return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
-    // ABA: Brincar (🎮 — core do app, inline em vez de overlay)
+    // ABA: Rotina (🎯 — substitui "Brincar" na tab bar; pilar de hábito)
+    if (activeTab === "routine") {
+      return <RoutineScreen key="routine" />;
+    }
+    // Brincar permanece acessível via Home (botão), apenas removido da tab bar
     if (activeTab === "play") {
       return (
         <KidzzPlay

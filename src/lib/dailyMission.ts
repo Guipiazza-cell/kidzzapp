@@ -76,6 +76,20 @@ export function completeMissionStep(action: "music" | "question" | "story"): {
   m[action] = true;
   const isComplete = m.music && m.question && m.story;
   setMission(m);
+  // Bridge to Routine: auto-complete matching routine task (lazy import to avoid cycle)
+  try {
+    import("./routine").then(({ completeByIntegration }) => {
+      const { completed, results } = completeByIntegration(action);
+      results.forEach((r, i) => {
+        if (r.newlyDone) {
+          import("@/components/flow/XpToast").then(({ showXpGained }) => {
+            showXpGained(r.xpGained, completed[i]?.title || "rotina");
+            if (r.bonusGained > 0) setTimeout(() => showXpGained(r.bonusGained, "BÔNUS"), 350);
+          });
+        }
+      });
+    });
+  } catch { /* noop */ }
   return { state: m, justCompleted: !wasComplete && isComplete, newlyMarked };
 }
 

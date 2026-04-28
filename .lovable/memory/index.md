@@ -15,6 +15,7 @@ Updated: now
 - **KIDZZ é UM personagem só:** 4 estados visuais (cosmic/moon/explorer/music) que metamorfoseiam via crossfade. Nunca trocar imagem bruscamente. Nunca usar emoji 🦎 ou cartoon genérico.
 
 ## Memories
+- [Routine Tab](mem://features/routine-tab) — Daily Habit Loop substitui Brincar na tab bar. 9 tarefas/dia (manhã/tarde/noite), 40-task bank, auto-complete via integrações (música/história/pergunta), streak, +5/+8/+20 XP
 - [KIDZZ Chameleon System](mem://features/kidzz-chameleon-system) — Personagem único com 4 estados, morph crossfade, eye-follow, memória contextual, tab bar viva
 - [Floresta Musical](mem://features/music-forest) — Tab Música ATIVA com parallax pseudo-3D, mascotes reativos, 4 pilares, XP musical separado
 - [Parental Control](mem://features/parental-control) — PIN 1234, plan comparisons, child profile management
