@@ -98,22 +98,24 @@ const ANCHORS: Record<AvatarBase, Anchors> = {
     rightEye: { cx: 62, cy: 23 },
     eyeRx: 6.5,
     eyeRy: 7,
-    mouth: { cx: 50, cy: 30 },
+    // Boca real da Ane fica logo abaixo dos olhos, na linha do focinho rosado
+    mouth: { cx: 50, cy: 36 },
     headTop: { cx: 50, cy: 6 },
     headCenter: { cx: 50, cy: 19 },
     faceWidth: 44,
-    collar: { cx: 50, cy: 46 },
+    collar: { cx: 50, cy: 50 },
   },
   pixel: {
     leftEye: { cx: 38, cy: 24 },
     rightEye: { cx: 60, cy: 25 },
     eyeRx: 5.5,
     eyeRy: 6,
-    mouth: { cx: 50, cy: 32 },
+    // Boca do Pixel é menor e mais próxima dos olhos
+    mouth: { cx: 49, cy: 37 },
     headTop: { cx: 48, cy: 6 },
     headCenter: { cx: 48, cy: 21 },
     faceWidth: 40,
-    collar: { cx: 50, cy: 47 },
+    collar: { cx: 50, cy: 51 },
   },
 };
 
@@ -223,14 +225,22 @@ const Eyes = ({ expression, anchors }: { expression: AvatarExpression; anchors: 
 };
 
 /* ────────────────────────── MOUTH ────────────────────────── */
-const Mouth = ({ expression, anchors }: { expression: AvatarExpression; anchors: Anchors }) => {
+const Mouth = ({ expression, anchors, base }: { expression: AvatarExpression; anchors: Anchors; base: AvatarBase }) => {
   const { mouth: M } = anchors;
-  const w = 7; // half-width da boca
+  const w = base === "ane" ? 8 : 6.5; // half-width da boca, proporcional ao focinho
+  // Tom de cobertura para mascarar a boca neutra do PNG (combina com a pele do mascote)
+  const skin = base === "ane" ? "#f5b3cc" : "#cdb89a";
+
+  // Patch base: oval suave que cobre a boca original do PNG na linha do focinho
+  const Cover = () => (
+    <ellipse cx={M.cx} cy={M.cy} rx={w + 1} ry={2.6} fill={skin} opacity="0.85" />
+  );
 
   if (expression === "dormindo") {
     return (
       <svg viewBox="0 0 100 150" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid meet">
-        <ellipse cx={M.cx} cy={M.cy} rx="2.5" ry="1.2" fill="#1a1a2e" opacity="0.55" />
+        <Cover />
+        <ellipse cx={M.cx} cy={M.cy} rx="2.6" ry="1.1" fill="#1a1a2e" opacity="0.7" />
       </svg>
     );
   }
@@ -239,46 +249,50 @@ const Mouth = ({ expression, anchors }: { expression: AvatarExpression; anchors:
     feliz: (
       <>
         <motion.path
-          d={`M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w} ${M.cy}`}
+          d={`M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 4.5} ${M.cx + w} ${M.cy - 0.5}`}
           stroke="#1a1a2e"
-          strokeWidth="1.6"
+          strokeWidth="1.7"
           fill="none"
           strokeLinecap="round"
           animate={{ d: [
-            `M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w} ${M.cy}`,
-            `M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 5} ${M.cx + w} ${M.cy}`,
-            `M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w} ${M.cy}`,
+            `M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 4.5} ${M.cx + w} ${M.cy - 0.5}`,
+            `M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 5.5} ${M.cx + w} ${M.cy - 0.5}`,
+            `M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 4.5} ${M.cx + w} ${M.cy - 0.5}`,
           ] }}
           transition={{ duration: 2.4, repeat: Infinity }}
         />
-        <path d={`M ${M.cx - w + 0.6} ${M.cy + 0.4} Q ${M.cx} ${M.cy + 3.6} ${M.cx + w - 0.6} ${M.cy + 0.4} Z`} fill="#FF6B8A" opacity="0.4" />
+        {/* Interior do sorriso (rosa) */}
+        <path d={`M ${M.cx - w + 0.8} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w - 0.8} ${M.cy} Z`} fill="#E0436A" opacity="0.55" />
       </>
     ),
     triste: (
-      <path d={`M ${M.cx - w} ${M.cy + 3} Q ${M.cx} ${M.cy - 2} ${M.cx + w} ${M.cy + 3}`} stroke="#1a1a2e" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      <path d={`M ${M.cx - w} ${M.cy + 2.5} Q ${M.cx} ${M.cy - 2} ${M.cx + w} ${M.cy + 2.5}`} stroke="#1a1a2e" strokeWidth="1.7" fill="none" strokeLinecap="round" />
     ),
     surpreso: (
-      <ellipse cx={M.cx} cy={M.cy + 1} rx="2.4" ry="3" fill="#1a1a2e" />
+      <ellipse cx={M.cx} cy={M.cy + 0.5} rx="2.6" ry="3.2" fill="#1a1a2e" />
     ),
     bravo: (
-      <path d={`M ${M.cx - w} ${M.cy + 1} L ${M.cx + w} ${M.cy + 1}`} stroke="#1a1a2e" strokeWidth="1.8" strokeLinecap="round" />
+      <path d={`M ${M.cx - w} ${M.cy + 0.5} L ${M.cx + w} ${M.cy + 0.5}`} stroke="#1a1a2e" strokeWidth="1.9" strokeLinecap="round" />
     ),
     curioso: (
-      <path d={`M ${M.cx - 4} ${M.cy + 1} Q ${M.cx} ${M.cy + 2.5} ${M.cx + 4} ${M.cy}`} stroke="#1a1a2e" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+      <path d={`M ${M.cx - 4.5} ${M.cy + 0.5} Q ${M.cx} ${M.cy + 2.5} ${M.cx + 4.5} ${M.cy - 0.5}`} stroke="#1a1a2e" strokeWidth="1.5" fill="none" strokeLinecap="round" />
     ),
     dormindo: <></>,
   };
   return (
     <svg viewBox="0 0 100 150" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid meet">
+      <Cover />
       {paths[expression]}
     </svg>
   );
 };
 
 /* ────────────────────────── OUTFIT ACCESSORIES ────────────────────────── */
-const Outfit = ({ outfit, anchors }: { outfit: AvatarOutfit; anchors: Anchors }) => {
+const Outfit = ({ outfit, anchors, base }: { outfit: AvatarOutfit; anchors: Anchors; base: AvatarBase }) => {
   if (outfit === "nenhum") return null;
   const { headTop: HT, headCenter: HC, collar: C, faceWidth: FW, leftEye: L, rightEye: R } = anchors;
+  // Escala dos óculos por base (Pixel tem cabeça menor → óculos um pouco menores)
+  const lensR = base === "ane" ? anchors.eyeRx + 2 : anchors.eyeRx + 1.6;
 
   const outfits: Record<Exclude<AvatarOutfit, "nenhum">, JSX.Element> = {
     astronauta: (
@@ -330,16 +344,24 @@ const Outfit = ({ outfit, anchors }: { outfit: AvatarOutfit; anchors: Anchors })
       </>
     ),
     cientista: (
-      // Óculos redondos posicionados EXATAMENTE sobre os olhos + jaleco no colarinho
+      // Óculos redondos posicionados EXATAMENTE sobre cada olho (não centralizados)
       <>
-        {/* Ponte entre os olhos */}
-        <path d={`M ${L.cx + 5} ${L.cy} L ${R.cx - 5} ${R.cy}`} stroke="#1a1a2e" strokeWidth="1.4" />
-        {/* Aros redondos sobre cada olho */}
-        <circle cx={L.cx} cy={L.cy} r={Math.max(6.5, anchors.eyeRx + 1.5)} fill="rgba(200,230,255,0.18)" stroke="#1a1a2e" strokeWidth="1.6" />
-        <circle cx={R.cx} cy={R.cy} r={Math.max(6.5, anchors.eyeRx + 1.5)} fill="rgba(200,230,255,0.18)" stroke="#1a1a2e" strokeWidth="1.6" />
-        {/* Hastes laterais */}
-        <path d={`M ${L.cx - anchors.eyeRx - 1.5} ${L.cy} L ${L.cx - anchors.eyeRx - 5} ${L.cy + 1}`} stroke="#1a1a2e" strokeWidth="1.4" strokeLinecap="round" />
-        <path d={`M ${R.cx + anchors.eyeRx + 1.5} ${R.cy} L ${R.cx + anchors.eyeRx + 5} ${R.cy + 1}`} stroke="#1a1a2e" strokeWidth="1.4" strokeLinecap="round" />
+        {/* Ponte fina entre as lentes, seguindo a leve inclinação dos olhos */}
+        <path
+          d={`M ${L.cx + lensR - 0.5} ${L.cy} L ${R.cx - lensR + 0.5} ${R.cy}`}
+          stroke="#1a1a2e"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+        {/* Aros redondos ancorados em cada olho real */}
+        <circle cx={L.cx} cy={L.cy} r={lensR} fill="rgba(220,240,255,0.22)" stroke="#1a1a2e" strokeWidth="1.7" />
+        <circle cx={R.cx} cy={R.cy} r={lensR} fill="rgba(220,240,255,0.22)" stroke="#1a1a2e" strokeWidth="1.7" />
+        {/* Brilho de lente (canto superior esquerdo de cada lente) */}
+        <path d={`M ${L.cx - lensR * 0.55} ${L.cy - lensR * 0.45} A ${lensR * 0.6} ${lensR * 0.6} 0 0 1 ${L.cx - lensR * 0.05} ${L.cy - lensR * 0.7}`} stroke="white" strokeWidth="1" fill="none" opacity="0.7" strokeLinecap="round" />
+        <path d={`M ${R.cx - lensR * 0.55} ${R.cy - lensR * 0.45} A ${lensR * 0.6} ${lensR * 0.6} 0 0 1 ${R.cx - lensR * 0.05} ${R.cy - lensR * 0.7}`} stroke="white" strokeWidth="1" fill="none" opacity="0.7" strokeLinecap="round" />
+        {/* Hastes laterais até as orelhas */}
+        <path d={`M ${L.cx - lensR} ${L.cy + 0.5} L ${L.cx - lensR - 5} ${L.cy + 1.5}`} stroke="#1a1a2e" strokeWidth="1.5" strokeLinecap="round" />
+        <path d={`M ${R.cx + lensR} ${R.cy + 0.5} L ${R.cx + lensR + 5} ${R.cy + 1.5}`} stroke="#1a1a2e" strokeWidth="1.5" strokeLinecap="round" />
         {/* Jaleco no colarinho */}
         <path d={`M ${C.cx - 14} ${C.cy} L ${C.cx - 16} ${C.cy + 16} L ${C.cx + 16} ${C.cy + 16} L ${C.cx + 14} ${C.cy} Z`} fill="white" opacity="0.9" />
         <path d={`M ${C.cx - 14} ${C.cy} L ${C.cx} ${C.cy + 6} L ${C.cx + 14} ${C.cy} Z`} fill="white" opacity="0.95" />
@@ -429,12 +451,12 @@ const KidzzAvatar = forwardRef<HTMLDivElement, Props>(
         <div className="absolute inset-0 transition-opacity duration-200">
           {/* Acessório atrás dos olhos quando aplicável (capacete, festa) */}
           {(config.outfit === "astronauta" || config.outfit === "festa" || config.outfit === "explorador" || config.outfit === "musica" || config.outfit === "super-heroi") && (
-            <Outfit outfit={config.outfit} anchors={anchors} />
+            <Outfit outfit={config.outfit} anchors={anchors} base={config.base} />
           )}
           <Eyes expression={config.expression} anchors={anchors} />
-          <Mouth expression={config.expression} anchors={anchors} />
+          <Mouth expression={config.expression} anchors={anchors} base={config.base} />
           {/* Cientista (óculos) à frente para alinhar perfeitamente sobre olhos */}
-          {config.outfit === "cientista" && <Outfit outfit={config.outfit} anchors={anchors} />}
+          {config.outfit === "cientista" && <Outfit outfit={config.outfit} anchors={anchors} base={config.base} />}
         </div>
       </motion.div>
     );
