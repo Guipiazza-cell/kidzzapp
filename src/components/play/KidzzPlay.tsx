@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, FlaskConical, Plane } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
@@ -191,16 +191,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
           highlight
         />
-        {onOpenLab && (
-          <HubCard
-            onClick={onOpenLab}
-            icon={<FlaskConical size={28} className="text-white" />}
-            emoji="🧠"
-            title="Explorar"
-            subtitle="Criar, testar e descobrir"
-            gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
-          />
-        )}
         {onOpenTravel && (
           <HubCard
             onClick={onOpenTravel}
