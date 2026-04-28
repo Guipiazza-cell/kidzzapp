@@ -213,6 +213,7 @@ const Index = () => {
           onBack={() => { setActiveTab("chat"); setStep("home"); }}
           onGameComplete={() => evolution.evolve("game")}
           onOpenAchievements={() => setActiveTab("achievements")}
+          onOpenLab={() => setShowLab(true)}
           onOpenTravel={() => {
             if (!profile?.is_premium) {
               setContextualPaywall({ open: true, context: "travel" });

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Palette, Target, Plane } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, FlaskConical, Target, Plane } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
@@ -10,7 +10,6 @@ import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
 import DailyChallengeGame from "./games/DailyChallengeGame";
 import PixelPulaGame from "./games/PixelPulaGame";
-import MyKidzz from "./MyKidzz";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
@@ -35,7 +34,7 @@ const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
 };
 
 type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
-type View = "menu" | "games" | "kidzz" | "activities";
+type View = "menu" | "games" | "activities";
 
 const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean; isNew?: boolean }[] = [
   { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o KIDZZ a pular!", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", isNew: true },
@@ -50,9 +49,10 @@ interface Props {
   onGameComplete?: () => void;
   onOpenTravel?: () => void;
   onOpenAchievements?: () => void;
+  onOpenLab?: () => void;
 }
 
-const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }: Props) => {
+const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, onOpenLab }: Props) => {
   const { profile } = useAuth();
   const { trackEvent } = useAchievementSync();
   const isPremium = profile?.is_premium ?? false;
@@ -113,8 +113,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
           ? "Quase lá! 💪"
           : "Você consegue! 💚"
         : "Escolha um jogo!"
-      : view === "kidzz"
-      ? "Me deixe lindo! ✨"
       : view === "activities"
       ? "Vamos brincar de verdade! 🎯"
       : `O que vamos fazer, ${childName}? 💚`;
@@ -146,8 +144,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
             ? "Escolha sua aventura"
             : view === "games"
             ? "Jogos rápidos"
-            : view === "kidzz"
-            ? "Personalize seu KIDZZ"
             : "Atividades da semana"}
         </p>
       </div>
@@ -201,14 +197,16 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
           subtitle="Mini jogos rápidos e divertidos"
           gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
         />
-        <HubCard
-          onClick={() => setView("kidzz")}
-          icon={<Palette size={28} className="text-white" />}
-          emoji="🦎"
-          title="Meu KIDZZ"
-          subtitle="Personalize cor, roupa e expressão"
-          gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
-        />
+        {onOpenLab && (
+          <HubCard
+            onClick={onOpenLab}
+            icon={<FlaskConical size={28} className="text-white" />}
+            emoji="🧪"
+            title="Lab"
+            subtitle="Experimentos e descobertas"
+            gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
+          />
+        )}
         <HubCard
           onClick={() => setView("activities")}
           icon={<Target size={28} className="text-white" />}
@@ -432,17 +430,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
         <AnimatePresence mode="wait">
           {view === "menu" && renderMenu()}
           {view === "games" && renderGames()}
-          {view === "kidzz" && (
-            <motion.div
-              key="kidzz"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              className="flex-1 overflow-hidden relative"
-            >
-              <MyKidzz onBack={() => setView("menu")} />
-            </motion.div>
-          )}
           {view === "activities" && <MyActivities key="activities" onBack={() => setView("menu")} />}
         </AnimatePresence>
       </div>
