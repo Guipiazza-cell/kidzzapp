@@ -252,6 +252,52 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         {/* Streak Card */}
         <StreakCard streakDays={streakDays} childName={childName} onSubmit={onSubmit} />
 
+        {/* Atalhos rápidos — Brincar / Lab / Atividades / Viagem (sempre visíveis) */}
+        <motion.div
+          className="w-full max-w-sm mt-3"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <p className="text-gray-500 text-[10px] font-bold text-center uppercase tracking-widest mb-1.5">
+            Atividades & Brincadeiras
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {onOpenPlay && (
+              <QuickShortcut
+                onClick={onOpenPlay}
+                emoji="🎮"
+                label="Brincar"
+                gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
+              />
+            )}
+            {onOpenLab && (
+              <QuickShortcut
+                onClick={onOpenLab}
+                emoji="🧪"
+                label="Lab"
+                gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
+              />
+            )}
+            {onOpenPlay && (
+              <QuickShortcut
+                onClick={onOpenPlay}
+                emoji="🎯"
+                label="Atividades"
+                gradient="linear-gradient(135deg, hsl(35 95% 60%), hsl(25 90% 55%))"
+              />
+            )}
+            {onOpenTravel && (
+              <QuickShortcut
+                onClick={onOpenTravel}
+                emoji="✈️"
+                label="Viagem"
+                gradient="linear-gradient(135deg, hsl(200 80% 55%), hsl(220 75% 45%))"
+              />
+            )}
+          </div>
+        </motion.div>
+
         {/* Daily mission loop — drives retention */}
         <div className="w-full flex justify-center mt-2 mb-1">
           <DailyMissionCard
