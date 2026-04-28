@@ -34,7 +34,7 @@ const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
 };
 
 type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
-type View = "menu" | "games" | "kidzz" | "activities";
+type View = "menu" | "games" | "activities";
 
 const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean; isNew?: boolean }[] = [
   { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o KIDZZ a pular!", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", isNew: true },
@@ -49,9 +49,10 @@ interface Props {
   onGameComplete?: () => void;
   onOpenTravel?: () => void;
   onOpenAchievements?: () => void;
+  onOpenLab?: () => void;
 }
 
-const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }: Props) => {
+const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, onOpenLab }: Props) => {
   const { profile } = useAuth();
   const { trackEvent } = useAchievementSync();
   const isPremium = profile?.is_premium ?? false;
@@ -112,8 +113,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
           ? "Quase lá! 💪"
           : "Você consegue! 💚"
         : "Escolha um jogo!"
-      : view === "kidzz"
-      ? "Me deixe lindo! ✨"
       : view === "activities"
       ? "Vamos brincar de verdade! 🎯"
       : `O que vamos fazer, ${childName}? 💚`;
@@ -145,8 +144,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements }:
             ? "Escolha sua aventura"
             : view === "games"
             ? "Jogos rápidos"
-            : view === "kidzz"
-            ? "Personalize seu KIDZZ"
             : "Atividades da semana"}
         </p>
       </div>
