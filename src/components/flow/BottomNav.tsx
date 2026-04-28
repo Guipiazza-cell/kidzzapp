@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircleHeart, Gamepad2, BookOpen, Music2, Moon, Heart } from "lucide-react";
+import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
@@ -26,18 +26,10 @@ const TABS: {
 }[] = [
   {
     id: "chat",
-    label: "Explorar",
+    label: "Perguntas",
     icon: MessageCircleHeart,
     color: "text-kid-blue",
     underline: "hsl(var(--kid-blue))",
-  },
-  {
-    id: "play",
-    label: "Brincar",
-    icon: Gamepad2,
-    color: "text-kid-green",
-    underline: "hsl(var(--kid-green))",
-    highlight: true,
   },
   {
     id: "explore",
@@ -52,6 +44,14 @@ const TABS: {
     icon: Music2,
     color: "text-kid-yellow",
     underline: "hsl(var(--kid-yellow))",
+  },
+  {
+    id: "routine",
+    label: "Rotina",
+    icon: Target,
+    color: "text-kid-green",
+    underline: "hsl(var(--kid-green))",
+    highlight: true,
   },
   {
     id: "dreams",
