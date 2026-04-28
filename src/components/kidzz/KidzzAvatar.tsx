@@ -344,16 +344,24 @@ const Outfit = ({ outfit, anchors, base }: { outfit: AvatarOutfit; anchors: Anch
       </>
     ),
     cientista: (
-      // Óculos redondos posicionados EXATAMENTE sobre os olhos + jaleco no colarinho
+      // Óculos redondos posicionados EXATAMENTE sobre cada olho (não centralizados)
       <>
-        {/* Ponte entre os olhos */}
-        <path d={`M ${L.cx + 5} ${L.cy} L ${R.cx - 5} ${R.cy}`} stroke="#1a1a2e" strokeWidth="1.4" />
-        {/* Aros redondos sobre cada olho */}
-        <circle cx={L.cx} cy={L.cy} r={Math.max(6.5, anchors.eyeRx + 1.5)} fill="rgba(200,230,255,0.18)" stroke="#1a1a2e" strokeWidth="1.6" />
-        <circle cx={R.cx} cy={R.cy} r={Math.max(6.5, anchors.eyeRx + 1.5)} fill="rgba(200,230,255,0.18)" stroke="#1a1a2e" strokeWidth="1.6" />
-        {/* Hastes laterais */}
-        <path d={`M ${L.cx - anchors.eyeRx - 1.5} ${L.cy} L ${L.cx - anchors.eyeRx - 5} ${L.cy + 1}`} stroke="#1a1a2e" strokeWidth="1.4" strokeLinecap="round" />
-        <path d={`M ${R.cx + anchors.eyeRx + 1.5} ${R.cy} L ${R.cx + anchors.eyeRx + 5} ${R.cy + 1}`} stroke="#1a1a2e" strokeWidth="1.4" strokeLinecap="round" />
+        {/* Ponte fina entre as lentes, seguindo a leve inclinação dos olhos */}
+        <path
+          d={`M ${L.cx + lensR - 0.5} ${L.cy} L ${R.cx - lensR + 0.5} ${R.cy}`}
+          stroke="#1a1a2e"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+        {/* Aros redondos ancorados em cada olho real */}
+        <circle cx={L.cx} cy={L.cy} r={lensR} fill="rgba(220,240,255,0.22)" stroke="#1a1a2e" strokeWidth="1.7" />
+        <circle cx={R.cx} cy={R.cy} r={lensR} fill="rgba(220,240,255,0.22)" stroke="#1a1a2e" strokeWidth="1.7" />
+        {/* Brilho de lente (canto superior esquerdo de cada lente) */}
+        <path d={`M ${L.cx - lensR * 0.55} ${L.cy - lensR * 0.45} A ${lensR * 0.6} ${lensR * 0.6} 0 0 1 ${L.cx - lensR * 0.05} ${L.cy - lensR * 0.7}`} stroke="white" strokeWidth="1" fill="none" opacity="0.7" strokeLinecap="round" />
+        <path d={`M ${R.cx - lensR * 0.55} ${R.cy - lensR * 0.45} A ${lensR * 0.6} ${lensR * 0.6} 0 0 1 ${R.cx - lensR * 0.05} ${R.cy - lensR * 0.7}`} stroke="white" strokeWidth="1" fill="none" opacity="0.7" strokeLinecap="round" />
+        {/* Hastes laterais até as orelhas */}
+        <path d={`M ${L.cx - lensR} ${L.cy + 0.5} L ${L.cx - lensR - 5} ${L.cy + 1.5}`} stroke="#1a1a2e" strokeWidth="1.5" strokeLinecap="round" />
+        <path d={`M ${R.cx + lensR} ${R.cy + 0.5} L ${R.cx + lensR + 5} ${R.cy + 1.5}`} stroke="#1a1a2e" strokeWidth="1.5" strokeLinecap="round" />
         {/* Jaleco no colarinho */}
         <path d={`M ${C.cx - 14} ${C.cy} L ${C.cx - 16} ${C.cy + 16} L ${C.cx + 16} ${C.cy + 16} L ${C.cx + 14} ${C.cy} Z`} fill="white" opacity="0.9" />
         <path d={`M ${C.cx - 14} ${C.cy} L ${C.cx} ${C.cy + 6} L ${C.cx + 14} ${C.cy} Z`} fill="white" opacity="0.95" />
