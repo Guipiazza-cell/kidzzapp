@@ -225,14 +225,22 @@ const Eyes = ({ expression, anchors }: { expression: AvatarExpression; anchors: 
 };
 
 /* ────────────────────────── MOUTH ────────────────────────── */
-const Mouth = ({ expression, anchors }: { expression: AvatarExpression; anchors: Anchors }) => {
+const Mouth = ({ expression, anchors, base }: { expression: AvatarExpression; anchors: Anchors; base: AvatarBase }) => {
   const { mouth: M } = anchors;
-  const w = 7; // half-width da boca
+  const w = base === "ane" ? 8 : 6.5; // half-width da boca, proporcional ao focinho
+  // Tom de cobertura para mascarar a boca neutra do PNG (combina com a pele do mascote)
+  const skin = base === "ane" ? "#f5b3cc" : "#cdb89a";
+
+  // Patch base: oval suave que cobre a boca original do PNG na linha do focinho
+  const Cover = () => (
+    <ellipse cx={M.cx} cy={M.cy} rx={w + 1} ry={2.6} fill={skin} opacity="0.85" />
+  );
 
   if (expression === "dormindo") {
     return (
       <svg viewBox="0 0 100 150" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid meet">
-        <ellipse cx={M.cx} cy={M.cy} rx="2.5" ry="1.2" fill="#1a1a2e" opacity="0.55" />
+        <Cover />
+        <ellipse cx={M.cx} cy={M.cy} rx="2.6" ry="1.1" fill="#1a1a2e" opacity="0.7" />
       </svg>
     );
   }
@@ -241,37 +249,39 @@ const Mouth = ({ expression, anchors }: { expression: AvatarExpression; anchors:
     feliz: (
       <>
         <motion.path
-          d={`M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w} ${M.cy}`}
+          d={`M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 4.5} ${M.cx + w} ${M.cy - 0.5}`}
           stroke="#1a1a2e"
-          strokeWidth="1.6"
+          strokeWidth="1.7"
           fill="none"
           strokeLinecap="round"
           animate={{ d: [
-            `M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w} ${M.cy}`,
-            `M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 5} ${M.cx + w} ${M.cy}`,
-            `M ${M.cx - w} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w} ${M.cy}`,
+            `M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 4.5} ${M.cx + w} ${M.cy - 0.5}`,
+            `M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 5.5} ${M.cx + w} ${M.cy - 0.5}`,
+            `M ${M.cx - w} ${M.cy - 0.5} Q ${M.cx} ${M.cy + 4.5} ${M.cx + w} ${M.cy - 0.5}`,
           ] }}
           transition={{ duration: 2.4, repeat: Infinity }}
         />
-        <path d={`M ${M.cx - w + 0.6} ${M.cy + 0.4} Q ${M.cx} ${M.cy + 3.6} ${M.cx + w - 0.6} ${M.cy + 0.4} Z`} fill="#FF6B8A" opacity="0.4" />
+        {/* Interior do sorriso (rosa) */}
+        <path d={`M ${M.cx - w + 0.8} ${M.cy} Q ${M.cx} ${M.cy + 4} ${M.cx + w - 0.8} ${M.cy} Z`} fill="#E0436A" opacity="0.55" />
       </>
     ),
     triste: (
-      <path d={`M ${M.cx - w} ${M.cy + 3} Q ${M.cx} ${M.cy - 2} ${M.cx + w} ${M.cy + 3}`} stroke="#1a1a2e" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      <path d={`M ${M.cx - w} ${M.cy + 2.5} Q ${M.cx} ${M.cy - 2} ${M.cx + w} ${M.cy + 2.5}`} stroke="#1a1a2e" strokeWidth="1.7" fill="none" strokeLinecap="round" />
     ),
     surpreso: (
-      <ellipse cx={M.cx} cy={M.cy + 1} rx="2.4" ry="3" fill="#1a1a2e" />
+      <ellipse cx={M.cx} cy={M.cy + 0.5} rx="2.6" ry="3.2" fill="#1a1a2e" />
     ),
     bravo: (
-      <path d={`M ${M.cx - w} ${M.cy + 1} L ${M.cx + w} ${M.cy + 1}`} stroke="#1a1a2e" strokeWidth="1.8" strokeLinecap="round" />
+      <path d={`M ${M.cx - w} ${M.cy + 0.5} L ${M.cx + w} ${M.cy + 0.5}`} stroke="#1a1a2e" strokeWidth="1.9" strokeLinecap="round" />
     ),
     curioso: (
-      <path d={`M ${M.cx - 4} ${M.cy + 1} Q ${M.cx} ${M.cy + 2.5} ${M.cx + 4} ${M.cy}`} stroke="#1a1a2e" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+      <path d={`M ${M.cx - 4.5} ${M.cy + 0.5} Q ${M.cx} ${M.cy + 2.5} ${M.cx + 4.5} ${M.cy - 0.5}`} stroke="#1a1a2e" strokeWidth="1.5" fill="none" strokeLinecap="round" />
     ),
     dormindo: <></>,
   };
   return (
     <svg viewBox="0 0 100 150" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid meet">
+      <Cover />
       {paths[expression]}
     </svg>
   );
