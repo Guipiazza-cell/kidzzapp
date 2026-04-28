@@ -10,7 +10,6 @@ import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
 import DailyChallengeGame from "./games/DailyChallengeGame";
 import PixelPulaGame from "./games/PixelPulaGame";
-import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
 // Hue values per saved color id — matches KidzzLab/HomeScreen
