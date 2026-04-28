@@ -288,9 +288,11 @@ const Mouth = ({ expression, anchors, base }: { expression: AvatarExpression; an
 };
 
 /* ────────────────────────── OUTFIT ACCESSORIES ────────────────────────── */
-const Outfit = ({ outfit, anchors }: { outfit: AvatarOutfit; anchors: Anchors }) => {
+const Outfit = ({ outfit, anchors, base }: { outfit: AvatarOutfit; anchors: Anchors; base: AvatarBase }) => {
   if (outfit === "nenhum") return null;
   const { headTop: HT, headCenter: HC, collar: C, faceWidth: FW, leftEye: L, rightEye: R } = anchors;
+  // Escala dos óculos por base (Pixel tem cabeça menor → óculos um pouco menores)
+  const lensR = base === "ane" ? anchors.eyeRx + 2 : anchors.eyeRx + 1.6;
 
   const outfits: Record<Exclude<AvatarOutfit, "nenhum">, JSX.Element> = {
     astronauta: (
