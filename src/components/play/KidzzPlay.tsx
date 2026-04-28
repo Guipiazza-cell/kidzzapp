@@ -197,14 +197,16 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           subtitle="Mini jogos rápidos e divertidos"
           gradient="linear-gradient(135deg, hsl(140 70% 50%), hsl(155 65% 40%))"
         />
-        <HubCard
-          onClick={() => setView("kidzz")}
-          icon={<Palette size={28} className="text-white" />}
-          emoji="🦎"
-          title="Meu KIDZZ"
-          subtitle="Personalize cor, roupa e expressão"
-          gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
-        />
+        {onOpenLab && (
+          <HubCard
+            onClick={onOpenLab}
+            icon={<FlaskConical size={28} className="text-white" />}
+            emoji="🧪"
+            title="Lab"
+            subtitle="Experimentos e descobertas"
+            gradient="linear-gradient(135deg, hsl(280 65% 60%), hsl(265 70% 50%))"
+          />
+        )}
         <HubCard
           onClick={() => setView("activities")}
           icon={<Target size={28} className="text-white" />}
@@ -428,17 +430,6 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
         <AnimatePresence mode="wait">
           {view === "menu" && renderMenu()}
           {view === "games" && renderGames()}
-          {view === "kidzz" && (
-            <motion.div
-              key="kidzz"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              className="flex-1 overflow-hidden relative"
-            >
-              <MyKidzz onBack={() => setView("menu")} />
-            </motion.div>
-          )}
           {view === "activities" && <MyActivities key="activities" onBack={() => setView("menu")} />}
         </AnimatePresence>
       </div>
