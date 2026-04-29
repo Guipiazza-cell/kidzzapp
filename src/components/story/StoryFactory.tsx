@@ -20,7 +20,7 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 type Step = "intro" | "avatar" | "form" | "display";
 
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
-  const { profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
+  const { user, profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
@@ -72,7 +72,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           childAvatar: avatar,
           age,
           interests,
-          ageRange: profile?.age_range || "3-7"
+          ageRange: profile?.age_range || "3-7",
+          userId: user?.id ?? null,
         })
       });
 
