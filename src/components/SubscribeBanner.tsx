@@ -7,6 +7,10 @@ interface SubscribeBannerProps {
   isPremium: boolean;
 }
 
+const openPlans = () => {
+  window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+};
+
 const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: SubscribeBannerProps) => {
   if (isPremium) {
     return (
