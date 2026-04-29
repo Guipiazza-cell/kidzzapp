@@ -123,6 +123,23 @@ const Index = () => {
     return () => window.removeEventListener("kidzz:open-paywall", handler);
   }, []);
 
+  // Global plans-screen opener — shows the FULL Paywall screen (plan picker)
+  useEffect(() => {
+    const openPlans = () => {
+      setContextualPaywall((p) => ({ ...p, open: false }));
+      setShowLab(false);
+      setShowPlay(false);
+      setShowTravel(false);
+      setShowChallenge(false);
+      setShowReferral(false);
+      setShowRetrospective(false);
+      setActiveTab("chat");
+      setStep("paywall");
+    };
+    window.addEventListener("kidzz:open-plans", openPlans);
+    return () => window.removeEventListener("kidzz:open-plans", openPlans);
+  }, []);
+
   // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
   useEffect(() => {
     if (profile?.is_premium) return;
