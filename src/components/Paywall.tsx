@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star, Music2 } from "lucide-react";
+import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star, Music2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
@@ -8,12 +8,17 @@ import musicKidzz from "@/assets/kidzz/music.png";
 
 interface PaywallProps {
   onLogin: () => void;
+  onBack?: () => void;
 }
 
 type BillingPeriod = "annual" | "monthly";
 type PlanKey = "premium" | "premium_annual" | "super_premium";
 
-const Paywall = ({ onLogin }: PaywallProps) => {
+const Paywall = ({ onLogin, onBack }: PaywallProps) => {
+  const handleBack = () => {
+    if (onBack) onBack();
+    else window.history.back();
+  };
   const { user, handleCheckout, profile } = useAuth();
   const childName = profile?.child_name || "seu filho";
   const questionsUsed = profile?.questions_used ?? 0;
@@ -57,6 +62,19 @@ const Paywall = ({ onLogin }: PaywallProps) => {
       >
         {/* Soft forest overlay bg */}
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/50 via-amber-50/30 to-orange-50/50 pointer-events-none" />
+
+        {/* Top bar with back button */}
+        <div className="relative z-20 flex items-center justify-between px-4 pt-3 pb-1">
+          <button
+            onClick={handleBack}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/70 backdrop-blur-sm shadow-sm active:scale-90 transition-transform"
+            aria-label="Voltar"
+          >
+            <ArrowLeft size={18} className="text-gray-700" />
+          </button>
+          <span className="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Planos KIDZZ</span>
+          <div className="w-10" />
+        </div>
 
         <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
           {/* Mascots */}
@@ -129,7 +147,7 @@ const Paywall = ({ onLogin }: PaywallProps) => {
           </motion.button>
 
           <motion.button
-            onClick={() => window.history.back()}
+            onClick={handleBack}
             className="mt-4 text-gray-400 text-xs font-bold underline"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -150,6 +168,19 @@ const Paywall = ({ onLogin }: PaywallProps) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      {/* Top bar with back button */}
+      <div className="sticky top-0 z-30 flex items-center justify-between px-4 pt-3 pb-2 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <button
+          onClick={handleBack}
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-transform"
+          aria-label="Voltar"
+        >
+          <ArrowLeft size={18} className="text-gray-700" />
+        </button>
+        <span className="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Escolha seu plano</span>
+        <div className="w-10" />
+      </div>
+
       <div className="p-5 space-y-4 max-w-sm mx-auto w-full">
         {/* Header */}
         <div className="text-center pt-1">
@@ -160,7 +191,56 @@ const Paywall = ({ onLogin }: PaywallProps) => {
           >
             Escolha o melhor plano para {childName} ✨
           </motion.h2>
+          <motion.p
+            className="text-xs text-gray-500 font-bold mt-1.5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.05 }}
+          >
+            🎁 7 dias de garantia · Cancele quando quiser
+          </motion.p>
         </div>
+
+        {/* Freemium vs Premium quick compare */}
+        <motion.div
+          className="grid grid-cols-2 gap-2"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+        >
+          <div className="rounded-xl p-3 bg-gray-50 border border-gray-200">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="text-[10px] font-black text-gray-500 uppercase">Grátis</span>
+            </div>
+            <ul className="space-y-1 text-[10px] font-bold text-gray-500 leading-snug">
+              <li>• 3 perguntas (total)</li>
+              <li>• 1 história demo</li>
+              <li>• Sem narração</li>
+              <li>• Sem Mundo dos Sonhos</li>
+            </ul>
+          </div>
+          <div
+            className="rounded-xl p-3 border-2 relative overflow-hidden"
+            style={{
+              borderColor: "#D4A847",
+              background: "linear-gradient(135deg, rgba(212,168,71,0.10), rgba(245,158,11,0.06))",
+            }}
+          >
+            <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg">
+              ⭐
+            </div>
+            <div className="flex items-center gap-1 mb-1">
+              <Crown size={10} className="text-amber-600" />
+              <span className="text-[10px] font-black text-amber-700 uppercase">Premium</span>
+            </div>
+            <ul className="space-y-1 text-[10px] font-bold text-gray-700 leading-snug">
+              <li>✓ 10 perguntas/dia</li>
+              <li>✓ Histórias ilimitadas</li>
+              <li>✓ Narração por voz</li>
+              <li>✓ Tudo desbloqueado</li>
+            </ul>
+          </div>
+        </motion.div>
 
         {/* Billing toggle */}
         <motion.div
@@ -377,7 +457,7 @@ const Paywall = ({ onLogin }: PaywallProps) => {
             transition={{ delay: 0.4 }}
           >
             <button
-              onClick={() => window.history.back()}
+              onClick={handleBack}
               className="text-xs text-gray-400 font-bold underline"
             >
               Continuar grátis (3 perguntas)

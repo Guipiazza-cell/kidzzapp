@@ -7,6 +7,10 @@ interface SubscribeBannerProps {
   isPremium: boolean;
 }
 
+const openPlans = () => {
+  window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+};
+
 const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: SubscribeBannerProps) => {
   if (isPremium) {
     return (
@@ -34,7 +38,7 @@ const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: 
 
   return (
     <motion.button
-      onClick={onOpenParentalGate}
+      onClick={openPlans}
       className="w-full flex items-center justify-between px-4 py-2.5 border-b border-amber-200/30"
       style={{
         background: isOver
