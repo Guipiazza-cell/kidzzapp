@@ -63,6 +63,19 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
         {/* Soft forest overlay bg */}
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/50 via-amber-50/30 to-orange-50/50 pointer-events-none" />
 
+        {/* Top bar with back button */}
+        <div className="relative z-20 flex items-center justify-between px-4 pt-3 pb-1">
+          <button
+            onClick={handleBack}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/70 backdrop-blur-sm shadow-sm active:scale-90 transition-transform"
+            aria-label="Voltar"
+          >
+            <ArrowLeft size={18} className="text-gray-700" />
+          </button>
+          <span className="text-[11px] font-extrabold text-gray-500 uppercase tracking-wider">Planos KIDZZ</span>
+          <div className="w-10" />
+        </div>
+
         <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
           {/* Mascots */}
           <div className="flex items-end gap-4 mb-4">
