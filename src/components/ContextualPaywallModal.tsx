@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, Crown, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPaywallCopy, type PaywallContext } from "@/lib/contextualPaywall";
 
@@ -49,12 +49,23 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
             </button>
 
             {/* Hero */}
-            <div className="px-6 pt-7 pb-5 bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 text-center">
+            <div className="px-6 pt-7 pb-5 bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 text-center relative">
+              {/* Badge de urgência no topo */}
+              <motion.div
+                initial={{ scale: 0, y: -10 }}
+                animate={{ scale: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 260, delay: 0.05 }}
+                className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1"
+              >
+                <Lock size={10} />
+                LIMITE ATINGIDO
+              </motion.div>
+
               <motion.div
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                className="text-5xl mb-2"
+                className="text-5xl mb-2 mt-2"
               >
                 {copy.emoji}
               </motion.div>
@@ -96,17 +107,25 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
 
               <motion.button
                 onClick={handleCTA}
-                whileTap={{ scale: 0.97 }}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
+                whileTap={{ scale: 0.96 }}
+                animate={{ scale: [1, 1.025, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                className="w-full py-5 rounded-2xl bg-gradient-to-r from-kid-purple via-pink-500 to-kid-pink text-white font-black text-base shadow-2xl flex items-center justify-center gap-2 relative overflow-hidden"
               >
-                <Sparkles size={16} />
-                {copy.cta}
+                <motion.div
+                  className="absolute inset-0 bg-white/20"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <Crown size={20} className="relative" />
+                <span className="relative">Assinar agora</span>
+                <Sparkles size={16} className="relative" />
               </motion.button>
 
-              <p className="text-center text-[10px] text-gray-400 font-bold">
-                🛡️ Garantia de 7 dias · Cancele quando quiser
+              <p className="text-center text-[11px] text-gray-500 font-bold">
+                🛡️ Garantia 7 dias · Cancele quando quiser · 1 toque
               </p>
-              <button onClick={onClose} className="w-full text-[11px] text-gray-400 font-bold underline-offset-2 hover:underline">
+              <button onClick={onClose} className="w-full text-[11px] text-gray-400 font-bold underline-offset-2 hover:underline py-1">
                 Agora não
               </button>
             </div>

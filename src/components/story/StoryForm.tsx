@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Lock, Crown } from "lucide-react";
 
 interface StoryFormProps {
   childName: string;
   onGenerate: (age: number, interests: string) => void;
   isLoading: boolean;
+  storiesRemaining?: number;
+  isPremium?: boolean;
+  onUpgrade?: () => void;
 }
 
 const INTEREST_OPTIONS = [
@@ -19,7 +22,7 @@ const INTEREST_OPTIONS = [
   { id: "oceano", label: "Oceano", emoji: "🌊" },
 ];
 
-const StoryForm = ({ childName, onGenerate, isLoading }: StoryFormProps) => {
+const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isPremium = false, onUpgrade }: StoryFormProps) => {
   const [age, setAge] = useState("");
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
@@ -91,24 +94,77 @@ const StoryForm = ({ childName, onGenerate, isLoading }: StoryFormProps) => {
         </div>
       </div>
 
-      <motion.button
-        onClick={handleSubmit}
-        disabled={!age || selectedInterests.length === 0 || isLoading}
-        className="w-full py-5 rounded-2xl kid-gradient-premium text-white font-extrabold text-base shadow-2xl flex items-center justify-center gap-2 disabled:opacity-40 active:scale-95"
-        whileTap={{ scale: 0.97 }}
-      >
-        {isLoading ? (
-          <>
-            <Loader2 size={20} className="animate-spin" />
-            Criando história mágica...
-          </>
-        ) : (
-          <>
-            <Sparkles size={20} />
-            Gerar História Personalizada 🚀
-          </>
-        )}
-      </motion.button>
+      {/* Aviso de quota / bloqueio */}
+      {!isPremium && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-2xl px-4 py-3 flex items-center gap-3 border-2 ${
+            storiesRemaining > 0
+              ? "bg-amber-50/90 border-amber-300"
+              : "bg-rose-50/95 border-rose-300"
+          }`}
+        >
+          {storiesRemaining > 0 ? (
+            <>
+              <Sparkles size={18} className="text-amber-600 flex-shrink-0" />
+              <p className="text-[13px] font-extrabold text-amber-800 leading-tight">
+                Você tem <span className="text-amber-900">1 história grátis</span> para experimentar! ✨
+              </p>
+            </>
+          ) : (
+            <>
+              <Lock size={18} className="text-rose-600 flex-shrink-0" />
+              <p className="text-[13px] font-extrabold text-rose-800 leading-tight">
+                Sua história grátis já foi criada. Assine para criar histórias ilimitadas!
+              </p>
+            </>
+          )}
+        </motion.div>
+      )}
+
+      {/* Botão principal: Gerar OU Assinar (quando bloqueado) */}
+      {!isPremium && storiesRemaining <= 0 ? (
+        <motion.button
+          onClick={onUpgrade}
+          className="w-full py-5 rounded-2xl bg-gradient-to-r from-kid-purple via-pink-500 to-kid-pink text-white font-extrabold text-base shadow-2xl flex items-center justify-center gap-2 active:scale-95 relative overflow-hidden"
+          whileTap={{ scale: 0.97 }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Crown size={22} />
+          Assinar agora · Histórias ilimitadas
+        </motion.button>
+      ) : (
+        <motion.button
+          onClick={handleSubmit}
+          disabled={!age || selectedInterests.length === 0 || isLoading}
+          className="w-full py-5 rounded-2xl kid-gradient-premium text-white font-extrabold text-base shadow-2xl flex items-center justify-center gap-2 disabled:opacity-40 active:scale-95"
+          whileTap={{ scale: 0.97 }}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 size={20} className="animate-spin" />
+              Criando história mágica...
+            </>
+          ) : (
+            <>
+              <Sparkles size={20} />
+              Gerar História Personalizada 🚀
+            </>
+          )}
+        </motion.button>
+      )}
+
+      {/* Link sutil para assinar mesmo com história disponível */}
+      {!isPremium && storiesRemaining > 0 && onUpgrade && (
+        <button
+          onClick={onUpgrade}
+          className="w-full text-center text-[11px] font-bold text-kid-purple underline-offset-2 hover:underline"
+        >
+          💛 Quero histórias ilimitadas — ver planos
+        </button>
+      )}
     </motion.div>
   );
 };
