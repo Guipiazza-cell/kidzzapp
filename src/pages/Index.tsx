@@ -112,6 +112,33 @@ const Index = () => {
     return () => clearInterval(iv);
   }, [profile?.is_premium]);
 
+  // Global paywall opener — any feature can dispatch `kidzz:open-paywall`
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      const ctx = (detail.context as PaywallContext) || "question_limit";
+      setContextualPaywall({ open: true, context: ctx, meta: detail.meta });
+    };
+    window.addEventListener("kidzz:open-paywall", handler);
+    return () => window.removeEventListener("kidzz:open-paywall", handler);
+  }, []);
+
+  // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
+  useEffect(() => {
+    if (profile?.is_premium) return;
+    const used = profile?.questions_used ?? 0;
+    if (used > 0 && used === 2) {
+      // Última pergunta grátis: aviso suave
+      const key = "kidzz_warned_last_free";
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, "1");
+        setTimeout(() => {
+          setContextualPaywall({ open: true, context: "question_limit", meta: { count: used } });
+        }, 1500);
+      }
+    }
+  }, [profile?.questions_used, profile?.is_premium]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
