@@ -457,9 +457,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  // Free trial vitalício (não reseta): 3 perguntas + 1 história de demonstração
   const MAX_FREE_QUESTIONS = 3;
+  const MAX_FREE_STORIES = 1;
+  // Limites diários para assinantes
   const DAILY_QUESTION_LIMIT = 10;
   const DAILY_STORY_LIMIT = 3;
+  const SUPER_DAILY_STORY_LIMIT = 10;
 
   const canAskQuestion = useCallback(() => {
     if (!profile) return false;
@@ -470,9 +474,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const canGenerateStory = useCallback(() => {
     if (!profile) return false;
-    if (tier !== "super_premium") return false;
     const p = resetDailyIfNeeded(profile);
-    return p.stories_used < DAILY_STORY_LIMIT;
+    // Super premium: limite diário maior
+    if (tier === "super_premium") return p.stories_used < SUPER_DAILY_STORY_LIMIT;
+    // Premium: limite diário padrão
+    if (p.is_premium) return p.stories_used < DAILY_STORY_LIMIT;
+    // Free: 1 história de demonstração vitalícia
+    return p.stories_used < MAX_FREE_STORIES;
   }, [profile, tier, resetDailyIfNeeded]);
 
   const questionsRemaining = useCallback(() => {
@@ -485,8 +493,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const storiesRemaining = useCallback(() => {
     if (!profile) return 0;
     const p = resetDailyIfNeeded(profile);
-    return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
-  }, [profile, resetDailyIfNeeded]);
+    if (tier === "super_premium") return Math.max(0, SUPER_DAILY_STORY_LIMIT - p.stories_used);
+    if (p.is_premium) return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
+    return Math.max(0, MAX_FREE_STORIES - p.stories_used);
+  }, [profile, tier, resetDailyIfNeeded]);
 
   const computeLevel = (pts: number): string => {
     if (pts >= 100) return "pensador";
