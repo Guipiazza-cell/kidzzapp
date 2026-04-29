@@ -107,17 +107,25 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
 
               <motion.button
                 onClick={handleCTA}
-                whileTap={{ scale: 0.97 }}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
+                whileTap={{ scale: 0.96 }}
+                animate={{ scale: [1, 1.025, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                className="w-full py-5 rounded-2xl bg-gradient-to-r from-kid-purple via-pink-500 to-kid-pink text-white font-black text-base shadow-2xl flex items-center justify-center gap-2 relative overflow-hidden"
               >
-                <Sparkles size={16} />
-                {copy.cta}
+                <motion.div
+                  className="absolute inset-0 bg-white/20"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <Crown size={20} className="relative" />
+                <span className="relative">Assinar agora</span>
+                <Sparkles size={16} className="relative" />
               </motion.button>
 
-              <p className="text-center text-[10px] text-gray-400 font-bold">
-                🛡️ Garantia de 7 dias · Cancele quando quiser
+              <p className="text-center text-[11px] text-gray-500 font-bold">
+                🛡️ Garantia 7 dias · Cancele quando quiser · 1 toque
               </p>
-              <button onClick={onClose} className="w-full text-[11px] text-gray-400 font-bold underline-offset-2 hover:underline">
+              <button onClick={onClose} className="w-full text-[11px] text-gray-400 font-bold underline-offset-2 hover:underline py-1">
                 Agora não
               </button>
             </div>
