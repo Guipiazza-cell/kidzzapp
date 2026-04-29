@@ -125,6 +125,15 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
               <p className="text-center text-[11px] text-gray-500 font-bold">
                 🛡️ Garantia 7 dias · Cancele quando quiser · 1 toque
               </p>
+              <button
+                onClick={() => {
+                  onClose();
+                  window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+                }}
+                className="w-full py-2.5 rounded-xl border-2 border-amber-300 bg-amber-50/60 text-amber-800 text-xs font-extrabold active:scale-95 transition-transform"
+              >
+                Ver todos os planos →
+              </button>
               <button onClick={onClose} className="w-full text-[11px] text-gray-400 font-bold underline-offset-2 hover:underline py-1">
                 Agora não
               </button>
