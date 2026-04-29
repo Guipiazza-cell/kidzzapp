@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,19 +7,67 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const FREE_STORY_LIMIT = 1;
+const DAILY_STORY_LIMIT = 3;
+const SUPER_DAILY_STORY_LIMIT = 10;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { childName, childAvatar, age, interests, ageRange } = await req.json();
+    const { childName, childAvatar, age, interests, ageRange, userId } = await req.json();
 
     if (!childName || !age || !interests) {
       return new Response(
         JSON.stringify({ error: "Dados incompletos." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Server-side quota validation (defense in depth)
+    if (userId) {
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } }
+      );
+
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("stories_used, is_premium, premium_source, last_usage_date")
+        .eq("id", userId)
+        .single();
+
+      if (profile) {
+        const today = new Date().toISOString().slice(0, 10);
+        let storiesUsed = profile.stories_used ?? 0;
+        const isPremium = !!profile.is_premium;
+        const isSuper = profile.premium_source === "super_premium";
+        const limit = isSuper ? SUPER_DAILY_STORY_LIMIT : isPremium ? DAILY_STORY_LIMIT : FREE_STORY_LIMIT;
+
+        if (isPremium && profile.last_usage_date !== today) {
+          storiesUsed = 0;
+        }
+
+        if (storiesUsed >= limit) {
+          return new Response(
+            JSON.stringify({
+              error: "LIMIT_REACHED",
+              message: isPremium
+                ? "Limite diário de histórias atingido. Volte amanhã!"
+                : "Você já usou sua história gratuita. Assine para criar histórias ilimitadas!",
+            }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        await supabaseAdmin
+          .from("profiles")
+          .update({ stories_used: storiesUsed + 1, last_usage_date: today })
+          .eq("id", userId);
+      }
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

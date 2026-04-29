@@ -20,7 +20,7 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 type Step = "intro" | "avatar" | "form" | "display";
 
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
-  const { profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
+  const { user, profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
@@ -41,7 +41,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const handleGenerate = useCallback(async (age: number, interests: string) => {
     if (!avatar) return;
     if (!canGenerateStory()) {
-      toast.error("Você atingiu o limite de 3 histórias por dia! Volte amanhã 💛");
+      const isPremium = !!profile?.is_premium;
+      if (isPremium) {
+        toast.error("Você atingiu o limite de histórias por hoje! Volte amanhã 💛");
+      } else {
+        toast.info("Sua história grátis já foi criada! Desbloqueie histórias ilimitadas ✨");
+        window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
+      }
       return;
     }
     setIsGenerating(true);
@@ -66,7 +72,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           childAvatar: avatar,
           age,
           interests,
-          ageRange: profile?.age_range || "3-7"
+          ageRange: profile?.age_range || "3-7",
+          userId: user?.id ?? null,
         })
       });
 
