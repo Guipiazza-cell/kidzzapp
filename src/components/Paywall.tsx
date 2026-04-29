@@ -134,7 +134,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
           </motion.button>
 
           <motion.button
-            onClick={() => window.history.back()}
+            onClick={handleBack}
             className="mt-4 text-gray-400 text-xs font-bold underline"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -382,7 +382,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
             transition={{ delay: 0.4 }}
           >
             <button
-              onClick={() => window.history.back()}
+              onClick={handleBack}
               className="text-xs text-gray-400 font-bold underline"
             >
               Continuar grátis (3 perguntas)
