@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, Crown, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPaywallCopy, type PaywallContext } from "@/lib/contextualPaywall";
 
@@ -49,12 +49,23 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
             </button>
 
             {/* Hero */}
-            <div className="px-6 pt-7 pb-5 bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 text-center">
+            <div className="px-6 pt-7 pb-5 bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 text-center relative">
+              {/* Badge de urgência no topo */}
+              <motion.div
+                initial={{ scale: 0, y: -10 }}
+                animate={{ scale: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 260, delay: 0.05 }}
+                className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1"
+              >
+                <Lock size={10} />
+                LIMITE ATINGIDO
+              </motion.div>
+
               <motion.div
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                className="text-5xl mb-2"
+                className="text-5xl mb-2 mt-2"
               >
                 {copy.emoji}
               </motion.div>
