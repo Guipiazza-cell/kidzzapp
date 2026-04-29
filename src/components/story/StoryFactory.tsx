@@ -223,7 +223,16 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         }
 
         {step === "avatar" && <AvatarCustomization childName={childName} onComplete={handleAvatarComplete} />}
-        {step === "form" && <StoryForm childName={childName} onGenerate={handleGenerate} isLoading={isGenerating} />}
+        {step === "form" && (
+          <StoryForm
+            childName={childName}
+            onGenerate={handleGenerate}
+            isLoading={isGenerating}
+            storiesRemaining={storiesRemaining()}
+            isPremium={!!profile?.is_premium}
+            onUpgrade={() => window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }))}
+          />
+        )}
         {step === "display" && <StoryDisplay story={story} images={images} onReset={handleReset} onSpeak={handleSpeak} />}
       </div>
 
