@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star, Music2 } from "lucide-react";
+import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star, Music2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import aneImg from "@/assets/ane-chameleon.png";
@@ -8,12 +8,17 @@ import musicKidzz from "@/assets/kidzz/music.png";
 
 interface PaywallProps {
   onLogin: () => void;
+  onBack?: () => void;
 }
 
 type BillingPeriod = "annual" | "monthly";
 type PlanKey = "premium" | "premium_annual" | "super_premium";
 
-const Paywall = ({ onLogin }: PaywallProps) => {
+const Paywall = ({ onLogin, onBack }: PaywallProps) => {
+  const handleBack = () => {
+    if (onBack) onBack();
+    else window.history.back();
+  };
   const { user, handleCheckout, profile } = useAuth();
   const childName = profile?.child_name || "seu filho";
   const questionsUsed = profile?.questions_used ?? 0;
