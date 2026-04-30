@@ -29,6 +29,10 @@ export default defineConfig(({ mode }) => ({
       ],
       manifest: false, // we ship our own /manifest.json
       workbox: {
+        // Ativa nova versão imediatamente, sem esperar fechar todas as abas
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         // Never cache OAuth callbacks or supabase functions
         navigateFallbackDenylist: [
           /^\/~oauth/,
@@ -38,6 +42,16 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,png,jpg,jpeg,svg,webp,woff2,ttf}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
+          // HTML navigations — sempre rede primeiro, evita shell preso
+          {
+            urlPattern: ({ request }: any) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "kidzz-html-v1",
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
           // Static assets — cache first
           {
             urlPattern: /\.(?:png|jpg|jpeg|svg|webp|gif|woff2|ttf)$/,
