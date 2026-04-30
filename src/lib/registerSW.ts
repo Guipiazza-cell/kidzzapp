@@ -1,15 +1,11 @@
 /**
- * Service Worker registration with strict guards.
+ * Service Worker registration with strict guards + aggressive auto-update.
  *
- * The Lovable editor renders the app inside an iframe on a *.lovableproject.com
- * or id-preview--*.lovable.app host. A Service Worker registered there will
- * cache stale builds and break HMR. So we register ONLY in:
- *   - production builds
- *   - top-level windows (not iframes)
- *   - non-preview hosts
- *
- * On preview hosts we proactively unregister any stale SW that might exist
- * from a previous session.
+ * - Registra SW apenas em produção, fora de iframe e fora de hosts de preview.
+ * - Em preview/iframe, desregistra qualquer SW antigo (evita versões presas).
+ * - Em produção: checa updates a cada 60s, no foco da aba e ao voltar online.
+ *   Quando uma nova versão é encontrada, ativa imediatamente (skipWaiting)
+ *   e faz reload da página para garantir que o usuário sempre veja a build mais recente.
  */
 
 const isInIframe = (() => {
@@ -32,31 +28,70 @@ const isProdBuild = import.meta.env.PROD;
 export async function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
 
-  // Always cleanup stale SWs in preview/iframe contexts
+  // Cleanup agressivo em preview/iframe/dev
   if (isPreviewHost || isInIframe || !isProdBuild) {
     try {
       const regs = await navigator.serviceWorker.getRegistrations();
       await Promise.all(regs.map((r) => r.unregister()));
+      // Limpa caches do workbox que possam ter sobrado
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
     } catch {
       /* noop */
     }
     return;
   }
 
-  // Production-only registration via vite-plugin-pwa virtual module.
   try {
     const { registerSW } = await import("virtual:pwa-register");
-    registerSW({
+
+    let reloading = false;
+    const updateSW = registerSW({
       immediate: true,
-      onRegisteredSW(_swUrl, _registration) {
-        // SW active
+      onNeedRefresh() {
+        // Nova versão disponível: aplica e recarrega imediatamente.
+        // (Como usamos registerType: "autoUpdate" no vite.config, o SW
+        // já chama skipWaiting; aqui garantimos o reload.)
+        if (reloading) return;
+        reloading = true;
+        // Pequeno delay para o SW assumir o controle antes do reload
+        setTimeout(() => window.location.reload(), 50);
+      },
+      onRegisteredSW(_swUrl, registration) {
+        if (!registration) return;
+
+        // Checagem periódica (a cada 60s) por novas versões
+        const checkForUpdate = () => {
+          registration.update().catch(() => {});
+        };
+        setInterval(checkForUpdate, 60 * 1000);
+
+        // Checa também quando a aba volta a ficar visível ou online
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") checkForUpdate();
+        });
+        window.addEventListener("online", checkForUpdate);
+        window.addEventListener("focus", checkForUpdate);
       },
       onOfflineReady() {
-        // App ready to work offline
+        // App pronto para uso offline
       },
     });
+
+    // Quando o SW assume o controle (após skipWaiting), recarrega para
+    // garantir que o cliente esteja rodando a nova versão.
+    let refreshed = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshed) return;
+      refreshed = true;
+      window.location.reload();
+    });
+
+    // Mantém referência (evita tree-shake) e expõe para debug eventual
+    (window as any).__updateSW = updateSW;
   } catch (e) {
-    // Module not available (e.g. plugin not built yet) — fail silently
     console.warn("[pwa] register failed", e);
   }
 }
