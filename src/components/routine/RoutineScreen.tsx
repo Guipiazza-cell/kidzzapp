@@ -29,6 +29,37 @@ import { haptic } from "@/lib/haptics";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import confetti from "canvas-confetti";
+import { toast } from "sonner";
+
+const ENCOURAGEMENTS = [
+  "Incrível! Você arrasou! 🌟",
+  "Que criança incrível! ⭐",
+  "Kidzz ficou super feliz! 💛",
+  "Missão cumprida! 🎯",
+  "Você é demais! 🚀",
+  "Continua assim, campeão(ã)! 🏆",
+];
+
+// Lightweight "ding" using WebAudio (no asset needed).
+function playDing() {
+  try {
+    const Ctx = (window.AudioContext || (window as any).webkitAudioContext);
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(880, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.18);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.5);
+    setTimeout(() => { try { ctx.close(); } catch { /* noop */ } }, 700);
+  } catch { /* noop */ }
+}
 
 const HUE_MAP: Record<string, number> = {
   "rosa-encantado": 0,
