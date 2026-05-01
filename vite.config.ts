@@ -85,7 +85,7 @@ export default defineConfig(({ mode }) => ({
           },
           // Static assets — network-first para não manter imagens/JS/CSS antigos.
           {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|webp|gif|woff2|ttf)$/,
+            urlPattern: /\.(?:js|css|png|jpg|jpeg|svg|webp|gif|woff2|ttf)$/,
             handler: "NetworkFirst",
             options: {
               cacheName: `kidzz-assets-${buildVersion}`,
