@@ -182,6 +182,10 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
   }
+  // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
+  if (showStatesIntro) {
+    return <KidzzStatesIntro onDone={() => setShowStatesIntro(false)} />;
+  }
   // Notification time prompt is now contextual (after first answer), not blocking onboarding
 
   const childName = profile.child_name;
