@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -10,7 +10,7 @@ const buildVersion =
   process.env.CF_PAGES_COMMIT_SHA ||
   `${Date.now()}`;
 
-const appVersionPlugin = () => ({
+const appVersionPlugin = (): Plugin => ({
   name: "kidzz-app-version",
   transformIndexHtml(html: string) {
     if (process.env.NODE_ENV !== "production") return html;
