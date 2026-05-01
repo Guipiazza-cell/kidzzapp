@@ -115,7 +115,7 @@ export async function checkForNewAppVersion(force = false) {
       const storedVersion = localStorage.getItem(CURRENT_VERSION_KEY);
       if (storedVersion !== APP_VERSION) {
         localStorage.setItem(CURRENT_VERSION_KEY, APP_VERSION);
-        if (storedVersion) void clearAppCaches();
+        void clearAppCaches();
       }
     } catch {
       /* storage may be unavailable */
