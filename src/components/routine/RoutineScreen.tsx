@@ -289,7 +289,9 @@ const RoutineScreen = () => {
   const [view, setView] = useState<TodayView>(() => getToday());
   const [streak, setStreak] = useState(() => getStreak());
   const [celebrate, setCelebrate] = useState(false);
+  const [kidzzBounce, setKidzzBounce] = useState(0); // increments to retrigger animation
   const memorySaved = useRef(false);
+  const encouragementIdx = useRef(0);
 
   // Refresh on mount + every minute (period rollover) + on visibility change
   useEffect(() => {
@@ -320,20 +322,33 @@ const RoutineScreen = () => {
     if (result.bonusGained > 0) {
       setTimeout(() => showXpGained(result.bonusGained, "BÔNUS"), 350);
     }
-    // Micro confetti at the card area (lightweight burst)
+    // Kidzz reaction (jump/bounce)
+    setKidzzBounce(n => n + 1);
+    // Encouragement toast (rotating)
+    const phrase = ENCOURAGEMENTS[encouragementIdx.current % ENCOURAGEMENTS.length];
+    encouragementIdx.current += 1;
+    toast.success(phrase, { duration: 1500, position: "bottom-center" });
+    // Soft celebratory ding
+    playDing();
+    // Confetti shower (~1.5s)
+    const colors = ["#F59E0B", "#EC4899", "#A855F7", "#10B981", "#3B82F6", "#FFD86E"];
     confetti({
-      particleCount: 18,
-      spread: 55,
-      startVelocity: 28,
-      origin: { y: 0.55 },
-      scalar: 0.7,
-      ticks: 90,
+      particleCount: 60,
+      spread: 75,
+      startVelocity: 38,
+      origin: { y: 0.6 },
+      scalar: 0.9,
+      ticks: 140,
+      colors,
     });
+    setTimeout(() => {
+      confetti({ particleCount: 35, spread: 90, startVelocity: 30, origin: { y: 0.55 }, scalar: 0.8, ticks: 110, colors });
+    }, 250);
     if (result.allDone) {
       setCelebrate(true);
       // Bigger confetti for full-day completion
       setTimeout(() => {
-        confetti({ particleCount: 90, spread: 100, origin: { y: 0.5 }, ticks: 160 });
+        confetti({ particleCount: 120, spread: 110, origin: { y: 0.5 }, ticks: 180, colors });
       }, 200);
       if (!memorySaved.current) {
         memorySaved.current = true;
