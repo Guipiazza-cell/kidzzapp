@@ -1,30 +1,16 @@
-// Pré-carrega imagens dos mascotes e backgrounds críticos no startup
-// para evitar flicker ao abrir cada aba.
-import pixelImg from "@/assets/pixel-chameleon.png";
-import aneImg from "@/assets/ane-chameleon.png";
-import chameleonBlue from "@/assets/chameleon-blue.png";
-import chameleonHappy from "@/assets/chameleon-happy.png";
-import chameleonDark from "@/assets/chameleon-dark.png";
-import chameleonRed from "@/assets/chameleon-red.png";
-import chameleonMain from "@/assets/chameleon.png";
+// Pré-carrega APENAS os assets críticos da primeira tela (splash + bg + mascote home).
+// Todos os outros mascotes carregam sob demanda quando a aba correspondente abre.
+// Antes: 14 imagens (~25MB). Agora: 3 imagens (~600KB) — UX inicial muito mais leve.
+import splashMascot from "@/assets/splash-mascot.png";
 import forestBg from "@/assets/forest-bg-light.jpg";
+import cosmicMascot from "@/assets/kidzz/cosmic.png";
 
-const ASSETS = [
-  pixelImg,
-  aneImg,
-  chameleonBlue,
-  chameleonHappy,
-  chameleonDark,
-  chameleonRed,
-  chameleonMain,
-  forestBg,
-];
+const CRITICAL_ASSETS = [splashMascot, forestBg, cosmicMascot];
 
 export function preloadAssets() {
   if (typeof window === "undefined") return;
-  // Use requestIdleCallback when available so preload doesn't block first paint.
   const run = () => {
-    ASSETS.forEach((src) => {
+    CRITICAL_ASSETS.forEach((src) => {
       const img = new Image();
       img.decoding = "async";
       img.src = src;
