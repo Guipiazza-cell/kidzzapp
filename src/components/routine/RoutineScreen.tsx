@@ -378,13 +378,19 @@ const RoutineScreen = () => {
           animate={{ y: [0, -4, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
-          <KidzzChameleon
-            size="xl"
-            state={kidzzState}
-            mood={kidzzMood as any}
-            interactive={false}
-            showParticles
-          />
+          <motion.div
+            key={`bounce-${kidzzBounce}`}
+            animate={kidzzBounce > 0 ? { y: [0, -14, 0, -6, 0], scale: [1, 1.06, 1, 1.02, 1] } : {}}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            <KidzzChameleon
+              size="xl"
+              state={kidzzState}
+              mood={kidzzMood as any}
+              interactive={false}
+              showParticles
+            />
+          </motion.div>
         </motion.div>
 
         <motion.div
