@@ -1,12 +1,12 @@
 /**
- * KIDZZ ROUTINE — Daily habit loop with 9 balanced tasks/day across 3 periods.
+ * KIDZZ ROUTINE — Daily habit loop with 15 balanced tasks/day across 3 periods.
  *
  * Goals:
- *  - Build a daily habit loop (morning/afternoon/night)
- *  - 40 curated tasks across 5 categories (rotina, aprendizado, emoção, energia, vida)
+ *  - Build a daily habit loop (morning/afternoon/night) — 5 tasks per period
+ *  - 45+ curated tasks across 5 categories (rotina, aprendizado, emoção, energia, vida)
  *  - Deterministic per-day generation (same day = same tasks, no flicker)
  *  - Auto-completes when child uses integrated app features (music/story/question)
- *  - Anti-addiction: hard cap at 9 tasks/day, no punishment on miss
+ *  - Anti-addiction: hard cap at 15 tasks/day, no punishment on miss
  *
  * Pure localStorage. Resets at midnight.
  */
