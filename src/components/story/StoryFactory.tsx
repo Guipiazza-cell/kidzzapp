@@ -180,7 +180,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 16 }}
             >
-              <KidzzChameleon state="explorer" mood="happy" size="xl" interactive showParticles />
+              <KidzzChameleon state="cosmic" mood="curious" size="xl" interactive showParticles />
             </motion.div>
             <h2 className="text-2xl font-extrabold text-gray-800 drop-shadow-sm">Uma história especial para {childName} 📖</h2>
             <p className="text-gray-500 text-sm max-w-[280px]">
