@@ -179,10 +179,14 @@ const TaskCard = ({
         {done ? (
           <motion.div
             className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ background: accent, color: "white", boxShadow: `0 4px 14px ${accent.replace(")", " / 0.45)")}` }}
+            style={{
+              background: "linear-gradient(135deg, hsl(140 70% 48%), hsl(150 75% 40%))",
+              color: "white",
+              boxShadow: "0 4px 14px hsl(140 70% 45% / 0.55)",
+            }}
             initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: [0, 1.25, 1], rotate: 0 }}
-            transition={{ type: "spring", stiffness: 320, damping: 18 }}
+            animate={{ scale: [0, 1.35, 1], rotate: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 16 }}
             aria-label="Concluído"
           >
             <Check size={20} strokeWidth={3} />
