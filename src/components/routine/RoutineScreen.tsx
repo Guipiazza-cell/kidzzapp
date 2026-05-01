@@ -29,6 +29,37 @@ import { haptic } from "@/lib/haptics";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import confetti from "canvas-confetti";
+import { toast } from "sonner";
+
+const ENCOURAGEMENTS = [
+  "Incrível! Você arrasou! 🌟",
+  "Que criança incrível! ⭐",
+  "Kidzz ficou super feliz! 💛",
+  "Missão cumprida! 🎯",
+  "Você é demais! 🚀",
+  "Continua assim, campeão(ã)! 🏆",
+];
+
+// Lightweight "ding" using WebAudio (no asset needed).
+function playDing() {
+  try {
+    const Ctx = (window.AudioContext || (window as any).webkitAudioContext);
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(880, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.18);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.5);
+    setTimeout(() => { try { ctx.close(); } catch { /* noop */ } }, 700);
+  } catch { /* noop */ }
+}
 
 const HUE_MAP: Record<string, number> = {
   "rosa-encantado": 0,
@@ -148,10 +179,14 @@ const TaskCard = ({
         {done ? (
           <motion.div
             className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ background: accent, color: "white", boxShadow: `0 4px 14px ${accent.replace(")", " / 0.45)")}` }}
+            style={{
+              background: "linear-gradient(135deg, hsl(140 70% 48%), hsl(150 75% 40%))",
+              color: "white",
+              boxShadow: "0 4px 14px hsl(140 70% 45% / 0.55)",
+            }}
             initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: [0, 1.25, 1], rotate: 0 }}
-            transition={{ type: "spring", stiffness: 320, damping: 18 }}
+            animate={{ scale: [0, 1.35, 1], rotate: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 16 }}
             aria-label="Concluído"
           >
             <Check size={20} strokeWidth={3} />
@@ -258,7 +293,9 @@ const RoutineScreen = () => {
   const [view, setView] = useState<TodayView>(() => getToday());
   const [streak, setStreak] = useState(() => getStreak());
   const [celebrate, setCelebrate] = useState(false);
+  const [kidzzBounce, setKidzzBounce] = useState(0); // increments to retrigger animation
   const memorySaved = useRef(false);
+  const encouragementIdx = useRef(0);
 
   // Refresh on mount + every minute (period rollover) + on visibility change
   useEffect(() => {
@@ -289,20 +326,33 @@ const RoutineScreen = () => {
     if (result.bonusGained > 0) {
       setTimeout(() => showXpGained(result.bonusGained, "BÔNUS"), 350);
     }
-    // Micro confetti at the card area (lightweight burst)
+    // Kidzz reaction (jump/bounce)
+    setKidzzBounce(n => n + 1);
+    // Encouragement toast (rotating)
+    const phrase = ENCOURAGEMENTS[encouragementIdx.current % ENCOURAGEMENTS.length];
+    encouragementIdx.current += 1;
+    toast.success(phrase, { duration: 1500, position: "bottom-center" });
+    // Soft celebratory ding
+    playDing();
+    // Confetti shower (~1.5s)
+    const colors = ["#F59E0B", "#EC4899", "#A855F7", "#10B981", "#3B82F6", "#FFD86E"];
     confetti({
-      particleCount: 18,
-      spread: 55,
-      startVelocity: 28,
-      origin: { y: 0.55 },
-      scalar: 0.7,
-      ticks: 90,
+      particleCount: 60,
+      spread: 75,
+      startVelocity: 38,
+      origin: { y: 0.6 },
+      scalar: 0.9,
+      ticks: 140,
+      colors,
     });
+    setTimeout(() => {
+      confetti({ particleCount: 35, spread: 90, startVelocity: 30, origin: { y: 0.55 }, scalar: 0.8, ticks: 110, colors });
+    }, 250);
     if (result.allDone) {
       setCelebrate(true);
       // Bigger confetti for full-day completion
       setTimeout(() => {
-        confetti({ particleCount: 90, spread: 100, origin: { y: 0.5 }, ticks: 160 });
+        confetti({ particleCount: 120, spread: 110, origin: { y: 0.5 }, ticks: 180, colors });
       }, 200);
       if (!memorySaved.current) {
         memorySaved.current = true;
@@ -332,13 +382,19 @@ const RoutineScreen = () => {
           animate={{ y: [0, -4, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
-          <KidzzChameleon
-            size="xl"
-            state={kidzzState}
-            mood={kidzzMood as any}
-            interactive={false}
-            showParticles
-          />
+          <motion.div
+            key={`bounce-${kidzzBounce}`}
+            animate={kidzzBounce > 0 ? { y: [0, -14, 0, -6, 0], scale: [1, 1.06, 1, 1.02, 1] } : {}}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            <KidzzChameleon
+              size="xl"
+              state={kidzzState}
+              mood={kidzzMood as any}
+              interactive={false}
+              showParticles
+            />
+          </motion.div>
         </motion.div>
 
         <motion.div

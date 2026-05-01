@@ -1,12 +1,12 @@
 /**
- * KIDZZ ROUTINE — Daily habit loop with 9 balanced tasks/day across 3 periods.
+ * KIDZZ ROUTINE — Daily habit loop with 15 balanced tasks/day across 3 periods.
  *
  * Goals:
- *  - Build a daily habit loop (morning/afternoon/night)
- *  - 40 curated tasks across 5 categories (rotina, aprendizado, emoção, energia, vida)
+ *  - Build a daily habit loop (morning/afternoon/night) — 5 tasks per period
+ *  - 45+ curated tasks across 5 categories (rotina, aprendizado, emoção, energia, vida)
  *  - Deterministic per-day generation (same day = same tasks, no flicker)
  *  - Auto-completes when child uses integrated app features (music/story/question)
- *  - Anti-addiction: hard cap at 9 tasks/day, no punishment on miss
+ *  - Anti-addiction: hard cap at 15 tasks/day, no punishment on miss
  *
  * Pure localStorage. Resets at midnight.
  */
@@ -46,6 +46,9 @@ export const TASKS: RoutineTask[] = [
   { id: "m-dress",      title: "Se vestir sozinho(a)",        short: "Você consegue!",               category: "rotina",      period: "morning", icon: "Shirt" },
   { id: "m-greet",      title: "Dar bom dia",                 short: "Pra alguém da família",        category: "emocao",      period: "morning", icon: "HandMetal" },
   { id: "m-fruit",      title: "Comer uma fruta",             short: "Energia natural",              category: "vida",        period: "morning", icon: "Apple" },
+  { id: "m-backpack",   title: "Organizar a mochila",         short: "Tudo no lugar pra escola",     category: "rotina",      period: "morning", icon: "Package" },
+  { id: "m-readbook",   title: "Ler um pouquinho",            short: "5 minutinhos de leitura",      category: "aprendizado", period: "morning", icon: "BookOpen" },
+  { id: "m-shoes",      title: "Calçar o sapato sozinho(a)",  short: "Você consegue!",               category: "rotina",      period: "morning", icon: "Footprints" },
 
   // 🌞 AFTERNOON
   { id: "a-story",      title: "Ouvir uma história",          short: "Fábrica de Histórias",         category: "aprendizado", period: "afternoon", icon: "BookOpen", integration: "story" },
@@ -61,6 +64,9 @@ export const TASKS: RoutineTask[] = [
   { id: "a-build",      title: "Montar algo legal",           short: "Blocos, lego, qualquer coisa", category: "aprendizado", period: "afternoon", icon: "Blocks" },
   { id: "a-thanks",     title: "Agradecer alguém",            short: "Um obrigado de verdade",       category: "emocao",      period: "afternoon", icon: "Heart" },
   { id: "a-walk",       title: "Caminhar um pouquinho",       short: "Mover o corpo",                category: "energia",     period: "afternoon", icon: "Footprints" },
+  { id: "a-homework",   title: "Fazer a lição de casa",       short: "Foco total!",                  category: "aprendizado", period: "afternoon", icon: "BookOpen" },
+  { id: "a-readstory",  title: "Ler uma história",            short: "Mergulhar num livro",          category: "aprendizado", period: "afternoon", icon: "BookOpen" },
+  { id: "a-water-plant",title: "Regar uma plantinha",         short: "Cuidar da natureza",           category: "vida",        period: "afternoon", icon: "Droplet" },
 
   // 🌙 NIGHT
   { id: "n-bath",       title: "Tomar banho",                 short: "Limpinho(a) e cheiroso(a)",    category: "rotina",      period: "night",   icon: "Droplet" },
@@ -77,6 +83,9 @@ export const TASKS: RoutineTask[] = [
   { id: "n-tidy",       title: "Deixar o quarto arrumado",    short: "Pra acordar feliz",            category: "rotina",      period: "night",   icon: "Package" },
   { id: "n-think",      title: "Pensar 'fui incrível hoje'",  short: "Você foi mesmo!",              category: "emocao",      period: "night",   icon: "Star" },
   { id: "n-water3",     title: "Beber água antes de deitar",  short: "Pequeno gole",                 category: "rotina",      period: "night",   icon: "Droplet" },
+  { id: "n-dishes",     title: "Ajudar com a louça do jantar",short: "Família feliz, casa em paz",   category: "vida",        period: "night",   icon: "Sparkles" },
+  { id: "n-readbook",   title: "Ler um livro com alguém",     short: "Aconchego antes de dormir",    category: "aprendizado", period: "night",   icon: "BookOpen" },
+  { id: "n-prepare",    title: "Separar a roupa de amanhã",   short: "Manhã sem correria",           category: "rotina",      period: "night",   icon: "Shirt" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -120,6 +129,7 @@ function seedFromDate(date: string) {
 }
 
 function pickBalanced(period: RoutinePeriod, exclude: Set<string>, rand: () => number): RoutineTask[] {
+  const TARGET = 5;
   const pool = TASKS.filter(t => t.period === period && !exclude.has(t.id));
   const byCat = new Map<RoutineCategory, RoutineTask[]>();
   for (const t of pool) {
@@ -134,22 +144,22 @@ function pickBalanced(period: RoutinePeriod, exclude: Set<string>, rand: () => n
     [cats[i], cats[j]] = [cats[j], cats[i]];
   }
   const picked: RoutineTask[] = [];
-  // First, pick 1 per category until we hit 3 or exhaust cats
+  // First, pick 1 per category until we hit TARGET or exhaust cats
   for (const c of cats) {
-    if (picked.length >= 3) break;
+    if (picked.length >= TARGET) break;
     const arr = byCat.get(c)!;
     const idx = Math.floor(rand() * arr.length);
     picked.push(arr[idx]);
   }
-  // Fallback: if not enough categories, fill from full pool
-  if (picked.length < 3) {
+  // Fill remaining slots from full pool (any category, no duplicates)
+  if (picked.length < TARGET) {
     const remaining = pool.filter(t => !picked.find(p => p.id === t.id));
-    while (picked.length < 3 && remaining.length) {
+    while (picked.length < TARGET && remaining.length) {
       const idx = Math.floor(rand() * remaining.length);
       picked.push(remaining.splice(idx, 1)[0]);
     }
   }
-  return picked.slice(0, 3);
+  return picked.slice(0, TARGET);
 }
 
 function generateForDay(date: string): string[] {
@@ -166,8 +176,8 @@ function generateForDay(date: string): string[] {
   const ids: string[] = [];
   (["morning", "afternoon", "night"] as RoutinePeriod[]).forEach(p => {
     let chosen = pickBalanced(p, exclude, rand);
-    // If exclusion left fewer than 3 in a period, retry without exclusion
-    if (chosen.length < 3) chosen = pickBalanced(p, new Set(), rand);
+    // If exclusion left fewer than 5 in a period, retry without exclusion
+    if (chosen.length < 5) chosen = pickBalanced(p, new Set(), rand);
     chosen.forEach(t => ids.push(t.id));
   });
   return ids;
@@ -179,7 +189,21 @@ export function getDayState(): DayState {
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as DayState;
-      if (parsed.date === date) return parsed;
+      // Migrate old days (when there were 9 tasks/day) to the new 15-task layout,
+      // preserving anything already completed.
+      if (parsed.date === date && parsed.taskIds?.length >= 15) return parsed;
+      if (parsed.date === date && parsed.taskIds?.length > 0) {
+        const newIds = generateForDay(date);
+        const merged = Array.from(new Set([...parsed.taskIds, ...newIds])).slice(0, 15);
+        const migrated: DayState = {
+          date,
+          taskIds: merged,
+          done: (parsed.done || []).filter(id => merged.includes(id)),
+          bonusGiven: parsed.bonusGiven ?? false,
+        };
+        safeWrite(KEY_DAY, JSON.stringify(migrated));
+        return migrated;
+      }
     } catch { /* noop */ }
   }
   // New day → generate
