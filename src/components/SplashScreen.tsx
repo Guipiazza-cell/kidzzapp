@@ -291,7 +291,6 @@ const SplashScreen = ({ onFinish, duration = 1400 }: SplashScreenProps) => {
           {LOADING_LABELS[labelIdx]}
         </p>
       </div>
-      </div>
     </div>
   );
 };
