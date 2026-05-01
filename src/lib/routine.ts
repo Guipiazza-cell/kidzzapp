@@ -46,6 +46,9 @@ export const TASKS: RoutineTask[] = [
   { id: "m-dress",      title: "Se vestir sozinho(a)",        short: "Você consegue!",               category: "rotina",      period: "morning", icon: "Shirt" },
   { id: "m-greet",      title: "Dar bom dia",                 short: "Pra alguém da família",        category: "emocao",      period: "morning", icon: "HandMetal" },
   { id: "m-fruit",      title: "Comer uma fruta",             short: "Energia natural",              category: "vida",        period: "morning", icon: "Apple" },
+  { id: "m-backpack",   title: "Organizar a mochila",         short: "Tudo no lugar pra escola",     category: "rotina",      period: "morning", icon: "Package" },
+  { id: "m-readbook",   title: "Ler um pouquinho",            short: "5 minutinhos de leitura",      category: "aprendizado", period: "morning", icon: "BookOpen" },
+  { id: "m-shoes",      title: "Calçar o sapato sozinho(a)",  short: "Você consegue!",               category: "rotina",      period: "morning", icon: "Footprints" },
 
   // 🌞 AFTERNOON
   { id: "a-story",      title: "Ouvir uma história",          short: "Fábrica de Histórias",         category: "aprendizado", period: "afternoon", icon: "BookOpen", integration: "story" },
@@ -61,6 +64,9 @@ export const TASKS: RoutineTask[] = [
   { id: "a-build",      title: "Montar algo legal",           short: "Blocos, lego, qualquer coisa", category: "aprendizado", period: "afternoon", icon: "Blocks" },
   { id: "a-thanks",     title: "Agradecer alguém",            short: "Um obrigado de verdade",       category: "emocao",      period: "afternoon", icon: "Heart" },
   { id: "a-walk",       title: "Caminhar um pouquinho",       short: "Mover o corpo",                category: "energia",     period: "afternoon", icon: "Footprints" },
+  { id: "a-homework",   title: "Fazer a lição de casa",       short: "Foco total!",                  category: "aprendizado", period: "afternoon", icon: "BookOpen" },
+  { id: "a-readstory",  title: "Ler uma história",            short: "Mergulhar num livro",          category: "aprendizado", period: "afternoon", icon: "BookOpen" },
+  { id: "a-water-plant",title: "Regar uma plantinha",         short: "Cuidar da natureza",           category: "vida",        period: "afternoon", icon: "Droplet" },
 
   // 🌙 NIGHT
   { id: "n-bath",       title: "Tomar banho",                 short: "Limpinho(a) e cheiroso(a)",    category: "rotina",      period: "night",   icon: "Droplet" },
@@ -77,6 +83,9 @@ export const TASKS: RoutineTask[] = [
   { id: "n-tidy",       title: "Deixar o quarto arrumado",    short: "Pra acordar feliz",            category: "rotina",      period: "night",   icon: "Package" },
   { id: "n-think",      title: "Pensar 'fui incrível hoje'",  short: "Você foi mesmo!",              category: "emocao",      period: "night",   icon: "Star" },
   { id: "n-water3",     title: "Beber água antes de deitar",  short: "Pequeno gole",                 category: "rotina",      period: "night",   icon: "Droplet" },
+  { id: "n-dishes",     title: "Ajudar com a louça do jantar",short: "Família feliz, casa em paz",   category: "vida",        period: "night",   icon: "Sparkles" },
+  { id: "n-readbook",   title: "Ler um livro com alguém",     short: "Aconchego antes de dormir",    category: "aprendizado", period: "night",   icon: "BookOpen" },
+  { id: "n-prepare",    title: "Separar a roupa de amanhã",   short: "Manhã sem correria",           category: "rotina",      period: "night",   icon: "Shirt" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
