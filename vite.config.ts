@@ -64,7 +64,7 @@ export default defineConfig(({ mode }) => ({
           /^\/api/,
           /supabase\.co\/(functions|auth|rest)/,
         ],
-        globPatterns: [],
+        globPatterns: ["version.json"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
           // Version endpoint — sempre rede, nunca cache.
