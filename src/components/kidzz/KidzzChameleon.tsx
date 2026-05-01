@@ -46,13 +46,11 @@ const stateAssets: Record<KidzzState, string> = {
   moon: moonImg,
   explorer: explorerImg,
   music: musicImg,
-  // "play" reusa explorer.png aplicando hue-rotate verde via CSS filter (ver stateImageFilter)
+  // "play" usa o mesmo asset aventureiro do explorer (já é verde/laranja vibrante)
   play: explorerImg,
 };
 
-const stateImageFilter: Partial<Record<KidzzState, string>> = {
-  play: "hue-rotate(50deg) saturate(1.45) brightness(1.05)",
-};
+const stateImageFilter: Partial<Record<KidzzState, string>> = {};
 
 const stateGlow: Record<KidzzState, string> = {
   cosmic: "radial-gradient(circle, hsl(220 80% 65% / 0.45), transparent 70%)",

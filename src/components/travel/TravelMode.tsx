@@ -267,7 +267,7 @@ const TravelMode = ({ onBack }: Props) => {
           <div className="relative flex-1 flex flex-col items-center justify-center px-6 gap-5 overflow-y-auto pb-6">
             {/* KIDZZ Explorer */}
             <KidzzChameleon
-              state="explorer"
+              state="cosmic"
               mood="guide"
               size="lg"
               showParticles
@@ -413,7 +413,7 @@ const TravelMode = ({ onBack }: Props) => {
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
             {/* KIDZZ Explorer */}
             <KidzzChameleon
-              state="explorer"
+              state="cosmic"
               mood="talking"
               size="lg"
               showParticles
@@ -491,7 +491,7 @@ const TravelMode = ({ onBack }: Props) => {
       <CosmicRoad>
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
           <KidzzChameleon
-            state="explorer"
+            state="cosmic"
             mood="happy"
             size="lg"
             showParticles
