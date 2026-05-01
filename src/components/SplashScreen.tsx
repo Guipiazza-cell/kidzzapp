@@ -3,16 +3,18 @@ import splashMascot from "@/assets/splash-mascot.png";
 
 interface SplashScreenProps {
   onFinish?: () => void;
-  /** Total visible duration in ms (excluding fade-out). Default 2500ms */
+  /** Total visible duration in ms (excluding fade-out). Default 1400ms */
   duration?: number;
 }
 
 const PARTICLE_COLORS = ["#FFD700", "#FF8C00", "#7C3AED", "#4CAF50"];
+const LOADING_LABELS = ["Acordando o Kidzz…", "Pintando a floresta…", "Pronto pra brincar! ✨"];
 
-const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
+const SplashScreen = ({ onFinish, duration = 1400 }: SplashScreenProps) => {
   const [fadingOut, setFadingOut] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
+  const [labelIdx, setLabelIdx] = useState(0);
 
   // Generate stable randomized particles once.
   const particles = useMemo(
@@ -34,10 +36,16 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
     const doneTimer = setTimeout(() => {
       setHidden(true);
       onFinish?.();
-    }, duration + 300);
+    }, duration + 250);
+    // Rotate the loading label in sync with the progress bar phases.
+    const stepMs = Math.max(220, Math.floor(duration / LOADING_LABELS.length));
+    const labelTimer = setInterval(() => {
+      setLabelIdx((i) => Math.min(LOADING_LABELS.length - 1, i + 1));
+    }, stepMs);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(doneTimer);
+      clearInterval(labelTimer);
     };
   }, [duration, onFinish]);
 
@@ -88,6 +96,18 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
         @keyframes splash-glow-pulse {
           0%, 100% { opacity: 0.45; transform: scale(1); }
           50% { opacity: 0.7; transform: scale(1.08); }
+        }
+        @keyframes splash-shimmer {
+          0% { transform: translateX(-120%) skewX(-20deg); }
+          100% { transform: translateX(220%) skewX(-20deg); }
+        }
+        @keyframes splash-dot-bounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+          40% { transform: translateY(-4px); opacity: 1; }
+        }
+        @keyframes splash-label-in {
+          0% { opacity: 0; transform: translateY(4px); }
+          100% { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
@@ -194,49 +214,82 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
         </p>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar + microinterações */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 w-[70%] max-w-xs"
-        style={{ bottom: "calc(env(safe-area-inset-bottom) + 48px)" }}
+        className="absolute left-1/2 -translate-x-1/2 w-[72%] max-w-xs flex flex-col items-center gap-3"
+        style={{ bottom: "calc(env(safe-area-inset-bottom) + 44px)" }}
       >
+        {/* Track */}
         <div
-          className="relative overflow-hidden"
+          className="relative overflow-hidden w-full"
           style={{
-            height: "16px",
-            borderRadius: "8px",
-            backgroundColor: "#E5E7EB",
-            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.08)",
+            height: "10px",
+            borderRadius: "999px",
+            backgroundColor: "rgba(232, 130, 26, 0.12)",
+            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.06)",
           }}
         >
+          {/* Fill */}
           <div
             style={{
-              height: "100%",
-              borderRadius: "8px",
+              position: "absolute",
+              inset: 0,
+              borderRadius: "999px",
               background:
-                "linear-gradient(90deg, #FF8C00 0%, #FFB347 50%, #FFD700 100%)",
-              // Sync progress bar exactly with `duration` so it reaches 100% the
-              // moment the fade-out begins.
-              animation: `splash-progress ${duration}ms ease-out forwards`,
-              boxShadow: "0 0 10px rgba(255,180,0,0.55)",
+                "linear-gradient(90deg, #E8821A 0%, #FFB347 55%, #FFD66B 100%)",
+              animation: `splash-progress ${duration}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+              boxShadow: "0 0 12px rgba(232,130,26,0.45)",
+              transformOrigin: "left center",
             }}
           />
-          {/* Twinkling stars inside the bar */}
-          <div className="absolute inset-0 flex items-center justify-around pointer-events-none">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span
-                key={i}
-                style={{
-                  fontSize: "10px",
-                  color: "#FFFFFF",
-                  textShadow: "0 0 4px rgba(255,255,255,0.9)",
-                  animation: `splash-star-twinkle 1.2s ease-in-out ${i * 0.18}s infinite`,
-                }}
-              >
-                ✨
-              </span>
-            ))}
-          </div>
+          {/* Shimmer overlay */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              width: "40%",
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.65) 50%, transparent 100%)",
+              animation: "splash-shimmer 1.1s ease-in-out infinite",
+              pointerEvents: "none",
+              mixBlendMode: "overlay",
+            }}
+          />
         </div>
+
+        {/* Bouncing dots */}
+        <div className="flex items-center gap-1.5" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "999px",
+                backgroundColor: "#E8821A",
+                display: "inline-block",
+                animation: `splash-dot-bounce 0.9s ease-in-out ${i * 0.15}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Dynamic loading label */}
+        <p
+          key={labelIdx}
+          style={{
+            fontFamily: "'Nunito', system-ui, sans-serif",
+            fontWeight: 700,
+            fontSize: "13px",
+            color: "#8A6A3D",
+            letterSpacing: "0.2px",
+            margin: 0,
+            animation: "splash-label-in 320ms ease-out both",
+          }}
+        >
+          {LOADING_LABELS[labelIdx]}
+        </p>
       </div>
     </div>
   );

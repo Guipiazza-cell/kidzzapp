@@ -50,10 +50,10 @@ const AppShell = () => {
     setSplashDone(true);
   };
 
-  // Safety net: ensure we never block UI longer than 2.5s + 300ms fade + buffer.
+  // Safety net: ensure we never block UI longer than splash duration + fade + buffer.
   useEffect(() => {
     if (splashDone) return;
-    const t = setTimeout(handleSplashFinish, 3200);
+    const t = setTimeout(handleSplashFinish, 2000);
     return () => clearTimeout(t);
   }, [splashDone]);
 
