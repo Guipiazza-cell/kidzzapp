@@ -3,16 +3,18 @@ import splashMascot from "@/assets/splash-mascot.png";
 
 interface SplashScreenProps {
   onFinish?: () => void;
-  /** Total visible duration in ms (excluding fade-out). Default 2500ms */
+  /** Total visible duration in ms (excluding fade-out). Default 1400ms */
   duration?: number;
 }
 
 const PARTICLE_COLORS = ["#FFD700", "#FF8C00", "#7C3AED", "#4CAF50"];
+const LOADING_LABELS = ["Acordando o Kidzz…", "Pintando a floresta…", "Pronto pra brincar! ✨"];
 
-const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
+const SplashScreen = ({ onFinish, duration = 1400 }: SplashScreenProps) => {
   const [fadingOut, setFadingOut] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
+  const [labelIdx, setLabelIdx] = useState(0);
 
   // Generate stable randomized particles once.
   const particles = useMemo(
@@ -34,10 +36,16 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
     const doneTimer = setTimeout(() => {
       setHidden(true);
       onFinish?.();
-    }, duration + 300);
+    }, duration + 250);
+    // Rotate the loading label in sync with the progress bar phases.
+    const stepMs = Math.max(220, Math.floor(duration / LOADING_LABELS.length));
+    const labelTimer = setInterval(() => {
+      setLabelIdx((i) => Math.min(LOADING_LABELS.length - 1, i + 1));
+    }, stepMs);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(doneTimer);
+      clearInterval(labelTimer);
     };
   }, [duration, onFinish]);
 
