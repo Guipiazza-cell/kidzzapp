@@ -74,6 +74,7 @@ const Index = () => {
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
+  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasSeenKidzzStatesIntro());
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
