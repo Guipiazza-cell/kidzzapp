@@ -12,9 +12,15 @@ const buildVersion =
 
 const appVersionPlugin = (): Plugin => ({
   name: "kidzz-app-version",
-  transformIndexHtml(html: string) {
-    if (process.env.NODE_ENV !== "production") return html;
-    return html.replace(/(src="\/assets\/[^\"]+\.(?:js|css))(\")/g, `$1?v=${buildVersion}$2`);
+  transformIndexHtml: {
+    order: "post",
+    handler(html: string) {
+      if (process.env.NODE_ENV !== "production") return html;
+      return html.replace(
+        /((?:src|href)="\/assets\/[^\"]+\.(?:js|css|png|jpg|jpeg|svg|webp|gif|woff2|ttf))(\")/g,
+        `$1?v=${buildVersion}$2`
+      );
+    },
   },
   generateBundle() {
     this.emitFile({
