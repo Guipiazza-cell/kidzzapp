@@ -1,13 +1,6 @@
-/**
- * Service Worker registration — auto-update agressivo.
- *
- * Garantias:
- * - Em preview/iframe/dev: nunca registra; desregistra qualquer SW antigo + limpa caches.
- * - Em produção:
- *   • Checa updates a cada 20s, ao focar a aba, ao voltar online e a cada navegação SPA.
- *   • Quando uma nova versão é detectada, aplica `skipWaiting` + reload imediato.
- *   • Usuário NUNCA precisa "limpar cookies/cache" — a atualização é automática.
- */
+import { checkForNewAppVersion, clearAppCaches } from "@/lib/appUpdate";
+
+/** Service Worker registration — atualização automática com limpeza de cache. */
 
 const isInIframe = (() => {
   try {
@@ -31,16 +24,7 @@ export async function registerServiceWorker() {
 
   // Cleanup agressivo em preview/iframe/dev — nunca deixar SW preso aqui.
   if (isPreviewHost || isInIframe || !isProdBuild) {
-    try {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map((r) => r.unregister()));
-      if ("caches" in window) {
-        const keys = await caches.keys();
-        await Promise.all(keys.map((k) => caches.delete(k)));
-      }
-    } catch {
-      /* noop */
-    }
+    await clearAppCaches({ unregisterServiceWorkers: true });
     return;
   }
 
@@ -48,10 +32,10 @@ export async function registerServiceWorker() {
     const { registerSW } = await import("virtual:pwa-register");
 
     let reloading = false;
-    const forceReload = () => {
+    const forceReload = async () => {
       if (reloading) return;
       reloading = true;
-      // Pequeno delay para garantir que o novo SW assumiu o controle.
+      await clearAppCaches();
       setTimeout(() => window.location.reload(), 30);
     };
 
@@ -66,6 +50,7 @@ export async function registerServiceWorker() {
 
         const checkForUpdate = () => {
           registration.update().catch(() => {});
+          void checkForNewAppVersion();
         };
 
         // Checagem periódica curta (20s) — pega novas versões rapidamente.
