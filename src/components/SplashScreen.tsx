@@ -97,6 +97,18 @@ const SplashScreen = ({ onFinish, duration = 1400 }: SplashScreenProps) => {
           0%, 100% { opacity: 0.45; transform: scale(1); }
           50% { opacity: 0.7; transform: scale(1.08); }
         }
+        @keyframes splash-shimmer {
+          0% { transform: translateX(-120%) skewX(-20deg); }
+          100% { transform: translateX(220%) skewX(-20deg); }
+        }
+        @keyframes splash-dot-bounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+          40% { transform: translateY(-4px); opacity: 1; }
+        }
+        @keyframes splash-label-in {
+          0% { opacity: 0; transform: translateY(4px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
 
       {/* Floating particles */}
