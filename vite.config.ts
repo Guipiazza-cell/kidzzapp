@@ -42,14 +42,15 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,png,jpg,jpeg,svg,webp,woff2,ttf}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
-          // HTML navigations — sempre rede primeiro, evita shell preso
+          // HTML navigations — rede primeiro com timeout curto, evita shell preso.
+          // Cache HTML expira em 5min para garantir que updates cheguem rápido.
           {
             urlPattern: ({ request }: any) => request.mode === "navigate",
             handler: "NetworkFirst",
             options: {
-              cacheName: "kidzz-html-v1",
-              networkTimeoutSeconds: 3,
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 },
+              cacheName: "kidzz-html-v2",
+              networkTimeoutSeconds: 1.5,
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 5 },
             },
           },
           // Static assets — cache first
