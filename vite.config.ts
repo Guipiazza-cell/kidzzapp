@@ -51,28 +51,27 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       // CRITICAL: never run SW in dev (breaks Lovable preview/HMR)
       devOptions: { enabled: false },
-      includeAssets: [
-        "favicon.png",
-        "apple-touch-icon.png",
-        "icon-192.png",
-        "icon-512.png",
-        "robots.txt",
-      ],
       manifest: false, // we ship our own /manifest.json
       workbox: {
         // Ativa nova versão imediatamente, sem esperar fechar todas as abas
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        navigateFallback: null,
         // Never cache OAuth callbacks or supabase functions
         navigateFallbackDenylist: [
           /^\/~oauth/,
           /^\/api/,
           /supabase\.co\/(functions|auth|rest)/,
         ],
-        globPatterns: ["**/*.{js,css,html,png,jpg,jpeg,svg,webp,woff2,ttf}"],
+        globPatterns: [],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
+          // Version endpoint — sempre rede, nunca cache.
+          {
+            urlPattern: ({ url }: any) => url.pathname === "/version.json",
+            handler: "NetworkOnly",
+          },
           // HTML navigations — rede primeiro e cache curtíssimo para evitar shell preso.
           {
             urlPattern: ({ request }: any) => request.mode === "navigate",
