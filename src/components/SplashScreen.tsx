@@ -124,7 +124,7 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
             className="absolute inset-0 -z-10 rounded-full blur-3xl"
             style={{
               background:
-                "radial-gradient(circle, rgba(56,189,248,0.55) 0%, rgba(168,85,247,0.32) 45%, transparent 78%)",
+                "radial-gradient(circle, rgba(255,200,120,0.45) 0%, rgba(232,130,26,0.18) 50%, transparent 78%)",
               animation: "splash-glow-pulse 2.4s ease-in-out infinite",
             }}
           />
