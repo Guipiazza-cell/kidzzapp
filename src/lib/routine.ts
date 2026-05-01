@@ -189,7 +189,21 @@ export function getDayState(): DayState {
   if (raw) {
     try {
       const parsed = JSON.parse(raw) as DayState;
-      if (parsed.date === date) return parsed;
+      // Migrate old days (when there were 9 tasks/day) to the new 15-task layout,
+      // preserving anything already completed.
+      if (parsed.date === date && parsed.taskIds?.length >= 15) return parsed;
+      if (parsed.date === date && parsed.taskIds?.length > 0) {
+        const newIds = generateForDay(date);
+        const merged = Array.from(new Set([...parsed.taskIds, ...newIds])).slice(0, 15);
+        const migrated: DayState = {
+          date,
+          taskIds: merged,
+          done: (parsed.done || []).filter(id => merged.includes(id)),
+          bonusGiven: parsed.bonusGiven ?? false,
+        };
+        safeWrite(KEY_DAY, JSON.stringify(migrated));
+        return migrated;
+      }
     } catch { /* noop */ }
   }
   // New day → generate
