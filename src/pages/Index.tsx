@@ -36,6 +36,7 @@ import ReferralProgram from "@/components/viral/ReferralProgram";
 import MonthlyRetrospective from "@/components/viral/MonthlyRetrospective";
 import ChameleonMascot from "@/components/ChameleonMascot";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
@@ -73,6 +74,7 @@ const Index = () => {
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
+  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasSeenKidzzStatesIntro());
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -179,6 +181,10 @@ const Index = () => {
   const interests = (profile as any)?.child_interests as string[] | undefined;
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
+  }
+  // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
+  if (showStatesIntro) {
+    return <KidzzStatesIntro onDone={() => setShowStatesIntro(false)} />;
   }
   // Notification time prompt is now contextual (after first answer), not blocking onboarding
 
