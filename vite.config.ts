@@ -92,12 +92,13 @@ export default defineConfig(({ mode }) => ({
               expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 6 },
             },
           },
-          // Google Fonts
+          // Google Fonts — rede primeiro para evitar fonte/cache preso em versões antigas.
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
-            handler: "CacheFirst",
+            handler: "NetworkFirst",
             options: {
-              cacheName: "google-fonts-v1",
+              cacheName: `google-fonts-${buildVersion}`,
+              networkTimeoutSeconds: 2,
               expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
           },
