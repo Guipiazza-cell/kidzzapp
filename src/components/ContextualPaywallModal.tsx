@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Crown, Lock } from "lucide-react";
+import { X, Sparkles, Crown, Music, Globe2, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPaywallCopy, type PaywallContext } from "@/lib/contextualPaywall";
 
@@ -35,58 +35,93 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
           <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={onClose} />
           <motion.div
             className="relative w-full max-w-sm rounded-3xl bg-white shadow-2xl overflow-hidden"
-            initial={{ y: 60, scale: 0.95 }}
-            animate={{ y: 0, scale: 1 }}
-            exit={{ y: 60, scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 240, damping: 24 }}
+            initial={{ y: 120, scale: 0.85, opacity: 0 }}
+            animate={{ y: 0, scale: 1, opacity: 1 }}
+            exit={{ y: 80, scale: 0.92, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18, mass: 0.9 }}
           >
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:scale-90"
+              className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/30 backdrop-blur-sm text-white active:scale-90"
               aria-label="Fechar"
             >
               <X size={18} />
             </button>
 
-            {/* Hero */}
-            <div className="px-6 pt-7 pb-5 bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 text-center relative">
-              {/* Badge de urgência no topo */}
+            {/* Hero — convite dourado */}
+            <div
+              className="px-6 pt-8 pb-6 text-center relative overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #F4C430 0%, #E8821A 100%)" }}
+            >
+              {/* Sparkles decorativos */}
               <motion.div
-                initial={{ scale: 0, y: -10 }}
-                animate={{ scale: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 260, delay: 0.05 }}
-                className="absolute -top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1"
+                className="absolute top-4 left-6 text-white/40"
+                animate={{ scale: [1, 1.3, 1], rotate: [0, 15, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity }}
               >
-                <Lock size={10} />
-                LIMITE ATINGIDO
+                <Sparkles size={14} />
+              </motion.div>
+              <motion.div
+                className="absolute top-8 right-10 text-white/50"
+                animate={{ scale: [1, 1.4, 1], rotate: [0, -20, 0] }}
+                transition={{ duration: 2.8, repeat: Infinity, delay: 0.4 }}
+              >
+                <Sparkles size={10} />
               </motion.div>
 
               <motion.div
-                initial={{ scale: 0, rotate: -20 }}
+                initial={{ scale: 0, rotate: -30 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                className="text-5xl mb-2 mt-2"
+                transition={{ type: "spring", stiffness: 220, delay: 0.15 }}
+                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/25 backdrop-blur-sm mb-3 shadow-lg"
               >
-                {copy.emoji}
+                <Crown size={32} className="text-white drop-shadow" fill="white" />
               </motion.div>
-              <h2 className="text-lg font-black text-gray-800 leading-snug">{copy.headline}</h2>
-              <p className="text-sm text-gray-600 font-medium mt-2 leading-relaxed">
+              <h2 className="text-xl font-black text-white leading-snug drop-shadow-sm">
+                Kidzz quer continuar com você! ✨
+              </h2>
+              <p className="text-sm text-white/95 font-semibold mt-2 leading-relaxed">
                 {copy.subheadline}
               </p>
             </div>
 
-            {/* Plan */}
-            <div className="px-6 py-5 space-y-3">
+            {/* Corpo */}
+            <div className="px-6 py-5 space-y-4">
+              {/* Benefícios */}
+              <div className="space-y-2.5">
+                {[
+                  { icon: <Music size={16} className="text-pink-600" />, bg: "bg-pink-100", text: "Músicas e histórias ilimitadas" },
+                  { icon: <Globe2 size={16} className="text-sky-600" />, bg: "bg-sky-100", text: "Modo Viagem para qualquer lugar" },
+                  { icon: <BarChart3 size={16} className="text-emerald-600" />, bg: "bg-emerald-100", text: "Relatório semanal para os pais" },
+                ].map((b, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.25 + i * 0.08 }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className={`w-9 h-9 rounded-xl ${b.bg} flex items-center justify-center shrink-0`}>
+                      {b.icon}
+                    </div>
+                    <span className="text-sm font-bold text-gray-800">{b.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Card do plano */}
               <div
                 className="rounded-2xl p-4 border-2"
                 style={{
                   borderColor: "#D4A847",
-                  background: "linear-gradient(135deg, rgba(212,168,71,0.08), rgba(240,200,90,0.04))",
+                  background: "linear-gradient(135deg, rgba(244,196,48,0.10), rgba(232,130,26,0.05))",
                 }}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
-                    style={{ background: "linear-gradient(135deg, #D4A847, #F0C85A)" }}>
+                  <span
+                    className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
+                    style={{ background: "linear-gradient(135deg, #D4A847, #F0C85A)" }}
+                  >
                     MAIS ESCOLHIDO 💛
                   </span>
                   <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
@@ -102,41 +137,50 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
                 <p className="text-[11px] text-amber-700 font-bold mt-0.5">
                   💰 Economize R$ 60 por ano · Cobrado R$ 238,80/ano
                 </p>
-                <p className="text-[11px] text-gray-600 font-bold mt-2">✓ {copy.highlight}</p>
               </div>
 
+              {/* CTA */}
               <motion.button
                 onClick={handleCTA}
                 whileTap={{ scale: 0.96 }}
                 animate={{ scale: [1, 1.025, 1] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                className="w-full py-5 rounded-2xl bg-gradient-to-r from-kid-purple via-pink-500 to-kid-pink text-white font-black text-base shadow-2xl flex items-center justify-center gap-2 relative overflow-hidden"
+                className="w-full py-5 rounded-2xl text-white font-black text-base shadow-2xl flex items-center justify-center gap-2 relative overflow-hidden"
+                style={{ background: "linear-gradient(135deg, #6B3FA0 0%, #E8821A 100%)" }}
               >
                 <motion.div
                   className="absolute inset-0 bg-white/20"
                   animate={{ x: ["-100%", "100%"] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 />
-                <Crown size={20} className="relative" />
-                <span className="relative">Assinar agora</span>
-                <Sparkles size={16} className="relative" />
+                <Crown size={20} className="relative" fill="white" />
+                <span className="relative">Quero continuar a aventura! 🚀</span>
               </motion.button>
 
-              <p className="text-center text-[11px] text-gray-500 font-bold">
-                🛡️ Garantia 7 dias · Cancele quando quiser · 1 toque
-              </p>
-              <button
-                onClick={() => {
-                  onClose();
-                  window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
-                }}
-                className="w-full py-2.5 rounded-xl border-2 border-amber-300 bg-amber-50/60 text-amber-800 text-xs font-extrabold active:scale-95 transition-transform"
-              >
-                Ver todos os planos →
-              </button>
-              <button onClick={onClose} className="w-full text-[11px] text-gray-400 font-bold underline-offset-2 hover:underline py-1">
-                Agora não
-              </button>
+              {/* Footer */}
+              <div className="space-y-1.5 pt-1">
+                <p className="text-center text-[11px] text-gray-600 font-bold">
+                  ✅ Garantia 7 dias · Cancele quando quiser
+                </p>
+                <p className="text-center text-[11px] text-rose-600 font-extrabold">
+                  ❤️ Mais de 1.000 famílias já adoram
+                </p>
+                <button
+                  onClick={() => {
+                    onClose();
+                    window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+                  }}
+                  className="w-full py-2 rounded-xl text-amber-700 text-xs font-extrabold active:scale-95 transition-transform"
+                >
+                  Ver todos os planos →
+                </button>
+                <button
+                  onClick={onClose}
+                  className="w-full text-[11px] text-gray-400 font-semibold hover:text-gray-600 py-1"
+                >
+                  Agora não
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>
