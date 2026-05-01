@@ -129,6 +129,7 @@ function seedFromDate(date: string) {
 }
 
 function pickBalanced(period: RoutinePeriod, exclude: Set<string>, rand: () => number): RoutineTask[] {
+  const TARGET = 5;
   const pool = TASKS.filter(t => t.period === period && !exclude.has(t.id));
   const byCat = new Map<RoutineCategory, RoutineTask[]>();
   for (const t of pool) {
@@ -143,22 +144,22 @@ function pickBalanced(period: RoutinePeriod, exclude: Set<string>, rand: () => n
     [cats[i], cats[j]] = [cats[j], cats[i]];
   }
   const picked: RoutineTask[] = [];
-  // First, pick 1 per category until we hit 3 or exhaust cats
+  // First, pick 1 per category until we hit TARGET or exhaust cats
   for (const c of cats) {
-    if (picked.length >= 3) break;
+    if (picked.length >= TARGET) break;
     const arr = byCat.get(c)!;
     const idx = Math.floor(rand() * arr.length);
     picked.push(arr[idx]);
   }
-  // Fallback: if not enough categories, fill from full pool
-  if (picked.length < 3) {
+  // Fill remaining slots from full pool (any category, no duplicates)
+  if (picked.length < TARGET) {
     const remaining = pool.filter(t => !picked.find(p => p.id === t.id));
-    while (picked.length < 3 && remaining.length) {
+    while (picked.length < TARGET && remaining.length) {
       const idx = Math.floor(rand() * remaining.length);
       picked.push(remaining.splice(idx, 1)[0]);
     }
   }
-  return picked.slice(0, 3);
+  return picked.slice(0, TARGET);
 }
 
 function generateForDay(date: string): string[] {
@@ -175,8 +176,8 @@ function generateForDay(date: string): string[] {
   const ids: string[] = [];
   (["morning", "afternoon", "night"] as RoutinePeriod[]).forEach(p => {
     let chosen = pickBalanced(p, exclude, rand);
-    // If exclusion left fewer than 3 in a period, retry without exclusion
-    if (chosen.length < 3) chosen = pickBalanced(p, new Set(), rand);
+    // If exclusion left fewer than 5 in a period, retry without exclusion
+    if (chosen.length < 5) chosen = pickBalanced(p, new Set(), rand);
     chosen.forEach(t => ids.push(t.id));
   });
   return ids;
