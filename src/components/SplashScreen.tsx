@@ -214,49 +214,83 @@ const SplashScreen = ({ onFinish, duration = 1400 }: SplashScreenProps) => {
         </p>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar + microinterações */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 w-[70%] max-w-xs"
-        style={{ bottom: "calc(env(safe-area-inset-bottom) + 48px)" }}
+        className="absolute left-1/2 -translate-x-1/2 w-[72%] max-w-xs flex flex-col items-center gap-3"
+        style={{ bottom: "calc(env(safe-area-inset-bottom) + 44px)" }}
       >
+        {/* Track */}
         <div
-          className="relative overflow-hidden"
+          className="relative overflow-hidden w-full"
           style={{
-            height: "16px",
-            borderRadius: "8px",
-            backgroundColor: "#E5E7EB",
-            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.08)",
+            height: "10px",
+            borderRadius: "999px",
+            backgroundColor: "rgba(232, 130, 26, 0.12)",
+            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.06)",
           }}
         >
+          {/* Fill */}
           <div
             style={{
-              height: "100%",
-              borderRadius: "8px",
+              position: "absolute",
+              inset: 0,
+              borderRadius: "999px",
               background:
-                "linear-gradient(90deg, #FF8C00 0%, #FFB347 50%, #FFD700 100%)",
-              // Sync progress bar exactly with `duration` so it reaches 100% the
-              // moment the fade-out begins.
-              animation: `splash-progress ${duration}ms ease-out forwards`,
-              boxShadow: "0 0 10px rgba(255,180,0,0.55)",
+                "linear-gradient(90deg, #E8821A 0%, #FFB347 55%, #FFD66B 100%)",
+              animation: `splash-progress ${duration}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+              boxShadow: "0 0 12px rgba(232,130,26,0.45)",
+              transformOrigin: "left center",
             }}
           />
-          {/* Twinkling stars inside the bar */}
-          <div className="absolute inset-0 flex items-center justify-around pointer-events-none">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span
-                key={i}
-                style={{
-                  fontSize: "10px",
-                  color: "#FFFFFF",
-                  textShadow: "0 0 4px rgba(255,255,255,0.9)",
-                  animation: `splash-star-twinkle 1.2s ease-in-out ${i * 0.18}s infinite`,
-                }}
-              >
-                ✨
-              </span>
-            ))}
-          </div>
+          {/* Shimmer overlay */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              width: "40%",
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.65) 50%, transparent 100%)",
+              animation: "splash-shimmer 1.1s ease-in-out infinite",
+              pointerEvents: "none",
+              mixBlendMode: "overlay",
+            }}
+          />
         </div>
+
+        {/* Bouncing dots */}
+        <div className="flex items-center gap-1.5" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "999px",
+                backgroundColor: "#E8821A",
+                display: "inline-block",
+                animation: `splash-dot-bounce 0.9s ease-in-out ${i * 0.15}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Dynamic loading label */}
+        <p
+          key={labelIdx}
+          style={{
+            fontFamily: "'Nunito', system-ui, sans-serif",
+            fontWeight: 700,
+            fontSize: "13px",
+            color: "#8A6A3D",
+            letterSpacing: "0.2px",
+            margin: 0,
+            animation: "splash-label-in 320ms ease-out both",
+          }}
+        >
+          {LOADING_LABELS[labelIdx]}
+        </p>
+      </div>
       </div>
     </div>
   );
