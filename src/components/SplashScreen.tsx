@@ -49,7 +49,7 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
       style={{
         background:
-          "radial-gradient(circle at 50% 50%, #FFF9F0 0%, #F5E6CC 55%, #E8D5B7 100%)",
+          "linear-gradient(180deg, #FBF5EB 0%, #F5E6C8 100%)",
         opacity: fadingOut ? 0 : 1,
         transition: "opacity 300ms ease-out",
         paddingTop: "env(safe-area-inset-top)",
@@ -124,7 +124,7 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
             className="absolute inset-0 -z-10 rounded-full blur-3xl"
             style={{
               background:
-                "radial-gradient(circle, rgba(56,189,248,0.55) 0%, rgba(168,85,247,0.32) 45%, transparent 78%)",
+                "radial-gradient(circle, rgba(255,200,120,0.45) 0%, rgba(232,130,26,0.18) 50%, transparent 78%)",
               animation: "splash-glow-pulse 2.4s ease-in-out infinite",
             }}
           />
@@ -148,7 +148,11 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
               <img
                 src={splashMascot}
                 alt="KIDZZ"
-                className="w-52 h-52 sm:w-64 sm:h-64 object-contain drop-shadow-[0_14px_32px_rgba(56,189,248,0.55)]"
+                className="w-64 h-64 sm:w-80 sm:h-80 object-contain"
+                style={{
+                  background: "transparent",
+                  filter: "drop-shadow(0 18px 28px rgba(232,130,26,0.25)) drop-shadow(0 6px 12px rgba(0,0,0,0.08))",
+                }}
                 decoding="async"
                 loading="eager"
                 onError={() => setImgFailed(true)}
@@ -162,11 +166,11 @@ const SplashScreen = ({ onFinish, duration = 2500 }: SplashScreenProps) => {
           style={{
             fontFamily: "'Nunito', system-ui, sans-serif",
             fontWeight: 900,
-            color: "#FF8C00",
-            fontSize: "32px",
+            color: "#E8821A",
+            fontSize: "34px",
             letterSpacing: "2px",
             marginTop: "24px",
-            textShadow: "0 2px 8px rgba(255,140,0,0.25)",
+            textShadow: "0 2px 8px rgba(232,130,26,0.18)",
             opacity: 0,
             animation: "splash-fade-up 500ms ease-out 400ms forwards",
           }}
