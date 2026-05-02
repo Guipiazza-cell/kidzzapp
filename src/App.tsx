@@ -17,6 +17,7 @@ import Landing from "./pages/Landing";
 import Admin from "./pages/Admin";
 import InstallPrompt from "./components/InstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
+import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const AppShell = () => {
           </Routes>
           <InstallPrompt />
           <OfflineIndicator />
+          <KidzzShareTrigger />
         </AuthProvider>
       </BrowserRouter>
     </>
