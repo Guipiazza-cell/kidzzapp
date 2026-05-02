@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, LogIn, Shield, Crown, Gift } from "lucide-react";
+import { Send, LogIn, Shield, Crown, Gift, BarChart3 } from "lucide-react";
 import StreakCard from "./StreakCard";
 import StreakCelebration from "./StreakCelebration";
 import VoiceInput from "../VoiceInput";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
+import ParentDashboard from "../parental/ParentDashboard";
 import SubscribeBanner from "../SubscribeBanner";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
