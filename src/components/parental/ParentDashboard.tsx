@@ -1,17 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  X, Flame, MessageCircleHeart, BookOpen, Clock, Share2, Crown,
-  Lock, Settings, ChevronRight, Sun, CloudSun, Moon, Sparkles, Loader2,
+  X, Flame, MessageCircleHeart, BookOpen, Clock, Share2,
+  Lock, Settings, ChevronRight, Sun, CloudSun, Moon, Loader2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { getStreak as getRoutineStreak, getToday as getRoutineToday, TASKS } from "@/lib/routine";
-import { getTotalXp } from "@/lib/dailyMission";
+import { getToday as getRoutineToday } from "@/lib/routine";
 import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
 import { toast } from "sonner";
-import cosmicImg from "@/assets/kidzz/cosmic.png";
 
 interface Props {
   onClose: () => void;
