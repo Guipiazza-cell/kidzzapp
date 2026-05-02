@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, LogIn, Shield, Crown, Gift } from "lucide-react";
+import { Send, LogIn, Shield, Crown, Gift, BarChart3 } from "lucide-react";
 import StreakCard from "./StreakCard";
 import StreakCelebration from "./StreakCelebration";
 import VoiceInput from "../VoiceInput";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
+import ParentDashboard from "../parental/ParentDashboard";
 import SubscribeBanner from "../SubscribeBanner";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
@@ -87,7 +88,9 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const [showPixelSpeech, setShowPixelSpeech] = useState(true);
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
+  const [showParentalGateForDashboard, setShowParentalGateForDashboard] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [mascotState, setMascotState] = useState<MascotState>(getTimeOfDay());
   const inputRef = useRef<HTMLInputElement>(null);
@@ -227,14 +230,25 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <LogIn size={18} />
             </motion.button>
           ) : (
-            <motion.button
-              onClick={() => setShowParentalGateForSettings(true)}
-              className="p-2 rounded-xl glass-card text-gray-600"
-              whileTap={{ scale: 0.9 }}
-              aria-label="Controle parental"
-            >
-              <Shield size={18} />
-            </motion.button>
+            <>
+              <motion.button
+                onClick={() => setShowParentalGateForDashboard(true)}
+                className="px-2.5 py-2 rounded-xl glass-card text-amber-700 flex items-center gap-1"
+                whileTap={{ scale: 0.9 }}
+                aria-label="Para os Pais"
+              >
+                <BarChart3 size={16} />
+                <span className="text-[10px] font-extrabold">Pais</span>
+              </motion.button>
+              <motion.button
+                onClick={() => setShowParentalGateForSettings(true)}
+                className="p-2 rounded-xl glass-card text-gray-600"
+                whileTap={{ scale: 0.9 }}
+                aria-label="Controle parental"
+              >
+                <Shield size={18} />
+              </motion.button>
+            </>
           )}
         </div>
       </header>
@@ -485,6 +499,25 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               setShowSettings(true);
             }}
             onCancel={() => setShowParentalGateForSettings(false)}
+          />
+        )}
+        {showParentalGateForDashboard && (
+          <ParentalGate
+            onSuccess={() => {
+              setShowParentalGateForDashboard(false);
+              setShowDashboard(true);
+            }}
+            onCancel={() => setShowParentalGateForDashboard(false)}
+          />
+        )}
+        {showDashboard && (
+          <ParentDashboard
+            onClose={() => setShowDashboard(false)}
+            onOpenSettings={() => { setShowDashboard(false); setShowSettings(true); }}
+            onOpenUpgrade={() => {
+              setShowDashboard(false);
+              window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "premium_feature" } }));
+            }}
           />
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
