@@ -163,16 +163,22 @@ const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) =>
 
       <div className="flex flex-col gap-2 pt-2">
         <motion.button
-          onClick={handleShare}
-          disabled={sharing}
-          className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95 disabled:opacity-60"
+          onClick={() => {
+            haptic("light");
+            import("@/components/viral/KidzzShareTrigger").then(({ triggerKidzzShare }) =>
+              triggerKidzzShare({
+                title: storyTitle,
+                subtitle: `acabou de criar "${storyTitle}" no Kidzz! 📖`,
+                emoji: "📖",
+                category: "story",
+                shareSlug: "story-created",
+              })
+            );
+          }}
+          className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95"
           whileTap={{ scale: 0.97 }}
         >
-          {sharing ? (
-            <><Loader2 size={18} className="animate-spin" /> Gerando imagem...</>
-          ) : (
-            <><Share2 size={18} /> 📤 Compartilhar esta história</>
-          )}
+          <Share2 size={18} /> 📤 Compartilhar esta história
         </motion.button>
         <motion.button
           onClick={handleExport}

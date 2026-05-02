@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import pixelImg from "@/assets/pixel-chameleon.png";
 import { getMilestoneProgress } from "@/lib/habitLoop";
+import { triggerKidzzShare } from "@/components/viral/KidzzShareTrigger";
+
+const SHARE_MILESTONES = new Set([3, 7, 14, 30]);
 
 interface StreakEventDetail {
   streak: number;
@@ -32,6 +35,20 @@ const StreakCelebration = ({ streakDays, childName, previousRecord }: Props) => 
       setIsNewRecord(detail.isNewRecord || detail.streak > previousRecord);
       setShow(true);
       const t = setTimeout(() => setShow(false), detail.isNewRecord ? 2600 : 1800);
+      // Auto-open share for milestone streaks (3, 7, 14, 30)
+      if (SHARE_MILESTONES.has(detail.streak)) {
+        const shareTimer = setTimeout(() => {
+          triggerKidzzShare({
+            title: `${detail.streak} dias seguidos! 🔥`,
+            subtitle: `está há ${detail.streak} dias aprendendo com o Kidzz!`,
+            emoji: detail.streak >= 30 ? "🏆" : detail.streak >= 14 ? "💛" : detail.streak >= 7 ? "🌟" : "🔥",
+            category: "streak",
+            streakDays: detail.streak,
+            shareSlug: `streak-${detail.streak}`,
+          });
+        }, detail.isNewRecord ? 2800 : 2000);
+        return () => { clearTimeout(t); clearTimeout(shareTimer); };
+      }
       return () => clearTimeout(t);
     };
     window.addEventListener("kidzz:streak", handler);
