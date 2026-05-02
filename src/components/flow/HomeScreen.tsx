@@ -230,14 +230,25 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <LogIn size={18} />
             </motion.button>
           ) : (
-            <motion.button
-              onClick={() => setShowParentalGateForSettings(true)}
-              className="p-2 rounded-xl glass-card text-gray-600"
-              whileTap={{ scale: 0.9 }}
-              aria-label="Controle parental"
-            >
-              <Shield size={18} />
-            </motion.button>
+            <>
+              <motion.button
+                onClick={() => setShowParentalGateForDashboard(true)}
+                className="px-2.5 py-2 rounded-xl glass-card text-amber-700 flex items-center gap-1"
+                whileTap={{ scale: 0.9 }}
+                aria-label="Para os Pais"
+              >
+                <BarChart3 size={16} />
+                <span className="text-[10px] font-extrabold">Pais</span>
+              </motion.button>
+              <motion.button
+                onClick={() => setShowParentalGateForSettings(true)}
+                className="p-2 rounded-xl glass-card text-gray-600"
+                whileTap={{ scale: 0.9 }}
+                aria-label="Controle parental"
+              >
+                <Shield size={18} />
+              </motion.button>
+            </>
           )}
         </div>
       </header>
