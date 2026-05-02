@@ -15,7 +15,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Admin from "./pages/Admin";
-import InstallPrompt from "./components/InstallPrompt";
+import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
 import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
 
@@ -75,7 +75,7 @@ const AppShell = () => {
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <InstallPrompt />
+          <InstallBanner />
           <OfflineIndicator />
           <KidzzShareTrigger />
         </AuthProvider>
