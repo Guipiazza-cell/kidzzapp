@@ -501,6 +501,25 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             onCancel={() => setShowParentalGateForSettings(false)}
           />
         )}
+        {showParentalGateForDashboard && (
+          <ParentalGate
+            onSuccess={() => {
+              setShowParentalGateForDashboard(false);
+              setShowDashboard(true);
+            }}
+            onCancel={() => setShowParentalGateForDashboard(false)}
+          />
+        )}
+        {showDashboard && (
+          <ParentDashboard
+            onClose={() => setShowDashboard(false)}
+            onOpenSettings={() => { setShowDashboard(false); setShowSettings(true); }}
+            onOpenUpgrade={() => {
+              setShowDashboard(false);
+              window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "premium_feature" } }));
+            }}
+          />
+        )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
     </motion.div>
