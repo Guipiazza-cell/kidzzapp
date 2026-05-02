@@ -225,7 +225,17 @@ const AchievementsScreen = ({ onBack }: Props) => {
                   </div>
                   {unlocked && (
                     <motion.button
-                      onClick={(e) => { e.stopPropagation(); setShareBadge(badge); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerKidzzShare({
+                          title: badge.title,
+                          subtitle: `desbloqueou "${badge.title}"! ${badge.emoji}`,
+                          emoji: badge.emoji,
+                          category: TYPE_TO_CATEGORY[badge.type] || "default",
+                          streakDays: badge.type === "streak" ? streakDays : undefined,
+                          shareSlug: `badge-${badge.id}`,
+                        });
+                      }}
                       className="ml-1 w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md flex-shrink-0"
                       whileTap={{ scale: 0.9 }}
                       aria-label={`Compartilhar ${badge.title}`}
@@ -239,17 +249,6 @@ const AchievementsScreen = ({ onBack }: Props) => {
           })}
         </div>
       </div>
-
-      <AnimatePresence>
-        {shareBadge && (
-          <AchievementShareModal
-            achievementTitle={shareBadge.title}
-            achievementEmoji={shareBadge.emoji}
-            customMessage={`${profile?.child_name || "amigo"} desbloqueou "${shareBadge.title}"! 🌟`}
-            onClose={() => setShareBadge(null)}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 };
