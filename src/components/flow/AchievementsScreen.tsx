@@ -1,10 +1,18 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
 import confetti from "canvas-confetti";
-import { useEffect, useRef, useState } from "react";
-import AchievementShareModal from "@/components/viral/AchievementShareModal";
+import { useEffect, useRef } from "react";
+import { triggerKidzzShare } from "@/components/viral/KidzzShareTrigger";
+import type { AchievementCategory } from "@/components/viral/KidzzShareCard";
+
+const TYPE_TO_CATEGORY: Record<string, AchievementCategory> = {
+  questions: "questions",
+  stories: "story",
+  streak: "streak",
+  points: "default",
+};
 
 interface Badge {
   id: string;
@@ -53,7 +61,6 @@ const AchievementsScreen = ({ onBack }: Props) => {
   const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
   const levelProgress = Math.min(100, (points / levelInfo.next) * 100);
   const celebratedRef = useRef<Set<string>>(new Set());
-  const [shareBadge, setShareBadge] = useState<Badge | null>(null);
 
   const getCount = (badge: Badge) => {
     switch (badge.type) {
