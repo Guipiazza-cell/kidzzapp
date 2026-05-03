@@ -35,7 +35,7 @@ export async function registerServiceWorker() {
     const forceReload = async () => {
       if (reloading) return;
       reloading = true;
-      await clearAppCaches();
+      await clearAppCaches({ unregisterServiceWorkers: true });
       setTimeout(() => window.location.reload(), 30);
     };
 
@@ -77,7 +77,8 @@ export async function registerServiceWorker() {
         wrap("replaceState");
         window.addEventListener("popstate", checkForUpdate);
 
-        // Primeira checagem rápida (3s após registro) para pegar deploys recém-publicados.
+        // Primeiras checagens rápidas para pegar deploys recém-publicados no mobile/PWA aberto.
+        setTimeout(checkForUpdate, 600);
         setTimeout(checkForUpdate, 3000);
       },
       onOfflineReady() { /* noop */ },
@@ -88,7 +89,7 @@ export async function registerServiceWorker() {
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (refreshed) return;
       refreshed = true;
-      window.location.reload();
+      void clearAppCaches().finally(() => window.location.reload());
     });
 
     (window as any).__updateSW = updateSW;

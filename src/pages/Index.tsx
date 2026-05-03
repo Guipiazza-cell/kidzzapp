@@ -31,6 +31,7 @@ import MusicForest from "@/components/music/MusicForest";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
+import ParentDashboard from "@/components/parental/ParentDashboard";
 import SevenDayChallenge from "@/components/viral/SevenDayChallenge";
 import ReferralProgram from "@/components/viral/ReferralProgram";
 import MonthlyRetrospective from "@/components/viral/MonthlyRetrospective";
@@ -66,7 +67,9 @@ const Index = () => {
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
+  const [showParentalGateForDashboard, setShowParentalGateForDashboard] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [notifPromptDismissed, setNotifPromptDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     return !!window.localStorage.getItem("kidzz_notification_set");
@@ -375,7 +378,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
       <MagicalBackground />
-      <div className="flex-1 flex flex-col pb-[72px]">
+      <div className="flex-1 flex flex-col pb-[112px]">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeTab}
@@ -389,7 +392,13 @@ const Index = () => {
           </motion.div>
         </AnimatePresence>
       </div>
-      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        isPremium={profile?.is_premium ?? false}
+        onOpenParents={() => setShowParentalGateForDashboard(true)}
+        onOpenPlans={() => window.dispatchEvent(new CustomEvent("kidzz:open-plans"))}
+      />
       <AnimatePresence>
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
@@ -400,6 +409,19 @@ const Index = () => {
         {showLoginGate && <ParentalGate onSuccess={() => setShowLoginGate(false)} onCancel={() => setShowLoginGate(false)} />}
         {showParentalGateForSettings && (
           <ParentalGate onSuccess={() => { setShowParentalGateForSettings(false); setShowSettings(true); }} onCancel={() => setShowParentalGateForSettings(false)} />
+        )}
+        {showParentalGateForDashboard && (
+          <ParentalGate onSuccess={() => { setShowParentalGateForDashboard(false); setShowDashboard(true); }} onCancel={() => setShowParentalGateForDashboard(false)} />
+        )}
+        {showDashboard && (
+          <ParentDashboard
+            onClose={() => setShowDashboard(false)}
+            onOpenSettings={() => { setShowDashboard(false); setShowSettings(true); }}
+            onOpenUpgrade={() => {
+              setShowDashboard(false);
+              window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+            }}
+          />
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>

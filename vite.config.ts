@@ -12,14 +12,39 @@ const buildVersion =
 
 const appVersionPlugin = (): Plugin => ({
   name: "kidzz-app-version",
+  config(config) {
+    const existingOutput = config.build?.rollupOptions?.output;
+    const objectOutput =
+      existingOutput && typeof existingOutput === "object" && !Array.isArray(existingOutput)
+        ? existingOutput
+        : {};
+
+    config.build = {
+      ...(config.build ?? {}),
+      rollupOptions: {
+        ...(config.build?.rollupOptions ?? {}),
+        output: {
+          ...objectOutput,
+          entryFileNames: `assets/[name]-${buildVersion}-[hash].js`,
+          chunkFileNames: `assets/[name]-${buildVersion}-[hash].js`,
+          assetFileNames: `assets/[name]-${buildVersion}-[hash][extname]`,
+        },
+      },
+    };
+  },
   transformIndexHtml: {
     order: "post",
     handler(html: string) {
       if (process.env.NODE_ENV !== "production") return html;
-      return html.replace(
-        /((?:src|href)="\/assets\/[^\"]+\.(?:js|css|png|jpg|jpeg|svg|webp|gif|woff2|ttf))(\")/g,
-        `$1?v=${buildVersion}$2`
-      );
+      return html
+        .replace(
+          /((?:src|href)="\/assets\/[^\"]+\.(?:js|css|png|jpg|jpeg|svg|webp|gif|woff2|ttf))(\")/g,
+          `$1?v=${buildVersion}$2`
+        )
+        .replace(
+          /((?:href)="\/(?:manifest\.json|favicon\.png|apple-touch-icon\.png))(\")/g,
+          `$1?v=${buildVersion}$2`
+        );
     },
   },
   generateBundle() {
