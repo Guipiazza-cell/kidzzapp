@@ -283,6 +283,30 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
 
         {/* Atalhos rápidos removidos — Brincar agora vive no menu inferior */}
 
+        <motion.div
+          className="w-full max-w-sm grid grid-cols-2 gap-2 mt-2 mb-1"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+        >
+          <button
+            type="button"
+            onClick={() => setShowParentalGateForDashboard(true)}
+            className="min-h-[44px] rounded-2xl glass-card px-3 py-2 flex items-center justify-center gap-2 text-[12px] font-black text-foreground active:scale-[0.98]"
+          >
+            <BarChart3 size={16} className="text-primary" />
+            Área dos Pais
+          </button>
+          <button
+            type="button"
+            onClick={openPlans}
+            className="min-h-[44px] rounded-2xl kid-gradient-premium px-3 py-2 flex items-center justify-center gap-2 text-[12px] font-black text-primary-foreground shadow-lg active:scale-[0.98]"
+          >
+            <Crown size={16} />
+            Assinatura
+          </button>
+        </motion.div>
+
         {/* Daily mission loop — drives retention */}
         <div className="w-full flex justify-center mt-2 mb-1">
           <DailyMissionCard
