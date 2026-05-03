@@ -32,10 +32,15 @@ const appVersionPlugin = (): Plugin => ({
     order: "post",
     handler(html: string) {
       if (process.env.NODE_ENV !== "production") return html;
-      return html.replace(
-        /((?:src|href)="\/assets\/[^\"]+\.(?:js|css|png|jpg|jpeg|svg|webp|gif|woff2|ttf))(\")/g,
-        `$1?v=${buildVersion}$2`
-      );
+      return html
+        .replace(
+          /((?:src|href)="\/assets\/[^\"]+\.(?:js|css|png|jpg|jpeg|svg|webp|gif|woff2|ttf))(\")/g,
+          `$1?v=${buildVersion}$2`
+        )
+        .replace(
+          /((?:href)="\/(?:manifest\.json|favicon\.png|apple-touch-icon\.png))(\")/g,
+          `$1?v=${buildVersion}$2`
+        );
     },
   },
   generateBundle() {
