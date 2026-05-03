@@ -13,14 +13,18 @@ const buildVersion =
 const appVersionPlugin = (): Plugin => ({
   name: "kidzz-app-version",
   config(config) {
+    const existingOutput = config.build?.rollupOptions?.output;
+    const objectOutput =
+      existingOutput && typeof existingOutput === "object" && !Array.isArray(existingOutput)
+        ? existingOutput
+        : {};
+
     config.build = {
       ...(config.build ?? {}),
       rollupOptions: {
         ...(config.build?.rollupOptions ?? {}),
         output: {
-          ...(typeof config.build?.rollupOptions?.output === "object" && !Array.isArray(config.build.rollupOptions.output)
-            ? config.build.rollupOptions.output
-            : {}),
+          ...objectOutput,
           entryFileNames: `assets/[name]-${buildVersion}-[hash].js`,
           chunkFileNames: `assets/[name]-${buildVersion}-[hash].js`,
           assetFileNames: `assets/[name]-${buildVersion}-[hash][extname]`,
