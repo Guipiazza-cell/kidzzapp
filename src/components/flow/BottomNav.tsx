@@ -1,10 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart, Gamepad2 } from "lucide-react";
+import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart, Gamepad2, Crown, Shield } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onOpenParents?: () => void;
+  onOpenPlans?: () => void;
+  isPremium?: boolean;
 }
 
 /**
@@ -76,7 +79,7 @@ const TABS: {
   },
 ];
 
-const BottomNav = ({ activeTab, onTabChange }: Props) => (
+const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => (
   <nav
     className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/30"
     style={{
@@ -86,6 +89,30 @@ const BottomNav = ({ activeTab, onTabChange }: Props) => (
       WebkitBackdropFilter: "blur(22px)",
     }}
   >
+    {(onOpenParents || onOpenPlans) && (
+      <div className="flex items-center justify-center gap-2 px-3 pt-2">
+        {onOpenParents && (
+          <button
+            type="button"
+            onClick={() => { haptic("light"); onOpenParents(); }}
+            className="min-h-[36px] rounded-full glass-card px-3 text-[11px] font-black text-foreground flex items-center gap-1.5 active:scale-95"
+          >
+            <Shield size={14} className="text-primary" />
+            Pais
+          </button>
+        )}
+        {onOpenPlans && !isPremium && (
+          <button
+            type="button"
+            onClick={() => { haptic("light"); onOpenPlans(); }}
+            className="min-h-[36px] rounded-full kid-gradient-premium px-3 text-[11px] font-black text-primary-foreground shadow-md flex items-center gap-1.5 active:scale-95"
+          >
+            <Crown size={14} />
+            Assinatura
+          </button>
+        )}
+      </div>
+    )}
     <div className="flex items-center justify-around px-0.5 pt-1.5">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
