@@ -16,7 +16,7 @@ import {
   Sun, Cloud, Moon, Flame, Check, Sparkles,
   Smile, Droplet, BedDouble, Coffee, Heart, Music2, MessageCircleHeart,
   Apple, BookOpen, Palette, Zap, Users, Package, Blocks, Footprints,
-  Wind, Star, Shirt, HandMetal,
+  Wind, Star, Shirt, HandMetal, Crown,
 } from "lucide-react";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { loadMascotConfig } from "@/components/lab/KidzzLab";
@@ -287,6 +287,7 @@ const RoutineScreen = () => {
   const { profile } = useAuth();
   const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
+  const isPremium = profile?.is_premium ?? false;
   const mascotConfig = useMemo(() => loadMascotConfig(), []);
   const hue = HUE_MAP[mascotConfig.colorId] ?? 0;
 
@@ -446,6 +447,26 @@ const RoutineScreen = () => {
           >
             Tudo bem… hoje é um novo começo 💛
           </motion.p>
+        )}
+
+        {!isPremium && (
+          <motion.button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("kidzz:open-plans"))}
+            className="mt-3 w-full max-w-md rounded-2xl border border-border bg-card/70 px-4 py-3 text-left shadow-sm backdrop-blur active:scale-[0.98]"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Crown size={18} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13px] font-black text-foreground">Desbloqueie tudo com o plano premium</span>
+                <span className="block text-[11px] font-bold text-muted-foreground">Mais rotina, histórias, sonhos e relatórios para os pais.</span>
+              </span>
+            </div>
+          </motion.button>
         )}
       </header>
 
