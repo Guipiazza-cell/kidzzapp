@@ -173,6 +173,10 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
     onSubmit(text.trim());
   };
 
+  const openPlans = () => {
+    window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+  };
+
   const points = profile?.points ?? 0;
   const level = profile?.level ?? "iniciante";
   const levelInfo = LEVEL_CONFIG[level] || LEVEL_CONFIG.iniciante;
@@ -220,6 +224,17 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           <span className="text-[11px] text-gray-800 font-extrabold glass-card px-2 py-1 rounded-full">
             {questionsRemaining()} 💬
           </span>
+          {!profile?.is_premium && (
+            <motion.button
+              onClick={openPlans}
+              className="px-2.5 py-2 rounded-xl kid-gradient-premium text-white flex items-center gap-1 shadow-lg"
+              whileTap={{ scale: 0.9 }}
+              aria-label="Assinatura"
+            >
+              <Crown size={14} />
+              <span className="text-[10px] font-extrabold">Assinar</span>
+            </motion.button>
+          )}
           {!user ? (
             <motion.button
               onClick={() => navigate("/auth")}
