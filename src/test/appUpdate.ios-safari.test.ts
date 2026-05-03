@@ -62,7 +62,7 @@ const setupIOSEnv = (overrides?: { version?: string; appVersion?: string }): IOS
 
   // Make sure the module sees a "production" build.
   vi.stubGlobal("__APP_VERSION__", overrides?.appVersion ?? "v-current");
-  vi.stubEnv("PROD", true as unknown as string);
+  vi.stubEnv("PROD", true as any);
   vi.stubEnv("MODE", "production");
 
   // CacheStorage stub.
