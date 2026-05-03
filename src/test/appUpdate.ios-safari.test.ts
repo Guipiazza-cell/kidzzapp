@@ -165,19 +165,16 @@ describe("iOS Safari — auto-update guarantees", () => {
     expect(env.swUnregisters).toBe(0);
   });
 
-  it("stops auto-reloading after 2 attempts so the user sees the update banner", async () => {
+  it("always emits the update event before reloading so the banner is the safety net", async () => {
     const env = setupIOSEnv({ version: "v-next", appVersion: "v-current" });
     const mod = await import("@/lib/appUpdate");
 
     await mod.checkForNewAppVersion(true);
-    await mod.checkForNewAppVersion(true);
-    await mod.checkForNewAppVersion(true);
-    await mod.checkForNewAppVersion(true);
 
-    // First call triggers the reload; subsequent calls only re-emit the event
-    // (iOS Safari may have ignored the first reload — the banner is the safety net).
-    expect(env.reloadCalls.length).toBeLessThanOrEqual(2);
-    expect(env.dispatched.length).toBeGreaterThanOrEqual(2);
+    // Banner event fires BEFORE the hard-reload — if iOS Safari swallows the
+    // reload (e.g. PWA in background), the banner stays visible as a fallback.
+    expect(env.dispatched.length).toBeGreaterThanOrEqual(1);
+    expect(env.reloadCalls.length).toBe(1);
   });
 
   it("forceAppUpdateReload clears caches, unregisters SW, and hard-reloads (banner CTA path)", async () => {
