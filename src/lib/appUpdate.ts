@@ -10,6 +10,7 @@ const CURRENT_VERSION_KEY = "kidzz_current_app_version";
 const UPDATE_ATTEMPT_PREFIX = "kidzz_update_attempt_";
 const CHECK_INTERVAL_MS = 15_000;
 const CHECK_THROTTLE_MS = 4_000;
+export const APP_UPDATE_AVAILABLE_EVENT = "kidzz:update-available";
 
 const isInIframe = (() => {
   try {
@@ -97,6 +98,31 @@ function hardReloadToVersion(version: string) {
   window.location.replace(url.toString());
 }
 
+function notifyUpdateAvailable(version: string) {
+  window.dispatchEvent(new CustomEvent(APP_UPDATE_AVAILABLE_EVENT, { detail: { version } }));
+}
+
+function getUpdateAttempts(key: string) {
+  try {
+    return Number(sessionStorage.getItem(key) || "0");
+  } catch {
+    return 0;
+  }
+}
+
+function setUpdateAttempts(key: string, value: number) {
+  try {
+    sessionStorage.setItem(key, String(value));
+  } catch {
+    /* storage may be unavailable on iOS private mode */
+  }
+}
+
+export async function forceAppUpdateReload(version = `manual-${Date.now()}`) {
+  await clearAppCaches({ unregisterServiceWorkers: true });
+  hardReloadToVersion(version);
+}
+
 export async function checkForNewAppVersion(force = false) {
   if (!canCheckUpdates() || reloading) return;
 
@@ -126,11 +152,12 @@ export async function checkForNewAppVersion(force = false) {
       return;
     }
 
+    notifyUpdateAvailable(latestVersion);
     const attemptKey = `${UPDATE_ATTEMPT_PREFIX}${latestVersion}`;
-    const attempts = Number(sessionStorage.getItem(attemptKey) || "0");
-    if (attempts >= 3) return;
+    const attempts = getUpdateAttempts(attemptKey);
+    if (attempts >= 2) return;
 
-    sessionStorage.setItem(attemptKey, String(attempts + 1));
+    setUpdateAttempts(attemptKey, attempts + 1);
     await clearAppCaches({ unregisterServiceWorkers: true });
     hardReloadToVersion(latestVersion);
   } catch {
