@@ -392,7 +392,13 @@ const Index = () => {
           </motion.div>
         </AnimatePresence>
       </div>
-      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        isPremium={profile?.is_premium ?? false}
+        onOpenParents={() => setShowParentalGateForDashboard(true)}
+        onOpenPlans={() => window.dispatchEvent(new CustomEvent("kidzz:open-plans"))}
+      />
       <AnimatePresence>
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
@@ -403,6 +409,19 @@ const Index = () => {
         {showLoginGate && <ParentalGate onSuccess={() => setShowLoginGate(false)} onCancel={() => setShowLoginGate(false)} />}
         {showParentalGateForSettings && (
           <ParentalGate onSuccess={() => { setShowParentalGateForSettings(false); setShowSettings(true); }} onCancel={() => setShowParentalGateForSettings(false)} />
+        )}
+        {showParentalGateForDashboard && (
+          <ParentalGate onSuccess={() => { setShowParentalGateForDashboard(false); setShowDashboard(true); }} onCancel={() => setShowParentalGateForDashboard(false)} />
+        )}
+        {showDashboard && (
+          <ParentDashboard
+            onClose={() => setShowDashboard(false)}
+            onOpenSettings={() => { setShowDashboard(false); setShowSettings(true); }}
+            onOpenUpgrade={() => {
+              setShowDashboard(false);
+              window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+            }}
+          />
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
