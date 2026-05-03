@@ -31,6 +31,7 @@ import MusicForest from "@/components/music/MusicForest";
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
+import ParentDashboard from "@/components/parental/ParentDashboard";
 import SevenDayChallenge from "@/components/viral/SevenDayChallenge";
 import ReferralProgram from "@/components/viral/ReferralProgram";
 import MonthlyRetrospective from "@/components/viral/MonthlyRetrospective";
@@ -66,7 +67,9 @@ const Index = () => {
   const [selectedAgeRange, setSelectedAgeRange] = useState<string | null>(getCachedAgeRange());
   const [showLoginGate, setShowLoginGate] = useState(false);
   const [showParentalGateForSettings, setShowParentalGateForSettings] = useState(false);
+  const [showParentalGateForDashboard, setShowParentalGateForDashboard] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [notifPromptDismissed, setNotifPromptDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     return !!window.localStorage.getItem("kidzz_notification_set");
