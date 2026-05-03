@@ -7,7 +7,8 @@ export type PaywallContext =
   | "lab_outfit"
   | "memories_old"
   | "travel"
-  | "moments";
+  | "moments"
+  | "premium_feature";
 
 export interface PaywallCopy {
   emoji: string;
@@ -95,6 +96,14 @@ export function getPaywallCopy(
         subheadline: "Missões novas todo mês para criar conexão real em família.",
         cta: "✨ Liberar missões",
         highlight: "Fábrica de Momentos completa",
+      };
+    case "premium_feature":
+      return {
+        emoji: "👑",
+        headline: `Desbloqueie tudo para ${name}`,
+        subheadline: "Plano premium com rotina completa, conteúdos bloqueados, histórias, sonhos e relatório dos pais.",
+        cta: "👑 Ver assinatura",
+        highlight: "Kidzz Premium completo",
       };
   }
 }
