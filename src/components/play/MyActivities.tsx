@@ -96,6 +96,26 @@ const MyActivities = ({ onBack }: Props) => {
     [activities, completed]
   );
 
+  // 1ª atividade de cada categoria fica grátis; demais são premium.
+  // O destaque do dia fica sempre liberado para manter engajamento diário.
+  const freeIds = useMemo(() => {
+    const seen = new Set<ActivityCategory>();
+    const ids = new Set<string>();
+    if (dailyHighlight) ids.add(dailyHighlight.id);
+    for (const a of activities) {
+      if (!seen.has(a.category)) {
+        seen.add(a.category);
+        ids.add(a.id);
+      }
+    }
+    return ids;
+  }, [activities, dailyHighlight]);
+
+  const isLocked = useCallback(
+    (a: Activity) => !isPremium && !freeIds.has(a.id),
+    [isPremium, freeIds]
+  );
+
   const handleComplete = useCallback(
     (activity: Activity) => {
       if (completed.has(activity.id)) return;
