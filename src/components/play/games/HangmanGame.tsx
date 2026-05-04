@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow, gameGradient } from "@/lib/gameTheme";
 
 const POSITIVE_WORDS = [
   { word: "AMIZADE", hint: "Algo que nos faz sorrir quando estamos juntos" },
