@@ -20,6 +20,7 @@ import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
 import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
 import LevelUpOverlay from "./components/flow/LevelUpOverlay";
+import { markSeen, markLevelUp } from "@/lib/emotionalState";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,14 @@ const AppShell = () => {
     const t = setTimeout(handleSplashFinish, 2000);
     return () => clearTimeout(t);
   }, [splashDone]);
+
+  // Motor emocional: registra "última visita" e captura level-ups globais.
+  useEffect(() => {
+    markSeen();
+    const handler = () => markLevelUp();
+    window.addEventListener("kidzz:level-up", handler);
+    return () => window.removeEventListener("kidzz:level-up", handler);
+  }, []);
 
   return (
     <>
