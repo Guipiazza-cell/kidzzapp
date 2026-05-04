@@ -463,7 +463,21 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           />
         </div>
 
-        {/* Pixel character */}
+        {/* Pixel character + ground shadow */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            left: PIXEL_X + 6,
+            bottom: GROUND_Y - 6,
+            width: PIXEL_SIZE - 12,
+            height: 10,
+            borderRadius: "50%",
+            background: "radial-gradient(ellipse, rgba(0,0,0,0.45), transparent 70%)",
+            transform: `scale(${Math.max(0.5, 1 - pixelY / 200)})`,
+            opacity: Math.max(0.3, 1 - pixelY / 220),
+            filter: "blur(2px)",
+          }}
+        />
         <div
           className="absolute"
           style={{
@@ -473,7 +487,7 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
             height: PIXEL_SIZE,
             transform: `rotate(${pixelRot}deg)`,
             transition: "transform 50ms linear",
-            filter: "drop-shadow(0 4px 8px rgba(167,139,250,0.6))",
+            filter: "drop-shadow(0 6px 14px rgba(167,139,250,0.7)) drop-shadow(0 0 18px rgba(244,114,182,0.35))",
           }}
         >
           <img src={pixelImg} alt="Pixel" className="w-full h-full object-contain" draggable={false} />
@@ -488,15 +502,14 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
               left: o.x,
               bottom: GROUND_Y,
               width: o.width,
-              height: 44,
-              fontSize: 36,
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5))",
+              height: 48,
+              fontSize: 42,
+              filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.55))",
             }}
           >
             {o.emoji}
           </div>
         ))}
-
         {/* Stars to collect */}
         {stars.map((s) => (
           <div
