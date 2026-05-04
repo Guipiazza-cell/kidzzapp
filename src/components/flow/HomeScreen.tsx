@@ -23,6 +23,7 @@ import { kidzzMemory, getContextualGreeting } from "@/components/kidzz/kidzzMemo
 import { loadMascotConfig } from "@/components/lab/KidzzLab";
 import DailyMissionCard from "@/components/flow/DailyMissionCard";
 import { getTotalXp } from "@/lib/dailyMission";
+import LevelProgressBar from "@/components/flow/LevelProgressBar";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
@@ -281,7 +282,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         {/* Streak Card */}
         <StreakCard streakDays={streakDays} childName={childName} onSubmit={onSubmit} />
 
-        {/* Atalhos rápidos removidos — Brincar agora vive no menu inferior */}
+        {/* Global Level Bar (1-100) */}
+        <LevelProgressBar />
 
         <motion.div
           className="w-full max-w-sm grid grid-cols-2 gap-2 mt-2 mb-1"
