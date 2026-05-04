@@ -25,6 +25,7 @@ import DailyMissionCard from "@/components/flow/DailyMissionCard";
 import { getTotalXp } from "@/lib/dailyMission";
 import LevelProgressBar from "@/components/flow/LevelProgressBar";
 import KidzzAura from "@/components/flow/KidzzAura";
+import EmotionalSpeechBubble from "@/components/flow/EmotionalSpeechBubble";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
@@ -330,6 +331,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         {/* KIDZZ Hero — personagem único, vivo, contextual + aura por nível */}
         <KidzzAura />
         <KidzzHero childName={childName} streakDays={streakDays} ageRange={profile?.age_range ?? null} />
+        <EmotionalSpeechBubble childName={childName} streakDays={streakDays} />
 
         {/* Convite — "Me pergunta qualquer coisa" */}
         <motion.p
