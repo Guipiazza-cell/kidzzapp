@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow, gameGradient } from "@/lib/gameTheme";
 
 interface Props {
   onScore: (pts: number) => void;
@@ -121,8 +122,8 @@ const EmotionsGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
           exit={{ opacity: 0, y: -12 }}
           className="rounded-3xl p-5 mb-4 text-center border border-white/50 shadow-xl"
           style={{
-            background:
-              "linear-gradient(135deg, hsl(280 60% 65%), hsl(310 60% 55%))",
+            background: `linear-gradient(135deg, ${neon.violet}, ${neon.magenta})`,
+            boxShadow: glow.primary,
           }}
         >
           <p className="text-[11px] font-bold uppercase tracking-wide text-white/80 mb-2">
@@ -134,7 +135,7 @@ const EmotionsGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
         </motion.div>
       </AnimatePresence>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3" style={{ gap: "clamp(8px, 2.5vw, 14px)" }}>
         {options.map((opt) => {
           const isPicked = picked === opt.id;
           const isRight = opt.id === current.id;
@@ -145,14 +146,16 @@ const EmotionsGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
               key={opt.id}
               onClick={() => handlePick(opt.id)}
               disabled={!!picked}
-              className="rounded-2xl p-3 flex flex-col items-center gap-1 border min-h-[100px] shadow-md"
+              className="rounded-2xl p-3 flex flex-col items-center gap-1 border shadow-md"
               style={{
+                minHeight: "clamp(96px, 22vw, 120px)",
                 background: showRight
-                  ? "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))"
+                  ? gameGradient.success
                   : showWrong
-                  ? "linear-gradient(135deg, hsl(0 75% 60%), hsl(15 75% 50%))"
-                  : "rgba(255,255,255,0.78)",
+                  ? gameGradient.error
+                  : "rgba(255,255,255,0.85)",
                 borderColor: "rgba(255,255,255,0.55)",
+                boxShadow: showRight ? glow.success : showWrong ? glow.error : glow.soft,
               }}
               whileTap={{ scale: 0.95 }}
               animate={

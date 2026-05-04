@@ -321,7 +321,7 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
         onClick={handleArenaTap}
         className="relative w-full overflow-hidden rounded-3xl border-2 border-white/20 select-none cursor-pointer shadow-2xl"
         style={{
-          height: 380,
+          height: "clamp(320px, 55vh, 460px)",
           background:
             "linear-gradient(180deg, #0c1a3d 0%, #1e3a8a 25%, #5b21b6 55%, #831843 85%, #4a1d3f 100%)",
           touchAction: "manipulation",

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sparkles, RefreshCw, Check } from "lucide-react";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow, gameGradient } from "@/lib/gameTheme";
 
 interface Props {
   onScore: (pts: number) => void;
@@ -78,8 +79,8 @@ const CreateGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
         animate={{ opacity: 1, y: 0 }}
         className="rounded-3xl p-5 mb-4 border border-white/50 shadow-xl"
         style={{
-          background:
-            "linear-gradient(135deg, hsl(200 75% 60%), hsl(260 70% 55%))",
+          background: gameGradient.primary,
+          boxShadow: glow.primary,
         }}
       >
         <div className="flex items-center gap-2 mb-2 text-white/85">
@@ -102,9 +103,9 @@ const CreateGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
       </motion.div>
 
       <div className="space-y-2 mb-4">
-        <Slot label="Quem?" value={hero} onChange={() => setHero(pick(HEROES))} color="hsl(280 65% 60%)" />
-        <Slot label="Onde?" value={place} onChange={() => setPlace(pick(PLACES))} color="hsl(200 75% 55%)" />
-        <Slot label="O que acontece?" value={twist} onChange={() => setTwist(pick(TWISTS))} color="hsl(140 65% 45%)" />
+        <Slot label="Quem?" value={hero} onChange={() => setHero(pick(HEROES))} color={neon.violet} />
+        <Slot label="Onde?" value={place} onChange={() => setPlace(pick(PLACES))} color={neon.cyan} />
+        <Slot label="O que acontece?" value={twist} onChange={() => setTwist(pick(TWISTS))} color={neon.lime} />
       </div>
 
       <motion.button
@@ -132,8 +133,8 @@ const CreateGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
         disabled={confirmed}
         className="w-full rounded-2xl py-4 font-black text-white text-base shadow-xl border border-white/40 flex items-center justify-center gap-2 min-h-[52px]"
         style={{
-          background:
-            "linear-gradient(135deg, hsl(140 70% 50%), hsl(155 70% 40%))",
+          background: gameGradient.success,
+          boxShadow: glow.success,
         }}
         whileTap={{ scale: 0.97 }}
         animate={confirmed ? { scale: [1, 1.05, 1] } : {}}

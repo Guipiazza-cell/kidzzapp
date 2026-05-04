@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Zap } from "lucide-react";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow } from "@/lib/gameTheme";
 
 interface Props {
   onScore: (pts: number) => void;
@@ -110,12 +111,12 @@ const ReactionGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
 
   const bg =
     phase === "go"
-      ? "linear-gradient(135deg, hsl(140 70% 50%), hsl(155 70% 40%))"
+      ? `linear-gradient(135deg, ${neon.lime}, hsl(160 75% 40%))`
       : phase === "waiting"
-      ? "linear-gradient(135deg, hsl(0 75% 55%), hsl(15 80% 50%))"
+      ? `linear-gradient(135deg, ${neon.rose}, ${neon.magenta})`
       : phase === "tooSoon"
-      ? "linear-gradient(135deg, hsl(35 90% 55%), hsl(25 85% 45%))"
-      : "linear-gradient(135deg, hsl(220 70% 55%), hsl(240 70% 50%))";
+      ? `linear-gradient(135deg, ${neon.gold}, hsl(28 95% 55%))`
+      : `linear-gradient(135deg, ${neon.cyan}, ${neon.violet})`;
 
   const title =
     phase === "intro"
@@ -158,13 +159,15 @@ const ReactionGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
       <motion.button
         onClick={handleTap}
         className="w-full rounded-3xl border border-white/50 shadow-xl flex flex-col items-center justify-center text-white"
-        style={{ background: bg, height: 360 }}
+        style={{ background: bg, height: "clamp(280px, 55vh, 400px)" }}
         whileTap={{ scale: 0.97 }}
         animate={{
           boxShadow:
             phase === "go"
-              ? "0 0 40px hsl(140 80% 60% / 0.6)"
-              : "0 10px 30px rgba(0,0,0,0.15)",
+              ? glow.success + ", 0 0 50px hsl(140 80% 60% / 0.7)"
+              : phase === "waiting"
+              ? glow.error
+              : "0 10px 30px rgba(0,0,0,0.18)",
         }}
       >
         <AnimatePresence mode="wait">

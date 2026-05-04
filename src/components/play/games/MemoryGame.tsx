@@ -2,26 +2,27 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow, gameGradient } from "@/lib/gameTheme";
 
 // Bigger, themed nature sets — animals, plants, ocean
 const EMOJI_SETS: { theme: string; emojis: string[]; gradient: string; glow: string }[] = [
   {
     theme: "🌳 Floresta",
     emojis: ["🦊", "🦉", "🐿️", "🦔", "🐝", "🦋"],
-    gradient: "linear-gradient(135deg, hsl(140 45% 35%), hsl(155 50% 25%))",
-    glow: "rgba(74,222,128,0.55)",
+    gradient: `linear-gradient(135deg, ${neon.lime}, ${neon.cyan})`,
+    glow: "hsl(140 80% 55% / 0.55)",
   },
   {
     theme: "🌊 Oceano",
     emojis: ["🐢", "🐬", "🐠", "🦈", "🐙", "🦀"],
-    gradient: "linear-gradient(135deg, hsl(200 70% 45%), hsl(220 70% 30%))",
-    glow: "rgba(56,189,248,0.55)",
+    gradient: `linear-gradient(135deg, ${neon.cyan}, ${neon.violet})`,
+    glow: "hsl(190 95% 60% / 0.55)",
   },
   {
     theme: "🌸 Jardim",
     emojis: ["🌻", "🌷", "🌹", "🌺", "🌼", "🍄"],
-    gradient: "linear-gradient(135deg, hsl(320 60% 55%), hsl(280 55% 45%))",
-    glow: "rgba(244,114,182,0.55)",
+    gradient: `linear-gradient(135deg, ${neon.magenta}, ${neon.violet})`,
+    glow: "hsl(320 90% 65% / 0.55)",
   },
 ];
 
@@ -149,8 +150,14 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
         </div>
       </div>
 
-      {/* Grid: bigger cards w/ depth */}
-      <div className="grid grid-cols-3 gap-3 w-full max-w-[360px]">
+      {/* Grid: bigger cards w/ depth, fluid for any screen */}
+      <div
+        className="grid grid-cols-3 w-full mx-auto"
+        style={{
+          maxWidth: "min(96vw, 420px)",
+          gap: "clamp(8px, 2.5vw, 14px)",
+        }}
+      >
         {cards.map((card) => {
           const revealed = card.flipped || card.matched;
           return (

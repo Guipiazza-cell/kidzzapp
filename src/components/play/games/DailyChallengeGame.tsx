@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow, gameGradient } from "@/lib/gameTheme";
 
 interface Challenge {
   type: "quiz" | "emoji" | "math";
@@ -130,18 +131,28 @@ const DailyChallengeGame = ({ onScore, onReaction, isPremium, onOpenAchievements
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 px-2 pb-2">
       <div className="flex gap-2">
         {questions.map((_, i) => (
           <div
             key={i}
-            className={`w-3 h-3 rounded-full transition-all ${
-              i < totalAnswered
-                ? "bg-emerald-400"
-                : i === questionIdx
-                ? "bg-sky-400"
-                : "bg-white/10"
-            }`}
+            className="rounded-full transition-all"
+            style={{
+              width: 12,
+              height: 12,
+              background:
+                i < totalAnswered
+                  ? neon.lime
+                  : i === questionIdx
+                  ? neon.cyan
+                  : "rgba(255,255,255,0.18)",
+              boxShadow:
+                i === questionIdx
+                  ? `0 0 12px ${neon.cyan}`
+                  : i < totalAnswered
+                  ? `0 0 8px ${neon.lime}`
+                  : undefined,
+            }}
           />
         ))}
       </div>
@@ -154,24 +165,44 @@ const DailyChallengeGame = ({ onScore, onReaction, isPremium, onOpenAchievements
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -30 }}
         >
-          <p className="text-center text-white/80 font-bold text-sm mb-4 px-2">
-            {current.question}
-          </p>
+          <div
+            className="rounded-2xl px-4 py-3 mb-4 border border-white/50 shadow-md text-center"
+            style={{ background: gameGradient.primary, boxShadow: glow.primary }}
+          >
+            <p className="text-white font-extrabold text-base leading-snug">
+              {current.question}
+            </p>
+          </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2" style={{ gap: "clamp(8px, 2.5vw, 12px)" }}>
             {current.options.map((opt, i) => {
-              let style = "bg-white/5 border-white/10 text-white/70";
-              if (answered !== null) {
-                if (i === current.correct)
-                  style = "bg-emerald-500/30 border-emerald-400/50 text-emerald-300";
-                else if (i === answered)
-                  style = "bg-orange-500/20 border-orange-400/30 text-orange-300";
-              }
+              const isCorrectAnswered = answered !== null && i === current.correct;
+              const isWrongAnswered = answered === i && i !== current.correct;
               return (
                 <motion.button
                   key={i}
                   onClick={() => handleAnswer(i)}
-                  className={`p-3 rounded-xl text-sm font-bold border transition-all ${style}`}
+                  className="rounded-2xl text-sm font-extrabold border transition-all flex items-center justify-center"
+                  style={{
+                    minHeight: "clamp(52px, 12vw, 64px)",
+                    padding: "12px",
+                    background: isCorrectAnswered
+                      ? gameGradient.success
+                      : isWrongAnswered
+                      ? gameGradient.error
+                      : "rgba(255,255,255,0.85)",
+                    borderColor: isCorrectAnswered
+                      ? neon.lime
+                      : isWrongAnswered
+                      ? neon.rose
+                      : "rgba(255,255,255,0.6)",
+                    color: isCorrectAnswered || isWrongAnswered ? "white" : "hsl(220 25% 25%)",
+                    boxShadow: isCorrectAnswered
+                      ? glow.success
+                      : isWrongAnswered
+                      ? glow.error
+                      : glow.soft,
+                  }}
                   whileTap={answered === null ? { scale: 0.93 } : undefined}
                 >
                   {opt}

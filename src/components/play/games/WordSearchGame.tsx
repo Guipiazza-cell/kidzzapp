@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow } from "@/lib/gameTheme";
 
 const WORD_SETS = [
   { words: ["SOL", "LUA", "MAR", "CÉU"], gridSize: 6, theme: "Natureza 🌿" },
@@ -167,13 +168,15 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
         ))}
       </div>
 
-      {/* Grid */}
+      {/* Grid — fluid cells, fits small + large screens */}
       <div
-        className="grid gap-1.5 p-3 rounded-2xl border border-white/60 shadow-xl"
+        className="grid p-3 rounded-2xl border border-white/60 shadow-xl mx-auto"
         style={{
           gridTemplateColumns: `repeat(${wordSet.gridSize}, 1fr)`,
+          gap: "clamp(4px, 1.2vw, 8px)",
+          maxWidth: "min(96vw, 420px)",
           background:
-            "linear-gradient(135deg, rgba(255,255,255,0.85), rgba(220,252,231,0.7))",
+            "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(224,242,254,0.7))",
         }}
       >
         {grid.map((row, r) =>
@@ -184,16 +187,18 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
               <motion.button
                 key={key}
                 onClick={() => handleCellClick(r, c)}
-                className="w-10 h-10 rounded-xl text-base font-extrabold flex items-center justify-center border transition-all"
+                className="rounded-xl font-extrabold flex items-center justify-center border transition-all aspect-square"
                 style={{
+                  width: "100%",
+                  fontSize: "clamp(13px, 3.6vw, 18px)",
                   background: isSel
-                    ? "linear-gradient(135deg, hsl(145 70% 50%), hsl(160 70% 40%))"
-                    : "linear-gradient(135deg, #ffffff, hsl(150 30% 95%))",
-                  borderColor: isSel ? "hsl(145 70% 45%)" : "rgba(255,255,255,0.9)",
-                  color: isSel ? "white" : "hsl(150 30% 25%)",
+                    ? `linear-gradient(135deg, ${neon.cyan}, ${neon.violet})`
+                    : "linear-gradient(135deg, #ffffff, hsl(220 30% 96%))",
+                  borderColor: isSel ? neon.cyan : "rgba(255,255,255,0.9)",
+                  color: isSel ? "white" : "hsl(220 25% 25%)",
                   boxShadow: isSel
-                    ? "0 4px 12px rgba(34,197,94,0.5), inset 0 1px 0 rgba(255,255,255,0.4)"
-                    : "0 2px 5px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)",
+                    ? glow.primary
+                    : glow.soft,
                 }}
                 whileTap={{ scale: 0.88 }}
                 animate={isSel ? { scale: [1, 1.08, 1] } : {}}

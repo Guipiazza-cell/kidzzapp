@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow, gameGradient } from "@/lib/gameTheme";
 
 const POSITIVE_WORDS = [
   { word: "AMIZADE", hint: "Algo que nos faz sorrir quando estamos juntos" },
@@ -120,23 +121,22 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
         <p className="text-sm font-extrabold text-gray-800 leading-snug">{current.hint}</p>
       </div>
 
-      {/* Word display */}
-      <div className="flex gap-2 justify-center flex-wrap">
+      {/* Word display — fluid tiles */}
+      <div className="flex justify-center flex-wrap" style={{ gap: "clamp(4px, 1.5vw, 8px)" }}>
         {word.split("").map((letter, i) => {
           const revealed = guessed.includes(letter);
           return (
             <motion.div
               key={i}
-              className="w-10 h-12 rounded-xl flex items-center justify-center text-xl font-black border-2"
+              className="rounded-xl flex items-center justify-center font-black border-2"
               style={{
-                background: revealed
-                  ? "linear-gradient(135deg, hsl(145 70% 55%), hsl(160 70% 45%))"
-                  : "rgba(255,255,255,0.85)",
-                borderColor: revealed ? "hsl(145 70% 50%)" : "rgba(255,255,255,0.7)",
+                width: "clamp(28px, 8vw, 44px)",
+                height: "clamp(36px, 10vw, 52px)",
+                fontSize: "clamp(16px, 4.5vw, 22px)",
+                background: revealed ? gameGradient.success : "rgba(255,255,255,0.9)",
+                borderColor: revealed ? neon.lime : "rgba(255,255,255,0.7)",
                 color: revealed ? "white" : "hsl(220 20% 30%)",
-                boxShadow: revealed
-                  ? "0 6px 18px rgba(34,197,94,0.5), inset 0 1px 0 rgba(255,255,255,0.4)"
-                  : "0 3px 8px rgba(0,0,0,0.1), inset 0 -2px 0 rgba(0,0,0,0.05)",
+                boxShadow: revealed ? glow.success : glow.soft,
               }}
               animate={revealed ? { scale: [0.8, 1.15, 1] } : {}}
             >
@@ -146,8 +146,14 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
         })}
       </div>
 
-      {/* Keyboard */}
-      <div className="flex flex-wrap gap-1.5 justify-center max-w-[330px]">
+      {/* Keyboard — fluid */}
+      <div
+        className="flex flex-wrap justify-center mx-auto"
+        style={{
+          gap: "clamp(4px, 1.2vw, 8px)",
+          maxWidth: "min(96vw, 380px)",
+        }}
+      >
         {KEYBOARD.map((letter) => {
           const isGuessed = guessed.includes(letter);
           const isCorrect = isGuessed && word.includes(letter);
@@ -157,23 +163,20 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
               key={letter}
               onClick={() => handleGuess(letter)}
               disabled={isGuessed || won || lost}
-              className="w-9 h-10 rounded-xl text-sm font-extrabold flex items-center justify-center border transition-all"
+              className="rounded-xl font-extrabold flex items-center justify-center border transition-all"
               style={{
+                width: "clamp(26px, 7.5vw, 36px)",
+                height: "clamp(32px, 9vw, 42px)",
+                fontSize: "clamp(11px, 3vw, 14px)",
                 background: isCorrect
-                  ? "linear-gradient(135deg, hsl(145 70% 55%), hsl(160 70% 45%))"
+                  ? gameGradient.success
                   : isWrong
-                  ? "linear-gradient(135deg, hsl(0 60% 80%), hsl(15 60% 75%))"
+                  ? `linear-gradient(135deg, ${neon.rose}, ${neon.magenta})`
                   : "linear-gradient(135deg, #ffffff, hsl(220 20% 95%))",
-                borderColor: isCorrect
-                  ? "hsl(145 70% 45%)"
-                  : isWrong
-                  ? "hsl(0 60% 70%)"
-                  : "rgba(255,255,255,0.9)",
-                color: isCorrect ? "white" : isWrong ? "hsl(0 50% 35%)" : "hsl(220 20% 30%)",
+                borderColor: isCorrect ? neon.lime : isWrong ? neon.rose : "rgba(255,255,255,0.9)",
+                color: isCorrect || isWrong ? "white" : "hsl(220 20% 30%)",
                 opacity: isWrong ? 0.55 : 1,
-                boxShadow: isCorrect
-                  ? "0 3px 10px rgba(34,197,94,0.45)"
-                  : "0 2px 5px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)",
+                boxShadow: isCorrect ? glow.success : isWrong ? glow.error : glow.soft,
               }}
               whileTap={!isGuessed ? { scale: 0.88 } : undefined}
             >
