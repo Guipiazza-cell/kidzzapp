@@ -150,8 +150,14 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
         </div>
       </div>
 
-      {/* Grid: bigger cards w/ depth */}
-      <div className="grid grid-cols-3 gap-3 w-full max-w-[360px]">
+      {/* Grid: bigger cards w/ depth, fluid for any screen */}
+      <div
+        className="grid grid-cols-3 w-full mx-auto"
+        style={{
+          maxWidth: "min(96vw, 420px)",
+          gap: "clamp(8px, 2.5vw, 14px)",
+        }}
+      >
         {cards.map((card) => {
           const revealed = card.flipped || card.matched;
           return (
