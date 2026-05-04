@@ -420,6 +420,11 @@ const MyActivities = ({ onBack }: Props) => {
         onComplete={handleComplete}
         onClose={() => setSelected(null)}
       />
+      <ContextualPaywallModal
+        open={showPremiumCTA}
+        context="premium_feature"
+        onClose={() => setShowPremiumCTA(false)}
+      />
     </motion.div>
   );
 };
