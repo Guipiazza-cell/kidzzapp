@@ -328,35 +328,70 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           boxShadow: "0 20px 60px rgba(76,29,149,0.4), inset 0 0 60px rgba(0,0,0,0.3)",
         }}
       >
-        {/* Moon */}
-        <div className="absolute top-4 right-6 text-3xl opacity-90 drop-shadow-[0_0_12px_rgba(253,224,71,0.5)]">
-          🌙
+        {/* Aurora glow */}
+        <div
+          className="absolute inset-x-0 top-0 h-32 pointer-events-none opacity-60"
+          style={{
+            background:
+              "radial-gradient(ellipse at 30% 40%, rgba(167,139,250,0.5), transparent 60%), radial-gradient(ellipse at 70% 60%, rgba(244,114,182,0.4), transparent 60%)",
+            filter: "blur(20px)",
+          }}
+        />
+
+        {/* Moon with halo */}
+        <div className="absolute top-5 right-7">
+          <div
+            className="absolute -inset-3 rounded-full opacity-50"
+            style={{ background: "radial-gradient(circle, rgba(253,224,71,0.6), transparent 70%)", filter: "blur(8px)" }}
+          />
+          <div className="relative text-4xl drop-shadow-[0_0_16px_rgba(253,224,71,0.7)]">🌙</div>
         </div>
 
         {/* Stars background */}
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={`bg-star-${i}`}
-            className="absolute w-0.5 h-0.5 bg-white rounded-full opacity-70"
-            style={{
-              top: `${(i * 17) % 60}%`,
-              left: `${(i * 31) % 100}%`,
-              animation: `twinkle ${2 + (i % 3)}s ease-in-out infinite`,
-              animationDelay: `${i * 0.2}s`,
-            }}
-          />
-        ))}
+        {[...Array(28)].map((_, i) => {
+          const size = i % 4 === 0 ? 2 : 1;
+          return (
+            <div
+              key={`bg-star-${i}`}
+              className="absolute bg-white rounded-full"
+              style={{
+                width: size,
+                height: size,
+                top: `${(i * 13) % 65}%`,
+                left: `${(i * 37) % 100}%`,
+                opacity: 0.7,
+                boxShadow: "0 0 4px rgba(255,255,255,0.8)",
+                animation: `twinkle ${2 + (i % 3)}s ease-in-out infinite`,
+                animationDelay: `${i * 0.15}s`,
+              }}
+            />
+          );
+        })}
+
+        {/* Distant mountains */}
+        <div
+          className="absolute left-0 right-0 pointer-events-none"
+          style={{
+            bottom: GROUND_Y - 4,
+            height: 90,
+            background:
+              "linear-gradient(180deg, transparent 0%, rgba(30,27,75,0.6) 100%)",
+            clipPath:
+              "polygon(0 100%, 0 60%, 12% 30%, 22% 55%, 35% 20%, 48% 50%, 60% 25%, 75% 55%, 88% 30%, 100% 50%, 100% 100%)",
+            opacity: 0.7,
+          }}
+        />
 
         {/* Trees parallax (back layer) */}
         <div
-          className="absolute bottom-[60px] left-0 right-0 h-20 pointer-events-none"
-          style={{ transform: `translateX(${parallax * 0.5}px)` }}
+          className="absolute left-0 right-0 h-20 pointer-events-none"
+          style={{ bottom: GROUND_Y, transform: `translateX(${parallax * 0.5}px)` }}
         >
-          {[...Array(8)].map((_, i) => (
+          {[...Array(10)].map((_, i) => (
             <div
               key={`tree-${i}`}
-              className="absolute bottom-0 text-2xl opacity-30"
-              style={{ left: `${i * 120 + (parallax % 120)}px` }}
+              className="absolute bottom-0 text-2xl opacity-40"
+              style={{ left: `${i * 110 + (parallax % 110)}px`, filter: "blur(0.5px)" }}
             >
               🌲
             </div>
@@ -365,19 +400,37 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
 
         {/* Trees parallax (front layer) */}
         <div
-          className="absolute bottom-[60px] left-0 right-0 h-24 pointer-events-none"
-          style={{ transform: `translateX(${parallax}px)` }}
+          className="absolute left-0 right-0 h-28 pointer-events-none"
+          style={{ bottom: GROUND_Y, transform: `translateX(${parallax}px)` }}
         >
-          {[...Array(6)].map((_, i) => (
+          {[...Array(7)].map((_, i) => (
             <div
               key={`tree2-${i}`}
-              className="absolute bottom-0 text-3xl opacity-50"
-              style={{ left: `${i * 180 + ((parallax * 0.6) % 180)}px` }}
+              className="absolute bottom-0 text-4xl opacity-70"
+              style={{ left: `${i * 170 + ((parallax * 0.6) % 170)}px`, filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.4))" }}
             >
               🌳
             </div>
           ))}
         </div>
+
+        {/* Fireflies */}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={`firefly-${i}`}
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: 4,
+              height: 4,
+              background: "rgba(253,224,71,0.9)",
+              boxShadow: "0 0 10px rgba(253,224,71,0.9), 0 0 20px rgba(253,224,71,0.6)",
+              top: `${30 + (i * 11) % 50}%`,
+              left: `${(i * 23) % 90}%`,
+              animation: `firefly ${4 + (i % 3)}s ease-in-out infinite`,
+              animationDelay: `${i * 0.5}s`,
+            }}
+          />
+        ))}
 
         {/* Ground */}
         <div
@@ -385,9 +438,9 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           style={{
             height: GROUND_Y,
             background:
-              "linear-gradient(180deg, #4c1d95 0%, #2e1065 60%, #1e1b4b 100%)",
-            borderTop: "2px solid rgba(167,139,250,0.4)",
-            boxShadow: "inset 0 4px 12px rgba(0,0,0,0.4)",
+              "linear-gradient(180deg, #5b21b6 0%, #2e1065 50%, #0f0a1f 100%)",
+            borderTop: "2px solid rgba(167,139,250,0.5)",
+            boxShadow: "inset 0 6px 16px rgba(0,0,0,0.5), 0 -4px 20px rgba(167,139,250,0.3)",
           }}
         >
           {/* Ground texture */}
@@ -397,6 +450,15 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
               backgroundImage:
                 "repeating-linear-gradient(90deg, transparent 0 30px, rgba(255,255,255,0.08) 30px 32px)",
               transform: `translateX(${parallax * 1.2}px)`,
+            }}
+          />
+          {/* Grass blades */}
+          <div
+            className="absolute top-0 left-0 right-0 h-2 opacity-50"
+            style={{
+              background:
+                "repeating-linear-gradient(90deg, transparent 0 8px, rgba(134,239,172,0.5) 8px 10px)",
+              transform: `translateX(${parallax * 1.4}px)`,
             }}
           />
         </div>
