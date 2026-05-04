@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target, Heart, Wand2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
@@ -10,6 +10,9 @@ import MemoryGame from "./games/MemoryGame";
 import HangmanGame from "./games/HangmanGame";
 import DailyChallengeGame from "./games/DailyChallengeGame";
 import PixelPulaGame from "./games/PixelPulaGame";
+import ReactionGame from "./games/ReactionGame";
+import EmotionsGame from "./games/EmotionsGame";
+import CreateGame from "./games/CreateGame";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
@@ -33,14 +36,17 @@ const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
   challenging: "guide",
 };
 
-type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
+type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily" | "reaction" | "emotions" | "create";
 type View = "menu" | "games" | "activities";
 
 // Estratégia de monetização: 1 jogo grátis por categoria — Memória é o item gratuito.
 // Os demais ficam bloqueados para free e disparam o paywall contextual.
 const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean; isNew?: boolean }[] = [
   { id: "memory", label: "Memória", icon: Brain, emoji: "🧠", sub: "Grátis para todos", bgColor: "linear-gradient(135deg, hsl(280 65% 65%), hsl(265 70% 55%))" },
-  { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o KIDZZ a pular!", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", premium: true, isNew: true },
+  { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "3 partidas por dia", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", premium: true, isNew: true },
+  { id: "reaction", label: "Reação", icon: Zap, emoji: "⚡", sub: "Quão rápido você é?", bgColor: "linear-gradient(135deg, hsl(45 95% 55%), hsl(25 90% 50%))", premium: true, isNew: true },
+  { id: "emotions", label: "Emoções", icon: Heart, emoji: "💞", sub: "Mundo dos sentimentos", bgColor: "linear-gradient(135deg, hsl(320 70% 60%), hsl(280 65% 55%))", premium: true, isNew: true },
+  { id: "create", label: "Eu Crio", icon: Wand2, emoji: "✨", sub: "Invente uma história", bgColor: "linear-gradient(135deg, hsl(200 75% 60%), hsl(260 70% 55%))", premium: true, isNew: true },
   { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍", sub: "Encontre as palavras", bgColor: "linear-gradient(135deg, hsl(200 75% 60%), hsl(210 80% 50%))", premium: true },
   { id: "hangman", label: "Forca", icon: Type, emoji: "✏️", sub: "Descubra a palavra", bgColor: "linear-gradient(135deg, hsl(35 90% 60%), hsl(25 90% 55%))", premium: true },
   { id: "daily", label: "Desafio", icon: Zap, emoji: "🎯", sub: "Missão especial", bgColor: "linear-gradient(135deg, hsl(340 75% 65%), hsl(0 75% 60%))", premium: true },
@@ -382,6 +388,30 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
             )}
             {activeGame === "hangman" && (
               <HangmanGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
+            )}
+            {activeGame === "reaction" && (
+              <ReactionGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
+            )}
+            {activeGame === "emotions" && (
+              <EmotionsGame
+                onScore={handleScore}
+                onReaction={handleReaction}
+                onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
+                onHome={() => { setActiveGame(null); onBack(); }}
+              />
+            )}
+            {activeGame === "create" && (
+              <CreateGame
                 onScore={handleScore}
                 onReaction={handleReaction}
                 onOpenAchievements={() => { setActiveGame(null); onOpenAchievements?.(); }}
