@@ -108,6 +108,12 @@ export const getXP = (): number => {
 export const addXP = (amount: number): number => {
   const next = Math.max(0, getXP() + amount);
   safeWrite(KEYS.xp, String(next));
+  // Bridge into global level system using shared totalXp counter
+  try {
+    if (typeof window !== "undefined" && amount > 0) {
+      import("./dailyMission").then(({ addXp }) => addXp("activity", amount));
+    }
+  } catch { /* noop */ }
   return next;
 };
 
