@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Zap } from "lucide-react";
 import GameResultScreen from "./GameResultScreen";
+import { neon, glow } from "@/lib/gameTheme";
 
 interface Props {
   onScore: (pts: number) => void;
