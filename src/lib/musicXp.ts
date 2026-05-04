@@ -43,6 +43,19 @@ export function addMusicXp(action: MusicAction): { xp: number; gained: number } 
   const xp = getMusicXp() + gained;
   window.localStorage.setItem(XP_KEY, String(xp));
   bumpStreak();
+  // Bridge to global Level System (Bloco 1) — every musical action also
+  // contributes to the universal XP/Level so progress is unified.
+  try {
+    import("./dailyMission").then(({ addXp }) => {
+      // Map music action to a MissionAction tier; passes explicit gained
+      // value so the level XP is identical to the music XP earned.
+      const mapped =
+        action === "create" ? "create" :
+        action === "story" ? "story" :
+        "music";
+      addXp(mapped as any, gained);
+    });
+  } catch { /* noop */ }
   return { xp, gained };
 }
 
