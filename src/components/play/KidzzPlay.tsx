@@ -95,7 +95,28 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
   }, []);
 
   const handleGameSelect = (id: GameId) => {
-    if (GAMES.find((g) => g.id === id)?.premium && !isPremium) {
+    const def = GAMES.find((g) => g.id === id);
+    if (!def) return;
+    // "Kidzz Pula!" tem limite suave de 3 partidas/dia para free; demais premium = bloqueio total
+    if (def.premium && !isPremium) {
+      if (id === "pixel-pula") {
+        try {
+          const today = new Date().toISOString().slice(0, 10);
+          const raw = localStorage.getItem("kidzz_pula_daily") || "{}";
+          const obj = JSON.parse(raw);
+          const used = obj.date === today ? Number(obj.count) || 0 : 0;
+          if (used >= 3) {
+            setShowPremiumCTA(true);
+            return;
+          }
+          localStorage.setItem(
+            "kidzz_pula_daily",
+            JSON.stringify({ date: today, count: used + 1 })
+          );
+        } catch { /* noop */ }
+        setActiveGame(id);
+        return;
+      }
       setShowPremiumCTA(true);
       return;
     }
