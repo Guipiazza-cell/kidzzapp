@@ -133,8 +133,8 @@ const CreateGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
         disabled={confirmed}
         className="w-full rounded-2xl py-4 font-black text-white text-base shadow-xl border border-white/40 flex items-center justify-center gap-2 min-h-[52px]"
         style={{
-          background:
-            "linear-gradient(135deg, hsl(140 70% 50%), hsl(155 70% 40%))",
+          background: gameGradient.success,
+          boxShadow: glow.success,
         }}
         whileTap={{ scale: 0.97 }}
         animate={confirmed ? { scale: [1, 1.05, 1] } : {}}
