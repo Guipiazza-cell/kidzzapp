@@ -28,12 +28,12 @@ interface Props {
 }
 
 const OBSTACLE_EMOJIS = ["🍄", "🪨", "🌵", "🪵", "🌿"];
-const GROUND_Y = 60; // px from bottom
-const PIXEL_X = 60;  // fixed left position
-const PIXEL_SIZE = 56;
-const GRAVITY = 1.2;
-const JUMP_VELOCITY = -16;
-const TICK_MS = 30;
+const GROUND_Y = 72; // px from bottom — taller ground
+const PIXEL_X = 70;  // fixed left position
+const PIXEL_SIZE = 84; // bigger character (was 56)
+const GRAVITY = 0.95; // a bit floatier
+const JUMP_VELOCITY = -18; // higher jump
+const TICK_MS = 28;
 
 const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
   const { profile } = useAuth();
