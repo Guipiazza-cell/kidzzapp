@@ -327,24 +327,27 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
 };
 
 const PillarCard = ({
-  emoji, title, subtitle, gradient, onClick, available,
-}: { emoji: string; title: string; subtitle: string; gradient: string; onClick: () => void; available?: boolean }) => (
+  emoji, title, subtitle, gradient, onClick, available, locked,
+}: { emoji: string; title: string; subtitle: string; gradient: string; onClick: () => void; available?: boolean; locked?: boolean }) => (
   <motion.button
     onClick={onClick}
     whileTap={{ scale: available ? 0.97 : 1 }}
     className={`relative rounded-3xl p-4 text-left border ${available ? "border-amber-400/50" : "border-white/20 opacity-60"} bg-white/75 backdrop-blur-md shadow-lg`}
-    style={{
-      boxShadow: available ? "0 6px 20px hsl(45 80% 50% / 0.15)" : "none",
-    }}
+    style={{ boxShadow: available ? "0 6px 20px hsl(45 80% 50% / 0.15)" : "none" }}
   >
-    {available && (
+    {locked && (
+      <div className="absolute top-2 right-2 text-[9px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow flex items-center gap-1">
+        🔒 Premium
+      </div>
+    )}
+    {!locked && available && (
       <motion.div
         className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-amber-900 shadow"
         animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
       >NOVO</motion.div>
     )}
-    <div className={`text-4xl mb-2 bg-gradient-to-br ${gradient} bg-clip-text drop-shadow`}>{emoji}</div>
+    <div className={`text-4xl mb-2 bg-gradient-to-br ${gradient} bg-clip-text drop-shadow ${locked ? "opacity-60" : ""}`}>{emoji}</div>
     <p className="text-gray-800 text-sm font-extrabold leading-tight">{title}</p>
     <p className="text-gray-600 text-[11px] font-semibold leading-tight mt-0.5">{subtitle}</p>
   </motion.button>
