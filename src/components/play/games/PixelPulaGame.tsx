@@ -319,12 +319,13 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       <div
         ref={arenaRef}
         onClick={handleArenaTap}
-        className="relative w-full overflow-hidden rounded-2xl border border-white/10 select-none cursor-pointer"
+        className="relative w-full overflow-hidden rounded-3xl border-2 border-white/20 select-none cursor-pointer shadow-2xl"
         style={{
-          height: 320,
+          height: 380,
           background:
-            "linear-gradient(180deg, #1e1b4b 0%, #312e81 40%, #4c1d95 75%, #5b21b6 100%)",
+            "linear-gradient(180deg, #0c1a3d 0%, #1e3a8a 25%, #5b21b6 55%, #831843 85%, #4a1d3f 100%)",
           touchAction: "manipulation",
+          boxShadow: "0 20px 60px rgba(76,29,149,0.4), inset 0 0 60px rgba(0,0,0,0.3)",
         }}
       >
         {/* Moon */}
