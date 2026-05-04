@@ -323,6 +323,11 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           )}
         </AnimatePresence>
       </LivingForest>
+      <ContextualPaywallModal
+        open={showPremiumCTA}
+        context="premium_feature"
+        onClose={() => setShowPremiumCTA(false)}
+      />
     </motion.div>
   );
 };
