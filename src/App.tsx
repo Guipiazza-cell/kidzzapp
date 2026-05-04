@@ -19,6 +19,7 @@ import AppUpdateBanner from "./components/AppUpdateBanner";
 import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
 import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
+import LevelUpOverlay from "./components/flow/LevelUpOverlay";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ const AppShell = () => {
           <InstallBanner />
           <OfflineIndicator />
           <KidzzShareTrigger />
+          <LevelUpOverlay />
         </AuthProvider>
       </BrowserRouter>
     </>

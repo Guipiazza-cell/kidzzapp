@@ -114,8 +114,30 @@ export function getTotalXp(): number {
 
 export function addXp(action: MissionAction, override?: number): { total: number; gained: number } {
   const gained = typeof override === "number" && override > 0 ? override : XP_VALUES[action];
-  const total = getTotalXp() + gained;
+  const prevTotal = getTotalXp();
+  const total = prevTotal + gained;
   safeWrite(TOTAL_XP_KEY, String(total));
+
+  // Bridge into the global Level System: dispatch xp-gained and (if crossed)
+  // level-up so any listener (overlay, progress bar) updates instantly.
+  try {
+    if (typeof window !== "undefined") {
+      // Lazy import to avoid circular ref at module init
+      import("./levelSystem").then(({ getLevelInfo }) => {
+        const before = getLevelInfo(prevTotal);
+        const after = getLevelInfo(total);
+        window.dispatchEvent(new CustomEvent("kidzz:xp-gained", { detail: { gained, after } }));
+        if (after.level > before.level) {
+          window.dispatchEvent(
+            new CustomEvent("kidzz:level-up", {
+              detail: { from: before.level, to: after.level, after },
+            })
+          );
+        }
+      });
+    }
+  } catch { /* noop */ }
+
   return { total, gained };
 }
 
