@@ -28,18 +28,30 @@ export default function LevelProgressBar({ compact }: Props) {
     };
   }, []);
 
+  const open = () => {
+    try {
+      window.dispatchEvent(new CustomEvent("kidzz:open-journey"));
+    } catch {
+      /* noop */
+    }
+  };
+
   return (
-    <div
-      className={`w-full max-w-sm rounded-2xl glass-card px-3 py-2 ${
+    <motion.button
+      type="button"
+      onClick={open}
+      whileTap={{ scale: 0.97 }}
+      className={`w-full max-w-sm rounded-2xl glass-card px-3 py-2 text-left ${
         compact ? "" : "mb-2"
       }`}
+      aria-label={`Ver sua jornada — nível ${info.level}`}
     >
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[11px] font-black text-gray-800">
           Nível {info.level} <span className="text-gray-500">— {info.title}</span>
         </span>
         <span className="text-[10px] font-extrabold text-gray-600">
-          {info.xpInLevel}/{info.xpForNext} XP
+          {info.xpInLevel}/{info.xpForNext} XP →
         </span>
       </div>
       <div className="relative h-2 rounded-full bg-gray-200/70 overflow-hidden">
@@ -55,6 +67,6 @@ export default function LevelProgressBar({ compact }: Props) {
           transition={{ duration: 2.6, repeat: Infinity, ease: "linear" }}
         />
       </div>
-    </div>
+    </motion.button>
   );
 }
