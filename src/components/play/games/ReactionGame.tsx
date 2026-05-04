@@ -111,12 +111,12 @@ const ReactionGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
 
   const bg =
     phase === "go"
-      ? "linear-gradient(135deg, hsl(140 70% 50%), hsl(155 70% 40%))"
+      ? `linear-gradient(135deg, ${neon.lime}, hsl(160 75% 40%))`
       : phase === "waiting"
-      ? "linear-gradient(135deg, hsl(0 75% 55%), hsl(15 80% 50%))"
+      ? `linear-gradient(135deg, ${neon.rose}, ${neon.magenta})`
       : phase === "tooSoon"
-      ? "linear-gradient(135deg, hsl(35 90% 55%), hsl(25 85% 45%))"
-      : "linear-gradient(135deg, hsl(220 70% 55%), hsl(240 70% 50%))";
+      ? `linear-gradient(135deg, ${neon.gold}, hsl(28 95% 55%))`
+      : `linear-gradient(135deg, ${neon.cyan}, ${neon.violet})`;
 
   const title =
     phase === "intro"
