@@ -199,14 +199,14 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
             Mais maneiras de brincar com música
           </p>
 
-          {/* 4 Pilares */}
+          {/* 4 Pilares — Karaokê grátis; demais premium */}
           <div className="grid grid-cols-2 gap-3">
             <PillarCard
               emoji="☀️"
               title="Karaokê do Dia"
-              subtitle="Cante com o Kidzz"
+              subtitle="Grátis — cante com o Kidzz"
               gradient="from-amber-400 to-orange-500"
-              onClick={() => setActivePillar("morning")}
+              onClick={() => tryOpenPillar("morning", false)}
               available
             />
             <PillarCard
@@ -214,24 +214,27 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
               title="Dance com Kidzz"
               subtitle="Mini-game de palmas"
               gradient="from-pink-400 to-rose-500"
-              onClick={() => setActivePillar("dance")}
+              onClick={() => tryOpenPillar("dance", true)}
               available
+              locked={!isPremium}
             />
             <PillarCard
               emoji="📖"
               title="Histórias Cantadas"
               subtitle="4 livros mágicos"
               gradient="from-purple-400 to-indigo-500"
-              onClick={() => setActivePillar("stories")}
+              onClick={() => tryOpenPillar("stories", true)}
               available
+              locked={!isPremium}
             />
             <PillarCard
               emoji="🎼"
               title="Crie Sua Música"
               subtitle="Laboratório sonoro"
               gradient="from-emerald-400 to-teal-500"
-              onClick={() => setActivePillar("create")}
+              onClick={() => tryOpenPillar("create", true)}
               available
+              locked={!isPremium}
             />
           </div>
 
