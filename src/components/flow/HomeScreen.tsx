@@ -24,6 +24,7 @@ import { loadMascotConfig } from "@/components/lab/KidzzLab";
 import DailyMissionCard from "@/components/flow/DailyMissionCard";
 import { getTotalXp } from "@/lib/dailyMission";
 import LevelProgressBar from "@/components/flow/LevelProgressBar";
+import KidzzAura from "@/components/flow/KidzzAura";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
