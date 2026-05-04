@@ -588,11 +588,17 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       <style>{`
         @keyframes twinkle {
           0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.9; }
+          50% { opacity: 0.95; }
         }
         @keyframes spinPulse {
           0%, 100% { transform: scale(1) rotate(0deg); }
-          50% { transform: scale(1.2) rotate(180deg); }
+          50% { transform: scale(1.25) rotate(180deg); }
+        }
+        @keyframes firefly {
+          0%, 100% { transform: translate(0,0); opacity: 0.4; }
+          25% { transform: translate(8px,-6px); opacity: 1; }
+          50% { transform: translate(-6px,-12px); opacity: 0.7; }
+          75% { transform: translate(4px,-4px); opacity: 0.9; }
         }
       `}</style>
     </div>
