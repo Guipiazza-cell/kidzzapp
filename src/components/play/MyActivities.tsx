@@ -309,67 +309,93 @@ const MyActivities = ({ onBack }: Props) => {
         <div className="space-y-2">
           {activities.map((a) => {
             const done = completed.has(a.id);
+            const locked = isLocked(a);
             const meta = getCategoryMeta(a.category);
+            const open = () => {
+              if (locked) {
+                setShowPremiumCTA(true);
+                return;
+              }
+              setSelected(a);
+            };
             return (
               <motion.div
                 key={a.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => setSelected(a)}
+                onClick={open}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    setSelected(a);
+                    open();
                   }
                 }}
-                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-sm ${
+                className={`relative flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-sm ${
                   done
                     ? "bg-emerald-50/80 border-emerald-200 opacity-70"
+                    : locked
+                    ? "bg-white/55 border-white/50"
                     : "bg-white/70 border-white/60"
                 }`}
                 layout
                 whileTap={{ scale: 0.98 }}
-                aria-label={`Ver detalhes de ${a.title}`}
+                aria-label={locked ? `${a.title} — premium` : `Ver detalhes de ${a.title}`}
               >
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                  style={{ background: `${meta.color.replace(")", " / 0.18)")}` }}
+                  style={{
+                    background: `${meta.color.replace(")", " / 0.18)")}`,
+                    filter: locked ? "blur(1.5px) saturate(0.6)" : "none",
+                  }}
                 >
                   {a.emoji}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-sm font-extrabold leading-tight ${
-                      done ? "text-gray-500 line-through" : "text-gray-800"
+                      done
+                        ? "text-gray-500 line-through"
+                        : locked
+                        ? "text-gray-500"
+                        : "text-gray-800"
                     }`}
                   >
                     {a.title}
                   </p>
                   <p className="text-[10px] font-bold" style={{ color: meta.color }}>
                     {meta.emoji} {meta.label} · +{a.xp} XP
+                    {locked && " · 🔒 Premium"}
                   </p>
                 </div>
                 <motion.button
                   onClick={(e) => {
                     e.stopPropagation();
                     if (done) return;
-                    setSelected(a);
+                    open();
                   }}
                   disabled={done}
                   className={`min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all ${
                     done
                       ? "bg-emerald-500 text-white"
+                      : locked
+                      ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white"
                       : "bg-gray-100 text-gray-700 active:scale-90"
                   }`}
                   whileTap={done ? undefined : { scale: 0.9 }}
-                  aria-label={done ? "Concluído" : "Ver atividade"}
+                  aria-label={done ? "Concluído" : locked ? "Desbloquear premium" : "Ver atividade"}
                 >
-                  {done ? <Check size={18} /> : "Ver"}
+                  {done ? <Check size={18} /> : locked ? <Lock size={16} /> : "Ver"}
                 </motion.button>
               </motion.div>
             );
           })}
         </div>
+
+        {!isPremium && (
+          <p className="mt-3 text-center text-[11px] text-gray-600 font-semibold">
+            ✨ 1 atividade grátis em cada categoria · Premium libera todas
+          </p>
+        )}
 
         <p className="mt-4 text-center text-[10px] text-gray-400 font-semibold">
           As atividades mudam toda segunda-feira ✨
