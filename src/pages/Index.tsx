@@ -143,7 +143,12 @@ const Index = () => {
       setStep("paywall");
     };
     window.addEventListener("kidzz:open-plans", openPlans);
-    return () => window.removeEventListener("kidzz:open-plans", openPlans);
+    const openJourney = () => setShowJourney(true);
+    window.addEventListener("kidzz:open-journey", openJourney);
+    return () => {
+      window.removeEventListener("kidzz:open-plans", openPlans);
+      window.removeEventListener("kidzz:open-journey", openJourney);
+    };
   }, []);
 
   // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
