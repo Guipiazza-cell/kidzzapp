@@ -79,8 +79,8 @@ const CreateGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
         animate={{ opacity: 1, y: 0 }}
         className="rounded-3xl p-5 mb-4 border border-white/50 shadow-xl"
         style={{
-          background:
-            "linear-gradient(135deg, hsl(200 75% 60%), hsl(260 70% 55%))",
+          background: gameGradient.primary,
+          boxShadow: glow.primary,
         }}
       >
         <div className="flex items-center gap-2 mb-2 text-white/85">
