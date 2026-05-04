@@ -362,6 +362,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
             exit={{ opacity: 0, x: -30 }}
             className="flex-1 overflow-y-auto pb-24"
           >
+            <Suspense fallback={<div className="flex items-center justify-center py-16 text-sm font-bold text-gray-600">Carregando jogo… ✨</div>}>
             {activeGame === "pixel-pula" && (
               <PixelPulaGame
                 onScore={handleScore}
@@ -433,6 +434,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
                 }}
               />
             )}
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>
