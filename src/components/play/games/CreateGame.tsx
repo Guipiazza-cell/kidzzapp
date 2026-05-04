@@ -103,9 +103,9 @@ const CreateGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
       </motion.div>
 
       <div className="space-y-2 mb-4">
-        <Slot label="Quem?" value={hero} onChange={() => setHero(pick(HEROES))} color="hsl(280 65% 60%)" />
-        <Slot label="Onde?" value={place} onChange={() => setPlace(pick(PLACES))} color="hsl(200 75% 55%)" />
-        <Slot label="O que acontece?" value={twist} onChange={() => setTwist(pick(TWISTS))} color="hsl(140 65% 45%)" />
+        <Slot label="Quem?" value={hero} onChange={() => setHero(pick(HEROES))} color={neon.violet} />
+        <Slot label="Onde?" value={place} onChange={() => setPlace(pick(PLACES))} color={neon.cyan} />
+        <Slot label="O que acontece?" value={twist} onChange={() => setTwist(pick(TWISTS))} color={neon.lime} />
       </div>
 
       <motion.button
