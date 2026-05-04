@@ -326,7 +326,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           <DailyQuestionCard childName={childName} onSubmit={submit} disabled={submitting || isFreeLimitReached} />
         </div>
 
-        {/* KIDZZ Hero — personagem único, vivo, contextual */}
+        {/* KIDZZ Hero — personagem único, vivo, contextual + aura por nível */}
+        <KidzzAura />
         <KidzzHero childName={childName} streakDays={streakDays} ageRange={profile?.age_range ?? null} />
 
         {/* Convite — "Me pergunta qualquer coisa" */}
