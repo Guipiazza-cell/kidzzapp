@@ -136,19 +136,31 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <p className="text-xs font-bold text-emerald-300/70">{wordSet.theme}</p>
+    <div className="flex flex-col items-center gap-3 px-2 pb-2">
+      <div
+        className="px-4 py-1.5 rounded-full border border-emerald-300/40 shadow-sm"
+        style={{
+          background: "linear-gradient(135deg, hsl(150 60% 92%), hsl(165 70% 85%))",
+        }}
+      >
+        <p className="text-xs font-extrabold text-emerald-700">{wordSet.theme}</p>
+      </div>
 
       {/* Words to find */}
       <div className="flex flex-wrap gap-2 justify-center">
         {wordSet.words.map((w) => (
           <span
             key={w}
-            className={`text-xs font-bold px-2 py-1 rounded-lg transition-all ${
+            className={`text-xs font-extrabold px-3 py-1.5 rounded-xl border transition-all shadow-sm ${
               found.includes(w)
-                ? "bg-emerald-500/30 text-emerald-300 line-through"
-                : "bg-white/10 text-white/60"
+                ? "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white border-emerald-300 line-through"
+                : "bg-white/80 text-gray-700 border-white/60"
             }`}
+            style={
+              found.includes(w)
+                ? { boxShadow: "0 4px 12px rgba(34,197,94,0.45)" }
+                : undefined
+            }
           >
             {w}
           </span>
@@ -157,9 +169,11 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
 
       {/* Grid */}
       <div
-        className="grid gap-1"
+        className="grid gap-1.5 p-3 rounded-2xl border border-white/60 shadow-xl"
         style={{
           gridTemplateColumns: `repeat(${wordSet.gridSize}, 1fr)`,
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.85), rgba(220,252,231,0.7))",
         }}
       >
         {grid.map((row, r) =>
@@ -170,12 +184,19 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
               <motion.button
                 key={key}
                 onClick={() => handleCellClick(r, c)}
-                className={`w-9 h-9 rounded-lg text-sm font-bold flex items-center justify-center transition-all border ${
-                  isSel
-                    ? "bg-emerald-500/30 border-emerald-400/50 text-white"
-                    : "bg-white/5 border-white/10 text-white/70"
-                }`}
-                whileTap={{ scale: 0.9 }}
+                className="w-10 h-10 rounded-xl text-base font-extrabold flex items-center justify-center border transition-all"
+                style={{
+                  background: isSel
+                    ? "linear-gradient(135deg, hsl(145 70% 50%), hsl(160 70% 40%))"
+                    : "linear-gradient(135deg, #ffffff, hsl(150 30% 95%))",
+                  borderColor: isSel ? "hsl(145 70% 45%)" : "rgba(255,255,255,0.9)",
+                  color: isSel ? "white" : "hsl(150 30% 25%)",
+                  boxShadow: isSel
+                    ? "0 4px 12px rgba(34,197,94,0.5), inset 0 1px 0 rgba(255,255,255,0.4)"
+                    : "0 2px 5px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)",
+                }}
+                whileTap={{ scale: 0.88 }}
+                animate={isSel ? { scale: [1, 1.08, 1] } : {}}
               >
                 {letter}
               </motion.button>

@@ -86,44 +86,68 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 px-2 pb-2">
       {/* Hearts */}
-      <div className="flex gap-1">
+      <div className="flex gap-1.5 px-3 py-1.5 rounded-full bg-white/70 border border-white/60 shadow-sm">
         {Array.from({ length: MAX_ERRORS }).map((_, i) => (
           <motion.span
             key={i}
-            className="text-lg"
+            className="text-xl"
+            style={{
+              filter:
+                i < hearts
+                  ? "drop-shadow(0 0 6px rgba(244,63,94,0.6))"
+                  : "grayscale(1) opacity(0.4)",
+            }}
             animate={i >= hearts ? { scale: 0, opacity: 0 } : { scale: 1 }}
           >
-            {i < hearts ? "💚" : "🤍"}
+            {i < hearts ? "❤️" : "🤍"}
           </motion.span>
         ))}
       </div>
 
-      {/* Hint */}
-      <p className="text-xs text-sky-300/60 text-center font-medium px-4">
-        💡 {current.hint}
-      </p>
+      {/* Hint card */}
+      <div
+        className="w-full rounded-2xl px-4 py-3 border border-white/60 shadow-sm text-center"
+        style={{
+          background:
+            "linear-gradient(135deg, hsl(200 80% 92%), hsl(220 70% 88%))",
+        }}
+      >
+        <p className="text-[10px] font-bold uppercase tracking-wide text-sky-700/70 mb-0.5">
+          💡 Dica
+        </p>
+        <p className="text-sm font-extrabold text-gray-800 leading-snug">{current.hint}</p>
+      </div>
 
       {/* Word display */}
-      <div className="flex gap-1.5 justify-center flex-wrap">
-        {word.split("").map((letter, i) => (
-          <motion.div
-            key={i}
-            className={`w-9 h-11 rounded-lg flex items-center justify-center text-lg font-bold border ${
-              guessed.includes(letter)
-                ? "bg-emerald-500/20 border-emerald-400/40 text-white"
-                : "bg-white/5 border-white/15 text-transparent"
-            }`}
-            animate={guessed.includes(letter) ? { scale: [0.8, 1.1, 1] } : {}}
-          >
-            {guessed.includes(letter) || lost ? letter : "_"}
-          </motion.div>
-        ))}
+      <div className="flex gap-2 justify-center flex-wrap">
+        {word.split("").map((letter, i) => {
+          const revealed = guessed.includes(letter);
+          return (
+            <motion.div
+              key={i}
+              className="w-10 h-12 rounded-xl flex items-center justify-center text-xl font-black border-2"
+              style={{
+                background: revealed
+                  ? "linear-gradient(135deg, hsl(145 70% 55%), hsl(160 70% 45%))"
+                  : "rgba(255,255,255,0.85)",
+                borderColor: revealed ? "hsl(145 70% 50%)" : "rgba(255,255,255,0.7)",
+                color: revealed ? "white" : "hsl(220 20% 30%)",
+                boxShadow: revealed
+                  ? "0 6px 18px rgba(34,197,94,0.5), inset 0 1px 0 rgba(255,255,255,0.4)"
+                  : "0 3px 8px rgba(0,0,0,0.1), inset 0 -2px 0 rgba(0,0,0,0.05)",
+              }}
+              animate={revealed ? { scale: [0.8, 1.15, 1] } : {}}
+            >
+              {revealed || lost ? letter : "_"}
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Keyboard */}
-      <div className="flex flex-wrap gap-1 justify-center max-w-[300px]">
+      <div className="flex flex-wrap gap-1.5 justify-center max-w-[330px]">
         {KEYBOARD.map((letter) => {
           const isGuessed = guessed.includes(letter);
           const isCorrect = isGuessed && word.includes(letter);
@@ -133,21 +157,31 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
               key={letter}
               onClick={() => handleGuess(letter)}
               disabled={isGuessed || won || lost}
-              className={`w-8 h-9 rounded-lg text-xs font-bold flex items-center justify-center border transition-all ${
-                isCorrect
-                  ? "bg-emerald-500/30 border-emerald-400/40 text-emerald-300"
+              className="w-9 h-10 rounded-xl text-sm font-extrabold flex items-center justify-center border transition-all"
+              style={{
+                background: isCorrect
+                  ? "linear-gradient(135deg, hsl(145 70% 55%), hsl(160 70% 45%))"
                   : isWrong
-                  ? "bg-red-500/10 border-red-400/20 text-red-300/40"
-                  : "bg-white/5 border-white/10 text-white/60"
-              }`}
-              whileTap={!isGuessed ? { scale: 0.85 } : undefined}
+                  ? "linear-gradient(135deg, hsl(0 60% 80%), hsl(15 60% 75%))"
+                  : "linear-gradient(135deg, #ffffff, hsl(220 20% 95%))",
+                borderColor: isCorrect
+                  ? "hsl(145 70% 45%)"
+                  : isWrong
+                  ? "hsl(0 60% 70%)"
+                  : "rgba(255,255,255,0.9)",
+                color: isCorrect ? "white" : isWrong ? "hsl(0 50% 35%)" : "hsl(220 20% 30%)",
+                opacity: isWrong ? 0.55 : 1,
+                boxShadow: isCorrect
+                  ? "0 3px 10px rgba(34,197,94,0.45)"
+                  : "0 2px 5px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)",
+              }}
+              whileTap={!isGuessed ? { scale: 0.88 } : undefined}
             >
               {letter}
             </motion.button>
           );
         })}
       </div>
-
     </div>
   );
 };

@@ -28,12 +28,12 @@ interface Props {
 }
 
 const OBSTACLE_EMOJIS = ["🍄", "🪨", "🌵", "🪵", "🌿"];
-const GROUND_Y = 60; // px from bottom
-const PIXEL_X = 60;  // fixed left position
-const PIXEL_SIZE = 56;
-const GRAVITY = 1.2;
-const JUMP_VELOCITY = -16;
-const TICK_MS = 30;
+const GROUND_Y = 72; // px from bottom — taller ground
+const PIXEL_X = 70;  // fixed left position
+const PIXEL_SIZE = 84; // bigger character (was 56)
+const GRAVITY = 0.95; // a bit floatier
+const JUMP_VELOCITY = -18; // higher jump
+const TICK_MS = 28;
 
 const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
   const { profile } = useAuth();
@@ -319,43 +319,79 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       <div
         ref={arenaRef}
         onClick={handleArenaTap}
-        className="relative w-full overflow-hidden rounded-2xl border border-white/10 select-none cursor-pointer"
+        className="relative w-full overflow-hidden rounded-3xl border-2 border-white/20 select-none cursor-pointer shadow-2xl"
         style={{
-          height: 320,
+          height: 380,
           background:
-            "linear-gradient(180deg, #1e1b4b 0%, #312e81 40%, #4c1d95 75%, #5b21b6 100%)",
+            "linear-gradient(180deg, #0c1a3d 0%, #1e3a8a 25%, #5b21b6 55%, #831843 85%, #4a1d3f 100%)",
           touchAction: "manipulation",
+          boxShadow: "0 20px 60px rgba(76,29,149,0.4), inset 0 0 60px rgba(0,0,0,0.3)",
         }}
       >
-        {/* Moon */}
-        <div className="absolute top-4 right-6 text-3xl opacity-90 drop-shadow-[0_0_12px_rgba(253,224,71,0.5)]">
-          🌙
+        {/* Aurora glow */}
+        <div
+          className="absolute inset-x-0 top-0 h-32 pointer-events-none opacity-60"
+          style={{
+            background:
+              "radial-gradient(ellipse at 30% 40%, rgba(167,139,250,0.5), transparent 60%), radial-gradient(ellipse at 70% 60%, rgba(244,114,182,0.4), transparent 60%)",
+            filter: "blur(20px)",
+          }}
+        />
+
+        {/* Moon with halo */}
+        <div className="absolute top-5 right-7">
+          <div
+            className="absolute -inset-3 rounded-full opacity-50"
+            style={{ background: "radial-gradient(circle, rgba(253,224,71,0.6), transparent 70%)", filter: "blur(8px)" }}
+          />
+          <div className="relative text-4xl drop-shadow-[0_0_16px_rgba(253,224,71,0.7)]">🌙</div>
         </div>
 
         {/* Stars background */}
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={`bg-star-${i}`}
-            className="absolute w-0.5 h-0.5 bg-white rounded-full opacity-70"
-            style={{
-              top: `${(i * 17) % 60}%`,
-              left: `${(i * 31) % 100}%`,
-              animation: `twinkle ${2 + (i % 3)}s ease-in-out infinite`,
-              animationDelay: `${i * 0.2}s`,
-            }}
-          />
-        ))}
+        {[...Array(28)].map((_, i) => {
+          const size = i % 4 === 0 ? 2 : 1;
+          return (
+            <div
+              key={`bg-star-${i}`}
+              className="absolute bg-white rounded-full"
+              style={{
+                width: size,
+                height: size,
+                top: `${(i * 13) % 65}%`,
+                left: `${(i * 37) % 100}%`,
+                opacity: 0.7,
+                boxShadow: "0 0 4px rgba(255,255,255,0.8)",
+                animation: `twinkle ${2 + (i % 3)}s ease-in-out infinite`,
+                animationDelay: `${i * 0.15}s`,
+              }}
+            />
+          );
+        })}
+
+        {/* Distant mountains */}
+        <div
+          className="absolute left-0 right-0 pointer-events-none"
+          style={{
+            bottom: GROUND_Y - 4,
+            height: 90,
+            background:
+              "linear-gradient(180deg, transparent 0%, rgba(30,27,75,0.6) 100%)",
+            clipPath:
+              "polygon(0 100%, 0 60%, 12% 30%, 22% 55%, 35% 20%, 48% 50%, 60% 25%, 75% 55%, 88% 30%, 100% 50%, 100% 100%)",
+            opacity: 0.7,
+          }}
+        />
 
         {/* Trees parallax (back layer) */}
         <div
-          className="absolute bottom-[60px] left-0 right-0 h-20 pointer-events-none"
-          style={{ transform: `translateX(${parallax * 0.5}px)` }}
+          className="absolute left-0 right-0 h-20 pointer-events-none"
+          style={{ bottom: GROUND_Y, transform: `translateX(${parallax * 0.5}px)` }}
         >
-          {[...Array(8)].map((_, i) => (
+          {[...Array(10)].map((_, i) => (
             <div
               key={`tree-${i}`}
-              className="absolute bottom-0 text-2xl opacity-30"
-              style={{ left: `${i * 120 + (parallax % 120)}px` }}
+              className="absolute bottom-0 text-2xl opacity-40"
+              style={{ left: `${i * 110 + (parallax % 110)}px`, filter: "blur(0.5px)" }}
             >
               🌲
             </div>
@@ -364,19 +400,37 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
 
         {/* Trees parallax (front layer) */}
         <div
-          className="absolute bottom-[60px] left-0 right-0 h-24 pointer-events-none"
-          style={{ transform: `translateX(${parallax}px)` }}
+          className="absolute left-0 right-0 h-28 pointer-events-none"
+          style={{ bottom: GROUND_Y, transform: `translateX(${parallax}px)` }}
         >
-          {[...Array(6)].map((_, i) => (
+          {[...Array(7)].map((_, i) => (
             <div
               key={`tree2-${i}`}
-              className="absolute bottom-0 text-3xl opacity-50"
-              style={{ left: `${i * 180 + ((parallax * 0.6) % 180)}px` }}
+              className="absolute bottom-0 text-4xl opacity-70"
+              style={{ left: `${i * 170 + ((parallax * 0.6) % 170)}px`, filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.4))" }}
             >
               🌳
             </div>
           ))}
         </div>
+
+        {/* Fireflies */}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={`firefly-${i}`}
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: 4,
+              height: 4,
+              background: "rgba(253,224,71,0.9)",
+              boxShadow: "0 0 10px rgba(253,224,71,0.9), 0 0 20px rgba(253,224,71,0.6)",
+              top: `${30 + (i * 11) % 50}%`,
+              left: `${(i * 23) % 90}%`,
+              animation: `firefly ${4 + (i % 3)}s ease-in-out infinite`,
+              animationDelay: `${i * 0.5}s`,
+            }}
+          />
+        ))}
 
         {/* Ground */}
         <div
@@ -384,9 +438,9 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           style={{
             height: GROUND_Y,
             background:
-              "linear-gradient(180deg, #4c1d95 0%, #2e1065 60%, #1e1b4b 100%)",
-            borderTop: "2px solid rgba(167,139,250,0.4)",
-            boxShadow: "inset 0 4px 12px rgba(0,0,0,0.4)",
+              "linear-gradient(180deg, #5b21b6 0%, #2e1065 50%, #0f0a1f 100%)",
+            borderTop: "2px solid rgba(167,139,250,0.5)",
+            boxShadow: "inset 0 6px 16px rgba(0,0,0,0.5), 0 -4px 20px rgba(167,139,250,0.3)",
           }}
         >
           {/* Ground texture */}
@@ -398,9 +452,32 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
               transform: `translateX(${parallax * 1.2}px)`,
             }}
           />
+          {/* Grass blades */}
+          <div
+            className="absolute top-0 left-0 right-0 h-2 opacity-50"
+            style={{
+              background:
+                "repeating-linear-gradient(90deg, transparent 0 8px, rgba(134,239,172,0.5) 8px 10px)",
+              transform: `translateX(${parallax * 1.4}px)`,
+            }}
+          />
         </div>
 
-        {/* Pixel character */}
+        {/* Pixel character + ground shadow */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            left: PIXEL_X + 6,
+            bottom: GROUND_Y - 6,
+            width: PIXEL_SIZE - 12,
+            height: 10,
+            borderRadius: "50%",
+            background: "radial-gradient(ellipse, rgba(0,0,0,0.45), transparent 70%)",
+            transform: `scale(${Math.max(0.5, 1 - pixelY / 200)})`,
+            opacity: Math.max(0.3, 1 - pixelY / 220),
+            filter: "blur(2px)",
+          }}
+        />
         <div
           className="absolute"
           style={{
@@ -410,7 +487,7 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
             height: PIXEL_SIZE,
             transform: `rotate(${pixelRot}deg)`,
             transition: "transform 50ms linear",
-            filter: "drop-shadow(0 4px 8px rgba(167,139,250,0.6))",
+            filter: "drop-shadow(0 6px 14px rgba(167,139,250,0.7)) drop-shadow(0 0 18px rgba(244,114,182,0.35))",
           }}
         >
           <img src={pixelImg} alt="Pixel" className="w-full h-full object-contain" draggable={false} />
@@ -425,15 +502,14 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
               left: o.x,
               bottom: GROUND_Y,
               width: o.width,
-              height: 44,
-              fontSize: 36,
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5))",
+              height: 48,
+              fontSize: 42,
+              filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.55))",
             }}
           >
             {o.emoji}
           </div>
         ))}
-
         {/* Stars to collect */}
         {stars.map((s) => (
           <div
@@ -512,11 +588,17 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       <style>{`
         @keyframes twinkle {
           0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.9; }
+          50% { opacity: 0.95; }
         }
         @keyframes spinPulse {
           0%, 100% { transform: scale(1) rotate(0deg); }
-          50% { transform: scale(1.2) rotate(180deg); }
+          50% { transform: scale(1.25) rotate(180deg); }
+        }
+        @keyframes firefly {
+          0%, 100% { transform: translate(0,0); opacity: 0.4; }
+          25% { transform: translate(8px,-6px); opacity: 1; }
+          50% { transform: translate(-6px,-12px); opacity: 0.7; }
+          75% { transform: translate(4px,-4px); opacity: 0.9; }
         }
       `}</style>
     </div>
