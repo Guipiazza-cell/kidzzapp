@@ -23,11 +23,21 @@ type Pillar = "morning" | "dance" | "stories" | "create";
 const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
   const { profile } = useAuth();
   const childName = profile?.child_name || "amigo";
+  const isPremium = profile?.is_premium ?? false;
   const [activePillar, setActivePillar] = useState<Pillar | null>(null);
   const [xp, setXp] = useState(getMusicXp());
   const [streak, setStreak] = useState(getMusicStreak());
   const [rareEffect, setRareEffect] = useState<"stars" | "butterflies" | "choir" | null>(null);
   const [achievementToast, setAchievementToast] = useState<MusicAchievement | null>(null);
+  const [showPremiumCTA, setShowPremiumCTA] = useState(false);
+
+  const tryOpenPillar = (p: Pillar, premium: boolean) => {
+    if (premium && !isPremium) {
+      setShowPremiumCTA(true);
+      return;
+    }
+    setActivePillar(p);
+  };
 
   // Refresh XP/streak after pillar visits + mark daily mission step + global XP
   useEffect(() => {
