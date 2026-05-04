@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
-import { neon, glow, cellSize } from "@/lib/gameTheme";
+import { neon, glow } from "@/lib/gameTheme";
 
 const WORD_SETS = [
   { words: ["SOL", "LUA", "MAR", "CÉU"], gridSize: 6, theme: "Natureza 🌿" },
