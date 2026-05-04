@@ -21,6 +21,7 @@ import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
 // Lazy-load so it only ships when the parent opens the Dreams tab —
 // makes first paint of that tab much faster.
 const DreamWorld = lazy(() => import("@/components/dreams/DreamWorld"));
+const JourneyScreen = lazy(() => import("@/components/flow/JourneyScreen"));
 import StoryFactory from "@/components/story/StoryFactory";
 import KidzzLab from "@/components/lab/KidzzLab";
 import KidzzPlay from "@/components/play/KidzzPlay";
@@ -467,6 +468,35 @@ const Index = () => {
         onClose={() => setContextualPaywall((p) => ({ ...p, open: false }))}
         onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); setShowLoginGate(true); }}
       />
+
+      {/* Sua Jornada — overlay com nível, próxima recompensa e jornada XP */}
+      <AnimatePresence>
+        {showJourney && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex flex-col"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              background:
+                "linear-gradient(180deg, hsl(45 60% 92%) 0%, hsl(140 35% 85%) 100%)",
+            }}
+          >
+            <Suspense
+              fallback={
+                <div className="flex-1 flex items-center justify-center text-sm font-bold text-gray-600">
+                  Abrindo sua jornada… ✨
+                </div>
+              }
+            >
+              <JourneyScreen
+                childName={childName}
+                onBack={() => setShowJourney(false)}
+              />
+            </Suspense>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Floating XP gain toasts */}
       <XpToast />
