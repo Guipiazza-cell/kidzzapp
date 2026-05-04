@@ -122,8 +122,8 @@ const EmotionsGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
           exit={{ opacity: 0, y: -12 }}
           className="rounded-3xl p-5 mb-4 text-center border border-white/50 shadow-xl"
           style={{
-            background:
-              "linear-gradient(135deg, hsl(280 60% 65%), hsl(310 60% 55%))",
+            background: `linear-gradient(135deg, ${neon.violet}, ${neon.magenta})`,
+            boxShadow: glow.primary,
           }}
         >
           <p className="text-[11px] font-bold uppercase tracking-wide text-white/80 mb-2">
