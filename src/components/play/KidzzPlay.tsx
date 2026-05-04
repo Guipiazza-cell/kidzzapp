@@ -1,18 +1,18 @@
-import { useState, useCallback, useEffect, memo } from "react";
+import { useState, useCallback, useEffect, memo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target, Heart, Wand2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
 import { loadMascotConfig, type LabExpression } from "@/components/lab/KidzzLab";
-import WordSearchGame from "./games/WordSearchGame";
-import MemoryGame from "./games/MemoryGame";
-import HangmanGame from "./games/HangmanGame";
-import DailyChallengeGame from "./games/DailyChallengeGame";
-import PixelPulaGame from "./games/PixelPulaGame";
-import ReactionGame from "./games/ReactionGame";
-import EmotionsGame from "./games/EmotionsGame";
-import CreateGame from "./games/CreateGame";
+const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
+const MemoryGame = lazy(() => import("./games/MemoryGame"));
+const HangmanGame = lazy(() => import("./games/HangmanGame"));
+const DailyChallengeGame = lazy(() => import("./games/DailyChallengeGame"));
+const PixelPulaGame = lazy(() => import("./games/PixelPulaGame"));
+const ReactionGame = lazy(() => import("./games/ReactionGame"));
+const EmotionsGame = lazy(() => import("./games/EmotionsGame"));
+const CreateGame = lazy(() => import("./games/CreateGame"));
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
@@ -362,6 +362,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
             exit={{ opacity: 0, x: -30 }}
             className="flex-1 overflow-y-auto pb-24"
           >
+            <Suspense fallback={<div className="flex items-center justify-center py-16 text-sm font-bold text-gray-600">Carregando jogo… ✨</div>}>
             {activeGame === "pixel-pula" && (
               <PixelPulaGame
                 onScore={handleScore}
@@ -433,6 +434,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
                 }}
               />
             )}
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>
