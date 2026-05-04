@@ -36,11 +36,13 @@ const EXPR_TO_MOOD: Record<LabExpression, KidzzMood> = {
 type GameId = "pixel-pula" | "word" | "memory" | "hangman" | "daily";
 type View = "menu" | "games" | "activities";
 
+// Estratégia de monetização: 1 jogo grátis por categoria — Memória é o item gratuito.
+// Os demais ficam bloqueados para free e disparam o paywall contextual.
 const GAMES: { id: GameId; label: string; icon: typeof Search; emoji: string; sub: string; bgColor: string; premium?: boolean; isNew?: boolean }[] = [
-  { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o KIDZZ a pular!", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", isNew: true },
-  { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍", sub: "Encontre as palavras", bgColor: "linear-gradient(135deg, hsl(200 75% 60%), hsl(210 80% 50%))" },
-  { id: "memory", label: "Memória", icon: Brain, emoji: "🧠", sub: "Treine a memória", bgColor: "linear-gradient(135deg, hsl(280 65% 65%), hsl(265 70% 55%))" },
-  { id: "hangman", label: "Forca", icon: Type, emoji: "✏️", sub: "Descubra a palavra", bgColor: "linear-gradient(135deg, hsl(35 90% 60%), hsl(25 90% 55%))" },
+  { id: "memory", label: "Memória", icon: Brain, emoji: "🧠", sub: "Grátis para todos", bgColor: "linear-gradient(135deg, hsl(280 65% 65%), hsl(265 70% 55%))" },
+  { id: "pixel-pula", label: "Kidzz Pula!", icon: Sparkles, emoji: "🦎", sub: "Ajude o KIDZZ a pular!", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", premium: true, isNew: true },
+  { id: "word", label: "Caça Palavras", icon: Search, emoji: "🔍", sub: "Encontre as palavras", bgColor: "linear-gradient(135deg, hsl(200 75% 60%), hsl(210 80% 50%))", premium: true },
+  { id: "hangman", label: "Forca", icon: Type, emoji: "✏️", sub: "Descubra a palavra", bgColor: "linear-gradient(135deg, hsl(35 90% 60%), hsl(25 90% 55%))", premium: true },
   { id: "daily", label: "Desafio", icon: Zap, emoji: "🎯", sub: "Missão especial", bgColor: "linear-gradient(135deg, hsl(340 75% 65%), hsl(0 75% 60%))", premium: true },
 ];
 
