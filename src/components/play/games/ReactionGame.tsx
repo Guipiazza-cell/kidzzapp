@@ -159,13 +159,15 @@ const ReactionGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
       <motion.button
         onClick={handleTap}
         className="w-full rounded-3xl border border-white/50 shadow-xl flex flex-col items-center justify-center text-white"
-        style={{ background: bg, height: 360 }}
+        style={{ background: bg, height: "clamp(280px, 55vh, 400px)" }}
         whileTap={{ scale: 0.97 }}
         animate={{
           boxShadow:
             phase === "go"
-              ? "0 0 40px hsl(140 80% 60% / 0.6)"
-              : "0 10px 30px rgba(0,0,0,0.15)",
+              ? glow.success + ", 0 0 50px hsl(140 80% 60% / 0.7)"
+              : phase === "waiting"
+              ? glow.error
+              : "0 10px 30px rgba(0,0,0,0.18)",
         }}
       >
         <AnimatePresence mode="wait">
