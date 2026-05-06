@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
 const TIMEOUT_MS = 30_000;

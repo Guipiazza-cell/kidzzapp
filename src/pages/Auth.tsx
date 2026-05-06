@@ -4,8 +4,8 @@ import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import MagicalBackground from "@/components/MagicalBackground";
 import { toast } from "sonner";
-import pixelImg from "@/assets/pixel-chameleon.png";
-import aneImg from "@/assets/ane-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
+import aneImg from "@/assets/ane-chameleon.webp";
 
 type Mode = "login" | "signup" | "forgot";
 

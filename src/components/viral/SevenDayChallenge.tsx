@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Share2, Copy, Gift, Users, Trophy, MessageCircle, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChallenges } from "@/hooks/useChallenges";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
 import confetti from "canvas-confetti";
 
 interface Props {

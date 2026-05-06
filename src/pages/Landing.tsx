@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Music, BookOpen, MessageCircle, Moon, CheckCircle, Shield, Sparkles, Heart, X, Check, Star, Clock, Zap } from "lucide-react";
-import chameleonHero from "@/assets/kidzz/landing-hero.jpeg";
+import chameleonHero from "@/assets/kidzz/landing-hero.webp";
 import MagicalBackground from "@/components/MagicalBackground";
 
 const CTA_URL = "https://kidzzapp.lovable.app";

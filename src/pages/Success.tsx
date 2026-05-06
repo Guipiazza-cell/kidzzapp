@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sparkles, Check, Crown, Loader2 } from "lucide-react";
 import MagicalBackground from "@/components/MagicalBackground";
-import pixelImg from "@/assets/pixel-chameleon.png";
-import aneImg from "@/assets/ane-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
+import aneImg from "@/assets/ane-chameleon.webp";
 
 type PlanInfo = {
   label: string;

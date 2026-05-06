@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { Lock, Sparkles, Crown } from "lucide-react";
-import chameleonBlue from "@/assets/chameleon-blue.png";
-import chameleonRed from "@/assets/chameleon-red.png";
-import chameleonDark from "@/assets/chameleon-dark.png";
-import chameleonMain from "@/assets/chameleon-main.jpeg";
+import chameleonBlue from "@/assets/chameleon-blue.webp";
+import chameleonRed from "@/assets/chameleon-red.webp";
+import chameleonDark from "@/assets/chameleon-dark.webp";
+import chameleonMain from "@/assets/chameleon-main.webp";
 import type { SubscriptionTier } from "@/contexts/AuthContext";
 
 interface PremiumCharactersProps {

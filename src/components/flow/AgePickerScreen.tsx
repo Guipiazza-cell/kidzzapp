@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check } from "lucide-react";
-import aneImg from "@/assets/ane-chameleon.png";
+import aneImg from "@/assets/ane-chameleon.webp";
 
 const AGE_OPTIONS = [
   { range: "0-3", emoji: "🧸", label: "3 – 5 anos", desc: "Respostas simples e carinhosas", accent: "from-emerald-400 to-teal-400" },

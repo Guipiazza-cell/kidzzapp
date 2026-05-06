@@ -28,6 +28,22 @@ const appVersionPlugin = (): Plugin => ({
           entryFileNames: `assets/[name]-${buildVersion}-[hash].js`,
           chunkFileNames: `assets/[name]-${buildVersion}-[hash].js`,
           assetFileNames: `assets/[name]-${buildVersion}-[hash][extname]`,
+          // Split heavy vendor libs into separate chunks for better caching
+          // and to keep the initial JS payload as small as possible.
+          manualChunks(id: string) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("framer-motion")) return "vendor-motion";
+            if (id.includes("@supabase")) return "vendor-supabase";
+            if (id.includes("@radix-ui")) return "vendor-radix";
+            if (id.includes("react-router")) return "vendor-router";
+            if (id.includes("@tanstack")) return "vendor-query";
+            if (id.includes("lucide-react")) return "vendor-icons";
+            if (
+              id.includes("/react/") ||
+              id.includes("/react-dom/") ||
+              id.includes("/scheduler/")
+            ) return "vendor-react";
+          },
         },
       },
     };
@@ -60,6 +76,13 @@ const appVersionPlugin = (): Plugin => ({
 export default defineConfig(({ mode }) => ({
   define: {
     __APP_VERSION__: JSON.stringify(buildVersion),
+  },
+  build: {
+    target: "es2020",
+    cssCodeSplit: true,
+    sourcemap: false,
+    reportCompressedSize: false,
+    chunkSizeWarningLimit: 1000,
   },
   server: {
     host: "::",

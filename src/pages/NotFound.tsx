@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import MagicalBackground from "@/components/MagicalBackground";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
 import { motion } from "framer-motion";
 
 const NotFound = () => {

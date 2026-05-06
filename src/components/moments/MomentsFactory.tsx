@@ -7,7 +7,7 @@ import { MISSIONS, type Mission } from "./MissionsData";
 import MissionDetail from "./MissionDetail";
 import ContextualPaywallModal from "../ContextualPaywallModal";
 import { MISSION_PACKS, isPackPurchased, openMissionPackCheckout } from "@/lib/missionPacks";
-import aneImg from "@/assets/ane-chameleon.png";
+import aneImg from "@/assets/ane-chameleon.webp";
 import { toast } from "sonner";
 
 interface Props {

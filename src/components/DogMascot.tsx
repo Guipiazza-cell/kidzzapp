@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import dogMascotImg from "@/assets/dog-mascot.png";
+import dogMascotImg from "@/assets/dog-mascot.webp";
 
 interface DogMascotProps {
   isTalking?: boolean;

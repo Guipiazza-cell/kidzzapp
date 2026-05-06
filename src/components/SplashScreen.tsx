@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import splashMascot from "@/assets/kidzz/cosmic.png";
+import splashMascot from "@/assets/kidzz/cosmic.webp";
 
 interface SplashScreenProps {
   onFinish?: () => void;
