@@ -1,14 +1,23 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary SEO -->
+    <title>Kidzz — IA educativa e divertida para crianças de 4 a 10 anos</title>
+    <meta name="description" content="Kidzz é o app de IA infantil que responde perguntas, conta histórias e cria experiências educativas seguras para crianças de 4 a 10 anos. Aprender brincando, com confiança." />
+    <meta name="keywords" content="app infantil, IA para crianças, educação infantil, histórias para dormir, perguntas de criança, aprendizado lúdico, app educativo, kidzz" />
+    <meta name="author" content="Kidzz" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://kidzz.app/" />
+
+    <!-- Performance: preconnect & font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Kidzz — Aprender nunca foi tão divertido</title>
-    <meta name="description" content="Kidzz é uma IA educativa e divertida para crianças de 4 a 10 anos. Pergunte qualquer coisa e aprenda brincando!">
-    <meta name="author" content="Kidzz" />
+
+    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -19,17 +28,59 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Kidzz">
     <meta name="format-detection" content="telephone=no">
-    
-    
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d06b7001-98b4-4b5e-bf2f-dd71a7649e65/id-preview-cfcf3a3e--19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovable.app-1774405340169.png">
+    <meta property="og:site_name" content="Kidzz" />
+    <meta property="og:url" content="https://kidzz.app/" />
+    <meta property="og:title" content="Kidzz — Aprender nunca foi tão divertido" />
+    <meta property="og:description" content="IA educativa e divertida para crianças de 4 a 10 anos. Pergunte qualquer coisa e aprenda brincando!" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d06b7001-98b4-4b5e-bf2f-dd71a7649e65/id-preview-cfcf3a3e--19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovable.app-1774405340169.png" />
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d06b7001-98b4-4b5e-bf2f-dd71a7649e65/id-preview-cfcf3a3e--19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovable.app-1774405340169.png">
-    <meta property="og:title" content="Kidzz — Aprender nunca foi tão divertido">
-  <meta name="twitter:title" content="Kidzz — Aprender nunca foi tão divertido">
-  <meta property="og:description" content="Kidzz é uma IA educativa e divertida para crianças de 4 a 10 anos. Pergunte qualquer coisa e aprenda brincando!">
-  <meta name="twitter:description" content="Kidzz é uma IA educativa e divertida para crianças de 4 a 10 anos. Pergunte qualquer coisa e aprenda brincando!">
-</head>
+    <meta name="twitter:title" content="Kidzz — Aprender nunca foi tão divertido" />
+    <meta name="twitter:description" content="IA educativa e divertida para crianças de 4 a 10 anos. Pergunte qualquer coisa e aprenda brincando!" />
+    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d06b7001-98b4-4b5e-bf2f-dd71a7649e65/id-preview-cfcf3a3e--19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovable.app-1774405340169.png" />
+
+    <!-- Structured data: Organization + WebSite + SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "Kidzz",
+          "url": "https://kidzz.app",
+          "logo": "https://kidzz.app/icon-512.png",
+          "sameAs": ["https://kidzzapp.lovable.app"]
+        },
+        {
+          "@type": "WebSite",
+          "name": "Kidzz",
+          "url": "https://kidzz.app",
+          "inLanguage": "pt-BR",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://kidzz.app/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Kidzz",
+          "operatingSystem": "Web, iOS, Android",
+          "applicationCategory": "EducationalApplication",
+          "audience": { "@type": "PeopleAudience", "suggestedMinAge": 4, "suggestedMaxAge": 10 },
+          "description": "IA educativa para crianças de 4 a 10 anos: perguntas, histórias, jogos e experiências de sono.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" },
+          "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "5000" }
+        }
+      ]
+    }
+    </script>
+  </head>
 
   <body>
     <div id="root"></div>

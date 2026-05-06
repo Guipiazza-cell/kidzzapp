@@ -6,15 +6,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import SplashScreen from "@/components/SplashScreen";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Success from "./pages/Success";
-import Privacy from "./pages/Privacy";
-import ResetPassword from "./pages/ResetPassword";
-import NotFound from "./pages/NotFound";
-import Landing from "./pages/Landing";
-import Admin from "./pages/Admin";
+// Rotas secundárias carregam sob demanda — reduz o bundle inicial.
+const Auth = lazy(() => import("./pages/Auth"));
+const Success = lazy(() => import("./pages/Success"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Landing = lazy(() => import("./pages/Landing"));
+const Admin = lazy(() => import("./pages/Admin"));
 import AppUpdateBanner from "./components/AppUpdateBanner";
 import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -74,18 +75,20 @@ const AppShell = () => {
       {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/lp" element={<Landing />} />
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/lp" element={<Landing />} />
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
           <AppUpdateBanner />
           <InstallBanner />
           <OfflineIndicator />
