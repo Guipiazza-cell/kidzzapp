@@ -7,7 +7,7 @@
 */
 
 import { forwardRef } from "react";
-import cosmicImg from "@/assets/kidzz/cosmic.png";
+import cosmicImg from "@/assets/kidzz/cosmic.webp";
 
 interface Props {
   childName: string;

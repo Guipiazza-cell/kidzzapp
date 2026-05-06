@@ -7,10 +7,10 @@
 
 import { forwardRef, useRef, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import cosmicImg from "@/assets/kidzz/cosmic.png";
-import moonImg from "@/assets/kidzz/moon.png";
-import explorerImg from "@/assets/kidzz/explorer.png";
-import musicImg from "@/assets/kidzz/music.png";
+import cosmicImg from "@/assets/kidzz/cosmic.webp";
+import moonImg from "@/assets/kidzz/moon.webp";
+import explorerImg from "@/assets/kidzz/explorer.webp";
+import musicImg from "@/assets/kidzz/music.webp";
 
 export type KidzzState = "cosmic" | "moon" | "explorer" | "music" | "play";
 export type KidzzMood = "idle" | "curious" | "calm" | "guide" | "happy" | "talking" | "thinking";

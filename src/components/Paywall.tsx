@@ -2,9 +2,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star, Music2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import pixelImg from "@/assets/pixel-chameleon.png";
-import aneImg from "@/assets/ane-chameleon.png";
-import musicKidzz from "@/assets/kidzz/music.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
+import aneImg from "@/assets/ane-chameleon.webp";
+import musicKidzz from "@/assets/kidzz/music.webp";
 
 interface PaywallProps {
   onLogin: () => void;

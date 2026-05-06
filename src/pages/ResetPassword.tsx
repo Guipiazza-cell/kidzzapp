@@ -5,7 +5,7 @@ import { Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import MagicalBackground from "@/components/MagicalBackground";
 import { toast } from "sonner";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
 
 const ResetPassword = () => {
   const navigate = useNavigate();

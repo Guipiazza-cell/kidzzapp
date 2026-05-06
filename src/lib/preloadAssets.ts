@@ -2,7 +2,7 @@
 // Todos os outros mascotes carregam sob demanda quando a aba correspondente abre.
 // Antes: 14 imagens (~25MB). Agora: 3 imagens (~600KB) — UX inicial muito mais leve.
 import forestBg from "@/assets/forest-bg-light.jpg";
-import cosmicMascot from "@/assets/kidzz/cosmic.png";
+import cosmicMascot from "@/assets/kidzz/cosmic.webp";
 
 // Splash usa o mesmo cosmic.png — único asset de mascote crítico no boot.
 const CRITICAL_ASSETS = [forestBg, cosmicMascot];

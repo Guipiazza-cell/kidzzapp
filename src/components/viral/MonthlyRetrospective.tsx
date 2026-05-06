@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, Copy, Check, Share2, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import pixelImg from "@/assets/pixel-chameleon.png";
+import pixelImg from "@/assets/pixel-chameleon.webp";
 import ShareableRetroCard from "./ShareableRetroCard";
 import { captureAndShare } from "@/lib/viralShare";
 import { toast } from "sonner";
