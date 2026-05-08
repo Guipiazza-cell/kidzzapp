@@ -38,6 +38,7 @@ const MonthlyRetrospective = lazy(() => import("@/components/viral/MonthlyRetros
 import ChameleonMascot from "@/components/ChameleonMascot";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
+import OnboardingWelcome from "@/components/onboarding/OnboardingWelcome";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
