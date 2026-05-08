@@ -71,8 +71,14 @@ const LockedFeature = ({
   const finalTier = requiredTier ?? preset.tier;
 
   const handleUpgrade = () => {
+    haptic("medium");
+    sfx("unlock");
     if (onUpgrade) onUpgrade();
-    else navigate("/?paywall=1");
+    else {
+      // Open the in-app paywall instead of forcing a navigation
+      window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+      if (window.location.pathname !== "/") navigate("/?paywall=1");
+    }
   };
 
   const tierLabel = finalTier === "premium" ? "Premium" : "KIDZZ";
