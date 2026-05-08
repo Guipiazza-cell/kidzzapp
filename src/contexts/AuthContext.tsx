@@ -471,38 +471,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const KIDZZ_DAILY_STORIES = 3;
   const PREMIUM_DAILY_STORIES = 5;
 
+  const dailyQLimit = tier === "premium" ? PREMIUM_DAILY_QUESTIONS : KIDZZ_DAILY_QUESTIONS;
+  const dailySLimit = tier === "premium" ? PREMIUM_DAILY_STORIES : KIDZZ_DAILY_STORIES;
+
   const canAskQuestion = useCallback(() => {
     if (!profile) return false;
     const p = resetDailyIfNeeded(profile);
-    if (p.is_premium) return p.questions_used < DAILY_QUESTION_LIMIT;
+    if (p.is_premium) return p.questions_used < dailyQLimit;
     return p.questions_used < MAX_FREE_QUESTIONS;
-  }, [profile, resetDailyIfNeeded]);
+  }, [profile, resetDailyIfNeeded, dailyQLimit]);
 
   const canGenerateStory = useCallback(() => {
     if (!profile) return false;
     const p = resetDailyIfNeeded(profile);
-    // Super premium: limite diário maior
-    if (tier === "premium") return p.stories_used < SUPER_DAILY_STORY_LIMIT;
-    // Premium: limite diário padrão
-    if (p.is_premium) return p.stories_used < DAILY_STORY_LIMIT;
-    // Free: 1 história de demonstração vitalícia
+    if (p.is_premium) return p.stories_used < dailySLimit;
     return p.stories_used < MAX_FREE_STORIES;
-  }, [profile, tier, resetDailyIfNeeded]);
+  }, [profile, resetDailyIfNeeded, dailySLimit]);
 
   const questionsRemaining = useCallback(() => {
     if (!profile) return 0;
     const p = resetDailyIfNeeded(profile);
-    if (p.is_premium) return Math.max(0, DAILY_QUESTION_LIMIT - p.questions_used);
+    if (p.is_premium) return Math.max(0, dailyQLimit - p.questions_used);
     return Math.max(0, MAX_FREE_QUESTIONS - p.questions_used);
-  }, [profile, resetDailyIfNeeded]);
+  }, [profile, resetDailyIfNeeded, dailyQLimit]);
 
   const storiesRemaining = useCallback(() => {
     if (!profile) return 0;
     const p = resetDailyIfNeeded(profile);
-    if (tier === "premium") return Math.max(0, SUPER_DAILY_STORY_LIMIT - p.stories_used);
-    if (p.is_premium) return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
+    if (p.is_premium) return Math.max(0, dailySLimit - p.stories_used);
     return Math.max(0, MAX_FREE_STORIES - p.stories_used);
-  }, [profile, tier, resetDailyIfNeeded]);
+  }, [profile, resetDailyIfNeeded, dailySLimit]);
 
   const computeLevel = (pts: number): string => {
     if (pts >= 100) return "pensador";
