@@ -160,6 +160,40 @@ const Success = () => {
                 Estamos preparando tudo para a aventura de {childName} 💛
               </p>
             </motion.div>
+          ) : !confirmed ? (
+            // TIMEOUT FALLBACK — give user a manual recheck CTA
+            <motion.div
+              key="timeout"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center max-w-sm"
+            >
+              <div className="text-5xl mb-3">⏳</div>
+              <h2 className="text-xl font-black text-gray-800">
+                Quase lá!
+              </h2>
+              <p className="text-gray-600 text-sm font-bold mt-2">
+                O pagamento foi recebido — só estamos ativando sua conta. Isso pode levar alguns segundos.
+              </p>
+              <motion.button
+                onClick={async () => {
+                  setConfirming(true);
+                  try { await refreshSubscription(); } catch { /* noop */ }
+                  setTimeout(() => setConfirming(false), 1500);
+                }}
+                whileTap={{ scale: 0.96 }}
+                className="mt-5 px-5 py-3 rounded-2xl bg-gradient-to-r from-kid-purple via-pink-500 to-kid-pink text-white font-extrabold text-sm shadow-lg min-h-[44px]"
+              >
+                Verificar novamente 🔄
+              </motion.button>
+              <button
+                onClick={() => navigate("/")}
+                className="mt-3 text-xs text-gray-500 font-bold underline"
+              >
+                Voltar ao início
+              </button>
+            </motion.div>
           ) : (
             // CONFIRMED STATE
             <motion.div
