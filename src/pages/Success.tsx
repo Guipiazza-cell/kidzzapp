@@ -85,6 +85,9 @@ const Success = () => {
     if (profile?.is_premium && !confirmed) {
       setConfirmed(true);
       setConfirming(false);
+      // Premium activation feedback
+      import("@/lib/sfx").then(({ sfx }) => sfx("reward"));
+      import("@/lib/haptics").then(({ haptic }) => haptic("success"));
     }
   }, [profile?.is_premium, confirmed]);
 
