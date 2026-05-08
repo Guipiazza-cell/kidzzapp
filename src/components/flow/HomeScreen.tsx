@@ -286,6 +286,93 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
       />
 
       <div className="flex-1 flex flex-col items-center px-5 overflow-y-auto">
+        {/* ⭐ HERO QUESTION BOX — coração da app, sempre visível no topo */}
+        <motion.div
+          className="w-full max-w-sm relative mt-2 mb-3"
+          initial={{ opacity: 0, y: -8, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
+        >
+          {/* Halo premium pulsante */}
+          <motion.div
+            aria-hidden
+            className="absolute -inset-3 rounded-[28px] pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(70% 90% at 50% 50%, hsl(var(--kid-orange) / 0.42), hsl(var(--kid-pink) / 0.18) 55%, transparent 75%)",
+              filter: "blur(18px)",
+            }}
+            animate={{ opacity: [0.55, 0.95, 0.55], scale: [1, 1.05, 1] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          {/* Card glass premium */}
+          <div
+            className="relative rounded-[26px] p-3 border border-white/60 shadow-[0_18px_48px_-12px_hsl(var(--kid-orange)/0.45)]"
+            style={{
+              background:
+                "linear-gradient(145deg, rgba(255,255,255,0.92) 0%, rgba(255,247,235,0.85) 100%)",
+              backdropFilter: "blur(14px)",
+            }}
+          >
+            <div className="flex items-center justify-between px-1 mb-2">
+              <p className="text-[11px] font-black text-gray-700 tracking-wide flex items-center gap-1.5">
+                <span className="text-base">✨</span>
+                Me pergunta qualquer coisa
+              </p>
+              <span className="text-[9px] font-extrabold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full">
+                {questionsRemaining()} 💬
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="flex-shrink-0">
+                <VoiceInput onResult={submit} disabled={submitting || isFreeLimitReached} />
+              </div>
+              <motion.div
+                className="flex-1 min-w-0 relative"
+                animate={{
+                  boxShadow: [
+                    "0 0 0 0 hsl(var(--kid-orange) / 0)",
+                    "0 0 0 5px hsl(var(--kid-orange) / 0.18)",
+                    "0 0 0 0 hsl(var(--kid-orange) / 0)",
+                  ],
+                }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                style={{ borderRadius: 18 }}
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submit(input)}
+                  placeholder={isFreeLimitReached ? "Limite atingido" : "Escreva ou fale…"}
+                  className="w-full min-w-0 py-3.5 px-4 rounded-2xl bg-white/85 text-gray-800 text-base font-semibold placeholder:text-gray-400 placeholder:font-medium placeholder:text-sm focus:outline-none focus:ring-4 focus:ring-kid-orange/40 transition-all disabled:opacity-40 border-2 border-white/70"
+                  disabled={submitting || isFreeLimitReached}
+                />
+              </motion.div>
+              <motion.button
+                onClick={() => submit(input)}
+                disabled={!input.trim() || submitting || isFreeLimitReached}
+                aria-label="Enviar pergunta"
+                className="flex-shrink-0 w-12 h-12 rounded-2xl kid-gradient-orange shadow-xl flex items-center justify-center disabled:opacity-30 transition-all"
+                whileTap={{ scale: 0.88 }}
+                animate={{
+                  boxShadow: [
+                    "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
+                    "0 12px 28px -4px hsl(var(--kid-orange) / 0.65)",
+                    "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
+                  ],
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Send size={20} className="text-white" />
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Streak Celebration overlay */}
         <StreakCelebration streakDays={streakDays} childName={childName} previousRecord={streakDays} />
 
@@ -340,90 +427,6 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         <KidzzAura />
         <KidzzHero childName={childName} streakDays={streakDays} ageRange={profile?.age_range ?? null} />
         <EmotionalSpeechBubble childName={childName} streakDays={streakDays} />
-
-        {/* Convite — "Me pergunta qualquer coisa" */}
-        <motion.p
-          className="w-full max-w-sm text-center text-gray-700 text-sm font-extrabold mt-2 mb-1"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          Me pergunta qualquer coisa ✨
-        </motion.p>
-
-        {/* Input block — DESTAQUE: barra de pergunta + microfone (menor) */}
-        <motion.div
-          className="w-full max-w-sm relative mt-1"
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.5, type: "spring", stiffness: 180, damping: 18 }}
-        >
-          {/* Halo pulsante atrás da barra para chamar atenção */}
-          <motion.div
-            aria-hidden
-            className="absolute -inset-2 rounded-3xl pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(60% 80% at 50% 50%, hsl(var(--kid-orange) / 0.35), transparent 70%)",
-              filter: "blur(14px)",
-            }}
-            animate={{ opacity: [0.55, 0.95, 0.55], scale: [1, 1.04, 1] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          />
-
-          <div className="relative flex items-center gap-2">
-            <motion.div
-              className="flex-shrink-0"
-              animate={{ scale: [1, 1.06, 1] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <VoiceInput onResult={submit} disabled={submitting || isFreeLimitReached} />
-            </motion.div>
-            <motion.div
-              className="flex-1 min-w-0 relative"
-              animate={{
-                boxShadow: [
-                  "0 0 0 0 hsl(var(--kid-orange) / 0)",
-                  "0 0 0 6px hsl(var(--kid-orange) / 0.18)",
-                  "0 0 0 0 hsl(var(--kid-orange) / 0)",
-                ],
-              }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-              style={{ borderRadius: 18 }}
-            >
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && submit(input)}
-                placeholder={
-                  isFreeLimitReached ? "Limite atingido" : "Escreva ou fale…"
-                }
-                className="w-full min-w-0 py-4 px-4 rounded-2xl glass-card text-gray-800 text-base font-semibold placeholder:text-gray-500 placeholder:font-semibold placeholder:text-sm focus:outline-none focus:ring-4 focus:ring-kid-orange/50 transition-all disabled:opacity-40 shadow-lg border-2 border-white/60"
-                disabled={submitting || isFreeLimitReached}
-              />
-            </motion.div>
-            <motion.button
-              onClick={() => submit(input)}
-              disabled={!input.trim() || submitting || isFreeLimitReached}
-              aria-label="Enviar pergunta"
-              className="flex-shrink-0 w-12 h-12 rounded-2xl kid-gradient-orange shadow-xl flex items-center justify-center disabled:opacity-30 transition-all"
-              whileTap={{ scale: 0.88 }}
-              animate={{
-                boxShadow: [
-                  "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
-                  "0 12px 28px -4px hsl(var(--kid-orange) / 0.65)",
-                  "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Send size={20} className="text-white" />
-            </motion.button>
-          </div>
-        </motion.div>
-
         {/* MODO VIAGEM — card grande, ABAIXO da barra de pergunta */}
         {onOpenTravel && (
           <motion.button
