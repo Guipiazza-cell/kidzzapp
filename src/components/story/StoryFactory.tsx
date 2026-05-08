@@ -20,7 +20,7 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 type Step = "intro" | "avatar" | "form" | "display";
 
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
-  const { user, profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
+  const { user, profile, tier, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
@@ -41,11 +41,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const handleGenerate = useCallback(async (age: number, interests: string) => {
     if (!avatar) return;
     if (!canGenerateStory()) {
-      const isPremium = !!profile?.is_premium;
-      if (isPremium) {
-        toast.error("Você atingiu o limite de histórias por hoje! Volte amanhã 💛");
+      if (tier === "premium") {
+        toast.error("Você atingiu o limite de 5 histórias por hoje! Volte amanhã 💛");
+      } else if (tier === "kidzz") {
+        toast.info("Você usou suas 3 histórias de hoje! Faça upgrade para Premium e libere 5/dia ✨");
+        window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       } else {
-        toast.info("Sua história grátis já foi criada! Desbloqueie histórias ilimitadas ✨");
+        toast.info("Sua história grátis já foi criada! Desbloqueie o KIDZZ e crie histórias todos os dias ✨");
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       }
       return;
@@ -187,7 +189,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               Crie histórias personalizadas com ilustrações exclusivas!
             </p>
             <span className="text-xs font-bold glass-card text-gray-600 px-3 py-1 rounded-full">
-              {storiesRemaining()} de 3 histórias restantes hoje
+              {storiesRemaining()} de {tier === "premium" ? 5 : tier === "kidzz" ? 3 : 1} {tier === "free" ? "história" : "histórias"} restante{storiesRemaining() !== 1 ? "s" : ""} hoje
             </span>
 
             <div className="glass-card rounded-3xl p-4 w-full max-w-xs space-y-2">
@@ -229,7 +231,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
             onGenerate={handleGenerate}
             isLoading={isGenerating}
             storiesRemaining={storiesRemaining()}
-            isPremium={!!profile?.is_premium}
+            isPremium={tier !== "free"}
             onUpgrade={() => window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }))}
           />
         )}

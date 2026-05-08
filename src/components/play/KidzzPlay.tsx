@@ -13,6 +13,7 @@ const PixelPulaGame = lazy(() => import("./games/PixelPulaGame"));
 const ReactionGame = lazy(() => import("./games/ReactionGame"));
 const EmotionsGame = lazy(() => import("./games/EmotionsGame"));
 const CreateGame = lazy(() => import("./games/CreateGame"));
+import LockedFeature from "@/components/LockedFeature";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
@@ -61,9 +62,10 @@ interface Props {
 }
 
 const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, onOpenLab }: Props) => {
-  const { profile } = useAuth();
+  const { profile, tier } = useAuth();
   const { trackEvent } = useAchievementSync();
-  const isPremium = profile?.is_premium ?? false;
+  // Jogos desbloqueiam a partir do plano KIDZZ (tier !== "free")
+  const isPremium = tier !== "free";
   const childName = profile?.child_name || "amigo";
 
   const [view, setView] = useState<View>("menu");
@@ -341,7 +343,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
                     <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-white/30">
                       <Lock size={18} className="text-gray-600" />
                       <span className="text-[8px] text-gray-700 font-extrabold mt-1">
-                        Premium
+                        KIDZZ
                       </span>
                     </div>
                   )}
@@ -487,45 +489,33 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
       <AnimatePresence>
         {showPremiumCTA && (
           <motion.div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowPremiumCTA(false)}
           >
             <motion.div
-              className="mx-6 p-6 rounded-3xl border-2 border-amber-300 text-center bg-white"
-              initial={{ scale: 0.85, opacity: 0 }}
+              className="w-full max-w-sm"
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <motion.div
-                className="text-5xl mb-3"
-                animate={{ rotate: [0, -10, 10, 0], y: [0, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                🎮
-              </motion.div>
-              <h3 className="text-lg font-extrabold text-gray-800 mb-2">
-                Desbloqueie todos os jogos
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Desafios diários, jogos avançados e diversão sem limites!
-              </p>
-              <motion.button
-                className="w-full py-3 rounded-2xl font-extrabold text-white text-sm"
-                style={{
-                  background:
-                    "linear-gradient(135deg, hsl(140 70% 50%), hsl(200 75% 55%))",
+              <LockedFeature
+                type="games"
+                requiredTier="kidzz"
+                onUpgrade={() => {
+                  setShowPremiumCTA(false);
+                  window.dispatchEvent(
+                    new CustomEvent("kidzz:open-paywall", {
+                      detail: { context: "games_locked" },
+                    })
+                  );
                 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowPremiumCTA(false)}
-              >
-                Desbloquear todos os jogos 🎮✨
-              </motion.button>
+              />
               <button
-                className="mt-3 text-xs text-gray-400 font-bold"
+                className="block mx-auto mt-3 text-xs text-white/80 font-bold underline"
                 onClick={() => setShowPremiumCTA(false)}
               >
                 Agora não

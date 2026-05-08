@@ -11,7 +11,7 @@ import CreateMusic from "./CreateMusic";
 import { getMusicXp, getMusicStreak, type MusicAchievement } from "@/lib/musicXp";
 import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
-import ContextualPaywallModal from "@/components/ContextualPaywallModal";
+import LockedFeature from "@/components/LockedFeature";
 
 interface Props {
   onBack: () => void;
@@ -22,9 +22,10 @@ interface Props {
 type Pillar = "morning" | "dance" | "stories" | "create";
 
 const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
-  const { profile } = useAuth();
+  const { profile, tier } = useAuth();
   const childName = profile?.child_name || "amigo";
-  const isPremium = profile?.is_premium ?? false;
+  // Floresta Musical é exclusiva do plano Premium
+  const isPremium = tier === "premium";
   const [activePillar, setActivePillar] = useState<Pillar | null>(null);
   const [xp, setXp] = useState(getMusicXp());
   const [streak, setStreak] = useState(getMusicStreak());
@@ -323,11 +324,44 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           )}
         </AnimatePresence>
       </LivingForest>
-      <ContextualPaywallModal
-        open={showPremiumCTA}
-        context="premium_feature"
-        onClose={() => setShowPremiumCTA(false)}
-      />
+      <AnimatePresence>
+        {showPremiumCTA && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPremiumCTA(false)}
+          >
+            <motion.div
+              className="w-full max-w-sm"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <LockedFeature
+                type="music"
+                requiredTier="premium"
+                onUpgrade={() => {
+                  setShowPremiumCTA(false);
+                  window.dispatchEvent(
+                    new CustomEvent("kidzz:open-paywall", {
+                      detail: { context: "music_locked" },
+                    })
+                  );
+                }}
+              />
+              <button
+                className="block mx-auto mt-3 text-xs text-white/80 font-bold underline"
+                onClick={() => setShowPremiumCTA(false)}
+              >
+                Agora não
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
