@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Sparkles, MessageCircle, Heart, Lock, Check, Crown, Zap, BookOpen, Star, Music2, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
+import { Sparkles, Lock, Check, Crown, Zap, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import pixelImg from "@/assets/pixel-chameleon.webp";
-import aneImg from "@/assets/ane-chameleon.webp";
 import musicKidzz from "@/assets/kidzz/music.webp";
 
 interface PaywallProps {
@@ -11,7 +9,6 @@ interface PaywallProps {
   onBack?: () => void;
 }
 
-type BillingPeriod = "annual" | "monthly";
 type TierKey = "free" | "kidzz" | "premium";
 type PlanKey = "kidzz" | "kidzz_annual" | "premium" | "premium_annual";
 
