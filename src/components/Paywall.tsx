@@ -279,7 +279,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
         <p className="text-center text-gray-500 text-[10px] font-bold">
           🛡️ Garantia de 7 dias. Se não amar, devolvemos 100%.
         </p>
-        <p className="text-center text-gray-400 text-[10px] font-bold pb-4">
+        <p className="text-center text-gray-400 text-[10px] font-bold pb-32">
           🔓 Acesso liberado hoje • Cancele quando quiser
         </p>
       </div>
