@@ -7,9 +7,22 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Tier mapping by Stripe product id.
+// New 2026 catalog: kidzz → "kidzz" (3/day), premium → "premium" (5/day).
+// Legacy products are mapped to keep historical subscribers from being downgraded.
 const PRODUCT_TIERS: Record<string, string> = {
-  "prod_UDg1BKoaDApx46": "premium",
-  "prod_UDg2zSZBKNtI2i": "super_premium",
+  // New (2026)
+  "prod_UTaV3ceAAUThlX": "kidzz",            // KIDZZ Mensal R$19,90
+  "prod_UTaW2oqm99hFrj": "kidzz",            // KIDZZ Anual R$199
+  "prod_UTaXRFmVOR4wia": "premium",          // KIDZZ Premium Mensal R$24,90
+  "prod_UTaXJcEbqCrQtO": "premium",          // KIDZZ Premium Anual R$249
+  // Legacy (renamed: old premium → kidzz, old super_premium → premium)
+  "prod_UDg1BKoaDApx46": "kidzz",
+  "prod_UKyyAWU5fNnNai": "kidzz",
+  "prod_UDg2zSZBKNtI2i": "premium",
+  "prod_UL7k8ZAZsn97rA": "premium",
+  "prod_UDfWnSBu8lW6rX": "kidzz",
+  "prod_UDfZw7XqUeSvb9": "premium",
 };
 
 const logStep = (step: string, details?: any) => {
