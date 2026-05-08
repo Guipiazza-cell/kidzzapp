@@ -88,6 +88,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       background: "hsl(0 0% 100% / 0.82)",
       backdropFilter: "blur(22px)",
       WebkitBackdropFilter: "blur(22px)",
+      touchAction: "manipulation",
     }}
   >
     {(onOpenParents || onOpenPlans) && (
