@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
@@ -52,6 +53,7 @@ const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 
 const Index = () => {
+  const navigate = useNavigate();
   const { profile, loading, updateProfile, canAskQuestion } = useAuth();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
@@ -377,7 +379,7 @@ const Index = () => {
           />
         )}
         {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
-        {step === "paywall" && <Paywall key="paywall" onLogin={() => setShowLoginGate(true)} onBack={() => { setStep("home"); setActiveTab("chat"); }} />}
+        {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); setActiveTab("chat"); }} />}
       </AnimatePresence>
     );
   };
@@ -466,7 +468,7 @@ const Index = () => {
         context={contextualPaywall.context}
         meta={contextualPaywall.meta}
         onClose={() => setContextualPaywall((p) => ({ ...p, open: false }))}
-        onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); setShowLoginGate(true); }}
+        onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); navigate("/auth"); }}
       />
 
       {/* Sua Jornada — overlay com nível, próxima recompensa e jornada XP */}
