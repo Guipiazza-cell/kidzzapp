@@ -12,7 +12,49 @@ interface PaywallProps {
 }
 
 type BillingPeriod = "annual" | "monthly";
-type PlanKey = "premium" | "premium_annual" | "super_premium";
+type TierKey = "free" | "kidzz" | "premium";
+type PlanKey = "kidzz" | "kidzz_annual" | "premium" | "premium_annual";
+
+const PLAN_PRICES = {
+  kidzz: { monthly: 19.9, annual: 199, monthlyEquivalent: 16.58 },
+  premium: { monthly: 24.9, annual: 249, monthlyEquivalent: 20.75 },
+};
+
+const TIER_BENEFITS: Record<TierKey, { title: string; benefits: string[]; tagline: string }> = {
+  free: {
+    title: "Grátis",
+    tagline: "Para experimentar",
+    benefits: [
+      "3 perguntas (total)",
+      "1 história demo",
+      "Sem narração por voz",
+      "Sem Mundo dos Sonhos",
+    ],
+  },
+  kidzz: {
+    title: "KIDZZ",
+    tagline: "O essencial mágico",
+    benefits: [
+      "30 perguntas/dia",
+      "3 histórias/dia",
+      "Narração por voz",
+      "Todos os jogos KIDZZ Play",
+      "Conquistas e progressão",
+    ],
+  },
+  premium: {
+    title: "Premium",
+    tagline: "A experiência completa",
+    benefits: [
+      "60 perguntas/dia",
+      "5 histórias/dia",
+      "Floresta Musical 🎵",
+      "Mundo dos Sonhos completo",
+      "Momentos especiais e rotina",
+      "Novos conteúdos antecipados",
+    ],
+  },
+};
 
 const Paywall = ({ onLogin, onBack }: PaywallProps) => {
   const handleBack = () => {
@@ -25,8 +67,13 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
 
   const [showPlans, setShowPlans] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("annual");
-  const [selectedPlan, setSelectedPlan] = useState<PlanKey>("premium_annual");
+  const [selectedTier, setSelectedTier] = useState<Exclude<TierKey, "free">>("premium");
   const [loading, setLoading] = useState(false);
+
+  const selectedPlan: PlanKey =
+    billingPeriod === "annual"
+      ? (selectedTier === "premium" ? "premium_annual" : "kidzz_annual")
+      : selectedTier;
 
   const handleUnlock = async () => {
     if (!user) {
@@ -35,19 +82,9 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
     }
     setLoading(true);
     try {
-      const planForCheckout = selectedPlan === "premium_annual" ? "premium_annual" : selectedPlan;
-      await handleCheckout(planForCheckout as any);
+      await handleCheckout(selectedPlan as any);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePeriodChange = (period: BillingPeriod) => {
-    setBillingPeriod(period);
-    if (period === "annual") {
-      setSelectedPlan("premium_annual");
-    } else {
-      setSelectedPlan("premium");
     }
   };
 
@@ -201,47 +238,6 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
           </motion.p>
         </div>
 
-        {/* Freemium vs Premium quick compare */}
-        <motion.div
-          className="grid grid-cols-2 gap-2"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-        >
-          <div className="rounded-xl p-3 bg-gray-50 border border-gray-200">
-            <div className="flex items-center gap-1 mb-1">
-              <span className="text-[10px] font-black text-gray-500 uppercase">Grátis</span>
-            </div>
-            <ul className="space-y-1 text-[10px] font-bold text-gray-500 leading-snug">
-              <li>• 3 perguntas (total)</li>
-              <li>• 1 história demo</li>
-              <li>• Sem narração</li>
-              <li>• Sem Mundo dos Sonhos</li>
-            </ul>
-          </div>
-          <div
-            className="rounded-xl p-3 border-2 relative overflow-hidden"
-            style={{
-              borderColor: "#D4A847",
-              background: "linear-gradient(135deg, rgba(212,168,71,0.10), rgba(245,158,11,0.06))",
-            }}
-          >
-            <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg">
-              ⭐
-            </div>
-            <div className="flex items-center gap-1 mb-1">
-              <Crown size={10} className="text-amber-600" />
-              <span className="text-[10px] font-black text-amber-700 uppercase">Premium</span>
-            </div>
-            <ul className="space-y-1 text-[10px] font-bold text-gray-700 leading-snug">
-              <li>✓ 10 perguntas/dia</li>
-              <li>✓ Histórias ilimitadas</li>
-              <li>✓ Narração por voz</li>
-              <li>✓ Tudo desbloqueado</li>
-            </ul>
-          </div>
-        </motion.div>
-
         {/* Billing toggle */}
         <motion.div
           className="flex items-center justify-center gap-1 bg-gray-100 rounded-full p-1"
@@ -250,7 +246,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
           transition={{ delay: 0.1 }}
         >
           <button
-            onClick={() => handlePeriodChange("monthly")}
+            onClick={() => setBillingPeriod("monthly")}
             className={`flex-1 py-2 rounded-full text-xs font-extrabold transition-all ${
               billingPeriod === "monthly"
                 ? "bg-white text-gray-800 shadow-sm"
@@ -260,7 +256,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
             Mensal
           </button>
           <button
-            onClick={() => handlePeriodChange("annual")}
+            onClick={() => setBillingPeriod("annual")}
             className={`flex-1 py-2 rounded-full text-xs font-extrabold transition-all flex items-center justify-center gap-1 ${
               billingPeriod === "annual"
                 ? "bg-white text-gray-800 shadow-sm"
@@ -269,112 +265,135 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
           >
             Anual
             <span className="text-[8px] font-black text-kid-green bg-kid-green/10 px-1.5 py-0.5 rounded-full">
-              -33%
+              -17%
             </span>
           </button>
         </motion.div>
 
-        {/* Plans */}
+        {/* 3-Tier Plans */}
         <div className="space-y-3">
-          {/* Annual / Monthly KIDZZ */}
-          <AnimatePresence mode="wait">
-            {billingPeriod === "annual" ? (
-              <motion.button
-                key="annual"
-                onClick={() => setSelectedPlan("premium_annual")}
-                className={`w-full text-left rounded-2xl p-4 transition-all relative overflow-hidden ${
-                  selectedPlan === "premium_annual"
-                    ? "ring-2 ring-amber-400 bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg"
-                    : "glass-card"
-                }`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-400 to-yellow-400 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl">
-                  MELHOR VALOR · Economize 33%
-                </div>
-                <div className="flex items-center justify-between mb-1 mt-2">
-                  <div className="flex items-center gap-2">
-                    <Crown size={18} className="text-amber-500" />
-                    <span className="font-extrabold text-gray-800 text-sm">KIDZZ Anual</span>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    selectedPlan === "premium_annual" ? "bg-amber-500 border-amber-500" : "border-gray-300"
-                  }`}>
-                    {selectedPlan === "premium_annual" && <Check size={12} className="text-white" />}
-                  </div>
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <p className="text-xl font-black text-gray-800">R$ 119,90</p>
-                  <span className="text-xs font-bold text-gray-400">/ano</span>
-                </div>
-                <p className="text-xs text-amber-700 font-bold mt-0.5">
-                  = R$ 9,99/mês · <span className="line-through text-gray-400">R$ 14,90/mês</span>
-                </p>
-                <p className="text-[10px] text-gray-500 font-bold mt-1">10 perguntas/dia • Narração por voz • 3 personagens</p>
-              </motion.button>
-            ) : (
-              <motion.button
-                key="monthly-premium"
-                onClick={() => setSelectedPlan("premium")}
-                className={`w-full text-left rounded-2xl p-4 transition-all glass-card ${
-                  selectedPlan === "premium" ? "ring-2 ring-kid-purple/60" : ""
-                }`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <Crown size={16} className="text-kid-yellow" />
-                    <span className="font-extrabold text-gray-800 text-sm">Plano KIDZZ</span>
-                    <span className="text-[8px] font-black bg-kid-purple text-white px-1.5 py-0.5 rounded-full">POPULAR</span>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    selectedPlan === "premium" ? "bg-kid-purple border-kid-purple" : "border-gray-300"
-                  }`}>
-                    {selectedPlan === "premium" && <Check size={12} className="text-white" />}
-                  </div>
-                </div>
-                <p className="text-xl font-black text-gray-800">
-                  R$ 14,90<span className="text-xs font-bold text-gray-400">/mês</span>
-                </p>
-                <p className="text-[10px] text-gray-500 font-bold mt-1">10 perguntas/dia • Narração por voz</p>
-              </motion.button>
-            )}
-          </AnimatePresence>
-
-          {/* Super Premium */}
-          <motion.button
-            onClick={() => setSelectedPlan("super_premium")}
-            className={`w-full text-left rounded-2xl p-4 transition-all glass-card ${
-              selectedPlan === "super_premium" ? "ring-2 ring-kid-orange/60" : ""
-            }`}
+          {/* FREE card (informational) */}
+          <motion.div
+            className="w-full text-left rounded-2xl p-4 bg-gray-50 border border-gray-200"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            whileTap={{ scale: 0.98 }}
+            transition={{ delay: 0.15 }}
           >
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <Zap size={16} className="text-kid-orange" />
-                <span className="font-extrabold text-gray-800 text-sm">KIDZZ Premium</span>
-                <span className="text-[8px] font-black bg-kid-orange text-white px-1.5 py-0.5 rounded-full">COMPLETO</span>
+                <span className="text-base">🌱</span>
+                <span className="font-extrabold text-gray-700 text-sm">{TIER_BENEFITS.free.title}</span>
+                <span className="text-[9px] font-bold text-gray-400">{TIER_BENEFITS.free.tagline}</span>
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                selectedPlan === "super_premium" ? "bg-kid-orange border-kid-orange" : "border-gray-300"
-              }`}>
-                {selectedPlan === "super_premium" && <Check size={12} className="text-white" />}
-              </div>
+              <span className="text-xs font-black text-gray-500">R$ 0</span>
             </div>
-            <p className="text-xl font-black text-gray-800">
-              R$ 24,90<span className="text-xs font-bold text-gray-400">/mês</span>
-            </p>
-            <p className="text-[10px] text-gray-500 font-bold mt-1">Tudo do KIDZZ + Histórias + Avatar</p>
-          </motion.button>
+            <ul className="mt-2 space-y-1">
+              {TIER_BENEFITS.free.benefits.map((b) => (
+                <li key={b} className="text-[11px] font-bold text-gray-500 flex items-start gap-1.5">
+                  <span className="mt-0.5">•</span>
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* KIDZZ + Premium selectable cards */}
+          {(["kidzz", "premium"] as const).map((tierKey, idx) => {
+            const isPremium = tierKey === "premium";
+            const isSelected = selectedTier === tierKey;
+            const price = PLAN_PRICES[tierKey];
+            const showAnnual = billingPeriod === "annual";
+            const displayPrice = showAnnual ? price.monthlyEquivalent : price.monthly;
+            const totalAnnual = price.annual;
+            const accentBorder = isPremium
+              ? (isSelected ? "ring-2 ring-amber-400" : "")
+              : (isSelected ? "ring-2 ring-kid-purple/60" : "");
+            const accentBg = isSelected && isPremium
+              ? "bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg"
+              : "glass-card";
+            const radioColor = isPremium
+              ? (isSelected ? "bg-amber-500 border-amber-500" : "border-gray-300")
+              : (isSelected ? "bg-kid-purple border-kid-purple" : "border-gray-300");
+
+            return (
+              <motion.button
+                key={tierKey}
+                onClick={() => setSelectedTier(tierKey)}
+                className={`w-full text-left rounded-2xl p-4 transition-all relative overflow-hidden ${accentBg} ${accentBorder}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + idx * 0.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {isPremium ? (
+                  <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-400 to-yellow-400 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl">
+                    MAIS COMPLETO
+                  </div>
+                ) : (
+                  <div className="absolute top-0 right-0 bg-kid-purple text-white text-[8px] font-black px-3 py-1 rounded-bl-xl">
+                    POPULAR
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mb-2 mt-2">
+                  <div className="flex items-center gap-2">
+                    {isPremium ? (
+                      <Zap size={18} className="text-amber-500" />
+                    ) : (
+                      <Crown size={18} className="text-kid-purple" />
+                    )}
+                    <span className="font-extrabold text-gray-800 text-sm">
+                      {TIER_BENEFITS[tierKey].title}
+                    </span>
+                    <span className="text-[9px] font-bold text-gray-400">
+                      {TIER_BENEFITS[tierKey].tagline}
+                    </span>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${radioColor}`}>
+                    {isSelected && <Check size={12} className="text-white" />}
+                  </div>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={billingPeriod}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.18 }}
+                  >
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-2xl font-black text-gray-800">
+                        R$ {displayPrice.toFixed(2).replace(".", ",")}
+                      </p>
+                      <span className="text-xs font-bold text-gray-400">/mês</span>
+                    </div>
+                    {showAnnual ? (
+                      <p className={`text-[11px] font-bold mt-0.5 ${isPremium ? "text-amber-700" : "text-kid-purple"}`}>
+                        R$ {totalAnnual.toFixed(2).replace(".", ",")}/ano ·{" "}
+                        <span className="line-through text-gray-400">
+                          R$ {price.monthly.toFixed(2).replace(".", ",")}/mês
+                        </span>
+                      </p>
+                    ) : (
+                      <p className="text-[11px] font-bold mt-0.5 text-gray-400">
+                        Cobrado mensalmente
+                      </p>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+
+                <ul className="mt-3 space-y-1.5">
+                  {TIER_BENEFITS[tierKey].benefits.map((b) => (
+                    <li key={b} className="text-[11px] font-semibold text-gray-700 flex items-start gap-1.5">
+                      <Check size={12} className={`mt-0.5 flex-shrink-0 ${isPremium ? "text-amber-500" : "text-kid-purple"}`} />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.button>
+            );
+          })}
 
           {/* Teaser — Floresta Musical em breve */}
           <motion.div
@@ -509,9 +528,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
               <span className="relative z-10">
                 {loading
                   ? "Abrindo..."
-                  : selectedPlan === "premium_annual"
-                    ? "✨ Começar Nossa Aventura Anual"
-                    : "Desbloquear agora"}
+                  : `✨ Assinar ${selectedTier === "premium" ? "Premium" : "KIDZZ"} ${billingPeriod === "annual" ? "Anual" : "Mensal"}`}
               </span>
             </>
           )}
