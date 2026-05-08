@@ -38,6 +38,7 @@ const MonthlyRetrospective = lazy(() => import("@/components/viral/MonthlyRetros
 import ChameleonMascot from "@/components/ChameleonMascot";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
+import OnboardingWelcome from "@/components/onboarding/OnboardingWelcome";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
@@ -79,6 +80,10 @@ const Index = () => {
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
   const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasSeenKidzzStatesIntro());
+  const [showWelcome, setShowWelcome] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try { return window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
+  });
   const [showJourney, setShowJourney] = useState(false);
 
   useEffect(() => {
@@ -191,6 +196,18 @@ const Index = () => {
   const interests = (profile as any)?.child_interests as string[] | undefined;
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
+  }
+  // Tela final emocional do onboarding (uma vez, após interests)
+  if (showWelcome) {
+    return (
+      <OnboardingWelcome
+        childName={profile.child_name}
+        onEnter={() => {
+          try { localStorage.setItem("kidzz_onboarding_welcomed", "1"); } catch {}
+          setShowWelcome(false);
+        }}
+      />
+    );
   }
   // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
   if (showStatesIntro) {

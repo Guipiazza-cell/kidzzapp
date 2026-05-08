@@ -2,8 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import KidzzChameleon from "./kidzz/KidzzChameleon";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
+import OnboardingShell from "./onboarding/OnboardingShell";
 import { useAuth } from "@/contexts/AuthContext";
-import MagicalBackground from "./MagicalBackground";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 const INTEREST_OPTIONS = [
   { id: "animais", label: "Animais", emoji: "🐾" },
@@ -23,6 +25,8 @@ const InterestsOnboarding = () => {
   const childName = profile?.child_name || "amigo";
 
   const toggle = (id: string) => {
+    sfx("click");
+    haptic("light");
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
@@ -31,49 +35,42 @@ const InterestsOnboarding = () => {
   const handleSubmit = async () => {
     if (selected.length === 0 || saving) return;
     setSaving(true);
+    sfx("reward");
+    haptic("success");
     try {
       await updateProfile({ child_interests: selected } as any);
     } catch (e) {
       console.error("InterestsOnboarding error", e);
       setSaving(false);
+      sfx("error");
     }
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(90,24%,89%)] via-[hsl(90,20%,93%)] to-[hsl(90,24%,89%)] relative">
-      <MagicalBackground />
+  const ready = selected.length > 0;
 
-      <div className="relative z-20 pt-[max(env(safe-area-inset-top,16px),20px)] px-6">
+  return (
+    <OnboardingShell tone="violet">
+      <div className="pt-[max(env(safe-area-inset-top,16px),20px)] px-6">
         <OnboardingProgress step={3} />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-start px-6 pt-2 pb-6 relative z-10">
-        {/* KIDZZ HERO — animado */}
+      <div className="flex-1 flex flex-col items-center justify-start px-6 pt-2 pb-6">
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ scale: 0, opacity: 0, y: 12 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 180, damping: 12 }}
         >
-          <KidzzChameleon state="music" mood="happy" size="lg" interactive showParticles />
+          <KidzzChameleon state="music" mood={ready ? "happy" : "curious"} size="lg" interactive showParticles />
         </motion.div>
 
         <motion.h1
-          className="text-2xl font-black text-gray-900 text-center mt-3"
-          initial={{ opacity: 0, y: 15 }}
+          className="text-[26px] font-black text-gray-900 text-center mt-3 leading-tight"
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.25 }}
         >
-          O que você mais gosta, {childName}? 🌟
+          O que te encanta, {childName}? 🌟
         </motion.h1>
-
-        <motion.p
-          className="text-gray-600 text-center text-sm mt-1.5 max-w-xs"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          Escolha pelo menos 1 — pode escolher quantos quiser
-        </motion.p>
 
         <div className="w-full max-w-sm mt-5 grid grid-cols-2 gap-3 relative z-20">
           {INTEREST_OPTIONS.map((opt, i) => {
@@ -85,21 +82,24 @@ const InterestsOnboarding = () => {
                 onClick={() => toggle(opt.id)}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6 + i * 0.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`flex items-center gap-3 p-4 rounded-2xl transition-all border-2 min-h-[64px] ${
-                  isSelected
-                    ? "bg-white/90 border-kid-orange shadow-lg scale-[1.03]"
-                    : "bg-white/60 border-transparent"
-                }`}
+                transition={{ delay: 0.4 + i * 0.04 }}
+                whileTap={{ scale: 0.94 }}
+                className="flex items-center gap-3 p-4 rounded-2xl min-h-[64px]"
+                style={{
+                  background: isSelected ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.6)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  border: isSelected ? "1.5px solid hsl(35 95% 58%)" : "1.5px solid rgba(255,255,255,0.6)",
+                  boxShadow: isSelected
+                    ? "0 0 18px hsl(35 95% 58% / 0.4), 0 6px 14px rgba(0,0,0,0.08)"
+                    : "0 4px 12px rgba(0,0,0,0.05)",
+                  transform: isSelected ? "scale(1.03)" : "scale(1)",
+                  transition: "all 240ms cubic-bezier(0.22,1,0.36,1)",
+                }}
               >
                 <span className="text-2xl">{opt.emoji}</span>
-                <span className="text-sm font-extrabold text-gray-900">
-                  {opt.label}
-                </span>
-                {isSelected && (
-                  <span className="ml-auto text-kid-orange font-bold">✓</span>
-                )}
+                <span className="text-sm font-extrabold text-gray-900">{opt.label}</span>
+                {isSelected && <span className="ml-auto text-kid-orange font-bold">✓</span>}
               </motion.button>
             );
           })}
@@ -107,33 +107,40 @@ const InterestsOnboarding = () => {
 
         <motion.button
           onClick={handleSubmit}
-          disabled={selected.length === 0 || saving}
-          className="w-full max-w-sm mt-6 py-5 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-lg shadow-xl disabled:opacity-40 active:scale-[0.98] transition-transform relative overflow-hidden min-h-[56px]"
+          disabled={!ready || saving}
+          className="relative w-full max-w-sm mt-7 py-5 rounded-2xl text-white font-extrabold text-lg overflow-hidden min-h-[56px] disabled:opacity-50 active:scale-[0.98]"
+          style={{
+            background: ready
+              ? "linear-gradient(135deg, hsl(35 95% 58%), hsl(28 95% 62%) 60%, hsl(280 70% 65%))"
+              : "linear-gradient(135deg, hsl(35 35% 70%), hsl(35 25% 75%))",
+            boxShadow: ready
+              ? "0 0 30px hsl(35 95% 58% / 0.55), 0 10px 24px rgba(0,0,0,0.15)"
+              : "0 6px 14px rgba(0,0,0,0.08)",
+            transition: "box-shadow 300ms ease, background 300ms ease",
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 0.85 }}
           whileTap={{ scale: 0.97 }}
         >
-          <motion.div
-            className="absolute inset-0 bg-white/20 rounded-2xl"
-            animate={{ opacity: [0, 0.3, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
+          {ready && (
+            <motion.span
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)",
+              }}
+              initial={{ x: "-110%" }}
+              animate={{ x: "120%" }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            />
+          )}
           <span className="relative z-10">
-            {saving ? "Salvando... ⏳" : selected.length > 0 ? `Vamos lá! 🚀` : "Escolha 1 ou mais"}
+            {saving ? "Preparando seu mundo…" : ready ? "Continuar →" : "Escolha 1 ou mais"}
           </span>
         </motion.button>
-
-        <motion.p
-          className="text-gray-500 text-[10px] mt-4 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-        >
-          Você pode mudar isso depois nas configurações
-        </motion.p>
       </div>
-    </div>
+    </OnboardingShell>
   );
 };
 

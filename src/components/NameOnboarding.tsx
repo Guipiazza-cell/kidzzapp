@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import KidzzChameleon from "./kidzz/KidzzChameleon";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
+import OnboardingShell from "./onboarding/OnboardingShell";
 import { useAuth } from "@/contexts/AuthContext";
-import MagicalBackground from "./MagicalBackground";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
+
+// Preload das próximas telas do onboarding
+import("./AgeSelection");
+import("./InterestsOnboarding");
 
 const NameOnboarding = () => {
   const { updateProfile } = useAuth();
@@ -11,15 +17,31 @@ const NameOnboarding = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // Pré-aquece os mascotes que vêm a seguir
+  useEffect(() => {
+    const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void) => void);
+    const run = () => {
+      ["explorer", "music", "moon"].forEach((s) => {
+        const img = new Image();
+        img.src = `/src/assets/kidzz/${s}.webp`;
+      });
+    };
+    if (ric) ric(run); else setTimeout(run, 400);
+  }, []);
+
   const handleSubmit = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      setError("Digite um nome para continuar 😊");
+      setError("Digite seu nome 😊");
+      sfx("error");
+      haptic("warning");
       return;
     }
     if (saving) return;
     setError("");
     setSaving(true);
+    sfx("click");
+    haptic("medium");
     try {
       await updateProfile({ child_name: trimmed });
       setTimeout(() => setSaving(false), 3000);
@@ -27,54 +49,42 @@ const NameOnboarding = () => {
       console.error("NameOnboarding: updateProfile error", e);
       setError("Algo deu errado. Tente novamente!");
       setSaving(false);
+      sfx("error");
     }
   };
 
-  const mood = saving ? "happy" : name.trim() ? "curious" : "curious";
+  const filled = !!name.trim();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)] relative">
-      <MagicalBackground />
-
+    <OnboardingShell tone="warm">
       {/* Progresso topo */}
-      <div className="relative z-20 pt-[max(env(safe-area-inset-top,16px),20px)] px-6">
+      <div className="pt-[max(env(safe-area-inset-top,16px),20px)] px-6">
         <OnboardingProgress step={1} />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
-        {/* KIDZZ HERO — ~40% da tela */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ scale: 0, opacity: 0, y: 12 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 180, damping: 14 }}
-          className="mb-2"
         >
-          <KidzzChameleon state="cosmic" mood={mood} size="xl" interactive showParticles />
+          <KidzzChameleon state="cosmic" mood={filled ? "happy" : "curious"} size="xl" interactive showParticles />
         </motion.div>
 
         <motion.h1
-          className="text-2xl font-black text-gray-900 text-center mt-2"
-          initial={{ opacity: 0, y: 15 }}
+          className="text-[26px] leading-tight font-black text-gray-900 text-center mt-3"
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.25 }}
         >
-          Oi! Eu sou o Kidzz! 💫
+          Como você se chama? ✨
         </motion.h1>
 
-        <motion.p
-          className="text-gray-700 text-center text-base font-semibold mt-1.5 max-w-xs"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          Como você se chama?
-        </motion.p>
-
         <motion.div
-          className="w-full max-w-sm mt-6 space-y-4"
-          initial={{ opacity: 0, y: 20 }}
+          className="w-full max-w-sm mt-7 space-y-4"
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.45 }}
         >
           <div className="relative">
             <input
@@ -85,22 +95,20 @@ const NameOnboarding = () => {
                 if (error) setError("");
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              placeholder="Digite seu nome aqui ✨"
-              className="w-full py-5 px-6 rounded-2xl glass-card text-gray-900 text-xl font-bold text-center placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-kid-orange/40 transition-all"
+              placeholder="Seu nome"
+              className="w-full py-5 px-6 rounded-2xl text-gray-900 text-xl font-bold text-center placeholder:text-gray-400 focus:outline-none transition-all"
+              style={{
+                background: "rgba(255,255,255,0.65)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: filled ? "1.5px solid hsl(35 95% 58% / 0.55)" : "1.5px solid rgba(255,255,255,0.7)",
+                boxShadow: filled
+                  ? "0 0 24px hsl(35 95% 58% / 0.28), inset 0 0 12px hsl(35 95% 58% / 0.06)"
+                  : "0 6px 18px rgba(0,0,0,0.06)",
+              }}
               autoFocus
               maxLength={20}
             />
-            {name.trim() && (
-              <motion.div
-                className="absolute inset-0 rounded-2xl pointer-events-none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                style={{
-                  boxShadow:
-                    "0 0 22px hsl(35 90% 55% / 0.25), inset 0 0 14px hsl(35 90% 55% / 0.08)",
-                }}
-              />
-            )}
           </div>
 
           {error && (
@@ -116,20 +124,32 @@ const NameOnboarding = () => {
           <motion.button
             onClick={handleSubmit}
             disabled={saving}
-            className="w-full py-5 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-yellow text-white font-extrabold text-lg shadow-xl disabled:opacity-50 active:scale-[0.98] transition-transform relative overflow-hidden min-h-[56px]"
+            className="relative w-full py-5 rounded-2xl text-white font-extrabold text-lg overflow-hidden min-h-[56px] disabled:opacity-50 active:scale-[0.98]"
+            style={{
+              background: filled
+                ? "linear-gradient(135deg, hsl(35 95% 58%), hsl(28 95% 62%) 60%, hsl(45 95% 62%))"
+                : "linear-gradient(135deg, hsl(35 35% 70%), hsl(35 25% 75%))",
+              boxShadow: filled
+                ? "0 0 28px hsl(35 95% 58% / 0.55), 0 10px 24px rgba(0,0,0,0.15)"
+                : "0 6px 16px rgba(0,0,0,0.08)",
+              transition: "box-shadow 300ms ease, background 300ms ease",
+            }}
             whileTap={{ scale: 0.97 }}
           >
-            <motion.div
-              className="absolute inset-0 bg-white/20 rounded-2xl"
-              animate={{ opacity: [0, 0.3, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
+            {filled && (
+              <motion.span
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)",
+                }}
+                initial={{ x: "-110%" }}
+                animate={{ x: "120%" }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+            )}
             <span className="relative z-10">
-              {saving
-                ? "Entrando... ⏳"
-                : name.trim()
-                ? `Vamos lá, ${name.trim()}! 🚀`
-                : "Continuar"}
+              {saving ? "Entrando…" : filled ? "Continuar →" : "Continuar"}
             </span>
           </motion.button>
         </motion.div>
@@ -138,12 +158,12 @@ const NameOnboarding = () => {
           className="text-gray-500 text-[10px] mt-6 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 0.9 }}
         >
-          🔒 Seguro e feito para crianças • Sem anúncios
+          🔒 Seguro • Sem anúncios • Feito para crianças
         </motion.p>
       </div>
-    </div>
+    </OnboardingShell>
   );
 };
 
