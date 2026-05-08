@@ -75,7 +75,11 @@ const AppShell = () => {
       {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       <BrowserRouter>
         <AuthProvider>
-          <Suspense fallback={null}>
+          <Suspense fallback={
+            <div className="fixed inset-0 flex items-center justify-center bg-background/40 backdrop-blur-sm">
+              <div className="w-12 h-12 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
+            </div>
+          }>
             <Routes>
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />

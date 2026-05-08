@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart, Gamepad2, Crown, Shield } from "lucide-react";
 import { haptic } from "@/lib/haptics";
+import { sfx } from "@/lib/sfx";
 
 interface Props {
   activeTab: string;
@@ -94,8 +95,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         {onOpenParents && (
           <button
             type="button"
-            onClick={() => { haptic("light"); onOpenParents(); }}
-            className="min-h-[36px] rounded-full glass-card px-3 text-[11px] font-black text-foreground flex items-center gap-1.5 active:scale-95"
+            onClick={() => { haptic("light"); sfx("click"); onOpenParents(); }}
+            className="min-h-[36px] rounded-full glass-card px-3 text-[11px] font-black text-foreground flex items-center gap-1.5 active:scale-95 tap-press"
           >
             <Shield size={14} className="text-primary" />
             Pais
@@ -104,11 +105,12 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         {onOpenPlans && !isPremium && (
           <button
             type="button"
-            onClick={() => { haptic("light"); onOpenPlans(); }}
-            className="min-h-[36px] rounded-full kid-gradient-premium px-3 text-[11px] font-black text-primary-foreground shadow-md flex items-center gap-1.5 active:scale-95"
+            onClick={() => { haptic("medium"); sfx("click"); onOpenPlans(); }}
+            className="min-h-[36px] rounded-full kid-gradient-premium px-3 text-[11px] font-black text-primary-foreground shadow-premium flex items-center gap-1.5 active:scale-95 tap-press relative overflow-hidden"
           >
-            <Crown size={14} />
-            Assinatura
+            <span className="shine-overlay" aria-hidden />
+            <Crown size={14} className="relative z-10" />
+            <span className="relative z-10">Assinatura</span>
           </button>
         )}
       </div>
@@ -121,7 +123,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         return (
           <motion.button
             key={tab.id}
-            onClick={() => { haptic("light"); onTabChange(tab.id); }}
+            onClick={() => { if (activeTab === tab.id) return; haptic("light"); sfx("click"); onTabChange(tab.id); }}
             className={`relative flex flex-col items-center gap-0.5 px-1 py-1 rounded-2xl transition-colors min-w-[48px] ${
               isHighlight ? "min-w-[58px]" : ""
             }`}

@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Lock, Sparkles, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 export type LockedFeatureType = "games" | "music" | "stories" | "dreams" | "moments" | "generic";
 
@@ -69,8 +71,14 @@ const LockedFeature = ({
   const finalTier = requiredTier ?? preset.tier;
 
   const handleUpgrade = () => {
+    haptic("medium");
+    sfx("unlock");
     if (onUpgrade) onUpgrade();
-    else navigate("/?paywall=1");
+    else {
+      // Open the in-app paywall instead of forcing a navigation
+      window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
+      if (window.location.pathname !== "/") navigate("/?paywall=1");
+    }
   };
 
   const tierLabel = finalTier === "premium" ? "Premium" : "KIDZZ";
@@ -145,10 +153,11 @@ const LockedFeature = ({
       <motion.button
         onClick={handleUpgrade}
         whileTap={{ scale: 0.97 }}
-        className={`mt-5 w-full max-w-xs mx-auto py-3.5 rounded-2xl bg-gradient-to-r ${tierGradient} text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2`}
+        className={`relative overflow-hidden mt-5 w-full max-w-xs mx-auto py-3.5 rounded-2xl bg-gradient-to-r ${tierGradient} text-white font-extrabold text-sm shadow-premium-lg flex items-center justify-center gap-2 animate-premium-glow`}
       >
-        <Sparkles size={16} />
-        Fazer upgrade agora
+        <span className="shine-overlay" aria-hidden />
+        <Sparkles size={16} className="relative z-10" />
+        <span className="relative z-10">Fazer upgrade agora</span>
       </motion.button>
 
       <p className="text-[10px] text-gray-500 font-bold mt-3">
