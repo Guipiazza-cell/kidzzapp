@@ -123,7 +123,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         return (
           <motion.button
             key={tab.id}
-            onClick={() => { haptic("light"); onTabChange(tab.id); }}
+            onClick={() => { if (activeTab === tab.id) return; haptic("light"); sfx("click"); onTabChange(tab.id); }}
             className={`relative flex flex-col items-center gap-0.5 px-1 py-1 rounded-2xl transition-colors min-w-[48px] ${
               isHighlight ? "min-w-[58px]" : ""
             }`}
