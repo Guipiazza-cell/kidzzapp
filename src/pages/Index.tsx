@@ -406,7 +406,7 @@ const Index = () => {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeTab}
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col min-h-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
