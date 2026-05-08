@@ -8,6 +8,7 @@ import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
 import ParentDashboard from "../parental/ParentDashboard";
 import SubscribeBanner from "../SubscribeBanner";
+import SoundToggle from "../SoundToggle";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,8 @@ import { getTotalXp } from "@/lib/dailyMission";
 import LevelProgressBar from "@/components/flow/LevelProgressBar";
 import KidzzAura from "@/components/flow/KidzzAura";
 import EmotionalSpeechBubble from "@/components/flow/EmotionalSpeechBubble";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
