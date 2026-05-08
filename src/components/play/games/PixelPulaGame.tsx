@@ -355,9 +355,29 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
     return () => window.removeEventListener("keydown", onKey);
   }, [phase, jump]);
 
-  const handleArenaTap = () => {
+  const handleArenaPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
     if (phase === "playing") jump();
   };
+
+  // Combo decays after ~1.6s without a fresh near miss
+  useEffect(() => {
+    if (combo === 0) return;
+    const t = setTimeout(() => {
+      if (performance.now() - nearMissAt > 1500) setCombo(0);
+    }, 1700);
+    return () => clearTimeout(t);
+  }, [combo, nearMissAt]);
+
+  // Cull old landing puffs (keeps DOM lean)
+  useEffect(() => {
+    if (landingPuffs.length === 0) return;
+    const t = setTimeout(() => {
+      const now = performance.now();
+      setLandingPuffs((p) => p.filter((x) => now - x.t < 500));
+    }, 500);
+    return () => clearTimeout(t);
+  }, [landingPuffs]);
 
   // Endless score → stars (1-3) based on milestones
   const computeStars = (s: number): 1 | 2 | 3 => (s >= 300 ? 3 : s >= 150 ? 2 : 1);
