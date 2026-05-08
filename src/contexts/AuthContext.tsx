@@ -273,8 +273,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (!mounted) return;
           setProfile(prof);
 
-          // On init, use cache if available, otherwise check
-          const subResult = await checkSubscription(currentSession.access_token, prof);
+          // On init, force refresh from Stripe to keep tier/locks in sync
+          const subResult = await checkSubscription(currentSession.access_token, prof, true);
           if (!mounted) return;
           setTier(subResult.tier);
           if (subResult.isPremium !== prof.is_premium) {
