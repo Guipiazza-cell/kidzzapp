@@ -528,9 +528,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
               <span className="relative z-10">
                 {loading
                   ? "Abrindo..."
-                  : selectedPlan === "premium_annual"
-                    ? "✨ Começar Nossa Aventura Anual"
-                    : "Desbloquear agora"}
+                  : `✨ Assinar ${selectedTier === "premium" ? "Premium" : "KIDZZ"} ${billingPeriod === "annual" ? "Anual" : "Mensal"}`}
               </span>
             </>
           )}
