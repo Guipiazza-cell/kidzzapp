@@ -92,6 +92,31 @@ const Index = () => {
     window.localStorage.setItem(AGE_STORAGE_KEY, profile.age_range);
   }, [profile?.age_range]);
 
+  // Prefetch lazy tab chunks in idle time → trocar de aba fica instantâneo após a 1ª carga
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const idle = (cb: () => void) =>
+      (window as any).requestIdleCallback
+        ? (window as any).requestIdleCallback(cb, { timeout: 2500 })
+        : setTimeout(cb, 1200);
+    const handle = idle(() => {
+      // Carrega em paralelo, sem bloquear o thread principal
+      import("@/components/story/StoryFactory");
+      import("@/components/routine/RoutineScreen");
+      import("@/components/play/KidzzPlay");
+      import("@/components/moments/MomentsFactory");
+      import("@/components/dreams/DreamWorld");
+      import("@/components/music/MusicForest");
+      import("@/components/lab/KidzzLab");
+      import("@/components/travel/TravelMode");
+    });
+    return () => {
+      if ((window as any).cancelIdleCallback && typeof handle === "number") {
+        (window as any).cancelIdleCallback(handle);
+      }
+    };
+  }, []);
+
   // Auto monthly retrospective: day 1 + activity + not seen this month
   useEffect(() => {
     if (typeof window === "undefined" || !profile?.child_name) return;
