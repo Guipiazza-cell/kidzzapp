@@ -465,9 +465,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const MAX_FREE_QUESTIONS = 3;
   const MAX_FREE_STORIES = 1;
   // Limites diários para assinantes
-  const DAILY_QUESTION_LIMIT = 10;
-  const DAILY_STORY_LIMIT = 3;
-  const SUPER_DAILY_STORY_LIMIT = 10;
+  // Limites diários por tier (alinhado ao backend)
+  const KIDZZ_DAILY_QUESTIONS = 30;
+  const PREMIUM_DAILY_QUESTIONS = 60;
+  const KIDZZ_DAILY_STORIES = 3;
+  const PREMIUM_DAILY_STORIES = 5;
 
   const canAskQuestion = useCallback(() => {
     if (!profile) return false;
