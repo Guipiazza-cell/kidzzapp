@@ -351,29 +351,63 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleCheckout = useCallback(async (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
     if (!session?.access_token) {
       const { toast } = await import("sonner");
-      toast.error("Crie uma conta para assinar! Acesse o controle parental para fazer login.");
+      toast.error("Crie uma conta para assinar 💛", {
+        description: "Acesse o controle parental para fazer login.",
+      });
       return;
     }
-    try {
-      const ref = sessionStorage.getItem("kidzz_ref") || undefined;
-      const resp = await fetch(CHECKOUT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ plan, ref }),
-      });
-      const data = await resp.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        const { toast } = await import("sonner");
-        toast.error(data.error || "Erro ao criar checkout. Tente novamente.");
-      }
-    } catch {
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
       const { toast } = await import("sonner");
-      toast.error("Erro ao iniciar pagamento. Verifique sua conexão.");
+      toast.error("Você está offline 🌐", {
+        description: "Conecte-se à internet e tente novamente.",
+      });
+      return;
+    }
+    const ref = sessionStorage.getItem("kidzz_ref") || undefined;
+
+    const attempt = async (): Promise<{ url?: string; error?: string }> => {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 12000);
+      try {
+        const resp = await fetch(CHECKOUT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ plan, ref }),
+          signal: ctrl.signal,
+        });
+        const data = await resp.json().catch(() => ({}));
+        return data;
+      } finally {
+        clearTimeout(t);
+      }
+    };
+
+    try {
+      let data = await attempt();
+      if (!data?.url) {
+        // gentle one-shot retry for transient errors
+        await new Promise((r) => setTimeout(r, 800));
+        data = await attempt();
+      }
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      const { toast } = await import("sonner");
+      toast.error("Não conseguimos abrir o checkout 💛", {
+        description: data?.error || "Tente novamente em instantes — nada foi cobrado.",
+      });
+    } catch (err) {
+      const { toast } = await import("sonner");
+      const aborted = (err as Error)?.name === "AbortError";
+      toast.error(aborted ? "A conexão demorou demais ⏳" : "Erro ao iniciar pagamento", {
+        description: aborted
+          ? "Verifique sua internet e tente de novo — nada foi cobrado."
+          : "Tente novamente em instantes.",
+      });
     }
   }, [session]);
 
