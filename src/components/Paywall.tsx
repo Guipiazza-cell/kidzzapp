@@ -115,7 +115,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
 
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-y-auto"
+      className="flex-1 min-h-0 flex flex-col overflow-y-auto pb-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
