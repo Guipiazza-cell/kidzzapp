@@ -14,6 +14,8 @@ import { ChildAvatar } from "@/types/story";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-story`;
 
@@ -115,9 +117,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         showXpGained(gained, "história");
       }
       bumpSessionActions();
+      sfx("complete");
+      haptic("success");
       toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
     } catch (e: any) {
       console.error("Story generation error:", e);
+      sfx("error");
+      haptic("error");
       toast.error(e.message || "Erro ao gerar história");
     } finally {
       clearInterval(timer);
