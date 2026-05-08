@@ -1,6 +1,20 @@
+import { memo } from "react";
 import forestBg from "@/assets/forest-bg-light.jpg";
 
-const FIREFLIES = Array.from({ length: 12 }, (_, i) => ({
+// Detect low-end devices once at module load to reduce particle count.
+const IS_LOW_END = (() => {
+  if (typeof navigator === "undefined") return false;
+  const mem = (navigator as any).deviceMemory;
+  const cores = (navigator as any).hardwareConcurrency;
+  const mql = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)");
+  return Boolean(mql?.matches) || (mem && mem <= 4) || (cores && cores <= 4);
+})();
+
+const FIREFLY_COUNT = IS_LOW_END ? 5 : 12;
+const LEAF_COUNT = IS_LOW_END ? 2 : 5;
+const DRAGONFLY_COUNT = IS_LOW_END ? 1 : 4;
+
+const FIREFLIES = Array.from({ length: FIREFLY_COUNT }, (_, i) => ({
   id: i,
   left: `${5 + ((i * 17 + 7) % 90)}%`,
   top: `${10 + ((i * 23 + 11) % 75)}%`,
@@ -10,7 +24,7 @@ const FIREFLIES = Array.from({ length: 12 }, (_, i) => ({
   drift: i % 2 === 0 ? "firefly-float-a" : "firefly-float-b",
 }));
 
-const LEAVES = Array.from({ length: 5 }, (_, i) => ({
+const LEAVES = Array.from({ length: LEAF_COUNT }, (_, i) => ({
   id: i,
   left: `${10 + ((i * 19) % 80)}%`,
   size: 6 + (i % 4) * 2,
@@ -19,7 +33,7 @@ const LEAVES = Array.from({ length: 5 }, (_, i) => ({
   drift: i % 2 === 0 ? "leaf-drift-1" : "leaf-drift-2",
 }));
 
-const DRAGONFLIES = Array.from({ length: 4 }, (_, i) => ({
+const DRAGONFLIES = Array.from({ length: DRAGONFLY_COUNT }, (_, i) => ({
   id: i,
   delay: `${(i * 3.5).toFixed(1)}s`,
   duration: `${12 + (i % 3) * 4}s`,
@@ -169,4 +183,4 @@ const MagicalBackground = () => (
   </div>
 );
 
-export default MagicalBackground;
+export default memo(MagicalBackground);
