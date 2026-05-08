@@ -468,7 +468,7 @@ const Index = () => {
         context={contextualPaywall.context}
         meta={contextualPaywall.meta}
         onClose={() => setContextualPaywall((p) => ({ ...p, open: false }))}
-        onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); setShowLoginGate(true); }}
+        onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); navigate("/auth"); }}
       />
 
       {/* Sua Jornada — overlay com nível, próxima recompensa e jornada XP */}
