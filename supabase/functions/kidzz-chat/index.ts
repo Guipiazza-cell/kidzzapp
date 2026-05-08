@@ -6,8 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const FREE_LIMIT = 3;
-const DAILY_LIMIT = 10;
+// 2026 limits per tier
+const FREE_LIMIT = 3;          // lifetime para guests/free
+const KIDZZ_DAILY_LIMIT = 30;  // perguntas KIDZZ
+const PREMIUM_DAILY_LIMIT = 60; // perguntas PREMIUM
 
 // IMPORTANT: respostas devem priorizar TEXTO LIMPO. Emojis são opcionais
 // (no máximo 1 por resposta) — a narração em voz não lê emojis e o texto
