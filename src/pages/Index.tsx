@@ -175,7 +175,7 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
+      <div className="min-h-dvh flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
         <div className="text-center space-y-3 flex flex-col items-center">
           <KidzzChameleon size="md" mood="thinking" state="cosmic" interactive={false} />
           <motion.p className="text-gray-700 font-bold text-sm" animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>
@@ -400,9 +400,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
+    <div className="min-h-dvh flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
       <MagicalBackground />
-      <div className="flex-1 flex flex-col pb-[112px]">
+      <div className="flex-1 flex flex-col pb-safe-nav">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeTab}

@@ -60,6 +60,26 @@
     --sidebar-accent-foreground: 25 40% 18%;
     --sidebar-border: 35 30% 85%;
     --sidebar-ring: 25 90% 55%;
+
+    /* === Polish design tokens (Block 3) === */
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --glow-primary: 0 0 20px rgba(232,130,26,0.35);
+    --glow-magic: 0 0 30px rgba(107,63,160,0.40);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
@@ -68,12 +88,26 @@
     @apply border-border;
   }
 
+  html, body {
+    /* iOS safe-area + dynamic viewport */
+    min-height: 100dvh;
+  }
+
   body {
     @apply bg-background text-foreground font-kids antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
+
+  /* Touch targets: min 44x44 on interactive primitives */
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Tabular numerals for streak/XP counters */
+  .tabular-nums { font-variant-numeric: tabular-nums; }
 }
 
 @layer utilities {
@@ -164,7 +198,64 @@
   .tap-press:active {
     transform: scale(0.97);
   }
+
+  /* Dynamic viewport height (Block 1) */
+  .min-h-dvh { min-height: 100dvh; }
+  .h-dvh { height: 100dvh; }
+
+  /* Safe-area helpers (Block 1) */
+  .pt-safe { padding-top: max(env(safe-area-inset-top, 0px), 0px); }
+  .pb-safe { padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px); }
+  .pb-safe-nav { padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
+
+  /* Shimmer skeleton (Block 6) */
+  .shimmer {
+    background: linear-gradient(90deg,
+      hsl(0 0% 100% / 0) 0%,
+      hsl(0 0% 100% / 0.45) 50%,
+      hsl(0 0% 100% / 0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer-slide 1.4s linear infinite;
+  }
+
+  /* Idle breathing for the mascot (Block 6) */
+  .idle-breathing {
+    animation: idle-breathing 3s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Smoother momentum scroll on iOS */
+  .scroll-touch {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Card hover/focus (Block 6) */
+  .card-lift {
+    transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+    will-change: transform;
+  }
+  .card-lift:hover, .card-lift:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
 }
+
+@keyframes shimmer-slide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes idle-breathing {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes gold-flash {
+  0%, 100% { color: inherit; }
+  50% { color: hsl(45 95% 50%); text-shadow: 0 0 12px hsl(45 95% 60% / 0.55); }
+}
+.gold-flash { animation: gold-flash 600ms ease-out; }
 
 /* Firefly animations — pure CSS, GPU-accelerated */
 @keyframes firefly-float-a {
