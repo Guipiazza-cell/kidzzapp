@@ -231,7 +231,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
             onGenerate={handleGenerate}
             isLoading={isGenerating}
             storiesRemaining={storiesRemaining()}
-            isPremium={!!profile?.is_premium}
+            isPremium={tier !== "free"}
             onUpgrade={() => window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }))}
           />
         )}
