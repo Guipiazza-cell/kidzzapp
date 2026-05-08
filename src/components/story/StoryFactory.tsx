@@ -41,11 +41,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const handleGenerate = useCallback(async (age: number, interests: string) => {
     if (!avatar) return;
     if (!canGenerateStory()) {
-      const isPremium = !!profile?.is_premium;
-      if (isPremium) {
-        toast.error("Você atingiu o limite de histórias por hoje! Volte amanhã 💛");
+      if (tier === "premium") {
+        toast.error("Você atingiu o limite de 5 histórias por hoje! Volte amanhã 💛");
+      } else if (tier === "kidzz") {
+        toast.info("Você usou suas 3 histórias de hoje! Faça upgrade para Premium e libere 5/dia ✨");
+        window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       } else {
-        toast.info("Sua história grátis já foi criada! Desbloqueie histórias ilimitadas ✨");
+        toast.info("Sua história grátis já foi criada! Desbloqueie o KIDZZ e crie histórias todos os dias ✨");
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       }
       return;
