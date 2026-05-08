@@ -189,7 +189,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               Crie histórias personalizadas com ilustrações exclusivas!
             </p>
             <span className="text-xs font-bold glass-card text-gray-600 px-3 py-1 rounded-full">
-              {storiesRemaining()} de 3 histórias restantes hoje
+              {storiesRemaining()} de {tier === "premium" ? 5 : tier === "kidzz" ? 3 : 1} {tier === "free" ? "história" : "histórias"} restante{storiesRemaining() !== 1 ? "s" : ""} hoje
             </span>
 
             <div className="glass-card rounded-3xl p-4 w-full max-w-xs space-y-2">
