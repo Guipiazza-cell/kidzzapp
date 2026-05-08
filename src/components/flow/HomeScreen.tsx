@@ -8,6 +8,7 @@ import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
 import ParentDashboard from "../parental/ParentDashboard";
 import SubscribeBanner from "../SubscribeBanner";
+import SoundToggle from "../SoundToggle";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,8 @@ import { getTotalXp } from "@/lib/dailyMission";
 import LevelProgressBar from "@/components/flow/LevelProgressBar";
 import KidzzAura from "@/components/flow/KidzzAura";
 import EmotionalSpeechBubble from "@/components/flow/EmotionalSpeechBubble";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
@@ -173,10 +176,14 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const submit = (text: string) => {
     if (!text.trim() || submitting) return;
     setSubmitting(true);
+    haptic("light");
+    sfx("click");
     onSubmit(text.trim());
   };
 
   const openPlans = () => {
+    haptic("medium");
+    sfx("click");
     window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
   };
 
@@ -258,6 +265,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                 <BarChart3 size={16} />
                 <span className="text-[10px] font-extrabold">Pais</span>
               </motion.button>
+              <SoundToggle size={16} />
               <motion.button
                 onClick={() => setShowParentalGateForSettings(true)}
                 className="p-2 rounded-xl glass-card text-gray-600"

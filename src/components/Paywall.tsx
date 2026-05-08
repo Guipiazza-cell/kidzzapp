@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Lock, Check, Crown, Zap, ArrowLeft } from "lucide-react";
+import { Sparkles, Lock, Check, Crown, Zap, ArrowLeft, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 interface PaywallProps {
   onLogin: () => void;
@@ -89,6 +91,8 @@ const PLANS: PlanCard[] = [
 
 const Paywall = ({ onLogin, onBack }: PaywallProps) => {
   const handleBack = () => {
+    haptic("light");
+    sfx("click");
     if (onBack) onBack();
     else window.history.back();
   };
@@ -98,11 +102,21 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
   const [selectedPlan, setSelectedPlan] = useState<PlanKey>("premium_annual");
   const [loading, setLoading] = useState(false);
 
+  const selectPlan = (key: PlanKey) => {
+    if (key === selectedPlan) return;
+    setSelectedPlan(key);
+    haptic("light");
+    sfx("click");
+  };
+
   const handleUnlock = async () => {
     if (!user) {
+      haptic("medium");
       onLogin();
       return;
     }
+    haptic("medium");
+    sfx("unlock");
     setLoading(true);
     try {
       await handleCheckout(selectedPlan as never);
@@ -167,7 +181,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
             return (
               <motion.button
                 key={plan.key}
-                onClick={() => setSelectedPlan(plan.key)}
+                onClick={() => selectPlan(plan.key)}
                 className={`w-full text-left rounded-2xl p-4 transition-all relative overflow-hidden ${bg} ${
                   isSelected ? ringColor : ""
                 }`}
@@ -260,31 +274,38 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
         </p>
       </div>
 
-      {/* Sticky CTA — always visible above the bottom nav */}
+      {/* Sticky CTA — premium glow + shine sweep */}
       <div className="sticky bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 py-3">
         <div className="max-w-sm mx-auto">
           <motion.button
             onClick={handleUnlock}
             disabled={loading}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-base shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
+            className="relative w-full py-4 rounded-2xl bg-gradient-to-r from-kid-purple via-pink-500 to-kid-pink text-white font-extrabold text-base shadow-premium-lg flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[0.98] transition-all duration-200 ease-premium overflow-hidden animate-premium-glow"
             whileTap={{ scale: 0.97 }}
           >
-            {!user ? (
+            {!loading && <span className="shine-overlay" aria-hidden />}
+            {loading ? (
               <>
-                <Lock size={18} />
-                <span>Criar conta e assinar</span>
+                <Loader2 size={18} className="animate-spin relative z-10" />
+                <span className="relative z-10">Abrindo checkout seguro…</span>
+              </>
+            ) : !user ? (
+              <>
+                <Lock size={18} className="relative z-10" />
+                <span className="relative z-10">Criar conta e assinar</span>
               </>
             ) : (
               <>
-                <Sparkles size={18} />
-                <span>
-                  {loading
-                    ? "Abrindo checkout..."
-                    : `✨ Assinar ${selected.title}`}
+                <Sparkles size={18} className="relative z-10" />
+                <span className="relative z-10">
+                  ✨ Assinar {selected.title}
                 </span>
               </>
             )}
           </motion.button>
+          <p className="text-center text-[10px] text-gray-400 font-bold mt-2">
+            🔒 Pagamento seguro via Stripe · Cancele quando quiser
+          </p>
         </div>
       </div>
     </motion.div>
