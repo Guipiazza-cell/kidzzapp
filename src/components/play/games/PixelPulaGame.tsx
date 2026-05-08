@@ -245,13 +245,34 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       const pixelTop = yRef.current + PIXEL_SIZE - 12;
 
       let hit = false;
+      let nearMissThisTick = false;
       for (const o of obstaclesRef.current) {
         const oLeft = o.x + 6;
         const oRight = o.x + o.width - 6;
-        const oTop = 38; // obstacles are ~44px tall, sitting on ground
+        const oTop = 38;
         if (pixelRight > oLeft && pixelLeft < oRight && pixelBottom < oTop) {
           hit = true;
           break;
+        }
+        // Near miss: obstacle just passed under us while we were airborne
+        if (
+          !passedObstaclesRef.current.has(o.id) &&
+          o.x + o.width < PIXEL_X &&
+          pixelBottom > oTop - 8
+        ) {
+          passedObstaclesRef.current.add(o.id);
+          nearMissThisTick = true;
+        }
+      }
+      if (nearMissThisTick) {
+        const next = combo + 1;
+        setCombo(next);
+        setNearMissAt(performance.now());
+        setComboFloater({ id: idRef.current++, x: PIXEL_X + 20, n: next });
+        setTimeout(() => setComboFloater((f) => (f && f.n === next ? null : f)), 700);
+        if (next >= 2) {
+          sfx("reward");
+          haptic("light");
         }
       }
 
