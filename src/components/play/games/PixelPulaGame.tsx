@@ -49,7 +49,7 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
   const [showHint, setShowHint] = useState(true);
 
   // Physics state in refs (avoid re-renders every tick)
-  const yRef = useRef(0);              // offset above ground (positive up)
+  const yRef = useRef(0);
   const vyRef = useRef(0);
   const groundedRef = useRef(true);
   const speedRef = useRef(6);
@@ -59,29 +59,47 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
   const idRef = useRef(0);
   const arenaRef = useRef<HTMLDivElement>(null);
   const rotationRef = useRef(0);
+  const lastGroundedAtRef = useRef<number>(0);
+  const jumpBufferAtRef = useRef<number>(0);
+  const passedObstaclesRef = useRef<Set<number>>(new Set());
 
-  // Visual state — updated each tick by setState
+  // Visual state
   const [pixelY, setPixelY] = useState(0);
   const [pixelRot, setPixelRot] = useState(0);
+  const [pixelSquash, setPixelSquash] = useState(0);
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
   const [stars, setStars] = useState<Star[]>([]);
   const [parallax, setParallax] = useState(0);
+  const [landingPuffs, setLandingPuffs] = useState<{ id: number; x: number; t: number }[]>([]);
+  const [combo, setCombo] = useState(0);
+  const [nearMissAt, setNearMissAt] = useState(0);
+  const [comboFloater, setComboFloater] = useState<{ id: number; x: number; n: number } | null>(null);
 
   useEffect(() => {
     const stored = parseInt(localStorage.getItem("kidzz_pixel_pula_high") || "0", 10);
     setHighScore(Number.isFinite(stored) ? stored : 0);
   }, []);
 
+  const performJump = useCallback(() => {
+    vyRef.current = JUMP_VELOCITY;
+    groundedRef.current = false;
+    setShowHint(false);
+    setPixelSquash(0.6);
+    setTimeout(() => setPixelSquash(0), 140);
+    sfx("click");
+    haptic("light");
+  }, []);
+
   const jump = useCallback(() => {
     if (phase !== "playing") return;
-    if (groundedRef.current) {
-      vyRef.current = JUMP_VELOCITY;
-      groundedRef.current = false;
-      setShowHint(false);
-      sfx("click");
-      haptic("light");
+    const now = performance.now();
+    const canCoyote = !groundedRef.current && now - lastGroundedAtRef.current < COYOTE_MS;
+    if (groundedRef.current || canCoyote) {
+      performJump();
+    } else {
+      jumpBufferAtRef.current = now;
     }
-  }, [phase]);
+  }, [phase, performJump]);
 
   const startGame = () => {
     yRef.current = 0;
