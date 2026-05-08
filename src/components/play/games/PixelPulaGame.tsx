@@ -767,6 +767,9 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           25% { transform: translate(8px,-6px); opacity: 1; }
           50% { transform: translate(-6px,-12px); opacity: 0.7; }
           75% { transform: translate(4px,-4px); opacity: 0.9; }
+        @keyframes puff {
+          0% { transform: scale(0.6); opacity: 0.7; }
+          100% { transform: scale(1.8) translateY(-4px); opacity: 0; }
         }
       `}</style>
     </div>
