@@ -11,6 +11,7 @@ Updated: now
 - **Quotas:** 3 free lifetime. Kidzz plan: 10 daily Qs. Premium: 10 Qs, 3 stories. Validated in backend Edge Function `kidzz-chat`.
 - **UX Rules:** 30s timeout for generation (AbortController). 2s timeout for auth. Optimistic local persistence (`kidzz_guest_profile`, `kidzz_last_age_range`).
 - **Payment:** Stripe checkout via `window.location.href` (same tab). Requires authentication first.
+- **Premium polish:** Use `shadow-premium-lg`, `animate-premium-glow`, `<span className="shine-overlay" />` on premium CTAs. Pair every meaningful tap with `haptic()` + `sfx()` from `@/lib/haptics` and `@/lib/sfx`.
 - **Música ≠ Sonhos:** Floresta Musical = ATIVO (canta/dança/cria). Mundo dos Sonhos = PASSIVO (escuta/relaxa). NUNCA fundir.
 - **KIDZZ é UM personagem só:** 4 estados visuais (cosmic/moon/explorer/music) que metamorfoseiam via crossfade. Nunca trocar imagem bruscamente. Nunca usar emoji 🦎 ou cartoon genérico.
 
