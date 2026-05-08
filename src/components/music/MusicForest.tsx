@@ -11,7 +11,7 @@ import CreateMusic from "./CreateMusic";
 import { getMusicXp, getMusicStreak, type MusicAchievement } from "@/lib/musicXp";
 import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
-import ContextualPaywallModal from "@/components/ContextualPaywallModal";
+import LockedFeature from "@/components/LockedFeature";
 
 interface Props {
   onBack: () => void;
