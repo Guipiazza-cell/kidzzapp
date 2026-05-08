@@ -123,11 +123,16 @@ export default {
       transitionTimingFunction: {
         "premium": "cubic-bezier(0.22, 1, 0.36, 1)",
         "spring-soft": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "in-quad": "cubic-bezier(0.4, 0, 1, 1)",
       },
       boxShadow: {
         "premium": "0 8px 32px -8px hsl(var(--kid-purple) / 0.35), 0 4px 12px -4px hsl(var(--kid-pink) / 0.25)",
         "premium-lg": "0 16px 48px -12px hsl(var(--kid-purple) / 0.45), 0 8px 24px -8px hsl(var(--kid-pink) / 0.3)",
         "soft": "0 2px 12px -2px hsl(0 0% 0% / 0.08)",
+        "ds-sm": "0 2px 8px rgba(0,0,0,0.06)",
+        "ds-md": "0 4px 16px rgba(0,0,0,0.10)",
+        "ds-lg": "0 8px 32px rgba(0,0,0,0.14)",
       },
     },
   },
