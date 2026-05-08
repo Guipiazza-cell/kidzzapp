@@ -91,6 +91,8 @@ const PLANS: PlanCard[] = [
 
 const Paywall = ({ onLogin, onBack }: PaywallProps) => {
   const handleBack = () => {
+    haptic("light");
+    sfx("click");
     if (onBack) onBack();
     else window.history.back();
   };
@@ -100,11 +102,21 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
   const [selectedPlan, setSelectedPlan] = useState<PlanKey>("premium_annual");
   const [loading, setLoading] = useState(false);
 
+  const selectPlan = (key: PlanKey) => {
+    if (key === selectedPlan) return;
+    setSelectedPlan(key);
+    haptic("light");
+    sfx("click");
+  };
+
   const handleUnlock = async () => {
     if (!user) {
+      haptic("medium");
       onLogin();
       return;
     }
+    haptic("medium");
+    sfx("unlock");
     setLoading(true);
     try {
       await handleCheckout(selectedPlan as never);
