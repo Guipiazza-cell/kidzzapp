@@ -136,11 +136,12 @@ serve(async (req) => {
             } catch { /* skip */ }
           }
 
-          // Sync to DB
+          // Sync to DB (incl. tier)
           await supabaseClient.from("profiles").update({
             is_premium: true,
             premium_source: "stripe",
             plan_end_date: subscriptionEnd,
+            tier: bestTier,
           }).eq("id", user.id);
         }
       } else {
