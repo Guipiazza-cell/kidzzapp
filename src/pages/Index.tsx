@@ -18,25 +18,23 @@ import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
-// Dream world is heavy (audio engine + 25 animated particles).
-// Lazy-load so it only ships when the parent opens the Dreams tab —
-// makes first paint of that tab much faster.
+// Heavy/secondary screens are lazy-loaded — only the chat home ships in the initial bundle.
 const DreamWorld = lazy(() => import("@/components/dreams/DreamWorld"));
 const JourneyScreen = lazy(() => import("@/components/flow/JourneyScreen"));
-import StoryFactory from "@/components/story/StoryFactory";
-import KidzzLab from "@/components/lab/KidzzLab";
-import KidzzPlay from "@/components/play/KidzzPlay";
-import RoutineScreen from "@/components/routine/RoutineScreen";
-import MomentsFactory from "@/components/moments/MomentsFactory";
-import TravelMode from "@/components/travel/TravelMode";
-import MusicForest from "@/components/music/MusicForest";
+const StoryFactory = lazy(() => import("@/components/story/StoryFactory"));
+const KidzzLab = lazy(() => import("@/components/lab/KidzzLab"));
+const KidzzPlay = lazy(() => import("@/components/play/KidzzPlay"));
+const RoutineScreen = lazy(() => import("@/components/routine/RoutineScreen"));
+const MomentsFactory = lazy(() => import("@/components/moments/MomentsFactory"));
+const TravelMode = lazy(() => import("@/components/travel/TravelMode"));
+const MusicForest = lazy(() => import("@/components/music/MusicForest"));
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
-import ParentDashboard from "@/components/parental/ParentDashboard";
-import SevenDayChallenge from "@/components/viral/SevenDayChallenge";
-import ReferralProgram from "@/components/viral/ReferralProgram";
-import MonthlyRetrospective from "@/components/viral/MonthlyRetrospective";
+const ParentDashboard = lazy(() => import("@/components/parental/ParentDashboard"));
+const SevenDayChallenge = lazy(() => import("@/components/viral/SevenDayChallenge"));
+const ReferralProgram = lazy(() => import("@/components/viral/ReferralProgram"));
+const MonthlyRetrospective = lazy(() => import("@/components/viral/MonthlyRetrospective"));
 import ChameleonMascot from "@/components/ChameleonMascot";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
