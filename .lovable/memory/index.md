@@ -63,3 +63,4 @@ Updated: now
 - [Avatar Evolution System](mem://features/avatar-evolution-system) — character_profiles table tracks evolution_points and dominant_trait
 - [Kidzz Pré-sono](mem://features/kidzz-pre-sleep) — Respiração 4-2-6 + canção lenta sintetizada Web Audio dentro do Mundo dos Sonhos
 - [Daily Mission Loop](mem://features/daily-mission-loop) — 3 daily goals + XP toast + confetti reward + parent conversion nudge after 2-3 actions
+- [Premium Polish System](mem://style/premium-polish-system) — Tokens (shadow-premium, animate-premium-glow, shine-overlay), `@/lib/sfx` WebAudio system + `<SoundToggle />`, `<PageTransition />` wrapper
