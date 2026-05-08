@@ -489,45 +489,33 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
       <AnimatePresence>
         {showPremiumCTA && (
           <motion.div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowPremiumCTA(false)}
           >
             <motion.div
-              className="mx-6 p-6 rounded-3xl border-2 border-amber-300 text-center bg-white"
-              initial={{ scale: 0.85, opacity: 0 }}
+              className="w-full max-w-sm"
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <motion.div
-                className="text-5xl mb-3"
-                animate={{ rotate: [0, -10, 10, 0], y: [0, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                🎮
-              </motion.div>
-              <h3 className="text-lg font-extrabold text-gray-800 mb-2">
-                Desbloqueie todos os jogos
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Desafios diários, jogos avançados e diversão sem limites!
-              </p>
-              <motion.button
-                className="w-full py-3 rounded-2xl font-extrabold text-white text-sm"
-                style={{
-                  background:
-                    "linear-gradient(135deg, hsl(140 70% 50%), hsl(200 75% 55%))",
+              <LockedFeature
+                type="games"
+                requiredTier="kidzz"
+                onUpgrade={() => {
+                  setShowPremiumCTA(false);
+                  window.dispatchEvent(
+                    new CustomEvent("kidzz:open-paywall", {
+                      detail: { context: "games_locked" },
+                    })
+                  );
                 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowPremiumCTA(false)}
-              >
-                Desbloquear todos os jogos 🎮✨
-              </motion.button>
+              />
               <button
-                className="mt-3 text-xs text-gray-400 font-bold"
+                className="block mx-auto mt-3 text-xs text-white/80 font-bold underline"
                 onClick={() => setShowPremiumCTA(false)}
               >
                 Agora não
