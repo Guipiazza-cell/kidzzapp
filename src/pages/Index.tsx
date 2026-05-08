@@ -53,6 +53,7 @@ const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 
 const Index = () => {
+  const navigate = useNavigate();
   const { profile, loading, updateProfile, canAskQuestion } = useAuth();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
