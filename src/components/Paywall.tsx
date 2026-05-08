@@ -12,7 +12,49 @@ interface PaywallProps {
 }
 
 type BillingPeriod = "annual" | "monthly";
-type PlanKey = "premium" | "premium_annual" | "super_premium";
+type TierKey = "free" | "kidzz" | "premium";
+type PlanKey = "kidzz" | "kidzz_annual" | "premium" | "premium_annual";
+
+const PLAN_PRICES = {
+  kidzz: { monthly: 19.9, annual: 199, monthlyEquivalent: 16.58 },
+  premium: { monthly: 24.9, annual: 249, monthlyEquivalent: 20.75 },
+};
+
+const TIER_BENEFITS: Record<TierKey, { title: string; benefits: string[]; tagline: string }> = {
+  free: {
+    title: "Grátis",
+    tagline: "Para experimentar",
+    benefits: [
+      "3 perguntas (total)",
+      "1 história demo",
+      "Sem narração por voz",
+      "Sem Mundo dos Sonhos",
+    ],
+  },
+  kidzz: {
+    title: "KIDZZ",
+    tagline: "O essencial mágico",
+    benefits: [
+      "30 perguntas/dia",
+      "3 histórias/dia",
+      "Narração por voz",
+      "Todos os jogos KIDZZ Play",
+      "Conquistas e progressão",
+    ],
+  },
+  premium: {
+    title: "Premium",
+    tagline: "A experiência completa",
+    benefits: [
+      "60 perguntas/dia",
+      "5 histórias/dia",
+      "Floresta Musical 🎵",
+      "Mundo dos Sonhos completo",
+      "Momentos especiais e rotina",
+      "Novos conteúdos antecipados",
+    ],
+  },
+};
 
 const Paywall = ({ onLogin, onBack }: PaywallProps) => {
   const handleBack = () => {
