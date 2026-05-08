@@ -153,10 +153,11 @@ const LockedFeature = ({
       <motion.button
         onClick={handleUpgrade}
         whileTap={{ scale: 0.97 }}
-        className={`mt-5 w-full max-w-xs mx-auto py-3.5 rounded-2xl bg-gradient-to-r ${tierGradient} text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2`}
+        className={`relative overflow-hidden mt-5 w-full max-w-xs mx-auto py-3.5 rounded-2xl bg-gradient-to-r ${tierGradient} text-white font-extrabold text-sm shadow-premium-lg flex items-center justify-center gap-2 animate-premium-glow`}
       >
-        <Sparkles size={16} />
-        Fazer upgrade agora
+        <span className="shine-overlay" aria-hidden />
+        <Sparkles size={16} className="relative z-10" />
+        <span className="relative z-10">Fazer upgrade agora</span>
       </motion.button>
 
       <p className="text-[10px] text-gray-500 font-bold mt-3">
