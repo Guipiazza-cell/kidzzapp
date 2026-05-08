@@ -67,8 +67,13 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
 
   const [showPlans, setShowPlans] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("annual");
-  const [selectedPlan, setSelectedPlan] = useState<PlanKey>("premium_annual");
+  const [selectedTier, setSelectedTier] = useState<Exclude<TierKey, "free">>("premium");
   const [loading, setLoading] = useState(false);
+
+  const selectedPlan: PlanKey =
+    billingPeriod === "annual"
+      ? (selectedTier === "premium" ? "premium_annual" : "kidzz_annual")
+      : selectedTier;
 
   const handleUnlock = async () => {
     if (!user) {
@@ -77,19 +82,9 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
     }
     setLoading(true);
     try {
-      const planForCheckout = selectedPlan === "premium_annual" ? "premium_annual" : selectedPlan;
-      await handleCheckout(planForCheckout as any);
+      await handleCheckout(selectedPlan as any);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePeriodChange = (period: BillingPeriod) => {
-    setBillingPeriod(period);
-    if (period === "annual") {
-      setSelectedPlan("premium_annual");
-    } else {
-      setSelectedPlan("premium");
     }
   };
 
