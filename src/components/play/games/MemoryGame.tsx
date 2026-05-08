@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
 import { neon, glow, gameGradient } from "@/lib/gameTheme";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 // Bigger, themed nature sets — animals, plants, ocean
 const EMOJI_SETS: { theme: string; emojis: string[]; gradient: string; glow: string }[] = [
@@ -63,6 +66,8 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
     if (locked || completed) return;
     const card = cards[id];
     if (card.flipped || card.matched) return;
+    sfx("click");
+    haptic("light");
 
     const newCards = cards.map((c) => c.id === id ? { ...c, flipped: true } : c);
     setCards(newCards);
@@ -83,9 +88,19 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
           setLocked(false);
           onScore(15);
           onReaction("happy");
+          sfx("reward");
+          haptic("success");
           if (matched.every((c) => c.matched)) {
             setCompleted(true);
             onScore(30);
+            sfx("complete");
+            haptic("success");
+            confetti({
+              particleCount: 100,
+              spread: 80,
+              origin: { y: 0.5 },
+              colors: ["#A78BFA", "#F472B6", "#FBBF24", "#34D399"],
+            });
           }
         }, 450);
       } else {
@@ -98,6 +113,8 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
           setFlippedIds([]);
           setLocked(false);
           onReaction("encourage");
+          sfx("error");
+          haptic("light");
         }, 850);
       }
     }

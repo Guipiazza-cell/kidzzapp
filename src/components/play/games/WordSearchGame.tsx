@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import { useAuth } from "@/contexts/AuthContext";
 import GameResultScreen from "./GameResultScreen";
 import { neon, glow } from "@/lib/gameTheme";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 const WORD_SETS = [
   { words: ["SOL", "LUA", "MAR", "CÉU"], gridSize: 6, theme: "Natureza 🌿" },
@@ -93,6 +96,8 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
       ? selected.filter((k) => k !== key)
       : [...selected, key];
     setSelected(newSel);
+    sfx("click");
+    haptic("light");
 
     const selWord = newSel
       .map((k) => {
@@ -110,9 +115,19 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
       setSelected([]);
       onScore(10);
       onReaction("happy");
+      sfx("reward");
+      haptic("success");
       if (newFound.length === wordSet.words.length) {
         setCompleted(true);
         onScore(25);
+        sfx("complete");
+        haptic("success");
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.5 },
+          colors: ["#10B981", "#A78BFA", "#FBBF24", "#F472B6"],
+        });
       }
     }
   };
