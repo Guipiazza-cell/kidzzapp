@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { addXP } from "@/lib/habitLoop";
 import { useAuth } from "@/contexts/AuthContext";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 import pixelImg from "@/assets/pixel-chameleon.webp";
 import GameResultScreen from "./GameResultScreen";
 
@@ -74,6 +76,8 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       vyRef.current = JUMP_VELOCITY;
       groundedRef.current = false;
       setShowHint(false);
+      sfx("click");
+      haptic("light");
     }
   }, [phase]);
 
@@ -106,8 +110,12 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
         localStorage.setItem("kidzz_pixel_pula_high", String(finalScore));
         setIsNewRecord(true);
         onReaction("happy");
+        sfx("streak");
+        haptic("success");
       } else {
         onReaction("encourage");
+        sfx("error");
+        haptic("medium");
       }
       // Convert score to XP
       const xpEarned = Math.floor(finalScore / 10);
@@ -225,6 +233,8 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           colors: ["#FBBF24", "#fff"],
           scalar: 0.6,
         });
+        sfx("reward");
+        haptic("light");
       }
 
       // Score & difficulty (record celebration WITHOUT ending game)
