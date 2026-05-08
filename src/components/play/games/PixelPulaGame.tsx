@@ -308,9 +308,11 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
 
       // Score & difficulty (record celebration WITHOUT ending game)
       setScore((s) => {
-        const next = s + 1 + starGain;
-        const targetSpeed = 6 + Math.floor(next / 150) * 1.2;
-        speedRef.current = Math.min(14, targetSpeed);
+        const next = s + 1 + starGain + (nearMissThisTick ? Math.min(5, combo + 1) : 0);
+        // Smooth asymptotic speed curve (was step-based)
+        const targetSpeed = 6 + Math.min(8, Math.log2(1 + next / 40) * 2.4);
+        // ease toward target instead of snapping
+        speedRef.current = speedRef.current + (targetSpeed - speedRef.current) * 0.05;
         // celebrate new record live (only once per run)
         if (highScore > 0 && s <= highScore && next > highScore) {
           confetti({
