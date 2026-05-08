@@ -25,6 +25,11 @@
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap"></noscript>
+    <!-- iOS safe area + tap optimization -->
+    <style>
+      html, body { overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
+      img { content-visibility: auto; }
+    </style>
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/favicon.png" type="image/png">

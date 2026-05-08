@@ -1,5 +1,6 @@
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import { motion } from "framer-motion";
+import chameleonImg from "@/assets/chameleon-main.webp";
 
 type MascotMood = "idle" | "curious" | "happy" | "thinking" | "talking";
 
@@ -70,9 +71,14 @@ const ChameleonMascot = forwardRef<HTMLDivElement, ChameleonMascotProps>(
         />
 
         <motion.img
-          src="/lovable-uploads/28aadb76-b87d-4bb5-b230-759168d38c42.png"
+          src={chameleonImg}
           alt="Kidzz - camaleão mascote"
           className="w-full h-full object-contain drop-shadow-2xl relative z-10"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          width={224}
+          height={224}
           whileHover={interactive ? { scale: 1.12, rotate: [0, -5, 5, 0] } : undefined}
           whileTap={interactive ? { scale: 0.92 } : undefined}
           transition={{ type: "spring", stiffness: 300 }}
@@ -128,4 +134,4 @@ const ChameleonMascot = forwardRef<HTMLDivElement, ChameleonMascotProps>(
 
 ChameleonMascot.displayName = "ChameleonMascot";
 
-export default ChameleonMascot;
+export default memo(ChameleonMascot);

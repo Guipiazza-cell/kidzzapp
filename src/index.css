@@ -241,3 +241,21 @@
   66% { transform: scale(0.96) rotate(-2deg); opacity: 0.95; }
 }
 .streak-fire { animation: flicker 1.8s ease-in-out infinite; display: inline-block; }
+
+/* Performance: defer offscreen heavy sections */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+
+/* Respect prefers-reduced-motion globally — disables expensive ambient loops
+   for users who opted out, and reduces battery drain on mobile. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
