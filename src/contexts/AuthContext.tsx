@@ -231,7 +231,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await resp.json();
 
       if (data.subscribed) {
-        const newTier: SubscriptionTier = data.tier === "super_premium" ? "super_premium" : "premium";
+        const newTier: SubscriptionTier = data.tier === "premium" ? "premium" : "kidzz";
         const result = { tier: newTier, isPremium: true };
         setSubCache(result.tier, result.isPremium);
         return result;
