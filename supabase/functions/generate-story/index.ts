@@ -7,9 +7,10 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// 2026 limits: Free 1/dia · Kidzz 3/dia · Premium 5/dia
 const FREE_STORY_LIMIT = 1;
-const DAILY_STORY_LIMIT = 3;
-const SUPER_DAILY_STORY_LIMIT = 10;
+const KIDZZ_DAILY_STORY_LIMIT = 3;
+const PREMIUM_DAILY_STORY_LIMIT = 5;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
