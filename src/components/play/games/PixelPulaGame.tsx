@@ -169,15 +169,37 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       tickRef.current += 1;
 
       // Physics
+      const wasAir = !groundedRef.current;
       vyRef.current += GRAVITY;
-      yRef.current -= vyRef.current; // y is "height above ground" (positive up)
+      yRef.current -= vyRef.current;
       if (yRef.current <= 0) {
+        const landingHard = wasAir && vyRef.current > 12;
         yRef.current = 0;
         vyRef.current = 0;
+        if (wasAir) {
+          // squash on land + dust puff
+          setPixelSquash(-0.6);
+          setTimeout(() => setPixelSquash(0), 130);
+          haptic("light");
+          setLandingPuffs((p) => [
+            ...p.slice(-3),
+            { id: idRef.current++, x: PIXEL_X, t: performance.now() },
+          ]);
+        }
         groundedRef.current = true;
+        lastGroundedAtRef.current = performance.now();
         rotationRef.current = 0;
+        // jump buffer — auto-fire if user tapped right before landing
+        if (performance.now() - jumpBufferAtRef.current < JUMP_BUFFER_MS) {
+          jumpBufferAtRef.current = 0;
+          performJump();
+        }
+        if (landingHard) {
+          // small impact rumble
+          haptic("medium");
+        }
       } else {
-        rotationRef.current = Math.min(25, rotationRef.current + 1.5);
+        rotationRef.current = Math.min(20, rotationRef.current + 1.2);
       }
       setPixelY(yRef.current);
       setPixelRot(rotationRef.current);
