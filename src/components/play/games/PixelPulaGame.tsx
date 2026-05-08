@@ -30,12 +30,14 @@ interface Props {
 }
 
 const OBSTACLE_EMOJIS = ["🍄", "🪨", "🌵", "🪵", "🌿"];
-const GROUND_Y = 72; // px from bottom — taller ground
-const PIXEL_X = 70;  // fixed left position
-const PIXEL_SIZE = 84; // bigger character (was 56)
-const GRAVITY = 0.95; // a bit floatier
-const JUMP_VELOCITY = -18; // higher jump
-const TICK_MS = 28;
+const GROUND_Y = 72;
+const PIXEL_X = 70;
+const PIXEL_SIZE = 84;
+const GRAVITY = 1.05;          // slightly snappier fall
+const JUMP_VELOCITY = -18.5;   // higher arc
+const TICK_MS = 24;            // ~42fps logic, GPU does the rest
+const COYOTE_MS = 90;          // forgiveness window after leaving ground
+const JUMP_BUFFER_MS = 110;    // buffer taps slightly before landing
 
 const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
   const { profile } = useAuth();
