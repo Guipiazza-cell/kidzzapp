@@ -343,7 +343,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
                     <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-white/30">
                       <Lock size={18} className="text-gray-600" />
                       <span className="text-[8px] text-gray-700 font-extrabold mt-1">
-                        Premium
+                        KIDZZ
                       </span>
                     </div>
                   )}
