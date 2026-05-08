@@ -395,7 +395,13 @@ const Index = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
           >
-            {renderContent()}
+            <Suspense fallback={
+              <div className="flex-1 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
+              </div>
+            }>
+              {renderContent()}
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </div>
@@ -406,7 +412,7 @@ const Index = () => {
         onOpenParents={() => setShowParentalGateForDashboard(true)}
         onOpenPlans={() => window.dispatchEvent(new CustomEvent("kidzz:open-plans"))}
       />
-      <AnimatePresence>
+      <Suspense fallback={null}><AnimatePresence>
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
         {/* showPlay overlay descontinuado: Brincar agora é aba inline */}
@@ -431,7 +437,7 @@ const Index = () => {
           />
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
-      </AnimatePresence>
+      </AnimatePresence></Suspense>
       <WeeklySurpriseBox
         childName={childName}
         streakDays={profile.streak_days ?? 0}
