@@ -197,6 +197,18 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding />;
   }
+  // Tela final emocional do onboarding (uma vez, após interests)
+  if (showWelcome) {
+    return (
+      <OnboardingWelcome
+        childName={profile.child_name}
+        onEnter={() => {
+          try { localStorage.setItem("kidzz_onboarding_welcomed", "1"); } catch {}
+          setShowWelcome(false);
+        }}
+      />
+    );
+  }
   // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
   if (showStatesIntro) {
     return <KidzzStatesIntro onDone={() => setShowStatesIntro(false)} />;
