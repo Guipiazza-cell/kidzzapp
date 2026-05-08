@@ -181,7 +181,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
             return (
               <motion.button
                 key={plan.key}
-                onClick={() => setSelectedPlan(plan.key)}
+                onClick={() => selectPlan(plan.key)}
                 className={`w-full text-left rounded-2xl p-4 transition-all relative overflow-hidden ${bg} ${
                   isSelected ? ringColor : ""
                 }`}
