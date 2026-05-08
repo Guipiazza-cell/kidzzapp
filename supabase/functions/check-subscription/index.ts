@@ -112,7 +112,7 @@ serve(async (req) => {
 
         if (allSubs.length > 0) {
           stripeSubscribed = true;
-          bestTier = "premium";
+          bestTier = "kidzz";
 
           for (const sub of allSubs) {
             const priceObj = sub.items.data[0]?.price;
@@ -120,8 +120,9 @@ serve(async (req) => {
               ? priceObj.product
               : (priceObj?.product as any)?.id ?? "";
 
-            const tier = PRODUCT_TIERS[productId] || "premium";
-            if (tier === "super_premium") bestTier = "super_premium";
+            const tier = PRODUCT_TIERS[productId] || "kidzz";
+            // premium > kidzz
+            if (tier === "premium") bestTier = "premium";
 
             try {
               const rawEnd = sub.current_period_end;
