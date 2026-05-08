@@ -61,9 +61,10 @@ interface Props {
 }
 
 const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, onOpenLab }: Props) => {
-  const { profile } = useAuth();
+  const { profile, tier } = useAuth();
   const { trackEvent } = useAchievementSync();
-  const isPremium = profile?.is_premium ?? false;
+  // Jogos desbloqueiam a partir do plano KIDZZ (tier !== "free")
+  const isPremium = tier !== "free";
   const childName = profile?.child_name || "amigo";
 
   const [view, setView] = useState<View>("menu");
