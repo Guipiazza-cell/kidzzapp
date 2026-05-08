@@ -143,7 +143,7 @@ serve(async (req) => {
 
       const { data: profile, error: profileError } = await supabaseAdmin
         .from("profiles")
-        .select("questions_used, is_premium, last_usage_date")
+        .select("questions_used, is_premium, last_usage_date, tier")
         .eq("id", userId)
         .single();
 
@@ -154,20 +154,18 @@ serve(async (req) => {
       if (profile) {
         const today = new Date().toISOString().slice(0, 10);
         let questionsUsed = profile.questions_used;
+        const tier = (profile.tier as string) || (profile.is_premium ? "kidzz" : "free");
 
         if (profile.is_premium) {
-          // Premium: daily reset
-          if (profile.last_usage_date !== today) {
-            questionsUsed = 0;
-          }
-          if (questionsUsed >= DAILY_LIMIT) {
-            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite diário atingido. Volte amanhã! 😊" }), {
+          if (profile.last_usage_date !== today) questionsUsed = 0;
+          const dailyLimit = tier === "premium" ? PREMIUM_DAILY_LIMIT : KIDZZ_DAILY_LIMIT;
+          if (questionsUsed >= dailyLimit) {
+            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite diário atingido. Volte amanhã!" }), {
               status: 403,
               headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
           }
         } else {
-          // Free: lifetime limit, NO reset
           if (questionsUsed >= FREE_LIMIT) {
             return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite de perguntas gratuitas atingido." }), {
               status: 403,
