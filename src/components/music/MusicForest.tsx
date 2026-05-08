@@ -324,11 +324,44 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           )}
         </AnimatePresence>
       </LivingForest>
-      <ContextualPaywallModal
-        open={showPremiumCTA}
-        context="premium_feature"
-        onClose={() => setShowPremiumCTA(false)}
-      />
+      <AnimatePresence>
+        {showPremiumCTA && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPremiumCTA(false)}
+          >
+            <motion.div
+              className="w-full max-w-sm"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <LockedFeature
+                type="music"
+                requiredTier="premium"
+                onUpgrade={() => {
+                  setShowPremiumCTA(false);
+                  window.dispatchEvent(
+                    new CustomEvent("kidzz:open-paywall", {
+                      detail: { context: "music_locked" },
+                    })
+                  );
+                }}
+              />
+              <button
+                className="block mx-auto mt-3 text-xs text-white/80 font-bold underline"
+                onClick={() => setShowPremiumCTA(false)}
+              >
+                Agora não
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
