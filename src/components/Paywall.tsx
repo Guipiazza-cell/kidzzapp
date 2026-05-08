@@ -115,7 +115,7 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
 
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-y-auto"
+      className="flex-1 min-h-0 flex flex-col overflow-y-auto pb-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -252,36 +252,40 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
           <p className="text-[10px] text-gray-400 font-bold mt-1">— Ricardo M.</p>
         </div>
 
-        {/* CTA */}
-        <motion.button
-          onClick={handleUnlock}
-          disabled={loading}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-base shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
-          whileTap={{ scale: 0.97 }}
-        >
-          {!user ? (
-            <>
-              <Lock size={18} />
-              <span>Criar conta e assinar</span>
-            </>
-          ) : (
-            <>
-              <Sparkles size={18} />
-              <span>
-                {loading
-                  ? "Abrindo checkout..."
-                  : `✨ Assinar ${selected.title}`}
-              </span>
-            </>
-          )}
-        </motion.button>
-
         <p className="text-center text-gray-500 text-[10px] font-bold">
           🛡️ Garantia de 7 dias. Se não amar, devolvemos 100%.
         </p>
-        <p className="text-center text-gray-400 text-[10px] font-bold pb-4">
+        <p className="text-center text-gray-400 text-[10px] font-bold pb-2">
           🔓 Acesso liberado hoje • Cancele quando quiser
         </p>
+      </div>
+
+      {/* Sticky CTA — always visible above the bottom nav */}
+      <div className="sticky bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 py-3">
+        <div className="max-w-sm mx-auto">
+          <motion.button
+            onClick={handleUnlock}
+            disabled={loading}
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-base shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
+            whileTap={{ scale: 0.97 }}
+          >
+            {!user ? (
+              <>
+                <Lock size={18} />
+                <span>Criar conta e assinar</span>
+              </>
+            ) : (
+              <>
+                <Sparkles size={18} />
+                <span>
+                  {loading
+                    ? "Abrindo checkout..."
+                    : `✨ Assinar ${selected.title}`}
+                </span>
+              </>
+            )}
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   );
