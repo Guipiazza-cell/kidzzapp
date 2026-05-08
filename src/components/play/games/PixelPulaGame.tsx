@@ -564,7 +564,47 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           />
         </div>
 
-        {/* Pixel character + ground shadow */}
+        {/* Speed lines (subtle, ramps with speed) */}
+        {speedRef.current > 8 && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={`sl-${i}`}
+                className="absolute"
+                style={{
+                  top: `${15 + i * 12}%`,
+                  right: 0,
+                  width: 60 + i * 14,
+                  height: 1.5,
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.5))",
+                  transform: `translateX(${(parallax * (1.6 + i * 0.2)) % 320}px)`,
+                  opacity: Math.min(0.6, (speedRef.current - 8) / 6),
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Landing puffs */}
+        {landingPuffs.map((p) => (
+          <span
+            key={p.id}
+            className="absolute pointer-events-none"
+            style={{
+              left: p.x + PIXEL_SIZE / 2 - 14,
+              bottom: GROUND_Y - 4,
+              width: 28,
+              height: 10,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.55)",
+              filter: "blur(3px)",
+              animation: "puff 0.5s ease-out forwards",
+            }}
+          />
+        ))}
+
+        {/* Pixel character + ground shadow (dynamic) */}
         <div
           className="absolute pointer-events-none"
           style={{
@@ -573,10 +613,11 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
             width: PIXEL_SIZE - 12,
             height: 10,
             borderRadius: "50%",
-            background: "radial-gradient(ellipse, rgba(0,0,0,0.45), transparent 70%)",
-            transform: `scale(${Math.max(0.5, 1 - pixelY / 200)})`,
-            opacity: Math.max(0.3, 1 - pixelY / 220),
+            background: "radial-gradient(ellipse, rgba(0,0,0,0.5), transparent 70%)",
+            transform: `scaleX(${Math.max(0.45, 1 - pixelY / 220)}) scaleY(${Math.max(0.5, 1 - pixelY / 260)})`,
+            opacity: Math.max(0.25, 1 - pixelY / 240),
             filter: "blur(2px)",
+            transition: "transform 60ms linear, opacity 60ms linear",
           }}
         />
         <div
@@ -586,13 +627,39 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
             bottom: GROUND_Y + pixelY,
             width: PIXEL_SIZE,
             height: PIXEL_SIZE,
-            transform: `rotate(${pixelRot}deg)`,
-            transition: "transform 50ms linear",
-            filter: "drop-shadow(0 6px 14px rgba(167,139,250,0.7)) drop-shadow(0 0 18px rgba(244,114,182,0.35))",
+            transform: `rotate(${pixelRot}deg) scaleX(${1 - pixelSquash * 0.18}) scaleY(${1 + pixelSquash * 0.22})`,
+            transformOrigin: "50% 100%",
+            transition: "transform 90ms cubic-bezier(0.22, 1, 0.36, 1)",
+            willChange: "transform, bottom",
+            filter:
+              "drop-shadow(0 6px 14px rgba(167,139,250,0.7)) drop-shadow(0 0 18px rgba(244,114,182,0.35))",
           }}
         >
           <img src={pixelImg} alt="Pixel" className="w-full h-full object-contain" draggable={false} />
         </div>
+
+        {/* Combo near-miss floater */}
+        <AnimatePresence>
+          {comboFloater && combo >= 2 && (
+            <motion.div
+              key={comboFloater.id}
+              initial={{ opacity: 0, y: 0, scale: 0.6 }}
+              animate={{ opacity: 1, y: -34, scale: 1 }}
+              exit={{ opacity: 0, y: -50 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute font-black text-yellow-300"
+              style={{
+                left: comboFloater.x,
+                bottom: GROUND_Y + 90,
+                fontSize: 18,
+                textShadow: "0 0 14px rgba(253,224,71,0.85), 0 2px 4px rgba(0,0,0,0.45)",
+                pointerEvents: "none",
+              }}
+            >
+              x{combo} !
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Obstacles */}
         {obstacles.map((o) => (
