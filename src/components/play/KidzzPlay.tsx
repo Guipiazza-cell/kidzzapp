@@ -13,6 +13,7 @@ const PixelPulaGame = lazy(() => import("./games/PixelPulaGame"));
 const ReactionGame = lazy(() => import("./games/ReactionGame"));
 const EmotionsGame = lazy(() => import("./games/EmotionsGame"));
 const CreateGame = lazy(() => import("./games/CreateGame"));
+import LockedFeature from "@/components/LockedFeature";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
