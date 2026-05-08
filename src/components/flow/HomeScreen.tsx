@@ -265,6 +265,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                 <BarChart3 size={16} />
                 <span className="text-[10px] font-extrabold">Pais</span>
               </motion.button>
+              <SoundToggle size={16} />
               <motion.button
                 onClick={() => setShowParentalGateForSettings(true)}
                 className="p-2 rounded-xl glass-card text-gray-600"
