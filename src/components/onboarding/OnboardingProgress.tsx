@@ -5,30 +5,56 @@ interface Props {
   total?: number;
 }
 
-const OnboardingProgress = ({ step, total = 3 }: Props) => (
-  <div className="flex items-center justify-center gap-2 pt-2">
-    {Array.from({ length: total }).map((_, i) => {
-      const idx = i + 1;
-      const isActive = idx <= step;
-      const isCurrent = idx === step;
-      return (
-        <motion.span
-          key={i}
-          className="rounded-full"
+/**
+ * Premium onboarding progress — single sleek bar with shimmer and glow.
+ * Replaces the old dot indicator for a more cinematic, app-store feel.
+ */
+const OnboardingProgress = ({ step, total = 3 }: Props) => {
+  const pct = (step / total) * 100;
+  return (
+    <div className="w-full max-w-sm mx-auto pt-2 select-none">
+      <div className="flex items-center justify-between mb-2 px-1">
+        <span className="text-[10px] font-black tracking-[0.2em] uppercase text-gray-700/80">
+          KIDZZ • Início
+        </span>
+        <span className="text-[10px] font-black text-gray-700/80">
+          {step}/{total}
+        </span>
+      </div>
+      <div
+        className="relative h-2 rounded-full overflow-hidden"
+        style={{
+          background: "rgba(255,255,255,0.45)",
+          boxShadow: "inset 0 1px 2px rgba(0,0,0,0.06)",
+          backdropFilter: "blur(6px)",
+        }}
+      >
+        <motion.div
+          className="absolute inset-y-0 left-0 rounded-full"
           initial={false}
-          animate={{
-            width: isCurrent ? 28 : 10,
-            height: 10,
-            background: isActive
-              ? "hsl(35 90% 55%)"
-              : "hsl(0 0% 100% / 0.5)",
-            boxShadow: isCurrent ? "0 0 12px hsl(35 90% 55% / 0.6)" : "none",
+          animate={{ width: `${pct}%` }}
+          transition={{ type: "spring", stiffness: 140, damping: 22 }}
+          style={{
+            background:
+              "linear-gradient(90deg, hsl(35 95% 58%) 0%, hsl(45 95% 62%) 60%, hsl(28 95% 60%) 100%)",
+            boxShadow: "0 0 14px hsl(35 95% 58% / 0.55)",
           }}
-          transition={{ type: "spring", stiffness: 240, damping: 22 }}
         />
-      );
-    })}
-  </div>
-);
+        {/* Shimmer overlay */}
+        <motion.div
+          className="absolute inset-y-0 w-1/3 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
+            mixBlendMode: "overlay",
+          }}
+          initial={{ x: "-120%" }}
+          animate={{ x: "320%" }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+    </div>
+  );
+};
 
 export default OnboardingProgress;
