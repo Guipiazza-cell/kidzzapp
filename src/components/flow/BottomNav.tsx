@@ -88,7 +88,6 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       background: "hsl(0 0% 100% / 0.82)",
       backdropFilter: "blur(22px)",
       WebkitBackdropFilter: "blur(22px)",
-      touchAction: "manipulation",
     }}
   >
     {(onOpenParents || onOpenPlans) && (
@@ -124,19 +123,11 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         return (
           <motion.button
             key={tab.id}
-            type="button"
-            onPointerDown={() => {
-              if (activeTab === tab.id) return;
-              haptic("light");
-              try { navigator.vibrate?.(8); } catch { /* noop */ }
-              sfx("click");
-              onTabChange(tab.id);
-            }}
-            style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent", minHeight: 44 }}
-            className={`relative flex flex-col items-center gap-0.5 px-1 py-1 rounded-2xl transition-[transform,opacity] duration-[80ms] min-w-[48px] active:scale-[0.92] ${
+            onClick={() => { if (activeTab === tab.id) return; haptic("light"); sfx("click"); onTabChange(tab.id); }}
+            className={`relative flex flex-col items-center gap-0.5 px-1 py-1 rounded-2xl transition-colors min-w-[48px] ${
               isHighlight ? "min-w-[58px]" : ""
-            } ${isActive ? "opacity-100" : "opacity-60"}`}
-            whileTap={{ scale: 0.92 }}
+            }`}
+            whileTap={{ scale: 0.88 }}
             aria-label={tab.label}
             aria-current={isActive ? "page" : undefined}
           >
