@@ -379,7 +379,7 @@ const Index = () => {
           />
         )}
         {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
-        {step === "paywall" && <Paywall key="paywall" onLogin={() => setShowLoginGate(true)} onBack={() => { setStep("home"); setActiveTab("chat"); }} />}
+        {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); setActiveTab("chat"); }} />}
       </AnimatePresence>
     );
   };
