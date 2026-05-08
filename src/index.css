@@ -127,6 +127,43 @@
     border: 1px solid hsl(0 0% 100% / 0.5);
     box-shadow: 0 2px 8px hsl(0 0% 0% / 0.04);
   }
+
+  /* Premium glass — paywall, success, premium CTAs */
+  .glass-premium {
+    background: linear-gradient(135deg, hsl(0 0% 100% / 0.75), hsl(0 0% 100% / 0.55));
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid hsl(0 0% 100% / 0.6);
+    box-shadow:
+      0 12px 36px -12px hsl(var(--kid-purple) / 0.25),
+      inset 0 1px 0 hsl(0 0% 100% / 0.6);
+  }
+
+  /* Shine sweep overlay — wrap a child <span className="shine-overlay" /> */
+  .shine-overlay {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .shine-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -60%;
+    width: 50%; height: 100%;
+    background: linear-gradient(110deg, transparent 30%, hsl(0 0% 100% / 0.45) 50%, transparent 70%);
+    transform: skewX(-20deg);
+    animation: shine-sweep 2.8s ease-in-out infinite;
+  }
+
+  /* Premium tap feedback — subtle press */
+  .tap-press {
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .tap-press:active {
+    transform: scale(0.97);
+  }
 }
 
 /* Firefly animations — pure CSS, GPU-accelerated */
