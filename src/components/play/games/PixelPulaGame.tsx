@@ -110,10 +110,16 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
     starsRef.current = [];
     tickRef.current = 0;
     rotationRef.current = 0;
+    passedObstaclesRef.current = new Set();
     setObstacles([]);
     setStars([]);
     setPixelY(0);
     setPixelRot(0);
+    setPixelSquash(0);
+    setLandingPuffs([]);
+    setCombo(0);
+    setNearMissAt(0);
+    setComboFloater(null);
     setScore(0);
     setIsNewRecord(false);
     setShowHint(true);
