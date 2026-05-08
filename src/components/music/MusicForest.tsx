@@ -22,9 +22,10 @@ interface Props {
 type Pillar = "morning" | "dance" | "stories" | "create";
 
 const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
-  const { profile } = useAuth();
+  const { profile, tier } = useAuth();
   const childName = profile?.child_name || "amigo";
-  const isPremium = profile?.is_premium ?? false;
+  // Floresta Musical é exclusiva do plano Premium
+  const isPremium = tier === "premium";
   const [activePillar, setActivePillar] = useState<Pillar | null>(null);
   const [xp, setXp] = useState(getMusicXp());
   const [streak, setStreak] = useState(getMusicStreak());
