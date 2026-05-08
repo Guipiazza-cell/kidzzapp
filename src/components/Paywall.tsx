@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Lock, Check, Crown, Zap, ArrowLeft } from "lucide-react";
+import { Sparkles, Lock, Check, Crown, Zap, ArrowLeft, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 interface PaywallProps {
   onLogin: () => void;
