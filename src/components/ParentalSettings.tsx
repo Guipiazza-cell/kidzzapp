@@ -37,7 +37,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const [copied, setCopied] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("annual");
 
-  const currentPlan = tier === "super_premium" ? "super_premium" : isPremium ? "premium" : "free";
+  const currentPlan = tier === "premium" ? "super_premium" : isPremium ? "premium" : "free";
 
   const handleAgeChange = async (range: string) => {
     await updateProfile({ age_range: range });
@@ -181,10 +181,10 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           {/* Current plan highlight */}
           <div className={`rounded-2xl p-4 text-center ${isPremium ? "kid-gradient-premium text-white" : "bg-muted"}`}>
             <p className="font-extrabold text-lg">
-              {tier === "super_premium" ? "⚡ KIDZZ Premium Ativo" : isPremium ? "⭐ Plano KIDZZ Ativo" : "Plano Gratuito"}
+              {tier === "premium" ? "⚡ KIDZZ Premium Ativo" : isPremium ? "⭐ Plano KIDZZ Ativo" : "Plano Gratuito"}
             </p>
             <p className="text-sm opacity-80">
-              {tier === "super_premium"
+              {tier === "premium"
                 ? `${10 - (profile?.questions_used ?? 0)} perguntas • ${3 - (profile?.stories_used ?? 0)} histórias hoje`
                 : isPremium
                 ? `${10 - (profile?.questions_used ?? 0)} de 10 perguntas restantes hoje`

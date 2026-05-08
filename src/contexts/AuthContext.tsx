@@ -480,7 +480,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!profile) return false;
     const p = resetDailyIfNeeded(profile);
     // Super premium: limite diário maior
-    if (tier === "super_premium") return p.stories_used < SUPER_DAILY_STORY_LIMIT;
+    if (tier === "premium") return p.stories_used < SUPER_DAILY_STORY_LIMIT;
     // Premium: limite diário padrão
     if (p.is_premium) return p.stories_used < DAILY_STORY_LIMIT;
     // Free: 1 história de demonstração vitalícia
@@ -497,7 +497,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const storiesRemaining = useCallback(() => {
     if (!profile) return 0;
     const p = resetDailyIfNeeded(profile);
-    if (tier === "super_premium") return Math.max(0, SUPER_DAILY_STORY_LIMIT - p.stories_used);
+    if (tier === "premium") return Math.max(0, SUPER_DAILY_STORY_LIMIT - p.stories_used);
     if (p.is_premium) return Math.max(0, DAILY_STORY_LIMIT - p.stories_used);
     return Math.max(0, MAX_FREE_STORIES - p.stories_used);
   }, [profile, tier, resetDailyIfNeeded]);

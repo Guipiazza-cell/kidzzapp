@@ -30,7 +30,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
   const [memorySaved, setMemorySaved] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const isPremium = profile?.is_premium ?? false;
-  const isSuperPremium = tier === "super_premium";
+  const isSuperPremium = tier === "premium";
   const trackedRef = useRef(false);
   const logIdRef = useRef<string | null>(null);
   const loggedRef = useRef(false);
