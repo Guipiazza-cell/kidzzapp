@@ -2,7 +2,11 @@ import { createContext, useContext, useEffect, useState, useCallback, useRef, ty
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
-export type SubscriptionTier = "free" | "premium" | "super_premium";
+export type SubscriptionTier = "free" | "kidzz" | "premium";
+
+// Aliases legados — UI/back-compat. "super_premium" velho → novo "premium".
+export type LegacyTier = "free" | "premium" | "super_premium";
+export type CheckoutPlan = "kidzz" | "kidzz_annual" | "premium" | "premium_annual";
 
 interface Profile {
   child_name: string;
