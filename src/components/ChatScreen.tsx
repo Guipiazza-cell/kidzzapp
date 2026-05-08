@@ -60,7 +60,7 @@ const ChatScreen = ({
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
-  const isSuperPremium = tier === "super_premium";
+  const isSuperPremium = tier === "premium";
   const isFreeLimitReached = !canAskQuestion();
 
   useEffect(() => {

@@ -233,6 +233,7 @@ export type Database = {
           questions_used: number
           stories_used: number
           streak_days: number
+          tier: string
           updated_at: string
           voice_enabled: boolean
         }
@@ -253,6 +254,7 @@ export type Database = {
           questions_used?: number
           stories_used?: number
           streak_days?: number
+          tier?: string
           updated_at?: string
           voice_enabled?: boolean
         }
@@ -273,6 +275,7 @@ export type Database = {
           questions_used?: number
           stories_used?: number
           streak_days?: number
+          tier?: string
           updated_at?: string
           voice_enabled?: boolean
         }

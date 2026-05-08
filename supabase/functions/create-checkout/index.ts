@@ -7,18 +7,26 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// New 2026 catalog: 4 active prices (kidzz / premium × monthly / annual)
+// Aliases keep backward compatibility with old keys (premium → kidzz, super_premium → premium)
 const PRICES: Record<string, string> = {
-  premium: "price_1TFEfW8nR9x8D1BWr4RCvV84",
-  premium_annual: "price_1TMJ0c8nR9x8D1BWVLXAtxM6",
-  super_premium: "price_1TFEgH8nR9x8D1BWguQ8xu0w",
-  super_premium_annual: "price_1TMRUt8nR9x8D1BWIIkQUrnf",
+  // New canonical keys
+  kidzz: "price_1TUdKp8nR9x8D1BWZgsv3iAT",                 // R$19,90/mês  prod_UTaV3ceAAUThlX
+  kidzz_annual: "price_1TUdLb8nR9x8D1BWSr7AXj1Z",          // R$199/ano    prod_UTaW2oqm99hFrj
+  premium: "price_1TUdM98nR9x8D1BWTTxnuNRI",               // R$24,90/mês  prod_UTaXRFmVOR4wia
+  premium_annual: "price_1TUdMk8nR9x8D1BW9JrzxlB2",        // R$249/ano    prod_UTaXJcEbqCrQtO
+  // Legacy aliases (rename: premium → kidzz, super_premium → premium)
+  super_premium: "price_1TUdM98nR9x8D1BWTTxnuNRI",
+  super_premium_annual: "price_1TUdMk8nR9x8D1BW9JrzxlB2",
 };
 
 const PLAN_AMOUNTS: Record<string, number> = {
-  premium: 14.90,
-  premium_annual: 119.90,
+  kidzz: 19.90,
+  kidzz_annual: 199.00,
+  premium: 24.90,
+  premium_annual: 249.00,
   super_premium: 24.90,
-  super_premium_annual: 238.80,
+  super_premium_annual: 249.00,
 };
 
 serve(async (req) => {

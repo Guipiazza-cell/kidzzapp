@@ -7,9 +7,10 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// 2026 limits: Free 1/dia · Kidzz 3/dia · Premium 5/dia
 const FREE_STORY_LIMIT = 1;
-const DAILY_STORY_LIMIT = 3;
-const SUPER_DAILY_STORY_LIMIT = 10;
+const KIDZZ_DAILY_STORY_LIMIT = 3;
+const PREMIUM_DAILY_STORY_LIMIT = 5;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -36,7 +37,7 @@ serve(async (req) => {
 
       const { data: profile } = await supabaseAdmin
         .from("profiles")
-        .select("stories_used, is_premium, premium_source, last_usage_date")
+        .select("stories_used, is_premium, premium_source, last_usage_date, tier")
         .eq("id", userId)
         .single();
 
@@ -44,8 +45,11 @@ serve(async (req) => {
         const today = new Date().toISOString().slice(0, 10);
         let storiesUsed = profile.stories_used ?? 0;
         const isPremium = !!profile.is_premium;
-        const isSuper = profile.premium_source === "super_premium";
-        const limit = isSuper ? SUPER_DAILY_STORY_LIMIT : isPremium ? DAILY_STORY_LIMIT : FREE_STORY_LIMIT;
+        const tier = (profile.tier as string) || (isPremium ? "kidzz" : "free");
+        const limit =
+          tier === "premium" ? PREMIUM_DAILY_STORY_LIMIT
+            : tier === "kidzz" ? KIDZZ_DAILY_STORY_LIMIT
+            : FREE_STORY_LIMIT;
 
         if (isPremium && profile.last_usage_date !== today) {
           storiesUsed = 0;
@@ -57,7 +61,7 @@ serve(async (req) => {
               error: "LIMIT_REACHED",
               message: isPremium
                 ? "Limite diário de histórias atingido. Volte amanhã!"
-                : "Você já usou sua história gratuita. Assine para criar histórias ilimitadas!",
+                : "Você já usou sua história gratuita de hoje. Assine para criar mais histórias!",
             }),
             { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );

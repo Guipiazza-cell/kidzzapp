@@ -89,7 +89,7 @@ const Success = () => {
   }, [profile?.is_premium, confirmed]);
 
   const childName = profile?.child_name || "seu filho";
-  const planKey = tier === "super_premium" ? "super_premium" : "premium";
+  const planKey = tier === "premium" ? "super_premium" : "premium";
   const plan = PLAN_INFO[planKey];
 
   return (

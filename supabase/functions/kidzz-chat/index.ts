@@ -6,8 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const FREE_LIMIT = 3;
-const DAILY_LIMIT = 10;
+// 2026 limits per tier
+const FREE_LIMIT = 3;          // lifetime para guests/free
+const KIDZZ_DAILY_LIMIT = 30;  // perguntas KIDZZ
+const PREMIUM_DAILY_LIMIT = 60; // perguntas PREMIUM
 
 // IMPORTANT: respostas devem priorizar TEXTO LIMPO. Emojis são opcionais
 // (no máximo 1 por resposta) — a narração em voz não lê emojis e o texto
@@ -141,7 +143,7 @@ serve(async (req) => {
 
       const { data: profile, error: profileError } = await supabaseAdmin
         .from("profiles")
-        .select("questions_used, is_premium, last_usage_date")
+        .select("questions_used, is_premium, last_usage_date, tier")
         .eq("id", userId)
         .single();
 
@@ -152,20 +154,18 @@ serve(async (req) => {
       if (profile) {
         const today = new Date().toISOString().slice(0, 10);
         let questionsUsed = profile.questions_used;
+        const tier = (profile.tier as string) || (profile.is_premium ? "kidzz" : "free");
 
         if (profile.is_premium) {
-          // Premium: daily reset
-          if (profile.last_usage_date !== today) {
-            questionsUsed = 0;
-          }
-          if (questionsUsed >= DAILY_LIMIT) {
-            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite diário atingido. Volte amanhã! 😊" }), {
+          if (profile.last_usage_date !== today) questionsUsed = 0;
+          const dailyLimit = tier === "premium" ? PREMIUM_DAILY_LIMIT : KIDZZ_DAILY_LIMIT;
+          if (questionsUsed >= dailyLimit) {
+            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite diário atingido. Volte amanhã!" }), {
               status: 403,
               headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
           }
         } else {
-          // Free: lifetime limit, NO reset
           if (questionsUsed >= FREE_LIMIT) {
             return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite de perguntas gratuitas atingido." }), {
               status: 403,
