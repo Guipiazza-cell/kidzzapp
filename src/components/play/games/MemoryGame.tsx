@@ -180,24 +180,38 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
           return (
             <motion.button
               key={card.id}
-              onClick={() => handleFlip(card.id)}
-              className="relative aspect-square rounded-2xl overflow-hidden"
-              style={{
-                perspective: 800,
-              }}
-              whileTap={{ scale: 0.92 }}
-              animate={card.matched ? { scale: [1, 1.08, 1] } : {}}
-              transition={{ duration: 0.4 }}
+              onPointerDown={() => handleFlip(card.id)}
+              className="relative aspect-square rounded-2xl"
+              style={{ perspective: 900 }}
+              whileTap={{ scale: 0.93 }}
+              animate={card.matched ? { scale: [1, 1.12, 0.98, 1.04, 1] } : {}}
+              transition={
+                card.matched
+                  ? { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
+                  : { duration: 0.2 }
+              }
             >
+              {card.matched && (
+                <motion.span
+                  className="absolute inset-0 rounded-2xl pointer-events-none"
+                  initial={{ opacity: 0.9, scale: 0.6 }}
+                  animate={{ opacity: 0, scale: 1.6 }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                  style={{
+                    background:
+                      "radial-gradient(circle, hsl(48 100% 70% / 0.7), transparent 70%)",
+                    filter: "blur(2px)",
+                  }}
+                />
+              )}
               <motion.div
                 className="absolute inset-0"
-                style={{ transformStyle: "preserve-3d" }}
+                style={{ transformStyle: "preserve-3d", willChange: "transform" }}
                 animate={{ rotateY: revealed ? 180 : 0 }}
-                transition={{ type: "spring", stiffness: 220, damping: 22 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20, mass: 0.6 }}
               >
-                {/* Back */}
                 <div
-                  className="absolute inset-0 rounded-2xl flex items-center justify-center border"
+                  className="absolute inset-0 rounded-2xl flex items-center justify-center border overflow-hidden"
                   style={{
                     background: set.gradient,
                     borderColor: "rgba(255,255,255,0.35)",
@@ -210,37 +224,48 @@ const MemoryGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) 
                     className="absolute inset-0 rounded-2xl pointer-events-none opacity-30"
                     style={{
                       background:
-                        "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.4), transparent 60%)",
+                        "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.45), transparent 60%)",
                     }}
                   />
                 </div>
-                {/* Front */}
                 <div
-                  className="absolute inset-0 rounded-2xl flex items-center justify-center"
+                  className="absolute inset-0 rounded-2xl flex items-center justify-center overflow-hidden"
                   style={{
                     background: card.matched
-                      ? "linear-gradient(135deg, hsl(140 70% 92%), hsl(150 75% 80%))"
+                      ? "linear-gradient(135deg, hsl(140 75% 94%), hsl(150 80% 82%))"
                       : "linear-gradient(135deg, #ffffff, hsl(45 80% 92%))",
                     border: card.matched
-                      ? "2px solid hsl(145 70% 50%)"
+                      ? "2px solid hsl(145 75% 50%)"
                       : "2px solid rgba(255,255,255,0.7)",
                     boxShadow: card.matched
-                      ? "0 6px 22px rgba(74,222,128,0.55), inset 0 1px 0 rgba(255,255,255,0.5)"
+                      ? "0 8px 24px hsl(140 75% 50% / 0.55), inset 0 1px 0 rgba(255,255,255,0.6), 0 0 22px hsl(48 100% 65% / 0.45)"
                       : "0 4px 14px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6)",
                     transform: "rotateY(180deg)",
                     backfaceVisibility: "hidden",
                   }}
                 >
-                  <span
-                    className="text-5xl"
+                  {revealed && (
+                    <span
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%)",
+                      }}
+                    />
+                  )}
+                  <motion.span
+                    className="text-5xl relative"
+                    initial={false}
+                    animate={card.matched ? { scale: [1, 1.18, 1] } : { scale: 1 }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     style={{
                       filter: card.matched
-                        ? "drop-shadow(0 2px 6px rgba(34,197,94,0.4))"
+                        ? "drop-shadow(0 2px 8px rgba(34,197,94,0.55))"
                         : "drop-shadow(0 2px 4px rgba(0,0,0,0.15))",
                     }}
                   >
                     {card.emoji}
-                  </span>
+                  </motion.span>
                 </div>
               </motion.div>
             </motion.button>
