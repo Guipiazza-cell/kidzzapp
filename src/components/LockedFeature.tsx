@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Lock, Sparkles, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { sfx } from "@/lib/sfx";
+import { haptic } from "@/lib/haptics";
 
 export type LockedFeatureType = "games" | "music" | "stories" | "dreams" | "moments" | "generic";
 
