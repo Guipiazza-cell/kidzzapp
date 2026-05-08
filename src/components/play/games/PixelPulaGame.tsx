@@ -30,12 +30,14 @@ interface Props {
 }
 
 const OBSTACLE_EMOJIS = ["🍄", "🪨", "🌵", "🪵", "🌿"];
-const GROUND_Y = 72; // px from bottom — taller ground
-const PIXEL_X = 70;  // fixed left position
-const PIXEL_SIZE = 84; // bigger character (was 56)
-const GRAVITY = 0.95; // a bit floatier
-const JUMP_VELOCITY = -18; // higher jump
-const TICK_MS = 28;
+const GROUND_Y = 72;
+const PIXEL_X = 70;
+const PIXEL_SIZE = 84;
+const GRAVITY = 1.05;          // slightly snappier fall
+const JUMP_VELOCITY = -18.5;   // higher arc
+const TICK_MS = 24;            // ~42fps logic, GPU does the rest
+const COYOTE_MS = 90;          // forgiveness window after leaving ground
+const JUMP_BUFFER_MS = 110;    // buffer taps slightly before landing
 
 const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props) => {
   const { profile } = useAuth();
@@ -47,7 +49,7 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
   const [showHint, setShowHint] = useState(true);
 
   // Physics state in refs (avoid re-renders every tick)
-  const yRef = useRef(0);              // offset above ground (positive up)
+  const yRef = useRef(0);
   const vyRef = useRef(0);
   const groundedRef = useRef(true);
   const speedRef = useRef(6);
@@ -57,29 +59,47 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
   const idRef = useRef(0);
   const arenaRef = useRef<HTMLDivElement>(null);
   const rotationRef = useRef(0);
+  const lastGroundedAtRef = useRef<number>(0);
+  const jumpBufferAtRef = useRef<number>(0);
+  const passedObstaclesRef = useRef<Set<number>>(new Set());
 
-  // Visual state — updated each tick by setState
+  // Visual state
   const [pixelY, setPixelY] = useState(0);
   const [pixelRot, setPixelRot] = useState(0);
+  const [pixelSquash, setPixelSquash] = useState(0);
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
   const [stars, setStars] = useState<Star[]>([]);
   const [parallax, setParallax] = useState(0);
+  const [landingPuffs, setLandingPuffs] = useState<{ id: number; x: number; t: number }[]>([]);
+  const [combo, setCombo] = useState(0);
+  const [nearMissAt, setNearMissAt] = useState(0);
+  const [comboFloater, setComboFloater] = useState<{ id: number; x: number; n: number } | null>(null);
 
   useEffect(() => {
     const stored = parseInt(localStorage.getItem("kidzz_pixel_pula_high") || "0", 10);
     setHighScore(Number.isFinite(stored) ? stored : 0);
   }, []);
 
+  const performJump = useCallback(() => {
+    vyRef.current = JUMP_VELOCITY;
+    groundedRef.current = false;
+    setShowHint(false);
+    setPixelSquash(0.6);
+    setTimeout(() => setPixelSquash(0), 140);
+    sfx("click");
+    haptic("light");
+  }, []);
+
   const jump = useCallback(() => {
     if (phase !== "playing") return;
-    if (groundedRef.current) {
-      vyRef.current = JUMP_VELOCITY;
-      groundedRef.current = false;
-      setShowHint(false);
-      sfx("click");
-      haptic("light");
+    const now = performance.now();
+    const canCoyote = !groundedRef.current && now - lastGroundedAtRef.current < COYOTE_MS;
+    if (groundedRef.current || canCoyote) {
+      performJump();
+    } else {
+      jumpBufferAtRef.current = now;
     }
-  }, [phase]);
+  }, [phase, performJump]);
 
   const startGame = () => {
     yRef.current = 0;
@@ -90,10 +110,16 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
     starsRef.current = [];
     tickRef.current = 0;
     rotationRef.current = 0;
+    passedObstaclesRef.current = new Set();
     setObstacles([]);
     setStars([]);
     setPixelY(0);
     setPixelRot(0);
+    setPixelSquash(0);
+    setLandingPuffs([]);
+    setCombo(0);
+    setNearMissAt(0);
+    setComboFloater(null);
     setScore(0);
     setIsNewRecord(false);
     setShowHint(true);
@@ -143,15 +169,37 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       tickRef.current += 1;
 
       // Physics
+      const wasAir = !groundedRef.current;
       vyRef.current += GRAVITY;
-      yRef.current -= vyRef.current; // y is "height above ground" (positive up)
+      yRef.current -= vyRef.current;
       if (yRef.current <= 0) {
+        const landingHard = wasAir && vyRef.current > 12;
         yRef.current = 0;
         vyRef.current = 0;
+        if (wasAir) {
+          // squash on land + dust puff
+          setPixelSquash(-0.6);
+          setTimeout(() => setPixelSquash(0), 130);
+          haptic("light");
+          setLandingPuffs((p) => [
+            ...p.slice(-3),
+            { id: idRef.current++, x: PIXEL_X, t: performance.now() },
+          ]);
+        }
         groundedRef.current = true;
+        lastGroundedAtRef.current = performance.now();
         rotationRef.current = 0;
+        // jump buffer — auto-fire if user tapped right before landing
+        if (performance.now() - jumpBufferAtRef.current < JUMP_BUFFER_MS) {
+          jumpBufferAtRef.current = 0;
+          performJump();
+        }
+        if (landingHard) {
+          // small impact rumble
+          haptic("medium");
+        }
       } else {
-        rotationRef.current = Math.min(25, rotationRef.current + 1.5);
+        rotationRef.current = Math.min(20, rotationRef.current + 1.2);
       }
       setPixelY(yRef.current);
       setPixelRot(rotationRef.current);
@@ -197,13 +245,34 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       const pixelTop = yRef.current + PIXEL_SIZE - 12;
 
       let hit = false;
+      let nearMissThisTick = false;
       for (const o of obstaclesRef.current) {
         const oLeft = o.x + 6;
         const oRight = o.x + o.width - 6;
-        const oTop = 38; // obstacles are ~44px tall, sitting on ground
+        const oTop = 38;
         if (pixelRight > oLeft && pixelLeft < oRight && pixelBottom < oTop) {
           hit = true;
           break;
+        }
+        // Near miss: obstacle just passed under us while we were airborne
+        if (
+          !passedObstaclesRef.current.has(o.id) &&
+          o.x + o.width < PIXEL_X &&
+          pixelBottom > oTop - 8
+        ) {
+          passedObstaclesRef.current.add(o.id);
+          nearMissThisTick = true;
+        }
+      }
+      if (nearMissThisTick) {
+        const next = combo + 1;
+        setCombo(next);
+        setNearMissAt(performance.now());
+        setComboFloater({ id: idRef.current++, x: PIXEL_X + 20, n: next });
+        setTimeout(() => setComboFloater((f) => (f && f.n === next ? null : f)), 700);
+        if (next >= 2) {
+          sfx("reward");
+          haptic("light");
         }
       }
 
@@ -239,9 +308,11 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
 
       // Score & difficulty (record celebration WITHOUT ending game)
       setScore((s) => {
-        const next = s + 1 + starGain;
-        const targetSpeed = 6 + Math.floor(next / 150) * 1.2;
-        speedRef.current = Math.min(14, targetSpeed);
+        const next = s + 1 + starGain + (nearMissThisTick ? Math.min(5, combo + 1) : 0);
+        // Smooth asymptotic speed curve (was step-based)
+        const targetSpeed = 6 + Math.min(8, Math.log2(1 + next / 40) * 2.4);
+        // ease toward target instead of snapping
+        speedRef.current = speedRef.current + (targetSpeed - speedRef.current) * 0.05;
         // celebrate new record live (only once per run)
         if (highScore > 0 && s <= highScore && next > highScore) {
           confetti({
@@ -284,9 +355,29 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
     return () => window.removeEventListener("keydown", onKey);
   }, [phase, jump]);
 
-  const handleArenaTap = () => {
+  const handleArenaPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
     if (phase === "playing") jump();
   };
+
+  // Combo decays after ~1.6s without a fresh near miss
+  useEffect(() => {
+    if (combo === 0) return;
+    const t = setTimeout(() => {
+      if (performance.now() - nearMissAt > 1500) setCombo(0);
+    }, 1700);
+    return () => clearTimeout(t);
+  }, [combo, nearMissAt]);
+
+  // Cull old landing puffs (keeps DOM lean)
+  useEffect(() => {
+    if (landingPuffs.length === 0) return;
+    const t = setTimeout(() => {
+      const now = performance.now();
+      setLandingPuffs((p) => p.filter((x) => now - x.t < 500));
+    }, 500);
+    return () => clearTimeout(t);
+  }, [landingPuffs]);
 
   // Endless score → stars (1-3) based on milestones
   const computeStars = (s: number): 1 | 2 | 3 => (s >= 300 ? 3 : s >= 150 ? 2 : 1);
@@ -328,13 +419,13 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
       {/* Arena */}
       <div
         ref={arenaRef}
-        onClick={handleArenaTap}
+        onPointerDown={handleArenaPointerDown}
         className="relative w-full overflow-hidden rounded-3xl border-2 border-white/20 select-none cursor-pointer shadow-2xl"
         style={{
           height: "clamp(320px, 55vh, 460px)",
           background:
             "linear-gradient(180deg, #0c1a3d 0%, #1e3a8a 25%, #5b21b6 55%, #831843 85%, #4a1d3f 100%)",
-          touchAction: "manipulation",
+          touchAction: "none",
           boxShadow: "0 20px 60px rgba(76,29,149,0.4), inset 0 0 60px rgba(0,0,0,0.3)",
         }}
       >
@@ -473,7 +564,47 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           />
         </div>
 
-        {/* Pixel character + ground shadow */}
+        {/* Speed lines (subtle, ramps with speed) */}
+        {speedRef.current > 8 && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={`sl-${i}`}
+                className="absolute"
+                style={{
+                  top: `${15 + i * 12}%`,
+                  right: 0,
+                  width: 60 + i * 14,
+                  height: 1.5,
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.5))",
+                  transform: `translateX(${(parallax * (1.6 + i * 0.2)) % 320}px)`,
+                  opacity: Math.min(0.6, (speedRef.current - 8) / 6),
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Landing puffs */}
+        {landingPuffs.map((p) => (
+          <span
+            key={p.id}
+            className="absolute pointer-events-none"
+            style={{
+              left: p.x + PIXEL_SIZE / 2 - 14,
+              bottom: GROUND_Y - 4,
+              width: 28,
+              height: 10,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.55)",
+              filter: "blur(3px)",
+              animation: "puff 0.5s ease-out forwards",
+            }}
+          />
+        ))}
+
+        {/* Pixel character + ground shadow (dynamic) */}
         <div
           className="absolute pointer-events-none"
           style={{
@@ -482,10 +613,11 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
             width: PIXEL_SIZE - 12,
             height: 10,
             borderRadius: "50%",
-            background: "radial-gradient(ellipse, rgba(0,0,0,0.45), transparent 70%)",
-            transform: `scale(${Math.max(0.5, 1 - pixelY / 200)})`,
-            opacity: Math.max(0.3, 1 - pixelY / 220),
+            background: "radial-gradient(ellipse, rgba(0,0,0,0.5), transparent 70%)",
+            transform: `scaleX(${Math.max(0.45, 1 - pixelY / 220)}) scaleY(${Math.max(0.5, 1 - pixelY / 260)})`,
+            opacity: Math.max(0.25, 1 - pixelY / 240),
             filter: "blur(2px)",
+            transition: "transform 60ms linear, opacity 60ms linear",
           }}
         />
         <div
@@ -495,13 +627,39 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
             bottom: GROUND_Y + pixelY,
             width: PIXEL_SIZE,
             height: PIXEL_SIZE,
-            transform: `rotate(${pixelRot}deg)`,
-            transition: "transform 50ms linear",
-            filter: "drop-shadow(0 6px 14px rgba(167,139,250,0.7)) drop-shadow(0 0 18px rgba(244,114,182,0.35))",
+            transform: `rotate(${pixelRot}deg) scaleX(${1 - pixelSquash * 0.18}) scaleY(${1 + pixelSquash * 0.22})`,
+            transformOrigin: "50% 100%",
+            transition: "transform 90ms cubic-bezier(0.22, 1, 0.36, 1)",
+            willChange: "transform, bottom",
+            filter:
+              "drop-shadow(0 6px 14px rgba(167,139,250,0.7)) drop-shadow(0 0 18px rgba(244,114,182,0.35))",
           }}
         >
           <img src={pixelImg} alt="Pixel" className="w-full h-full object-contain" draggable={false} />
         </div>
+
+        {/* Combo near-miss floater */}
+        <AnimatePresence>
+          {comboFloater && combo >= 2 && (
+            <motion.div
+              key={comboFloater.id}
+              initial={{ opacity: 0, y: 0, scale: 0.6 }}
+              animate={{ opacity: 1, y: -34, scale: 1 }}
+              exit={{ opacity: 0, y: -50 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute font-black text-yellow-300"
+              style={{
+                left: comboFloater.x,
+                bottom: GROUND_Y + 90,
+                fontSize: 18,
+                textShadow: "0 0 14px rgba(253,224,71,0.85), 0 2px 4px rgba(0,0,0,0.45)",
+                pointerEvents: "none",
+              }}
+            >
+              x{combo} !
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Obstacles */}
         {obstacles.map((o) => (
@@ -609,6 +767,9 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
           25% { transform: translate(8px,-6px); opacity: 1; }
           50% { transform: translate(-6px,-12px); opacity: 0.7; }
           75% { transform: translate(4px,-4px); opacity: 0.9; }
+        @keyframes puff {
+          0% { transform: scale(0.6); opacity: 0.7; }
+          100% { transform: scale(1.8) translateY(-4px); opacity: 0; }
         }
       `}</style>
     </div>
