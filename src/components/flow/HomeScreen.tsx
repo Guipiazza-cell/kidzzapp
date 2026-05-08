@@ -176,10 +176,14 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
   const submit = (text: string) => {
     if (!text.trim() || submitting) return;
     setSubmitting(true);
+    haptic("light");
+    sfx("click");
     onSubmit(text.trim());
   };
 
   const openPlans = () => {
+    haptic("medium");
+    sfx("click");
     window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
   };
 
