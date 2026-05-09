@@ -327,18 +327,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <div className="flex-shrink-0">
                 <VoiceInput onResult={submit} disabled={submitting || isFreeLimitReached} />
               </div>
-              <motion.div
-                className="flex-1 min-w-0 relative"
-                animate={{
-                  boxShadow: [
-                    "0 0 0 0 hsl(var(--kid-orange) / 0)",
-                    "0 0 0 5px hsl(var(--kid-orange) / 0.18)",
-                    "0 0 0 0 hsl(var(--kid-orange) / 0)",
-                  ],
-                }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                style={{ borderRadius: 18 }}
-              >
+              <div className="flex-1 min-w-0 relative">
                 <input
                   ref={inputRef}
                   type="text"
@@ -349,21 +338,13 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                   className="w-full min-w-0 py-3.5 px-4 rounded-2xl bg-white/85 text-gray-800 text-base font-semibold placeholder:text-gray-400 placeholder:font-medium placeholder:text-sm focus:outline-none focus:ring-4 focus:ring-kid-orange/40 transition-all disabled:opacity-40 border-2 border-white/70"
                   disabled={submitting || isFreeLimitReached}
                 />
-              </motion.div>
+              </div>
               <motion.button
                 onClick={() => submit(input)}
                 disabled={!input.trim() || submitting || isFreeLimitReached}
                 aria-label="Enviar pergunta"
                 className="flex-shrink-0 w-12 h-12 rounded-2xl kid-gradient-orange shadow-xl flex items-center justify-center disabled:opacity-30 transition-all"
                 whileTap={{ scale: 0.88 }}
-                animate={{
-                  boxShadow: [
-                    "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
-                    "0 12px 28px -4px hsl(var(--kid-orange) / 0.65)",
-                    "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
                 <Send size={20} className="text-white" />
               </motion.button>
