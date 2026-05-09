@@ -293,17 +293,15 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
         >
-          {/* Halo premium pulsante */}
-          <motion.div
+          {/* Halo premium suave (sem flicker) */}
+          <div
             aria-hidden
-            className="absolute -inset-3 rounded-[28px] pointer-events-none"
+            className="absolute -inset-3 rounded-[28px] pointer-events-none opacity-70"
             style={{
               background:
-                "radial-gradient(70% 90% at 50% 50%, hsl(var(--kid-orange) / 0.42), hsl(var(--kid-pink) / 0.18) 55%, transparent 75%)",
+                "radial-gradient(70% 90% at 50% 50%, hsl(var(--kid-orange) / 0.32), hsl(var(--kid-pink) / 0.12) 55%, transparent 75%)",
               filter: "blur(18px)",
             }}
-            animate={{ opacity: [0.55, 0.95, 0.55], scale: [1, 1.05, 1] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
           />
 
           {/* Card glass premium */}
