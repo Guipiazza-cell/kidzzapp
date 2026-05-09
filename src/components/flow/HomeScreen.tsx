@@ -194,7 +194,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
 
   return (
     <motion.div
-      className="flex-1 flex flex-col relative"
+      className="flex-1 flex flex-col relative min-h-0"
       initial={{ opacity: 0, x: -30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
@@ -285,7 +285,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         isPremium={profile?.is_premium ?? false}
       />
 
-      <div className="flex-1 flex flex-col items-center px-5 overflow-y-auto">
+      <div className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain pb-32" style={{ WebkitOverflowScrolling: "touch" }}>
         {/* ⭐ HERO QUESTION BOX — coração da app, sempre visível no topo */}
         <motion.div
           className="w-full max-w-sm relative mt-2 mb-3"
@@ -293,17 +293,15 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
         >
-          {/* Halo premium pulsante */}
-          <motion.div
+          {/* Halo premium suave (sem flicker) */}
+          <div
             aria-hidden
-            className="absolute -inset-3 rounded-[28px] pointer-events-none"
+            className="absolute -inset-3 rounded-[28px] pointer-events-none opacity-70"
             style={{
               background:
-                "radial-gradient(70% 90% at 50% 50%, hsl(var(--kid-orange) / 0.42), hsl(var(--kid-pink) / 0.18) 55%, transparent 75%)",
+                "radial-gradient(70% 90% at 50% 50%, hsl(var(--kid-orange) / 0.32), hsl(var(--kid-pink) / 0.12) 55%, transparent 75%)",
               filter: "blur(18px)",
             }}
-            animate={{ opacity: [0.55, 0.95, 0.55], scale: [1, 1.05, 1] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
           />
 
           {/* Card glass premium */}
@@ -329,18 +327,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               <div className="flex-shrink-0">
                 <VoiceInput onResult={submit} disabled={submitting || isFreeLimitReached} />
               </div>
-              <motion.div
-                className="flex-1 min-w-0 relative"
-                animate={{
-                  boxShadow: [
-                    "0 0 0 0 hsl(var(--kid-orange) / 0)",
-                    "0 0 0 5px hsl(var(--kid-orange) / 0.18)",
-                    "0 0 0 0 hsl(var(--kid-orange) / 0)",
-                  ],
-                }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                style={{ borderRadius: 18 }}
-              >
+              <div className="flex-1 min-w-0 relative">
                 <input
                   ref={inputRef}
                   type="text"
@@ -351,21 +338,13 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
                   className="w-full min-w-0 py-3.5 px-4 rounded-2xl bg-white/85 text-gray-800 text-base font-semibold placeholder:text-gray-400 placeholder:font-medium placeholder:text-sm focus:outline-none focus:ring-4 focus:ring-kid-orange/40 transition-all disabled:opacity-40 border-2 border-white/70"
                   disabled={submitting || isFreeLimitReached}
                 />
-              </motion.div>
+              </div>
               <motion.button
                 onClick={() => submit(input)}
                 disabled={!input.trim() || submitting || isFreeLimitReached}
                 aria-label="Enviar pergunta"
                 className="flex-shrink-0 w-12 h-12 rounded-2xl kid-gradient-orange shadow-xl flex items-center justify-center disabled:opacity-30 transition-all"
                 whileTap={{ scale: 0.88 }}
-                animate={{
-                  boxShadow: [
-                    "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
-                    "0 12px 28px -4px hsl(var(--kid-orange) / 0.65)",
-                    "0 8px 20px -4px hsl(var(--kid-orange) / 0.4)",
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
                 <Send size={20} className="text-white" />
               </motion.button>

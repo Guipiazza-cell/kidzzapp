@@ -10,9 +10,9 @@ const IS_LOW_END = (() => {
   return Boolean(mql?.matches) || (mem && mem <= 4) || (cores && cores <= 4);
 })();
 
-const FIREFLY_COUNT = IS_LOW_END ? 5 : 12;
-const LEAF_COUNT = IS_LOW_END ? 2 : 5;
-const DRAGONFLY_COUNT = IS_LOW_END ? 1 : 4;
+const FIREFLY_COUNT = IS_LOW_END ? 3 : 7;
+const LEAF_COUNT = IS_LOW_END ? 2 : 4;
+const DRAGONFLY_COUNT = IS_LOW_END ? 1 : 2;
 
 const FIREFLIES = Array.from({ length: FIREFLY_COUNT }, (_, i) => ({
   id: i,

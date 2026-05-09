@@ -148,7 +148,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   }, [speak]);
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden relative">
+    <div className="flex-1 flex flex-col overflow-hidden relative min-h-0">
 
       {/* Header */}
       <header className="relative z-10 flex items-center gap-3 px-4 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
