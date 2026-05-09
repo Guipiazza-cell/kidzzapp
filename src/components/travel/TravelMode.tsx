@@ -264,17 +264,8 @@ const TravelMode = ({ onBack }: Props) => {
             </h1>
           </header>
 
-          <div className="relative flex-1 flex flex-col items-center justify-center px-6 gap-5 overflow-y-auto pb-6">
-            {/* KIDZZ Explorer */}
-            <KidzzChameleon
-              state="cosmic"
-              mood="guide"
-              size="lg"
-              showParticles
-              interactive
-            />
-
-            {/* Preview de pergunta — alto-falante */}
+          <div className="relative flex-1 min-h-0 flex flex-col items-center px-6 gap-4 overflow-y-auto overscroll-contain pb-10 pt-2">
+            {/* Preview de pergunta — alto-falante (PRIMEIRO: coração da experiência) */}
             <motion.button
               onClick={speakPreview}
               className="w-full max-w-xs rounded-2xl px-4 py-3 backdrop-blur-md border border-amber-300/30 flex items-start gap-3 text-left active:scale-[0.98] transition-transform"
