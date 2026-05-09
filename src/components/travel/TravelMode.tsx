@@ -304,10 +304,37 @@ const TravelMode = ({ onBack }: Props) => {
               </div>
             </motion.button>
 
-            <p className="text-white/85 text-center text-sm font-bold leading-relaxed max-w-xs">
-              <span className="text-amber-300">{questionCount} perguntas</span> mágicas pra{" "}
-              <span className="text-amber-300">{childName}</span> na estrada cósmica 🛸
-            </p>
+            {/* KIDZZ Explorer — logo abaixo do box de perguntas */}
+            <KidzzChameleon
+              state="cosmic"
+              mood="guide"
+              size="md"
+              showParticles
+              interactive
+            />
+
+            {/* Theme selector — coerência com o assunto da pergunta */}
+            <div className="w-full max-w-xs">
+              <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-2 text-center">
+                Assunto
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {THEMES.map(t => (
+                  <motion.button
+                    key={t}
+                    onClick={() => { setTheme(t); setPreviewIndex(0); }}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur ${
+                      theme === t
+                        ? "bg-white/20 text-white border border-white/40"
+                        : "bg-white/5 text-white/50 border border-transparent"
+                    }`}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {t}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
 
             {/* Question count selector */}
             <div className="w-full max-w-xs">
@@ -332,28 +359,11 @@ const TravelMode = ({ onBack }: Props) => {
               </div>
             </div>
 
-            {/* Theme selector */}
-            <div className="w-full max-w-xs">
-              <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-2 text-center">
-                Tema
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {THEMES.map(t => (
-                  <motion.button
-                    key={t}
-                    onClick={() => setTheme(t)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all backdrop-blur ${
-                      theme === t
-                        ? "bg-white/20 text-white border border-white/40"
-                        : "bg-white/5 text-white/50 border border-transparent"
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {t}
-                  </motion.button>
-                ))}
-              </div>
-            </div>
+            <p className="text-white/85 text-center text-sm font-bold leading-relaxed max-w-xs">
+              <span className="text-amber-300">{questionCount} perguntas</span> de{" "}
+              <span className="text-amber-300">{theme}</span> pra{" "}
+              <span className="text-amber-300">{childName}</span> 🛸
+            </p>
 
             {/* Start button */}
             <motion.button
