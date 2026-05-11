@@ -26,6 +26,7 @@ const KidzzLab = lazy(() => import("@/components/lab/KidzzLab"));
 const KidzzPlay = lazy(() => import("@/components/play/KidzzPlay"));
 const RoutineScreen = lazy(() => import("@/components/routine/RoutineScreen"));
 const MomentsFactory = lazy(() => import("@/components/moments/MomentsFactory"));
+const MomentsPlaylists = lazy(() => import("@/components/moments/MomentsPlaylists"));
 const TravelMode = lazy(() => import("@/components/travel/TravelMode"));
 const MusicForest = lazy(() => import("@/components/music/MusicForest"));
 import Paywall from "@/components/Paywall";
