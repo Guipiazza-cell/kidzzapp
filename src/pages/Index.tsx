@@ -105,7 +105,7 @@ const Index = () => {
       import("@/components/story/StoryFactory");
       import("@/components/routine/RoutineScreen");
       import("@/components/play/KidzzPlay");
-      import("@/components/moments/MomentsFactory");
+      import("@/components/moments/MomentsPlaylists");
       import("@/components/dreams/DreamWorld");
       import("@/components/music/MusicForest");
       import("@/components/lab/KidzzLab");
