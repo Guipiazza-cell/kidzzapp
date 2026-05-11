@@ -26,6 +26,7 @@ const KidzzLab = lazy(() => import("@/components/lab/KidzzLab"));
 const KidzzPlay = lazy(() => import("@/components/play/KidzzPlay"));
 const RoutineScreen = lazy(() => import("@/components/routine/RoutineScreen"));
 const MomentsFactory = lazy(() => import("@/components/moments/MomentsFactory"));
+const MomentsPlaylists = lazy(() => import("@/components/moments/MomentsPlaylists"));
 const TravelMode = lazy(() => import("@/components/travel/TravelMode"));
 const MusicForest = lazy(() => import("@/components/music/MusicForest"));
 import Paywall from "@/components/Paywall";
@@ -104,7 +105,7 @@ const Index = () => {
       import("@/components/story/StoryFactory");
       import("@/components/routine/RoutineScreen");
       import("@/components/play/KidzzPlay");
-      import("@/components/moments/MomentsFactory");
+      import("@/components/moments/MomentsPlaylists");
       import("@/components/dreams/DreamWorld");
       import("@/components/music/MusicForest");
       import("@/components/lab/KidzzLab");
@@ -331,7 +332,7 @@ const Index = () => {
       return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
     }
     if (activeTab === "moments") {
-      return <MomentsFactory key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
+      return <MomentsPlaylists key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "achievements") {
       // Conquistas vivem como subaba dentro de Memórias
