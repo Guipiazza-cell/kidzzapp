@@ -72,11 +72,11 @@ const TABS: {
     underline: "hsl(var(--kid-purple))",
   },
   {
-    id: "memories",
-    label: "Memórias",
-    icon: Heart,
-    color: "text-kid-pink",
-    underline: "hsl(var(--kid-pink))",
+    id: "moments",
+    label: "Momentos",
+    icon: Disc3,
+    color: "text-kid-yellow",
+    underline: "hsl(45 100% 65%)",
   },
 ];
 
