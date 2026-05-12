@@ -191,7 +191,7 @@ const LivingForest = ({ children, variant = "light" }: { children?: React.ReactN
       </AnimatePresence>
 
       {/* CONTENT */}
-      <div className="relative z-10 w-full h-full">{children}</div>
+      <div className="relative z-10 w-full h-full flex flex-col min-h-0">{children}</div>
     </div>
   );
 };
