@@ -224,14 +224,34 @@ const PlaylistCard = ({
 
 /* ============================================================ */
 const MomentsPlaylists = ({ onBack }: Props) => {
-  const [active, setActive] = useState<KidzzPlaylist | null>(null);
+  const [active, setActive] = useState<Playable | null>(null);
   const weekly = getWeeklyPlaylist();
   const others = PLAYLISTS.filter((p) => p.id !== weekly.id);
 
   const open = (p: KidzzPlaylist) => {
     haptic("light");
     sfx("click");
-    setActive(p);
+    setActive({
+      title: p.title,
+      emoji: p.emoji,
+      spotifyId: p.spotifyId,
+      gradient: p.gradient,
+      glow: p.glow,
+      subtitle: p.emotionalLine,
+    });
+  };
+
+  const openAge = (p: AgePlaylist) => {
+    haptic("light");
+    sfx("click");
+    setActive({
+      title: p.title,
+      emoji: p.emoji,
+      spotifyId: p.spotifyId,
+      gradient: p.gradient,
+      glow: p.glow,
+      subtitle: `${p.ageRange} · ${p.badge}`,
+    });
   };
 
   return (
