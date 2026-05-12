@@ -51,11 +51,20 @@ const FloatingParticles = ({ color }: { color: string }) => (
 );
 
 /* ---------- Modal Spotify Embed ---------- */
+type Playable = {
+  title: string;
+  emoji: string;
+  spotifyId: string;
+  gradient: string;
+  glow: string;
+  subtitle?: string;
+};
+
 const PlayerSheet = ({
   playlist,
   onClose,
 }: {
-  playlist: KidzzPlaylist;
+  playlist: Playable;
   onClose: () => void;
 }) => (
   <motion.div
