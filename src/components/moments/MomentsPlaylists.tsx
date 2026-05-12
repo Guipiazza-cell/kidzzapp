@@ -1,15 +1,18 @@
-import { useState, lazy, Suspense } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ExternalLink, Music2, Sparkles, Clock, ListMusic, X } from "lucide-react";
 import {
   PLAYLISTS,
+  AGE_PLAYLISTS,
   getWeeklyPlaylist,
   getSpotifyEmbedUrl,
   getSpotifyOpenUrl,
   type KidzzPlaylist,
+  type AgePlaylist,
 } from "@/lib/playlistsConfig";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 
 interface Props {
   onBack: () => void;
@@ -48,11 +51,20 @@ const FloatingParticles = ({ color }: { color: string }) => (
 );
 
 /* ---------- Modal Spotify Embed ---------- */
+type Playable = {
+  title: string;
+  emoji: string;
+  spotifyId: string;
+  gradient: string;
+  glow: string;
+  subtitle?: string;
+};
+
 const PlayerSheet = ({
   playlist,
   onClose,
 }: {
-  playlist: KidzzPlaylist;
+  playlist: Playable;
   onClose: () => void;
 }) => (
   <motion.div
@@ -78,7 +90,7 @@ const PlayerSheet = ({
             <span className="text-2xl">{playlist.emoji}</span>
             <div>
               <h3 className="font-black text-base leading-tight">{playlist.title}</h3>
-              <p className="text-[11px] opacity-80 font-medium">{playlist.emotionalLine}</p>
+              <p className="text-[11px] opacity-80 font-medium">{playlist.subtitle}</p>
             </div>
           </div>
           <button
@@ -212,14 +224,34 @@ const PlaylistCard = ({
 
 /* ============================================================ */
 const MomentsPlaylists = ({ onBack }: Props) => {
-  const [active, setActive] = useState<KidzzPlaylist | null>(null);
+  const [active, setActive] = useState<Playable | null>(null);
   const weekly = getWeeklyPlaylist();
   const others = PLAYLISTS.filter((p) => p.id !== weekly.id);
 
   const open = (p: KidzzPlaylist) => {
     haptic("light");
     sfx("click");
-    setActive(p);
+    setActive({
+      title: p.title,
+      emoji: p.emoji,
+      spotifyId: p.spotifyId,
+      gradient: p.gradient,
+      glow: p.glow,
+      subtitle: p.emotionalLine,
+    });
+  };
+
+  const openAge = (p: AgePlaylist) => {
+    haptic("light");
+    sfx("click");
+    setActive({
+      title: p.title,
+      emoji: p.emoji,
+      spotifyId: p.spotifyId,
+      gradient: p.gradient,
+      glow: p.glow,
+      subtitle: `${p.ageRange} · ${p.badge}`,
+    });
   };
 
   return (
@@ -263,24 +295,18 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-32 pt-2 relative z-10"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
-        {/* Hero emocional */}
+        {/* Hero — Camaleão Dourado com headphones */}
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mt-1 mb-5 text-center"
+          className="mt-1 mb-4 flex flex-col items-center text-center"
         >
-          <motion.div
-            className="inline-block text-5xl drop-shadow-[0_0_18px_rgba(255,214,107,0.55)]"
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            🦎
-          </motion.div>
-          <h2 className="mt-2 text-white font-black text-2xl tracking-tight leading-tight">
+          <KidzzChameleon state="music" mood="happy" size="lg" interactive showParticles />
+          <h2 className="mt-2 text-white font-black text-2xl tracking-tight leading-tight drop-shadow">
             Momentos que ficam.
           </h2>
-          <p className="mt-1 text-white/75 text-sm font-medium max-w-xs mx-auto">
+          <p className="mt-1 text-white/75 text-sm font-medium max-w-xs">
             Transformando minutos em memórias através da música.
           </p>
         </motion.section>
@@ -288,7 +314,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         {/* Featured */}
         <FeaturedCard playlist={weekly} onOpen={() => open(weekly)} />
 
-        {/* Lista */}
+        {/* Lista por momento */}
         <div className="mt-5 mb-2 flex items-center justify-between px-0.5">
           <h3 className="text-white font-black text-sm">Para cada momento</h3>
           <span className="text-white/50 text-[10px] font-bold uppercase tracking-wider">
@@ -298,6 +324,57 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         <div className="grid grid-cols-2 gap-3">
           {others.map((p, i) => (
             <PlaylistCard key={p.id} playlist={p} onOpen={() => open(p)} index={i} />
+          ))}
+        </div>
+
+        {/* Playlists por idade */}
+        <div className="mt-7 mb-2 flex items-center justify-between px-0.5">
+          <div>
+            <h3 className="text-white font-black text-sm">Por idade</h3>
+            <p className="text-white/55 text-[11px] font-semibold">A música certa para cada fase</p>
+          </div>
+          <span className="text-white/50 text-[10px] font-bold uppercase tracking-wider">Spotify</span>
+        </div>
+        <div
+          className="flex gap-3 overflow-x-auto overflow-y-hidden pb-2 -mx-4 px-4 snap-x snap-mandatory"
+          style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}
+        >
+          {AGE_PLAYLISTS.map((p, i) => (
+            <motion.button
+              key={p.id}
+              onClick={() => openAge(p)}
+              whileTap={{ scale: 0.97 }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.05 * i }}
+              className={`snap-start flex-shrink-0 text-left rounded-3xl overflow-hidden bg-gradient-to-br ${p.gradient} p-4 relative`}
+              style={{
+                width: 210,
+                boxShadow: `0 14px 34px -16px ${p.glow}90, inset 0 1px 0 rgba(255,255,255,0.15)`,
+              }}
+            >
+              <FloatingParticles color={p.glow} />
+              <div className="relative z-10 flex items-center justify-between mb-2">
+                <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white/85 text-gray-800 uppercase tracking-wider">
+                  {p.ageRange}
+                </span>
+                <span className="text-2xl">{p.emoji}</span>
+              </div>
+              <p className="relative z-10 text-white text-base font-black leading-tight drop-shadow">
+                {p.title}
+              </p>
+              <p className="relative z-10 text-white/85 text-[11px] font-semibold mt-1 leading-snug line-clamp-2">
+                {p.description}
+              </p>
+              <div className="relative z-10 mt-3 flex items-center justify-between gap-2">
+                <span className="text-white/85 text-[10px] font-bold flex items-center gap-1">
+                  <ListMusic size={10} /> {p.approxTracks} · <Clock size={10} /> {p.approxMinutes}m
+                </span>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-white text-gray-900 flex items-center gap-1">
+                  <Music2 size={10} /> Ouvir
+                </span>
+              </div>
+            </motion.button>
           ))}
         </div>
 
