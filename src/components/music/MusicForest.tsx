@@ -267,8 +267,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
             </motion.button>
           )}
 
-          {/* 🎵 Playlists por idade — scroll horizontal */}
-          <AgePlaylistsSection />
+          {/* Playlists por idade movidas para a aba Momentos */}
+
 
           <p className="text-center text-gray-700/80 text-[10px] font-semibold pb-4 drop-shadow-sm">
             🍃 Mais maravilhas em breve
