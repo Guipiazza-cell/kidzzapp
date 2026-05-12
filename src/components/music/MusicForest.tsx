@@ -142,7 +142,13 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-4"
+          style={{
+            WebkitOverflowScrolling: "touch",
+            paddingBottom: "calc(110px + env(safe-area-inset-bottom, 0px))",
+          }}
+        >
           {/* KIDZZ HERO — amarelo dominante (Music Soul), interface orbita */}
           <div className="flex flex-col items-center justify-center pt-2">
             <motion.div
