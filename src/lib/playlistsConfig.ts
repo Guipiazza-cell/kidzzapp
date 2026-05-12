@@ -116,3 +116,73 @@ export const getSpotifyEmbedUrl = (spotifyId: string) =>
 
 export const getSpotifyOpenUrl = (spotifyId: string) =>
   `https://open.spotify.com/playlist/${spotifyId}`;
+
+/* ─── Playlists por idade (Momentos) ─── */
+export interface AgePlaylist {
+  id: string;
+  ageRange: string;
+  title: string;
+  emoji: string;
+  badge: string;
+  description: string;
+  spotifyId: string;
+  glow: string;
+  gradient: string;
+  approxTracks?: number;
+  approxMinutes?: number;
+}
+
+export const AGE_PLAYLISTS: AgePlaylist[] = [
+  {
+    id: "babies",
+    ageRange: "0 a 2 anos",
+    title: "Acalanto do Kidzz",
+    emoji: "🍼",
+    badge: "Sono & Calma",
+    description: "Canções de ninar e sons suaves para os primeiros anos.",
+    spotifyId: "37i9dQZF1DWZd79rJ6a7lp",
+    glow: "#FFB3CE",
+    gradient: "from-[#fff0f5] via-[#ffd6e7] to-[#ffb3ce]",
+    approxTracks: 30,
+    approxMinutes: 75,
+  },
+  {
+    id: "early",
+    ageRange: "3 a 5 anos",
+    title: "Mundo Mágico",
+    emoji: "🌈",
+    badge: "Aprender Brincando",
+    description: "Músicas que ensinam cores, números e emoções.",
+    spotifyId: "37i9dQZF1DX8C9xQcOrE6T",
+    glow: "#7BC5FF",
+    gradient: "from-[#dff1ff] via-[#9ed3ff] to-[#5ab1ff]",
+    approxTracks: 50,
+    approxMinutes: 120,
+  },
+  {
+    id: "preschool",
+    ageRange: "6 a 8 anos",
+    title: "Aventuras Sonoras",
+    emoji: "🚀",
+    badge: "Curiosidade & Criatividade",
+    description: "Despertam curiosidade sobre o mundo e a ciência.",
+    spotifyId: "37i9dQZF1DX1MUPbVKMgJE",
+    glow: "#C58AFF",
+    gradient: "from-[#efe3ff] via-[#c9a8ff] to-[#8b5cf6]",
+    approxTracks: 40,
+    approxMinutes: 105,
+  },
+  {
+    id: "kids",
+    ageRange: "9 a 12 anos",
+    title: "Minha Trilha",
+    emoji: "🎸",
+    badge: "Identidade & Expressão",
+    description: "Músicas sobre quem você é e o que sente.",
+    spotifyId: "37i9dQZF1DX1H4LbvY4OJi",
+    glow: "#FFD66B",
+    gradient: "from-[#fff5d6] via-[#ffd66b] to-[#e8a020]",
+    approxTracks: 45,
+    approxMinutes: 130,
+  },
+];
