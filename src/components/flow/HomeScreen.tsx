@@ -449,13 +449,13 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             </motion.div>
 
             <div className="relative flex-1 min-w-0">
-              <p className="text-[9px] font-black uppercase tracking-wider text-amber-200 mb-0.5">
+              <p className="text-[9px] font-black uppercase tracking-wider text-amber-200 mb-0.5 break-words">
                 ⭐ Aventura sonora
               </p>
-              <h3 className="text-sm font-black text-white leading-tight">
+              <h3 className="text-sm font-black text-white leading-tight break-words">
                 Modo Viagem
               </h3>
-              <p className="text-[11px] font-semibold text-white/85 leading-tight mt-0.5">
+              <p className="text-[11px] font-semibold text-white/85 leading-tight mt-0.5 break-words">
                 Explore o mundo com o KIDZZ →
               </p>
             </div>
