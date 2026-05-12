@@ -1,15 +1,18 @@
-import { useState, lazy, Suspense } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ExternalLink, Music2, Sparkles, Clock, ListMusic, X } from "lucide-react";
 import {
   PLAYLISTS,
+  AGE_PLAYLISTS,
   getWeeklyPlaylist,
   getSpotifyEmbedUrl,
   getSpotifyOpenUrl,
   type KidzzPlaylist,
+  type AgePlaylist,
 } from "@/lib/playlistsConfig";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 
 interface Props {
   onBack: () => void;
