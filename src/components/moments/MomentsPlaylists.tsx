@@ -90,7 +90,7 @@ const PlayerSheet = ({
             <span className="text-2xl">{playlist.emoji}</span>
             <div>
               <h3 className="font-black text-base leading-tight">{playlist.title}</h3>
-              <p className="text-[11px] opacity-80 font-medium">{playlist.emotionalLine}</p>
+              <p className="text-[11px] opacity-80 font-medium">{playlist.subtitle}</p>
             </div>
           </div>
           <button
