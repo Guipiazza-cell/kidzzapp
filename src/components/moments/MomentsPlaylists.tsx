@@ -353,10 +353,9 @@ const MomentsPlaylists = ({ onBack }: Props) => {
 
   const filtered = useMemo(() => {
     return PLAYLISTS.filter((p) => {
-      if (age === "2-4" && !(p.idadeMin <= 4 && p.idadeMax >= 2 && p.idadeMin <= 4)) return false;
-      if (age === "2-4" && (p.idadeMin > 4)) return false;
+      if (age === "2-4" && !(p.idadeMin <= 4 && p.idadeMax >= 2)) return false;
       if (age === "5-7" && !(p.idadeMin <= 7 && p.idadeMax >= 5)) return false;
-      if (age === "8-10" && !(p.idadeMax >= 8)) return false;
+      if (age === "8-10" && !(p.idadeMin <= 10 && p.idadeMax >= 8)) return false;
       if (lang !== "all" && p.idioma !== lang) return false;
       if (cat !== "all" && p.categoria !== cat) return false;
       if (mood !== "all" && p.mood !== mood) return false;
