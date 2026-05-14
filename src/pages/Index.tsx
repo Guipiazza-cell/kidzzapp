@@ -111,6 +111,7 @@ const Index = () => {
       import("@/components/music/MusicForest");
       import("@/components/lab/KidzzLab");
       import("@/components/travel/TravelMode");
+      import("@/components/cinema/FamilyCinema");
     });
     return () => {
       if ((window as any).cancelIdleCallback && typeof handle === "number") {
