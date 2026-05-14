@@ -27,6 +27,7 @@ const KidzzPlay = lazy(() => import("@/components/play/KidzzPlay"));
 const RoutineScreen = lazy(() => import("@/components/routine/RoutineScreen"));
 const MomentsFactory = lazy(() => import("@/components/moments/MomentsFactory"));
 const MomentsPlaylists = lazy(() => import("@/components/moments/MomentsPlaylists"));
+const FamilyCinema = lazy(() => import("@/components/cinema/FamilyCinema"));
 const TravelMode = lazy(() => import("@/components/travel/TravelMode"));
 const MusicForest = lazy(() => import("@/components/music/MusicForest"));
 import Paywall from "@/components/Paywall";
@@ -110,6 +111,7 @@ const Index = () => {
       import("@/components/music/MusicForest");
       import("@/components/lab/KidzzLab");
       import("@/components/travel/TravelMode");
+      import("@/components/cinema/FamilyCinema");
     });
     return () => {
       if ((window as any).cancelIdleCallback && typeof handle === "number") {
@@ -333,6 +335,9 @@ const Index = () => {
     }
     if (activeTab === "moments") {
       return <MomentsPlaylists key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
+    }
+    if (activeTab === "cinema") {
+      return <FamilyCinema key="cinema" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "achievements") {
       // Conquistas vivem como subaba dentro de Memórias
