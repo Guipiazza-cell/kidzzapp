@@ -7,7 +7,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Moon, Play, Lock, Crown, Timer, BookOpen, Music, ChevronRight,
-  Volume2, Headphones, Wind, Sparkles, Heart, Disc3, Sun, MoonStar,
+  Volume2, Headphones, Wind, Heart, Disc3, Sun, MoonStar,
   X, ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
