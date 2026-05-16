@@ -369,10 +369,9 @@ const DreamWorld = ({ onBack }: Props) => {
             <Headphones size={16} />
             {isNarrating ? "Parar narração" : "Ouvir história"}
             {isNarrating && (
-              <motion.span
+              <span
                 className="w-2 h-2 rounded-full bg-amber-300 ml-1"
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 1.2, repeat: Infinity }}
+                style={{ boxShadow: "0 0 8px rgba(255,220,140,0.6)" }}
               />
             )}
           </motion.button>
@@ -428,8 +427,8 @@ const DreamWorld = ({ onBack }: Props) => {
               background: "radial-gradient(circle at 35% 35%, #fff8e0, #f5d97a 60%, #b88a3a 100%)",
               boxShadow: `0 0 ${60 * moonScale}px ${20 * moonScale}px rgba(255,220,140,${0.4 * moonScale})`,
             }}
-            animate={{ scale: [moonScale, moonScale * 1.04, moonScale], opacity: [0.85, 1, 0.85] }}
-            transition={{ duration: 4, repeat: Infinity }}
+            animate={{ scale: moonScale }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
           />
           <p className="text-amber-200/60 text-xs font-bold tracking-[0.25em] uppercase">
             Noite tranquila
@@ -438,13 +437,9 @@ const DreamWorld = ({ onBack }: Props) => {
             {timerMinutes === 0 ? "∞" : formatTime(timeLeft)}
           </div>
           {isNarrating && (
-            <motion.p
-              className="text-amber-100/65 text-xs flex items-center justify-center gap-2"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <p className="text-amber-100/65 text-xs flex items-center justify-center gap-2">
               <Headphones size={12} /> Narrando história…
-            </motion.p>
+            </p>
           )}
           {Object.keys(activeSounds).length > 0 && (
             <div className="flex gap-2 justify-center flex-wrap">
@@ -913,11 +908,9 @@ const DreamWorld = ({ onBack }: Props) => {
                     {sound.label}
                   </span>
                   {isActive && (
-                    <motion.div
+                    <span
                       className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-300"
                       style={{ boxShadow: "0 0 10px rgba(255,220,140,0.7)" }}
-                      animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
                     />
                   )}
                 </motion.button>
@@ -979,14 +972,13 @@ const DreamWorld = ({ onBack }: Props) => {
                   }}
                   className="shrink-0 w-[180px] snap-start text-left overflow-hidden relative"
                   style={glassCardStyle}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
                   <div className={`relative h-32 bg-gradient-to-br ${pl.gradient}`}>
-                    <motion.div
+                    <div
                       className="absolute inset-0"
                       style={{ background: `radial-gradient(circle at 50% 50%, ${pl.glow}55, transparent 70%)` }}
-                      animate={{ opacity: [0.5, 0.85, 0.5] }}
-                      transition={{ duration: 4, repeat: Infinity }}
                     />
                     <span className="absolute top-3 left-3 text-3xl drop-shadow-lg">{pl.emoji}</span>
                     {locked && (
