@@ -8,8 +8,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Moon, Play, Lock, Crown, Timer, BookOpen, Music, ChevronRight,
   Volume2, Headphones, Wind, Heart, Disc3, Sun, MoonStar,
-  X, ExternalLink,
+  X, ExternalLink, Sparkles,
 } from "lucide-react";
+
+/* Spring premium reusável para microinterações */
+const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
+const cardTap = { scale: 0.975 };
 import { useAuth } from "@/contexts/AuthContext";
 import { Slider } from "@/components/ui/slider";
 import { AmbientSoundEngine } from "./AmbientSoundEngine";
@@ -38,27 +42,16 @@ const PHASE_BG: Record<TimePhase, string> = {
 };
 
 const CinematicBackdrop = ({ phase, sleepy }: { phase: TimePhase; sleepy: boolean }) => {
-  // estrelas e partículas memoizadas para evitar re-render aleatório
+  // estrelas estáticas memoizadas — sem cintilar
   const stars = useMemo(
     () =>
-      Array.from({ length: phase === "night" ? 36 : 14 }).map(() => ({
+      Array.from({ length: phase === "night" ? 32 : 12 }).map(() => ({
         size: Math.random() * 2 + 1,
         left: Math.random() * 100,
         top: Math.random() * 75,
-        dur: 3 + Math.random() * 4,
-        delay: Math.random() * 3,
+        opacity: 0.35 + Math.random() * 0.45,
       })),
     [phase],
-  );
-  const motes = useMemo(
-    () =>
-      Array.from({ length: 10 }).map(() => ({
-        left: Math.random() * 100,
-        top: 55 + Math.random() * 40,
-        dur: 9 + Math.random() * 7,
-        delay: Math.random() * 5,
-      })),
-    [],
   );
 
   return (
@@ -69,19 +62,18 @@ const CinematicBackdrop = ({ phase, sleepy }: { phase: TimePhase; sleepy: boolea
         filter: sleepy ? "brightness(0.5) saturate(0.75)" : "brightness(1) saturate(1)",
       }}
     >
-      {/* Aurora cinematográfica respirando */}
-      <motion.div
+      {/* Aurora cinematográfica estática */}
+      <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(70% 45% at 22% 22%, rgba(165,140,255,0.32), transparent 70%), radial-gradient(55% 38% at 82% 68%, rgba(255,200,120,0.22), transparent 72%), radial-gradient(50% 34% at 48% 98%, rgba(120,140,255,0.26), transparent 72%)",
+            "radial-gradient(70% 45% at 22% 22%, rgba(165,140,255,0.28), transparent 70%), radial-gradient(55% 38% at 82% 68%, rgba(255,200,120,0.20), transparent 72%), radial-gradient(50% 34% at 48% 98%, rgba(120,140,255,0.22), transparent 72%)",
+          opacity: 0.75,
         }}
-        animate={{ opacity: [0.55, 0.85, 0.55] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Faixa de luz volumétrica diagonal */}
-      <motion.div
+      {/* Faixa de luz volumétrica diagonal — estática */}
+      <div
         className="absolute -top-1/4 -left-1/4 w-[150%] h-[60%] pointer-events-none"
         style={{
           background:
@@ -89,40 +81,34 @@ const CinematicBackdrop = ({ phase, sleepy }: { phase: TimePhase; sleepy: boolea
           filter: "blur(40px)",
           transform: "rotate(-8deg)",
         }}
-        animate={{ x: ["-4%", "4%", "-4%"] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Lua à direita (modo noite) com halo orgânico respirando */}
+      {/* Lua à direita (modo noite) — sem pulsar */}
       {phase === "night" && (
         <>
-          <motion.div
+          <div
             className="absolute top-[6%] right-[8%] w-40 h-40 rounded-full pointer-events-none"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,220,140,0.28) 0%, rgba(255,210,120,0.12) 45%, transparent 75%)",
+                "radial-gradient(circle, rgba(255,220,140,0.26) 0%, rgba(255,210,120,0.12) 45%, transparent 75%)",
               filter: "blur(6px)",
             }}
-            animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0.9, 0.6] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           />
-          <motion.div
+          <div
             className="absolute top-[8%] right-[10%] w-24 h-24 rounded-full"
             style={{
               background:
                 "radial-gradient(circle at 35% 35%, #fff8e0, #f5d97a 60%, #b88a3a 100%)",
               boxShadow:
-                "0 0 60px 20px rgba(255,220,140,0.35), inset -8px -8px 18px rgba(120,80,30,0.4)",
+                "0 0 60px 20px rgba(255,220,140,0.32), inset -8px -8px 18px rgba(120,80,30,0.4)",
             }}
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
         </>
       )}
 
-      {/* Sol/halo manhã/tarde */}
+      {/* Sol/halo manhã/tarde — sem pulsar */}
       {phase !== "night" && (
-        <motion.div
+        <div
           className="absolute top-[6%] right-[12%] w-28 h-28 rounded-full"
           style={{
             background:
@@ -131,14 +117,12 @@ const CinematicBackdrop = ({ phase, sleepy }: { phase: TimePhase; sleepy: boolea
                 : "radial-gradient(circle, #ffd58a, #ff8a4a 60%, transparent 80%)",
             filter: "blur(2px)",
           }}
-          animate={{ scale: [1, 1.06, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
 
-      {/* Estrelas cintilantes */}
+      {/* Estrelas estáticas (brilho fixo) */}
       {stars.map((s, i) => (
-        <motion.div
+        <div
           key={i}
           className="absolute rounded-full bg-white"
           style={{
@@ -146,40 +130,19 @@ const CinematicBackdrop = ({ phase, sleepy }: { phase: TimePhase; sleepy: boolea
             height: s.size,
             left: `${s.left}%`,
             top: `${s.top}%`,
-            boxShadow: `0 0 ${s.size * 3}px rgba(255,255,255,0.8)`,
+            opacity: s.opacity,
+            boxShadow: `0 0 ${s.size * 2.5}px rgba(255,255,255,0.55)`,
           }}
-          animate={{ opacity: [0.15, 0.95, 0.15] }}
-          transition={{ duration: s.dur, repeat: Infinity, delay: s.delay }}
         />
       ))}
 
-      {/* Partículas douradas flutuando */}
-      {motes.map((m, i) => (
-        <motion.div
-          key={`p-${i}`}
-          className="absolute rounded-full"
-          style={{
-            width: 3,
-            height: 3,
-            left: `${m.left}%`,
-            top: `${m.top}%`,
-            background: "rgba(255,220,140,0.55)",
-            boxShadow: "0 0 12px rgba(255,200,120,0.65)",
-          }}
-          animate={{ y: [-5, -50, -5], opacity: [0.15, 0.85, 0.15] }}
-          transition={{ duration: m.dur, repeat: Infinity, delay: m.delay }}
-        />
-      ))}
-
-      {/* Névoa volumétrica suave (parte inferior) */}
-      <motion.div
+      {/* Névoa volumétrica suave (parte inferior) — estática */}
+      <div
         className="absolute bottom-0 left-0 right-0 h-2/5 pointer-events-none"
         style={{
           background:
             "linear-gradient(180deg, transparent, rgba(20,15,40,0.45) 55%, rgba(8,6,20,0.75))",
         }}
-        animate={{ opacity: [0.85, 1, 0.85] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Vinheta cinematográfica nas bordas */}
@@ -406,10 +369,9 @@ const DreamWorld = ({ onBack }: Props) => {
             <Headphones size={16} />
             {isNarrating ? "Parar narração" : "Ouvir história"}
             {isNarrating && (
-              <motion.span
+              <span
                 className="w-2 h-2 rounded-full bg-amber-300 ml-1"
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 1.2, repeat: Infinity }}
+                style={{ boxShadow: "0 0 8px rgba(255,220,140,0.6)" }}
               />
             )}
           </motion.button>
@@ -465,8 +427,8 @@ const DreamWorld = ({ onBack }: Props) => {
               background: "radial-gradient(circle at 35% 35%, #fff8e0, #f5d97a 60%, #b88a3a 100%)",
               boxShadow: `0 0 ${60 * moonScale}px ${20 * moonScale}px rgba(255,220,140,${0.4 * moonScale})`,
             }}
-            animate={{ scale: [moonScale, moonScale * 1.04, moonScale], opacity: [0.85, 1, 0.85] }}
-            transition={{ duration: 4, repeat: Infinity }}
+            animate={{ scale: moonScale }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
           />
           <p className="text-amber-200/60 text-xs font-bold tracking-[0.25em] uppercase">
             Noite tranquila
@@ -475,13 +437,9 @@ const DreamWorld = ({ onBack }: Props) => {
             {timerMinutes === 0 ? "∞" : formatTime(timeLeft)}
           </div>
           {isNarrating && (
-            <motion.p
-              className="text-amber-100/65 text-xs flex items-center justify-center gap-2"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <p className="text-amber-100/65 text-xs flex items-center justify-center gap-2">
               <Headphones size={12} /> Narrando história…
-            </motion.p>
+            </p>
           )}
           {Object.keys(activeSounds).length > 0 && (
             <div className="flex gap-2 justify-center flex-wrap">
@@ -622,6 +580,34 @@ const DreamWorld = ({ onBack }: Props) => {
           const sound = playableSounds[dayIndex % playableSounds.length];
           const playlist = SLEEP_PLAYLISTS[dayIndex % SLEEP_PLAYLISTS.length];
           const moment = FAMILY_MOMENTS[dayIndex % FAMILY_MOMENTS.length];
+          const playMagicSequence = async () => {
+            haptic("medium");
+            const soundFree = canAccess(sound.free);
+            const playlistAllowed = canAccess(false) || playlist.id === "babies";
+            const storyAllowed = canAccess(story.free);
+            // 1. ambient sound (se permitido)
+            if (soundFree && sound.url) {
+              const engine = engineRef.current;
+              if (engine && activeSounds[sound.id] === undefined) {
+                const ok = await engine.start(sound.id, sound.url, 0.4);
+                if (ok) setActiveSounds({ [sound.id]: 0.4 });
+              }
+            }
+            // 2. narrate story
+            if (storyAllowed) {
+              setSelectedStory(story.id);
+              setIsNarrating(true);
+              narratorRef.current?.speak(story.text, () => {
+                setIsNarrating(false);
+                // 3. abrir playlist quando a história terminar
+                if (playlistAllowed) setOpenPlaylist(playlist.id);
+              });
+            } else if (playlistAllowed) {
+              setOpenPlaylist(playlist.id);
+            } else {
+              triggerPaywall("Sequência mágica completa no plano Premium.");
+            }
+          };
           return (
             <section>
               <SectionTitle
@@ -630,6 +616,24 @@ const DreamWorld = ({ onBack }: Props) => {
                 title="A noite já está preparada"
                 subtitle="Curadoria automática para esse fim de dia."
               />
+
+              {/* ✨ Sequência mágica — toca história, som e playlist em sequência */}
+              <motion.button
+                onClick={playMagicSequence}
+                className="w-full mb-3 px-4 py-3.5 rounded-2xl font-bold text-[14px] text-white flex items-center justify-center gap-2 relative overflow-hidden"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(180,140,255,0.32) 0%, rgba(255,200,120,0.28) 100%)",
+                  border: "1px solid rgba(255,220,140,0.35)",
+                  boxShadow: "0 8px 28px -8px rgba(180,140,255,0.45)",
+                }}
+                whileTap={cardTap}
+                transition={tapSpring}
+              >
+                <Sparkles size={16} className="text-amber-200" />
+                Reproduzir sequência mágica
+              </motion.button>
+
               <div className="grid grid-cols-2 gap-2.5">
                 <motion.button
                   onClick={() => {
@@ -648,16 +652,15 @@ const DreamWorld = ({ onBack }: Props) => {
                       "linear-gradient(135deg, rgba(180,140,255,0.18) 0%, rgba(255,210,120,0.10) 100%)",
                     border: "1px solid rgba(255,210,120,0.22)",
                   }}
-                  whileTap={{ scale: 0.985 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
-                  <motion.div
+                  <div
                     className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
                     style={{
-                      background: "radial-gradient(circle, rgba(255,220,140,0.35), transparent 70%)",
+                      background: "radial-gradient(circle, rgba(255,220,140,0.32), transparent 70%)",
                       filter: "blur(8px)",
                     }}
-                    animate={{ opacity: [0.55, 0.95, 0.55] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200/75">
                     História da noite
@@ -678,7 +681,8 @@ const DreamWorld = ({ onBack }: Props) => {
                   onClick={() => toggleSound(sound.id, sound.free)}
                   className="p-4 text-left flex flex-col gap-1.5"
                   style={glassCardStyle}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-200/70">
                     Som ideal
@@ -698,15 +702,14 @@ const DreamWorld = ({ onBack }: Props) => {
                   }}
                   className="p-4 text-left flex flex-col gap-1.5 relative overflow-hidden"
                   style={glassCardStyle}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
-                  <motion.div
+                  <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                      background: `radial-gradient(circle at 80% 20%, ${playlist.glow}33, transparent 65%)`,
+                      background: `radial-gradient(circle at 80% 20%, ${playlist.glow}2e, transparent 65%)`,
                     }}
-                    animate={{ opacity: [0.4, 0.85, 0.4] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: playlist.glow }}>
                     Playlist da noite
@@ -722,7 +725,8 @@ const DreamWorld = ({ onBack }: Props) => {
                     ...glassCardStyle,
                     background: "rgba(255,255,255,0.04)",
                   }}
-                  whileTap={{ scale: 0.985 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-pink-200/70">
                     Pergunta da noite
@@ -904,11 +908,9 @@ const DreamWorld = ({ onBack }: Props) => {
                     {sound.label}
                   </span>
                   {isActive && (
-                    <motion.div
+                    <span
                       className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-300"
                       style={{ boxShadow: "0 0 10px rgba(255,220,140,0.7)" }}
-                      animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
                     />
                   )}
                 </motion.button>
@@ -970,14 +972,13 @@ const DreamWorld = ({ onBack }: Props) => {
                   }}
                   className="shrink-0 w-[180px] snap-start text-left overflow-hidden relative"
                   style={glassCardStyle}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
                   <div className={`relative h-32 bg-gradient-to-br ${pl.gradient}`}>
-                    <motion.div
+                    <div
                       className="absolute inset-0"
                       style={{ background: `radial-gradient(circle at 50% 50%, ${pl.glow}55, transparent 70%)` }}
-                      animate={{ opacity: [0.5, 0.85, 0.5] }}
-                      transition={{ duration: 4, repeat: Infinity }}
                     />
                     <span className="absolute top-3 left-3 text-3xl drop-shadow-lg">{pl.emoji}</span>
                     {locked && (
