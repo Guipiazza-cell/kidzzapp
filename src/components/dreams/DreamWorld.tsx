@@ -614,6 +614,129 @@ const DreamWorld = ({ onBack }: Props) => {
           </motion.button>
         </div>
 
+        {/* HOJE PARA SUA FAMÍLIA — curadoria automática */}
+        {(() => {
+          const dayIndex = Math.floor(Date.now() / 86_400_000);
+          const story = SLEEP_STORIES[dayIndex % SLEEP_STORIES.length];
+          const playableSounds = SOUND_PRESETS.filter((s) => !!s.url);
+          const sound = playableSounds[dayIndex % playableSounds.length];
+          const playlist = SLEEP_PLAYLISTS[dayIndex % SLEEP_PLAYLISTS.length];
+          const moment = FAMILY_MOMENTS[dayIndex % FAMILY_MOMENTS.length];
+          return (
+            <section>
+              <SectionTitle
+                icon={<MoonStar size={11} />}
+                eyebrow="Hoje para sua família"
+                title="A noite já está preparada"
+                subtitle="Curadoria automática para esse fim de dia."
+              />
+              <div className="grid grid-cols-2 gap-2.5">
+                <motion.button
+                  onClick={() => {
+                    if (!canAccess(story.free)) {
+                      triggerPaywall(`"${story.title}" está esperando por ${childName}.`);
+                      return;
+                    }
+                    setSelectedStory(story.id);
+                    setView("story");
+                    haptic("light");
+                  }}
+                  className="p-4 text-left flex flex-col gap-1.5 col-span-2 relative overflow-hidden"
+                  style={{
+                    ...glassCardStyle,
+                    background:
+                      "linear-gradient(135deg, rgba(180,140,255,0.18) 0%, rgba(255,210,120,0.10) 100%)",
+                    border: "1px solid rgba(255,210,120,0.22)",
+                  }}
+                  whileTap={{ scale: 0.985 }}
+                >
+                  <motion.div
+                    className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
+                    style={{
+                      background: "radial-gradient(circle, rgba(255,220,140,0.35), transparent 70%)",
+                      filter: "blur(8px)",
+                    }}
+                    animate={{ opacity: [0.55, 0.95, 0.55] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200/75">
+                    História da noite
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{story.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[15px] font-bold text-white truncate">{story.title}</p>
+                      <p className="text-[11px] text-white/55">
+                        {story.duration} · {story.ageRange ?? "Família"}
+                      </p>
+                    </div>
+                    <ChevronRight size={16} className="text-white/35" />
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => toggleSound(sound.id, sound.free)}
+                  className="p-4 text-left flex flex-col gap-1.5"
+                  style={glassCardStyle}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-200/70">
+                    Som ideal
+                  </p>
+                  <span className="text-2xl">{sound.emoji}</span>
+                  <p className="text-[13px] font-bold text-white leading-tight">{sound.label}</p>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => {
+                    if (!canAccess(false) && playlist.id !== "babies") {
+                      triggerPaywall("Playlists premium para todas as idades.");
+                      return;
+                    }
+                    setOpenPlaylist(playlist.id);
+                    haptic("light");
+                  }}
+                  className="p-4 text-left flex flex-col gap-1.5 relative overflow-hidden"
+                  style={glassCardStyle}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(circle at 80% 20%, ${playlist.glow}33, transparent 65%)`,
+                    }}
+                    animate={{ opacity: [0.4, 0.85, 0.4] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: playlist.glow }}>
+                    Playlist da noite
+                  </p>
+                  <span className="text-2xl">{playlist.emoji}</span>
+                  <p className="text-[13px] font-bold text-white leading-tight">{playlist.title}</p>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => { setOpenMoment(moment.id); haptic("light"); }}
+                  className="p-4 text-left flex flex-col gap-1.5 col-span-2"
+                  style={{
+                    ...glassCardStyle,
+                    background: "rgba(255,255,255,0.04)",
+                  }}
+                  whileTap={{ scale: 0.985 }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-pink-200/70">
+                    Pergunta da noite
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{moment.emoji}</span>
+                    <p className="text-[13px] text-white/85 leading-snug flex-1">"{moment.prompt}"</p>
+                  </div>
+                </motion.button>
+              </div>
+            </section>
+          );
+        })()}
+
         {/* TIMER DO SONINHO */}
         <section>
           <SectionTitle
