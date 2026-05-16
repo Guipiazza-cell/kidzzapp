@@ -585,6 +585,34 @@ const DreamWorld = ({ onBack }: Props) => {
           const sound = playableSounds[dayIndex % playableSounds.length];
           const playlist = SLEEP_PLAYLISTS[dayIndex % SLEEP_PLAYLISTS.length];
           const moment = FAMILY_MOMENTS[dayIndex % FAMILY_MOMENTS.length];
+          const playMagicSequence = async () => {
+            haptic("medium");
+            const soundFree = canAccess(sound.free);
+            const playlistAllowed = canAccess(false) || playlist.id === "babies";
+            const storyAllowed = canAccess(story.free);
+            // 1. ambient sound (se permitido)
+            if (soundFree && sound.url) {
+              const engine = engineRef.current;
+              if (engine && activeSounds[sound.id] === undefined) {
+                const ok = await engine.start(sound.id, sound.url, 0.4);
+                if (ok) setActiveSounds({ [sound.id]: 0.4 });
+              }
+            }
+            // 2. narrate story
+            if (storyAllowed) {
+              setSelectedStory(story.id);
+              setIsNarrating(true);
+              narratorRef.current?.speak(story.text, () => {
+                setIsNarrating(false);
+                // 3. abrir playlist quando a história terminar
+                if (playlistAllowed) setOpenPlaylist(playlist.id);
+              });
+            } else if (playlistAllowed) {
+              setOpenPlaylist(playlist.id);
+            } else {
+              triggerPaywall("Sequência mágica completa no plano Premium.");
+            }
+          };
           return (
             <section>
               <SectionTitle
@@ -593,6 +621,24 @@ const DreamWorld = ({ onBack }: Props) => {
                 title="A noite já está preparada"
                 subtitle="Curadoria automática para esse fim de dia."
               />
+
+              {/* ✨ Sequência mágica — toca história, som e playlist em sequência */}
+              <motion.button
+                onClick={playMagicSequence}
+                className="w-full mb-3 px-4 py-3.5 rounded-2xl font-bold text-[14px] text-white flex items-center justify-center gap-2 relative overflow-hidden"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(180,140,255,0.32) 0%, rgba(255,200,120,0.28) 100%)",
+                  border: "1px solid rgba(255,220,140,0.35)",
+                  boxShadow: "0 8px 28px -8px rgba(180,140,255,0.45)",
+                }}
+                whileTap={cardTap}
+                transition={tapSpring}
+              >
+                <Sparkles size={16} className="text-amber-200" />
+                Reproduzir sequência mágica
+              </motion.button>
+
               <div className="grid grid-cols-2 gap-2.5">
                 <motion.button
                   onClick={() => {
@@ -611,16 +657,15 @@ const DreamWorld = ({ onBack }: Props) => {
                       "linear-gradient(135deg, rgba(180,140,255,0.18) 0%, rgba(255,210,120,0.10) 100%)",
                     border: "1px solid rgba(255,210,120,0.22)",
                   }}
-                  whileTap={{ scale: 0.985 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
-                  <motion.div
+                  <div
                     className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
                     style={{
-                      background: "radial-gradient(circle, rgba(255,220,140,0.35), transparent 70%)",
+                      background: "radial-gradient(circle, rgba(255,220,140,0.32), transparent 70%)",
                       filter: "blur(8px)",
                     }}
-                    animate={{ opacity: [0.55, 0.95, 0.55] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200/75">
                     História da noite
@@ -641,7 +686,8 @@ const DreamWorld = ({ onBack }: Props) => {
                   onClick={() => toggleSound(sound.id, sound.free)}
                   className="p-4 text-left flex flex-col gap-1.5"
                   style={glassCardStyle}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-200/70">
                     Som ideal
@@ -661,15 +707,14 @@ const DreamWorld = ({ onBack }: Props) => {
                   }}
                   className="p-4 text-left flex flex-col gap-1.5 relative overflow-hidden"
                   style={glassCardStyle}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
-                  <motion.div
+                  <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                      background: `radial-gradient(circle at 80% 20%, ${playlist.glow}33, transparent 65%)`,
+                      background: `radial-gradient(circle at 80% 20%, ${playlist.glow}2e, transparent 65%)`,
                     }}
-                    animate={{ opacity: [0.4, 0.85, 0.4] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: playlist.glow }}>
                     Playlist da noite
@@ -685,7 +730,8 @@ const DreamWorld = ({ onBack }: Props) => {
                     ...glassCardStyle,
                     background: "rgba(255,255,255,0.04)",
                   }}
-                  whileTap={{ scale: 0.985 }}
+                  whileTap={cardTap}
+                  transition={tapSpring}
                 >
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-pink-200/70">
                     Pergunta da noite
