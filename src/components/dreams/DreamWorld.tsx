@@ -8,8 +8,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Moon, Play, Lock, Crown, Timer, BookOpen, Music, ChevronRight,
   Volume2, Headphones, Wind, Heart, Disc3, Sun, MoonStar,
-  X, ExternalLink,
+  X, ExternalLink, Sparkles,
 } from "lucide-react";
+
+/* Spring premium reusável para microinterações */
+const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
+const cardTap = { scale: 0.975 };
 import { useAuth } from "@/contexts/AuthContext";
 import { Slider } from "@/components/ui/slider";
 import { AmbientSoundEngine } from "./AmbientSoundEngine";
