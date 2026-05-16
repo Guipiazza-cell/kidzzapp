@@ -37,96 +37,162 @@ const PHASE_BG: Record<TimePhase, string> = {
   night: "linear-gradient(180deg, #07091e 0%, #100a30 45%, #0a0820 100%)",
 };
 
-const CinematicBackdrop = ({ phase, sleepy }: { phase: TimePhase; sleepy: boolean }) => (
-  <div
-    className="fixed inset-0 z-0 pointer-events-none transition-all duration-[2000ms]"
-    style={{
-      background: PHASE_BG[phase],
-      filter: sleepy ? "brightness(0.55) saturate(0.8)" : "brightness(1) saturate(1)",
-    }}
-  >
-    {/* nebulosas/glows */}
+const CinematicBackdrop = ({ phase, sleepy }: { phase: TimePhase; sleepy: boolean }) => {
+  // estrelas e partículas memoizadas para evitar re-render aleatório
+  const stars = useMemo(
+    () =>
+      Array.from({ length: phase === "night" ? 36 : 14 }).map(() => ({
+        size: Math.random() * 2 + 1,
+        left: Math.random() * 100,
+        top: Math.random() * 75,
+        dur: 3 + Math.random() * 4,
+        delay: Math.random() * 3,
+      })),
+    [phase],
+  );
+  const motes = useMemo(
+    () =>
+      Array.from({ length: 10 }).map(() => ({
+        left: Math.random() * 100,
+        top: 55 + Math.random() * 40,
+        dur: 9 + Math.random() * 7,
+        delay: Math.random() * 5,
+      })),
+    [],
+  );
+
+  return (
     <div
-      className="absolute inset-0 opacity-70"
+      className="fixed inset-0 z-0 pointer-events-none transition-all duration-[2000ms] overflow-hidden"
       style={{
-        background:
-          "radial-gradient(60% 40% at 20% 25%, rgba(165,140,255,0.25), transparent 70%), radial-gradient(50% 35% at 80% 70%, rgba(255,200,120,0.18), transparent 70%), radial-gradient(45% 30% at 50% 95%, rgba(120,140,255,0.22), transparent 70%)",
+        background: PHASE_BG[phase],
+        filter: sleepy ? "brightness(0.5) saturate(0.75)" : "brightness(1) saturate(1)",
       }}
-    />
-    {/* Lua à direita (modo noite) */}
-    {phase === "night" && (
+    >
+      {/* Aurora cinematográfica respirando */}
       <motion.div
-        className="absolute top-[8%] right-[10%] w-24 h-24 rounded-full"
+        className="absolute inset-0"
         style={{
-          background: "radial-gradient(circle at 35% 35%, #fff8e0, #f5d97a 60%, #b88a3a 100%)",
-          boxShadow: "0 0 60px 20px rgba(255,220,140,0.35), inset -8px -8px 18px rgba(120,80,30,0.4)",
+          background:
+            "radial-gradient(70% 45% at 22% 22%, rgba(165,140,255,0.32), transparent 70%), radial-gradient(55% 38% at 82% 68%, rgba(255,200,120,0.22), transparent 72%), radial-gradient(50% 34% at 48% 98%, rgba(120,140,255,0.26), transparent 72%)",
         }}
-        animate={{ y: [0, -4, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ opacity: [0.55, 0.85, 0.55] }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
-    )}
-    {/* Sol/halo manhã/tarde */}
-    {phase !== "night" && (
+
+      {/* Faixa de luz volumétrica diagonal */}
       <motion.div
-        className="absolute top-[6%] right-[12%] w-28 h-28 rounded-full"
+        className="absolute -top-1/4 -left-1/4 w-[150%] h-[60%] pointer-events-none"
         style={{
-          background: phase === "morning"
-            ? "radial-gradient(circle, #ffe8c4, #ffc77a 55%, transparent 75%)"
-            : "radial-gradient(circle, #ffd58a, #ff8a4a 60%, transparent 80%)",
-          filter: "blur(2px)",
+          background:
+            "linear-gradient(110deg, transparent 35%, rgba(180,140,255,0.10) 48%, rgba(255,210,140,0.06) 55%, transparent 70%)",
+          filter: "blur(40px)",
+          transform: "rotate(-8deg)",
         }}
-        animate={{ scale: [1, 1.04, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ x: ["-4%", "4%", "-4%"] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
-    )}
-    {/* Estrelas piscantes (sempre, mais densas à noite) */}
-    {Array.from({ length: phase === "night" ? 28 : 12 }).map((_, i) => {
-      const size = Math.random() * 2 + 1;
-      return (
+
+      {/* Lua à direita (modo noite) com halo orgânico respirando */}
+      {phase === "night" && (
+        <>
+          <motion.div
+            className="absolute top-[6%] right-[8%] w-40 h-40 rounded-full pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(255,220,140,0.28) 0%, rgba(255,210,120,0.12) 45%, transparent 75%)",
+              filter: "blur(6px)",
+            }}
+            animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0.9, 0.6] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute top-[8%] right-[10%] w-24 h-24 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle at 35% 35%, #fff8e0, #f5d97a 60%, #b88a3a 100%)",
+              boxShadow:
+                "0 0 60px 20px rgba(255,220,140,0.35), inset -8px -8px 18px rgba(120,80,30,0.4)",
+            }}
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
+
+      {/* Sol/halo manhã/tarde */}
+      {phase !== "night" && (
+        <motion.div
+          className="absolute top-[6%] right-[12%] w-28 h-28 rounded-full"
+          style={{
+            background:
+              phase === "morning"
+                ? "radial-gradient(circle, #ffe8c4, #ffc77a 55%, transparent 75%)"
+                : "radial-gradient(circle, #ffd58a, #ff8a4a 60%, transparent 80%)",
+            filter: "blur(2px)",
+          }}
+          animate={{ scale: [1, 1.06, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+
+      {/* Estrelas cintilantes */}
+      {stars.map((s, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full bg-white"
           style={{
-            width: size,
-            height: size,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 75}%`,
-            boxShadow: `0 0 ${size * 3}px rgba(255,255,255,0.8)`,
+            width: s.size,
+            height: s.size,
+            left: `${s.left}%`,
+            top: `${s.top}%`,
+            boxShadow: `0 0 ${s.size * 3}px rgba(255,255,255,0.8)`,
           }}
-          animate={{ opacity: [0.2, 0.9, 0.2] }}
-          transition={{ duration: 3 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3 }}
+          animate={{ opacity: [0.15, 0.95, 0.15] }}
+          transition={{ duration: s.dur, repeat: Infinity, delay: s.delay }}
         />
-      );
-    })}
-    {/* Partículas douradas flutuando */}
-    {Array.from({ length: 8 }).map((_, i) => (
+      ))}
+
+      {/* Partículas douradas flutuando */}
+      {motes.map((m, i) => (
+        <motion.div
+          key={`p-${i}`}
+          className="absolute rounded-full"
+          style={{
+            width: 3,
+            height: 3,
+            left: `${m.left}%`,
+            top: `${m.top}%`,
+            background: "rgba(255,220,140,0.55)",
+            boxShadow: "0 0 12px rgba(255,200,120,0.65)",
+          }}
+          animate={{ y: [-5, -50, -5], opacity: [0.15, 0.85, 0.15] }}
+          transition={{ duration: m.dur, repeat: Infinity, delay: m.delay }}
+        />
+      ))}
+
+      {/* Névoa volumétrica suave (parte inferior) */}
       <motion.div
-        key={`p-${i}`}
-        className="absolute rounded-full"
+        className="absolute bottom-0 left-0 right-0 h-2/5 pointer-events-none"
         style={{
-          width: 3,
-          height: 3,
-          left: `${Math.random() * 100}%`,
-          top: `${60 + Math.random() * 35}%`,
-          background: "rgba(255,220,140,0.55)",
-          boxShadow: "0 0 10px rgba(255,200,120,0.6)",
+          background:
+            "linear-gradient(180deg, transparent, rgba(20,15,40,0.45) 55%, rgba(8,6,20,0.75))",
         }}
-        animate={{
-          y: [-5, -40, -5],
-          opacity: [0.2, 0.8, 0.2],
-        }}
-        transition={{ duration: 8 + Math.random() * 6, repeat: Infinity, delay: Math.random() * 4 }}
+        animate={{ opacity: [0.85, 1, 0.85] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
-    ))}
-    {/* Neblina suave inferior */}
-    <div
-      className="absolute bottom-0 left-0 right-0 h-1/3"
-      style={{
-        background: "linear-gradient(180deg, transparent, rgba(20,15,40,0.55))",
-      }}
-    />
-  </div>
-);
+
+      {/* Vinheta cinematográfica nas bordas */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0,0,0,0.45) 100%)",
+        }}
+      />
+    </div>
+  );
+};
 
 /* ────────── Premium glass card ────────── */
 const glassCardStyle: React.CSSProperties = {
@@ -547,6 +613,129 @@ const DreamWorld = ({ onBack }: Props) => {
             <p className="text-[11px] text-white/55 leading-snug">Uma pergunta para a noite.</p>
           </motion.button>
         </div>
+
+        {/* HOJE PARA SUA FAMÍLIA — curadoria automática */}
+        {(() => {
+          const dayIndex = Math.floor(Date.now() / 86_400_000);
+          const story = SLEEP_STORIES[dayIndex % SLEEP_STORIES.length];
+          const playableSounds = SOUND_PRESETS.filter((s) => !!s.url);
+          const sound = playableSounds[dayIndex % playableSounds.length];
+          const playlist = SLEEP_PLAYLISTS[dayIndex % SLEEP_PLAYLISTS.length];
+          const moment = FAMILY_MOMENTS[dayIndex % FAMILY_MOMENTS.length];
+          return (
+            <section>
+              <SectionTitle
+                icon={<MoonStar size={11} />}
+                eyebrow="Hoje para sua família"
+                title="A noite já está preparada"
+                subtitle="Curadoria automática para esse fim de dia."
+              />
+              <div className="grid grid-cols-2 gap-2.5">
+                <motion.button
+                  onClick={() => {
+                    if (!canAccess(story.free)) {
+                      triggerPaywall(`"${story.title}" está esperando por ${childName}.`);
+                      return;
+                    }
+                    setSelectedStory(story.id);
+                    setView("story");
+                    haptic("light");
+                  }}
+                  className="p-4 text-left flex flex-col gap-1.5 col-span-2 relative overflow-hidden"
+                  style={{
+                    ...glassCardStyle,
+                    background:
+                      "linear-gradient(135deg, rgba(180,140,255,0.18) 0%, rgba(255,210,120,0.10) 100%)",
+                    border: "1px solid rgba(255,210,120,0.22)",
+                  }}
+                  whileTap={{ scale: 0.985 }}
+                >
+                  <motion.div
+                    className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
+                    style={{
+                      background: "radial-gradient(circle, rgba(255,220,140,0.35), transparent 70%)",
+                      filter: "blur(8px)",
+                    }}
+                    animate={{ opacity: [0.55, 0.95, 0.55] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200/75">
+                    História da noite
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{story.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[15px] font-bold text-white truncate">{story.title}</p>
+                      <p className="text-[11px] text-white/55">
+                        {story.duration} · {story.ageRange ?? "Família"}
+                      </p>
+                    </div>
+                    <ChevronRight size={16} className="text-white/35" />
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => toggleSound(sound.id, sound.free)}
+                  className="p-4 text-left flex flex-col gap-1.5"
+                  style={glassCardStyle}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-200/70">
+                    Som ideal
+                  </p>
+                  <span className="text-2xl">{sound.emoji}</span>
+                  <p className="text-[13px] font-bold text-white leading-tight">{sound.label}</p>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => {
+                    if (!canAccess(false) && playlist.id !== "babies") {
+                      triggerPaywall("Playlists premium para todas as idades.");
+                      return;
+                    }
+                    setOpenPlaylist(playlist.id);
+                    haptic("light");
+                  }}
+                  className="p-4 text-left flex flex-col gap-1.5 relative overflow-hidden"
+                  style={glassCardStyle}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(circle at 80% 20%, ${playlist.glow}33, transparent 65%)`,
+                    }}
+                    animate={{ opacity: [0.4, 0.85, 0.4] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: playlist.glow }}>
+                    Playlist da noite
+                  </p>
+                  <span className="text-2xl">{playlist.emoji}</span>
+                  <p className="text-[13px] font-bold text-white leading-tight">{playlist.title}</p>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => { setOpenMoment(moment.id); haptic("light"); }}
+                  className="p-4 text-left flex flex-col gap-1.5 col-span-2"
+                  style={{
+                    ...glassCardStyle,
+                    background: "rgba(255,255,255,0.04)",
+                  }}
+                  whileTap={{ scale: 0.985 }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-pink-200/70">
+                    Pergunta da noite
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{moment.emoji}</span>
+                    <p className="text-[13px] text-white/85 leading-snug flex-1">"{moment.prompt}"</p>
+                  </div>
+                </motion.button>
+              </div>
+            </section>
+          );
+        })()}
 
         {/* TIMER DO SONINHO */}
         <section>
