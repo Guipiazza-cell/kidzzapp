@@ -78,6 +78,12 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
   const [sessionScore, setSessionScore] = useState(0);
   const [mascotMood, setMascotMood] = useState<"idle" | "happy" | "encourage">("idle");
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);
+  const [selectedExp, setSelectedExp] = useState<BrincarExperience | null>(null);
+  const dailyPick = useMemo(() => pickHeroOfDay(), []);
+  const offlineExperiences = useMemo(
+    () => BRINCAR_EXPERIENCES.filter((e) => e.tipo !== "viagem"),
+    [],
+  );
 
   // Saved KIDZZ config (cor + expressão) — recarregada apenas ao SAIR de "Meu KIDZZ"
   const [mascotConfig, setMascotConfig] = useState(() => loadMascotConfig());
