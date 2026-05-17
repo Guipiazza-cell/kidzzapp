@@ -555,13 +555,9 @@ const HubCard = memo(({ onClick, icon, emoji, title, subtitle, gradient, highlig
     transition={{ duration: 0.25 }}
   >
     {highlight && (
-      <motion.span
-        className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-amber-400 text-white text-[9px] font-black shadow-md"
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 1.6, repeat: Infinity }}
-      >
+      <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-amber-400 text-white text-[9px] font-black shadow-md">
         ⭐ HOJE
-      </motion.span>
+      </span>
     )}
     <div className="w-14 h-14 rounded-2xl bg-white/25 flex items-center justify-center text-3xl flex-shrink-0 backdrop-blur-sm">
       {emoji}
