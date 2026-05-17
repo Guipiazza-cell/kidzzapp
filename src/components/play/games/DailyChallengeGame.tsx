@@ -82,13 +82,7 @@ const DailyChallengeGame = ({ onScore, onReaction, isPremium, onOpenAchievements
   if (!isPremium) {
     return (
       <div className="flex flex-col items-center gap-4 py-6">
-        <motion.div
-          className="text-5xl"
-          animate={{ rotate: [0, -10, 10, 0], y: [0, -5, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          🎯
-        </motion.div>
+        <div className="text-5xl">🎯</div>
         <p className="text-sm font-bold text-white/70 text-center">
           Desafios diários exclusivos
         </p>

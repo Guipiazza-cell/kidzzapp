@@ -1,10 +1,15 @@
-import { useState, useCallback, useEffect, memo, lazy, Suspense } from "react";
+import { useState, useCallback, useEffect, useMemo, memo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target, Heart, Wand2 } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target, Heart, Wand2, Compass } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
 import { loadMascotConfig, type LabExpression } from "@/components/lab/KidzzLab";
+import {
+  BRINCAR_EXPERIENCES,
+  pickHeroOfDay,
+  type BrincarExperience,
+} from "@/data/brincarExperiences";
 const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
 const MemoryGame = lazy(() => import("./games/MemoryGame"));
 const HangmanGame = lazy(() => import("./games/HangmanGame"));
@@ -73,6 +78,12 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
   const [sessionScore, setSessionScore] = useState(0);
   const [mascotMood, setMascotMood] = useState<"idle" | "happy" | "encourage">("idle");
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);
+  const [selectedExp, setSelectedExp] = useState<BrincarExperience | null>(null);
+  const dailyPick = useMemo(() => pickHeroOfDay(), []);
+  const offlineExperiences = useMemo(
+    () => BRINCAR_EXPERIENCES.filter((e) => e.tipo !== "viagem"),
+    [],
+  );
 
   // Saved KIDZZ config (cor + expressão) — recarregada apenas ao SAIR de "Meu KIDZZ"
   const [mascotConfig, setMascotConfig] = useState(() => loadMascotConfig());
@@ -183,13 +194,14 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
   const renderMenu = () => (
     <motion.div
       key="menu"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col px-4"
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      className="flex-1 flex flex-col overflow-y-auto px-4 pb-6"
     >
-      {/* KIDZZ HERO grande — reflete a cor/expressão escolhidas em "Meu KIDZZ" */}
-      <div className="relative flex justify-center pt-2 pb-3">
+      {/* KIDZZ — menor, deixa o palco para a curadoria editorial */}
+      <div className="relative flex justify-center pt-1 pb-2">
         <motion.div
           className="relative"
           style={{ filter: `hue-rotate(${savedHue}deg)`, transition: "filter 350ms ease" }}
@@ -197,23 +209,77 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           <KidzzChameleon
             state="play"
             mood={kidzzMood}
-            size="xl"
+            size="md"
             interactive
-            showParticles
+            showParticles={false}
           />
           <motion.div
-            className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white/85 backdrop-blur-md rounded-2xl px-3 py-1.5 border border-white/60 whitespace-nowrap shadow-md"
+            className="absolute -top-1 left-1/2 -translate-x-1/2 bg-white/85 backdrop-blur-md rounded-2xl px-3 py-1 border border-white/60 whitespace-nowrap shadow-md"
             key={heroSpeech}
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="text-[12px] font-extrabold text-gray-800">{heroSpeech}</p>
+            <p className="text-[11px] font-extrabold text-gray-800">{heroSpeech}</p>
           </motion.div>
         </motion.div>
       </div>
 
-      {/* 3 CARDS PRINCIPAIS — Atividades, Jogos, Viagem */}
-      <div className="flex-1 flex flex-col gap-3">
+      {/* HERO editorial premium — rotaciona por dia */}
+      <motion.button
+        type="button"
+        onClick={() => setSelectedExp(dailyPick.experience)}
+        className="relative w-full rounded-3xl overflow-hidden border border-white/30 text-left mt-1 mb-4 min-h-[148px] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.45)]"
+        style={{ background: dailyPick.hero.gradient }}
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        whileTap={{ scale: 0.985 }}
+      >
+        {/* glow orgânico estático */}
+        <div
+          className="absolute -top-10 -right-10 w-48 h-48 rounded-full opacity-60 pointer-events-none"
+          style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.55), transparent 70%)" }}
+        />
+        <div
+          className="absolute -bottom-14 -left-10 w-48 h-48 rounded-full opacity-40 pointer-events-none"
+          style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.4), transparent 70%)" }}
+        />
+        <div className="relative z-10 p-4 flex gap-3 items-stretch">
+          <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center text-4xl flex-shrink-0 border border-white/30">
+            {dailyPick.hero.emoji}
+          </div>
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/85">
+              Hoje no KIDZZ
+            </p>
+            <h2 className="text-lg font-black text-white leading-tight drop-shadow-sm">
+              {dailyPick.hero.titulo}
+            </h2>
+            <p className="text-[12px] font-semibold text-white/90 leading-snug mt-0.5">
+              {dailyPick.hero.subtitulo}
+            </p>
+          </div>
+        </div>
+        <div className="relative z-10 px-4 pb-3">
+          <div className="rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 px-3 py-2 flex items-center gap-2">
+            <span className="text-xl flex-shrink-0">{dailyPick.experience.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-wider text-white/85">
+                Sugestão de agora
+              </p>
+              <p className="text-[13px] font-extrabold text-white leading-tight truncate">
+                {dailyPick.experience.titulo}
+              </p>
+            </div>
+            <span className="text-[11px] font-extrabold text-white/95 bg-white/20 rounded-full px-2 py-0.5 border border-white/30">
+              {dailyPick.experience.tempo}
+            </span>
+          </div>
+        </div>
+      </motion.button>
+
+      {/* 3 CARDS PRINCIPAIS */}
+      <div className="flex flex-col gap-3">
         <HubCard
           onClick={() => setView("activities")}
           icon={<Target size={28} className="text-white" />}
@@ -243,12 +309,87 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
         )}
       </div>
 
+      {/* EXPERIÊNCIAS FORA DAS TELAS — curadoria editorial */}
+      <div className="mt-5">
+        <div className="flex items-end justify-between mb-2 px-0.5">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-500">
+              Curadoria KIDZZ
+            </p>
+            <h3 className="text-base font-black text-gray-800 flex items-center gap-1.5">
+              <Compass size={16} className="text-emerald-600" />
+              Fora das telas
+            </h3>
+          </div>
+          <p className="text-[10px] font-bold text-gray-500">Momentos reais ✨</p>
+        </div>
+
+        <div className="-mx-4 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {offlineExperiences.map((e, i) => {
+            const locked = e.premium && !isPremium;
+            return (
+              <motion.button
+                key={e.id}
+                type="button"
+                onClick={() => {
+                  if (locked) {
+                    setShowPremiumCTA(true);
+                    return;
+                  }
+                  setSelectedExp(e);
+                }}
+                className="relative snap-start flex-shrink-0 w-[185px] rounded-3xl overflow-hidden text-left border border-white/35 shadow-[0_12px_28px_-14px_rgba(0,0,0,0.4)]"
+                style={{ background: e.gradient }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: Math.min(i * 0.03, 0.18), ease: [0.22, 1, 0.36, 1] }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <div
+                  className="absolute -top-8 -right-8 w-32 h-32 rounded-full opacity-55 pointer-events-none"
+                  style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.5), transparent 70%)" }}
+                />
+                <div className="relative z-10 p-3 flex flex-col h-full min-h-[170px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-white/90 bg-white/20 rounded-full px-2 py-0.5 border border-white/25">
+                      {e.categoria}
+                    </span>
+                    {locked && (
+                      <span className="bg-white/30 backdrop-blur rounded-full p-1">
+                        <Lock size={11} className="text-white" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-4xl mt-3" style={{ filter: locked ? "blur(2px)" : "none" }}>
+                    {e.emoji}
+                  </div>
+                  <h4 className="mt-2 text-[14px] font-black text-white leading-tight drop-shadow-sm">
+                    {e.titulo}
+                  </h4>
+                  <p className="text-[11px] text-white/90 font-semibold leading-snug mt-0.5 line-clamp-2">
+                    {e.descricao}
+                  </p>
+                  <div className="mt-auto pt-2 flex items-center justify-between">
+                    <span className="text-[10px] font-extrabold text-white/95">
+                      ⏱ {e.tempo}
+                    </span>
+                    <span className="text-[10px] font-extrabold text-white/95">
+                      {e.energia === "baixa" ? "💛 leve" : e.energia === "media" ? "💚 média" : "🧡 ativa"}
+                    </span>
+                  </div>
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Stats compactos */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white/70 backdrop-blur rounded-2xl p-3 border border-white/50 mt-3"
+        transition={{ delay: 0.15 }}
+        className="bg-white/70 backdrop-blur rounded-2xl p-3 border border-white/50 mt-4"
       >
         <div className="flex items-center justify-between gap-2">
           <Stat label="Hoje" value={sessionScore} suffix="pts" color="text-emerald-600" />
@@ -524,6 +665,84 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Experiência editorial — detalhe */}
+      <AnimatePresence>
+        {selectedExp && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedExp(null)}
+          >
+            <motion.div
+              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden border border-white/30 shadow-2xl"
+              style={{ background: selectedExp.gradient }}
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-5 relative">
+                <div
+                  className="absolute -top-12 -right-12 w-44 h-44 rounded-full opacity-50 pointer-events-none"
+                  style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.5), transparent 70%)" }}
+                />
+                <div className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur flex items-center justify-center text-4xl border border-white/30">
+                      {selectedExp.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-white/90">
+                        {selectedExp.categoria}
+                      </p>
+                      <h3 className="text-xl font-black text-white leading-tight drop-shadow-sm">
+                        {selectedExp.titulo}
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold text-white/95 leading-snug mt-3">
+                    {selectedExp.descricao}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
+                      ⏱ {selectedExp.tempo}
+                    </span>
+                    <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
+                      🎯 {selectedExp.idadeMin}–{selectedExp.idadeMax} anos
+                    </span>
+                    <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
+                      {selectedExp.energia === "baixa" ? "💛 leve" : selectedExp.energia === "media" ? "💚 média" : "🧡 ativa"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white/95 backdrop-blur p-4 flex flex-col gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full py-3 rounded-2xl font-black text-white text-sm shadow-md min-h-[48px]"
+                  style={{ background: selectedExp.gradient }}
+                  onClick={() => {
+                    handleScore(5);
+                    setSelectedExp(null);
+                  }}
+                >
+                  ✨ Vamos viver agora
+                </motion.button>
+                <button
+                  className="text-xs font-bold text-gray-500 mx-auto"
+                  onClick={() => setSelectedExp(null)}
+                >
+                  Fechar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -550,13 +769,9 @@ const HubCard = memo(({ onClick, icon, emoji, title, subtitle, gradient, highlig
     transition={{ duration: 0.25 }}
   >
     {highlight && (
-      <motion.span
-        className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-amber-400 text-white text-[9px] font-black shadow-md"
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 1.6, repeat: Infinity }}
-      >
+      <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-amber-400 text-white text-[9px] font-black shadow-md">
         ⭐ HOJE
-      </motion.span>
+      </span>
     )}
     <div className="w-14 h-14 rounded-2xl bg-white/25 flex items-center justify-center text-3xl flex-shrink-0 backdrop-blur-sm">
       {emoji}

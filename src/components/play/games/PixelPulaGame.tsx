@@ -720,11 +720,9 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
               exit={{ opacity: 0 }}
               className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm z-10"
             >
-              <motion.img
+              <img
                 src={pixelImg}
                 alt="Pixel"
-                animate={{ y: [0, -10, 0], rotate: [0, -5, 5, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
                 className="w-20 h-20 mb-3 drop-shadow-[0_0_20px_rgba(167,139,250,0.6)]"
               />
               <h2 className="text-2xl font-black text-white mb-1">Pixel Pula!</h2>
