@@ -1,10 +1,15 @@
-import { useState, useCallback, useEffect, memo, lazy, Suspense } from "react";
+import { useState, useCallback, useEffect, useMemo, memo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target, Heart, Wand2 } from "lucide-react";
+import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target, Heart, Wand2, Compass } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
 import { loadMascotConfig, type LabExpression } from "@/components/lab/KidzzLab";
+import {
+  BRINCAR_EXPERIENCES,
+  pickHeroOfDay,
+  type BrincarExperience,
+} from "@/data/brincarExperiences";
 const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
 const MemoryGame = lazy(() => import("./games/MemoryGame"));
 const HangmanGame = lazy(() => import("./games/HangmanGame"));
