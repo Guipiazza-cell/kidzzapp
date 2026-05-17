@@ -253,22 +253,12 @@ const GameResultScreen = ({
         transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
         className="relative"
       >
-        <motion.div
-          animate={
-            tone === "high"
-              ? { rotate: [-10, 10, -10] }
-              : { y: [0, -6, 0] }
-          }
-          transition={{
-            duration: tone === "high" ? 0.6 : 1.6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+        <div
           style={{ fontSize: 88, lineHeight: 1, display: "inline-block" }}
           aria-label="KIDZZ"
         >
           🦎
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Headline */}
