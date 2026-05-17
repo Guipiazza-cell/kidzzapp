@@ -665,6 +665,84 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Experiência editorial — detalhe */}
+      <AnimatePresence>
+        {selectedExp && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedExp(null)}
+          >
+            <motion.div
+              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden border border-white/30 shadow-2xl"
+              style={{ background: selectedExp.gradient }}
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-5 relative">
+                <div
+                  className="absolute -top-12 -right-12 w-44 h-44 rounded-full opacity-50 pointer-events-none"
+                  style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.5), transparent 70%)" }}
+                />
+                <div className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur flex items-center justify-center text-4xl border border-white/30">
+                      {selectedExp.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-white/90">
+                        {selectedExp.categoria}
+                      </p>
+                      <h3 className="text-xl font-black text-white leading-tight drop-shadow-sm">
+                        {selectedExp.titulo}
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold text-white/95 leading-snug mt-3">
+                    {selectedExp.descricao}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
+                      ⏱ {selectedExp.tempo}
+                    </span>
+                    <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
+                      🎯 {selectedExp.idadeMin}–{selectedExp.idadeMax} anos
+                    </span>
+                    <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
+                      {selectedExp.energia === "baixa" ? "💛 leve" : selectedExp.energia === "media" ? "💚 média" : "🧡 ativa"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white/95 backdrop-blur p-4 flex flex-col gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full py-3 rounded-2xl font-black text-white text-sm shadow-md min-h-[48px]"
+                  style={{ background: selectedExp.gradient }}
+                  onClick={() => {
+                    handleScore(5);
+                    setSelectedExp(null);
+                  }}
+                >
+                  ✨ Vamos viver agora
+                </motion.button>
+                <button
+                  className="text-xs font-bold text-gray-500 mx-auto"
+                  onClick={() => setSelectedExp(null)}
+                >
+                  Fechar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
