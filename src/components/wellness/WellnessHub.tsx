@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Moon, Wind, CloudRain, Heart, Sparkles, Cloud,
-  Play, Pause, Heart as HeartIcon, Flame, Sun, Mountain, Waves,
-  Leaf, Star, Bird, X, Timer,
+  Play, Pause, Heart as HeartIcon, Flame, Waves,
+  Leaf, Star, X, Timer,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
