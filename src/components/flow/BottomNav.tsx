@@ -79,6 +79,13 @@ const TABS: {
     underline: "hsl(45 100% 65%)",
   },
   {
+    id: "wellness",
+    label: "Wellness",
+    icon: Leaf,
+    color: "text-emerald-500",
+    underline: "hsl(160 60% 45%)",
+  },
+  {
     id: "cinema",
     label: "Sessão",
     icon: Film,
