@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart, Gamepad2, Crown, Shield, Disc3, Film } from "lucide-react";
+import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart, Gamepad2, Crown, Shield, Disc3, Film, Leaf } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 
@@ -77,6 +77,13 @@ const TABS: {
     icon: Disc3,
     color: "text-kid-yellow",
     underline: "hsl(45 100% 65%)",
+  },
+  {
+    id: "wellness",
+    label: "Wellness",
+    icon: Leaf,
+    color: "text-emerald-500",
+    underline: "hsl(160 60% 45%)",
   },
   {
     id: "cinema",
