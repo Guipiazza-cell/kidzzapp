@@ -340,6 +340,9 @@ const Index = () => {
     if (activeTab === "cinema") {
       return <FamilyCinema key="cinema" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
     }
+    if (activeTab === "wellness") {
+      return <WellnessHub key="wellness" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+    }
     if (activeTab === "achievements") {
       // Conquistas vivem como subaba dentro de Memórias
       return <MemoriesAlbum key="memories-ach" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
