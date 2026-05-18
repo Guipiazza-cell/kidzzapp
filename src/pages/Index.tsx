@@ -30,6 +30,7 @@ const MomentsPlaylists = lazy(() => import("@/components/moments/MomentsPlaylist
 const FamilyCinema = lazy(() => import("@/components/cinema/FamilyCinema"));
 const TravelMode = lazy(() => import("@/components/travel/TravelMode"));
 const MusicForest = lazy(() => import("@/components/music/MusicForest"));
+const WellnessHub = lazy(() => import("@/components/wellness/WellnessHub"));
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
