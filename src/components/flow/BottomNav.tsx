@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart, Gamepad2, Crown, Shield, Disc3, Film } from "lucide-react";
+import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Heart, Gamepad2, Crown, Shield, Disc3, Film, Leaf } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 
