@@ -113,6 +113,7 @@ const Index = () => {
       import("@/components/lab/KidzzLab");
       import("@/components/travel/TravelMode");
       import("@/components/cinema/FamilyCinema");
+      import("@/components/wellness/WellnessHub");
     });
     return () => {
       if ((window as any).cancelIdleCallback && typeof handle === "number") {
