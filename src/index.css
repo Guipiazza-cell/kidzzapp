@@ -175,6 +175,8 @@
     border-radius: 28px;
     box-shadow: 0 12px 36px -20px hsl(var(--wellness-deep) / 0.25);
   }
+
+  .glass-card-light {
     background: hsl(0 0% 100% / 0.65);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
