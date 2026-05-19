@@ -561,6 +561,10 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
 const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean }) => {
   const [active, setActive] = useState(true);
   const { phase, step } = useBreath(active);
+  const { completeToday } = useWellnessStreak();
+  const [cycles, setCycles] = useState(0);
+  useEffect(() => { if (step === 2) setCycles((c) => { const n = c + 1; if (n === 3) completeToday(); return n; }); }, [step, completeToday]);
+
 
   return (
     <>
