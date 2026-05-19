@@ -474,7 +474,7 @@ const Index = () => {
   return (
     <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
       <MagicalBackground />
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className={`flex-1 flex flex-col min-h-0 ${activeTab === "wellness" ? "" : "pb-[112px]"}`}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeTab}
