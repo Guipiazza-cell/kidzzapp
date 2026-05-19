@@ -1184,12 +1184,14 @@ const MindfulView = ({ onBack }: { onBack: () => void }) => {
 const PauseView = ({ onBack }: { onBack: () => void }) => {
   const [remain, setRemain] = useState(60);
   const [run, setRun] = useState(true);
+  const { completeToday } = useWellnessStreak();
   useEffect(() => {
     if (!run) return;
-    if (remain <= 0) { setRun(false); return; }
+    if (remain <= 0) { setRun(false); completeToday(); return; }
     const t = setTimeout(() => setRemain((r) => r - 1), 1000);
     return () => clearTimeout(t);
-  }, [run, remain]);
+  }, [run, remain, completeToday]);
+
   const pct = ((60 - remain) / 60) * 100;
   return (
     <>
