@@ -1,6 +1,6 @@
 import { forwardRef, memo } from "react";
 import { motion } from "framer-motion";
-import chameleonImg from "@/assets/kidzz/uploaded-chameleon-cutout.webp";
+import chameleonImg from "@/assets/chameleon-main.webp";
 
 type MascotMood = "idle" | "curious" | "happy" | "thinking" | "talking";
 
@@ -73,7 +73,7 @@ const ChameleonMascot = forwardRef<HTMLDivElement, ChameleonMascotProps>(
         <motion.img
           src={chameleonImg}
           alt="Kidzz - camaleão mascote"
-          className="w-full h-full object-contain drop-shadow-2xl relative z-10 scale-[1.08]"
+          className="w-full h-full object-contain drop-shadow-2xl relative z-10"
           loading="eager"
           decoding="async"
           fetchPriority="high"

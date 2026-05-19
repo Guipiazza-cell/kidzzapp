@@ -784,7 +784,7 @@ const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }
 
   return (
     <div
-      className="relative min-h-full"
+      className="min-h-[80vh]"
       style={{ background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)` }}
     >
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -1495,9 +1495,9 @@ const WellnessHub = ({ onBack }: Props) => {
   const back = useCallback(() => setView("home"), []);
 
   return (
-    <div className="relative flex-1 min-h-0 overflow-y-auto overscroll-contain" style={{ background: ivory, color: ink, WebkitOverflowScrolling: "touch" }}>
+    <div className="min-h-screen relative" style={{ background: ivory, color: ink }}>
       <Atmosphere />
-      <div className="relative max-w-[520px] min-h-full mx-auto pb-[calc(150px+env(safe-area-inset-bottom,0px))]">
+      <div className="relative max-w-[520px] mx-auto pb-28">
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
