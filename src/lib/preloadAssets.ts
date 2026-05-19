@@ -1,11 +1,13 @@
-// Pré-carrega APENAS os assets críticos da primeira tela (splash + bg + mascote home).
-// Todos os outros mascotes carregam sob demanda quando a aba correspondente abre.
-// Antes: 14 imagens (~25MB). Agora: 3 imagens (~600KB) — UX inicial muito mais leve.
+// Pré-carrega assets críticos + os 4 estados do KIDZZ Chameleon.
+// Garante que o mascote NUNCA pisque ao trocar de aba ou ao remontar (cache do browser).
 import forestBg from "@/assets/forest-bg-light.jpg";
 import cosmicMascot from "@/assets/kidzz/cosmic.webp";
+import moonMascot from "@/assets/kidzz/moon.webp";
+import explorerMascot from "@/assets/kidzz/explorer.webp";
+import musicMascot from "@/assets/kidzz/music.webp";
 
-// Splash usa o mesmo cosmic.png — único asset de mascote crítico no boot.
-const CRITICAL_ASSETS = [forestBg, cosmicMascot];
+// Splash + bg + 4 estados do mascote = essencial para zero-flicker em qualquer aba.
+const CRITICAL_ASSETS = [forestBg, cosmicMascot, moonMascot, explorerMascot, musicMascot];
 
 export function preloadAssets() {
   if (typeof window === "undefined") return;
