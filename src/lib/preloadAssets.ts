@@ -16,6 +16,8 @@ export function preloadAssets() {
       const img = new Image();
       img.decoding = "async";
       img.src = src;
+      // Força o decode pra ficar pronto no cache do compositor (evita flash ao re-mountar).
+      if ("decode" in img) (img as any).decode?.().catch(() => {});
     });
   };
   const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void) => void);
