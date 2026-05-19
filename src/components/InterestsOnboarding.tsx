@@ -124,15 +124,13 @@ const InterestsOnboarding = () => {
           whileTap={{ scale: 0.97 }}
         >
           {ready && (
-            <motion.span
-              className="absolute inset-0"
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-60"
               style={{
                 background:
-                  "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)",
+                  "linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.22) 50%, transparent 65%)",
               }}
-              initial={{ x: "-110%" }}
-              animate={{ x: "120%" }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
             />
           )}
           <span className="relative z-10">
