@@ -62,12 +62,22 @@ const AppShell = () => {
     return () => clearTimeout(t);
   }, [splashDone]);
 
-  // Motor emocional: registra "última visita" e captura level-ups globais.
+  // Motor emocional + Page Visibility flag (pausa animações CSS quando aba sai).
   useEffect(() => {
     markSeen();
     const handler = () => markLevelUp();
     window.addEventListener("kidzz:level-up", handler);
-    return () => window.removeEventListener("kidzz:level-up", handler);
+
+    const syncVis = () => {
+      document.documentElement.dataset.appHidden = document.hidden ? "true" : "false";
+    };
+    syncVis();
+    document.addEventListener("visibilitychange", syncVis);
+
+    return () => {
+      window.removeEventListener("kidzz:level-up", handler);
+      document.removeEventListener("visibilitychange", syncVis);
+    };
   }, []);
 
   return (
