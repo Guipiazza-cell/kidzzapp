@@ -730,96 +730,198 @@ const SLEEP_ITEMS = [
   { id: "slow",    icon: "☁️",  title: "Desacelerar",          sub: "Respiração 4·7·8", premium: true },
 ];
 
-const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }) => (
-  <div
-    className="min-h-[80vh]"
-    style={{
-      background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)`,
-    }}
-  >
-    {/* stars */}
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(14)].map((_, i) => (
-        <span
-          key={i}
-          className="absolute rounded-full bg-white"
-          style={{
-            width: 2 + (i % 3),
-            height: 2 + (i % 3),
-            top: `${(i * 41) % 90}%`,
-            left: `${(i * 67) % 95}%`,
-            opacity: 0.4 + (i % 3) * 0.2,
-            boxShadow: "0 0 6px rgba(255,255,255,0.7)",
-          }}
-        />
-      ))}
-    </div>
-    <div className="relative">
-      <div className="px-4 pt-3 pb-2 flex items-center gap-3">
-        <button
-          onClick={() => { haptic("light"); onBack(); }}
-          className="w-11 h-11 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}
-          aria-label="Voltar"
-        >
-          <ArrowLeft size={18} color="#fff" />
-        </button>
-        <div className="flex-1 text-center text-[15px] font-semibold text-white">Dormir melhor</div>
-        <div className="w-11 h-11" />
-      </div>
-      <div className="px-5 pt-6 pb-6 text-center">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5C8E8" }}>
-          Boa noite, família
-        </div>
-        <h1 className="mt-2 text-[28px] font-semibold leading-tight" style={{ color: "#F4F1FF", letterSpacing: "-0.01em" }}>
-          Um sono que abraça.
-        </h1>
-        <p className="mt-2 text-[14px] max-w-[300px] mx-auto" style={{ color: "#B8BCD8" }}>
-          Reduza o ritmo. Diminua a luz. Vamos desacelerar juntos.
-        </p>
-      </div>
-      <div className="px-5 pb-12 space-y-3">
-        {SLEEP_ITEMS.map((s) => (
-          <motion.button
-            key={s.id}
-            whileTap={{ scale: 0.985 }}
-            transition={tapSpring}
-            onClick={() => {
-              haptic("light");
-              if (s.premium) {
-                window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sleep" } }));
-                return;
-              }
-              if (s.id === "rain") go("sounds");
-              else if (s.id === "story") go("meditation");
-            }}
-            className="w-full text-left p-4 rounded-[24px] flex items-center gap-4 relative"
+const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }) => {
+  const engineRef = useRef<AmbientSoundEngine | null>(null);
+  const stopTimerRef = useRef<number | null>(null);
+  const tickRef = useRef<number | null>(null);
+  const [timer, setTimer] = useState<number | null>(null); // minutes selected
+  const [remain, setRemain] = useState<number>(0); // seconds remaining
+  const [playing, setPlaying] = useState<string | null>(null);
+
+  useEffect(() => {
+    engineRef.current = new AmbientSoundEngine();
+    return () => {
+      engineRef.current?.stopAll?.();
+      if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+      if (tickRef.current) clearInterval(tickRef.current);
+    };
+  }, []);
+
+  const stopEverything = () => {
+    engineRef.current?.stopAll?.();
+    setPlaying(null);
+    if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+    if (tickRef.current) clearInterval(tickRef.current);
+    stopTimerRef.current = null;
+    tickRef.current = null;
+    setTimer(null);
+    setRemain(0);
+  };
+
+  const playRain = () => {
+    haptic("light");
+    if (playing) { stopEverything(); return; }
+    (engineRef.current as any)?.start?.("rain", "/audio/rain-soft.mp3", 0.35);
+    setPlaying("rain");
+    if (timer) startTimer(timer);
+  };
+
+  const startTimer = (mins: number) => {
+    if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+    if (tickRef.current) clearInterval(tickRef.current);
+    setTimer(mins);
+    setRemain(mins * 60);
+    stopTimerRef.current = window.setTimeout(() => {
+      engineRef.current?.stopAll?.();
+      setPlaying(null);
+      setTimer(null);
+      setRemain(0);
+    }, mins * 60 * 1000);
+    tickRef.current = window.setInterval(() => setRemain((r) => Math.max(0, r - 1)), 1000);
+  };
+
+  const fmt = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+
+  return (
+    <div
+      className="min-h-[80vh]"
+      style={{ background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)` }}
+    >
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(14)].map((_, i) => (
+          <span
+            key={i}
+            className="absolute rounded-full bg-white"
             style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
+              width: 2 + (i % 3), height: 2 + (i % 3),
+              top: `${(i * 41) % 90}%`, left: `${(i * 67) % 95}%`,
+              opacity: 0.4 + (i % 3) * 0.2,
+              boxShadow: "0 0 6px rgba(255,255,255,0.7)",
             }}
-          >
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
-              style={{ background: "rgba(255,255,255,0.08)" }}
-            >
-              {s.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[15px] font-semibold text-white">{s.title}</div>
-              <div className="text-[12px]" style={{ color: "#B8BCD8" }}>{s.sub}</div>
-            </div>
-            {s.premium
-              ? <Lock size={16} color="#C9A84C" />
-              : <ChevronRight size={18} color="#B8BCD8" />}
-          </motion.button>
+          />
         ))}
       </div>
+      <div className="relative">
+        <div className="px-4 pt-3 pb-2 flex items-center gap-3">
+          <button
+            onClick={() => { haptic("light"); stopEverything(); onBack(); }}
+            className="w-11 h-11 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}
+            aria-label="Voltar"
+          >
+            <ArrowLeft size={18} color="#fff" />
+          </button>
+          <div className="flex-1 text-center text-[15px] font-semibold text-white">Dormir melhor</div>
+          <div className="w-11 h-11" />
+        </div>
+
+        <div className="px-5 pt-6 pb-4 text-center">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5C8E8" }}>
+            Boa noite, família
+          </div>
+          <h1 className="mt-2 text-[28px] font-semibold leading-tight" style={{ color: "#F4F1FF", letterSpacing: "-0.01em" }}>
+            Um sono que abraça.
+          </h1>
+          <p className="mt-2 text-[14px] max-w-[300px] mx-auto" style={{ color: "#B8BCD8" }}>
+            Reduza o ritmo. Diminua a luz. Vamos desacelerar juntos.
+          </p>
+        </div>
+
+        {/* Auto-pausa timer */}
+        <div className="px-5 pt-2 pb-4">
+          <div
+            className="rounded-[22px] p-4"
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Timer size={14} color="#C5C8E8" />
+                <span className="text-[12px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#C5C8E8" }}>
+                  Auto-pausa
+                </span>
+              </div>
+              {timer && remain > 0 && (
+                <span className="text-[12px] tabular-nums" style={{ color: "#F4F1FF" }}>{fmt(remain)}</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {[10, 20, 30].map((m) => {
+                const isOn = timer === m;
+                return (
+                  <button
+                    key={m}
+                    onClick={() => { haptic("light"); isOn ? stopEverything() : startTimer(m); }}
+                    className="flex-1 h-10 rounded-xl text-[13px] font-semibold"
+                    style={{
+                      background: isOn ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.06)",
+                      border: `1px solid ${isOn ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.12)"}`,
+                      color: "#F4F1FF",
+                    }}
+                  >
+                    {m} min
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={playRain}
+              className="mt-3 w-full h-12 rounded-2xl text-[14px] font-semibold flex items-center justify-center gap-2"
+              style={{
+                background: playing ? "#fff" : "rgba(255,255,255,0.12)",
+                color: playing ? "#1a2342" : "#fff",
+                border: "1px solid rgba(255,255,255,0.2)",
+              }}
+            >
+              {playing ? <Pause size={16} /> : <Play size={16} />}
+              {playing ? "Pausar chuva" : "Tocar chuva noturna"}
+            </button>
+          </div>
+        </div>
+
+        <div className="px-5 pb-12 space-y-3">
+          {SLEEP_ITEMS.map((s) => (
+            <motion.button
+              key={s.id}
+              whileTap={{ scale: 0.985 }}
+              transition={tapSpring}
+              onClick={() => {
+                haptic("light");
+                if (s.premium) {
+                  window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sleep" } }));
+                  return;
+                }
+                if (s.id === "rain") go("sounds");
+                else if (s.id === "story") go("meditation");
+              }}
+              className="w-full text-left p-4 rounded-[24px] flex items-center gap-4 relative"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+                style={{ background: "rgba(255,255,255,0.08)" }}
+              >
+                {s.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[15px] font-semibold text-white">{s.title}</div>
+                <div className="text-[12px]" style={{ color: "#B8BCD8" }}>{s.sub}</div>
+              </div>
+              {s.premium
+                ? <Lock size={16} color="#C9A84C" />
+                : <ChevronRight size={18} color="#B8BCD8" />}
+            </motion.button>
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
 
 
 /* ────────────── MEDITATION (real Web Speech narration) ────────────── */
