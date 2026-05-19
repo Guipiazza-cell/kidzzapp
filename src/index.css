@@ -44,6 +44,19 @@
     --kid-purple: 270 55% 58%;
     --kid-red: 0 75% 55%;
 
+    /* ── Premium Unified Palette (cinematic, calm, sophisticated) ── */
+    --cream: 38 55% 96%;            /* base background warm cream */
+    --cream-soft: 35 45% 92%;       /* secondary creamy surface */
+    --warm-white: 40 60% 98%;       /* warm white for cards */
+    --soft-gold: 42 60% 62%;        /* matte gold premium accent */
+    --soft-gold-glow: 45 80% 72%;   /* gold glow / particles */
+    --wellness-green: 150 28% 55%;  /* sage wellness */
+    --wellness-deep: 158 30% 38%;   /* emerald wellness */
+    --soft-lilac: 270 35% 80%;      /* discrete lilac */
+    --peach-soft: 22 70% 86%;       /* soft peach */
+    --sky-soft: 205 55% 88%;        /* very soft sky */
+    --warm-shadow: 30 25% 20%;      /* warm dark for shadows */
+
     /* Premium tokens */
     --premium-bg: 220 25% 8%;
     --premium-surface: 220 20% 14%;
@@ -132,11 +145,35 @@
   }
 
   .glass-card {
-    background: hsl(0 0% 100% / 0.55);
+    background: hsl(var(--warm-white) / 0.62);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid hsl(0 0% 100% / 0.4);
-    box-shadow: 0 2px 12px hsl(0 0% 0% / 0.06);
+    border: 1px solid hsl(0 0% 100% / 0.55);
+    box-shadow:
+      0 1px 0 hsl(0 0% 100% / 0.6) inset,
+      0 12px 36px -18px hsl(var(--warm-shadow) / 0.25);
+  }
+
+  /* Unified premium surface — use on EVERY card across the app */
+  .surface-premium {
+    background: hsl(var(--warm-white) / 0.7);
+    backdrop-filter: blur(22px) saturate(1.05);
+    -webkit-backdrop-filter: blur(22px) saturate(1.05);
+    border: 1px solid hsl(0 0% 100% / 0.6);
+    border-radius: 28px;
+    box-shadow:
+      0 1px 0 hsl(0 0% 100% / 0.65) inset,
+      0 10px 30px -16px hsl(var(--warm-shadow) / 0.22);
+  }
+
+  /* Soft wellness surface (sage tint) */
+  .surface-wellness {
+    background: hsl(var(--cream) / 0.78);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid hsl(var(--wellness-green) / 0.15);
+    border-radius: 28px;
+    box-shadow: 0 12px 36px -20px hsl(var(--wellness-deep) / 0.25);
   }
 
   .glass-card-light {
@@ -266,6 +303,20 @@
   content-visibility: auto;
   contain-intrinsic-size: 1px 600px;
 }
+
+/* Wellness/meditation breathing rhythm (4s inhale / hold / exhale) */
+@keyframes wellness-breath {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+.animate-breath { animation: wellness-breath 7s ease-in-out infinite; }
+
+/* Slow ambient drift for wellness orbs */
+@keyframes ambient-drift {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(0,-10px,0) scale(1.04); }
+}
+.animate-ambient-drift { animation: ambient-drift 10s ease-in-out infinite; }
 
 /* Respect prefers-reduced-motion globally — disables expensive ambient loops
    for users who opted out, and reduces battery drain on mobile. */

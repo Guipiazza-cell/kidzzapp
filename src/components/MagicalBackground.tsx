@@ -1,5 +1,5 @@
 import { memo } from "react";
-import forestBg from "@/assets/forest-bg-light.jpg";
+import forestBg from "@/assets/premium-forest-bg.jpg";
 
 // Detect low-end devices once at module load to reduce particle count.
 const IS_LOW_END = (() => {
@@ -50,13 +50,27 @@ const MagicalBackground = () => (
       alt=""
       aria-hidden="true"
       className="absolute inset-0 w-full h-full object-cover"
-      style={{ filter: "brightness(0.95) saturate(0.95)" }}
-      width={768}
-      height={1344}
+      style={{ filter: "brightness(1.02) saturate(0.92)" }}
+      width={1024}
+      height={1792}
     />
 
-    {/* Soft gradient overlay for legibility */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
+    {/* Soft cinematic veil: lifts the bottom for legibility, keeps the warm cream feel */}
+    <div
+      className="absolute inset-0"
+      style={{
+        background:
+          "linear-gradient(180deg, hsl(38 55% 96% / 0.0) 0%, hsl(38 55% 96% / 0.18) 45%, hsl(38 55% 94% / 0.55) 100%)",
+      }}
+    />
+    {/* Subtle vignette to keep focus center */}
+    <div
+      className="absolute inset-0"
+      style={{
+        background:
+          "radial-gradient(ellipse at center, transparent 55%, hsl(30 30% 18% / 0.10) 100%)",
+      }}
+    />
 
     {/* Subtle light sweep */}
     <div

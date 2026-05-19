@@ -1,6 +1,6 @@
 // Pré-carrega assets críticos + os 4 estados do KIDZZ Chameleon.
 // Garante que o mascote NUNCA pisque ao trocar de aba ou ao remontar (cache do browser).
-import forestBg from "@/assets/forest-bg-light.jpg";
+import forestBg from "@/assets/premium-forest-bg.jpg";
 import cosmicMascot from "@/assets/kidzz/cosmic.webp";
 import moonMascot from "@/assets/kidzz/moon.webp";
 import explorerMascot from "@/assets/kidzz/explorer.webp";
