@@ -715,20 +715,94 @@ const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }
 );
 
 
-/* ────────────── MEDITATION ────────────── */
+/* ────────────── MEDITATION (real Web Speech narration) ────────────── */
 const MED_TRACKS = [
-  { id: "m1", title: "Pousar o dia", sub: "Para o fim da tarde", min: 5, icon: Sunrise },
-  { id: "m2", title: "Coração calmo", sub: "Compaixão familiar",  min: 7, icon: Heart },
-  { id: "m3", title: "Antes de dormir", sub: "Soltar o corpo",     min: 10, icon: MoonIcon },
+  {
+    id: "m1", title: "Pousar o dia", sub: "Para o fim da tarde", min: 5, icon: Sunrise,
+    script: [
+      "Respire fundo. Sinta o ar entrar pelas narinas.",
+      "Solte o ar devagar pela boca. Mais uma vez.",
+      "Perceba o peso do corpo. Os ombros relaxam.",
+      "O dia já passou. Agora é só este momento.",
+      "Inspire calma. Expire o cansaço do dia.",
+      "Você está em paz. Aqui. Agora.",
+    ],
+  },
+  {
+    id: "m2", title: "Coração calmo", sub: "Compaixão familiar", min: 7, icon: Heart,
+    script: [
+      "Coloque uma mão no peito. Sinta o coração bater.",
+      "Pense em alguém que você ama profundamente.",
+      "Envie a essa pessoa um pensamento de carinho.",
+      "Que ela esteja bem. Que ela esteja feliz.",
+      "Agora, mande esse mesmo carinho para você.",
+      "Você merece amor. Você merece paz.",
+    ],
+  },
+  {
+    id: "m3", title: "Antes de dormir", sub: "Soltar o corpo", min: 10, icon: MoonIcon,
+    script: [
+      "Deite-se confortavelmente. Feche os olhos.",
+      "Solte os pés. Solte as pernas.",
+      "Solte a barriga. Solte os ombros.",
+      "Solte o rosto. Solte a testa.",
+      "O corpo está pesado, calmo, em paz.",
+      "Boa noite. Durma tranquilo.",
+    ],
+  },
 ];
+
+const speakLine = (text: string, onEnd?: () => void) => {
+  if (typeof window === "undefined" || !window.speechSynthesis) { onEnd?.(); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "pt-BR";
+  u.rate = 0.88;
+  u.pitch = 1.05;
+  u.volume = 0.9;
+  if (onEnd) u.onend = onEnd;
+  window.speechSynthesis.speak(u);
+};
 
 const MeditationView = ({ onBack }: { onBack: () => void }) => {
   const [active, setActive] = useState<string | null>(null);
+  const [lineIdx, setLineIdx] = useState(0);
+  const timerRef = useRef<number | null>(null);
+
+  const stopAll = useCallback(() => {
+    window.speechSynthesis?.cancel();
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = null;
+    setActive(null);
+    setLineIdx(0);
+  }, []);
+
+  useEffect(() => () => stopAll(), [stopAll]);
+
+  const start = (id: string) => {
+    stopAll();
+    const track = MED_TRACKS.find((t) => t.id === id);
+    if (!track) return;
+    setActive(id);
+    setLineIdx(0);
+    let idx = 0;
+    const speakNext = () => {
+      if (idx >= track.script.length) { setActive(null); setLineIdx(0); return; }
+      setLineIdx(idx);
+      speakLine(track.script[idx], () => {
+        idx += 1;
+        timerRef.current = window.setTimeout(speakNext, 2200);
+      });
+    };
+    speakNext();
+  };
+
+  const current = MED_TRACKS.find((t) => t.id === active);
+
   return (
     <>
-      <TopBar title="Meditação guiada" onBack={onBack} />
+      <TopBar title="Meditação guiada" onBack={() => { stopAll(); onBack(); }} />
       <div className="px-5 pt-4">
-        <Eyebrow>Sessões breves</Eyebrow>
+        <Eyebrow>Sessões breves · narração real</Eyebrow>
         <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
           Reserve um momento.
         </h1>
@@ -742,9 +816,13 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
               key={t.id}
               whileTap={{ scale: 0.985 }}
               transition={tapSpring}
-              onClick={() => { haptic("light"); setActive(isOn ? null : t.id); }}
+              onClick={() => { haptic("light"); isOn ? stopAll() : start(t.id); }}
               className="w-full text-left p-4 rounded-[24px] flex items-center gap-4"
-              style={{ background: surface, border: `1px solid ${stroke}` }}
+              style={{
+                background: isOn ? "#fff" : surface,
+                border: `1px solid ${isOn ? `${emerald}66` : stroke}`,
+                boxShadow: isOn ? `0 18px 40px -22px ${emerald}99` : undefined,
+              }}
             >
               <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center"
@@ -767,18 +845,161 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
             </motion.button>
           );
         })}
-        {active && (
+        {current && (
           <Surface className="p-5 text-center">
-            <Eyebrow>Tocando</Eyebrow>
-            <div className="mt-2 text-[15px]" style={{ color: ink }}>
-              Feche os olhos. Sinta o ar entrando devagar.
-            </div>
+            <Eyebrow>Tocando · {lineIdx + 1}/{current.script.length}</Eyebrow>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={lineIdx}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.4 }}
+                className="mt-2 text-[16px] leading-snug"
+                style={{ color: ink }}
+              >
+                {current.script[lineIdx]}
+              </motion.div>
+            </AnimatePresence>
           </Surface>
         )}
       </div>
     </>
   );
 };
+
+/* ────────────── FAMILY — respirar e agradecer juntos ────────────── */
+const GRATITUDE_PROMPTS = [
+  "O que fez você sorrir hoje?",
+  "Quem foi gentil com você?",
+  "Que cheiro do dia você gostou?",
+  "Que som te deixou feliz hoje?",
+  "Qual foi o melhor abraço de hoje?",
+];
+
+const FamilyView = ({ onBack }: { onBack: () => void }) => {
+  const [mode, setMode] = useState<"intro" | "breath" | "gratitude">("intro");
+  const [active, setActive] = useState(false);
+  const { phase, step } = useBreath(mode === "breath" && active);
+  const [pi, setPi] = useState(0);
+
+  return (
+    <>
+      <TopBar title="Wellness Família" onBack={onBack} />
+      <div className="px-5 pt-4">
+        <Eyebrow>Momento de conexão</Eyebrow>
+        <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
+          {mode === "intro" && "Vamos fazer juntos."}
+          {mode === "breath" && "Respirem no mesmo ritmo."}
+          {mode === "gratitude" && "Uma rodada de gratidão."}
+        </h1>
+      </div>
+
+      {mode === "intro" && (
+        <div className="px-5 pt-6 space-y-3 pb-10">
+          <motion.button
+            whileTap={{ scale: 0.985 }} transition={tapSpring}
+            onClick={() => { haptic("light"); setMode("breath"); setActive(true); }}
+            className="w-full text-left p-5 rounded-[24px] flex items-center gap-4"
+            style={{ background: surface, border: `1px solid ${stroke}` }}
+          >
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: `${sage}33` }}>
+              <Wind size={22} style={{ color: ink }} strokeWidth={1.7} />
+            </div>
+            <div className="flex-1">
+              <div className="text-[15px] font-semibold" style={{ color: ink }}>Respirar juntos</div>
+              <div className="text-[12px]" style={{ color: inkSoft }}>3 ciclos guiados em família</div>
+            </div>
+            <ChevronRight size={18} style={{ color: inkSoft }} />
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.985 }} transition={tapSpring}
+            onClick={() => { haptic("light"); setMode("gratitude"); setPi(0); }}
+            className="w-full text-left p-5 rounded-[24px] flex items-center gap-4"
+            style={{ background: surface, border: `1px solid ${stroke}` }}
+          >
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: `${clay}33` }}>
+              <HandHeart size={22} style={{ color: ink }} strokeWidth={1.7} />
+            </div>
+            <div className="flex-1">
+              <div className="text-[15px] font-semibold" style={{ color: ink }}>Rodada de gratidão</div>
+              <div className="text-[12px]" style={{ color: inkSoft }}>5 perguntas para cada um responder</div>
+            </div>
+            <ChevronRight size={18} style={{ color: inkSoft }} />
+          </motion.button>
+        </div>
+      )}
+
+      {mode === "breath" && (
+        <div className="flex flex-col items-center justify-center px-6 pt-8 pb-10">
+          <div className="relative w-[240px] h-[240px] flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full"
+              style={{ background: `radial-gradient(circle, ${sage}66, transparent 70%)`, filter: "blur(20px)" }} />
+            <motion.div
+              animate={{ scale: phase.scale }}
+              transition={{ duration: phase.ms / 1000, ease: [0.45, 0, 0.55, 1] }}
+              className="relative w-36 h-36 rounded-full flex items-center justify-center"
+              style={{
+                background: `radial-gradient(circle at 30% 30%, #FFFFFF, ${sage})`,
+                boxShadow: `0 30px 60px -30px ${emerald}AA, 0 0 0 8px rgba(255,255,255,0.5)`,
+              }}
+            >
+              <span className="text-[17px] font-semibold" style={{ color: ink }}>{phase.p}</span>
+            </motion.div>
+          </div>
+          <p className="mt-6 text-center text-[14px] max-w-[280px]" style={{ color: inkSoft }}>
+            Olhem-se nos olhos. Sigam o círculo. Inspirem juntos.
+          </p>
+          <button
+            onClick={() => { haptic("light"); setActive((a) => !a); }}
+            className="mt-6 px-6 h-12 rounded-full flex items-center gap-2 font-semibold text-[14px]"
+            style={{ background: ink, color: "#fff" }}
+          >
+            {active ? <Pause size={16} /> : <Play size={16} />}
+            {active ? "Pausar" : "Retomar"}
+          </button>
+          <button
+            onClick={() => { haptic("light"); setMode("intro"); setActive(false); }}
+            className="mt-3 text-[13px] underline" style={{ color: inkSoft }}
+          >
+            Voltar
+          </button>
+        </div>
+      )}
+
+      {mode === "gratitude" && (
+        <div className="px-6 pt-10 flex flex-col items-center text-center pb-10">
+          <Eyebrow>{pi + 1} de {GRATITUDE_PROMPTS.length}</Eyebrow>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pi}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.4 }}
+              className="mt-4 text-[24px] font-semibold leading-snug max-w-[300px]"
+              style={{ color: ink, letterSpacing: "-0.01em" }}
+            >
+              {GRATITUDE_PROMPTS[pi]}
+            </motion.div>
+          </AnimatePresence>
+          <button
+            onClick={() => {
+              haptic("light");
+              if (pi + 1 >= GRATITUDE_PROMPTS.length) setMode("intro");
+              else setPi(pi + 1);
+            }}
+            className="mt-10 px-6 h-12 rounded-full font-semibold text-[14px]"
+            style={{ background: ink, color: "#fff" }}
+          >
+            {pi + 1 >= GRATITUDE_PROMPTS.length ? "Concluir" : "Próxima"}
+          </button>
+        </div>
+      )}
+    </>
+  );
+};
+
 
 /* ────────────── MINDFUL ────────────── */
 const MINDFUL_PROMPTS = [
