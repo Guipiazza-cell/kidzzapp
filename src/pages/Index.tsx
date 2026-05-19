@@ -46,6 +46,7 @@ import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
 import XpToast from "@/components/flow/XpToast";
+import TabErrorBoundary from "@/components/TabErrorBoundary";
 import ConversionNudgeCard from "@/components/viral/ConversionNudgeCard";
 import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCard, markConversionCardShown } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
@@ -186,6 +187,41 @@ const Index = () => {
       window.removeEventListener("kidzz:open-journey", openJourney);
     };
   }, []);
+
+  // Tab <-> URL hash sync. Lets the browser back button + share links work
+  // without rewriting the routing layer. Hash format: `#tab=dreams`.
+  const KNOWN_TABS = ["chat","explore","routine","play","memories","moments","cinema","wellness","achievements","dreams","music"];
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const parseHash = () => {
+      const m = window.location.hash.match(/tab=([\w-]+)/);
+      return m && KNOWN_TABS.includes(m[1]) ? m[1] : null;
+    };
+    const initial = parseHash();
+    if (initial && initial !== activeTab) setActiveTab(initial);
+
+    const onPop = () => {
+      const t = parseHash() ?? "chat";
+      setActiveTab(t);
+      setShowLab(false); setShowPlay(false); setShowTravel(false);
+      setShowChallenge(false); setShowReferral(false); setShowRetrospective(false);
+      if (t === "chat") setStep("home");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const current = window.location.hash.match(/tab=([\w-]+)/)?.[1];
+    if (activeTab === "chat") {
+      if (current) window.history.replaceState(null, "", window.location.pathname);
+    } else if (current !== activeTab) {
+      // pushState so the back button returns to the previous tab.
+      window.history.pushState({ tab: activeTab }, "", `#tab=${activeTab}`);
+    }
+  }, [activeTab]);
 
   // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
   useEffect(() => {
@@ -448,13 +484,19 @@ const Index = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
           >
-            <Suspense fallback={
-              <div className="flex-1 flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
-              </div>
-            }>
-              {renderContent()}
-            </Suspense>
+            <TabErrorBoundary
+              resetKey={activeTab}
+              label={activeTab}
+              onBack={() => { setActiveTab("chat"); setStep("home"); }}
+            >
+              <Suspense fallback={
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
+                </div>
+              }>
+                {renderContent()}
+              </Suspense>
+            </TabErrorBoundary>
           </motion.div>
         </AnimatePresence>
       </div>

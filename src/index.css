@@ -278,3 +278,13 @@
   }
 }
 
+/* Page-visibility freeze: when the browser tab/PWA is hidden, JS timers throttle
+   automatically but CSS keyframes don't — this pauses every CSS animation in one
+   shot, saving battery and stopping the compositor from re-rasterizing offscreen
+   fireflies, gradients, etc. Re-enabled instantly when the user returns. */
+html[data-app-hidden="true"] *,
+html[data-app-hidden="true"] *::before,
+html[data-app-hidden="true"] *::after {
+  animation-play-state: paused !important;
+}
+
