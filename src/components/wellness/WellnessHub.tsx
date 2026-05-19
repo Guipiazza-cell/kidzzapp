@@ -93,11 +93,13 @@ const tapSpring = { type: "spring" as const, stiffness: 380, damping: 28, mass: 
 const DAILY = [
   { id: "meditation", view: "meditation" as View, label: "Meditação guiada", time: "5 min", icon: Flower2, tint: sage },
   { id: "breath",     view: "breath"     as View, label: "Respiração 4·4·6", time: "3 min", icon: Wind,    tint: serenity },
+  { id: "family",     view: "family"     as View, label: "Wellness família", time: "Juntos", icon: HandHeart, tint: emerald },
   { id: "sounds",     view: "sounds"     as View, label: "Sons da natureza", time: "Loop",  icon: Waves,   tint: serenity },
   { id: "mindful",    view: "mindful"    as View, label: "Mini mindfulness", time: "2 min", icon: Sparkles,tint: clay },
   { id: "pause",      view: "pause"      as View, label: "Pausa do dia",     time: "1 min", icon: Coffee,  tint: clay },
   { id: "routine",    view: "routine"    as View, label: "Rotina calma",     time: "Hoje",  icon: Sun,     tint: sage },
 ];
+
 
 const REAL_WORLD = [
   {
