@@ -263,4 +263,6 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
 
 KidzzChameleon.displayName = "KidzzChameleon";
 
-export default KidzzChameleon;
+// Memo: evita re-render quando o pai re-renderiza com as mesmas props.
+// Reduz drasticamente o "respirar" inconsistente do mascote em listas/abas.
+export default memo(KidzzChameleon);
