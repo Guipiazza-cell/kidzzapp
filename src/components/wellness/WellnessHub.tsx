@@ -1122,6 +1122,8 @@ const FamilyView = ({ onBack }: { onBack: () => void }) => {
   const [active, setActive] = useState(false);
   const { phase, step } = useBreath(mode === "breath" && active);
   const [pi, setPi] = useState(0);
+  const { completeToday } = useWellnessStreak();
+  useEffect(() => { if (mode !== "intro") completeToday(); }, [mode, completeToday]);
 
   return (
     <>
