@@ -3,6 +3,7 @@
 // Falls back to client-side curated pool if this function errors.
 
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 interface RequestBody {
   childName?: string;
