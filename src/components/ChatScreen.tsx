@@ -159,7 +159,7 @@ const ChatScreen = ({
       }
     }
     lastAssistantTextRef.current = assistantText;
-  }, [ageRange]);
+  }, [ageRange, session?.access_token]);
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isTyping || !canAskQuestion()) return;
