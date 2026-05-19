@@ -920,12 +920,27 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
   return (
     <>
       <TopBar title="Meditação guiada" onBack={() => { stopAll(); onBack(); }} />
-      <div className="px-5 pt-4">
-        <Eyebrow>Sessões breves · narração real</Eyebrow>
-        <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
-          Reserve um momento.
-        </h1>
+      <div className="px-5 pt-4 flex items-start justify-between gap-3">
+        <div>
+          <Eyebrow>Sessões breves · narração real</Eyebrow>
+          <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
+            Reserve um momento.
+          </h1>
+        </div>
+        <button
+          onClick={() => { haptic("light"); setAmbient(a => !a); if (!ambient && active) (engineRef.current as any)?.start?.("forest", "/audio/forest-calm.mp3", 0.18); if (ambient) engineRef.current?.stopAll?.(); }}
+          className="shrink-0 mt-1 px-3 h-9 rounded-full text-[11px] font-semibold flex items-center gap-1.5"
+          style={{
+            background: ambient ? `${sage}33` : "transparent",
+            border: `1px solid ${ambient ? `${sage}66` : stroke}`,
+            color: ink,
+          }}
+          aria-label="Som ambiente"
+        >
+          <Waves size={12} /> {ambient ? "Floresta on" : "Floresta off"}
+        </button>
       </div>
+
       <div className="px-5 pt-5 space-y-3 pb-10">
         {MED_TRACKS.map((t) => {
           const Icon = t.icon;
