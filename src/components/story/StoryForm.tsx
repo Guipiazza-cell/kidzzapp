@@ -129,8 +129,6 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
           onClick={onUpgrade}
           className="w-full py-5 rounded-2xl bg-gradient-to-r from-kid-purple via-pink-500 to-kid-pink text-white font-extrabold text-base shadow-2xl flex items-center justify-center gap-2 active:scale-95 relative overflow-hidden"
           whileTap={{ scale: 0.97 }}
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
         >
           <Crown size={22} />
           Assinar agora · Histórias ilimitadas
