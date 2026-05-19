@@ -410,10 +410,11 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
         {onOpenTravel && (
           <motion.button
             onClick={onOpenTravel}
-            className="w-full max-w-sm mt-3 mb-1 relative overflow-hidden rounded-3xl p-4 flex items-center gap-3 text-left shadow-lg border border-white/40"
+            className="w-full max-w-sm mt-3 mb-1 relative rounded-3xl p-4 flex items-center gap-3 text-left shadow-lg border border-white/40 isolate"
             style={{
               background:
                 "linear-gradient(135deg, hsl(220 75% 35%) 0%, hsl(265 65% 40%) 50%, hsl(35 90% 55%) 110%)",
+              minHeight: 88,
             }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -421,8 +422,8 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             whileTap={{ scale: 0.97 }}
             aria-label="Abrir Modo Viagem"
           >
-            {/* Stars background */}
-            <div className="absolute inset-0 pointer-events-none opacity-50">
+            {/* Stars background — clipped to card radius via inner wrapper */}
+            <div className="absolute inset-0 pointer-events-none opacity-50 overflow-hidden rounded-3xl">
               {[...Array(6)].map((_, i) => (
                 <motion.span
                   key={i}
@@ -440,7 +441,7 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
             </div>
 
             <motion.div
-              className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
+              className="relative w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
               style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)" }}
               animate={{ rotate: [0, -6, 6, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -448,19 +449,20 @@ const HomeScreen = ({ onSubmit, onOpenStoryFactory, onOpenMoments, onOpenAchieve
               🌍
             </motion.div>
 
-            <div className="relative flex-1 min-w-0">
-              <p className="text-[9px] font-black uppercase tracking-wider text-amber-200 mb-0.5 break-words">
+            <div className="relative flex-1 min-w-0 pr-1">
+              <p className="text-[10px] font-black uppercase tracking-wider text-amber-200 mb-0.5 truncate">
                 ⭐ Aventura sonora
               </p>
-              <h3 className="text-sm font-black text-white leading-tight break-words">
+              <h3 className="text-[15px] font-black text-white leading-tight truncate">
                 Modo Viagem
               </h3>
-              <p className="text-[11px] font-semibold text-white/85 leading-tight mt-0.5 break-words">
+              <p className="text-[11px] font-semibold text-white/85 leading-snug mt-0.5 line-clamp-1">
                 Explore o mundo com o KIDZZ →
               </p>
             </div>
           </motion.button>
         )}
+
 
         {/* Level & Progress — abaixo do Modo Viagem */}
         <motion.div

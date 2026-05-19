@@ -5,7 +5,7 @@
    - Touch reactive: olho segue toque, tap = bounce + ripple
 */
 
-import { forwardRef, useRef, useState, useCallback } from "react";
+import { forwardRef, memo, useRef, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import cosmicImg from "@/assets/kidzz/cosmic.webp";
 import moonImg from "@/assets/kidzz/moon.webp";
@@ -166,13 +166,10 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Character image — single layer, no AnimatePresence (avoid forwardRef warning + heavy remounts) */}
+        {/* Character image — sem fade-in de mount (evita flicker ao trocar de aba).
+            A imagem é pré-decodificada em preloadAssets, então aparece estável já no 1º frame. */}
         <motion.div
-          key={state}
           className="absolute inset-0"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
           style={{ x: eyeX, y: eyeY }}
         >
           <img
@@ -181,9 +178,11 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
             className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
             draggable={false}
             decoding="async"
+            loading="eager"
             style={stateImageFilter[state] ? { filter: stateImageFilter[state] } : undefined}
           />
         </motion.div>
+
 
         {/* Heart pulse (always visible since heart is on chest in all states) */}
         <motion.div
@@ -264,4 +263,6 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
 
 KidzzChameleon.displayName = "KidzzChameleon";
 
-export default KidzzChameleon;
+// Memo: evita re-render quando o pai re-renderiza com as mesmas props.
+// Reduz drasticamente o "respirar" inconsistente do mascote em listas/abas.
+export default memo(KidzzChameleon);
