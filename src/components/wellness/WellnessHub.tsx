@@ -518,12 +518,17 @@ const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean
   );
 };
 
-/* ────────────── SOUNDS ────────────── */
-const SOUND_LIST = [
-  { id: "rain",   label: "Chuva suave",   url: "/audio/rain-soft.mp3",   icon: "🌧" },
-  { id: "ocean",  label: "Oceano",        url: "/audio/ocean-waves.mp3", icon: "🌊" },
-  { id: "forest", label: "Floresta",      url: "/audio/forest-calm.mp3", icon: "🌿" },
-  { id: "white",  label: "Ruído branco",  url: "/audio/white-noise.mp3", icon: "☁️" },
+/* ────────────── SOUNDS — 8 atmosferas (4 grátis + 4 premium) ────────────── */
+type Sound = { id: string; label: string; url: string; icon: string; premium?: boolean; tint: string };
+const SOUND_LIST: Sound[] = [
+  { id: "rain",   label: "Chuva suave",    url: "/audio/rain-soft.mp3",   icon: "🌧",  tint: serenity },
+  { id: "ocean",  label: "Oceano",         url: "/audio/ocean-waves.mp3", icon: "🌊",  tint: serenity },
+  { id: "forest", label: "Floresta",       url: "/audio/forest-calm.mp3", icon: "🌿",  tint: sage },
+  { id: "white",  label: "Brisa branca",   url: "/audio/white-noise.mp3", icon: "☁️",  tint: pearl },
+  { id: "fire",   label: "Lareira",        url: "/audio/rain-soft.mp3",   icon: "🔥",  tint: clay,    premium: true },
+  { id: "train",  label: "Trem distante",  url: "/audio/white-noise.mp3", icon: "🚂",  tint: clay,    premium: true },
+  { id: "space",  label: "Espaço",         url: "/audio/ocean-waves.mp3", icon: "🌌",  tint: lilac,   premium: true },
+  { id: "river",  label: "Rio",            url: "/audio/forest-calm.mp3", icon: "🛶",  tint: emerald, premium: true },
 ];
 
 const SoundsView = ({ onBack }: { onBack: () => void }) => {
@@ -535,7 +540,12 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
     return () => { engineRef.current?.stopAll?.(); };
   }, []);
 
-  const toggle = (s: typeof SOUND_LIST[number]) => {
+  const toggle = (s: Sound) => {
+    if (s.premium) {
+      haptic("medium");
+      window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sound" } }));
+      return;
+    }
     haptic("light");
     const engine = engineRef.current as any;
     if (playing === s.id) {
@@ -552,7 +562,7 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
     <>
       <TopBar title="Sons da natureza" onBack={onBack} />
       <div className="px-5 pt-4 pb-2">
-        <Eyebrow>Som ambiente</Eyebrow>
+        <Eyebrow>Som ambiente · 8 atmosferas</Eyebrow>
         <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
           Escolha uma atmosfera.
         </h1>
@@ -566,18 +576,33 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
               whileTap={{ scale: 0.97 }}
               transition={tapSpring}
               onClick={() => toggle(s)}
-              className="p-4 rounded-[26px] flex flex-col gap-3 text-left min-h-[130px]"
+              className="relative p-4 rounded-[26px] flex flex-col gap-3 text-left min-h-[134px] overflow-hidden"
               style={{
                 background: isOn ? "#FFFFFF" : surface,
-                border: `1px solid ${isOn ? `${sage}66` : stroke}`,
-                boxShadow: isOn ? `0 18px 40px -22px ${sage}99` : "none",
+                border: `1px solid ${isOn ? `${emerald}66` : stroke}`,
+                boxShadow: isOn ? `0 18px 40px -22px ${emerald}99` : "0 6px 18px -12px rgba(39,48,42,0.12)",
               }}
             >
-              <div className="text-2xl">{s.icon}</div>
-              <div>
+              {/* tinted glow */}
+              <div
+                className="absolute -top-6 -right-6 w-24 h-24 rounded-full pointer-events-none"
+                style={{ background: `radial-gradient(circle, ${s.tint}55, transparent 70%)`, filter: "blur(12px)" }}
+              />
+              <div className="relative flex items-start justify-between">
+                <div className="text-2xl">{s.icon}</div>
+                {s.premium && (
+                  <div
+                    className="flex items-center gap-1 px-2 h-6 rounded-full text-[10px] font-bold"
+                    style={{ background: `${gold}22`, color: gold }}
+                  >
+                    <Lock size={10} /> Premium
+                  </div>
+                )}
+              </div>
+              <div className="relative">
                 <div className="text-[15px] font-semibold" style={{ color: ink }}>{s.label}</div>
                 <div className="mt-1 text-[12px]" style={{ color: inkSoft }}>
-                  {isOn ? "Tocando" : "Tocar"}
+                  {s.premium ? "Desbloquear" : isOn ? "Tocando" : "Tocar"}
                 </div>
               </div>
             </motion.button>
@@ -587,6 +612,106 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
     </>
   );
 };
+
+/* ────────────── SLEEP — área Dormir Melhor (premium feel) ────────────── */
+const SLEEP_ITEMS = [
+  { id: "story",   icon: "🌙", title: "Histórias calmas",     sub: "Narração suave para embalar" },
+  { id: "rain",    icon: "🌧", title: "Sons noturnos",        sub: "Chuva, oceano, floresta" },
+  { id: "deep",    icon: "🛏", title: "Relaxamento profundo", sub: "Body scan · 10 min", premium: true },
+  { id: "slow",    icon: "☁️",  title: "Desacelerar",          sub: "Respiração 4·7·8", premium: true },
+];
+
+const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }) => (
+  <div
+    className="min-h-[80vh]"
+    style={{
+      background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)`,
+    }}
+  >
+    {/* stars */}
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {[...Array(14)].map((_, i) => (
+        <span
+          key={i}
+          className="absolute rounded-full bg-white"
+          style={{
+            width: 2 + (i % 3),
+            height: 2 + (i % 3),
+            top: `${(i * 41) % 90}%`,
+            left: `${(i * 67) % 95}%`,
+            opacity: 0.4 + (i % 3) * 0.2,
+            boxShadow: "0 0 6px rgba(255,255,255,0.7)",
+          }}
+        />
+      ))}
+    </div>
+    <div className="relative">
+      <div className="px-4 pt-3 pb-2 flex items-center gap-3">
+        <button
+          onClick={() => { haptic("light"); onBack(); }}
+          className="w-11 h-11 rounded-full flex items-center justify-center"
+          style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}
+          aria-label="Voltar"
+        >
+          <ArrowLeft size={18} color="#fff" />
+        </button>
+        <div className="flex-1 text-center text-[15px] font-semibold text-white">Dormir melhor</div>
+        <div className="w-11 h-11" />
+      </div>
+      <div className="px-5 pt-6 pb-6 text-center">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5C8E8" }}>
+          Boa noite, família
+        </div>
+        <h1 className="mt-2 text-[28px] font-semibold leading-tight" style={{ color: "#F4F1FF", letterSpacing: "-0.01em" }}>
+          Um sono que abraça.
+        </h1>
+        <p className="mt-2 text-[14px] max-w-[300px] mx-auto" style={{ color: "#B8BCD8" }}>
+          Reduza o ritmo. Diminua a luz. Vamos desacelerar juntos.
+        </p>
+      </div>
+      <div className="px-5 pb-12 space-y-3">
+        {SLEEP_ITEMS.map((s) => (
+          <motion.button
+            key={s.id}
+            whileTap={{ scale: 0.985 }}
+            transition={tapSpring}
+            onClick={() => {
+              haptic("light");
+              if (s.premium) {
+                window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sleep" } }));
+                return;
+              }
+              if (s.id === "rain") go("sounds");
+              else if (s.id === "story") go("meditation");
+            }}
+            className="w-full text-left p-4 rounded-[24px] flex items-center gap-4 relative"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+            }}
+          >
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+            >
+              {s.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[15px] font-semibold text-white">{s.title}</div>
+              <div className="text-[12px]" style={{ color: "#B8BCD8" }}>{s.sub}</div>
+            </div>
+            {s.premium
+              ? <Lock size={16} color="#C9A84C" />
+              : <ChevronRight size={18} color="#B8BCD8" />}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 
 /* ────────────── MEDITATION ────────────── */
 const MED_TRACKS = [
