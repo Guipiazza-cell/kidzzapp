@@ -1260,6 +1260,8 @@ const WellnessHub = ({ onBack }: Props) => {
             {view === "realworld"  && <RealWorldView onBack={back} />}
             {view === "journey"    && <JourneyView onBack={back} />}
             {view === "sleep"      && <SleepView onBack={back} go={go} />}
+            {view === "family"     && <FamilyView onBack={back} />}
+
           </motion.div>
         </AnimatePresence>
       </div>
