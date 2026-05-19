@@ -68,12 +68,31 @@
     @apply border-border;
   }
 
+  html, body {
+    /* Smooth momentum scroll on iOS + contain overscroll bounce that breaks fixed UIs */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+
   body {
     @apply bg-background text-foreground font-kids antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
+    /* Kills 300ms tap delay + double-tap zoom on iOS — fixes "needs multiple taps" */
+    touch-action: manipulation;
+    text-rendering: optimizeLegibility;
   }
+
+  /* Tappables: instant feedback, no native blue flash, no text selection on long-press */
+  button, [role="button"], a {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+
+  /* Prevent layout-shift flicker on images while they decode */
+  img { content-visibility: auto; }
 }
 
 @layer utilities {
