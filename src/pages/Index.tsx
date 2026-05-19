@@ -188,6 +188,41 @@ const Index = () => {
     };
   }, []);
 
+  // Tab <-> URL hash sync. Lets the browser back button + share links work
+  // without rewriting the routing layer. Hash format: `#tab=dreams`.
+  const KNOWN_TABS = ["chat","explore","routine","play","memories","moments","cinema","wellness","achievements","dreams","music"];
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const parseHash = () => {
+      const m = window.location.hash.match(/tab=([\w-]+)/);
+      return m && KNOWN_TABS.includes(m[1]) ? m[1] : null;
+    };
+    const initial = parseHash();
+    if (initial && initial !== activeTab) setActiveTab(initial);
+
+    const onPop = () => {
+      const t = parseHash() ?? "chat";
+      setActiveTab(t);
+      setShowLab(false); setShowPlay(false); setShowTravel(false);
+      setShowChallenge(false); setShowReferral(false); setShowRetrospective(false);
+      if (t === "chat") setStep("home");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const current = window.location.hash.match(/tab=([\w-]+)/)?.[1];
+    if (activeTab === "chat") {
+      if (current) window.history.replaceState(null, "", window.location.pathname);
+    } else if (current !== activeTab) {
+      // pushState so the back button returns to the previous tab.
+      window.history.pushState({ tab: activeTab }, "", `#tab=${activeTab}`);
+    }
+  }, [activeTab]);
+
   // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
   useEffect(() => {
     if (profile?.is_premium) return;
