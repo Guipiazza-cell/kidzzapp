@@ -1495,7 +1495,7 @@ const WellnessHub = ({ onBack }: Props) => {
   const back = useCallback(() => setView("home"), []);
 
   return (
-    <div className="min-h-screen relative" style={{ background: ivory, color: ink }}>
+    <div className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain relative" style={{ background: ivory, color: ink, WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
       <Atmosphere />
       <div className="relative max-w-[520px] mx-auto pb-28">
         <AnimatePresence mode="wait">
