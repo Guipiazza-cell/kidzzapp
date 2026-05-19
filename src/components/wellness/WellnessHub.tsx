@@ -431,17 +431,18 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
 
   useEffect(() => {
     engineRef.current = new AmbientSoundEngine();
-    return () => { engineRef.current?.stop(); };
+    return () => { engineRef.current?.stopAll?.(); };
   }, []);
 
   const toggle = (s: typeof SOUND_LIST[number]) => {
     haptic("light");
+    const engine = engineRef.current as any;
     if (playing === s.id) {
-      engineRef.current?.stop();
+      engine?.stop?.(s.id);
       setPlaying(null);
     } else {
-      engineRef.current?.stop();
-      engineRef.current?.start(s.url, 0.5);
+      engine?.stopAll?.();
+      engine?.start?.(s.id, s.url, 0.5);
       setPlaying(s.id);
     }
   };
