@@ -23,7 +23,7 @@ interface Props {
 }
 
 const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReached }: Props) => {
-  const { user, incrementQuestions } = useAuth();
+  const { user, session, incrementQuestions } = useAuth();
   const calledRef = useRef(false);
   const [phraseIdx, setPhraseIdx] = useState(0);
 
