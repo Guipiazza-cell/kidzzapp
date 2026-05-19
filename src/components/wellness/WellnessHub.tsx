@@ -1341,7 +1341,9 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
       })}
     </div>
   </>
-);
+  );
+};
+
 
 /* ────────────── ROOT ────────────── */
 const WellnessHub = ({ onBack }: Props) => {
