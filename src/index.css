@@ -44,6 +44,19 @@
     --kid-purple: 270 55% 58%;
     --kid-red: 0 75% 55%;
 
+    /* ── Premium Unified Palette (cinematic, calm, sophisticated) ── */
+    --cream: 38 55% 96%;            /* base background warm cream */
+    --cream-soft: 35 45% 92%;       /* secondary creamy surface */
+    --warm-white: 40 60% 98%;       /* warm white for cards */
+    --soft-gold: 42 60% 62%;        /* matte gold premium accent */
+    --soft-gold-glow: 45 80% 72%;   /* gold glow / particles */
+    --wellness-green: 150 28% 55%;  /* sage wellness */
+    --wellness-deep: 158 30% 38%;   /* emerald wellness */
+    --soft-lilac: 270 35% 80%;      /* discrete lilac */
+    --peach-soft: 22 70% 86%;       /* soft peach */
+    --sky-soft: 205 55% 88%;        /* very soft sky */
+    --warm-shadow: 30 25% 20%;      /* warm dark for shadows */
+
     /* Premium tokens */
     --premium-bg: 220 25% 8%;
     --premium-surface: 220 20% 14%;
