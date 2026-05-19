@@ -1252,6 +1252,8 @@ const MINDFUL_PROMPTS = [
 
 const MindfulView = ({ onBack }: { onBack: () => void }) => {
   const [i, setI] = useState(0);
+  const { completeToday } = useWellnessStreak();
+  useEffect(() => { completeToday(); }, [completeToday]);
   return (
     <>
       <TopBar title="Mini mindfulness" onBack={onBack} />
