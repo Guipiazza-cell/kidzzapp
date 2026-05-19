@@ -869,12 +869,18 @@ const speakLine = (text: string, onEnd?: () => void) => {
 const MeditationView = ({ onBack }: { onBack: () => void }) => {
   const [active, setActive] = useState<string | null>(null);
   const [lineIdx, setLineIdx] = useState(0);
+  const [ambient, setAmbient] = useState(true);
   const timerRef = useRef<number | null>(null);
+  const engineRef = useRef<AmbientSoundEngine | null>(null);
+  const { completeToday } = useWellnessStreak();
+
+  useEffect(() => { engineRef.current = new AmbientSoundEngine(); return () => engineRef.current?.stopAll?.(); }, []);
 
   const stopAll = useCallback(() => {
     window.speechSynthesis?.cancel();
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = null;
+    engineRef.current?.stopAll?.();
     setActive(null);
     setLineIdx(0);
   }, []);
@@ -887,9 +893,18 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
     if (!track) return;
     setActive(id);
     setLineIdx(0);
+    if (ambient) {
+      (engineRef.current as any)?.start?.("forest", "/audio/forest-calm.mp3", 0.18);
+    }
     let idx = 0;
     const speakNext = () => {
-      if (idx >= track.script.length) { setActive(null); setLineIdx(0); return; }
+      if (idx >= track.script.length) {
+        completeToday();
+        engineRef.current?.stopAll?.();
+        setActive(null);
+        setLineIdx(0);
+        return;
+      }
       setLineIdx(idx);
       speakLine(track.script[idx], () => {
         idx += 1;
@@ -898,6 +913,7 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
     };
     speakNext();
   };
+
 
   const current = MED_TRACKS.find((t) => t.id === active);
 
