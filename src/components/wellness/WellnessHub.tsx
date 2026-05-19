@@ -132,10 +132,63 @@ const REAL_WORLD = [
   },
 ];
 
-const MOOD_WEEK = [
-  { d: "S", v: 3 }, { d: "T", v: 4 }, { d: "Q", v: 4 },
-  { d: "Q", v: 3 }, { d: "S", v: 5 }, { d: "S", v: 4 }, { d: "D", v: 5 },
-];
+/* ────────────── Streak + Mood (localStorage) ────────────── */
+const STREAK_KEY = "kidzz_wellness_streak";
+const MOOD_KEY = "kidzz_wellness_mood";
+const dayKey = (d = new Date()) => d.toISOString().slice(0, 10);
+
+const useWellnessStreak = () => {
+  const [streak, setStreak] = useState<{ count: number; last: string | null }>(() => {
+    try {
+      const raw = localStorage.getItem(STREAK_KEY);
+      return raw ? JSON.parse(raw) : { count: 0, last: null };
+    } catch { return { count: 0, last: null }; }
+  });
+  const completeToday = useCallback(() => {
+    const today = dayKey();
+    setStreak((s) => {
+      if (s.last === today) return s;
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      const isConsec = s.last === dayKey(y);
+      const next = { count: isConsec ? s.count + 1 : 1, last: today };
+      try { localStorage.setItem(STREAK_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+  return { streak, completeToday };
+};
+
+const useMoodWeek = () => {
+  const [week, setWeek] = useState<{ d: string; v: number; date: string }[]>(() => {
+    const days = ["D", "S", "T", "Q", "Q", "S", "S"];
+    try {
+      const raw = localStorage.getItem(MOOD_KEY);
+      const stored = raw ? JSON.parse(raw) : {};
+      const out: { d: string; v: number; date: string }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const dt = new Date(); dt.setDate(dt.getDate() - i);
+        const k = dayKey(dt);
+        out.push({ d: days[dt.getDay()], v: stored[k] ?? 0, date: k });
+      }
+      return out;
+    } catch {
+      return days.map((d) => ({ d, v: 0, date: "" }));
+    }
+  });
+  const setToday = useCallback((v: number) => {
+    const today = dayKey();
+    try {
+      const raw = localStorage.getItem(MOOD_KEY);
+      const stored = raw ? JSON.parse(raw) : {};
+      stored[today] = v;
+      localStorage.setItem(MOOD_KEY, JSON.stringify(stored));
+    } catch {}
+    setWeek((w) => w.map((x) => x.date === today ? { ...x, v } : x));
+  }, []);
+  const todayValue = week[week.length - 1]?.v ?? 0;
+  return { week, setToday, todayValue };
+};
+
 
 /* ────────────── Breathing engine (reused inside Breath + SOS) ────────────── */
 const useBreath = (active: boolean) => {
