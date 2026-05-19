@@ -65,11 +65,17 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
     }, 300);
 
     try {
+      if (!session?.access_token) {
+        toast.error("Faça login para criar histórias.");
+        setIsGenerating(false);
+        clearInterval(timer);
+        return;
+      }
       const resp = await fetch(GENERATE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           childName,
@@ -77,7 +83,6 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           age,
           interests,
           ageRange: profile?.age_range || "3-7",
-          userId: user?.id ?? null,
         })
       });
 
