@@ -1282,7 +1282,11 @@ const RealWorldView = ({ onBack }: { onBack: () => void }) => (
 );
 
 /* ────────────── JOURNEY ────────────── */
-const JourneyView = ({ onBack }: { onBack: () => void }) => (
+const JourneyView = ({ onBack }: { onBack: () => void }) => {
+  const { week } = useMoodWeek();
+  const { streak } = useWellnessStreak();
+  const avg = week.filter(w => w.v > 0).reduce((s, w) => s + w.v, 0) / Math.max(week.filter(w => w.v > 0).length, 1);
+  return (
   <>
     <TopBar title="Jornada" onBack={onBack} />
     <div className="px-5 pt-4">
@@ -1290,24 +1294,31 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => (
       <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
         Vocês estão indo bem.
       </h1>
+      <p className="mt-1 text-[13px]" style={{ color: inkSoft }}>
+        Humor médio {avg.toFixed(1)}/5 · {streak.count} {streak.count === 1 ? "dia" : "dias"} de calma seguidos
+      </p>
     </div>
     <div className="px-5 pt-6 pb-10 space-y-3">
       <Surface className="p-5">
         <div className="flex items-end justify-between gap-2 h-28">
-          {MOOD_WEEK.map((m, i) => (
+          {week.map((m, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-2">
               <motion.div
                 initial={{ height: 4 }}
-                animate={{ height: 12 + m.v * 14 }}
+                animate={{ height: 12 + Math.max(m.v, 0.4) * 14 }}
                 transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                 className="w-full rounded-full"
-                style={{ background: `linear-gradient(180deg, ${sage}, ${serenity})`, maxWidth: 22 }}
+                style={{
+                  background: m.v > 0 ? `linear-gradient(180deg, ${sage}, ${serenity})` : `${ink}22`,
+                  maxWidth: 22,
+                }}
               />
               <span className="text-[11px]" style={{ color: inkSoft }}>{m.d}</span>
             </div>
           ))}
         </div>
       </Surface>
+
 
       {[
         { icon: HandHeart, t: "5 respirações guiadas", s: "Esta semana" },
