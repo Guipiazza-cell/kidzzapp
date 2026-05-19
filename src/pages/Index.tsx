@@ -484,13 +484,19 @@ const Index = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
           >
-            <Suspense fallback={
-              <div className="flex-1 flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
-              </div>
-            }>
-              {renderContent()}
-            </Suspense>
+            <TabErrorBoundary
+              resetKey={activeTab}
+              label={activeTab}
+              onBack={() => { setActiveTab("chat"); setStep("home"); }}
+            >
+              <Suspense fallback={
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
+                </div>
+              }>
+                {renderContent()}
+              </Suspense>
+            </TabErrorBoundary>
           </motion.div>
         </AnimatePresence>
       </div>
