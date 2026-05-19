@@ -784,7 +784,7 @@ const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }
 
   return (
     <div
-      className="min-h-[80vh]"
+      className="relative min-h-full"
       style={{ background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)` }}
     >
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
