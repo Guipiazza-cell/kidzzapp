@@ -152,9 +152,9 @@ const useBreath = (active: boolean) => {
   return { phase: seq[i], step: i };
 };
 
-/* ────────────── Atmosphere (daylight, soft) ────────────── */
+/* ────────────── Atmosphere (daylight + floating particles) ────────────── */
 const Atmosphere = () => (
-  <div className="fixed inset-0 pointer-events-none -z-10" aria-hidden>
+  <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden" aria-hidden>
     <div
       className="absolute inset-0"
       style={{
@@ -162,14 +162,38 @@ const Atmosphere = () => (
           `radial-gradient(120% 80% at 50% -10%, ${sand} 0%, ${ivory} 55%, ${ivory} 100%)`,
       }}
     />
+    {/* Sage glow top-left */}
     <div
-      className="absolute -top-24 -left-20 w-[60vw] h-[60vw] rounded-full opacity-50"
-      style={{ background: `radial-gradient(circle, ${serenity}55, transparent 60%)`, filter: "blur(40px)" }}
+      className="absolute -top-32 -left-24 w-[70vw] h-[70vw] rounded-full opacity-60"
+      style={{ background: `radial-gradient(circle, ${sage}55, transparent 65%)`, filter: "blur(60px)" }}
     />
+    {/* Emerald glow bottom-right */}
     <div
-      className="absolute -bottom-32 -right-24 w-[70vw] h-[70vw] rounded-full opacity-50"
-      style={{ background: `radial-gradient(circle, ${sage}55, transparent 60%)`, filter: "blur(50px)" }}
+      className="absolute -bottom-40 -right-32 w-[80vw] h-[80vw] rounded-full opacity-50"
+      style={{ background: `radial-gradient(circle, ${emerald}55, transparent 60%)`, filter: "blur(70px)" }}
     />
+    {/* Lilac veil center */}
+    <div
+      className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[90vw] h-[40vh] rounded-full opacity-30"
+      style={{ background: `radial-gradient(ellipse, ${lilac}66, transparent 70%)`, filter: "blur(80px)" }}
+    />
+    {/* Soft floating particles — pure CSS for perf */}
+    {[...Array(6)].map((_, i) => (
+      <span
+        key={i}
+        className="absolute rounded-full"
+        style={{
+          width: 3 + (i % 3),
+          height: 3 + (i % 3),
+          background: i % 2 ? `${gold}88` : `${sage}99`,
+          boxShadow: `0 0 8px ${i % 2 ? gold : sage}66`,
+          top: `${15 + (i * 13) % 70}%`,
+          left: `${8 + (i * 17) % 84}%`,
+          animation: `firefly-float-${i % 2 === 0 ? "a" : "b"} ${10 + i * 1.4}s ease-in-out ${i * 0.7}s infinite`,
+          opacity: 0.4,
+        }}
+      />
+    ))}
   </div>
 );
 
@@ -178,7 +202,7 @@ const TopBar = ({ title, onBack, right }: any) => (
   <div className="px-4 pt-3 pb-2 flex items-center gap-3">
     <button
       onClick={() => { haptic("light"); onBack(); }}
-      className="w-10 h-10 rounded-full flex items-center justify-center"
+      className="w-11 h-11 rounded-full flex items-center justify-center"
       style={{ background: surface, border: `1px solid ${stroke}` }}
       aria-label="Voltar"
     >
@@ -187,9 +211,94 @@ const TopBar = ({ title, onBack, right }: any) => (
     <div className="flex-1 text-center text-[15px] font-semibold" style={{ color: ink }}>
       {title}
     </div>
-    <div className="w-10 h-10">{right}</div>
+    <div className="w-11 h-11">{right}</div>
   </div>
 );
+
+/* ────────────── Hero — camaleão respirando + frases rotativas ────────────── */
+const HERO_PHRASES = [
+  "Hoje é um bom dia para respirar.",
+  "Seu momento de calma começa agora.",
+  "Vamos desacelerar juntos?",
+  "Um respiro, um abraço, um instante.",
+];
+
+const HeroBlock = ({ go }: { go: (v: View) => void }) => {
+  const [phrase, setPhrase] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setPhrase((p) => (p + 1) % HERO_PHRASES.length), 5500);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <div className="relative px-5 pt-2 pb-5">
+      {/* Backdrop oval glow behind chameleon */}
+      <div className="relative flex flex-col items-center">
+        <motion.div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[180px] rounded-full pointer-events-none"
+          style={{ background: `radial-gradient(ellipse, ${emerald}33, transparent 65%)`, filter: "blur(30px)" }}
+          animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <div className="relative -mb-2 pointer-events-auto">
+          <KidzzChameleon state="explorer" mood="calm" size="lg" interactive={false} showParticles={false} />
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={phrase}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-2 text-center text-[19px] font-medium leading-snug max-w-[280px]"
+            style={{ color: ink, letterSpacing: "-0.01em" }}
+          >
+            {HERO_PHRASES[phrase]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+
+      {/* 4 ações rápidas — chips premium */}
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
+        {[
+          { v: "breath" as View, label: "Relaxar agora", icon: Wind, tint: sage },
+          { v: "mindful" as View, label: "Ritual rápido", icon: Sparkles, tint: clay },
+          { v: "sos" as View, label: "SOS emocional", icon: LifeBuoy, tint: emerald },
+          { v: "sleep" as View, label: "Dormir melhor", icon: MoonIcon, tint: lilac },
+        ].map((c) => {
+          const Icon = c.icon;
+          return (
+            <motion.button
+              key={c.v}
+              whileTap={{ scale: 0.96 }}
+              transition={tapSpring}
+              onClick={() => { haptic("light"); go(c.v); }}
+              className="min-h-[58px] rounded-2xl flex items-center gap-2.5 px-3.5 text-left"
+              style={{
+                background: surface,
+                border: `1px solid ${stroke}`,
+                backdropFilter: "blur(18px)",
+                WebkitBackdropFilter: "blur(18px)",
+                boxShadow: "0 8px 24px -16px rgba(39,48,42,0.18)",
+              }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: `${c.tint}33` }}
+              >
+                <Icon size={17} style={{ color: ink }} strokeWidth={1.8} />
+              </div>
+              <span className="text-[13px] font-semibold leading-tight" style={{ color: ink }}>
+                {c.label}
+              </span>
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 /* ────────────── HOME ────────────── */
 const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => {
@@ -201,51 +310,35 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
       <TopBar title="Wellness" onBack={onBack} />
 
       {/* Greeting */}
-      <header className="px-5 pt-4 pb-2">
+      <header className="px-5 pt-3 pb-1">
         <Eyebrow>{greet}, família</Eyebrow>
-        <h1
-          className="mt-2 text-[34px] leading-[1.05] font-semibold"
-          style={{ color: ink, letterSpacing: "-0.02em" }}
-        >
-          Um respiro<br/>
-          <span style={{ color: inkSoft, fontWeight: 400 }}>para vocês hoje.</span>
-        </h1>
       </header>
 
-      {/* 1 · SOS Emocional */}
-      <div className="px-5 pt-6">
-        <motion.button
-          whileTap={{ scale: 0.985 }}
-          transition={tapSpring}
-          onClick={() => { haptic("medium"); go("sos"); }}
-          className="w-full text-left rounded-[28px] p-5 flex items-center gap-4 relative overflow-hidden"
+      {/* Hero cinematográfico */}
+      <HeroBlock go={go} />
+
+      {/* Sugestão da IA do camaleão */}
+      <div className="px-5">
+        <div
+          className="rounded-[22px] p-4 flex items-start gap-3"
           style={{
-            background: `linear-gradient(135deg, #FFFFFF 0%, ${pearl} 100%)`,
-            border: `1px solid ${stroke}`,
-            boxShadow: "0 20px 50px -28px rgba(43,47,54,0.25)",
+            background: `linear-gradient(135deg, ${emerald}14, ${sage}10)`,
+            border: `1px solid ${emerald}26`,
           }}
         >
           <div
-            className="absolute -right-10 -top-10 w-40 h-40 rounded-full"
-            style={{ background: `radial-gradient(circle, ${clay}33, transparent 70%)` }}
-          />
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-            style={{ background: "#FFFFFF", border: `1px solid ${stroke}` }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: `${emerald}22` }}
           >
-            <LifeBuoy size={26} style={{ color: clay }} strokeWidth={1.8} />
+            <HandHeart size={17} style={{ color: emerald }} strokeWidth={1.8} />
           </div>
           <div className="flex-1 min-w-0">
-            <Eyebrow>SOS Emocional</Eyebrow>
-            <div className="mt-0.5 text-[17px] font-semibold" style={{ color: ink }}>
-              Acalmar agora
-            </div>
-            <div className="text-[13px]" style={{ color: inkSoft }}>
-              Respiração guiada · acolhimento imediato
-            </div>
+            <Eyebrow>Sussurro do KIDZZ</Eyebrow>
+            <p className="mt-0.5 text-[14px] leading-snug" style={{ color: ink }}>
+              Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?
+            </p>
           </div>
-          <ChevronRight size={20} style={{ color: inkSoft }} />
-        </motion.button>
+        </div>
       </div>
 
       {/* 2 · Bem-estar diário */}
@@ -269,7 +362,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
             >
               <div
                 className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{ background: `${c.tint}26` }}
+                style={{ background: `${c.tint}33` }}
               >
                 <Icon size={20} style={{ color: ink }} strokeWidth={1.7} />
               </div>
@@ -333,7 +426,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
               <div className="text-[15px] font-semibold" style={{ color: ink }}>Humor desta semana</div>
               <div className="text-[12px]" style={{ color: inkSoft }}>Toque para ver a jornada completa</div>
             </div>
-            <Smile size={22} style={{ color: sage }} />
+            <Smile size={22} style={{ color: emerald }} />
           </div>
           <div className="mt-4 flex items-end justify-between gap-2 h-20">
             {MOOD_WEEK.map((m, i) => (
@@ -344,7 +437,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
                   transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                   className="w-full rounded-full"
                   style={{
-                    background: `linear-gradient(180deg, ${sage}, ${serenity})`,
+                    background: `linear-gradient(180deg, ${sage}, ${emerald})`,
                     maxWidth: 18,
                   }}
                 />
@@ -357,6 +450,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
     </>
   );
 };
+
 
 /* ────────────── BREATH / SOS (shared engine, distinct UI) ────────────── */
 const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean }) => {
