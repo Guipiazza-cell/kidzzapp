@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import wellnessMascot from "@/assets/kidzz/wellness.png";
 
 /* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
    Paleta sálvia + esmeralda + creme + dourado fosco.
@@ -297,9 +297,19 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
           animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div className="relative -mb-2 pointer-events-auto">
-          <KidzzChameleon state="explorer" mood="calm" size="lg" interactive={false} showParticles={false} />
-        </div>
+        <motion.div
+          className="relative -mb-2 pointer-events-auto w-40 h-40 flex items-center justify-center"
+          animate={{ y: [0, -6, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <img
+            src={wellnessMascot}
+            alt="KIDZZ Wellness"
+            className="w-full h-full object-contain drop-shadow-2xl select-none pointer-events-none"
+            draggable={false}
+            decoding="async"
+          />
+        </motion.div>
 
         <AnimatePresence mode="wait">
           <motion.p
@@ -1495,7 +1505,7 @@ const WellnessHub = ({ onBack }: Props) => {
   const back = useCallback(() => setView("home"), []);
 
   return (
-    <div className="min-h-screen relative" style={{ background: ivory, color: ink }}>
+    <div className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain relative" style={{ background: ivory, color: ink, WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
       <Atmosphere />
       <div className="relative max-w-[520px] mx-auto pb-28">
         <AnimatePresence mode="wait">
