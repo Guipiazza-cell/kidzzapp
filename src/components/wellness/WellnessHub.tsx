@@ -4,14 +4,17 @@ import {
   ArrowLeft, Wind, Heart, Sparkles, Play, Pause, Timer, X,
   Sun, Coffee, Flower2, Music2, BookOpen, Trees, Waves,
   MapPin, Star, ChevronRight, LifeBuoy, HandHeart, Smile,
-  Sunrise, Moon as MoonIcon,
+  Sunrise, Moon as MoonIcon, Lock, Zap,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 
-/* ── KIDZZ Wellness — "Spa Emocional da Apple"
-   Daylight, airy, breathing layout. Sage + serenity + ivory palette.
-   Every action opens its own dedicated view (no shared route).
+/* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
+   Paleta sálvia + esmeralda + creme + dourado fosco.
+   Hero cinematográfico, camaleão respirando, frases rotativas,
+   4 ações rápidas (Relaxar / Ritual / SOS / Dormir), biblioteca
+   de sons expandida e área Dormir premium.
 */
 
 interface Props { onBack: () => void; }
@@ -26,20 +29,24 @@ type View =
   | "pause"
   | "routine"
   | "realworld"
-  | "journey";
+  | "journey"
+  | "sleep";
 
-/* ────────────── Design tokens (local, light) ────────────── */
-const ink = "#2B2F36";        // primary text
-const inkSoft = "#5A6270";    // secondary text
-const ivory = "#FBF8F3";      // base bg
-const sand = "#F2ECE2";       // warm neutral
-const sage = "#A8B5A0";       // sage accent
+/* ────────────── Design tokens (sage + emerald spa) ────────────── */
+const ink = "#27302A";        // primary text (warm dark green-grey)
+const inkSoft = "#5A6660";    // secondary text
+const ivory = "#F7F4EC";      // base bg (warm cream)
+const sand = "#EFE9DC";       // warm neutral
+const sage = "#9CB39A";       // sage accent
+const emerald = "#5A8F77";    // emerald premium
 const serenity = "#BCCCD8";   // serenity blue
 const pearl = "#E8E4DC";      // pearl
 const clay = "#C9A48A";       // warm clay accent
+const gold = "#C9A84C";       // matte gold (premium)
+const lilac = "#CFC4E0";      // discreet lilac
 
-const surface = "rgba(255,255,255,0.72)";
-const stroke = "rgba(43,47,54,0.08)";
+const surface = "rgba(255,255,255,0.68)";
+const stroke = "rgba(39,48,42,0.08)";
 
 /* ────────────── Shared atoms ────────────── */
 const Surface = ({ children, className = "", onClick, style }: any) => (
@@ -145,9 +152,9 @@ const useBreath = (active: boolean) => {
   return { phase: seq[i], step: i };
 };
 
-/* ────────────── Atmosphere (daylight, soft) ────────────── */
+/* ────────────── Atmosphere (daylight + floating particles) ────────────── */
 const Atmosphere = () => (
-  <div className="fixed inset-0 pointer-events-none -z-10" aria-hidden>
+  <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden" aria-hidden>
     <div
       className="absolute inset-0"
       style={{
@@ -155,14 +162,38 @@ const Atmosphere = () => (
           `radial-gradient(120% 80% at 50% -10%, ${sand} 0%, ${ivory} 55%, ${ivory} 100%)`,
       }}
     />
+    {/* Sage glow top-left */}
     <div
-      className="absolute -top-24 -left-20 w-[60vw] h-[60vw] rounded-full opacity-50"
-      style={{ background: `radial-gradient(circle, ${serenity}55, transparent 60%)`, filter: "blur(40px)" }}
+      className="absolute -top-32 -left-24 w-[70vw] h-[70vw] rounded-full opacity-60"
+      style={{ background: `radial-gradient(circle, ${sage}55, transparent 65%)`, filter: "blur(60px)" }}
     />
+    {/* Emerald glow bottom-right */}
     <div
-      className="absolute -bottom-32 -right-24 w-[70vw] h-[70vw] rounded-full opacity-50"
-      style={{ background: `radial-gradient(circle, ${sage}55, transparent 60%)`, filter: "blur(50px)" }}
+      className="absolute -bottom-40 -right-32 w-[80vw] h-[80vw] rounded-full opacity-50"
+      style={{ background: `radial-gradient(circle, ${emerald}55, transparent 60%)`, filter: "blur(70px)" }}
     />
+    {/* Lilac veil center */}
+    <div
+      className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[90vw] h-[40vh] rounded-full opacity-30"
+      style={{ background: `radial-gradient(ellipse, ${lilac}66, transparent 70%)`, filter: "blur(80px)" }}
+    />
+    {/* Soft floating particles — pure CSS for perf */}
+    {[...Array(6)].map((_, i) => (
+      <span
+        key={i}
+        className="absolute rounded-full"
+        style={{
+          width: 3 + (i % 3),
+          height: 3 + (i % 3),
+          background: i % 2 ? `${gold}88` : `${sage}99`,
+          boxShadow: `0 0 8px ${i % 2 ? gold : sage}66`,
+          top: `${15 + (i * 13) % 70}%`,
+          left: `${8 + (i * 17) % 84}%`,
+          animation: `firefly-float-${i % 2 === 0 ? "a" : "b"} ${10 + i * 1.4}s ease-in-out ${i * 0.7}s infinite`,
+          opacity: 0.4,
+        }}
+      />
+    ))}
   </div>
 );
 
@@ -171,7 +202,7 @@ const TopBar = ({ title, onBack, right }: any) => (
   <div className="px-4 pt-3 pb-2 flex items-center gap-3">
     <button
       onClick={() => { haptic("light"); onBack(); }}
-      className="w-10 h-10 rounded-full flex items-center justify-center"
+      className="w-11 h-11 rounded-full flex items-center justify-center"
       style={{ background: surface, border: `1px solid ${stroke}` }}
       aria-label="Voltar"
     >
@@ -180,9 +211,94 @@ const TopBar = ({ title, onBack, right }: any) => (
     <div className="flex-1 text-center text-[15px] font-semibold" style={{ color: ink }}>
       {title}
     </div>
-    <div className="w-10 h-10">{right}</div>
+    <div className="w-11 h-11">{right}</div>
   </div>
 );
+
+/* ────────────── Hero — camaleão respirando + frases rotativas ────────────── */
+const HERO_PHRASES = [
+  "Hoje é um bom dia para respirar.",
+  "Seu momento de calma começa agora.",
+  "Vamos desacelerar juntos?",
+  "Um respiro, um abraço, um instante.",
+];
+
+const HeroBlock = ({ go }: { go: (v: View) => void }) => {
+  const [phrase, setPhrase] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setPhrase((p) => (p + 1) % HERO_PHRASES.length), 5500);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <div className="relative px-5 pt-2 pb-5">
+      {/* Backdrop oval glow behind chameleon */}
+      <div className="relative flex flex-col items-center">
+        <motion.div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[180px] rounded-full pointer-events-none"
+          style={{ background: `radial-gradient(ellipse, ${emerald}33, transparent 65%)`, filter: "blur(30px)" }}
+          animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <div className="relative -mb-2 pointer-events-auto">
+          <KidzzChameleon state="explorer" mood="calm" size="lg" interactive={false} showParticles={false} />
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={phrase}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-2 text-center text-[19px] font-medium leading-snug max-w-[280px]"
+            style={{ color: ink, letterSpacing: "-0.01em" }}
+          >
+            {HERO_PHRASES[phrase]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+
+      {/* 4 ações rápidas — chips premium */}
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
+        {[
+          { v: "breath" as View, label: "Relaxar agora", icon: Wind, tint: sage },
+          { v: "mindful" as View, label: "Ritual rápido", icon: Sparkles, tint: clay },
+          { v: "sos" as View, label: "SOS emocional", icon: LifeBuoy, tint: emerald },
+          { v: "sleep" as View, label: "Dormir melhor", icon: MoonIcon, tint: lilac },
+        ].map((c) => {
+          const Icon = c.icon;
+          return (
+            <motion.button
+              key={c.v}
+              whileTap={{ scale: 0.96 }}
+              transition={tapSpring}
+              onClick={() => { haptic("light"); go(c.v); }}
+              className="min-h-[58px] rounded-2xl flex items-center gap-2.5 px-3.5 text-left"
+              style={{
+                background: surface,
+                border: `1px solid ${stroke}`,
+                backdropFilter: "blur(18px)",
+                WebkitBackdropFilter: "blur(18px)",
+                boxShadow: "0 8px 24px -16px rgba(39,48,42,0.18)",
+              }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: `${c.tint}33` }}
+              >
+                <Icon size={17} style={{ color: ink }} strokeWidth={1.8} />
+              </div>
+              <span className="text-[13px] font-semibold leading-tight" style={{ color: ink }}>
+                {c.label}
+              </span>
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 /* ────────────── HOME ────────────── */
 const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => {
@@ -194,51 +310,35 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
       <TopBar title="Wellness" onBack={onBack} />
 
       {/* Greeting */}
-      <header className="px-5 pt-4 pb-2">
+      <header className="px-5 pt-3 pb-1">
         <Eyebrow>{greet}, família</Eyebrow>
-        <h1
-          className="mt-2 text-[34px] leading-[1.05] font-semibold"
-          style={{ color: ink, letterSpacing: "-0.02em" }}
-        >
-          Um respiro<br/>
-          <span style={{ color: inkSoft, fontWeight: 400 }}>para vocês hoje.</span>
-        </h1>
       </header>
 
-      {/* 1 · SOS Emocional */}
-      <div className="px-5 pt-6">
-        <motion.button
-          whileTap={{ scale: 0.985 }}
-          transition={tapSpring}
-          onClick={() => { haptic("medium"); go("sos"); }}
-          className="w-full text-left rounded-[28px] p-5 flex items-center gap-4 relative overflow-hidden"
+      {/* Hero cinematográfico */}
+      <HeroBlock go={go} />
+
+      {/* Sugestão da IA do camaleão */}
+      <div className="px-5">
+        <div
+          className="rounded-[22px] p-4 flex items-start gap-3"
           style={{
-            background: `linear-gradient(135deg, #FFFFFF 0%, ${pearl} 100%)`,
-            border: `1px solid ${stroke}`,
-            boxShadow: "0 20px 50px -28px rgba(43,47,54,0.25)",
+            background: `linear-gradient(135deg, ${emerald}14, ${sage}10)`,
+            border: `1px solid ${emerald}26`,
           }}
         >
           <div
-            className="absolute -right-10 -top-10 w-40 h-40 rounded-full"
-            style={{ background: `radial-gradient(circle, ${clay}33, transparent 70%)` }}
-          />
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-            style={{ background: "#FFFFFF", border: `1px solid ${stroke}` }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: `${emerald}22` }}
           >
-            <LifeBuoy size={26} style={{ color: clay }} strokeWidth={1.8} />
+            <HandHeart size={17} style={{ color: emerald }} strokeWidth={1.8} />
           </div>
           <div className="flex-1 min-w-0">
-            <Eyebrow>SOS Emocional</Eyebrow>
-            <div className="mt-0.5 text-[17px] font-semibold" style={{ color: ink }}>
-              Acalmar agora
-            </div>
-            <div className="text-[13px]" style={{ color: inkSoft }}>
-              Respiração guiada · acolhimento imediato
-            </div>
+            <Eyebrow>Sussurro do KIDZZ</Eyebrow>
+            <p className="mt-0.5 text-[14px] leading-snug" style={{ color: ink }}>
+              Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?
+            </p>
           </div>
-          <ChevronRight size={20} style={{ color: inkSoft }} />
-        </motion.button>
+        </div>
       </div>
 
       {/* 2 · Bem-estar diário */}
@@ -262,7 +362,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
             >
               <div
                 className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{ background: `${c.tint}26` }}
+                style={{ background: `${c.tint}33` }}
               >
                 <Icon size={20} style={{ color: ink }} strokeWidth={1.7} />
               </div>
@@ -326,7 +426,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
               <div className="text-[15px] font-semibold" style={{ color: ink }}>Humor desta semana</div>
               <div className="text-[12px]" style={{ color: inkSoft }}>Toque para ver a jornada completa</div>
             </div>
-            <Smile size={22} style={{ color: sage }} />
+            <Smile size={22} style={{ color: emerald }} />
           </div>
           <div className="mt-4 flex items-end justify-between gap-2 h-20">
             {MOOD_WEEK.map((m, i) => (
@@ -337,7 +437,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
                   transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                   className="w-full rounded-full"
                   style={{
-                    background: `linear-gradient(180deg, ${sage}, ${serenity})`,
+                    background: `linear-gradient(180deg, ${sage}, ${emerald})`,
                     maxWidth: 18,
                   }}
                 />
@@ -350,6 +450,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
     </>
   );
 };
+
 
 /* ────────────── BREATH / SOS (shared engine, distinct UI) ────────────── */
 const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean }) => {
@@ -417,12 +518,17 @@ const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean
   );
 };
 
-/* ────────────── SOUNDS ────────────── */
-const SOUND_LIST = [
-  { id: "rain",   label: "Chuva suave",   url: "/audio/rain-soft.mp3",   icon: "🌧" },
-  { id: "ocean",  label: "Oceano",        url: "/audio/ocean-waves.mp3", icon: "🌊" },
-  { id: "forest", label: "Floresta",      url: "/audio/forest-calm.mp3", icon: "🌿" },
-  { id: "white",  label: "Ruído branco",  url: "/audio/white-noise.mp3", icon: "☁️" },
+/* ────────────── SOUNDS — 8 atmosferas (4 grátis + 4 premium) ────────────── */
+type Sound = { id: string; label: string; url: string; icon: string; premium?: boolean; tint: string };
+const SOUND_LIST: Sound[] = [
+  { id: "rain",   label: "Chuva suave",    url: "/audio/rain-soft.mp3",   icon: "🌧",  tint: serenity },
+  { id: "ocean",  label: "Oceano",         url: "/audio/ocean-waves.mp3", icon: "🌊",  tint: serenity },
+  { id: "forest", label: "Floresta",       url: "/audio/forest-calm.mp3", icon: "🌿",  tint: sage },
+  { id: "white",  label: "Brisa branca",   url: "/audio/white-noise.mp3", icon: "☁️",  tint: pearl },
+  { id: "fire",   label: "Lareira",        url: "/audio/rain-soft.mp3",   icon: "🔥",  tint: clay,    premium: true },
+  { id: "train",  label: "Trem distante",  url: "/audio/white-noise.mp3", icon: "🚂",  tint: clay,    premium: true },
+  { id: "space",  label: "Espaço",         url: "/audio/ocean-waves.mp3", icon: "🌌",  tint: lilac,   premium: true },
+  { id: "river",  label: "Rio",            url: "/audio/forest-calm.mp3", icon: "🛶",  tint: emerald, premium: true },
 ];
 
 const SoundsView = ({ onBack }: { onBack: () => void }) => {
@@ -434,7 +540,12 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
     return () => { engineRef.current?.stopAll?.(); };
   }, []);
 
-  const toggle = (s: typeof SOUND_LIST[number]) => {
+  const toggle = (s: Sound) => {
+    if (s.premium) {
+      haptic("medium");
+      window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sound" } }));
+      return;
+    }
     haptic("light");
     const engine = engineRef.current as any;
     if (playing === s.id) {
@@ -451,7 +562,7 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
     <>
       <TopBar title="Sons da natureza" onBack={onBack} />
       <div className="px-5 pt-4 pb-2">
-        <Eyebrow>Som ambiente</Eyebrow>
+        <Eyebrow>Som ambiente · 8 atmosferas</Eyebrow>
         <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
           Escolha uma atmosfera.
         </h1>
@@ -465,18 +576,33 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
               whileTap={{ scale: 0.97 }}
               transition={tapSpring}
               onClick={() => toggle(s)}
-              className="p-4 rounded-[26px] flex flex-col gap-3 text-left min-h-[130px]"
+              className="relative p-4 rounded-[26px] flex flex-col gap-3 text-left min-h-[134px] overflow-hidden"
               style={{
                 background: isOn ? "#FFFFFF" : surface,
-                border: `1px solid ${isOn ? `${sage}66` : stroke}`,
-                boxShadow: isOn ? `0 18px 40px -22px ${sage}99` : "none",
+                border: `1px solid ${isOn ? `${emerald}66` : stroke}`,
+                boxShadow: isOn ? `0 18px 40px -22px ${emerald}99` : "0 6px 18px -12px rgba(39,48,42,0.12)",
               }}
             >
-              <div className="text-2xl">{s.icon}</div>
-              <div>
+              {/* tinted glow */}
+              <div
+                className="absolute -top-6 -right-6 w-24 h-24 rounded-full pointer-events-none"
+                style={{ background: `radial-gradient(circle, ${s.tint}55, transparent 70%)`, filter: "blur(12px)" }}
+              />
+              <div className="relative flex items-start justify-between">
+                <div className="text-2xl">{s.icon}</div>
+                {s.premium && (
+                  <div
+                    className="flex items-center gap-1 px-2 h-6 rounded-full text-[10px] font-bold"
+                    style={{ background: `${gold}22`, color: gold }}
+                  >
+                    <Lock size={10} /> Premium
+                  </div>
+                )}
+              </div>
+              <div className="relative">
                 <div className="text-[15px] font-semibold" style={{ color: ink }}>{s.label}</div>
                 <div className="mt-1 text-[12px]" style={{ color: inkSoft }}>
-                  {isOn ? "Tocando" : "Tocar"}
+                  {s.premium ? "Desbloquear" : isOn ? "Tocando" : "Tocar"}
                 </div>
               </div>
             </motion.button>
@@ -486,6 +612,106 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
     </>
   );
 };
+
+/* ────────────── SLEEP — área Dormir Melhor (premium feel) ────────────── */
+const SLEEP_ITEMS = [
+  { id: "story",   icon: "🌙", title: "Histórias calmas",     sub: "Narração suave para embalar" },
+  { id: "rain",    icon: "🌧", title: "Sons noturnos",        sub: "Chuva, oceano, floresta" },
+  { id: "deep",    icon: "🛏", title: "Relaxamento profundo", sub: "Body scan · 10 min", premium: true },
+  { id: "slow",    icon: "☁️",  title: "Desacelerar",          sub: "Respiração 4·7·8", premium: true },
+];
+
+const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }) => (
+  <div
+    className="min-h-[80vh]"
+    style={{
+      background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)`,
+    }}
+  >
+    {/* stars */}
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {[...Array(14)].map((_, i) => (
+        <span
+          key={i}
+          className="absolute rounded-full bg-white"
+          style={{
+            width: 2 + (i % 3),
+            height: 2 + (i % 3),
+            top: `${(i * 41) % 90}%`,
+            left: `${(i * 67) % 95}%`,
+            opacity: 0.4 + (i % 3) * 0.2,
+            boxShadow: "0 0 6px rgba(255,255,255,0.7)",
+          }}
+        />
+      ))}
+    </div>
+    <div className="relative">
+      <div className="px-4 pt-3 pb-2 flex items-center gap-3">
+        <button
+          onClick={() => { haptic("light"); onBack(); }}
+          className="w-11 h-11 rounded-full flex items-center justify-center"
+          style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}
+          aria-label="Voltar"
+        >
+          <ArrowLeft size={18} color="#fff" />
+        </button>
+        <div className="flex-1 text-center text-[15px] font-semibold text-white">Dormir melhor</div>
+        <div className="w-11 h-11" />
+      </div>
+      <div className="px-5 pt-6 pb-6 text-center">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5C8E8" }}>
+          Boa noite, família
+        </div>
+        <h1 className="mt-2 text-[28px] font-semibold leading-tight" style={{ color: "#F4F1FF", letterSpacing: "-0.01em" }}>
+          Um sono que abraça.
+        </h1>
+        <p className="mt-2 text-[14px] max-w-[300px] mx-auto" style={{ color: "#B8BCD8" }}>
+          Reduza o ritmo. Diminua a luz. Vamos desacelerar juntos.
+        </p>
+      </div>
+      <div className="px-5 pb-12 space-y-3">
+        {SLEEP_ITEMS.map((s) => (
+          <motion.button
+            key={s.id}
+            whileTap={{ scale: 0.985 }}
+            transition={tapSpring}
+            onClick={() => {
+              haptic("light");
+              if (s.premium) {
+                window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sleep" } }));
+                return;
+              }
+              if (s.id === "rain") go("sounds");
+              else if (s.id === "story") go("meditation");
+            }}
+            className="w-full text-left p-4 rounded-[24px] flex items-center gap-4 relative"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+            }}
+          >
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+            >
+              {s.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[15px] font-semibold text-white">{s.title}</div>
+              <div className="text-[12px]" style={{ color: "#B8BCD8" }}>{s.sub}</div>
+            </div>
+            {s.premium
+              ? <Lock size={16} color="#C9A84C" />
+              : <ChevronRight size={18} color="#B8BCD8" />}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 
 /* ────────────── MEDITATION ────────────── */
 const MED_TRACKS = [
@@ -808,6 +1034,7 @@ const WellnessHub = ({ onBack }: Props) => {
             {view === "routine"    && <RoutineView onBack={back} />}
             {view === "realworld"  && <RealWorldView onBack={back} />}
             {view === "journey"    && <JourneyView onBack={back} />}
+            {view === "sleep"      && <SleepView onBack={back} go={go} />}
           </motion.div>
         </AnimatePresence>
       </div>
