@@ -361,21 +361,66 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
 const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => {
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  const { streak } = useWellnessStreak();
+  const { week, setToday, todayValue } = useMoodWeek();
 
   return (
     <>
       <TopBar title="Wellness" onBack={onBack} />
 
-      {/* Greeting */}
-      <header className="px-5 pt-3 pb-1">
+      {/* Greeting + streak */}
+      <header className="px-5 pt-3 pb-1 flex items-center justify-between">
         <Eyebrow>{greet}, família</Eyebrow>
+        {streak.count > 0 && (
+          <div
+            className="flex items-center gap-1.5 px-3 h-7 rounded-full text-[11px] font-semibold"
+            style={{ background: `${emerald}18`, color: emerald, border: `1px solid ${emerald}33` }}
+          >
+            <Zap size={12} fill="currentColor" strokeWidth={0} />
+            {streak.count} {streak.count === 1 ? "dia" : "dias"} de calma
+          </div>
+        )}
       </header>
 
       {/* Hero cinematográfico */}
       <HeroBlock go={go} />
 
-      {/* Sugestão da IA do camaleão */}
+      {/* Check-in de humor diário */}
       <div className="px-5">
+        <Surface className="p-4">
+          <Eyebrow>{todayValue > 0 ? "Hoje você está" : "Como você está hoje?"}</Eyebrow>
+          <div className="mt-2.5 flex items-center justify-between gap-1.5">
+            {[
+              { v: 1, emoji: "😔", label: "Triste" },
+              { v: 2, emoji: "😐", label: "Mais ou menos" },
+              { v: 3, emoji: "🙂", label: "Bem" },
+              { v: 4, emoji: "😊", label: "Feliz" },
+              { v: 5, emoji: "🤩", label: "Ótimo" },
+            ].map((m) => {
+              const isOn = todayValue === m.v;
+              return (
+                <motion.button
+                  key={m.v}
+                  whileTap={{ scale: 0.9 }}
+                  transition={tapSpring}
+                  onClick={() => { haptic("light"); setToday(m.v); }}
+                  className="flex-1 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-0.5"
+                  style={{
+                    background: isOn ? `${emerald}22` : "transparent",
+                    border: `1px solid ${isOn ? `${emerald}66` : stroke}`,
+                  }}
+                  aria-label={m.label}
+                >
+                  <span className="text-[22px] leading-none">{m.emoji}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </Surface>
+      </div>
+
+      {/* Sugestão da IA do camaleão */}
+      <div className="px-5 pt-3">
         <div
           className="rounded-[22px] p-4 flex items-start gap-3"
           style={{
@@ -392,14 +437,16 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
           <div className="flex-1 min-w-0">
             <Eyebrow>Sussurro do KIDZZ</Eyebrow>
             <p className="mt-0.5 text-[14px] leading-snug" style={{ color: ink }}>
-              Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?
+              {todayValue <= 2 && todayValue > 0
+                ? "Hoje parece pesado. Que tal 1 minuto de pausa?"
+                : "Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?"}
             </p>
           </div>
         </div>
       </div>
 
       {/* 2 · Bem-estar diário */}
-      <SectionTitle kicker="Bem-estar diário" title="Pequenos rituais" sub="Escolha um momento. Cada um abre sua própria experiência." />
+      <SectionTitle kicker="Bem-estar diário" title="Pequenos rituais" sub="Cada toque conta como um dia de calma." />
       <div className="px-5 grid grid-cols-2 gap-3">
         {DAILY.map((c) => {
           const Icon = c.icon;
@@ -486,15 +533,15 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
             <Smile size={22} style={{ color: emerald }} />
           </div>
           <div className="mt-4 flex items-end justify-between gap-2 h-20">
-            {MOOD_WEEK.map((m, i) => (
+            {week.map((m, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
                 <motion.div
                   initial={{ height: 4 }}
-                  animate={{ height: 8 + m.v * 10 }}
+                  animate={{ height: 8 + Math.max(m.v, 0.4) * 10 }}
                   transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                   className="w-full rounded-full"
                   style={{
-                    background: `linear-gradient(180deg, ${sage}, ${emerald})`,
+                    background: m.v > 0 ? `linear-gradient(180deg, ${sage}, ${emerald})` : `${ink}22`,
                     maxWidth: 18,
                   }}
                 />
@@ -507,6 +554,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
     </>
   );
 };
+
 
 
 /* ────────────── BREATH / SOS (shared engine, distinct UI) ────────────── */
