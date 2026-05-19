@@ -1505,7 +1505,16 @@ const WellnessHub = ({ onBack }: Props) => {
   const back = useCallback(() => setView("home"), []);
 
   return (
-    <div className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain relative" style={{ background: ivory, color: ink, WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+    <div
+      className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain relative"
+      style={{
+        // Translucent warm-cream veil over the global cinematic background.
+        // Keeps spa-silence feel while unifying with the rest of the app.
+        background: "linear-gradient(180deg, hsl(38 55% 96% / 0.78) 0%, hsl(150 28% 90% / 0.72) 100%)",
+        color: ink,
+        WebkitOverflowScrolling: "touch",
+      } as React.CSSProperties}
+    >
       <Atmosphere />
       <div className="relative max-w-[520px] mx-auto pb-28">
         <AnimatePresence mode="wait">
