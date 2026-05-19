@@ -23,7 +23,7 @@ interface Props {
 }
 
 const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReached }: Props) => {
-  const { user, incrementQuestions } = useAuth();
+  const { user, session, incrementQuestions } = useAuth();
   const calledRef = useRef(false);
   const [phraseIdx, setPhraseIdx] = useState(0);
 
@@ -45,18 +45,22 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReac
 
     const generate = async () => {
       try {
+        if (!session?.access_token) {
+          toast.error("Faça login para continuar.");
+          onError();
+          return;
+        }
         await incrementQuestions();
 
         const resp = await fetch(CHAT_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
             messages: [{ role: "user", content: question }],
             ageRange,
-            userId: user?.id || null,
           }),
           signal: controller.signal,
         });
