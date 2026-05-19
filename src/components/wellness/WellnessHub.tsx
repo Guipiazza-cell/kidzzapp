@@ -4,14 +4,17 @@ import {
   ArrowLeft, Wind, Heart, Sparkles, Play, Pause, Timer, X,
   Sun, Coffee, Flower2, Music2, BookOpen, Trees, Waves,
   MapPin, Star, ChevronRight, LifeBuoy, HandHeart, Smile,
-  Sunrise, Moon as MoonIcon,
+  Sunrise, Moon as MoonIcon, Lock, Zap,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 
-/* ── KIDZZ Wellness — "Spa Emocional da Apple"
-   Daylight, airy, breathing layout. Sage + serenity + ivory palette.
-   Every action opens its own dedicated view (no shared route).
+/* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
+   Paleta sálvia + esmeralda + creme + dourado fosco.
+   Hero cinematográfico, camaleão respirando, frases rotativas,
+   4 ações rápidas (Relaxar / Ritual / SOS / Dormir), biblioteca
+   de sons expandida e área Dormir premium.
 */
 
 interface Props { onBack: () => void; }
@@ -26,20 +29,24 @@ type View =
   | "pause"
   | "routine"
   | "realworld"
-  | "journey";
+  | "journey"
+  | "sleep";
 
-/* ────────────── Design tokens (local, light) ────────────── */
-const ink = "#2B2F36";        // primary text
-const inkSoft = "#5A6270";    // secondary text
-const ivory = "#FBF8F3";      // base bg
-const sand = "#F2ECE2";       // warm neutral
-const sage = "#A8B5A0";       // sage accent
+/* ────────────── Design tokens (sage + emerald spa) ────────────── */
+const ink = "#27302A";        // primary text (warm dark green-grey)
+const inkSoft = "#5A6660";    // secondary text
+const ivory = "#F7F4EC";      // base bg (warm cream)
+const sand = "#EFE9DC";       // warm neutral
+const sage = "#9CB39A";       // sage accent
+const emerald = "#5A8F77";    // emerald premium
 const serenity = "#BCCCD8";   // serenity blue
 const pearl = "#E8E4DC";      // pearl
 const clay = "#C9A48A";       // warm clay accent
+const gold = "#C9A84C";       // matte gold (premium)
+const lilac = "#CFC4E0";      // discreet lilac
 
-const surface = "rgba(255,255,255,0.72)";
-const stroke = "rgba(43,47,54,0.08)";
+const surface = "rgba(255,255,255,0.68)";
+const stroke = "rgba(39,48,42,0.08)";
 
 /* ────────────── Shared atoms ────────────── */
 const Surface = ({ children, className = "", onClick, style }: any) => (
