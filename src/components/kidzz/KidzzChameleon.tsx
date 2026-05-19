@@ -7,10 +7,7 @@
 
 import { forwardRef, memo, useRef, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import cosmicImg from "@/assets/kidzz/cosmic.webp";
-import moonImg from "@/assets/kidzz/moon.webp";
-import explorerImg from "@/assets/kidzz/explorer.webp";
-import musicImg from "@/assets/kidzz/music.webp";
+import uploadedChameleonImg from "@/assets/kidzz/uploaded-chameleon-cutout.webp";
 
 export type KidzzState = "cosmic" | "moon" | "explorer" | "music" | "play";
 export type KidzzMood = "idle" | "curious" | "calm" | "guide" | "happy" | "talking" | "thinking";
@@ -42,12 +39,11 @@ const glowMap = {
 };
 
 const stateAssets: Record<KidzzState, string> = {
-  cosmic: cosmicImg,
-  moon: moonImg,
-  explorer: explorerImg,
-  music: musicImg,
-  // "play" usa o mesmo asset aventureiro do explorer (já é verde/laranja vibrante)
-  play: explorerImg,
+  cosmic: uploadedChameleonImg,
+  moon: uploadedChameleonImg,
+  explorer: uploadedChameleonImg,
+  music: uploadedChameleonImg,
+  play: uploadedChameleonImg,
 };
 
 const stateImageFilter: Partial<Record<KidzzState, string>> = {};
@@ -175,7 +171,7 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
           <img
             src={stateAssets[state]}
             alt={`KIDZZ - ${state}`}
-            className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
+            className="w-full h-full object-contain drop-shadow-2xl pointer-events-none scale-[1.08]"
             draggable={false}
             decoding="async"
             loading="eager"
