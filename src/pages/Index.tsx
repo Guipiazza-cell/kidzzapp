@@ -46,6 +46,7 @@ import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import MagicalBackground from "@/components/MagicalBackground";
 import BottomNav from "@/components/flow/BottomNav";
 import XpToast from "@/components/flow/XpToast";
+import TabErrorBoundary from "@/components/TabErrorBoundary";
 import ConversionNudgeCard from "@/components/viral/ConversionNudgeCard";
 import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCard, markConversionCardShown } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
