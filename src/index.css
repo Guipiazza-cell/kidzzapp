@@ -304,6 +304,20 @@
   contain-intrinsic-size: 1px 600px;
 }
 
+/* Wellness/meditation breathing rhythm (4s inhale / hold / exhale) */
+@keyframes wellness-breath {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+.animate-breath { animation: wellness-breath 7s ease-in-out infinite; }
+
+/* Slow ambient drift for wellness orbs */
+@keyframes ambient-drift {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(0,-10px,0) scale(1.04); }
+}
+.animate-ambient-drift { animation: ambient-drift 10s ease-in-out infinite; }
+
 /* Respect prefers-reduced-motion globally — disables expensive ambient loops
    for users who opted out, and reduces battery drain on mobile. */
 @media (prefers-reduced-motion: reduce) {
