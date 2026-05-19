@@ -103,11 +103,14 @@ const ChatScreen = ({
   }, [speak, user]);
 
   const streamChat = useCallback(async (userMessages: { role: string; content: string }[]) => {
+    if (!session?.access_token) {
+      throw new Error("Você precisa estar logado para conversar com o KIDZZ.");
+    }
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({ messages: userMessages, ageRange }),
     });
