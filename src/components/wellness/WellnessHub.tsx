@@ -132,10 +132,63 @@ const REAL_WORLD = [
   },
 ];
 
-const MOOD_WEEK = [
-  { d: "S", v: 3 }, { d: "T", v: 4 }, { d: "Q", v: 4 },
-  { d: "Q", v: 3 }, { d: "S", v: 5 }, { d: "S", v: 4 }, { d: "D", v: 5 },
-];
+/* ────────────── Streak + Mood (localStorage) ────────────── */
+const STREAK_KEY = "kidzz_wellness_streak";
+const MOOD_KEY = "kidzz_wellness_mood";
+const dayKey = (d = new Date()) => d.toISOString().slice(0, 10);
+
+const useWellnessStreak = () => {
+  const [streak, setStreak] = useState<{ count: number; last: string | null }>(() => {
+    try {
+      const raw = localStorage.getItem(STREAK_KEY);
+      return raw ? JSON.parse(raw) : { count: 0, last: null };
+    } catch { return { count: 0, last: null }; }
+  });
+  const completeToday = useCallback(() => {
+    const today = dayKey();
+    setStreak((s) => {
+      if (s.last === today) return s;
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      const isConsec = s.last === dayKey(y);
+      const next = { count: isConsec ? s.count + 1 : 1, last: today };
+      try { localStorage.setItem(STREAK_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+  return { streak, completeToday };
+};
+
+const useMoodWeek = () => {
+  const [week, setWeek] = useState<{ d: string; v: number; date: string }[]>(() => {
+    const days = ["D", "S", "T", "Q", "Q", "S", "S"];
+    try {
+      const raw = localStorage.getItem(MOOD_KEY);
+      const stored = raw ? JSON.parse(raw) : {};
+      const out: { d: string; v: number; date: string }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const dt = new Date(); dt.setDate(dt.getDate() - i);
+        const k = dayKey(dt);
+        out.push({ d: days[dt.getDay()], v: stored[k] ?? 0, date: k });
+      }
+      return out;
+    } catch {
+      return days.map((d) => ({ d, v: 0, date: "" }));
+    }
+  });
+  const setToday = useCallback((v: number) => {
+    const today = dayKey();
+    try {
+      const raw = localStorage.getItem(MOOD_KEY);
+      const stored = raw ? JSON.parse(raw) : {};
+      stored[today] = v;
+      localStorage.setItem(MOOD_KEY, JSON.stringify(stored));
+    } catch {}
+    setWeek((w) => w.map((x) => x.date === today ? { ...x, v } : x));
+  }, []);
+  const todayValue = week[week.length - 1]?.v ?? 0;
+  return { week, setToday, todayValue };
+};
+
 
 /* ────────────── Breathing engine (reused inside Breath + SOS) ────────────── */
 const useBreath = (active: boolean) => {
@@ -308,21 +361,66 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
 const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => {
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  const { streak } = useWellnessStreak();
+  const { week, setToday, todayValue } = useMoodWeek();
 
   return (
     <>
       <TopBar title="Wellness" onBack={onBack} />
 
-      {/* Greeting */}
-      <header className="px-5 pt-3 pb-1">
+      {/* Greeting + streak */}
+      <header className="px-5 pt-3 pb-1 flex items-center justify-between">
         <Eyebrow>{greet}, família</Eyebrow>
+        {streak.count > 0 && (
+          <div
+            className="flex items-center gap-1.5 px-3 h-7 rounded-full text-[11px] font-semibold"
+            style={{ background: `${emerald}18`, color: emerald, border: `1px solid ${emerald}33` }}
+          >
+            <Zap size={12} fill="currentColor" strokeWidth={0} />
+            {streak.count} {streak.count === 1 ? "dia" : "dias"} de calma
+          </div>
+        )}
       </header>
 
       {/* Hero cinematográfico */}
       <HeroBlock go={go} />
 
-      {/* Sugestão da IA do camaleão */}
+      {/* Check-in de humor diário */}
       <div className="px-5">
+        <Surface className="p-4">
+          <Eyebrow>{todayValue > 0 ? "Hoje você está" : "Como você está hoje?"}</Eyebrow>
+          <div className="mt-2.5 flex items-center justify-between gap-1.5">
+            {[
+              { v: 1, emoji: "😔", label: "Triste" },
+              { v: 2, emoji: "😐", label: "Mais ou menos" },
+              { v: 3, emoji: "🙂", label: "Bem" },
+              { v: 4, emoji: "😊", label: "Feliz" },
+              { v: 5, emoji: "🤩", label: "Ótimo" },
+            ].map((m) => {
+              const isOn = todayValue === m.v;
+              return (
+                <motion.button
+                  key={m.v}
+                  whileTap={{ scale: 0.9 }}
+                  transition={tapSpring}
+                  onClick={() => { haptic("light"); setToday(m.v); }}
+                  className="flex-1 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-0.5"
+                  style={{
+                    background: isOn ? `${emerald}22` : "transparent",
+                    border: `1px solid ${isOn ? `${emerald}66` : stroke}`,
+                  }}
+                  aria-label={m.label}
+                >
+                  <span className="text-[22px] leading-none">{m.emoji}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </Surface>
+      </div>
+
+      {/* Sugestão da IA do camaleão */}
+      <div className="px-5 pt-3">
         <div
           className="rounded-[22px] p-4 flex items-start gap-3"
           style={{
@@ -339,14 +437,16 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
           <div className="flex-1 min-w-0">
             <Eyebrow>Sussurro do KIDZZ</Eyebrow>
             <p className="mt-0.5 text-[14px] leading-snug" style={{ color: ink }}>
-              Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?
+              {todayValue <= 2 && todayValue > 0
+                ? "Hoje parece pesado. Que tal 1 minuto de pausa?"
+                : "Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?"}
             </p>
           </div>
         </div>
       </div>
 
       {/* 2 · Bem-estar diário */}
-      <SectionTitle kicker="Bem-estar diário" title="Pequenos rituais" sub="Escolha um momento. Cada um abre sua própria experiência." />
+      <SectionTitle kicker="Bem-estar diário" title="Pequenos rituais" sub="Cada toque conta como um dia de calma." />
       <div className="px-5 grid grid-cols-2 gap-3">
         {DAILY.map((c) => {
           const Icon = c.icon;
@@ -433,15 +533,15 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
             <Smile size={22} style={{ color: emerald }} />
           </div>
           <div className="mt-4 flex items-end justify-between gap-2 h-20">
-            {MOOD_WEEK.map((m, i) => (
+            {week.map((m, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
                 <motion.div
                   initial={{ height: 4 }}
-                  animate={{ height: 8 + m.v * 10 }}
+                  animate={{ height: 8 + Math.max(m.v, 0.4) * 10 }}
                   transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                   className="w-full rounded-full"
                   style={{
-                    background: `linear-gradient(180deg, ${sage}, ${emerald})`,
+                    background: m.v > 0 ? `linear-gradient(180deg, ${sage}, ${emerald})` : `${ink}22`,
                     maxWidth: 18,
                   }}
                 />
@@ -456,10 +556,15 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
 };
 
 
+
 /* ────────────── BREATH / SOS (shared engine, distinct UI) ────────────── */
 const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean }) => {
   const [active, setActive] = useState(true);
   const { phase, step } = useBreath(active);
+  const { completeToday } = useWellnessStreak();
+  const [cycles, setCycles] = useState(0);
+  useEffect(() => { if (step === 2) setCycles((c) => { const n = c + 1; if (n === 3) completeToday(); return n; }); }, [step, completeToday]);
+
 
   return (
     <>
@@ -625,96 +730,198 @@ const SLEEP_ITEMS = [
   { id: "slow",    icon: "☁️",  title: "Desacelerar",          sub: "Respiração 4·7·8", premium: true },
 ];
 
-const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }) => (
-  <div
-    className="min-h-[80vh]"
-    style={{
-      background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)`,
-    }}
-  >
-    {/* stars */}
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(14)].map((_, i) => (
-        <span
-          key={i}
-          className="absolute rounded-full bg-white"
-          style={{
-            width: 2 + (i % 3),
-            height: 2 + (i % 3),
-            top: `${(i * 41) % 90}%`,
-            left: `${(i * 67) % 95}%`,
-            opacity: 0.4 + (i % 3) * 0.2,
-            boxShadow: "0 0 6px rgba(255,255,255,0.7)",
-          }}
-        />
-      ))}
-    </div>
-    <div className="relative">
-      <div className="px-4 pt-3 pb-2 flex items-center gap-3">
-        <button
-          onClick={() => { haptic("light"); onBack(); }}
-          className="w-11 h-11 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}
-          aria-label="Voltar"
-        >
-          <ArrowLeft size={18} color="#fff" />
-        </button>
-        <div className="flex-1 text-center text-[15px] font-semibold text-white">Dormir melhor</div>
-        <div className="w-11 h-11" />
-      </div>
-      <div className="px-5 pt-6 pb-6 text-center">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5C8E8" }}>
-          Boa noite, família
-        </div>
-        <h1 className="mt-2 text-[28px] font-semibold leading-tight" style={{ color: "#F4F1FF", letterSpacing: "-0.01em" }}>
-          Um sono que abraça.
-        </h1>
-        <p className="mt-2 text-[14px] max-w-[300px] mx-auto" style={{ color: "#B8BCD8" }}>
-          Reduza o ritmo. Diminua a luz. Vamos desacelerar juntos.
-        </p>
-      </div>
-      <div className="px-5 pb-12 space-y-3">
-        {SLEEP_ITEMS.map((s) => (
-          <motion.button
-            key={s.id}
-            whileTap={{ scale: 0.985 }}
-            transition={tapSpring}
-            onClick={() => {
-              haptic("light");
-              if (s.premium) {
-                window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sleep" } }));
-                return;
-              }
-              if (s.id === "rain") go("sounds");
-              else if (s.id === "story") go("meditation");
-            }}
-            className="w-full text-left p-4 rounded-[24px] flex items-center gap-4 relative"
+const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }) => {
+  const engineRef = useRef<AmbientSoundEngine | null>(null);
+  const stopTimerRef = useRef<number | null>(null);
+  const tickRef = useRef<number | null>(null);
+  const [timer, setTimer] = useState<number | null>(null); // minutes selected
+  const [remain, setRemain] = useState<number>(0); // seconds remaining
+  const [playing, setPlaying] = useState<string | null>(null);
+
+  useEffect(() => {
+    engineRef.current = new AmbientSoundEngine();
+    return () => {
+      engineRef.current?.stopAll?.();
+      if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+      if (tickRef.current) clearInterval(tickRef.current);
+    };
+  }, []);
+
+  const stopEverything = () => {
+    engineRef.current?.stopAll?.();
+    setPlaying(null);
+    if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+    if (tickRef.current) clearInterval(tickRef.current);
+    stopTimerRef.current = null;
+    tickRef.current = null;
+    setTimer(null);
+    setRemain(0);
+  };
+
+  const playRain = () => {
+    haptic("light");
+    if (playing) { stopEverything(); return; }
+    (engineRef.current as any)?.start?.("rain", "/audio/rain-soft.mp3", 0.35);
+    setPlaying("rain");
+    if (timer) startTimer(timer);
+  };
+
+  const startTimer = (mins: number) => {
+    if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+    if (tickRef.current) clearInterval(tickRef.current);
+    setTimer(mins);
+    setRemain(mins * 60);
+    stopTimerRef.current = window.setTimeout(() => {
+      engineRef.current?.stopAll?.();
+      setPlaying(null);
+      setTimer(null);
+      setRemain(0);
+    }, mins * 60 * 1000);
+    tickRef.current = window.setInterval(() => setRemain((r) => Math.max(0, r - 1)), 1000);
+  };
+
+  const fmt = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+
+  return (
+    <div
+      className="min-h-[80vh]"
+      style={{ background: `linear-gradient(180deg, #1a2342 0%, #2a2855 45%, #1f1c40 100%)` }}
+    >
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(14)].map((_, i) => (
+          <span
+            key={i}
+            className="absolute rounded-full bg-white"
             style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
+              width: 2 + (i % 3), height: 2 + (i % 3),
+              top: `${(i * 41) % 90}%`, left: `${(i * 67) % 95}%`,
+              opacity: 0.4 + (i % 3) * 0.2,
+              boxShadow: "0 0 6px rgba(255,255,255,0.7)",
             }}
-          >
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
-              style={{ background: "rgba(255,255,255,0.08)" }}
-            >
-              {s.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[15px] font-semibold text-white">{s.title}</div>
-              <div className="text-[12px]" style={{ color: "#B8BCD8" }}>{s.sub}</div>
-            </div>
-            {s.premium
-              ? <Lock size={16} color="#C9A84C" />
-              : <ChevronRight size={18} color="#B8BCD8" />}
-          </motion.button>
+          />
         ))}
       </div>
+      <div className="relative">
+        <div className="px-4 pt-3 pb-2 flex items-center gap-3">
+          <button
+            onClick={() => { haptic("light"); stopEverything(); onBack(); }}
+            className="w-11 h-11 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)" }}
+            aria-label="Voltar"
+          >
+            <ArrowLeft size={18} color="#fff" />
+          </button>
+          <div className="flex-1 text-center text-[15px] font-semibold text-white">Dormir melhor</div>
+          <div className="w-11 h-11" />
+        </div>
+
+        <div className="px-5 pt-6 pb-4 text-center">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5C8E8" }}>
+            Boa noite, família
+          </div>
+          <h1 className="mt-2 text-[28px] font-semibold leading-tight" style={{ color: "#F4F1FF", letterSpacing: "-0.01em" }}>
+            Um sono que abraça.
+          </h1>
+          <p className="mt-2 text-[14px] max-w-[300px] mx-auto" style={{ color: "#B8BCD8" }}>
+            Reduza o ritmo. Diminua a luz. Vamos desacelerar juntos.
+          </p>
+        </div>
+
+        {/* Auto-pausa timer */}
+        <div className="px-5 pt-2 pb-4">
+          <div
+            className="rounded-[22px] p-4"
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Timer size={14} color="#C5C8E8" />
+                <span className="text-[12px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#C5C8E8" }}>
+                  Auto-pausa
+                </span>
+              </div>
+              {timer && remain > 0 && (
+                <span className="text-[12px] tabular-nums" style={{ color: "#F4F1FF" }}>{fmt(remain)}</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {[10, 20, 30].map((m) => {
+                const isOn = timer === m;
+                return (
+                  <button
+                    key={m}
+                    onClick={() => { haptic("light"); isOn ? stopEverything() : startTimer(m); }}
+                    className="flex-1 h-10 rounded-xl text-[13px] font-semibold"
+                    style={{
+                      background: isOn ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.06)",
+                      border: `1px solid ${isOn ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.12)"}`,
+                      color: "#F4F1FF",
+                    }}
+                  >
+                    {m} min
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={playRain}
+              className="mt-3 w-full h-12 rounded-2xl text-[14px] font-semibold flex items-center justify-center gap-2"
+              style={{
+                background: playing ? "#fff" : "rgba(255,255,255,0.12)",
+                color: playing ? "#1a2342" : "#fff",
+                border: "1px solid rgba(255,255,255,0.2)",
+              }}
+            >
+              {playing ? <Pause size={16} /> : <Play size={16} />}
+              {playing ? "Pausar chuva" : "Tocar chuva noturna"}
+            </button>
+          </div>
+        </div>
+
+        <div className="px-5 pb-12 space-y-3">
+          {SLEEP_ITEMS.map((s) => (
+            <motion.button
+              key={s.id}
+              whileTap={{ scale: 0.985 }}
+              transition={tapSpring}
+              onClick={() => {
+                haptic("light");
+                if (s.premium) {
+                  window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sleep" } }));
+                  return;
+                }
+                if (s.id === "rain") go("sounds");
+                else if (s.id === "story") go("meditation");
+              }}
+              className="w-full text-left p-4 rounded-[24px] flex items-center gap-4 relative"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+                style={{ background: "rgba(255,255,255,0.08)" }}
+              >
+                {s.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[15px] font-semibold text-white">{s.title}</div>
+                <div className="text-[12px]" style={{ color: "#B8BCD8" }}>{s.sub}</div>
+              </div>
+              {s.premium
+                ? <Lock size={16} color="#C9A84C" />
+                : <ChevronRight size={18} color="#B8BCD8" />}
+            </motion.button>
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
 
 
 /* ────────────── MEDITATION (real Web Speech narration) ────────────── */
@@ -768,12 +975,18 @@ const speakLine = (text: string, onEnd?: () => void) => {
 const MeditationView = ({ onBack }: { onBack: () => void }) => {
   const [active, setActive] = useState<string | null>(null);
   const [lineIdx, setLineIdx] = useState(0);
+  const [ambient, setAmbient] = useState(true);
   const timerRef = useRef<number | null>(null);
+  const engineRef = useRef<AmbientSoundEngine | null>(null);
+  const { completeToday } = useWellnessStreak();
+
+  useEffect(() => { engineRef.current = new AmbientSoundEngine(); return () => engineRef.current?.stopAll?.(); }, []);
 
   const stopAll = useCallback(() => {
     window.speechSynthesis?.cancel();
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = null;
+    engineRef.current?.stopAll?.();
     setActive(null);
     setLineIdx(0);
   }, []);
@@ -786,9 +999,18 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
     if (!track) return;
     setActive(id);
     setLineIdx(0);
+    if (ambient) {
+      (engineRef.current as any)?.start?.("forest", "/audio/forest-calm.mp3", 0.18);
+    }
     let idx = 0;
     const speakNext = () => {
-      if (idx >= track.script.length) { setActive(null); setLineIdx(0); return; }
+      if (idx >= track.script.length) {
+        completeToday();
+        engineRef.current?.stopAll?.();
+        setActive(null);
+        setLineIdx(0);
+        return;
+      }
       setLineIdx(idx);
       speakLine(track.script[idx], () => {
         idx += 1;
@@ -798,17 +1020,33 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
     speakNext();
   };
 
+
   const current = MED_TRACKS.find((t) => t.id === active);
 
   return (
     <>
       <TopBar title="Meditação guiada" onBack={() => { stopAll(); onBack(); }} />
-      <div className="px-5 pt-4">
-        <Eyebrow>Sessões breves · narração real</Eyebrow>
-        <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
-          Reserve um momento.
-        </h1>
+      <div className="px-5 pt-4 flex items-start justify-between gap-3">
+        <div>
+          <Eyebrow>Sessões breves · narração real</Eyebrow>
+          <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
+            Reserve um momento.
+          </h1>
+        </div>
+        <button
+          onClick={() => { haptic("light"); setAmbient(a => !a); if (!ambient && active) (engineRef.current as any)?.start?.("forest", "/audio/forest-calm.mp3", 0.18); if (ambient) engineRef.current?.stopAll?.(); }}
+          className="shrink-0 mt-1 px-3 h-9 rounded-full text-[11px] font-semibold flex items-center gap-1.5"
+          style={{
+            background: ambient ? `${sage}33` : "transparent",
+            border: `1px solid ${ambient ? `${sage}66` : stroke}`,
+            color: ink,
+          }}
+          aria-label="Som ambiente"
+        >
+          <Waves size={12} /> {ambient ? "Floresta on" : "Floresta off"}
+        </button>
       </div>
+
       <div className="px-5 pt-5 space-y-3 pb-10">
         {MED_TRACKS.map((t) => {
           const Icon = t.icon;
@@ -884,6 +1122,8 @@ const FamilyView = ({ onBack }: { onBack: () => void }) => {
   const [active, setActive] = useState(false);
   const { phase, step } = useBreath(mode === "breath" && active);
   const [pi, setPi] = useState(0);
+  const { completeToday } = useWellnessStreak();
+  useEffect(() => { if (mode !== "intro") completeToday(); }, [mode, completeToday]);
 
   return (
     <>
@@ -1014,6 +1254,8 @@ const MINDFUL_PROMPTS = [
 
 const MindfulView = ({ onBack }: { onBack: () => void }) => {
   const [i, setI] = useState(0);
+  const { completeToday } = useWellnessStreak();
+  useEffect(() => { completeToday(); }, [completeToday]);
   return (
     <>
       <TopBar title="Mini mindfulness" onBack={onBack} />
@@ -1048,12 +1290,14 @@ const MindfulView = ({ onBack }: { onBack: () => void }) => {
 const PauseView = ({ onBack }: { onBack: () => void }) => {
   const [remain, setRemain] = useState(60);
   const [run, setRun] = useState(true);
+  const { completeToday } = useWellnessStreak();
   useEffect(() => {
     if (!run) return;
-    if (remain <= 0) { setRun(false); return; }
+    if (remain <= 0) { setRun(false); completeToday(); return; }
     const t = setTimeout(() => setRemain((r) => r - 1), 1000);
     return () => clearTimeout(t);
-  }, [run, remain]);
+  }, [run, remain, completeToday]);
+
   const pct = ((60 - remain) / 60) * 100;
   return (
     <>
@@ -1181,7 +1425,11 @@ const RealWorldView = ({ onBack }: { onBack: () => void }) => (
 );
 
 /* ────────────── JOURNEY ────────────── */
-const JourneyView = ({ onBack }: { onBack: () => void }) => (
+const JourneyView = ({ onBack }: { onBack: () => void }) => {
+  const { week } = useMoodWeek();
+  const { streak } = useWellnessStreak();
+  const avg = week.filter(w => w.v > 0).reduce((s, w) => s + w.v, 0) / Math.max(week.filter(w => w.v > 0).length, 1);
+  return (
   <>
     <TopBar title="Jornada" onBack={onBack} />
     <div className="px-5 pt-4">
@@ -1189,24 +1437,31 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => (
       <h1 className="mt-1 text-[26px] font-semibold" style={{ color: ink, letterSpacing: "-0.01em" }}>
         Vocês estão indo bem.
       </h1>
+      <p className="mt-1 text-[13px]" style={{ color: inkSoft }}>
+        Humor médio {avg.toFixed(1)}/5 · {streak.count} {streak.count === 1 ? "dia" : "dias"} de calma seguidos
+      </p>
     </div>
     <div className="px-5 pt-6 pb-10 space-y-3">
       <Surface className="p-5">
         <div className="flex items-end justify-between gap-2 h-28">
-          {MOOD_WEEK.map((m, i) => (
+          {week.map((m, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-2">
               <motion.div
                 initial={{ height: 4 }}
-                animate={{ height: 12 + m.v * 14 }}
+                animate={{ height: 12 + Math.max(m.v, 0.4) * 14 }}
                 transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
                 className="w-full rounded-full"
-                style={{ background: `linear-gradient(180deg, ${sage}, ${serenity})`, maxWidth: 22 }}
+                style={{
+                  background: m.v > 0 ? `linear-gradient(180deg, ${sage}, ${serenity})` : `${ink}22`,
+                  maxWidth: 22,
+                }}
               />
               <span className="text-[11px]" style={{ color: inkSoft }}>{m.d}</span>
             </div>
           ))}
         </div>
       </Surface>
+
 
       {[
         { icon: HandHeart, t: "5 respirações guiadas", s: "Esta semana" },
@@ -1229,7 +1484,9 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => (
       })}
     </div>
   </>
-);
+  );
+};
+
 
 /* ────────────── ROOT ────────────── */
 const WellnessHub = ({ onBack }: Props) => {
