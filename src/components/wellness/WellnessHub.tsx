@@ -30,7 +30,9 @@ type View =
   | "routine"
   | "realworld"
   | "journey"
-  | "sleep";
+  | "sleep"
+  | "family";
+
 
 /* ────────────── Design tokens (sage + emerald spa) ────────────── */
 const ink = "#27302A";        // primary text (warm dark green-grey)
