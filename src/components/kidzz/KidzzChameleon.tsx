@@ -5,7 +5,7 @@
    - Touch reactive: olho segue toque, tap = bounce + ripple
 */
 
-import { forwardRef, useRef, useState, useCallback } from "react";
+import { forwardRef, memo, useRef, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import cosmicImg from "@/assets/kidzz/cosmic.webp";
 import moonImg from "@/assets/kidzz/moon.webp";
