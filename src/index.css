@@ -44,18 +44,23 @@
     --kid-purple: 270 55% 58%;
     --kid-red: 0 75% 55%;
 
-    /* ── Premium Unified Palette (cinematic, calm, sophisticated) ── */
-    --cream: 38 55% 96%;            /* base background warm cream */
-    --cream-soft: 35 45% 92%;       /* secondary creamy surface */
-    --warm-white: 40 60% 98%;       /* warm white for cards */
-    --soft-gold: 42 60% 62%;        /* matte gold premium accent */
-    --soft-gold-glow: 45 80% 72%;   /* gold glow / particles */
-    --wellness-green: 150 28% 55%;  /* sage wellness */
-    --wellness-deep: 158 30% 38%;   /* emerald wellness */
-    --soft-lilac: 270 35% 80%;      /* discrete lilac */
-    --peach-soft: 22 70% 86%;       /* soft peach */
-    --sky-soft: 205 55% 88%;        /* very soft sky */
-    --warm-shadow: 30 25% 20%;      /* warm dark for shadows */
+    /* ── Premium Unified Palette v4 — WHITER + GREENER (less yellow) ── */
+    --cream: 70 25% 97%;            /* near-white with mint hint (#F7F8F2) */
+    --cream-soft: 80 22% 95%;       /* secondary (#F4F6EF) */
+    --warm-white: 60 30% 99%;       /* premium white (#FEFEFC) */
+    --soft-gold: 85 28% 60%;        /* sage-gold accent (replaces yellow) */
+    --soft-gold-glow: 90 35% 75%;   /* mint glow */
+    --kidzz-green: 85 30% 60%;      /* primary brand green #A8C686 */
+    --kidzz-green-deep: 90 28% 56%; /* #95B86D */
+    --kidzz-green-soft: 90 40% 86%; /* #DCEBCB */
+    --wellness-green: 140 28% 76%;  /* #D8EBDD */
+    --wellness-deep: 150 25% 35%;   /* deep sage text */
+    --soft-lilac: 270 35% 88%;      /* discrete lilac */
+    --peach-soft: 22 40% 92%;       /* very soft peach (muted) */
+    --sky-soft: 205 30% 92%;        /* very soft sky */
+    --warm-shadow: 100 15% 18%;     /* cool sage shadow */
+    --premium-ink: 60 8% 11%;       /* primary text #1E1E1A */
+    --premium-ink-soft: 80 5% 38%;  /* secondary text #5E6258 */
 
     /* Premium tokens */
     --premium-bg: 220 25% 8%;
