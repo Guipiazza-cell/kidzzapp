@@ -50,25 +50,25 @@ const MagicalBackground = () => (
       alt=""
       aria-hidden="true"
       className="absolute inset-0 w-full h-full object-cover"
-      style={{ filter: "brightness(1.02) saturate(0.92)" }}
+      style={{ filter: "brightness(1.04) saturate(0.88)" }}
       width={1024}
       height={1792}
     />
 
-    {/* Soft cinematic veil: lifts the bottom for legibility, keeps the warm cream feel */}
+    {/* Clean white veil — premium airy feel, minimal yellow */}
     <div
       className="absolute inset-0"
       style={{
         background:
-          "linear-gradient(180deg, hsl(38 55% 96% / 0.0) 0%, hsl(38 55% 96% / 0.18) 45%, hsl(38 55% 94% / 0.55) 100%)",
+          "linear-gradient(180deg, hsl(0 0% 100% / 0.25) 0%, hsl(80 30% 98% / 0.45) 50%, hsl(140 25% 96% / 0.6) 100%)",
       }}
     />
-    {/* Subtle vignette to keep focus center */}
+    {/* Very subtle vignette */}
     <div
       className="absolute inset-0"
       style={{
         background:
-          "radial-gradient(ellipse at center, transparent 55%, hsl(30 30% 18% / 0.10) 100%)",
+          "radial-gradient(ellipse at center, transparent 60%, hsl(100 15% 30% / 0.06) 100%)",
       }}
     />
 
