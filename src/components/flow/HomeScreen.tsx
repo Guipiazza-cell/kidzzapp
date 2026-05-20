@@ -15,7 +15,6 @@ import { getTotalXp } from "@/lib/dailyMission";
 import explorerImg from "@/assets/kidzz/explorer.webp";
 import moonImg from "@/assets/kidzz/moon.webp";
 import wellnessImg from "@/assets/kidzz/wellness.png";
-import cosmicImg from "@/assets/kidzz/cosmic.webp";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 
