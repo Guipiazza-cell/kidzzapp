@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, LogIn, Shield, Crown, Gift, BarChart3, Bell, Mic, Sparkles, Leaf, Heart, ChevronRight } from "lucide-react";
+import { Send, LogIn, Shield, Crown, Gift, Bell, Mic, Sparkles, Leaf, Heart, ChevronRight } from "lucide-react";
 import StreakCelebration from "./StreakCelebration";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
