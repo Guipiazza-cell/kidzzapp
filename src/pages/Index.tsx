@@ -240,16 +240,9 @@ const Index = () => {
   }, [profile?.questions_used, profile?.is_premium]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
-        <div className="text-center space-y-3 flex flex-col items-center">
-          <KidzzChameleon size="md" mood="thinking" state="cosmic" interactive={false} />
-          <motion.p className="text-gray-700 font-bold text-sm" animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>
-            Carregando...
-          </motion.p>
-        </div>
-      </div>
-    );
+    // Sem fundo/loading screen próprio — o MagicalBackground global e o SplashScreen
+    // cobrem a tela. Retornar null evita o flash branco/cinza durante o hidrate.
+    return null;
   }
 
   // Onboarding gates: name → age → interests
@@ -472,33 +465,30 @@ const Index = () => {
   };
 
   return (
-    <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
-      <MagicalBackground />
-      <div className="flex-1 flex flex-col min-h-0 pb-[112px]">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={activeTab}
-            className="flex-1 flex flex-col min-h-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+    <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden">
+      {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
+      <div className="flex-1 flex flex-col min-h-0 pb-[112px] relative">
+        {/* Troca de aba: sem AnimatePresence mode="wait" — evita o "flash vazio".
+            Conteúdo anterior fica até o novo montar (cross-fade suave via CSS). */}
+        <motion.div
+          key={activeTab}
+          className="flex-1 flex flex-col min-h-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <TabErrorBoundary
+            resetKey={activeTab}
+            label={activeTab}
+            onBack={() => { setActiveTab("chat"); setStep("home"); }}
           >
-            <TabErrorBoundary
-              resetKey={activeTab}
-              label={activeTab}
-              onBack={() => { setActiveTab("chat"); setStep("home"); }}
-            >
-              <Suspense fallback={
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="w-10 h-10 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
-                </div>
-              }>
-                {renderContent()}
-              </Suspense>
-            </TabErrorBoundary>
-          </motion.div>
-        </AnimatePresence>
+            {/* Suspense fallback = null → não pisca spinner ao trocar de aba.
+                A aba anterior permanece visível até a próxima estar pronta. */}
+            <Suspense fallback={null}>
+              {renderContent()}
+            </Suspense>
+          </TabErrorBoundary>
+        </motion.div>
       </div>
       <BottomNav
         activeTab={activeTab}
