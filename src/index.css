@@ -355,6 +355,22 @@
   }
 }
 
+/* ── Mobile/Safari Performance Cap ──
+   backdrop-blur > 12px destrói FPS no Safari iOS. Limita TODOS os blurs
+   em telas mobile + dispositivos touch — o glassmorphism continua visível
+   mas sem custo de compositor por frame. */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .surface-premium,
+  .surface-wellness,
+  .glass-card,
+  .glass-card-light,
+  .glass-premium,
+  .premium-glass {
+    backdrop-filter: blur(10px) saturate(1.05) !important;
+    -webkit-backdrop-filter: blur(10px) saturate(1.05) !important;
+  }
+}
+
 /* Page-visibility freeze: when the browser tab/PWA is hidden, JS timers throttle
    automatically but CSS keyframes don't — this pauses every CSS animation in one
    shot, saving battery and stopping the compositor from re-rasterizing offscreen
@@ -364,4 +380,5 @@ html[data-app-hidden="true"] *::before,
 html[data-app-hidden="true"] *::after {
   animation-play-state: paused !important;
 }
+
 
