@@ -52,9 +52,9 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       className="fixed bottom-0 left-0 right-0 z-50"
       style={{
         paddingBottom: "max(env(safe-area-inset-bottom, 6px), 6px)",
-        background: "hsl(0 0% 100% / 0.78)",
-        backdropFilter: "blur(28px) saturate(1.1)",
-        WebkitBackdropFilter: "blur(28px) saturate(1.1)",
+        background: "hsl(0 0% 100% / 0.82)",
+        backdropFilter: "blur(12px) saturate(1.1)",
+        WebkitBackdropFilter: "blur(12px) saturate(1.1)",
         borderTop: "1px solid hsl(0 0% 100% / 0.7)",
         boxShadow: "0 -8px 28px -16px hsl(100 15% 18% / 0.18)",
       }}

@@ -8,6 +8,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import SplashScreen from "@/components/SplashScreen";
 import { lazy, Suspense, useEffect, useState } from "react";
 import Index from "./pages/Index";
+import MagicalBackground from "@/components/MagicalBackground";
 // Rotas secundárias carregam sob demanda — reduz o bundle inicial.
 const Auth = lazy(() => import("./pages/Auth"));
 const Success = lazy(() => import("./pages/Success"));
@@ -83,13 +84,11 @@ const AppShell = () => {
   return (
     <>
       {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
+      {/* Background global persistente — nunca remontado entre rotas/abas */}
+      <MagicalBackground />
       <BrowserRouter>
         <AuthProvider>
-          <Suspense fallback={
-            <div className="fixed inset-0 flex items-center justify-center bg-background/40 backdrop-blur-sm">
-              <div className="w-12 h-12 rounded-full border-4 border-kid-purple/30 border-t-kid-purple animate-spin" />
-            </div>
-          }>
+          <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
