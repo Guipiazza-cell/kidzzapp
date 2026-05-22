@@ -23,6 +23,8 @@ import RitualCard from "@/components/rituals/RitualCard";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 import DecompressionCard from "@/components/decompress/DecompressionCard";
+import SleepCard from "@/components/sleep/SleepCard";
+import SleepMode from "@/components/sleep/SleepMode";
 import DecompressionMode from "@/components/decompress/DecompressionMode";
 import ConnectionMeter from "@/components/connection/ConnectionMeter";
 import ContextualNudge from "@/components/nudges/ContextualNudge";
@@ -153,10 +155,15 @@ const HomeScreen = ({
   const [sosOpen, setSosOpen] = useState(false);
   const [ritualOpen, setRitualOpen] = useState(false);
   const [decompressOpen, setDecompressOpen] = useState(false);
+  const [sleepOpen, setSleepOpen] = useState(false);
   const currentRitual = useMemo(() => getCurrentRitual(), []);
   const showDecompress = useMemo(() => {
     const h = new Date().getHours();
     return h >= 16 && h < 21; // janela do reencontro
+  }, []);
+  const showSleep = useMemo(() => {
+    const h = new Date().getHours();
+    return h >= 20 || h < 5; // janela noturna
   }, []);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -540,6 +547,13 @@ const HomeScreen = ({
           </div>
         )}
 
+        {/* ── 3.8 MODO DORMIR — janela noturna (20h+) ── */}
+        {showSleep && (
+          <div className="w-full max-w-sm mt-3">
+            <SleepCard onOpen={() => setSleepOpen(true)} />
+          </div>
+        )}
+
 
 
 
@@ -790,6 +804,9 @@ const HomeScreen = ({
 
       {/* ── Modo Decompressão — 60s só para o adulto ── */}
       <DecompressionMode open={decompressOpen} onClose={() => setDecompressOpen(false)} />
+
+      {/* ── Modo Dormir — boa noite cinemática ── */}
+      <SleepMode open={sleepOpen} onClose={() => setSleepOpen(false)} childName={childName} />
     </motion.div>
   );
 };
