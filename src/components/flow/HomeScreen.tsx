@@ -22,6 +22,8 @@ import SOSModal from "@/components/sos/SOSModal";
 import RitualCard from "@/components/rituals/RitualCard";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
+import DecompressionCard from "@/components/decompress/DecompressionCard";
+import DecompressionMode from "@/components/decompress/DecompressionMode";
 
 /* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
    Foco: respirável, sofisticado, Apple + Calm + Pixar.
@@ -148,7 +150,12 @@ const HomeScreen = ({
   const [bannerIdx, setBannerIdx] = useState(0);
   const [sosOpen, setSosOpen] = useState(false);
   const [ritualOpen, setRitualOpen] = useState(false);
+  const [decompressOpen, setDecompressOpen] = useState(false);
   const currentRitual = useMemo(() => getCurrentRitual(), []);
+  const showDecompress = useMemo(() => {
+    const h = new Date().getHours();
+    return h >= 16 && h < 21; // janela do reencontro
+  }, []);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const childName = profile?.child_name || "amigo";
@@ -501,6 +508,15 @@ const HomeScreen = ({
           <RitualCard onOpen={() => setRitualOpen(true)} />
         </div>
 
+        {/* ── 3.7 DECOMPRESSÃO — janela do reencontro (16h–21h) ── */}
+        {showDecompress && (
+          <div className="w-full max-w-sm mt-3">
+            <DecompressionCard onOpen={() => setDecompressOpen(true)} />
+          </div>
+        )}
+
+
+
 
 
 
@@ -746,6 +762,9 @@ const HomeScreen = ({
 
       {/* ── Ritual da Família — flow cinemático full-screen ── */}
       <RitualFlow ritual={currentRitual} open={ritualOpen} onClose={() => setRitualOpen(false)} />
+
+      {/* ── Modo Decompressão — 60s só para o adulto ── */}
+      <DecompressionMode open={decompressOpen} onClose={() => setDecompressOpen(false)} />
     </motion.div>
   );
 };
