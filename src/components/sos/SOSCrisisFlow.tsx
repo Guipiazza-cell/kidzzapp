@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Volume2, VolumeX, ChevronRight, Heart, Wind, Hand, Music2, Loader2 } from "lucide-react";
+import {
+  ArrowLeft, Volume2, VolumeX, ChevronRight,
+  Heart, Wind, Hand, Music2, Loader2,
+  Moon, Shield, Leaf, Sun, Compass,
+} from "lucide-react";
 import { useSosVoice } from "./useSosVoice";
 import { haptic } from "@/lib/haptics";
+import type { SosSituation } from "./situations";
 
 /**
- * Fluxo "Crise de choro":
- *  1) Acolhimento emocional (narração + pausa contemplativa)
- *  2) Respiração guiada (60s, círculo expandindo, 4-2-6)
- *  3) Orientação prática (cards)
- *  4) Conteúdo de apoio (playlist + histórias) com CTA p/ wellness
- *
- * Voz: ElevenLabs (Alice) via edge function. Falha silenciosa.
+ * Fluxo emocional genérico do SOS — alimentado por uma `SosSituation`.
+ * 1) Acolhimento (narração ElevenLabs + pausa contemplativa)
+ * 2) Respiração guiada (padrão dinâmico por situação)
+ * 3) Orientação prática (3 cards)
+ * 4) Conteúdo de apoio (playlist + bilhete pros pais)
  */
 interface Props {
+  situation: SosSituation;
   onBack: () => void;
   onClose: () => void;
   onGoWellness?: () => void;
@@ -21,31 +25,26 @@ interface Props {
 
 type Step = "acolhimento" | "respiracao" | "pratico" | "apoio";
 
-const ACOLHIMENTO_TEXT =
-  "Respira. Seu filho não precisa de perfeição. Precisa sentir segurança. Você está fazendo o suficiente.";
+const ICONS = {
+  hand: Hand, wind: Wind, heart: Heart,
+  moon: Moon, shield: Shield, leaf: Leaf,
+  sun: Sun, compass: Compass,
+} as const;
 
-const PRACTICAL_TIPS = [
-  { icon: Hand,  title: "Abraço silencioso", desc: "Sem palavras. Só presença. O corpo regula antes da mente." },
-  { icon: Wind,  title: "Mude de ambiente",  desc: "Levar pro colo até uma janela ou outro cômodo quebra o ciclo." },
-  { icon: Heart, title: "Valide o sentimento", desc: "\u201cTá difícil, né? Tô aqui com você.\u201d Sem corrigir, sem ensinar agora." },
-];
-
-const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
+const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
   const [step, setStep] = useState<Step>("acolhimento");
   const [muted, setMuted] = useState(false);
   const { speak, stop, loading } = useSosVoice();
 
-  // Cleanup ao desmontar
   useEffect(() => () => stop(), [stop]);
 
-  // Toca acolhimento ao entrar
   useEffect(() => {
     if (step === "acolhimento" && !muted) {
-      speak(ACOLHIMENTO_TEXT);
+      speak(situation.acolhimento.voice);
     } else {
       stop();
     }
-  }, [step, muted, speak, stop]);
+  }, [step, muted, speak, stop, situation]);
 
   const goNext = (next: Step) => {
     haptic("light");
@@ -66,10 +65,13 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
         >
           <ArrowLeft size={16} style={{ color: "hsl(var(--premium-ink))" }} />
         </button>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[18px]" aria-hidden>🔴</span>
-          <h2 className="text-[15px] font-black tracking-tight" style={{ color: "hsl(var(--premium-ink))" }}>
-            Crise de choro
+        <div className="flex items-center gap-1.5 min-w-0 px-2">
+          <span className="text-[18px]" aria-hidden>{situation.emoji}</span>
+          <h2
+            className="text-[15px] font-black tracking-tight truncate"
+            style={{ color: "hsl(var(--premium-ink))" }}
+          >
+            {situation.label}
           </h2>
         </div>
         <button
@@ -79,7 +81,7 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
           style={{ background: "hsl(0 0% 100% / 0.75)", border: "1px solid hsl(0 0% 100% / 0.7)" }}
           aria-label={muted ? "Ativar narração" : "Silenciar narração"}
         >
-          {muted ? <VolumeX size={16} /> : <Volume2 size={16} style={{ color: "hsl(var(--sos-to))" }} />}
+          {muted ? <VolumeX size={16} /> : <Volume2 size={16} style={{ color: situation.tint }} />}
         </button>
       </header>
 
@@ -91,7 +93,7 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
             className="h-1 rounded-full transition-all"
             style={{
               width: s === step ? 22 : 6,
-              background: s === step ? "hsl(var(--sos-to))" : "hsl(0 0% 80% / 0.6)",
+              background: s === step ? situation.tint : "hsl(0 0% 80% / 0.6)",
             }}
           />
         ))}
@@ -106,31 +108,62 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4 }}
-              className="flex flex-col items-center text-center pt-6"
+              className="flex flex-col items-center text-center pt-4"
             >
-              <motion.div
-                className="text-[64px] mb-4"
-                animate={{ scale: [1, 1.06, 1] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                🦎
-              </motion.div>
+              {/* Orbe respirando — sem mascote */}
+              <div className="relative flex items-center justify-center mb-6" style={{ width: 140, height: 140 }}>
+                <motion.span
+                  aria-hidden
+                  className="absolute rounded-full"
+                  style={{
+                    width: 140, height: 140,
+                    background: `radial-gradient(circle, ${situation.tint.replace(")", " / 0.35)")}, transparent 70%)`,
+                    filter: "blur(16px)",
+                  }}
+                  animate={{ scale: [1, 1.18, 1], opacity: [0.55, 0.85, 0.55] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="relative rounded-full flex items-center justify-center"
+                  style={{
+                    width: 96, height: 96,
+                    background: `linear-gradient(180deg, hsl(var(--sos-from)) 0%, ${situation.tint} 100%)`,
+                    boxShadow: `0 0 36px ${situation.tint.replace(")", " / 0.45)")}, inset 0 2px 10px hsl(0 0% 100% / 0.55), inset 0 -8px 18px hsl(0 0% 0% / 0.18)`,
+                  }}
+                  animate={{ scale: [1, 1.06, 1] }}
+                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  {/* gloss highlight */}
+                  <span
+                    aria-hidden
+                    className="absolute rounded-full"
+                    style={{
+                      top: 10, left: 14, width: 38, height: 24,
+                      background: "linear-gradient(180deg, hsl(0 0% 100% / 0.7), hsl(0 0% 100% / 0))",
+                      filter: "blur(2px)",
+                    }}
+                  />
+                  <Heart size={34} className="text-white fill-white relative" strokeWidth={2.2} />
+                </motion.div>
+              </div>
+
               <p
-                className="text-[20px] font-black leading-snug max-w-[280px] mb-3"
+                className="text-[22px] font-black leading-snug max-w-[280px] mb-3 tracking-tight"
                 style={{ color: "hsl(var(--premium-ink))" }}
               >
-                Respira. <span aria-hidden>🌬️</span>
+                {situation.acolhimento.title}
               </p>
               <p
-                className="text-[15px] font-medium leading-relaxed max-w-[300px] mb-6"
+                className="text-[15px] font-medium leading-relaxed max-w-[300px] mb-6 whitespace-pre-line"
                 style={{ color: "hsl(var(--premium-ink-soft))" }}
               >
-                Seu filho não precisa de perfeição.
-                <br />
-                Precisa sentir segurança.
+                {situation.acolhimento.subtitle}
               </p>
               {loading && (
-                <span className="text-[11px] font-medium flex items-center gap-1 mb-4" style={{ color: "hsl(var(--premium-ink-soft))" }}>
+                <span
+                  className="text-[11px] font-medium flex items-center gap-1 mb-4"
+                  style={{ color: "hsl(var(--premium-ink-soft))" }}
+                >
                   <Loader2 size={11} className="animate-spin" /> preparando voz acolhedora…
                 </span>
               )}
@@ -139,11 +172,11 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
                 onClick={() => goNext("respiracao")}
                 className="px-6 py-3 rounded-full text-white text-[14px] font-black tracking-tight flex items-center gap-1.5 active:scale-95 transition-transform"
                 style={{
-                  background: "linear-gradient(180deg, hsl(var(--sos-from)), hsl(var(--sos-to)))",
-                  boxShadow: "0 8px 22px -8px hsl(var(--sos-to) / 0.5)",
+                  background: `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
+                  boxShadow: `0 8px 22px -8px ${situation.tint.replace(")", " / 0.5)")}`,
                 }}
               >
-                Respirar juntos <ChevronRight size={14} />
+                {situation.acolhimento.cta} <ChevronRight size={14} />
               </button>
             </motion.div>
           )}
@@ -151,6 +184,7 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
           {step === "respiracao" && (
             <BreathingScene
               key="respiracao"
+              situation={situation}
               onSpeak={(t) => !muted && speak(t)}
               onDone={() => goNext("pratico")}
             />
@@ -165,15 +199,21 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
               transition={{ duration: 0.35 }}
               className="pt-2"
             >
-              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-center mb-1" style={{ color: "hsl(var(--sos-to))" }}>
-                Agora, com calma
+              <p
+                className="text-[11px] font-black uppercase tracking-[0.16em] text-center mb-1"
+                style={{ color: situation.tint }}
+              >
+                {situation.practical.eyebrow}
               </p>
-              <h3 className="text-[20px] font-black text-center mb-4 leading-tight" style={{ color: "hsl(var(--premium-ink))" }}>
-                Três coisas que ajudam
+              <h3
+                className="text-[20px] font-black text-center mb-4 leading-tight"
+                style={{ color: "hsl(var(--premium-ink))" }}
+              >
+                {situation.practical.title}
               </h3>
               <div className="space-y-2.5 mb-5">
-                {PRACTICAL_TIPS.map((tip, i) => {
-                  const Icon = tip.icon;
+                {situation.practical.tips.map((tip, i) => {
+                  const Icon = ICONS[tip.iconKey];
                   return (
                     <motion.div
                       key={tip.title}
@@ -187,15 +227,23 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
                         boxShadow: "0 4px 14px -8px hsl(100 15% 18% / 0.12)",
                       }}
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ background: "hsl(0 60% 96%)" }}>
-                        <Icon size={16} style={{ color: "hsl(var(--sos-to))" }} />
+                      <div
+                        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ background: situation.tint.replace(")", " / 0.12)") }}
+                      >
+                        <Icon size={16} style={{ color: situation.tint }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-black leading-tight" style={{ color: "hsl(var(--premium-ink))" }}>
+                        <p
+                          className="text-[14px] font-black leading-tight"
+                          style={{ color: "hsl(var(--premium-ink))" }}
+                        >
                           {tip.title}
                         </p>
-                        <p className="text-[12px] font-medium leading-snug mt-0.5" style={{ color: "hsl(var(--premium-ink-soft))" }}>
+                        <p
+                          className="text-[12px] font-medium leading-snug mt-0.5"
+                          style={{ color: "hsl(var(--premium-ink-soft))" }}
+                        >
                           {tip.desc}
                         </p>
                       </div>
@@ -208,8 +256,8 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
                 onClick={() => goNext("apoio")}
                 className="w-full py-3 rounded-2xl text-white text-[14px] font-black tracking-tight flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
                 style={{
-                  background: "linear-gradient(180deg, hsl(var(--sos-from)), hsl(var(--sos-to)))",
-                  boxShadow: "0 8px 22px -8px hsl(var(--sos-to) / 0.5)",
+                  background: `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
+                  boxShadow: `0 8px 22px -8px ${situation.tint.replace(")", " / 0.5)")}`,
                 }}
               >
                 Continuar <ChevronRight size={14} />
@@ -226,14 +274,23 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
               transition={{ duration: 0.35 }}
               className="pt-2"
             >
-              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-center mb-1" style={{ color: "hsl(var(--sos-to))" }}>
-                Apoio contínuo
+              <p
+                className="text-[11px] font-black uppercase tracking-[0.16em] text-center mb-1"
+                style={{ color: situation.tint }}
+              >
+                {situation.support.eyebrow}
               </p>
-              <h3 className="text-[20px] font-black text-center mb-1 leading-tight" style={{ color: "hsl(var(--premium-ink))" }}>
-                Sons que acalmam
+              <h3
+                className="text-[20px] font-black text-center mb-1 leading-tight"
+                style={{ color: "hsl(var(--premium-ink))" }}
+              >
+                {situation.support.title}
               </h3>
-              <p className="text-[13px] text-center mb-5 max-w-[280px] mx-auto" style={{ color: "hsl(var(--premium-ink-soft))" }}>
-                Playlist curada para o que veio agora — e o que vem depois.
+              <p
+                className="text-[13px] text-center mb-5 max-w-[280px] mx-auto"
+                style={{ color: "hsl(var(--premium-ink-soft))" }}
+              >
+                {situation.support.intro}
               </p>
 
               {/* Playlist sugerida */}
@@ -242,42 +299,59 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
                 onClick={() => { haptic("medium"); onGoWellness?.(); onClose(); }}
                 className="w-full text-left flex items-center gap-3 p-4 rounded-2xl mb-3 active:scale-[0.98] transition-transform"
                 style={{
-                  background: "linear-gradient(135deg, hsl(140 35% 94% / 0.9), hsl(150 30% 88% / 0.9))",
+                  background: `linear-gradient(135deg, hsl(${situation.support.playlist.from} / 0.9), hsl(${situation.support.playlist.to} / 0.9))`,
                   border: "1px solid hsl(0 0% 100% / 0.7)",
-                  boxShadow: "0 6px 20px -10px hsl(150 30% 30% / 0.25)",
+                  boxShadow: `0 6px 20px -10px hsl(${situation.support.playlist.accent} / 0.4)`,
                 }}
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: "hsl(150 45% 55%)" }}>
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: `hsl(${situation.support.playlist.accent})` }}
+                >
                   <Music2 size={20} className="text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-black uppercase tracking-wider" style={{ color: "hsl(150 35% 35%)" }}>
-                    Wellness · 6 faixas
+                  <p
+                    className="text-[11px] font-black uppercase tracking-wider"
+                    style={{ color: `hsl(${situation.support.playlist.accent})` }}
+                  >
+                    Wellness · {situation.support.playlist.tracks} faixas
                   </p>
-                  <p className="text-[15px] font-black leading-tight" style={{ color: "hsl(var(--premium-ink))" }}>
-                    Acalmar crise
+                  <p
+                    className="text-[15px] font-black leading-tight"
+                    style={{ color: "hsl(var(--premium-ink))" }}
+                  >
+                    {situation.support.playlist.label}
                   </p>
-                  <p className="text-[11px] font-medium" style={{ color: "hsl(var(--premium-ink-soft))" }}>
-                    chuva suave · canto de pássaros · piano lento
+                  <p
+                    className="text-[11px] font-medium"
+                    style={{ color: "hsl(var(--premium-ink-soft))" }}
+                  >
+                    {situation.support.playlist.desc}
                   </p>
                 </div>
                 <ChevronRight size={16} style={{ color: "hsl(var(--premium-ink-soft))" }} />
               </button>
 
-              {/* Mini dica de pais */}
-              <div className="p-4 rounded-2xl mb-4"
+              {/* Mini bilhete pros pais */}
+              <div
+                className="p-4 rounded-2xl mb-4"
                 style={{
                   background: "hsl(0 0% 100% / 0.82)",
                   border: "1px solid hsl(0 0% 100% / 0.7)",
                 }}
               >
-                <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: "hsl(var(--kidzz-green-deep))" }}>
+                <p
+                  className="text-[10px] font-black uppercase tracking-[0.16em] mb-1"
+                  style={{ color: "hsl(var(--kidzz-green-deep))" }}
+                >
                   Pra você, mãe / pai
                 </p>
-                <p className="text-[13px] leading-relaxed" style={{ color: "hsl(var(--premium-ink))" }}>
-                  Você acabou de regular um corpo pequeno que ainda não sabe se regular sozinho.
-                  Isso é amor em ação. <strong>Você está fazendo bem.</strong>
+                <p
+                  className="text-[13px] leading-relaxed"
+                  style={{ color: "hsl(var(--premium-ink))" }}
+                >
+                  {situation.support.parentNote}
                 </p>
               </div>
 
@@ -291,7 +365,7 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
                   color: "hsl(var(--premium-ink))",
                 }}
               >
-                Estou melhor agora
+                {situation.support.closeCta}
               </button>
             </motion.div>
           )}
@@ -301,19 +375,24 @@ const SOSCrisisFlow = ({ onBack, onClose, onGoWellness }: Props) => {
   );
 };
 
-/* ── Respiração guiada — círculo 4-2-6 por ~60s ── */
-const BreathingScene = ({ onSpeak, onDone }: { onSpeak: (t: string) => void; onDone: () => void }) => {
+/* ── Respiração guiada — padrão dinâmico por situação ── */
+const BreathingScene = ({
+  situation, onSpeak, onDone,
+}: {
+  situation: SosSituation;
+  onSpeak: (t: string) => void;
+  onDone: () => void;
+}) => {
+  const { in: inSec, hold: holdSec, out: outSec, cycles: TARGET_CYCLES, intro } = situation.breath;
   const [phase, setPhase] = useState<"in" | "hold" | "out">("in");
-  const [cycle, setCycle] = useState(0); // 5 ciclos = ~60s
-  const TARGET_CYCLES = 5;
+  const [cycle, setCycle] = useState(0);
 
   useEffect(() => {
-    // narração inicial
-    onSpeak("Vamos respirar juntos. Inspira pelo nariz, segura, e solta devagar pela boca.");
+    onSpeak(intro);
     let timer: ReturnType<typeof setTimeout>;
     const tick = (p: "in" | "hold" | "out") => {
       setPhase(p);
-      const dur = p === "in" ? 4000 : p === "hold" ? 2000 : 6000;
+      const durMs = (p === "in" ? inSec : p === "hold" ? holdSec : outSec) * 1000;
       timer = setTimeout(() => {
         if (p === "in") tick("hold");
         else if (p === "hold") tick("out");
@@ -328,7 +407,7 @@ const BreathingScene = ({ onSpeak, onDone }: { onSpeak: (t: string) => void; onD
             return next;
           });
         }
-      }, dur);
+      }, durMs);
     };
     tick("in");
     return () => clearTimeout(timer);
@@ -337,7 +416,7 @@ const BreathingScene = ({ onSpeak, onDone }: { onSpeak: (t: string) => void; onD
 
   const label = phase === "in" ? "Inspira" : phase === "hold" ? "Segura" : "Solta";
   const scale = phase === "in" ? 1.4 : phase === "hold" ? 1.4 : 0.85;
-  const dur = phase === "in" ? 4 : phase === "hold" ? 2 : 6;
+  const dur = phase === "in" ? inSec : phase === "hold" ? holdSec : outSec;
 
   return (
     <motion.div
@@ -346,7 +425,10 @@ const BreathingScene = ({ onSpeak, onDone }: { onSpeak: (t: string) => void; onD
       exit={{ opacity: 0 }}
       className="flex flex-col items-center justify-center pt-2"
     >
-      <p className="text-[11px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: "hsl(var(--sos-to))" }}>
+      <p
+        className="text-[11px] font-black uppercase tracking-[0.16em] mb-1"
+        style={{ color: situation.tint }}
+      >
         Respiração guiada
       </p>
       <p className="text-[13px] mb-6" style={{ color: "hsl(var(--premium-ink-soft))" }}>
@@ -354,43 +436,51 @@ const BreathingScene = ({ onSpeak, onDone }: { onSpeak: (t: string) => void; onD
       </p>
 
       <div className="relative flex items-center justify-center" style={{ width: 240, height: 240 }}>
-        {/* halo */}
         <motion.span
           aria-hidden
           className="absolute rounded-full"
           style={{
-            width: 220,
-            height: 220,
-            background: "radial-gradient(circle, hsl(var(--sos-glow) / 0.25), transparent 70%)",
+            width: 220, height: 220,
+            background: `radial-gradient(circle, ${situation.tint.replace(")", " / 0.28)")}, transparent 70%)`,
             filter: "blur(20px)",
           }}
           animate={{ scale, opacity: phase === "hold" ? 0.9 : 0.6 }}
           transition={{ duration: dur, ease: "easeInOut" }}
         />
-        {/* círculo principal */}
         <motion.div
           className="absolute rounded-full flex items-center justify-center"
           style={{
-            width: 140,
-            height: 140,
-            background: "linear-gradient(180deg, hsl(var(--sos-from)) 0%, hsl(var(--sos-to)) 100%)",
-            boxShadow: "0 0 40px hsl(var(--sos-glow) / 0.4), inset 0 2px 8px hsl(0 100% 90% / 0.4)",
+            width: 140, height: 140,
+            background: `linear-gradient(180deg, hsl(var(--sos-from)) 0%, ${situation.tint} 100%)`,
+            boxShadow: `0 0 40px ${situation.tint.replace(")", " / 0.45)")}, inset 0 2px 10px hsl(0 0% 100% / 0.55), inset 0 -10px 20px hsl(0 0% 0% / 0.18)`,
           }}
           animate={{ scale }}
           transition={{ duration: dur, ease: "easeInOut" }}
         >
-          <span className="text-white text-[18px] font-black tracking-tight">{label}</span>
+          <span
+            aria-hidden
+            className="absolute rounded-full"
+            style={{
+              top: 16, left: 22, width: 50, height: 28,
+              background: "linear-gradient(180deg, hsl(0 0% 100% / 0.6), hsl(0 0% 100% / 0))",
+              filter: "blur(2px)",
+            }}
+          />
+          <span className="text-white text-[18px] font-black tracking-tight relative">{label}</span>
         </motion.div>
       </div>
 
-      <p className="text-[12px] mt-8 max-w-[260px] text-center" style={{ color: "hsl(var(--premium-ink-soft))" }}>
+      <p
+        className="text-[12px] mt-8 max-w-[260px] text-center"
+        style={{ color: "hsl(var(--premium-ink-soft))" }}
+      >
         Acompanhe o ritmo do círculo. Quando quiser, toque pra avançar.
       </p>
       <button
         type="button"
         onClick={onDone}
         className="mt-4 text-[12px] font-black underline-offset-4 hover:underline"
-        style={{ color: "hsl(var(--sos-to))" }}
+        style={{ color: situation.tint }}
       >
         Pular respiração
       </button>
