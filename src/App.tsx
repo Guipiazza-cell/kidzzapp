@@ -16,6 +16,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
+const LandingQuiz = lazy(() => import("./pages/LandingQuiz"));
 const Admin = lazy(() => import("./pages/Admin"));
 import AppUpdateBanner from "./components/AppUpdateBanner";
 import InstallBanner from "./components/InstallBanner";
@@ -95,7 +96,7 @@ const AppShell = () => {
               <Route path="/auth" element={<Auth />} />
               <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
               <Route path="/privacy" element={<Privacy />} />
-              <Route path="/lp" element={<Landing />} />
+              <Route path="/lp" element={<LandingQuiz />} />
               <Route path="/landing" element={<Landing />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
