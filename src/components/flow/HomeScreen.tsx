@@ -404,6 +404,22 @@ const HomeScreen = ({
           <ConnectionMeter />
         </div>
 
+        {/* ── 1.6 NUDGE CONTEXTUAL — sussurro inteligente ── */}
+        <div className="w-full max-w-sm mb-3">
+          <ContextualNudge
+            onAction={(a) => {
+              if (a === "ritual") setRitualOpen(true);
+              else if (a === "decompress") setDecompressOpen(true);
+              else if (a === "moment-add") {
+                onTabChange?.("moments");
+                setTimeout(() => window.dispatchEvent(new CustomEvent("kidzz:open-moment-add")), 200);
+              }
+            }}
+          />
+        </div>
+
+
+
 
 
         {/* ── 2. HUD MINI — apenas Energia + Conexão ── */}
