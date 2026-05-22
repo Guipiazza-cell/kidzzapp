@@ -72,6 +72,7 @@ const MomentsAlbum = () => {
       setPhrases([{ id: `p${Date.now()}`, text: data.title, who: data.who || "família", date }, ...phrases]);
     }
     haptic("light"); sfx("click");
+    trackConnection("moment_added");
     setAdding(false);
   };
 
