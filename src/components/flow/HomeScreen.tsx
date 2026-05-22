@@ -24,6 +24,7 @@ import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 import DecompressionCard from "@/components/decompress/DecompressionCard";
 import DecompressionMode from "@/components/decompress/DecompressionMode";
+import ConnectionMeter from "@/components/connection/ConnectionMeter";
 
 /* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
    Foco: respirável, sofisticado, Apple + Calm + Pixar.
