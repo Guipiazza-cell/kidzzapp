@@ -4,11 +4,12 @@ import {
   ArrowLeft, Wind, Heart, Sparkles, Play, Pause, Timer, X,
   Sun, Coffee, Flower2, Music2, BookOpen, Trees, Waves,
   MapPin, Star, ChevronRight, LifeBuoy, HandHeart, Smile,
-  Sunrise, Moon as MoonIcon, Lock, Zap,
+  Sunrise, Moon as MoonIcon, Lock, Zap, Clapperboard,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
 import wellnessMascot from "@/assets/kidzz/wellness.png";
+import WellnessCinema from "./WellnessCinema";
 
 /* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
    Paleta sálvia + esmeralda + creme + dourado fosco.
@@ -1501,6 +1502,7 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
 /* ────────────── ROOT ────────────── */
 const WellnessHub = ({ onBack }: Props) => {
   const [view, setView] = useState<View>("home");
+  const [cinemaOpen, setCinemaOpen] = useState(false);
   const go = useCallback((v: View) => setView(v), []);
   const back = useCallback(() => setView("home"), []);
 
@@ -1508,8 +1510,6 @@ const WellnessHub = ({ onBack }: Props) => {
     <div
       className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain relative"
       style={{
-        // Translucent warm-cream veil over the global cinematic background.
-        // Keeps spa-silence feel while unifying with the rest of the app.
         background: "linear-gradient(180deg, hsl(38 55% 96% / 0.78) 0%, hsl(150 28% 90% / 0.72) 100%)",
         color: ink,
         WebkitOverflowScrolling: "touch",
@@ -1541,6 +1541,35 @@ const WellnessHub = ({ onBack }: Props) => {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* CTA flutuante — Modo cinemático */}
+      {view === "home" && (
+        <motion.button
+          type="button"
+          onClick={() => { haptic("medium"); setCinemaOpen(true); }}
+          className="fixed left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 px-5 py-3 rounded-full active:scale-[0.97] transition-transform"
+          style={{
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 92px)",
+            background: "linear-gradient(135deg, hsl(150 30% 96%) 0%, hsl(140 35% 88%) 60%, hsl(150 35% 80%) 100%)",
+            border: "1px solid hsl(0 0% 100% / 0.85)",
+            boxShadow: "0 1px 0 hsl(0 0% 100% / 0.9) inset, 0 14px 32px -14px hsl(150 30% 25% / 0.4)",
+          }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, type: "spring", stiffness: 220, damping: 22 }}
+          aria-label="Abrir Modo cinemático"
+        >
+          <Clapperboard size={16} style={{ color: "hsl(150 35% 28%)" }} />
+          <span className="text-[12px] font-black tracking-tight" style={{ color: "hsl(150 35% 22%)" }}>
+            Modo cinemático
+          </span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "hsl(150 35% 28%)", color: "white" }}>
+            90s
+          </span>
+        </motion.button>
+      )}
+
+      <WellnessCinema open={cinemaOpen} onClose={() => setCinemaOpen(false)} />
     </div>
   );
 };

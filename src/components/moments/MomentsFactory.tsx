@@ -7,6 +7,7 @@ import { MISSIONS, type Mission } from "./MissionsData";
 import MissionDetail from "./MissionDetail";
 import ContextualPaywallModal from "../ContextualPaywallModal";
 import { MISSION_PACKS, isPackPurchased, openMissionPackCheckout } from "@/lib/missionPacks";
+import MomentsAlbum from "./MomentsAlbum";
 import aneImg from "@/assets/ane-chameleon.webp";
 import { toast } from "sonner";
 
@@ -78,6 +79,9 @@ const MomentsFactory = ({ onBack }: Props) => {
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 pb-6 relative z-10">
+        {/* Coração emocional — Álbum afetivo da família */}
+        <MomentsAlbum />
+
         {/* Hero */}
         <motion.div
           className="mt-3 rounded-2xl overflow-hidden glass-card p-5 text-center"
