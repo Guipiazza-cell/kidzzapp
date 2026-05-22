@@ -508,6 +508,15 @@ const HomeScreen = ({
           <RitualCard onOpen={() => setRitualOpen(true)} />
         </div>
 
+        {/* ── 3.7 DECOMPRESSÃO — janela do reencontro (16h–21h) ── */}
+        {showDecompress && (
+          <div className="w-full max-w-sm mt-3">
+            <DecompressionCard onOpen={() => setDecompressOpen(true)} />
+          </div>
+        )}
+
+
+
 
 
 
@@ -753,6 +762,9 @@ const HomeScreen = ({
 
       {/* ── Ritual da Família — flow cinemático full-screen ── */}
       <RitualFlow ritual={currentRitual} open={ritualOpen} onClose={() => setRitualOpen(false)} />
+
+      {/* ── Modo Decompressão — 60s só para o adulto ── */}
+      <DecompressionMode open={decompressOpen} onClose={() => setDecompressOpen(false)} />
     </motion.div>
   );
 };
