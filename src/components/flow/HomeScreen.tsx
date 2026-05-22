@@ -17,6 +17,8 @@ import moonImg from "@/assets/kidzz/moon.webp";
 import wellnessImg from "@/assets/kidzz/wellness.png";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
+import SOSCard from "@/components/sos/SOSCard";
+import SOSModal from "@/components/sos/SOSModal";
 
 /* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
    Foco: respirável, sofisticado, Apple + Calm + Pixar.
@@ -141,6 +143,7 @@ const HomeScreen = ({
   const [showDashboard, setShowDashboard] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [bannerIdx, setBannerIdx] = useState(0);
+  const [sosOpen, setSosOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const childName = profile?.child_name || "amigo";
@@ -485,6 +488,10 @@ const HomeScreen = ({
           </div>
         </motion.section>
 
+        {/* ── 3.5 SOS KIDZZ — acolhimento emocional ── */}
+        <SOSCard onOpen={() => setSosOpen(true)} />
+
+
         {/* ── 4. BANNER ROTATIVO PREMIUM ── */}
         <motion.section
           className="w-full max-w-sm mb-4"
@@ -717,6 +724,13 @@ const HomeScreen = ({
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
+
+      {/* ── SOS Kidzz Modal — bottom sheet cinemático ── */}
+      <SOSModal
+        open={sosOpen}
+        onClose={() => setSosOpen(false)}
+        onGoWellness={() => onTabChange?.("wellness")}
+      />
     </motion.div>
   );
 };
