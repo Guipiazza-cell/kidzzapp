@@ -68,7 +68,7 @@ const Poster = ({
           <h4 className={`text-white font-bold leading-tight drop-shadow ${dim.title}`}>
             {movie.titulo}
           </h4>
-          <p className="text-white/65 text-[10px] font-semibold mt-1 uppercase tracking-wide">
+          <p className="text-white/85 text-[10px] font-semibold mt-1 uppercase tracking-wide">
             {movie.faixaEtaria === "familia" ? "Família" : `${movie.faixaEtaria} anos`}
           </p>
         </div>
@@ -105,7 +105,7 @@ const HeroFilm = ({ movie, onOpen }: { movie: Movie; onOpen: () => void }) => (
     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
 
     <div className="relative z-10 p-6 flex flex-col h-full justify-end" style={{ minHeight: 320 }}>
-      <span className="text-white/55 text-[10px] font-black uppercase tracking-[0.24em] mb-2 flex items-center gap-1.5">
+      <span className="text-white/80 text-[10px] font-black uppercase tracking-[0.24em] mb-2 flex items-center gap-1.5">
         <Sparkles size={11} /> Filme da semana
       </span>
 
@@ -183,7 +183,7 @@ const MovieSheet = ({ movie, onClose }: { movie: Movie; onClose: () => void }) =
           <div className="min-w-0 pb-1">
             <h3 className="text-white text-xl font-bold leading-tight">{movie.titulo}</h3>
             {movie.tituloOriginal && movie.tituloOriginal !== movie.titulo && (
-              <p className="text-white/60 text-[11px] italic">{movie.tituloOriginal}</p>
+              <p className="text-white/85 text-[11px] italic">{movie.tituloOriginal}</p>
             )}
           </div>
         </div>
@@ -197,7 +197,7 @@ const MovieSheet = ({ movie, onClose }: { movie: Movie; onClose: () => void }) =
         <p className="text-white/85 text-[14px] leading-relaxed italic">"{movie.descricao}"</p>
 
         <div className="rounded-2xl p-4 bg-white/[0.04] border border-white/8">
-          <div className="flex items-center gap-1.5 text-white/60 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
+          <div className="flex items-center gap-1.5 text-white/85 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
             <Sparkles size={11} /> Por que recomendamos
           </div>
           <p className="text-white text-[13.5px] leading-snug">{movie.motivoRecomendacao}</p>
@@ -212,7 +212,7 @@ const MovieSheet = ({ movie, onClose }: { movie: Movie; onClose: () => void }) =
 
         {movie.streaming && movie.streaming.length > 0 && (
           <div>
-            <div className="text-white/45 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
+            <div className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
               Onde assistir
             </div>
             <div className="flex flex-wrap gap-2">
@@ -237,7 +237,7 @@ const MovieSheet = ({ movie, onClose }: { movie: Movie; onClose: () => void }) =
               className={i < movie.ratingKidzz ? "" : "opacity-25"}
             />
           ))}
-          <span className="text-white/55 text-[11px] font-semibold ml-1">
+          <span className="text-white/80 text-[11px] font-semibold ml-1">
             Curadoria KIDZZ
           </span>
         </div>
@@ -248,7 +248,7 @@ const MovieSheet = ({ movie, onClose }: { movie: Movie; onClose: () => void }) =
 
 const InfoCard = ({ label, value }: { label: string; value: string }) => (
   <div className="rounded-xl p-3 bg-white/[0.04] border border-white/[0.06]">
-    <div className="text-white/40 text-[9.5px] font-black uppercase tracking-[0.18em]">{label}</div>
+    <div className="text-white/70 text-[9.5px] font-black uppercase tracking-[0.18em]">{label}</div>
     <div className="text-white text-[13px] font-bold mt-0.5 leading-tight">{value}</div>
   </div>
 );
@@ -275,7 +275,7 @@ const SectionCarousel = ({
             <span className="mr-1.5">{section.icon}</span>
             {section.title}
           </h3>
-          <p className="text-white/40 text-[11px] font-medium mt-0.5">{section.subtitle}</p>
+          <p className="text-white/70 text-[11px] font-medium mt-0.5">{section.subtitle}</p>
         </div>
       </div>
       <div
@@ -346,7 +346,7 @@ const FamilyCinema = ({ onBack }: Props) => {
         </motion.button>
         <div className="flex-1 min-w-0">
           <h1 className="text-white text-lg font-bold leading-tight">Sessão em Família</h1>
-          <p className="text-white/50 text-[11.5px] font-medium">Curadoria emocional cinematográfica</p>
+          <p className="text-white/75 text-[11.5px] font-medium">Curadoria emocional cinematográfica</p>
         </div>
       </header>
 
@@ -363,7 +363,7 @@ const FamilyCinema = ({ onBack }: Props) => {
           <h2 className="mt-3 text-white font-bold text-[26px] tracking-tight leading-tight">
             Momentos que ficam.
           </h2>
-          <p className="mt-1.5 text-white/55 text-[13px] font-medium max-w-xs mx-auto leading-snug">
+          <p className="mt-1.5 text-white/80 text-[13px] font-medium max-w-xs mx-auto leading-snug">
             Filmes para viver a infância junto.
           </p>
         </section>
@@ -377,7 +377,7 @@ const FamilyCinema = ({ onBack }: Props) => {
         <section className="mb-7">
           <div className="flex items-baseline justify-between px-5 mb-3">
             <h3 className="text-white font-bold text-[15px]">Em alta hoje</h3>
-            <span className="text-white/35 text-[10px] font-bold uppercase tracking-[0.18em]">
+            <span className="text-white/85 text-[10px] font-bold uppercase tracking-[0.18em]">
               Curadoria
             </span>
           </div>
@@ -406,7 +406,7 @@ const FamilyCinema = ({ onBack }: Props) => {
           <SectionCarousel key={s.id} section={s} onOpen={open} />
         ))}
 
-        <p className="mt-8 text-center text-white/30 text-[11px] font-medium px-6">
+        <p className="mt-8 text-center text-white/85 text-[11px] font-medium px-6">
           Curadoria KIDZZ · Selecionada para sua família
         </p>
       </div>

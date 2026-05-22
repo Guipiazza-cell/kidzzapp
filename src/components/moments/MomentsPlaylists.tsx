@@ -47,7 +47,7 @@ const PlayerSheet = ({
             <span className="text-2xl">{playlist.emoji}</span>
             <div className="min-w-0">
               <h3 className="font-bold text-base leading-tight truncate">{playlist.title}</h3>
-              <p className="text-[12px] text-white/60 italic truncate">"{playlist.emotionalLine}"</p>
+              <p className="text-[12px] text-white/85 italic truncate">"{playlist.emotionalLine}"</p>
             </div>
           </div>
           <button
@@ -112,7 +112,7 @@ const HeroCard = ({
     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
     <div className="relative z-10 p-6 flex flex-col h-full min-h-[200px] justify-end">
-      <span className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">
+      <span className="text-white/85 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">
         Em destaque
       </span>
       <div className="flex items-end justify-between gap-3">
@@ -173,7 +173,7 @@ const EditorialCard = ({
         <p className="mt-1 text-white/75 text-[12px] italic line-clamp-2 leading-snug">
           "{playlist.emotionalLine}"
         </p>
-        <div className="mt-2 text-white/60 text-[10.5px] font-semibold">
+        <div className="mt-2 text-white/85 text-[10.5px] font-semibold">
           {playlist.approxTracks} músicas · {playlist.approxMinutes} min
         </div>
       </div>
@@ -207,8 +207,8 @@ const ListRow = ({
     </div>
     <div className="flex-1 min-w-0 text-left">
       <h4 className="text-white text-sm font-bold leading-tight truncate">{playlist.title}</h4>
-      <p className="text-white/55 text-[11.5px] italic truncate">"{playlist.emotionalLine}"</p>
-      <p className="text-white/40 text-[10.5px] font-semibold mt-0.5">
+      <p className="text-white/80 text-[11.5px] italic truncate">"{playlist.emotionalLine}"</p>
+      <p className="text-white/70 text-[10.5px] font-semibold mt-0.5">
         {playlist.approxTracks} músicas · {playlist.approxMinutes} min
       </p>
     </div>
@@ -261,7 +261,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         </motion.button>
         <div className="flex-1 min-w-0">
           <h1 className="text-white text-lg font-bold leading-tight">Momentos</h1>
-          <p className="text-white/50 text-[11.5px] font-medium">Curadoria musical em família</p>
+          <p className="text-white/75 text-[11.5px] font-medium">Curadoria musical em família</p>
         </div>
       </header>
 
@@ -278,7 +278,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           <h2 className="mt-3 text-white font-bold text-[26px] tracking-tight leading-tight">
             Momentos que ficam.
           </h2>
-          <p className="mt-1.5 text-white/55 text-[13px] font-medium max-w-xs mx-auto leading-snug">
+          <p className="mt-1.5 text-white/80 text-[13px] font-medium max-w-xs mx-auto leading-snug">
             Música para viver a infância com presença.
           </p>
         </section>
@@ -292,7 +292,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         <section className="mb-7">
           <div className="flex items-baseline justify-between px-5 mb-3">
             <h3 className="text-white font-bold text-[15px]">Para cada momento</h3>
-            <span className="text-white/35 text-[10px] font-bold uppercase tracking-[0.18em]">
+            <span className="text-white/85 text-[10px] font-bold uppercase tracking-[0.18em]">
               Curadoria
             </span>
           </div>
@@ -316,7 +316,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           </div>
         </section>
 
-        <p className="mt-8 text-center text-white/30 text-[11px] font-medium px-6">
+        <p className="mt-8 text-center text-white/85 text-[11px] font-medium px-6">
           Curadoria KIDZZ · Atualizada direto pelo Spotify
         </p>
       </div>
