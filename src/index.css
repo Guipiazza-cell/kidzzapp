@@ -62,6 +62,11 @@
     --premium-ink: 60 8% 11%;       /* primary text #1E1E1A */
     --premium-ink-soft: 80 5% 38%;  /* secondary text #5E6258 */
 
+    /* ── SOS Kidzz — acolhimento de emergência emocional ── */
+    --sos-from: 0 100% 73%;          /* #FF7A7A */
+    --sos-to: 0 65% 57%;             /* #D94B4B */
+    --sos-glow: 0 95% 70%;
+
     /* Premium tokens */
     --premium-bg: 220 25% 8%;
     --premium-surface: 220 20% 14%;
