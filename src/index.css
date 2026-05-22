@@ -207,6 +207,16 @@
     border: 1px solid hsl(0 0% 100% / 0.7);
   }
 
+  /* Premium "SOS" CTA — red variant of btn-ask-premium */
+  .btn-sos-premium {
+    background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 90% 88%) 50%, hsl(0 78% 56%) 100%);
+    color: hsl(0 60% 22%);
+    box-shadow:
+      0 1px 0 hsl(0 0% 100% / 0.8) inset,
+      0 8px 24px -10px hsl(0 70% 40% / 0.55);
+    border: 1px solid hsl(0 0% 100% / 0.7);
+  }
+
   .glass-card-light {
     background: hsl(0 0% 100% / 0.65);
     backdrop-filter: blur(16px);
