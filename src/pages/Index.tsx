@@ -41,6 +41,7 @@ const MonthlyRetrospective = lazy(() => import("@/components/viral/MonthlyRetros
 import ChameleonMascot from "@/components/ChameleonMascot";
 import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
 import OnboardingWelcome from "@/components/onboarding/OnboardingWelcome";
+import EmotionalIntro from "@/components/onboarding/EmotionalIntro";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import BottomNav from "@/components/flow/BottomNav";
 import XpToast from "@/components/flow/XpToast";
@@ -87,6 +88,10 @@ const Index = () => {
     try { return window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
+  const [showEmotionalIntro, setShowEmotionalIntro] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try { return window.localStorage.getItem("kidzz_emotional_intro_v1") !== "1"; } catch { return false; }
+  });
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -241,6 +246,18 @@ const Index = () => {
     // Sem fundo/loading screen próprio — o MagicalBackground global e o SplashScreen
     // cobrem a tela. Retornar null evita o flash branco/cinza durante o hidrate.
     return null;
+  }
+
+  // Cinematic emotional intro — shown once before name collection
+  if (showEmotionalIntro && !profile?.child_name) {
+    return (
+      <EmotionalIntro
+        onDone={() => {
+          try { localStorage.setItem("kidzz_emotional_intro_v1", "1"); } catch {}
+          setShowEmotionalIntro(false);
+        }}
+      />
+    );
   }
 
   // Onboarding gates: name → age → interests
