@@ -724,6 +724,13 @@ const HomeScreen = ({
         )}
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
+
+      {/* ── SOS Kidzz Modal — bottom sheet cinemático ── */}
+      <SOSModal
+        open={sosOpen}
+        onClose={() => setSosOpen(false)}
+        onGoWellness={() => onTabChange?.("wellness")}
+      />
     </motion.div>
   );
 };
