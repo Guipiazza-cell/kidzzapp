@@ -271,11 +271,11 @@ const SectionCarousel = ({
     <section className="mb-7">
       <div className="flex items-baseline justify-between px-5 mb-3">
         <div className="min-w-0">
-          <h3 className="text-white font-bold text-[16px] leading-tight">
+          <h3 className="text-gray-900 font-bold text-[16px] leading-tight">
             <span className="mr-1.5">{section.icon}</span>
             {section.title}
           </h3>
-          <p className="text-white/70 text-[11px] font-medium mt-0.5">{section.subtitle}</p>
+          <p className="text-gray-700 text-[11px] font-medium mt-0.5">{section.subtitle}</p>
         </div>
       </div>
       <div
@@ -322,12 +322,12 @@ const FamilyCinema = ({ onBack }: Props) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Fundo escuro cinematográfico */}
+      {/* Fundo claro suave */}
       <div
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(120% 50% at 50% 0%, rgba(244,168,216,0.08), transparent 60%), linear-gradient(180deg, #06081a 0%, #0a0c20 50%, #050715 100%)",
+            "radial-gradient(120% 50% at 50% 0%, rgba(244,168,216,0.18), transparent 60%), linear-gradient(180deg, #fdf6ef 0%, #f7ece0 50%, #f0e3d2 100%)",
         }}
       />
 
@@ -339,14 +339,14 @@ const FamilyCinema = ({ onBack }: Props) => {
         <motion.button
           onClick={onBack}
           whileTap={{ scale: 0.9 }}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/[0.06] text-white border border-white/10"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-black/[0.06] text-gray-900 border border-black/10"
           aria-label="Voltar"
         >
           <ArrowLeft size={22} />
         </motion.button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-white text-lg font-bold leading-tight">Sessão em Família</h1>
-          <p className="text-white/75 text-[11.5px] font-medium">Curadoria emocional cinematográfica</p>
+          <h1 className="text-gray-900 text-lg font-bold leading-tight">Cinema em Família</h1>
+          <p className="text-gray-700 text-[11.5px] font-medium">Curadoria emocional cinematográfica</p>
         </div>
       </header>
 
@@ -360,10 +360,10 @@ const FamilyCinema = ({ onBack }: Props) => {
           <div className="flex justify-center">
             <KidzzChameleon state="cosmic" mood="happy" size="md" interactive={false} showParticles={false} />
           </div>
-          <h2 className="mt-3 text-white font-bold text-[26px] tracking-tight leading-tight">
+          <h2 className="mt-3 text-gray-900 font-bold text-[26px] tracking-tight leading-tight">
             Momentos que ficam.
           </h2>
-          <p className="mt-1.5 text-white/80 text-[13px] font-medium max-w-xs mx-auto leading-snug">
+          <p className="mt-1.5 text-gray-700 text-[13px] font-medium max-w-xs mx-auto leading-snug">
             Filmes para viver a infância junto.
           </p>
         </section>
@@ -376,8 +376,8 @@ const FamilyCinema = ({ onBack }: Props) => {
         {/* Em alta hoje */}
         <section className="mb-7">
           <div className="flex items-baseline justify-between px-5 mb-3">
-            <h3 className="text-white font-bold text-[15px]">Em alta hoje</h3>
-            <span className="text-white/85 text-[10px] font-bold uppercase tracking-[0.18em]">
+            <h3 className="text-gray-900 font-bold text-[15px]">Em alta hoje</h3>
+            <span className="text-gray-700 text-[10px] font-bold uppercase tracking-[0.18em]">
               Curadoria
             </span>
           </div>
@@ -406,7 +406,7 @@ const FamilyCinema = ({ onBack }: Props) => {
           <SectionCarousel key={s.id} section={s} onOpen={open} />
         ))}
 
-        <p className="mt-8 text-center text-white/85 text-[11px] font-medium px-6">
+        <p className="mt-8 text-center text-gray-700 text-[11px] font-medium px-6">
           Curadoria KIDZZ · Selecionada para sua família
         </p>
       </div>
