@@ -52,6 +52,7 @@ const RitualFlow = ({ ritual, open, onClose }: Props) => {
         setDone(true);
         haptic("medium");
         play(ritual.closing.voice);
+        trackConnection("ritual_completed");
       }
     }, step.duration);
     return () => clearTimeout(t);
