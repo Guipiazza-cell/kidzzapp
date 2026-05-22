@@ -19,7 +19,10 @@ interface Props {
 const RitualFlow = ({ ritual, open, onClose }: Props) => {
   const [idx, setIdx] = useState(0);
   const [done, setDone] = useState(false);
-  const { play, stop, muted, toggleMute } = useSosVoice();
+  const { speak, stop } = useSosVoice();
+  const [muted, setMuted] = useState(false);
+  const play = (t: string) => { if (!muted) speak(t); };
+  const toggleMute = () => { setMuted((m) => { const n = !m; if (n) stop(); return n; }); };
   const isNight = ritual.id === "night";
 
   // Reset on open
