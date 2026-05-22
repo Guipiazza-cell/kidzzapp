@@ -4,6 +4,7 @@ import { Heart, Award, Quote, Calendar, Plus, ChevronRight, X, Sparkles, Share2 
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import ShareMomentCard from "./ShareMomentCard";
+import { trackConnection } from "@/lib/connection";
 
 /**
  * Álbum afetivo da família — coração emocional da aba Momentos.
