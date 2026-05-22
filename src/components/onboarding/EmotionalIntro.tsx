@@ -46,7 +46,7 @@ const EmotionalIntro = ({ onDone }: Props) => {
 
   useEffect(() => {
     haptic("light");
-    sfx("chime");
+    sfx("click");
   }, [scene]);
 
   const particles = useMemo(
@@ -64,7 +64,7 @@ const EmotionalIntro = ({ onDone }: Props) => {
 
   const next = () => {
     haptic("medium");
-    sfx("tap");
+    sfx("click");
     if (isLast) {
       sfx("unlock");
       haptic("success");
