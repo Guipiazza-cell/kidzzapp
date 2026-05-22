@@ -398,6 +398,13 @@ const HomeScreen = ({
           </div>
         </section>
 
+        {/* ── 1.5 TERMÔMETRO DE CONEXÃO — coração emocional da família ── */}
+        <div className="mb-3">
+          <ConnectionMeter />
+        </div>
+
+
+
         {/* ── 2. HUD MINI — apenas Energia + Conexão ── */}
         <motion.div
           className="w-full max-w-sm flex items-center justify-end gap-2 mb-3 -mt-2"
