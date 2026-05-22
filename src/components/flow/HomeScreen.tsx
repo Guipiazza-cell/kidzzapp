@@ -19,6 +19,9 @@ import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 import SOSCard from "@/components/sos/SOSCard";
 import SOSModal from "@/components/sos/SOSModal";
+import RitualCard from "@/components/rituals/RitualCard";
+import RitualFlow from "@/components/rituals/RitualFlow";
+import { getCurrentRitual } from "@/components/rituals/rituals";
 
 /* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
    Foco: respirável, sofisticado, Apple + Calm + Pixar.
@@ -144,6 +147,8 @@ const HomeScreen = ({
   const [submitting, setSubmitting] = useState(false);
   const [bannerIdx, setBannerIdx] = useState(0);
   const [sosOpen, setSosOpen] = useState(false);
+  const [ritualOpen, setRitualOpen] = useState(false);
+  const currentRitual = useMemo(() => getCurrentRitual(), []);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const childName = profile?.child_name || "amigo";
@@ -491,6 +496,13 @@ const HomeScreen = ({
         {/* ── 3.5 SOS KIDZZ — acolhimento emocional ── */}
         <SOSCard onOpen={() => setSosOpen(true)} />
 
+        {/* ── 3.6 RITUAL DA FAMÍLIA — contextual por hora do dia ── */}
+        <div className="w-full max-w-sm mt-3">
+          <RitualCard onOpen={() => setRitualOpen(true)} />
+        </div>
+
+
+
 
         {/* ── 4. BANNER ROTATIVO PREMIUM ── */}
         <motion.section
@@ -731,6 +743,9 @@ const HomeScreen = ({
         onClose={() => setSosOpen(false)}
         onGoWellness={() => onTabChange?.("wellness")}
       />
+
+      {/* ── Ritual da Família — flow cinemático full-screen ── */}
+      <RitualFlow ritual={currentRitual} open={ritualOpen} onClose={() => setRitualOpen(false)} />
     </motion.div>
   );
 };

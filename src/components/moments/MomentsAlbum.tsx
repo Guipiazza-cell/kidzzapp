@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Award, Quote, Calendar, Plus, ChevronRight, X, Sparkles } from "lucide-react";
+import { Heart, Award, Quote, Calendar, Plus, ChevronRight, X, Sparkles, Share2 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
+import ShareMomentCard from "./ShareMomentCard";
 
 /**
  * Álbum afetivo da família — coração emocional da aba Momentos.
@@ -47,6 +48,7 @@ const MomentsAlbum = () => {
   const [wins, setWins]         = useState<WinEntry[]>(() => readLS(STORAGE.wins, SEED_WINS));
   const [phrases, setPhrases]   = useState<PhraseEntry[]>(() => readLS(STORAGE.phrases, SEED_PHRASES));
   const [adding, setAdding] = useState(false);
+  const [share, setShare] = useState<null | { text: string; attribution?: string; emoji: string; variant: "morning" | "evening" | "night" | "joy" }>(null);
 
   useEffect(() => writeLS(STORAGE.specials, specials), [specials]);
   useEffect(() => writeLS(STORAGE.wins, wins), [wins]);
@@ -156,21 +158,30 @@ const MomentsAlbum = () => {
             specials.length === 0 ? (
               <EmptyState text="Nenhum especial ainda. Guarde a primeira lembrança boa de hoje." tint="hsl(0 65% 60%)" />
             ) : specials.map((s) => (
-              <AlbumCard key={s.id} emoji={s.emoji} title={s.title} subtitle={s.note} date={s.date} tint="hsl(0 65% 60%)" />
+              <AlbumCard
+                key={s.id} emoji={s.emoji} title={s.title} subtitle={s.note} date={s.date} tint="hsl(0 65% 60%)"
+                onShare={() => setShare({ text: s.title, attribution: s.note || "um momento especial", emoji: s.emoji, variant: "joy" })}
+              />
             ))
           )}
           {tab === "wins" && (
             wins.length === 0 ? (
               <EmptyState text="Sem conquistas hoje? Respirar com seu filho já é uma." tint="hsl(40 80% 55%)" />
             ) : wins.map((w) => (
-              <AlbumCard key={w.id} emoji={w.emoji} title={w.title} date={w.date} tint="hsl(40 80% 55%)" />
+              <AlbumCard
+                key={w.id} emoji={w.emoji} title={w.title} date={w.date} tint="hsl(40 80% 55%)"
+                onShare={() => setShare({ text: w.title, attribution: "uma conquista nossa", emoji: w.emoji, variant: "morning" })}
+              />
             ))
           )}
           {tab === "phrases" && (
             phrases.length === 0 ? (
               <EmptyState text="Anote a próxima frase que vier dele. Vira ouro depois." tint="hsl(265 50% 60%)" />
             ) : phrases.map((p) => (
-              <AlbumCard key={p.id} emoji={"💬"} title={`“${p.text}”`} subtitle={p.who} date={p.date} tint="hsl(265 50% 60%)" />
+              <AlbumCard
+                key={p.id} emoji={"💬"} title={`“${p.text}”`} subtitle={p.who} date={p.date} tint="hsl(265 50% 60%)"
+                onShare={() => setShare({ text: p.text, attribution: p.who, emoji: "💬", variant: "evening" })}
+              />
             ))
           )}
           {tab === "timeline" && (
@@ -180,11 +191,20 @@ const MomentsAlbum = () => {
       </AnimatePresence>
 
       <AddSheet open={adding} initialTab={tab} onClose={() => setAdding(false)} onSubmit={handleAdd} />
+
+      <ShareMomentCard
+        open={!!share}
+        onClose={() => setShare(null)}
+        text={share?.text || ""}
+        attribution={share?.attribution}
+        emoji={share?.emoji}
+        variant={share?.variant}
+      />
     </motion.section>
   );
 };
 
-const AlbumCard = ({ emoji, title, subtitle, date, tint }: { emoji: string; title: string; subtitle?: string; date: string; tint: string }) => (
+const AlbumCard = ({ emoji, title, subtitle, date, tint, onShare }: { emoji: string; title: string; subtitle?: string; date: string; tint: string; onShare?: () => void }) => (
   <motion.div
     initial={{ opacity: 0, x: -6 }}
     animate={{ opacity: 1, x: 0 }}
@@ -211,9 +231,21 @@ const AlbumCard = ({ emoji, title, subtitle, date, tint }: { emoji: string; titl
         </p>
       )}
     </div>
-    <span className="text-[10px] font-black uppercase tracking-wider flex-shrink-0" style={{ color: tint }}>
-      {date}
-    </span>
+    <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+      <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: tint }}>
+        {date}
+      </span>
+      {onShare && (
+        <button
+          onClick={() => { haptic("light"); onShare(); }}
+          className="w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+          style={{ background: tint.replace(")", " / 0.1)") }}
+          aria-label="Compartilhar"
+        >
+          <Share2 size={11} style={{ color: tint }} />
+        </button>
+      )}
+    </div>
   </motion.div>
 );
 
