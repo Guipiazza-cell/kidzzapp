@@ -22,6 +22,8 @@ import SOSModal from "@/components/sos/SOSModal";
 import RitualCard from "@/components/rituals/RitualCard";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
+import DecompressionCard from "@/components/decompress/DecompressionCard";
+import DecompressionMode from "@/components/decompress/DecompressionMode";
 
 /* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
    Foco: respirável, sofisticado, Apple + Calm + Pixar.
@@ -148,7 +150,12 @@ const HomeScreen = ({
   const [bannerIdx, setBannerIdx] = useState(0);
   const [sosOpen, setSosOpen] = useState(false);
   const [ritualOpen, setRitualOpen] = useState(false);
+  const [decompressOpen, setDecompressOpen] = useState(false);
   const currentRitual = useMemo(() => getCurrentRitual(), []);
+  const showDecompress = useMemo(() => {
+    const h = new Date().getHours();
+    return h >= 16 && h < 21; // janela do reencontro
+  }, []);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const childName = profile?.child_name || "amigo";
