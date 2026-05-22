@@ -55,6 +55,13 @@ const MomentsAlbum = () => {
   useEffect(() => writeLS(STORAGE.wins, wins), [wins]);
   useEffect(() => writeLS(STORAGE.phrases, phrases), [phrases]);
 
+  // Permite que outros lugares (ex: nudge contextual) abram o sheet de adição.
+  useEffect(() => {
+    const open = () => setAdding(true);
+    window.addEventListener("kidzz:open-moment-add", open);
+    return () => window.removeEventListener("kidzz:open-moment-add", open);
+  }, []);
+
   const TABS: { id: Tab; label: string; icon: typeof Heart; tint: string }[] = [
     { id: "specials", label: "Especiais",  icon: Heart,    tint: "hsl(0 65% 60%)" },
     { id: "wins",     label: "Conquistas", icon: Award,    tint: "hsl(40 80% 55%)" },
