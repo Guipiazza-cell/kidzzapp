@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, VolumeX, Volume2 } from "lucide-react";
 import { useSosVoice } from "@/components/sos/useSosVoice";
 import { haptic } from "@/lib/haptics";
+import { trackConnection } from "@/lib/connection";
 
 interface Props {
   open: boolean;
@@ -56,7 +57,11 @@ const DecompressionMode = ({ open, onClose }: Props) => {
     const dur = PHASE_DURATION[phase];
     timerRef.current = window.setTimeout(() => {
       haptic("light");
-      setPhase((p) => (p === "arrive" ? "breathe" : p === "breathe" ? "ready" : "done"));
+      setPhase((p) => {
+        const next = p === "arrive" ? "breathe" : p === "breathe" ? "ready" : "done";
+        if (next === "done") trackConnection("decompression_done");
+        return next;
+      });
     }, dur);
     return () => { if (timerRef.current) window.clearTimeout(timerRef.current); };
   }, [phase, open, muted, speak]);

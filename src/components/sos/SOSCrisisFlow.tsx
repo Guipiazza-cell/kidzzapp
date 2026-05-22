@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useSosVoice } from "./useSosVoice";
 import { haptic } from "@/lib/haptics";
+import { trackConnection } from "@/lib/connection";
 import type { SosSituation } from "./situations";
 
 /**
@@ -50,6 +51,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
     haptic("light");
     stop();
     setStep(next);
+    if (next === "apoio") trackConnection("sos_used");
   };
 
   return (

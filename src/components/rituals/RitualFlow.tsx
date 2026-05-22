@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, VolumeX, Volume2, ChevronRight, Check } from "lucide-react";
 import { RitualDef } from "./rituals";
 import { useSosVoice } from "@/components/sos/useSosVoice";
+import { trackConnection } from "@/lib/connection";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
@@ -51,6 +52,7 @@ const RitualFlow = ({ ritual, open, onClose }: Props) => {
         setDone(true);
         haptic("medium");
         play(ritual.closing.voice);
+        trackConnection("ritual_completed");
       }
     }, step.duration);
     return () => clearTimeout(t);

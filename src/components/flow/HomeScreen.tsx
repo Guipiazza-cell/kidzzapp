@@ -24,6 +24,7 @@ import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 import DecompressionCard from "@/components/decompress/DecompressionCard";
 import DecompressionMode from "@/components/decompress/DecompressionMode";
+import ConnectionMeter from "@/components/connection/ConnectionMeter";
 
 /* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
    Foco: respirável, sofisticado, Apple + Calm + Pixar.
@@ -396,6 +397,13 @@ const HomeScreen = ({
             </motion.div>
           </div>
         </section>
+
+        {/* ── 1.5 TERMÔMETRO DE CONEXÃO — coração emocional da família ── */}
+        <div className="mb-3">
+          <ConnectionMeter />
+        </div>
+
+
 
         {/* ── 2. HUD MINI — apenas Energia + Conexão ── */}
         <motion.div

@@ -4,6 +4,7 @@ import { Heart, Award, Quote, Calendar, Plus, ChevronRight, X, Sparkles, Share2 
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import ShareMomentCard from "./ShareMomentCard";
+import { trackConnection } from "@/lib/connection";
 
 /**
  * Álbum afetivo da família — coração emocional da aba Momentos.
@@ -71,6 +72,7 @@ const MomentsAlbum = () => {
       setPhrases([{ id: `p${Date.now()}`, text: data.title, who: data.who || "família", date }, ...phrases]);
     }
     haptic("light"); sfx("click");
+    trackConnection("moment_added");
     setAdding(false);
   };
 
