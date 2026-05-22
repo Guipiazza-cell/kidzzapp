@@ -25,6 +25,7 @@ import { getCurrentRitual } from "@/components/rituals/rituals";
 import DecompressionCard from "@/components/decompress/DecompressionCard";
 import DecompressionMode from "@/components/decompress/DecompressionMode";
 import ConnectionMeter from "@/components/connection/ConnectionMeter";
+import ContextualNudge from "@/components/nudges/ContextualNudge";
 
 /* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
    Foco: respirável, sofisticado, Apple + Calm + Pixar.
@@ -402,6 +403,22 @@ const HomeScreen = ({
         <div className="mb-3">
           <ConnectionMeter />
         </div>
+
+        {/* ── 1.6 NUDGE CONTEXTUAL — sussurro inteligente ── */}
+        <div className="w-full max-w-sm mb-3">
+          <ContextualNudge
+            onAction={(a) => {
+              if (a === "ritual") setRitualOpen(true);
+              else if (a === "decompress") setDecompressOpen(true);
+              else if (a === "moment-add") {
+                onTabChange?.("moments");
+                setTimeout(() => window.dispatchEvent(new CustomEvent("kidzz:open-moment-add")), 200);
+              }
+            }}
+          />
+        </div>
+
+
 
 
 
