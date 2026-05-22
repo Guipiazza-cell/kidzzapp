@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronRight, Sparkles } from "lucide-react";
+import { X, ChevronRight } from "lucide-react";
 import { SOS_SITUATIONS, type SosSituation } from "./situations";
 import SOSCrisisFlow from "./SOSCrisisFlow";
 import { haptic } from "@/lib/haptics";
@@ -8,7 +8,7 @@ import { sfx } from "@/lib/sfx";
 
 /**
  * Bottom sheet do SOS — abertura cinemática client-side, sem reload.
- * Grid 2 colunas (mobile) de situações + fluxo profundo "Crise de choro".
+ * Grid 2 colunas (mobile) de situações + fluxo profundo parametrizado.
  */
 interface Props {
   open: boolean;
@@ -36,21 +36,15 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
   }, [open, onClose]);
 
   const pick = (s: SosSituation) => {
-    haptic(s.status === "implemented" ? "medium" : "light");
+    haptic("medium");
     sfx("click");
-    if (s.status === "implemented") {
-      setSelected(s);
-    } else {
-      // soft "soon" feedback in place — não navega
-      setSelected(s);
-    }
+    setSelected(s);
   };
 
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop cinemático */}
           <motion.div
             key="sos-backdrop"
             className="fixed inset-0 z-[90]"
@@ -67,7 +61,6 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
             aria-hidden
           />
 
-          {/* Sheet */}
           <motion.div
             key="sos-sheet"
             className="fixed inset-x-0 bottom-0 z-[100] flex flex-col"
@@ -90,16 +83,13 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
             aria-modal="true"
             aria-label="SOS Kidzz"
           >
-            {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1">
               <span className="block w-10 h-1 rounded-full" style={{ background: "hsl(0 0% 70%)" }} />
             </div>
 
-            {/* Conteúdo: roteador grid vs fluxo */}
             <div className="flex-1 min-h-0 px-5 pt-2">
-              {!selected || selected.status === "soon" ? (
+              {!selected ? (
                 <>
-                  {/* Header com X */}
                   <header className="flex items-start justify-between mb-4">
                     <div className="flex-1 min-w-0 pr-3">
                       <p
@@ -132,38 +122,6 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
                     </button>
                   </header>
 
-                  {/* "Em breve" feedback se clicou em situação não implementada */}
-                  {selected?.status === "soon" && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mb-3 p-3 rounded-2xl flex items-center gap-2"
-                      style={{
-                        background: "linear-gradient(135deg, hsl(85 40% 94%), hsl(140 30% 92%))",
-                        border: "1px solid hsl(85 30% 80%)",
-                      }}
-                    >
-                      <Sparkles size={14} style={{ color: "hsl(var(--kidzz-green-deep))" }} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-black leading-tight" style={{ color: "hsl(var(--premium-ink))" }}>
-                          {selected.label} — em breve, com carinho
-                        </p>
-                        <p className="text-[11px]" style={{ color: "hsl(var(--premium-ink-soft))" }}>
-                          Estamos cuidando do conteúdo. Por hoje, experimente "Crise de choro".
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setSelected(null)}
-                        className="text-[11px] font-black px-2"
-                        style={{ color: "hsl(var(--kidzz-green-deep))" }}
-                      >
-                        ✕
-                      </button>
-                    </motion.div>
-                  )}
-
-                  {/* Grid de situações */}
                   <div className="grid grid-cols-2 gap-2.5 pb-6 overflow-y-auto" style={{ maxHeight: "60vh" }}>
                     {SOS_SITUATIONS.map((s, i) => (
                       <motion.button
@@ -178,23 +136,19 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
                         style={{
                           background: "hsl(0 0% 100% / 0.82)",
                           backdropFilter: "blur(10px)",
-                          border: `1px solid ${s.status === "implemented" ? s.tint.replace(")", " / 0.3)") : "hsl(0 0% 100% / 0.7)"}`,
-                          boxShadow: s.status === "implemented"
-                            ? `0 6px 18px -10px ${s.tint.replace(")", " / 0.4)")}`
-                            : "0 4px 14px -10px hsl(100 15% 18% / 0.15)",
+                          border: `1px solid ${s.tint.replace(")", " / 0.3)")}`,
+                          boxShadow: `0 6px 18px -10px ${s.tint.replace(")", " / 0.4)")}`,
                           minHeight: 100,
                         }}
                       >
-                        {s.status === "implemented" && (
-                          <span
-                            aria-hidden
-                            className="absolute -top-4 -right-4 w-16 h-16 rounded-full"
-                            style={{
-                              background: `radial-gradient(circle, ${s.tint.replace(")", " / 0.25)")}, transparent 70%)`,
-                              filter: "blur(8px)",
-                            }}
-                          />
-                        )}
+                        <span
+                          aria-hidden
+                          className="absolute -top-4 -right-4 w-16 h-16 rounded-full"
+                          style={{
+                            background: `radial-gradient(circle, ${s.tint.replace(")", " / 0.22)")}, transparent 70%)`,
+                            filter: "blur(8px)",
+                          }}
+                        />
                         <span className="text-[26px] block mb-1.5" aria-hidden>{s.emoji}</span>
                         <p
                           className="text-[13px] font-black leading-tight tracking-tight"
@@ -202,27 +156,19 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
                         >
                           {s.label}
                         </p>
-                        {s.status === "implemented" ? (
-                          <span
-                            className="inline-flex items-center gap-0.5 mt-1.5 text-[10px] font-black"
-                            style={{ color: s.tint }}
-                          >
-                            Começar <ChevronRight size={10} />
-                          </span>
-                        ) : (
-                          <span
-                            className="inline-block mt-1.5 text-[10px] font-black uppercase tracking-wider"
-                            style={{ color: "hsl(var(--premium-ink-soft))" }}
-                          >
-                            em breve
-                          </span>
-                        )}
+                        <span
+                          className="inline-flex items-center gap-0.5 mt-1.5 text-[10px] font-black"
+                          style={{ color: s.tint }}
+                        >
+                          Começar <ChevronRight size={10} />
+                        </span>
                       </motion.button>
                     ))}
                   </div>
                 </>
               ) : (
                 <SOSCrisisFlow
+                  situation={selected}
                   onBack={() => setSelected(null)}
                   onClose={onClose}
                   onGoWellness={onGoWellness}
