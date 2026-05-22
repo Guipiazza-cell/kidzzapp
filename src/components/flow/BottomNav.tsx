@@ -35,7 +35,7 @@ const NAVIGATION: Tab[] = [
   { id: "explore",  label: "Histórias", icon: BookOpen,           tint: "hsl(25 85% 58%)" },
   { id: "music",    label: "Música",    icon: Music2,             tint: "hsl(85 50% 55%)" },
   { id: "routine",  label: "Rotina",    icon: Target,             tint: "hsl(145 45% 48%)" },
-  { id: "cinema",   label: "Sessão",    icon: Film,               tint: "hsl(330 60% 65%)" },
+  { id: "cinema",   label: "Cinema",    icon: Film,               tint: "hsl(330 60% 65%)" },
   { id: "moments",  label: "Momentos",  icon: Disc3,              tint: "hsl(45 70% 60%)" },
 ];
 
