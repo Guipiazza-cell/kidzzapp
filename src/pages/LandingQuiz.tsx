@@ -38,25 +38,38 @@ const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", 
 const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
   <div
     aria-hidden
-    className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
+    className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
     style={{ background: C.bg }}
   >
     {image && (
       <img
         src={premiumBgReference}
         alt=""
-        className="absolute inset-x-0 top-0 h-[92svh] w-full object-cover object-top opacity-30"
+        className="absolute inset-x-0 top-0 h-[92svh] w-full object-cover object-top opacity-25"
         style={{ filter: "saturate(0.9) brightness(1.08)" }}
         loading="eager"
         decoding="async"
       />
     )}
+    {/* Camaleão como decoração de fundo desfocada — leve e estática (fixed) para zero jank no scroll */}
+    <img
+      src={chameleonFrame}
+      alt=""
+      className="absolute left-1/2 top-[14%] w-[120vw] max-w-[680px] h-auto object-contain opacity-[0.16] select-none"
+      style={{
+        filter: "blur(38px) saturate(1.05)",
+        transform: "translate(-50%, 0) translateZ(0)",
+      }}
+      loading="eager"
+      decoding="async"
+      draggable={false}
+    />
     <div
       className="absolute inset-0"
       style={{
         background: image
-          ? `linear-gradient(180deg, rgba(247,246,242,0.72) 0%, rgba(247,246,242,0.86) 42%, ${C.bg} 90%)`
-          : `radial-gradient(60% 50% at 50% 0%, rgba(143,191,127,0.14) 0%, transparent 70%), ${C.bg}`,
+          ? `linear-gradient(180deg, rgba(247,246,242,0.78) 0%, rgba(247,246,242,0.90) 42%, ${C.bg} 90%)`
+          : `radial-gradient(60% 50% at 50% 0%, rgba(143,191,127,0.14) 0%, transparent 70%), linear-gradient(180deg, rgba(247,246,242,0.45) 0%, rgba(247,246,242,0.80) 55%, ${C.bg} 100%)`,
       }}
     />
   </div>
@@ -555,13 +568,6 @@ const FinalCTA = ({ onStart }: { onStart: () => void }) => (
     />
     <div className="max-w-xl mx-auto text-center text-white">
       <FadeIn>
-        <img
-          src={chameleonFrame}
-          alt=""
-          className="w-32 md:w-40 h-auto mx-auto mb-6 opacity-95 drop-shadow-[0_18px_30px_rgba(0,0,0,0.4)]"
-          loading="lazy"
-          decoding="async"
-        />
         <h2
           className="text-[32px] md:text-[48px] leading-[1.05] font-semibold"
           style={{ fontFamily: SERIF }}
@@ -764,7 +770,7 @@ const Result = ({ score, onClose }: { score: number; onClose: () => void }) => {
         </button>
 
         <div className="text-center mt-6">
-          <img src={chameleonFrame} alt="" className="w-44 h-auto mx-auto object-contain mb-2" loading="lazy" />
+          
           <p
             className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
             style={{ color: `${C.greenDark}B0` }}
