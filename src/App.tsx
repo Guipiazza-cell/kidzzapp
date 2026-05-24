@@ -7,9 +7,9 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import SplashScreen from "@/components/SplashScreen";
 import { lazy, Suspense, useEffect, useState } from "react";
-import Index from "./pages/Index";
 import MagicalBackground from "@/components/MagicalBackground";
 // Rotas secundárias carregam sob demanda — reduz o bundle inicial.
+const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Success = lazy(() => import("./pages/Success"));
 const Privacy = lazy(() => import("./pages/Privacy"));
@@ -50,6 +50,7 @@ try {
 
 const AppShell = () => {
   const [splashDone, setSplashDone] = useState(SPLASH_SHOWN);
+  const isLandingQuiz = typeof window !== "undefined" && window.location.pathname === "/lp";
 
   const handleSplashFinish = () => {
     SPLASH_SHOWN = true;
@@ -84,9 +85,9 @@ const AppShell = () => {
 
   return (
     <>
-      {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
+      {!isLandingQuiz && !splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       {/* Background global persistente — nunca remontado entre rotas/abas */}
-      <MagicalBackground />
+      {!isLandingQuiz && <MagicalBackground />}
       <BrowserRouter>
         <AuthProvider>
           <Suspense fallback={null}>
@@ -103,11 +104,11 @@ const AppShell = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
-          <AppUpdateBanner />
-          <InstallBanner />
-          <OfflineIndicator />
-          <KidzzShareTrigger />
-          <LevelUpOverlay />
+          {!isLandingQuiz && <AppUpdateBanner />}
+          {!isLandingQuiz && <InstallBanner />}
+          {!isLandingQuiz && <OfflineIndicator />}
+          {!isLandingQuiz && <KidzzShareTrigger />}
+          {!isLandingQuiz && <LevelUpOverlay />}
         </AuthProvider>
       </BrowserRouter>
     </>

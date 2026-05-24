@@ -14,7 +14,8 @@ import {
   Plane,
   Headphones,
 } from "lucide-react";
-import chameleonFrame from "@/assets/lp-chameleon-frame.png";
+import chameleonFrame from "@/assets/lp-chameleon-frame.webp";
+import premiumBgReference from "@/assets/reference/premium-bg-reference.webp";
 import { haptic } from "@/lib/haptics";
 
 const APP_URL = "https://kidzzapp.lovable.app";
@@ -29,23 +30,36 @@ const C = {
   greenDark: "#355B45",
   ink: "#2E2E2E",
 };
-const SERIF = "'Instrument Serif', Georgia, serif";
+const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 
 /* ============================================================
    BACKGROUND — CSS-only, zero JS animation, no scroll jank
    ============================================================ */
-const QuietBackground = () => (
+const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
   <div
     aria-hidden
-    className="fixed inset-0 -z-10 pointer-events-none"
-    style={{
-      background: `
-        radial-gradient(60% 50% at 50% 0%, rgba(143,191,127,0.16) 0%, transparent 70%),
-        radial-gradient(80% 60% at 50% 100%, rgba(53,91,69,0.08) 0%, transparent 70%),
-        ${C.bg}
-      `,
-    }}
-  />
+    className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
+    style={{ background: C.bg }}
+  >
+    {image && (
+      <img
+        src={premiumBgReference}
+        alt=""
+        className="absolute inset-x-0 top-0 h-[92svh] w-full object-cover object-top opacity-30"
+        style={{ filter: "saturate(0.9) brightness(1.08)" }}
+        loading="eager"
+        decoding="async"
+      />
+    )}
+    <div
+      className="absolute inset-0"
+      style={{
+        background: image
+          ? `linear-gradient(180deg, rgba(247,246,242,0.72) 0%, rgba(247,246,242,0.86) 42%, ${C.bg} 90%)`
+          : `radial-gradient(60% 50% at 50% 0%, rgba(143,191,127,0.14) 0%, transparent 70%), ${C.bg}`,
+      }}
+    />
+  </div>
 );
 
 /* ============================================================
@@ -77,9 +91,8 @@ const CTA = ({
             }
           : {
               color: C.greenDark,
-              background: "rgba(255,255,255,0.7)",
+              background: "rgba(255,255,255,0.88)",
               border: `1px solid rgba(53,91,69,0.18)`,
-              backdropFilter: "blur(8px)",
             }
       }
     >
@@ -109,9 +122,7 @@ const Glass = ({
     style={{
       background: "rgba(255,255,255,0.62)",
       border: "1px solid rgba(255,255,255,0.85)",
-      backdropFilter: "blur(14px)",
-      WebkitBackdropFilter: "blur(14px)",
-      boxShadow: "0 10px 30px -18px rgba(46,46,46,0.18)",
+      boxShadow: "0 10px 26px -18px rgba(46,46,46,0.18)",
     }}
   >
     {children}
@@ -123,8 +134,6 @@ const Glass = ({
    ============================================================ */
 const FadeIn = ({
   children,
-  delay = 0,
-  y = 18,
   className = "",
 }: {
   children: React.ReactNode;
@@ -132,45 +141,32 @@ const FadeIn = ({
   y?: number;
   className?: string;
 }) => (
-  <motion.div
-    initial={{ opacity: 0, y }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-60px" }}
-    transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
-    className={className}
-  >
+  <div className={className}>
     {children}
-  </motion.div>
+  </div>
 );
 
 /* ============================================================
    HERO
    ============================================================ */
 const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative px-5 pt-[max(env(safe-area-inset-top),28px)] pb-16 md:pb-24">
-    <div className="max-w-2xl mx-auto text-center">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mx-auto w-[230px] md:w-[300px]"
+  <section className="relative min-h-[86svh] px-5 pt-[max(env(safe-area-inset-top),28px)] pb-12 flex items-center">
+    <div className="relative z-10 max-w-2xl mx-auto text-center">
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
+        style={{ color: C.greenDark, background: "rgba(255,255,255,0.72)", border: "1px solid rgba(53,91,69,0.14)" }}
       >
-        <motion.img
-          src={chameleonFrame}
-          alt="Kidzz — companheiro emocional"
-          className="w-full h-auto object-contain drop-shadow-[0_24px_40px_rgba(53,91,69,0.18)]"
-          animate={{ y: [0, -5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          loading="eager"
-          decoding="async"
-        />
-      </motion.div>
+        Kidzz.app
+      </motion.p>
 
       <motion.h1
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-6 text-[30px] leading-[1.1] md:text-[54px] md:leading-[1.05] font-normal tracking-tight"
+        className="mt-5 text-[28px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
         style={{ fontFamily: SERIF, color: C.ink }}
       >
         Seu filho faz perguntas.
@@ -218,7 +214,7 @@ const PreviewQuestions = [
 ];
 
 const QuizSection = ({ onStart }: { onStart: () => void }) => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-2xl mx-auto text-center">
       <FadeIn>
         <p
@@ -228,7 +224,7 @@ const QuizSection = ({ onStart }: { onStart: () => void }) => (
           60 segundos
         </p>
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-normal tracking-tight"
+          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Descubra o perfil emocional da sua família.
@@ -303,11 +299,11 @@ const PAINS = [
 ];
 
 const PainSection = () => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-2xl mx-auto">
       <FadeIn className="text-center mb-12">
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-normal tracking-tight"
+          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Você não está sozinho.
@@ -384,7 +380,7 @@ const EXPERIENCES = [
 ];
 
 const Experiences = () => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-3xl mx-auto">
       <FadeIn className="text-center mb-12">
         <p
@@ -394,7 +390,7 @@ const Experiences = () => (
           Experiências
         </p>
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-normal tracking-tight"
+          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Tecnologia invisível.
@@ -457,7 +453,7 @@ const Wellness = () => (
           Wellness premium
         </p>
         <h2
-          className="text-[28px] md:text-[44px] leading-[1.1] font-normal tracking-tight"
+          className="text-[28px] md:text-[44px] leading-[1.1] font-semibold"
           style={{ fontFamily: SERIF }}
         >
           Um silêncio que a casa estava esperando.
@@ -479,9 +475,8 @@ const Wellness = () => (
             key={label}
             className="rounded-2xl px-4 py-5 flex flex-col items-start gap-3 text-left"
             style={{
-              background: "rgba(255,255,255,0.06)",
+              background: "rgba(255,255,255,0.08)",
               border: "1px solid rgba(255,255,255,0.08)",
-              backdropFilter: "blur(10px)",
             }}
           >
             <div
@@ -508,7 +503,7 @@ const TESTIMONIALS = [
 ];
 
 const SocialProof = () => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-3xl mx-auto text-center">
       <FadeIn>
         <p
@@ -518,7 +513,7 @@ const SocialProof = () => (
           + 10.000 famílias
         </p>
         <h2
-          className="text-[24px] md:text-[36px] leading-[1.15] font-normal tracking-tight max-w-xl mx-auto"
+          className="text-[24px] md:text-[36px] leading-[1.15] font-semibold max-w-xl mx-auto"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           O que estão sentindo com o Kidzz.
@@ -568,7 +563,7 @@ const FinalCTA = ({ onStart }: { onStart: () => void }) => (
           decoding="async"
         />
         <h2
-          className="text-[32px] md:text-[48px] leading-[1.05] font-normal tracking-tight"
+          className="text-[32px] md:text-[48px] leading-[1.05] font-semibold"
           style={{ fontFamily: SERIF }}
         >
           Menos caos.
@@ -667,7 +662,7 @@ const QuizExperience = ({
       transition={{ duration: 0.3 }}
       style={{ background: C.bg }}
     >
-      <QuietBackground />
+      <QuietBackground image />
       <div className="relative px-5 pt-[max(env(safe-area-inset-top),16px)] pb-4 flex items-center gap-3">
         <button
           onClick={() => { haptic("light"); onClose(); }}
@@ -705,7 +700,7 @@ const QuizExperience = ({
               Pergunta {idx + 1}
             </p>
             <h2
-              className="text-[26px] md:text-4xl font-normal leading-[1.15] tracking-tight mb-10"
+              className="text-[26px] md:text-4xl font-semibold leading-[1.15] mb-10"
               style={{ fontFamily: SERIF, color: C.ink }}
             >
               {QUESTIONS[idx].q}
@@ -718,9 +713,8 @@ const QuizExperience = ({
                   className="w-full text-left rounded-2xl px-5 py-5 text-[15px] font-medium transition-all active:scale-[0.99]"
                   style={{
                     color: C.ink,
-                    background: "rgba(255,255,255,0.72)",
+                    background: "rgba(255,255,255,0.88)",
                     border: "1px solid rgba(255,255,255,0.9)",
-                    backdropFilter: "blur(10px)",
                     boxShadow: "0 6px 20px -12px rgba(46,46,46,0.18)",
                   }}
                 >
@@ -778,7 +772,7 @@ const Result = ({ score, onClose }: { score: number; onClose: () => void }) => {
             Seu diagnóstico emocional
           </p>
           <h2
-            className="text-[28px] md:text-4xl font-normal tracking-tight leading-tight mb-4"
+            className="text-[28px] md:text-4xl font-semibold leading-tight mb-4"
             style={{ fontFamily: SERIF, color: C.ink }}
           >
             {profile.title}
@@ -829,15 +823,6 @@ const LandingQuiz = () => {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
-    const id = "lp-instrument-serif";
-    if (!document.getElementById(id)) {
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href =
-        "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap";
-      document.head.appendChild(link);
-    }
     document.title = "Kidzz — Conexão emocional para famílias modernas";
     const meta =
       document.querySelector('meta[name="description"]') ||
@@ -860,8 +845,8 @@ const LandingQuiz = () => {
 
   return (
     <div
-      className="relative min-h-screen overflow-x-hidden"
-      style={{ fontFamily: "'Inter', system-ui, sans-serif", color: C.ink, background: C.bg }}
+      className="relative isolate min-h-screen overflow-x-hidden"
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', color: C.ink, background: C.bg }}
     >
       <QuietBackground />
       <Hero onStart={start} />
