@@ -121,8 +121,6 @@ const Glass = ({
    ============================================================ */
 const FadeIn = ({
   children,
-  delay = 0,
-  y = 18,
   className = "",
 }: {
   children: React.ReactNode;
