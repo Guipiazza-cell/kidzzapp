@@ -568,13 +568,6 @@ const FinalCTA = ({ onStart }: { onStart: () => void }) => (
     />
     <div className="max-w-xl mx-auto text-center text-white">
       <FadeIn>
-        <img
-          src={chameleonFrame}
-          alt=""
-          className="w-32 md:w-40 h-auto mx-auto mb-6 opacity-95 drop-shadow-[0_18px_30px_rgba(0,0,0,0.4)]"
-          loading="lazy"
-          decoding="async"
-        />
         <h2
           className="text-[32px] md:text-[48px] leading-[1.05] font-semibold"
           style={{ fontFamily: SERIF }}
