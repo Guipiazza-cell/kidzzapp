@@ -7,9 +7,9 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import SplashScreen from "@/components/SplashScreen";
 import { lazy, Suspense, useEffect, useState } from "react";
-import Index from "./pages/Index";
 import MagicalBackground from "@/components/MagicalBackground";
 // Rotas secundárias carregam sob demanda — reduz o bundle inicial.
+const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Success = lazy(() => import("./pages/Success"));
 const Privacy = lazy(() => import("./pages/Privacy"));
