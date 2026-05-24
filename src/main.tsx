@@ -10,9 +10,8 @@ installAppUpdateGuard();
 
 createRoot(document.getElementById("root")!).render(<App />);
 
-// Warm-up the asset cache so mascots and the forest bg appear instantly
-// when the user navigates between tabs (no flicker / no empty frame).
-preloadAssets();
+// Warm-up do app principal; a landing /lp fica sem esse preload para abrir e rolar mais rápido.
+if (window.location.pathname !== "/lp") preloadAssets();
 
 // Register Service Worker (production + non-iframe only).
 registerServiceWorker();
