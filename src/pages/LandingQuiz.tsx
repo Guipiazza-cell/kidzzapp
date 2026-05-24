@@ -14,7 +14,7 @@ import {
   Plane,
   Headphones,
 } from "lucide-react";
-import chameleonFrame from "@/assets/lp-chameleon-frame.png";
+import chameleonFrame from "@/assets/lp-chameleon-frame.webp";
 import premiumBgReference from "@/assets/reference/premium-bg-reference.webp";
 import { haptic } from "@/lib/haptics";
 
@@ -41,8 +41,8 @@ const QuietBackground = () => (
     className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
     style={{
       background: `
-        linear-gradient(180deg, rgba(247,246,242,0.08) 0%, rgba(247,246,242,0.72) 48%, ${C.bg} 100%),
-        url(${premiumBgReference}) top center / min(100%, 1024px) auto no-repeat,
+        linear-gradient(180deg, rgba(247,246,242,0.58) 0%, rgba(247,246,242,0.88) 46%, ${C.bg} 100%),
+        url(${premiumBgReference}) top center / cover no-repeat,
         ${C.bg}
       `,
     }}
@@ -137,20 +137,18 @@ const FadeIn = ({
    HERO
    ============================================================ */
 const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative px-5 pt-[max(env(safe-area-inset-top),28px)] pb-16 md:pb-24">
-    <div className="max-w-2xl mx-auto text-center">
+  <section className="relative min-h-[92svh] px-5 pt-[max(env(safe-area-inset-top),28px)] pb-12 flex items-end">
+    <div className="relative z-10 max-w-2xl mx-auto text-center">
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mx-auto w-[230px] md:w-[300px]"
+        className="relative mx-auto w-[150px] md:w-[220px]"
       >
         <motion.img
           src={chameleonFrame}
           alt="Kidzz — companheiro emocional"
-          className="w-full h-auto object-contain drop-shadow-[0_24px_40px_rgba(53,91,69,0.18)]"
-          animate={{ y: [0, -5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="w-full h-auto object-contain drop-shadow-[0_18px_30px_rgba(53,91,69,0.16)]"
           loading="eager"
           decoding="async"
         />
@@ -160,7 +158,7 @@ const Hero = ({ onStart }: { onStart: () => void }) => (
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-6 text-[30px] leading-[1.1] md:text-[54px] md:leading-[1.05] font-semibold"
+        className="mt-5 text-[28px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
         style={{ fontFamily: SERIF, color: C.ink }}
       >
         Seu filho faz perguntas.
