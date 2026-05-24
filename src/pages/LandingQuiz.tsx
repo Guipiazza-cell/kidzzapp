@@ -15,6 +15,7 @@ import {
   Headphones,
 } from "lucide-react";
 import chameleonFrame from "@/assets/lp-chameleon-frame.png";
+import premiumBgReference from "@/assets/reference/premium-bg-reference.png";
 import { haptic } from "@/lib/haptics";
 
 const APP_URL = "https://kidzzapp.lovable.app";
@@ -37,11 +38,11 @@ const SERIF = "'Instrument Serif', Georgia, serif";
 const QuietBackground = () => (
   <div
     aria-hidden
-    className="fixed inset-0 -z-10 pointer-events-none"
+    className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
     style={{
       background: `
-        radial-gradient(60% 50% at 50% 0%, rgba(143,191,127,0.16) 0%, transparent 70%),
-        radial-gradient(80% 60% at 50% 100%, rgba(53,91,69,0.08) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(247,246,242,0.08) 0%, rgba(247,246,242,0.72) 48%, ${C.bg} 100%),
+        url(${premiumBgReference}) top center / min(100%, 1024px) auto no-repeat,
         ${C.bg}
       `,
     }}
@@ -77,9 +78,8 @@ const CTA = ({
             }
           : {
               color: C.greenDark,
-              background: "rgba(255,255,255,0.7)",
+              background: "rgba(255,255,255,0.88)",
               border: `1px solid rgba(53,91,69,0.18)`,
-              backdropFilter: "blur(8px)",
             }
       }
     >
@@ -109,9 +109,7 @@ const Glass = ({
     style={{
       background: "rgba(255,255,255,0.62)",
       border: "1px solid rgba(255,255,255,0.85)",
-      backdropFilter: "blur(14px)",
-      WebkitBackdropFilter: "blur(14px)",
-      boxShadow: "0 10px 30px -18px rgba(46,46,46,0.18)",
+      boxShadow: "0 10px 26px -18px rgba(46,46,46,0.18)",
     }}
   >
     {children}
@@ -132,15 +130,9 @@ const FadeIn = ({
   y?: number;
   className?: string;
 }) => (
-  <motion.div
-    initial={{ opacity: 0, y }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-60px" }}
-    transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
-    className={className}
-  >
+  <div className={className}>
     {children}
-  </motion.div>
+  </div>
 );
 
 /* ============================================================
