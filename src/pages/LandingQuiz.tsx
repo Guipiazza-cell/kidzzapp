@@ -201,7 +201,7 @@ const PreviewQuestions = [
 ];
 
 const QuizSection = ({ onStart }: { onStart: () => void }) => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-2xl mx-auto text-center">
       <FadeIn>
         <p
@@ -286,7 +286,7 @@ const PAINS = [
 ];
 
 const PainSection = () => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-2xl mx-auto">
       <FadeIn className="text-center mb-12">
         <h2
@@ -367,7 +367,7 @@ const EXPERIENCES = [
 ];
 
 const Experiences = () => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-3xl mx-auto">
       <FadeIn className="text-center mb-12">
         <p
@@ -490,7 +490,7 @@ const TESTIMONIALS = [
 ];
 
 const SocialProof = () => (
-  <section className="px-5 py-20 md:py-28">
+  <section className="px-5 py-14 md:py-20">
     <div className="max-w-3xl mx-auto text-center">
       <FadeIn>
         <p
