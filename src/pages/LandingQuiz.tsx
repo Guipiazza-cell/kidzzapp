@@ -38,7 +38,7 @@ const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", 
 const QuietBackground = () => (
   <div
     aria-hidden
-    className="absolute inset-0 pointer-events-none overflow-hidden"
+    className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
     style={{
       background: `
         linear-gradient(180deg, rgba(247,246,242,0.08) 0%, rgba(247,246,242,0.72) 48%, ${C.bg} 100%),
@@ -839,7 +839,7 @@ const LandingQuiz = () => {
 
   return (
     <div
-      className="relative min-h-screen overflow-x-hidden"
+      className="relative isolate min-h-screen overflow-x-hidden"
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', color: C.ink, background: C.bg }}
     >
       <QuietBackground />
