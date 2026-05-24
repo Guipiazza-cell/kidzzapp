@@ -15,7 +15,7 @@ import {
   Headphones,
 } from "lucide-react";
 import chameleonFrame from "@/assets/lp-chameleon-frame.png";
-import premiumBgReference from "@/assets/reference/premium-bg-reference.png";
+import premiumBgReference from "@/assets/reference/premium-bg-reference.webp";
 import { haptic } from "@/lib/haptics";
 
 const APP_URL = "https://kidzzapp.lovable.app";
