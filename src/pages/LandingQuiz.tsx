@@ -30,7 +30,7 @@ const C = {
   greenDark: "#355B45",
   ink: "#2E2E2E",
 };
-const SERIF = "'Instrument Serif', Georgia, serif";
+const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 
 /* ============================================================
    BACKGROUND — CSS-only, zero JS animation, no scroll jank
@@ -160,7 +160,7 @@ const Hero = ({ onStart }: { onStart: () => void }) => (
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-6 text-[30px] leading-[1.1] md:text-[54px] md:leading-[1.05] font-normal tracking-tight"
+        className="mt-6 text-[30px] leading-[1.1] md:text-[54px] md:leading-[1.05] font-semibold"
         style={{ fontFamily: SERIF, color: C.ink }}
       >
         Seu filho faz perguntas.
@@ -218,7 +218,7 @@ const QuizSection = ({ onStart }: { onStart: () => void }) => (
           60 segundos
         </p>
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-normal tracking-tight"
+          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Descubra o perfil emocional da sua família.
@@ -297,7 +297,7 @@ const PainSection = () => (
     <div className="max-w-2xl mx-auto">
       <FadeIn className="text-center mb-12">
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-normal tracking-tight"
+          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Você não está sozinho.
@@ -384,7 +384,7 @@ const Experiences = () => (
           Experiências
         </p>
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-normal tracking-tight"
+          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Tecnologia invisível.
