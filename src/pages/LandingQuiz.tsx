@@ -35,18 +35,31 @@ const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", 
 /* ============================================================
    BACKGROUND — CSS-only, zero JS animation, no scroll jank
    ============================================================ */
-const QuietBackground = () => (
+const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
   <div
     aria-hidden
-    className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
-    style={{
-      background: `
-        linear-gradient(180deg, rgba(247,246,242,0.58) 0%, rgba(247,246,242,0.88) 46%, ${C.bg} 100%),
-        url(${premiumBgReference}) top center / cover no-repeat,
-        ${C.bg}
-      `,
-    }}
-  />
+    className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
+    style={{ background: C.bg }}
+  >
+    {image && (
+      <img
+        src={premiumBgReference}
+        alt=""
+        className="absolute inset-x-0 top-0 h-[92svh] w-full object-cover object-top opacity-30"
+        style={{ filter: "saturate(0.9) brightness(1.08)" }}
+        loading="eager"
+        decoding="async"
+      />
+    )}
+    <div
+      className="absolute inset-0"
+      style={{
+        background: image
+          ? `linear-gradient(180deg, rgba(247,246,242,0.72) 0%, rgba(247,246,242,0.86) 42%, ${C.bg} 90%)`
+          : `radial-gradient(60% 50% at 50% 0%, rgba(143,191,127,0.14) 0%, transparent 70%), ${C.bg}`,
+      }}
+    />
+  </div>
 );
 
 /* ============================================================
@@ -649,7 +662,7 @@ const QuizExperience = ({
       transition={{ duration: 0.3 }}
       style={{ background: C.bg }}
     >
-      <QuietBackground />
+      <QuietBackground image />
       <div className="relative px-5 pt-[max(env(safe-area-inset-top),16px)] pb-4 flex items-center gap-3">
         <button
           onClick={() => { haptic("light"); onClose(); }}
