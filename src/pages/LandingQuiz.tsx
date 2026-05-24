@@ -817,15 +817,6 @@ const LandingQuiz = () => {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
-    const id = "lp-instrument-serif";
-    if (!document.getElementById(id)) {
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href =
-        "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap";
-      document.head.appendChild(link);
-    }
     document.title = "Kidzz — Conexão emocional para famílias modernas";
     const meta =
       document.querySelector('meta[name="description"]') ||
@@ -849,7 +840,7 @@ const LandingQuiz = () => {
   return (
     <div
       className="relative min-h-screen overflow-x-hidden"
-      style={{ fontFamily: "'Inter', system-ui, sans-serif", color: C.ink, background: C.bg }}
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', color: C.ink, background: C.bg }}
     >
       <QuietBackground />
       <Hero onStart={start} />
