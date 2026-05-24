@@ -471,9 +471,8 @@ const Wellness = () => (
             key={label}
             className="rounded-2xl px-4 py-5 flex flex-col items-start gap-3 text-left"
             style={{
-              background: "rgba(255,255,255,0.06)",
+              background: "rgba(255,255,255,0.08)",
               border: "1px solid rgba(255,255,255,0.08)",
-              backdropFilter: "blur(10px)",
             }}
           >
             <div
@@ -710,9 +709,8 @@ const QuizExperience = ({
                   className="w-full text-left rounded-2xl px-5 py-5 text-[15px] font-medium transition-all active:scale-[0.99]"
                   style={{
                     color: C.ink,
-                    background: "rgba(255,255,255,0.72)",
+                    background: "rgba(255,255,255,0.88)",
                     border: "1px solid rgba(255,255,255,0.9)",
-                    backdropFilter: "blur(10px)",
                     boxShadow: "0 6px 20px -12px rgba(46,46,46,0.18)",
                   }}
                 >
