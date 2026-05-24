@@ -447,7 +447,7 @@ const Wellness = () => (
           Wellness premium
         </p>
         <h2
-          className="text-[28px] md:text-[44px] leading-[1.1] font-normal tracking-tight"
+          className="text-[28px] md:text-[44px] leading-[1.1] font-semibold"
           style={{ fontFamily: SERIF }}
         >
           Um silêncio que a casa estava esperando.
@@ -507,7 +507,7 @@ const SocialProof = () => (
           + 10.000 famílias
         </p>
         <h2
-          className="text-[24px] md:text-[36px] leading-[1.15] font-normal tracking-tight max-w-xl mx-auto"
+          className="text-[24px] md:text-[36px] leading-[1.15] font-semibold max-w-xl mx-auto"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           O que estão sentindo com o Kidzz.
@@ -557,7 +557,7 @@ const FinalCTA = ({ onStart }: { onStart: () => void }) => (
           decoding="async"
         />
         <h2
-          className="text-[32px] md:text-[48px] leading-[1.05] font-normal tracking-tight"
+          className="text-[32px] md:text-[48px] leading-[1.05] font-semibold"
           style={{ fontFamily: SERIF }}
         >
           Menos caos.
@@ -694,7 +694,7 @@ const QuizExperience = ({
               Pergunta {idx + 1}
             </p>
             <h2
-              className="text-[26px] md:text-4xl font-normal leading-[1.15] tracking-tight mb-10"
+              className="text-[26px] md:text-4xl font-semibold leading-[1.15] mb-10"
               style={{ fontFamily: SERIF, color: C.ink }}
             >
               {QUESTIONS[idx].q}
@@ -766,7 +766,7 @@ const Result = ({ score, onClose }: { score: number; onClose: () => void }) => {
             Seu diagnóstico emocional
           </p>
           <h2
-            className="text-[28px] md:text-4xl font-normal tracking-tight leading-tight mb-4"
+            className="text-[28px] md:text-4xl font-semibold leading-tight mb-4"
             style={{ fontFamily: SERIF, color: C.ink }}
           >
             {profile.title}
