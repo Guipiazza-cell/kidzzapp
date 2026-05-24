@@ -770,7 +770,7 @@ const Result = ({ score, onClose }: { score: number; onClose: () => void }) => {
         </button>
 
         <div className="text-center mt-6">
-          <img src={chameleonFrame} alt="" className="w-44 h-auto mx-auto object-contain mb-2" loading="lazy" />
+          
           <p
             className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
             style={{ color: `${C.greenDark}B0` }}
