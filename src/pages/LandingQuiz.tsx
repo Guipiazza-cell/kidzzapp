@@ -38,7 +38,7 @@ const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", 
 const QuietBackground = () => (
   <div
     aria-hidden
-    className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
+    className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
     style={{
       background: `
         linear-gradient(180deg, rgba(247,246,242,0.58) 0%, rgba(247,246,242,0.88) 46%, ${C.bg} 100%),
@@ -137,22 +137,17 @@ const FadeIn = ({
    HERO
    ============================================================ */
 const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative min-h-[92svh] px-5 pt-[max(env(safe-area-inset-top),28px)] pb-12 flex items-end">
+  <section className="relative min-h-[86svh] px-5 pt-[max(env(safe-area-inset-top),28px)] pb-12 flex items-center">
     <div className="relative z-10 max-w-2xl mx-auto text-center">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mx-auto w-[150px] md:w-[220px]"
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
+        style={{ color: C.greenDark, background: "rgba(255,255,255,0.72)", border: "1px solid rgba(53,91,69,0.14)" }}
       >
-        <motion.img
-          src={chameleonFrame}
-          alt="Kidzz — companheiro emocional"
-          className="w-full h-auto object-contain drop-shadow-[0_18px_30px_rgba(53,91,69,0.16)]"
-          loading="eager"
-          decoding="async"
-        />
-      </motion.div>
+        Kidzz.app
+      </motion.p>
 
       <motion.h1
         initial={{ opacity: 0, y: 18 }}
