@@ -168,7 +168,7 @@ function HeroBackdrop({ onLoad }: { onLoad: () => void }) {
         height={1492}
         loading="eager"
         decoding="async"
-        fetchPriority="high"
+        {...({ fetchpriority: "high" } as Record<string, string>)}
         draggable={false}
         onLoad={onLoad}
       />
@@ -200,7 +200,7 @@ function Hero({ onStart }: { onStart: () => void }) {
           style={{ background: `radial-gradient(circle at 50% 22%, ${S.off} 0%, ${S.bg} 62%)` }}
         />
       )}
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+42px)] text-center md:min-h-screen md:justify-center md:pt-16" style={{ minHeight: "100dvh" }}>
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+58px)] text-center md:min-h-screen md:justify-center md:pt-16" style={{ minHeight: "100dvh" }}>
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -213,16 +213,16 @@ function Hero({ onStart }: { onStart: () => void }) {
           >
             Kidzz.app
           </div>
-          <h1 className="text-[34px] font-semibold leading-[1.03] md:text-[62px]" style={{ fontFamily: displayFont, color: S.ink, letterSpacing: 0 }}>
+          <h1 className="text-[29px] font-semibold leading-[1.04] min-[390px]:text-[31px] md:text-[62px]" style={{ fontFamily: displayFont, color: S.ink, letterSpacing: 0 }}>
             Seu filho faz perguntas…
             <span className="block" style={{ color: S.greenDark }}>
               mas talvez o que ele mais precise é conexão.
             </span>
           </h1>
-          <p className="mx-auto mt-5 max-w-[340px] text-[16px] leading-relaxed md:max-w-lg md:text-[19px]" style={{ color: S.inkSoft }}>
+          <p className="mx-auto mt-4 max-w-[340px] text-[15px] leading-relaxed md:max-w-lg md:text-[19px]" style={{ color: S.inkSoft }}>
             Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado.
           </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:mt-8">
             <CTA onClick={onStart} large>Começar teste gratuito ✨</CTA>
             <CTA variant="secondary" onClick={() => scrollToId("como-funciona")}>Entender como funciona</CTA>
           </div>
