@@ -224,8 +224,8 @@ function Hero({ onStart }: { onStart: () => void }) {
             Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado.
           </p>
           <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:mt-8">
-            <CTA onClick={onStart} large>Começar teste gratuito ✨</CTA>
-            <CTA variant="secondary" onClick={() => scrollToId("como-funciona")}>Entender como funciona</CTA>
+            <CTA onClick={() => { track("lp_cta_click", { location: "hero" }); onStart(); }} large>Começar teste gratuito ✨</CTA>
+            <CTA variant="secondary" onClick={() => { track("lp_cta_click", { location: "hero_secondary" }); scrollToId("como-funciona"); }}>Entender como funciona</CTA>
           </div>
         </motion.div>
         <div className="mt-auto pt-8 text-[11px] font-medium uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.48)", letterSpacing: "0.2em" }}>
