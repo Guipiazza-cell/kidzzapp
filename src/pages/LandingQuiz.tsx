@@ -648,12 +648,8 @@ const QuizExperience = ({
   };
 
   return (
-    <motion.div
+    <div
       className="fixed inset-0 z-50 flex flex-col overflow-y-auto"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
       style={{ background: C.bg }}
     >
       <QuietBackground image />
@@ -666,11 +662,9 @@ const QuizExperience = ({
           Fechar
         </button>
         <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(53,91,69,0.10)" }}>
-          <motion.div
+          <div
             className="h-full"
-            style={{ background: `linear-gradient(90deg, ${C.green}, ${C.greenDark})` }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            style={{ background: `linear-gradient(90deg, ${C.green}, ${C.greenDark})`, width: `${progress}%`, transition: "width 240ms ease" }}
           />
         </div>
         <span className="text-xs tabular-nums" style={{ color: `${C.ink}80` }}>
@@ -679,14 +673,7 @@ const QuizExperience = ({
       </div>
 
       <div className="relative flex-1 flex flex-col justify-center px-6 max-w-xl mx-auto w-full pb-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          >
+          <div key={idx}>
             <p
               className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-4"
               style={{ color: `${C.greenDark}B0` }}
@@ -716,10 +703,9 @@ const QuizExperience = ({
                 </button>
               ))}
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
