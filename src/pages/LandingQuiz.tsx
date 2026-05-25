@@ -545,6 +545,9 @@ export default function LandingQuiz() {
     meta.setAttribute("content", "Faça o teste emocional de 60 segundos do Kidzz e descubra experiências de calma, vínculo e aprendizado para sua família.");
     if (!meta.parentElement) document.head.appendChild(meta);
 
+    captureAttribution();
+    track("lp_view", { section: "landing" });
+
     return () => {
       document.documentElement.classList.remove("lp-route");
       preload.remove();
@@ -555,10 +558,13 @@ export default function LandingQuiz() {
     window.scrollTo(0, 0);
   }, [phase]);
 
-  const start = () => setPhase("quiz");
+  const start = () => {
+    track("lp_quiz_start");
+    setPhase("quiz");
+  };
 
   if (phase === "quiz") {
-    return <QuizExperience onClose={() => setPhase("landing")} onFinish={(value) => { setScore(value); setPhase("result"); }} />;
+    return <QuizExperience onClose={() => { track("lp_quiz_abandon"); setPhase("landing"); }} onFinish={(value) => { track("lp_quiz_complete", { score: value, max_score: QUESTIONS.length * 2 }); setScore(value); setPhase("result"); }} />;
   }
 
   if (phase === "result") {
