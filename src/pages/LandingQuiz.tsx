@@ -185,7 +185,7 @@ function HeroBackdrop({ onLoad }: { onLoad: () => void }) {
   );
 }
 
-function Hero({ onStart }: { onStart: () => void }) {
+function Hero({ onStart, onHeroReady }: { onStart: () => void; onHeroReady?: () => void }) {
   const [loaded, setLoaded] = useState(false);
   const reduced = useReducedMotion();
   return (
@@ -193,7 +193,7 @@ function Hero({ onStart }: { onStart: () => void }) {
       className="relative isolate min-h-[100svh] overflow-hidden"
       style={{ minHeight: "100dvh", background: S.bg }}
     >
-      <HeroBackdrop onLoad={() => setLoaded(true)} />
+      <HeroBackdrop onLoad={() => { setLoaded(true); onHeroReady?.(); }} />
       {!loaded && (
         <div
           aria-hidden
