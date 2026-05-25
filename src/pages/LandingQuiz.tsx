@@ -424,7 +424,7 @@ function FinalCTA({ onStart }: { onStart: () => void }) {
             Comece pelo teste. O próximo momento de conexão pode nascer hoje.
           </p>
           <div className="mt-8">
-            <CTA onClick={onStart} large>Começar agora ✨</CTA>
+            <CTA onClick={() => { track("lp_cta_click", { location: "final_cta" }); onStart(); }} large>Começar agora ✨</CTA>
           </div>
         </div>
       </FadeIn>
