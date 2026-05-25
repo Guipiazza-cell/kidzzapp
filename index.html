@@ -96,6 +96,18 @@
   </head>
 
   <body>
+    <script>
+      // /lp boot hint: paint LP background instantly to kill white flash before React mounts.
+      try {
+        if (location.pathname === "/lp") {
+          document.documentElement.style.background = "#F7F6F2";
+          document.documentElement.classList.add("lp-route");
+          var s = document.createElement("style");
+          s.textContent = "body{background:#F7F6F2}#root:empty::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 50% 22%,#FBFAF6 0%,#F7F6F2 62%);}";
+          document.head.appendChild(s);
+        }
+      } catch (e) {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
