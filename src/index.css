@@ -97,11 +97,31 @@
     overscroll-behavior-y: none;
   }
 
-  html.lp-route,
-  html.lp-route body {
+  html.lp-route {
+    --background: 48 24% 96%;   /* #F7F6F2 */
+    --foreground: 0 0% 18%;     /* #2E2E2E */
+    --primary: 105 33% 62%;     /* #8FBF7F */
+    --primary-foreground: 48 56% 98%;
+    --accent: 145 26% 28%;      /* #355B45 */
+    min-height: 100%;
+    scroll-behavior: auto;
     overscroll-behavior-y: auto;
-    overflow-x: hidden;
-    background: #F7F6F2;
+    overflow-x: clip;
+    background: hsl(var(--background));
+  }
+
+  html.lp-route body {
+    min-height: 100%;
+    overflow-x: clip;
+    overflow-y: auto !important;
+    position: static !important;
+    overscroll-behavior-y: auto;
+    background: hsl(var(--background));
+  }
+
+  html.lp-route #root {
+    min-height: 100%;
+    background: hsl(var(--background));
   }
 
   body {
