@@ -843,19 +843,17 @@ const LandingQuiz = () => {
         </p>
       </footer>
 
-      <AnimatePresence>
-        {phase === "quiz" && (
-          <QuizExperience
-            key="quiz"
-            onClose={() => setPhase("landing")}
-            onFinish={(s) => {
-              setScore(s);
-              setPhase("result");
-            }}
-          />
-        )}
-        {phase === "result" && <Result key="result" score={score} onClose={() => setPhase("landing")} />}
-      </AnimatePresence>
+      {phase === "quiz" && (
+        <QuizExperience
+          key="quiz"
+          onClose={() => setPhase("landing")}
+          onFinish={(s) => {
+            setScore(s);
+            setPhase("result");
+          }}
+        />
+      )}
+      {phase === "result" && <Result key="result" score={score} onClose={() => setPhase("landing")} />}
     </div>
   );
 };
