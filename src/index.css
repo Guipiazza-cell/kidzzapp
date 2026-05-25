@@ -124,6 +124,26 @@
     background: hsl(var(--background));
   }
 
+  .lp-skeleton {
+    background: linear-gradient(
+      90deg,
+      hsl(48 24% 92%) 0%,
+      hsl(48 30% 96%) 50%,
+      hsl(48 24% 92%) 100%
+    );
+    background-size: 200% 100%;
+    animation: lp-shimmer 1.6s ease-in-out infinite;
+  }
+
+  @keyframes lp-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lp-skeleton { animation: none; }
+  }
+
   body {
     @apply bg-background text-foreground font-kids antialiased;
     -webkit-font-smoothing: antialiased;

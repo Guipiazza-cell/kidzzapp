@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import heroImage from "@/assets/lp-kidzz-wellness-hero.webp";
 import { haptic } from "@/lib/haptics";
@@ -185,7 +185,7 @@ function HeroBackdrop({ onLoad }: { onLoad: () => void }) {
   );
 }
 
-function Hero({ onStart }: { onStart: () => void }) {
+function Hero({ onStart, onHeroReady }: { onStart: () => void; onHeroReady?: () => void }) {
   const [loaded, setLoaded] = useState(false);
   const reduced = useReducedMotion();
   return (
@@ -193,7 +193,7 @@ function Hero({ onStart }: { onStart: () => void }) {
       className="relative isolate min-h-[100svh] overflow-hidden"
       style={{ minHeight: "100dvh", background: S.bg }}
     >
-      <HeroBackdrop onLoad={() => setLoaded(true)} />
+      <HeroBackdrop onLoad={() => { setLoaded(true); onHeroReady?.(); }} />
       {!loaded && (
         <div
           aria-hidden
@@ -521,9 +521,38 @@ function Result({ score, onClose }: { score: number; onClose: () => void }) {
   );
 }
 
+function LpBootSkeleton({ visible }: { visible: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-[60]"
+      style={{
+        background: `radial-gradient(circle at 50% 22%, ${S.off} 0%, ${S.bg} 62%)`,
+        opacity: visible ? 1 : 0,
+        transition: "opacity 380ms ease-out",
+        willChange: "opacity",
+      }}
+    >
+      <div
+        className="absolute left-1/2 top-[18%] -translate-x-1/2 flex flex-col items-center gap-5"
+        style={{ width: "min(86%, 420px)" }}
+      >
+        <div className="lp-skeleton h-7 w-32 rounded-full" />
+        <div className="lp-skeleton h-9 w-full rounded-2xl" />
+        <div className="lp-skeleton h-9 w-[88%] rounded-2xl" />
+        <div className="lp-skeleton h-5 w-[70%] rounded-full" />
+        <div className="lp-skeleton mt-6 h-14 w-[78%] rounded-full" />
+      </div>
+    </div>
+  );
+}
+
 export default function LandingQuiz() {
   const [phase, setPhase] = useState<"landing" | "quiz" | "result">("landing");
   const [score, setScore] = useState(0);
+  const [heroReady, setHeroReady] = useState(false);
+  const [fontsReady, setFontsReady] = useState(false);
+  const [minDelayPassed, setMinDelayPassed] = useState(false);
 
   useLayoutEffect(() => {
     document.documentElement.classList.add("lp-route");
@@ -554,6 +583,30 @@ export default function LandingQuiz() {
     };
   }, []);
 
+  // Fonts ready signal (system stack resolves instantly, but await for safety on first paint)
+  useEffect(() => {
+    let cancelled = false;
+    const fonts = (document as Document & { fonts?: { ready?: Promise<unknown> } }).fonts;
+    if (fonts?.ready) {
+      fonts.ready.then(() => { if (!cancelled) setFontsReady(true); }).catch(() => setFontsReady(true));
+    } else {
+      setFontsReady(true);
+    }
+    return () => { cancelled = true; };
+  }, []);
+
+  // Minimum elegance delay so skeleton doesn't flash on instant loads
+  useEffect(() => {
+    const t = window.setTimeout(() => setMinDelayPassed(true), 220);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  // Hard fallback: never block UI more than 2.5s even if hero/fonts misbehave
+  useEffect(() => {
+    const t = window.setTimeout(() => { setHeroReady(true); setFontsReady(true); }, 2500);
+    return () => window.clearTimeout(t);
+  }, []);
+
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, [phase]);
@@ -571,9 +624,12 @@ export default function LandingQuiz() {
     return <Result score={score} onClose={() => setPhase("landing")} />;
   }
 
+  const showSkeleton = !(heroReady && fontsReady && minDelayPassed);
+
   return (
     <main className="relative min-h-screen overflow-x-clip" style={{ ...lpVars, background: S.bg, color: S.ink, fontFamily: bodyFont }}>
-      <Hero onStart={start} />
+      <LpBootSkeleton visible={showSkeleton} />
+      <Hero onStart={start} onHeroReady={() => setHeroReady(true)} />
       <Identification />
       <TestSection onStart={start} />
       <HowItWorks />
