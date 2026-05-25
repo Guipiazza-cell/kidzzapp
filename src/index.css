@@ -97,6 +97,13 @@
     overscroll-behavior-y: none;
   }
 
+  html.lp-route,
+  html.lp-route body {
+    overscroll-behavior-y: auto;
+    overflow-x: hidden;
+    background: #F7F6F2;
+  }
+
   body {
     @apply bg-background text-foreground font-kids antialiased;
     -webkit-font-smoothing: antialiased;

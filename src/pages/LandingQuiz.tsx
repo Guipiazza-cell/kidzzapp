@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Sparkles,
@@ -14,7 +13,7 @@ import {
   Plane,
   Headphones,
 } from "lucide-react";
-import chameleonFrame from "@/assets/lp-chameleon-frame.webp";
+import chameleonBlurBg from "@/assets/lp-chameleon-blur-bg.webp";
 import premiumBgReference from "@/assets/reference/premium-bg-reference.webp";
 import { haptic } from "@/lib/haptics";
 
@@ -38,7 +37,7 @@ const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", 
 const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
   <div
     aria-hidden
-    className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
+    className="absolute inset-x-0 top-0 -z-10 h-[150svh] pointer-events-none overflow-hidden"
     style={{ background: C.bg }}
   >
     {image && (
@@ -51,14 +50,15 @@ const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
         decoding="async"
       />
     )}
-    {/* Camaleão como decoração de fundo desfocada — leve e estática (fixed) para zero jank no scroll */}
+    {/* Camaleão já vem desfocado no arquivo: sem CSS blur pesado durante o scroll */}
     <img
-      src={chameleonFrame}
+      src={chameleonBlurBg}
       alt=""
-      className="absolute left-1/2 top-[14%] w-[120vw] max-w-[680px] h-auto object-contain opacity-[0.16] select-none"
+      className="absolute left-1/2 top-[10svh] w-[112vw] max-w-[640px] h-auto object-contain opacity-[0.18] select-none"
       style={{
-        filter: "blur(38px) saturate(1.05)",
-        transform: "translate(-50%, 0) translateZ(0)",
+        transform: "translate3d(-50%, 0, 0)",
+        WebkitMaskImage: "radial-gradient(ellipse at center, #000 0%, #000 42%, transparent 72%)",
+        maskImage: "radial-gradient(ellipse at center, #000 0%, #000 42%, transparent 72%)",
       }}
       loading="eager"
       decoding="async"
@@ -163,46 +163,34 @@ const FadeIn = ({
    HERO
    ============================================================ */
 const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative min-h-[86svh] px-5 pt-[max(env(safe-area-inset-top),28px)] pb-12 flex items-center">
+  <section className="relative min-h-[64svh] px-5 pt-[max(env(safe-area-inset-top),16px)] pb-6 flex items-center">
     <div className="relative z-10 max-w-2xl mx-auto text-center">
-      <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      <p
         className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
         style={{ color: C.greenDark, background: "rgba(255,255,255,0.72)", border: "1px solid rgba(53,91,69,0.14)" }}
       >
         Kidzz.app
-      </motion.p>
+      </p>
 
-      <motion.h1
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-5 text-[28px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
+      <h1
+        className="mt-4 text-[27px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
         style={{ fontFamily: SERIF, color: C.ink }}
       >
         Seu filho faz perguntas.
         <span className="block" style={{ color: C.greenDark }}>
           O Kidzz transforma isso em conexão.
         </span>
-      </motion.h1>
+      </h1>
 
-      <motion.p
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.3 }}
+      <p
         className="mt-5 text-[15.5px] md:text-lg leading-relaxed max-w-md mx-auto"
         style={{ color: `${C.ink}B3` }}
       >
         Experiências emocionais, histórias, brincadeiras e bem-estar para famílias modernas.
-      </motion.p>
+      </p>
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.45 }}
-        className="mt-9 flex flex-col items-center gap-3"
+      <div
+        className="mt-8 flex flex-col items-center gap-3"
       >
         <CTA onClick={onStart}>
           Fazer o teste de 60 segundos
@@ -211,7 +199,7 @@ const Hero = ({ onStart }: { onStart: () => void }) => (
         <p className="text-xs font-medium" style={{ color: `${C.ink}80` }}>
           Mais de 10.000 famílias já fizeram.
         </p>
-      </motion.div>
+      </div>
     </div>
   </section>
 );
@@ -227,17 +215,17 @@ const PreviewQuestions = [
 ];
 
 const QuizSection = ({ onStart }: { onStart: () => void }) => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-6 md:py-16">
     <div className="max-w-2xl mx-auto text-center">
       <FadeIn>
         <p
-          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-4"
+          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
           style={{ color: `${C.greenDark}B0` }}
         >
           60 segundos
         </p>
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
+          className="text-[24px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Descubra o perfil emocional da sua família.
@@ -312,7 +300,7 @@ const PAINS = [
 ];
 
 const PainSection = () => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-10 md:py-16">
     <div className="max-w-2xl mx-auto">
       <FadeIn className="text-center mb-12">
         <h2
@@ -393,7 +381,7 @@ const EXPERIENCES = [
 ];
 
 const Experiences = () => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-10 md:py-16">
     <div className="max-w-3xl mx-auto">
       <FadeIn className="text-center mb-12">
         <p
@@ -446,7 +434,7 @@ const Experiences = () => (
    WELLNESS (dark green cinematic)
    ============================================================ */
 const Wellness = () => (
-  <section className="relative px-5 py-24 md:py-32 mt-6">
+  <section className="relative px-5 py-16 md:py-24 mt-4">
     <div
       aria-hidden
       className="absolute inset-0 -z-10"
@@ -516,7 +504,7 @@ const TESTIMONIALS = [
 ];
 
 const SocialProof = () => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-10 md:py-16">
     <div className="max-w-3xl mx-auto text-center">
       <FadeIn>
         <p
@@ -555,7 +543,7 @@ const SocialProof = () => (
    FINAL CTA — cinematic dark
    ============================================================ */
 const FinalCTA = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative px-5 py-24 md:py-32 mt-6">
+  <section className="relative px-5 py-16 md:py-24 mt-4">
     <div
       aria-hidden
       className="absolute inset-0 -z-10"
@@ -660,12 +648,8 @@ const QuizExperience = ({
   };
 
   return (
-    <motion.div
+    <div
       className="fixed inset-0 z-50 flex flex-col overflow-y-auto"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
       style={{ background: C.bg }}
     >
       <QuietBackground image />
@@ -678,11 +662,9 @@ const QuizExperience = ({
           Fechar
         </button>
         <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(53,91,69,0.10)" }}>
-          <motion.div
+          <div
             className="h-full"
-            style={{ background: `linear-gradient(90deg, ${C.green}, ${C.greenDark})` }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            style={{ background: `linear-gradient(90deg, ${C.green}, ${C.greenDark})`, width: `${progress}%`, transition: "width 240ms ease" }}
           />
         </div>
         <span className="text-xs tabular-nums" style={{ color: `${C.ink}80` }}>
@@ -691,14 +673,7 @@ const QuizExperience = ({
       </div>
 
       <div className="relative flex-1 flex flex-col justify-center px-6 max-w-xl mx-auto w-full pb-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          >
+          <div key={idx}>
             <p
               className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-4"
               style={{ color: `${C.greenDark}B0` }}
@@ -728,10 +703,9 @@ const QuizExperience = ({
                 </button>
               ))}
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -829,6 +803,8 @@ const LandingQuiz = () => {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.classList.add("lp-route");
     document.title = "Kidzz — Conexão emocional para famílias modernas";
     const meta =
       document.querySelector('meta[name="description"]') ||
@@ -842,6 +818,7 @@ const LandingQuiz = () => {
       "content",
       "Seu filho faz perguntas. O Kidzz transforma em conexão. Faça o teste emocional de 60 segundos e descubra experiências personalizadas para sua família."
     );
+    return () => document.documentElement.classList.remove("lp-route");
   }, []);
 
   const start = () => {
@@ -869,19 +846,17 @@ const LandingQuiz = () => {
         </p>
       </footer>
 
-      <AnimatePresence>
-        {phase === "quiz" && (
-          <QuizExperience
-            key="quiz"
-            onClose={() => setPhase("landing")}
-            onFinish={(s) => {
-              setScore(s);
-              setPhase("result");
-            }}
-          />
-        )}
-        {phase === "result" && <Result key="result" score={score} onClose={() => setPhase("landing")} />}
-      </AnimatePresence>
+      {phase === "quiz" && (
+        <QuizExperience
+          key="quiz"
+          onClose={() => setPhase("landing")}
+          onFinish={(s) => {
+            setScore(s);
+            setPhase("result");
+          }}
+        />
+      )}
+      {phase === "result" && <Result key="result" score={score} onClose={() => setPhase("landing")} />}
     </div>
   );
 };
