@@ -450,6 +450,7 @@ function QuizExperience({ onClose, onFinish }: { onClose: () => void; onFinish: 
     haptic("medium");
     const next = score + weight;
     setScore(next);
+    track("lp_quiz_question_answered", { question_index: idx, question_number: idx + 1, weight, running_score: next });
     if (idx + 1 >= QUESTIONS.length) window.setTimeout(() => onFinish(next), 260);
     else setIdx((value) => value + 1);
   };
