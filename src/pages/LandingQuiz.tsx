@@ -513,7 +513,7 @@ function Result({ score, onClose }: { score: number; onClose: () => void }) {
           </div>
         </Glass>
         <div className="mt-8 flex flex-col items-center gap-3">
-          <CTA onClick={() => { window.location.href = APP_URL; }} large>Entrar no Kidzz agora ✨</CTA>
+          <CTA onClick={() => { track("lp_app_redirect", { score, location: "result" }); window.location.href = withAttribution(APP_URL); }} large>Entrar no Kidzz agora ✨</CTA>
           <p className="text-[12px]" style={{ color: S.inkMuted }}>Menos caos. Mais conexão.</p>
         </div>
       </div>
