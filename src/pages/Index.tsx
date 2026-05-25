@@ -87,10 +87,11 @@ const Index = () => {
     try { return window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
-  const [showEmotionalIntro, setShowEmotionalIntro] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    try { return window.localStorage.getItem("kidzz_emotional_intro_v1") !== "1"; } catch { return false; }
-  });
+  // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
+  // Mantemos a flag marcada como vista para não reintroduzir no futuro.
+  useEffect(() => {
+    try { localStorage.setItem("kidzz_emotional_intro_v1", "1"); } catch {}
+  }, []);
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
