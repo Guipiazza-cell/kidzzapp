@@ -248,17 +248,8 @@ const Index = () => {
     return null;
   }
 
-  // Cinematic emotional intro — shown once before name collection
-  if (showEmotionalIntro && !profile?.child_name) {
-    return (
-      <EmotionalIntro
-        onDone={() => {
-          try { localStorage.setItem("kidzz_emotional_intro_v1", "1"); } catch {}
-          setShowEmotionalIntro(false);
-        }}
-      />
-    );
-  }
+  // EmotionalIntro removida do fluxo — OnboardingWelcome no fim cobre o momento emocional.
+
 
   // Onboarding gates: name → age → interests
   if (!profile?.child_name) {
