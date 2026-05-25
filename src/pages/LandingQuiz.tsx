@@ -14,7 +14,7 @@ import {
   Plane,
   Headphones,
 } from "lucide-react";
-import chameleonFrame from "@/assets/lp-chameleon-frame.webp";
+import chameleonBlurBg from "@/assets/lp-chameleon-blur-bg.webp";
 import premiumBgReference from "@/assets/reference/premium-bg-reference.webp";
 import { haptic } from "@/lib/haptics";
 
@@ -38,7 +38,7 @@ const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", 
 const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
   <div
     aria-hidden
-    className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
+    className="absolute inset-x-0 top-0 -z-10 h-[150svh] pointer-events-none overflow-hidden"
     style={{ background: C.bg }}
   >
     {image && (
@@ -51,14 +51,13 @@ const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
         decoding="async"
       />
     )}
-    {/* Camaleão como decoração de fundo desfocada — leve e estática (fixed) para zero jank no scroll */}
+    {/* Camaleão já vem desfocado no arquivo: sem CSS blur pesado durante o scroll */}
     <img
-      src={chameleonFrame}
+      src={chameleonBlurBg}
       alt=""
-      className="absolute left-1/2 top-[14%] w-[120vw] max-w-[680px] h-auto object-contain opacity-[0.16] select-none"
+      className="absolute left-1/2 top-[10svh] w-[112vw] max-w-[640px] h-auto object-contain opacity-[0.18] select-none"
       style={{
-        filter: "blur(38px) saturate(1.05)",
-        transform: "translate(-50%, 0) translateZ(0)",
+        transform: "translate3d(-50%, 0, 0)",
       }}
       loading="eager"
       decoding="async"
@@ -163,7 +162,7 @@ const FadeIn = ({
    HERO
    ============================================================ */
 const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative min-h-[86svh] px-5 pt-[max(env(safe-area-inset-top),28px)] pb-12 flex items-center">
+  <section className="relative min-h-[74svh] px-5 pt-[max(env(safe-area-inset-top),24px)] pb-8 flex items-center">
     <div className="relative z-10 max-w-2xl mx-auto text-center">
       <motion.p
         initial={{ opacity: 0, y: 10 }}
@@ -227,7 +226,7 @@ const PreviewQuestions = [
 ];
 
 const QuizSection = ({ onStart }: { onStart: () => void }) => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-10 md:py-16">
     <div className="max-w-2xl mx-auto text-center">
       <FadeIn>
         <p
@@ -312,7 +311,7 @@ const PAINS = [
 ];
 
 const PainSection = () => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-10 md:py-16">
     <div className="max-w-2xl mx-auto">
       <FadeIn className="text-center mb-12">
         <h2
@@ -393,7 +392,7 @@ const EXPERIENCES = [
 ];
 
 const Experiences = () => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-10 md:py-16">
     <div className="max-w-3xl mx-auto">
       <FadeIn className="text-center mb-12">
         <p
@@ -446,7 +445,7 @@ const Experiences = () => (
    WELLNESS (dark green cinematic)
    ============================================================ */
 const Wellness = () => (
-  <section className="relative px-5 py-24 md:py-32 mt-6">
+  <section className="relative px-5 py-16 md:py-24 mt-4">
     <div
       aria-hidden
       className="absolute inset-0 -z-10"
@@ -516,7 +515,7 @@ const TESTIMONIALS = [
 ];
 
 const SocialProof = () => (
-  <section className="px-5 py-14 md:py-20">
+  <section className="px-5 py-10 md:py-16">
     <div className="max-w-3xl mx-auto text-center">
       <FadeIn>
         <p
@@ -555,7 +554,7 @@ const SocialProof = () => (
    FINAL CTA — cinematic dark
    ============================================================ */
 const FinalCTA = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative px-5 py-24 md:py-32 mt-6">
+  <section className="relative px-5 py-16 md:py-24 mt-4">
     <div
       aria-hidden
       className="absolute inset-0 -z-10"
