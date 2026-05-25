@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import heroImage from "@/assets/lp-kidzz-wellness-hero.webp";
 import { haptic } from "@/lib/haptics";
+import { captureAttribution, track, withAttribution } from "@/lib/lpAnalytics";
 
 const APP_URL = "https://kidzzapp.lovable.app";
 const EASE = [0.42, 0, 0.58, 1] as const;
