@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import heroImage from "@/assets/lp-kidzz-wellness-hero.webp";
 import { haptic } from "@/lib/haptics";
