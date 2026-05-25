@@ -297,7 +297,7 @@ function TestSection({ onStart }: { onStart: () => void }) {
               ))}
             </div>
             <div className="mt-8">
-              <CTA onClick={onStart} large>Fazer teste agora ✨</CTA>
+              <CTA onClick={() => { track("lp_cta_click", { location: "test_section" }); onStart(); }} large>Fazer teste agora ✨</CTA>
             </div>
           </Glass>
         </FadeIn>
