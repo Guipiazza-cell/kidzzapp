@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Sparkles,
@@ -58,6 +57,8 @@ const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
       className="absolute left-1/2 top-[10svh] w-[112vw] max-w-[640px] h-auto object-contain opacity-[0.18] select-none"
       style={{
         transform: "translate3d(-50%, 0, 0)",
+        WebkitMaskImage: "radial-gradient(ellipse at center, #000 0%, #000 42%, transparent 72%)",
+        maskImage: "radial-gradient(ellipse at center, #000 0%, #000 42%, transparent 72%)",
       }}
       loading="eager"
       decoding="async"
@@ -164,20 +165,14 @@ const FadeIn = ({
 const Hero = ({ onStart }: { onStart: () => void }) => (
   <section className="relative min-h-[74svh] px-5 pt-[max(env(safe-area-inset-top),20px)] pb-8 flex items-center">
     <div className="relative z-10 max-w-2xl mx-auto text-center">
-      <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      <p
         className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
         style={{ color: C.greenDark, background: "rgba(255,255,255,0.72)", border: "1px solid rgba(53,91,69,0.14)" }}
       >
         Kidzz.app
-      </motion.p>
+      </p>
 
-      <motion.h1
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+      <h1
         className="mt-4 text-[27px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
         style={{ fontFamily: SERIF, color: C.ink }}
       >
@@ -185,22 +180,16 @@ const Hero = ({ onStart }: { onStart: () => void }) => (
         <span className="block" style={{ color: C.greenDark }}>
           O Kidzz transforma isso em conexão.
         </span>
-      </motion.h1>
+      </h1>
 
-      <motion.p
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.3 }}
+      <p
         className="mt-5 text-[15.5px] md:text-lg leading-relaxed max-w-md mx-auto"
         style={{ color: `${C.ink}B3` }}
       >
         Experiências emocionais, histórias, brincadeiras e bem-estar para famílias modernas.
-      </motion.p>
+      </p>
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.45 }}
+      <div
         className="mt-8 flex flex-col items-center gap-3"
       >
         <CTA onClick={onStart}>
@@ -210,7 +199,7 @@ const Hero = ({ onStart }: { onStart: () => void }) => (
         <p className="text-xs font-medium" style={{ color: `${C.ink}80` }}>
           Mais de 10.000 famílias já fizeram.
         </p>
-      </motion.div>
+      </div>
     </div>
   </section>
 );
