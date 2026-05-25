@@ -1,864 +1,580 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowRight,
-  Sparkles,
-  Heart,
-  Moon,
-  Leaf,
-  Check,
-  Heart as HeartIcon,
-  Wind,
-  BookOpen,
-  Gamepad2,
-  Plane,
-  Headphones,
-} from "lucide-react";
-import chameleonBlurBg from "@/assets/lp-chameleon-blur-bg.webp";
-import premiumBgReference from "@/assets/reference/premium-bg-reference.webp";
+import { useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import heroImage from "@/assets/lp-kidzz-wellness-hero.webp";
 import { haptic } from "@/lib/haptics";
 
 const APP_URL = "https://kidzzapp.lovable.app";
+const EASE = [0.42, 0, 0.58, 1] as const;
 
-/* ============================================================
-   TOKENS
-   ============================================================ */
-const C = {
-  bg: "#F7F6F2",
-  off: "#FDFCF8",
-  green: "#8FBF7F",
-  greenDark: "#355B45",
-  ink: "#2E2E2E",
-};
-const SERIF = '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+const lpVars = {
+  "--lp-bg": "48 24% 96%",
+  "--lp-green": "105 33% 62%",
+  "--lp-green-dark": "145 26% 28%",
+  "--lp-off": "48 56% 98%",
+  "--lp-ink": "0 0% 18%",
+  "--lp-glow": "105 33% 62% / 0.18",
+} as CSSProperties & Record<string, string>;
 
-/* ============================================================
-   BACKGROUND — CSS-only, zero JS animation, no scroll jank
-   ============================================================ */
-const QuietBackground = ({ image = false }: { image?: boolean } = {}) => (
-  <div
-    aria-hidden
-    className="absolute inset-x-0 top-0 -z-10 h-[150svh] pointer-events-none overflow-hidden"
-    style={{ background: C.bg }}
-  >
-    {image && (
-      <img
-        src={premiumBgReference}
-        alt=""
-        className="absolute inset-x-0 top-0 h-[92svh] w-full object-cover object-top opacity-25"
-        style={{ filter: "saturate(0.9) brightness(1.08)" }}
-        loading="eager"
-        decoding="async"
-      />
-    )}
-    {/* Camaleão já vem desfocado no arquivo: sem CSS blur pesado durante o scroll */}
-    <img
-      src={chameleonBlurBg}
-      alt=""
-      className="absolute left-1/2 top-[10svh] w-[112vw] max-w-[640px] h-auto object-contain opacity-[0.18] select-none"
-      style={{
-        transform: "translate3d(-50%, 0, 0)",
-        WebkitMaskImage: "radial-gradient(ellipse at center, #000 0%, #000 42%, transparent 72%)",
-        maskImage: "radial-gradient(ellipse at center, #000 0%, #000 42%, transparent 72%)",
-      }}
-      loading="eager"
-      decoding="async"
-      draggable={false}
-    />
-    <div
-      className="absolute inset-0"
-      style={{
-        background: image
-          ? `linear-gradient(180deg, rgba(247,246,242,0.78) 0%, rgba(247,246,242,0.90) 42%, ${C.bg} 90%)`
-          : `radial-gradient(60% 50% at 50% 0%, rgba(143,191,127,0.14) 0%, transparent 70%), linear-gradient(180deg, rgba(247,246,242,0.45) 0%, rgba(247,246,242,0.80) 55%, ${C.bg} 100%)`,
-      }}
-    />
-  </div>
-);
-
-/* ============================================================
-   PREMIUM CTA
-   ============================================================ */
-const CTA = ({
-  children,
-  onClick,
-  variant = "primary",
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  variant?: "primary" | "ghost";
-}) => {
-  const isPrimary = variant === "primary";
-  return (
-    <button
-      onClick={() => {
-        haptic("light");
-        onClick?.();
-      }}
-      className="group relative inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-semibold text-[15px] md:text-base transition-all duration-300 active:scale-[0.98] will-change-transform"
-      style={
-        isPrimary
-          ? {
-              color: "#fff",
-              background: `linear-gradient(180deg, ${C.green} 0%, ${C.greenDark} 100%)`,
-              boxShadow: "0 8px 28px -8px rgba(53,91,69,0.45), inset 0 1px 0 rgba(255,255,255,0.25)",
-            }
-          : {
-              color: C.greenDark,
-              background: "rgba(255,255,255,0.88)",
-              border: `1px solid rgba(53,91,69,0.18)`,
-            }
-      }
-    >
-      <span
-        className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{
-          background: "radial-gradient(60% 100% at 50% 0%, rgba(255,255,255,0.35), transparent 70%)",
-        }}
-      />
-      <span className="relative flex items-center gap-2">{children}</span>
-    </button>
-  );
+const S = {
+  bg: "hsl(var(--lp-bg))",
+  green: "hsl(var(--lp-green))",
+  greenDark: "hsl(var(--lp-green-dark))",
+  off: "hsl(var(--lp-off))",
+  ink: "hsl(var(--lp-ink))",
+  inkSoft: "hsl(var(--lp-ink) / 0.68)",
+  inkMuted: "hsl(var(--lp-ink) / 0.52)",
+  glow: "hsl(var(--lp-glow))",
 };
 
-/* ============================================================
-   GLASS CARD
-   ============================================================ */
-const Glass = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <div
-    className={`rounded-3xl ${className}`}
-    style={{
-      background: "rgba(255,255,255,0.62)",
-      border: "1px solid rgba(255,255,255,0.85)",
-      boxShadow: "0 10px 26px -18px rgba(46,46,46,0.18)",
-    }}
-  >
-    {children}
-  </div>
-);
+const displayFont = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif';
+const bodyFont = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif';
 
-/* ============================================================
-   FADE-IN UTILITY (viewport once)
-   ============================================================ */
-const FadeIn = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  y?: number;
-  className?: string;
-}) => (
-  <div className={className}>
-    {children}
-  </div>
-);
+const fade = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.34, ease: EASE } },
+};
 
-/* ============================================================
-   HERO
-   ============================================================ */
-const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative min-h-[64svh] px-5 pt-[max(env(safe-area-inset-top),16px)] pb-6 flex items-center">
-    <div className="relative z-10 max-w-2xl mx-auto text-center">
-      <p
-        className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
-        style={{ color: C.greenDark, background: "rgba(255,255,255,0.72)", border: "1px solid rgba(53,91,69,0.14)" }}
-      >
-        Kidzz.app
-      </p>
+function scrollToId(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
-      <h1
-        className="mt-4 text-[27px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
-        style={{ fontFamily: SERIF, color: C.ink }}
-      >
-        Seu filho faz perguntas.
-        <span className="block" style={{ color: C.greenDark }}>
-          O Kidzz transforma isso em conexão.
-        </span>
-      </h1>
-
-      <p
-        className="mt-5 text-[15.5px] md:text-lg leading-relaxed max-w-md mx-auto"
-        style={{ color: `${C.ink}B3` }}
-      >
-        Experiências emocionais, histórias, brincadeiras e bem-estar para famílias modernas.
-      </p>
-
-      <div
-        className="mt-8 flex flex-col items-center gap-3"
-      >
-        <CTA onClick={onStart}>
-          Fazer o teste de 60 segundos
-          <Sparkles size={16} />
-        </CTA>
-        <p className="text-xs font-medium" style={{ color: `${C.ink}80` }}>
-          Mais de 10.000 famílias já fizeram.
-        </p>
-      </div>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   QUIZ PREVIEW
-   ============================================================ */
-const PreviewQuestions = [
-  "Como estão as noites aí?",
-  "Seu filho desacelera fácil?",
-  "Como está o nível de conexão da família?",
-  "O que mais pesa hoje na rotina?",
-];
-
-const QuizSection = ({ onStart }: { onStart: () => void }) => (
-  <section className="px-5 py-6 md:py-16">
-    <div className="max-w-2xl mx-auto text-center">
-      <FadeIn>
-        <p
-          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
-          style={{ color: `${C.greenDark}B0` }}
-        >
-          60 segundos
-        </p>
-        <h2
-          className="text-[24px] md:text-[42px] leading-[1.12] font-semibold"
-          style={{ fontFamily: SERIF, color: C.ink }}
-        >
-          Descubra o perfil emocional da sua família.
-        </h2>
-        <p className="mt-5 text-[15px] md:text-base leading-relaxed max-w-md mx-auto" style={{ color: `${C.ink}AA` }}>
-          O Kidzz analisa sua rotina e mostra experiências perfeitas para o momento da sua casa.
-        </p>
-      </FadeIn>
-
-      <FadeIn delay={0.15} className="mt-10">
-        <Glass className="p-5 md:p-7 text-left">
-          <div className="space-y-3">
-            {PreviewQuestions.map((q, i) => (
-              <div
-                key={q}
-                className="flex items-center gap-4 px-4 py-4 rounded-2xl"
-                style={{
-                  background: i === 0 ? "rgba(143,191,127,0.10)" : "transparent",
-                  border: i === 0 ? "1px solid rgba(143,191,127,0.25)" : "1px solid rgba(46,46,46,0.06)",
-                }}
-              >
-                <span
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold flex-shrink-0"
-                  style={{ background: "rgba(143,191,127,0.18)", color: C.greenDark }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <p className="text-[14.5px] font-medium" style={{ color: C.ink }}>
-                  {q}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {["Família Exploradora", "Família Conectada", "Família Sobrecarregada", "Modo Sobrevivência"].map(
-              (p) => (
-                <div
-                  key={p}
-                  className="text-[11px] md:text-xs font-medium text-center px-3 py-2 rounded-full"
-                  style={{
-                    background: "rgba(53,91,69,0.06)",
-                    color: C.greenDark,
-                  }}
-                >
-                  {p}
-                </div>
-              )
-            )}
-          </div>
-        </Glass>
-      </FadeIn>
-
-      <FadeIn delay={0.3} className="mt-8 flex justify-center">
-        <CTA onClick={onStart}>
-          Começar meu teste
-          <ArrowRight size={16} />
-        </CTA>
-      </FadeIn>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   "VOCÊ NÃO ESTÁ SOZINHO"
-   ============================================================ */
-const PAINS = [
-  "Meu filho não larga a tela.",
-  "A hora de dormir virou batalha.",
-  "Estamos juntos, mas desconectados.",
-  "Não sei mais como acalmar.",
-];
-
-const PainSection = () => (
-  <section className="px-5 py-10 md:py-16">
-    <div className="max-w-2xl mx-auto">
-      <FadeIn className="text-center mb-12">
-        <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
-          style={{ fontFamily: SERIF, color: C.ink }}
-        >
-          Você não está sozinho.
-        </h2>
-        <p className="mt-4 text-[15px] leading-relaxed max-w-md mx-auto" style={{ color: `${C.ink}A0` }}>
-          Frases que ouvimos todos os dias de famílias reais.
-        </p>
-      </FadeIn>
-
-      <div className="grid sm:grid-cols-2 gap-3">
-        {PAINS.map((p, i) => (
-          <FadeIn key={p} delay={i * 0.06}>
-            <Glass className="px-6 py-6 h-full">
-              <p
-                className="text-[16px] md:text-[17px] leading-snug"
-                style={{ fontFamily: SERIF, color: C.ink }}
-              >
-                “{p}”
-              </p>
-            </Glass>
-          </FadeIn>
-        ))}
-      </div>
-
-      <FadeIn delay={0.3} className="mt-10 text-center">
-        <p className="text-[15px] md:text-base leading-relaxed max-w-md mx-auto" style={{ color: `${C.ink}A8` }}>
-          O Kidzz não promete mágica. Ele cria pequenos respiros emocionais
-          que devolvem o que a rotina tirou: <em style={{ color: C.greenDark }}>presença</em>.
-        </p>
-      </FadeIn>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   EXPERIÊNCIAS
-   ============================================================ */
-const EXPERIENCES = [
-  {
-    icon: HeartIcon,
-    title: "SOS emocional",
-    desc: "Um respiro guiado para os picos de birra e crise — em segundos.",
-  },
-  {
-    icon: Moon,
-    title: "Sleep Ritual",
-    desc: "Histórias e sons que desaceleram a casa antes de dormir.",
-  },
-  {
-    icon: BookOpen,
-    title: "Histórias personalizadas",
-    desc: "Narrativas únicas com o nome e a fase do seu filho.",
-  },
-  {
-    icon: Wind,
-    title: "Wellness diário",
-    desc: "Pausas curtas para reconectar pais e filhos em 3 minutos.",
-  },
-  {
-    icon: Gamepad2,
-    title: "Brincadeiras sem tela",
-    desc: "Atividades simples para virar o jogo da rotina.",
-  },
-  {
-    icon: Headphones,
-    title: "Soundscapes",
-    desc: "Paisagens sonoras que acalmam o ambiente da casa.",
-  },
-  {
-    icon: Plane,
-    title: "Modo viagem",
-    desc: "Companhia leve para estradas, esperas e voos longos.",
-  },
-];
-
-const Experiences = () => (
-  <section className="px-5 py-10 md:py-16">
-    <div className="max-w-3xl mx-auto">
-      <FadeIn className="text-center mb-12">
-        <p
-          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
-          style={{ color: `${C.greenDark}B0` }}
-        >
-          Experiências
-        </p>
-        <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
-          style={{ fontFamily: SERIF, color: C.ink }}
-        >
-          Tecnologia invisível.
-          <span className="block" style={{ color: C.greenDark }}>
-            Conexão real.
-          </span>
-        </h2>
-      </FadeIn>
-
-      <div className="space-y-3 md:space-y-4">
-        {EXPERIENCES.map(({ icon: Icon, title, desc }, i) => (
-          <FadeIn key={title} delay={i * 0.05}>
-            <Glass className="px-5 py-5 md:px-7 md:py-6 flex items-center gap-4 md:gap-6">
-              <div
-                className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: "linear-gradient(180deg, rgba(143,191,127,0.22), rgba(53,91,69,0.10))",
-                  border: "1px solid rgba(143,191,127,0.25)",
-                }}
-              >
-                <Icon size={20} style={{ color: C.greenDark }} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="text-[16px] md:text-[18px] font-semibold mb-0.5" style={{ color: C.ink }}>
-                  {title}
-                </h3>
-                <p className="text-[13.5px] md:text-sm leading-snug" style={{ color: `${C.ink}A0` }}>
-                  {desc}
-                </p>
-              </div>
-            </Glass>
-          </FadeIn>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   WELLNESS (dark green cinematic)
-   ============================================================ */
-const Wellness = () => (
-  <section className="relative px-5 py-16 md:py-24 mt-4">
-    <div
-      aria-hidden
-      className="absolute inset-0 -z-10"
-      style={{
-        background: `
-          radial-gradient(60% 60% at 50% 30%, rgba(143,191,127,0.18) 0%, transparent 70%),
-          linear-gradient(180deg, #1e3a2d 0%, #14241c 100%)
-        `,
-      }}
-    />
-    <div className="max-w-2xl mx-auto text-center text-white">
-      <FadeIn>
-        <p
-          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
-          style={{ color: "rgba(143,191,127,0.85)" }}
-        >
-          Wellness premium
-        </p>
-        <h2
-          className="text-[28px] md:text-[44px] leading-[1.1] font-semibold"
-          style={{ fontFamily: SERIF }}
-        >
-          Um silêncio que a casa estava esperando.
-        </h2>
-        <p className="mt-5 text-[15px] md:text-base leading-relaxed max-w-md mx-auto text-white/75">
-          Respiração guiada, sleep ritual, sons da natureza e pausas curtas —
-          desenhadas para desacelerar pais e filhos juntos.
-        </p>
-      </FadeIn>
-
-      <FadeIn delay={0.15} className="mt-10 grid grid-cols-2 gap-3 max-w-md mx-auto">
-        {[
-          { icon: Wind, label: "Respiração guiada" },
-          { icon: Moon, label: "Sleep ritual" },
-          { icon: Leaf, label: "Sons da natureza" },
-          { icon: HeartIcon, label: "Pausas rápidas" },
-        ].map(({ icon: Icon, label }) => (
-          <div
-            key={label}
-            className="rounded-2xl px-4 py-5 flex flex-col items-start gap-3 text-left"
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{ background: "rgba(143,191,127,0.18)" }}
-            >
-              <Icon size={16} style={{ color: "#cfe9c3" }} />
-            </div>
-            <p className="text-[13.5px] font-semibold text-white/90">{label}</p>
-          </div>
-        ))}
-      </FadeIn>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   SOCIAL PROOF
-   ============================================================ */
-const TESTIMONIALS = [
-  "Finalmente uma experiência que acalma a casa.",
-  "Meu filho pede o Kidzz toda noite.",
-  "A sensação é de paz.",
-];
-
-const SocialProof = () => (
-  <section className="px-5 py-10 md:py-16">
-    <div className="max-w-3xl mx-auto text-center">
-      <FadeIn>
-        <p
-          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
-          style={{ color: `${C.greenDark}B0` }}
-        >
-          + 10.000 famílias
-        </p>
-        <h2
-          className="text-[24px] md:text-[36px] leading-[1.15] font-semibold max-w-xl mx-auto"
-          style={{ fontFamily: SERIF, color: C.ink }}
-        >
-          O que estão sentindo com o Kidzz.
-        </h2>
-      </FadeIn>
-
-      <div className="mt-10 grid md:grid-cols-3 gap-3 md:gap-4">
-        {TESTIMONIALS.map((t, i) => (
-          <FadeIn key={t} delay={i * 0.08}>
-            <Glass className="px-6 py-7 h-full text-left">
-              <p
-                className="text-[16.5px] leading-snug"
-                style={{ fontFamily: SERIF, color: C.ink }}
-              >
-                “{t}”
-              </p>
-            </Glass>
-          </FadeIn>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   FINAL CTA — cinematic dark
-   ============================================================ */
-const FinalCTA = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative px-5 py-16 md:py-24 mt-4">
-    <div
-      aria-hidden
-      className="absolute inset-0 -z-10"
-      style={{
-        background: `
-          radial-gradient(60% 60% at 50% 0%, rgba(143,191,127,0.20) 0%, transparent 70%),
-          linear-gradient(180deg, #1a2e23 0%, #0f1a14 100%)
-        `,
-      }}
-    />
-    <div className="max-w-xl mx-auto text-center text-white">
-      <FadeIn>
-        <h2
-          className="text-[32px] md:text-[48px] leading-[1.05] font-semibold"
-          style={{ fontFamily: SERIF }}
-        >
-          Menos caos.
-          <span className="block" style={{ color: "#cfe9c3" }}>
-            Mais conexão.
-          </span>
-        </h2>
-        <p className="mt-5 text-[15px] md:text-base leading-relaxed text-white/75 max-w-sm mx-auto">
-          Comece agora o teste de 60 segundos. Sem cadastro. Sem pressa.
-        </p>
-      </FadeIn>
-
-      <FadeIn delay={0.15} className="mt-9 flex flex-col items-center gap-3">
-        <CTA onClick={onStart}>
-          Entrar no Kidzz
-          <Sparkles size={16} />
-        </CTA>
-        <p className="text-xs text-white/55">Gratuito • Sem anúncios</p>
-      </FadeIn>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   QUIZ EXPERIENCE
-   ============================================================ */
-type QuizAnswer = "rare" | "sometimes" | "often";
-const QUESTIONS: { q: string; options: { label: string; value: QuizAnswer; weight: number }[] }[] = [
-  {
-    q: "Seu filho consegue ficar entediado sem tela?",
-    options: [
-      { label: "Quase sempre", value: "rare", weight: 0 },
-      { label: "Às vezes", value: "sometimes", weight: 1 },
-      { label: "Raramente", value: "often", weight: 2 },
-    ],
-  },
-  {
-    q: "Como costuma ser o momento antes de dormir?",
-    options: [
-      { label: "Calmo e conectado", value: "rare", weight: 0 },
-      { label: "Agitado em alguns dias", value: "sometimes", weight: 1 },
-      { label: "Difícil quase todo dia", value: "often", weight: 2 },
-    ],
-  },
-  {
-    q: "Você sente que está emocionalmente cansado?",
-    options: [
-      { label: "Pouco", value: "rare", weight: 0 },
-      { label: "Algumas semanas sim", value: "sometimes", weight: 1 },
-      { label: "Frequentemente", value: "often", weight: 2 },
-    ],
-  },
-  {
-    q: "Quantos minutos por dia vocês têm de presença real (sem tela)?",
-    options: [
-      { label: "Mais de 60 min", value: "rare", weight: 0 },
-      { label: "Entre 20 e 60 min", value: "sometimes", weight: 1 },
-      { label: "Menos de 20 min", value: "often", weight: 2 },
-    ],
-  },
-  {
-    q: "As birras estão mais frequentes nas últimas semanas?",
-    options: [
-      { label: "Não", value: "rare", weight: 0 },
-      { label: "Um pouco mais", value: "sometimes", weight: 1 },
-      { label: "Sim, bastante", value: "often", weight: 2 },
-    ],
-  },
-];
-
-const QuizExperience = ({
-  onClose,
-  onFinish,
-}: {
-  onClose: () => void;
-  onFinish: (score: number) => void;
-}) => {
-  const [idx, setIdx] = useState(0);
-  const [score, setScore] = useState(0);
-  const progress = (idx / QUESTIONS.length) * 100;
-
-  const pick = (w: number) => {
-    haptic("medium");
-    const next = score + w;
-    setScore(next);
-    if (idx + 1 >= QUESTIONS.length) setTimeout(() => onFinish(next), 280);
-    else setIdx((i) => i + 1);
+function Icon({ name }: { name: "heart" | "moon" | "book" | "spark" | "wave" | "family" | "sos" | "question" | "check" }) {
+  const paths: Record<typeof name, string> = {
+    heart: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z",
+    moon: "M19 14.5A7.5 7.5 0 0 1 9.5 5a7.8 7.8 0 1 0 9.5 9.5Z",
+    book: "M5 5.5A2.5 2.5 0 0 1 7.5 3H20v16H7.5A2.5 2.5 0 0 0 5 21V5.5Zm0 0V21m3-14h8m-8 4h8",
+    spark: "M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2Zm7 13l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z",
+    wave: "M4 14c2.5-4 5.5-4 8 0s5.5 4 8 0M4 18c2.5-2.5 5.5-2.5 8 0s5.5 2.5 8 0M6 9c1.8-2 3.8-2 6 0s4.2 2 6 0",
+    family: "M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3 20a5 5 0 0 1 10 0m1.5 0a4 4 0 0 1 6.5 0",
+    sos: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13v5m0 3h.01",
+    question: "M9.5 8.5A2.7 2.7 0 0 1 12.2 6c1.7 0 3.1 1.1 3.1 2.7 0 2.2-2.5 2.3-2.5 4.5M12 17h.01",
+    check: "M20 6 9 17l-5-5",
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col overflow-y-auto"
-      style={{ background: C.bg }}
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d={paths[name]} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CTA({ children, onClick, variant = "primary", large = false }: { children: React.ReactNode; onClick?: () => void; variant?: "primary" | "secondary"; large?: boolean }) {
+  const primary = variant === "primary";
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        haptic(primary ? "medium" : "light");
+        onClick?.();
+      }}
+      className="relative inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full px-6 font-semibold transition-transform duration-300 ease-in-out active:scale-[0.98]"
+      style={{
+        minWidth: large ? 230 : undefined,
+        color: primary ? S.off : S.greenDark,
+        background: primary
+          ? `linear-gradient(180deg, ${S.green} 0%, ${S.greenDark} 100%)`
+          : "hsl(var(--lp-off) / 0.84)",
+        border: primary ? "1px solid hsl(var(--lp-green) / 0.34)" : "1px solid hsl(var(--lp-green-dark) / 0.14)",
+        boxShadow: primary
+          ? "0 18px 36px -20px hsl(var(--lp-green-dark) / 0.58), inset 0 1px 0 hsl(var(--lp-off) / 0.34)"
+          : "0 10px 24px -20px hsl(var(--lp-ink) / 0.24)",
+      }}
     >
-      <QuietBackground image />
-      <div className="relative px-5 pt-[max(env(safe-area-inset-top),16px)] pb-4 flex items-center gap-3">
-        <button
-          onClick={() => { haptic("light"); onClose(); }}
-          className="text-sm font-medium"
-          style={{ color: `${C.ink}90` }}
+      <span>{children}</span>
+    </button>
+  );
+}
+
+function FadeIn({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={reduced ? false : "hidden"}
+      whileInView="show"
+      viewport={{ once: true, margin: "-8% 0px" }}
+      variants={{
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.34, delay, ease: EASE } },
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function Glass({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={`rounded-[28px] ${className}`}
+      style={{
+        background: "linear-gradient(180deg, hsl(var(--lp-off) / 0.72), hsl(var(--lp-off) / 0.48))",
+        border: "1px solid hsl(var(--lp-off) / 0.88)",
+        boxShadow: "0 18px 42px -32px hsl(var(--lp-ink) / 0.28)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Atmosphere() {
+  const reduced = useReducedMotion();
+  const particles = [
+    [18, 28, 0],
+    [72, 18, 0.12],
+    [84, 58, 0.24],
+    [31, 72, 0.08],
+    [58, 38, 0.2],
+  ];
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <motion.div
+        className="absolute left-[8%] top-[18%] h-28 w-28 rounded-full"
+        style={{ background: S.glow, filter: "blur(26px)" }}
+        animate={reduced ? undefined : { opacity: [0.38, 0.62, 0.38], scale: [1, 1.04, 1] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {particles.map(([left, top, delay], i) => (
+        <motion.span
+          key={i}
+          className="absolute h-1.5 w-1.5 rounded-full"
+          style={{ left: `${left}%`, top: `${top}%`, background: "hsl(var(--lp-off) / 0.9)", boxShadow: "0 0 14px hsl(var(--lp-off) / 0.72)" }}
+          animate={reduced ? undefined : { opacity: [0.16, 0.62, 0.16], y: [0, -8, 0] }}
+          transition={{ duration: 3.8, repeat: Infinity, delay, ease: "easeInOut" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function HeroBackdrop({ onLoad }: { onLoad: () => void }) {
+  return (
+    <div aria-hidden className="absolute inset-0 overflow-hidden" style={{ background: S.bg }}>
+      <img
+        src={heroImage}
+        alt=""
+        className="lp-hero-image absolute inset-0 h-full w-full scale-[1.03] object-cover object-top opacity-45"
+        style={{ filter: "blur(10px) saturate(1.04)" }}
+        decoding="async"
+        draggable={false}
+      />
+      <img
+        src={heroImage}
+        alt=""
+        className="lp-hero-image absolute inset-0 h-full w-full object-contain object-top md:object-cover"
+        style={{ filter: "saturate(1.03) contrast(0.99)", transform: "translateZ(0)" }}
+        width={1054}
+        height={1492}
+        loading="eager"
+        decoding="async"
+        fetchPriority="high"
+        draggable={false}
+        onLoad={onLoad}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(247,246,242,0.08) 0%, rgba(247,246,242,0.16) 25%, rgba(247,246,242,0.42) 70%, rgba(247,246,242,0.78) 100%)",
+        }}
+      />
+      <Atmosphere />
+    </div>
+  );
+}
+
+function Hero({ onStart }: { onStart: () => void }) {
+  const [loaded, setLoaded] = useState(false);
+  const reduced = useReducedMotion();
+  return (
+    <section
+      className="relative isolate min-h-[100svh] overflow-hidden"
+      style={{ minHeight: "100dvh", background: S.bg }}
+    >
+      <HeroBackdrop onLoad={() => setLoaded(true)} />
+      {!loaded && (
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: `radial-gradient(circle at 50% 22%, ${S.off} 0%, ${S.bg} 62%)` }}
+        />
+      )}
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+42px)] text-center md:min-h-screen md:justify-center md:pt-16" style={{ minHeight: "100dvh" }}>
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.36, ease: EASE }}
+          className="w-full max-w-[370px] md:max-w-2xl"
         >
-          Fechar
-        </button>
-        <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(53,91,69,0.10)" }}>
           <div
-            className="h-full"
-            style={{ background: `linear-gradient(90deg, ${C.green}, ${C.greenDark})`, width: `${progress}%`, transition: "width 240ms ease" }}
-          />
+            className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
+            style={{ color: S.greenDark, background: "hsl(var(--lp-off) / 0.74)", border: "1px solid hsl(var(--lp-green-dark) / 0.12)" }}
+          >
+            Kidzz.app
+          </div>
+          <h1 className="text-[34px] font-semibold leading-[1.03] md:text-[62px]" style={{ fontFamily: displayFont, color: S.ink, letterSpacing: 0 }}>
+            Seu filho faz perguntas…
+            <span className="block" style={{ color: S.greenDark }}>
+              mas talvez o que ele mais precise é conexão.
+            </span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-[340px] text-[16px] leading-relaxed md:max-w-lg md:text-[19px]" style={{ color: S.inkSoft }}>
+            Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado.
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <CTA onClick={onStart} large>Começar teste gratuito ✨</CTA>
+            <CTA variant="secondary" onClick={() => scrollToId("como-funciona")}>Entender como funciona</CTA>
+          </div>
+        </motion.div>
+        <div className="mt-auto pt-8 text-[11px] font-medium uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.48)", letterSpacing: "0.2em" }}>
+          60 segundos
         </div>
-        <span className="text-xs tabular-nums" style={{ color: `${C.ink}80` }}>
-          {idx + 1}/{QUESTIONS.length}
-        </span>
+      </div>
+    </section>
+  );
+}
+
+const painCards = [
+  "Seu filho pede atenção enquanto você tenta sobreviver ao dia.",
+  "Às vezes não falta amor. Falta respiro.",
+  "A tela vira pausa, mas a culpa continua.",
+  "A casa precisa de menos cobrança e mais presença.",
+];
+
+function Identification() {
+  return (
+    <section className="px-5 py-16 md:py-24">
+      <div className="mx-auto max-w-4xl">
+        <FadeIn className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
+            Identificação
+          </p>
+          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[50px]" style={{ fontFamily: displayFont, color: S.ink }}>
+            A rotina moderna cansou pais e filhos.
+          </h2>
+          <p className="mx-auto mt-5 max-w-lg text-[16px] leading-relaxed" style={{ color: S.inkSoft }}>
+            O Kidzz começa onde muitas famílias estão: tentando amar bem, mesmo no meio do caos.
+          </p>
+        </FadeIn>
+        <div className="mt-10 grid gap-3 md:grid-cols-2">
+          {painCards.map((card, index) => (
+            <FadeIn key={card} delay={index * 0.04}>
+              <Glass className="min-h-[116px] p-6">
+                <p className="text-[18px] font-semibold leading-snug md:text-[21px]" style={{ fontFamily: displayFont, color: index === 1 ? S.greenDark : S.ink }}>
+                  “{card}”
+                </p>
+              </Glass>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TestSection({ onStart }: { onStart: () => void }) {
+  return (
+    <section id="teste" className="px-5 py-14 md:py-20">
+      <div className="mx-auto max-w-3xl text-center">
+        <FadeIn>
+          <Glass className="p-7 md:p-10">
+            <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.68)", letterSpacing: "0.22em" }}>
+              Quiz emocional
+            </p>
+            <h2 className="text-[30px] font-semibold leading-[1.08] md:text-[48px]" style={{ fontFamily: displayFont, color: S.ink }}>
+              Em 60 segundos vamos mostrar:
+            </h2>
+            <div className="mx-auto mt-7 grid max-w-xl gap-3 text-left">
+              {["como sua família está hoje", "o que mais gera desconexão", "e como transformar isso em vínculo"].map((item) => (
+                <div key={item} className="flex items-center gap-3 rounded-2xl px-4 py-4" style={{ background: "hsl(var(--lp-green) / 0.11)", color: S.greenDark }}>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full" style={{ background: "hsl(var(--lp-off) / 0.8)" }}>
+                    <Icon name="check" />
+                  </span>
+                  <span className="text-[15px] font-semibold">{item}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8">
+              <CTA onClick={onStart} large>Fazer teste agora ✨</CTA>
+            </div>
+          </Glass>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    ["01", "Responda rápido", "Perguntas simples sobre rotina, telas, sono e vínculo."],
+    ["02", "Descubra o perfil emocional da família", "Um retrato leve do que está pedindo mais cuidado agora."],
+    ["03", "Receba experiências personalizadas", "SOS, histórias, sono e brincadeiras dentro do Kidzz."],
+  ];
+  return (
+    <section id="como-funciona" className="px-5 py-16 md:py-24">
+      <div className="mx-auto max-w-5xl">
+        <FadeIn className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
+            Como funciona
+          </p>
+          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[50px]" style={{ fontFamily: displayFont, color: S.ink }}>
+            Tecnologia invisível. Cuidado visível.
+          </h2>
+        </FadeIn>
+        <div className="mt-10 grid gap-3 md:grid-cols-3">
+          {steps.map(([n, title, desc], index) => (
+            <FadeIn key={title} delay={index * 0.05}>
+              <Glass className="h-full p-6">
+                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-full text-[12px] font-bold" style={{ color: S.greenDark, background: "hsl(var(--lp-green) / 0.16)" }}>
+                  {n}
+                </div>
+                <h3 className="text-[20px] font-semibold" style={{ color: S.ink }}>{title}</h3>
+                <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: S.inkSoft }}>{desc}</p>
+              </Glass>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const experiences = [
+  ["sos", "SOS emocional", "Respirar junto nos picos de crise."],
+  ["moon", "Ritual do sono", "Desacelerar a casa no fim do dia."],
+  ["book", "Histórias guiadas", "Narrativas que acolhem e ensinam."],
+  ["question", "Perguntas mágicas", "Curiosidade que vira conversa real."],
+  ["wave", "Wellness cinematográfico", "Pausas de calma para a família."],
+  ["family", "Conexão pai e filho", "Momentos pequenos que ficam."],
+] as const;
+
+function Experiences() {
+  return (
+    <section className="px-5 py-16 md:py-24">
+      <div className="mx-auto max-w-5xl">
+        <FadeIn className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
+            Experiências
+          </p>
+          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[50px]" style={{ fontFamily: displayFont, color: S.ink }}>
+            Não é catálogo. É presença em formatos diferentes.
+          </h2>
+        </FadeIn>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {experiences.map(([icon, title, desc], index) => (
+            <FadeIn key={title} delay={index * 0.035}>
+              <Glass className="h-full p-6">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl" style={{ color: S.greenDark, background: "linear-gradient(180deg, hsl(var(--lp-green) / 0.22), hsl(var(--lp-green-dark) / 0.08))" }}>
+                  <Icon name={icon} />
+                </div>
+                <h3 className="text-[19px] font-semibold" style={{ color: S.ink }}>{title}</h3>
+                <p className="mt-2 text-[14.5px] leading-relaxed" style={{ color: S.inkSoft }}>{desc}</p>
+              </Glass>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SocialProof() {
+  const reviews = [
+    ["A primeira vez que meu filho pediu uma história em vez de outro vídeo, eu entendi.", "Marina, mãe do Theo"],
+    ["Parece pequeno, mas mudou o clima da noite aqui em casa.", "Rafael, pai da Nina"],
+    ["É acolhedor sem parecer infantilizado. Eu uso junto com ela.", "Camila, mãe da Lis"],
+  ];
+  return (
+    <section className="px-5 py-16 md:py-24">
+      <div className="mx-auto max-w-5xl">
+        <FadeIn className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
+            Confiança emocional
+          </p>
+          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[48px]" style={{ fontFamily: displayFont, color: S.ink }}>
+            Famílias usando Kidzz para transformar o caos em conexão.
+          </h2>
+        </FadeIn>
+        <div className="mt-10 grid gap-3 md:grid-cols-3">
+          {reviews.map(([text, author], index) => (
+            <FadeIn key={author} delay={index * 0.05}>
+              <Glass className="h-full p-6">
+                <p className="text-[18px] font-semibold leading-snug" style={{ fontFamily: displayFont, color: S.ink }}>“{text}”</p>
+                <p className="mt-6 text-[13px] font-semibold" style={{ color: "hsl(var(--lp-green-dark) / 0.72)" }}>{author}</p>
+              </Glass>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCTA({ onStart }: { onStart: () => void }) {
+  return (
+    <section className="px-5 py-16 md:py-24">
+      <FadeIn>
+        <div className="mx-auto max-w-3xl overflow-hidden rounded-[34px] p-8 text-center md:p-12" style={{ background: `radial-gradient(circle at 50% 0%, hsl(var(--lp-green) / 0.2), transparent 54%), linear-gradient(180deg, ${S.greenDark}, hsl(var(--lp-green-dark) / 0.92))`, color: S.off, boxShadow: "0 26px 70px -44px hsl(var(--lp-green-dark) / 0.72)" }}>
+          <h2 className="text-[34px] font-semibold leading-[1.04] md:text-[54px]" style={{ fontFamily: displayFont }}>
+            Talvez seu filho não precise de mais tela. Talvez precise de momentos que fiquem.
+          </h2>
+          <p className="mx-auto mt-5 max-w-md text-[16px] leading-relaxed" style={{ color: "hsl(var(--lp-off) / 0.72)" }}>
+            Comece pelo teste. O próximo momento de conexão pode nascer hoje.
+          </p>
+          <div className="mt-8">
+            <CTA onClick={onStart} large>Começar agora ✨</CTA>
+          </div>
+        </div>
+      </FadeIn>
+    </section>
+  );
+}
+
+type QuizAnswer = { label: string; weight: number };
+const QUESTIONS: { q: string; options: QuizAnswer[] }[] = [
+  { q: "Hoje, qual sensação mais aparece na rotina da sua casa?", options: [{ label: "Calma, na maior parte do tempo", weight: 0 }, { label: "Oscila entre leve e cansativa", weight: 1 }, { label: "Sobrecarga quase diária", weight: 2 }] },
+  { q: "Quando seu filho pede tela, o que normalmente está por trás?", options: [{ label: "Curiosidade ou lazer", weight: 0 }, { label: "Tédio e busca por atenção", weight: 1 }, { label: "Cansaço, birra ou fuga do caos", weight: 2 }] },
+  { q: "Como costuma ser a hora de dormir?", options: [{ label: "Um ritual previsível", weight: 0 }, { label: "Depende do dia", weight: 1 }, { label: "Uma batalha emocional", weight: 2 }] },
+  { q: "Quanto espaço existe para presença real sem tela?", options: [{ label: "Todos os dias", weight: 0 }, { label: "Alguns dias", weight: 1 }, { label: "Quase nunca", weight: 2 }] },
+  { q: "O que sua família mais precisa agora?", options: [{ label: "Ideias leves para se conectar", weight: 0 }, { label: "Ajuda para criar rituais", weight: 1 }, { label: "Um respiro emocional urgente", weight: 2 }] },
+];
+
+function QuizExperience({ onClose, onFinish }: { onClose: () => void; onFinish: (score: number) => void }) {
+  const [idx, setIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const progress = ((idx + 1) / QUESTIONS.length) * 100;
+
+  const pick = (weight: number) => {
+    haptic("medium");
+    const next = score + weight;
+    setScore(next);
+    if (idx + 1 >= QUESTIONS.length) window.setTimeout(() => onFinish(next), 260);
+    else setIdx((value) => value + 1);
+  };
+
+  return (
+    <main className="min-h-[100svh] px-5 pb-12 pt-[calc(env(safe-area-inset-top)+18px)]" style={{ ...lpVars, minHeight: "100dvh", background: S.bg, color: S.ink, fontFamily: bodyFont }}>
+      <div className="mx-auto flex max-w-xl items-center gap-4">
+        <button type="button" onClick={onClose} className="min-h-[44px] text-[14px] font-semibold" style={{ color: S.inkSoft }}>Fechar</button>
+        <div className="h-1 flex-1 overflow-hidden rounded-full" style={{ background: "hsl(var(--lp-green-dark) / 0.12)" }}>
+          <motion.div className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${S.green}, ${S.greenDark})` }} animate={{ width: `${progress}%` }} transition={{ duration: 0.28, ease: EASE }} />
+        </div>
+        <span className="text-[12px] font-semibold tabular-nums" style={{ color: S.inkMuted }}>{idx + 1}/{QUESTIONS.length}</span>
       </div>
 
-      <div className="relative flex-1 flex flex-col justify-center px-6 max-w-xl mx-auto w-full pb-10">
-          <div key={idx}>
-            <p
-              className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-4"
-              style={{ color: `${C.greenDark}B0` }}
-            >
-              Pergunta {idx + 1}
-            </p>
-            <h2
-              className="text-[26px] md:text-4xl font-semibold leading-[1.15] mb-10"
-              style={{ fontFamily: SERIF, color: C.ink }}
-            >
-              {QUESTIONS[idx].q}
-            </h2>
-            <div className="space-y-3">
+      <div className="mx-auto flex min-h-[calc(100dvh-92px)] max-w-xl flex-col justify-center py-10">
+        <AnimatePresence mode="wait">
+          <motion.div key={idx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.28, ease: EASE }}>
+            <p className="mb-4 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>Pergunta {idx + 1}</p>
+            <h1 className="text-[31px] font-semibold leading-[1.08]" style={{ fontFamily: displayFont, color: S.ink }}>{QUESTIONS[idx].q}</h1>
+            <div className="mt-9 space-y-3">
               {QUESTIONS[idx].options.map((opt) => (
-                <button
-                  key={opt.label}
-                  onClick={() => pick(opt.weight)}
-                  className="w-full text-left rounded-2xl px-5 py-5 text-[15px] font-medium transition-all active:scale-[0.99]"
-                  style={{
-                    color: C.ink,
-                    background: "rgba(255,255,255,0.88)",
-                    border: "1px solid rgba(255,255,255,0.9)",
-                    boxShadow: "0 6px 20px -12px rgba(46,46,46,0.18)",
-                  }}
-                >
+                <button key={opt.label} type="button" onClick={() => pick(opt.weight)} className="min-h-[58px] w-full rounded-2xl px-5 text-left text-[15.5px] font-semibold transition-transform duration-300 active:scale-[0.99]" style={{ color: S.ink, background: "hsl(var(--lp-off) / 0.88)", border: "1px solid hsl(var(--lp-off) / 0.92)", boxShadow: "0 14px 34px -28px hsl(var(--lp-ink) / 0.28)" }}>
                   {opt.label}
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
-    </div>
+    </main>
   );
-};
+}
 
-/* ============================================================
-   RESULT
-   ============================================================ */
-const Result = ({ score, onClose }: { score: number; onClose: () => void }) => {
-  const max = QUESTIONS.length * 2;
-  const pct = score / max;
+function Result({ score, onClose }: { score: number; onClose: () => void }) {
   const profile = useMemo(() => {
-    if (pct < 0.34)
-      return {
-        title: "Sua família já respira presença.",
-        sub: "Pequenos ajustes podem aprofundar ainda mais essa conexão.",
-        tips: ["Rituais leves antes de dormir", "Perguntas mágicas semanais", "Momentos sem tela aos finais de semana"],
-      };
-    if (pct < 0.67)
-      return {
-        title: "Sua família precisa de mais respiros.",
-        sub: "Há sinais de sobrecarga emocional invisível na rotina.",
-        tips: ["SOS emocional nos picos de birra", "Sleep ritual nas próximas 3 noites", "10 min de presença real por dia"],
-      };
-    return {
-      title: "A rotina está pedindo pausa.",
-      sub: "O cansaço acumulado e o excesso de tela estão pesando — e isso tem solução leve.",
-      tips: ["Wellness diário (3 min)", "Ritual de desaceleração antes de dormir", "Perguntas mágicas para reconectar"],
-    };
-  }, [pct]);
+    const pct = score / (QUESTIONS.length * 2);
+    if (pct < 0.34) return { title: "Sua família já respira presença.", sub: "O Kidzz pode transformar essa base em pequenos rituais memoráveis.", tips: ["Perguntas mágicas semanais", "Histórias guiadas", "Brincadeiras de presença"] };
+    if (pct < 0.67) return { title: "Sua família precisa de mais respiros.", sub: "Há sinais de cansaço invisível, mas pequenos rituais podem mudar o clima da casa.", tips: ["Ritual do sono", "Wellness de 3 minutos", "Conexão pai e filho"] };
+    return { title: "A rotina está pedindo pausa.", sub: "O excesso de tela e a sobrecarga emocional estão falando alto. O próximo passo pode ser leve.", tips: ["SOS emocional", "Ritual de desaceleração", "Histórias para acolher"] };
+  }, [score]);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: C.bg }}>
-      <QuietBackground />
-      <div className="relative max-w-xl mx-auto px-6 pt-[max(env(safe-area-inset-top),24px)] pb-16">
-        <button onClick={onClose} className="text-sm font-medium" style={{ color: `${C.ink}90` }}>
-          Fechar
-        </button>
-
-        <div className="text-center mt-6">
-          
-          <p
-            className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
-            style={{ color: `${C.greenDark}B0` }}
-          >
-            Seu diagnóstico emocional
-          </p>
-          <h2
-            className="text-[28px] md:text-4xl font-semibold leading-tight mb-4"
-            style={{ fontFamily: SERIF, color: C.ink }}
-          >
-            {profile.title}
-          </h2>
-          <p className="text-[15px] leading-relaxed max-w-md mx-auto mb-10" style={{ color: `${C.ink}AA` }}>
-            {profile.sub}
-          </p>
-        </div>
-
-        <Glass className="p-6 md:p-8 mb-8">
-          <p
-            className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-4"
-            style={{ color: `${C.greenDark}B0` }}
-          >
-            Sugestões leves para esta semana
-          </p>
-          <div className="space-y-3">
-            {profile.tips.map((t, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div
-                  className="mt-1 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: "rgba(143,191,127,0.25)", color: C.greenDark }}
-                >
-                  <Check size={12} strokeWidth={3} />
-                </div>
-                <p className="text-[15px]" style={{ color: `${C.ink}D0` }}>{t}</p>
+    <main className="min-h-[100svh] px-5 pb-14 pt-[calc(env(safe-area-inset-top)+18px)]" style={{ ...lpVars, minHeight: "100dvh", background: S.bg, color: S.ink, fontFamily: bodyFont }}>
+      <div className="mx-auto max-w-xl">
+        <button type="button" onClick={onClose} className="min-h-[44px] text-[14px] font-semibold" style={{ color: S.inkSoft }}>Voltar</button>
+        <motion.div initial="hidden" animate="show" variants={fade} className="pt-8 text-center">
+          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>Resultado personalizado</p>
+          <h1 className="text-[34px] font-semibold leading-[1.05]" style={{ fontFamily: displayFont, color: S.ink }}>{profile.title}</h1>
+          <p className="mx-auto mt-5 max-w-md text-[16px] leading-relaxed" style={{ color: S.inkSoft }}>{profile.sub}</p>
+        </motion.div>
+        <Glass className="mt-9 p-6">
+          <p className="mb-5 text-[12px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.18em" }}>O Kidzz recomenda</p>
+          <div className="space-y-4">
+            {profile.tips.map((tip) => (
+              <div key={tip} className="flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ color: S.greenDark, background: "hsl(var(--lp-green) / 0.18)" }}><Icon name="check" /></span>
+                <span className="text-[15.5px] font-semibold" style={{ color: S.ink }}>{tip}</span>
               </div>
             ))}
           </div>
         </Glass>
-
-        <div className="flex flex-col items-center gap-3">
-          <CTA onClick={() => { window.location.href = APP_URL; }}>
-            Entrar no Kidzz agora <Heart size={16} className="fill-white" />
-          </CTA>
-          <p className="text-xs" style={{ color: `${C.ink}80` }}>Menos caos. Mais conexão.</p>
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <CTA onClick={() => { window.location.href = APP_URL; }} large>Entrar no Kidzz agora ✨</CTA>
+          <p className="text-[12px]" style={{ color: S.inkMuted }}>Menos caos. Mais conexão.</p>
         </div>
       </div>
-    </div>
+    </main>
   );
-};
+}
 
-/* ============================================================
-   PAGE
-   ============================================================ */
-const LandingQuiz = () => {
+export default function LandingQuiz() {
   const [phase, setPhase] = useState<"landing" | "quiz" | "result">("landing");
   const [score, setScore] = useState(0);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  useLayoutEffect(() => {
     document.documentElement.classList.add("lp-route");
-    document.title = "Kidzz — Conexão emocional para famílias modernas";
-    const meta =
-      document.querySelector('meta[name="description"]') ||
-      (() => {
-        const m = document.createElement("meta");
-        m.setAttribute("name", "description");
-        document.head.appendChild(m);
-        return m;
-      })();
-    meta.setAttribute(
-      "content",
-      "Seu filho faz perguntas. O Kidzz transforma em conexão. Faça o teste emocional de 60 segundos e descubra experiências personalizadas para sua família."
-    );
-    return () => document.documentElement.classList.remove("lp-route");
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const preload = document.createElement("link");
+    preload.rel = "preload";
+    preload.as = "image";
+    preload.href = heroImage;
+    preload.setAttribute("fetchpriority", "high");
+    document.head.appendChild(preload);
+
+    document.title = "Kidzz — Sistema emocional para famílias modernas";
+    const meta = document.querySelector('meta[name="description"]') || document.createElement("meta");
+    meta.setAttribute("name", "description");
+    meta.setAttribute("content", "Faça o teste emocional de 60 segundos do Kidzz e descubra experiências de calma, vínculo e aprendizado para sua família.");
+    if (!meta.parentElement) document.head.appendChild(meta);
+
+    return () => {
+      document.documentElement.classList.remove("lp-route");
+      preload.remove();
+    };
   }, []);
 
-  const start = () => {
-    haptic("medium");
-    setPhase("quiz");
-  };
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [phase]);
+
+  const start = () => setPhase("quiz");
+
+  if (phase === "quiz") {
+    return <QuizExperience onClose={() => setPhase("landing")} onFinish={(value) => { setScore(value); setPhase("result"); }} />;
+  }
+
+  if (phase === "result") {
+    return <Result score={score} onClose={() => setPhase("landing")} />;
+  }
 
   return (
-    <div
-      className="relative isolate min-h-screen overflow-x-hidden"
-      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', color: C.ink, background: C.bg }}
-    >
-      <QuietBackground />
+    <main className="relative min-h-screen overflow-x-clip" style={{ ...lpVars, background: S.bg, color: S.ink, fontFamily: bodyFont }}>
       <Hero onStart={start} />
-      <QuizSection onStart={start} />
-      <PainSection />
+      <Identification />
+      <TestSection onStart={start} />
+      <HowItWorks />
       <Experiences />
-      <Wellness />
       <SocialProof />
       <FinalCTA onStart={start} />
-
-      <footer className="px-5 pb-10 pt-4 text-center">
-        <p className="text-xs" style={{ color: `${C.ink}60` }}>
-          © {new Date().getFullYear()} Kidzz — Menos caos. Mais conexão.
-        </p>
+      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+30px)] pt-2 text-center">
+        <p className="text-[12px]" style={{ color: "hsl(var(--lp-ink) / 0.45)" }}>© {new Date().getFullYear()} Kidzz — Sistema emocional inteligente para famílias modernas.</p>
       </footer>
-
-      {phase === "quiz" && (
-        <QuizExperience
-          key="quiz"
-          onClose={() => setPhase("landing")}
-          onFinish={(s) => {
-            setScore(s);
-            setPhase("result");
-          }}
-        />
-      )}
-      {phase === "result" && <Result key="result" score={score} onClose={() => setPhase("landing")} />}
-    </div>
+    </main>
   );
-};
-
-export default LandingQuiz;
+}
