@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import heroImage from "@/assets/lp-kidzz-wellness-hero.webp";
 import { haptic } from "@/lib/haptics";
+import { captureAttribution, track, withAttribution } from "@/lib/lpAnalytics";
 
 const APP_URL = "https://kidzzapp.lovable.app";
 const EASE = [0.42, 0, 0.58, 1] as const;
@@ -223,8 +224,8 @@ function Hero({ onStart }: { onStart: () => void }) {
             Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado.
           </p>
           <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:mt-8">
-            <CTA onClick={onStart} large>Começar teste gratuito ✨</CTA>
-            <CTA variant="secondary" onClick={() => scrollToId("como-funciona")}>Entender como funciona</CTA>
+            <CTA onClick={() => { track("lp_cta_click", { location: "hero" }); onStart(); }} large>Começar teste gratuito ✨</CTA>
+            <CTA variant="secondary" onClick={() => { track("lp_cta_click", { location: "hero_secondary" }); scrollToId("como-funciona"); }}>Entender como funciona</CTA>
           </div>
         </motion.div>
         <div className="mt-auto pt-8 text-[11px] font-medium uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.48)", letterSpacing: "0.2em" }}>
@@ -296,7 +297,7 @@ function TestSection({ onStart }: { onStart: () => void }) {
               ))}
             </div>
             <div className="mt-8">
-              <CTA onClick={onStart} large>Fazer teste agora ✨</CTA>
+              <CTA onClick={() => { track("lp_cta_click", { location: "test_section" }); onStart(); }} large>Fazer teste agora ✨</CTA>
             </div>
           </Glass>
         </FadeIn>
@@ -423,7 +424,7 @@ function FinalCTA({ onStart }: { onStart: () => void }) {
             Comece pelo teste. O próximo momento de conexão pode nascer hoje.
           </p>
           <div className="mt-8">
-            <CTA onClick={onStart} large>Começar agora ✨</CTA>
+            <CTA onClick={() => { track("lp_cta_click", { location: "final_cta" }); onStart(); }} large>Começar agora ✨</CTA>
           </div>
         </div>
       </FadeIn>
@@ -449,6 +450,7 @@ function QuizExperience({ onClose, onFinish }: { onClose: () => void; onFinish: 
     haptic("medium");
     const next = score + weight;
     setScore(next);
+    track("lp_quiz_question_answered", { question_index: idx, question_number: idx + 1, weight, running_score: next });
     if (idx + 1 >= QUESTIONS.length) window.setTimeout(() => onFinish(next), 260);
     else setIdx((value) => value + 1);
   };
@@ -511,7 +513,7 @@ function Result({ score, onClose }: { score: number; onClose: () => void }) {
           </div>
         </Glass>
         <div className="mt-8 flex flex-col items-center gap-3">
-          <CTA onClick={() => { window.location.href = APP_URL; }} large>Entrar no Kidzz agora ✨</CTA>
+          <CTA onClick={() => { track("lp_app_redirect", { score, location: "result" }); window.location.href = withAttribution(APP_URL); }} large>Entrar no Kidzz agora ✨</CTA>
           <p className="text-[12px]" style={{ color: S.inkMuted }}>Menos caos. Mais conexão.</p>
         </div>
       </div>
@@ -543,6 +545,9 @@ export default function LandingQuiz() {
     meta.setAttribute("content", "Faça o teste emocional de 60 segundos do Kidzz e descubra experiências de calma, vínculo e aprendizado para sua família.");
     if (!meta.parentElement) document.head.appendChild(meta);
 
+    captureAttribution();
+    track("lp_view", { section: "landing" });
+
     return () => {
       document.documentElement.classList.remove("lp-route");
       preload.remove();
@@ -553,10 +558,13 @@ export default function LandingQuiz() {
     window.scrollTo(0, 0);
   }, [phase]);
 
-  const start = () => setPhase("quiz");
+  const start = () => {
+    track("lp_quiz_start");
+    setPhase("quiz");
+  };
 
   if (phase === "quiz") {
-    return <QuizExperience onClose={() => setPhase("landing")} onFinish={(value) => { setScore(value); setPhase("result"); }} />;
+    return <QuizExperience onClose={() => { track("lp_quiz_abandon"); setPhase("landing"); }} onFinish={(value) => { track("lp_quiz_complete", { score: value, max_score: QUESTIONS.length * 2 }); setScore(value); setPhase("result"); }} />;
   }
 
   if (phase === "result") {
