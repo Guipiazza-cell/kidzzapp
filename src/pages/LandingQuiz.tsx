@@ -163,7 +163,7 @@ const FadeIn = ({
    HERO
    ============================================================ */
 const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative min-h-[74svh] px-5 pt-[max(env(safe-area-inset-top),20px)] pb-8 flex items-center">
+  <section className="relative min-h-[64svh] px-5 pt-[max(env(safe-area-inset-top),16px)] pb-6 flex items-center">
     <div className="relative z-10 max-w-2xl mx-auto text-center">
       <p
         className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
@@ -215,7 +215,7 @@ const PreviewQuestions = [
 ];
 
 const QuizSection = ({ onStart }: { onStart: () => void }) => (
-  <section className="px-5 py-8 md:py-16">
+  <section className="px-5 py-6 md:py-16">
     <div className="max-w-2xl mx-auto text-center">
       <FadeIn>
         <p
@@ -803,6 +803,8 @@ const LandingQuiz = () => {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.classList.add("lp-route");
     document.title = "Kidzz — Conexão emocional para famílias modernas";
     const meta =
       document.querySelector('meta[name="description"]') ||
@@ -816,6 +818,7 @@ const LandingQuiz = () => {
       "content",
       "Seu filho faz perguntas. O Kidzz transforma em conexão. Faça o teste emocional de 60 segundos e descubra experiências personalizadas para sua família."
     );
+    return () => document.documentElement.classList.remove("lp-route");
   }, []);
 
   const start = () => {
