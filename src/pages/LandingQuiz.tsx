@@ -4,7 +4,7 @@ import heroImage from "@/assets/lp-kidzz-wellness-hero.webp";
 import { haptic } from "@/lib/haptics";
 import { captureAttribution, track, withAttribution } from "@/lib/lpAnalytics";
 
-const APP_URL = "https://kidzzapp.lovable.app";
+const APP_URL = "https://kidzz.app";
 const EASE = [0.42, 0, 0.58, 1] as const;
 
 const lpVars = {
