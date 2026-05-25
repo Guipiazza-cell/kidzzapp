@@ -583,6 +583,30 @@ export default function LandingQuiz() {
     };
   }, []);
 
+  // Fonts ready signal (system stack resolves instantly, but await for safety on first paint)
+  useEffect(() => {
+    let cancelled = false;
+    const fonts = (document as Document & { fonts?: { ready?: Promise<unknown> } }).fonts;
+    if (fonts?.ready) {
+      fonts.ready.then(() => { if (!cancelled) setFontsReady(true); }).catch(() => setFontsReady(true));
+    } else {
+      setFontsReady(true);
+    }
+    return () => { cancelled = true; };
+  }, []);
+
+  // Minimum elegance delay so skeleton doesn't flash on instant loads
+  useEffect(() => {
+    const t = window.setTimeout(() => setMinDelayPassed(true), 220);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  // Hard fallback: never block UI more than 2.5s even if hero/fonts misbehave
+  useEffect(() => {
+    const t = window.setTimeout(() => { setHeroReady(true); setFontsReady(true); }, 2500);
+    return () => window.clearTimeout(t);
+  }, []);
+
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, [phase]);
@@ -600,9 +624,12 @@ export default function LandingQuiz() {
     return <Result score={score} onClose={() => setPhase("landing")} />;
   }
 
+  const showSkeleton = !(heroReady && fontsReady && minDelayPassed);
+
   return (
     <main className="relative min-h-screen overflow-x-clip" style={{ ...lpVars, background: S.bg, color: S.ink, fontFamily: bodyFont }}>
-      <Hero onStart={start} />
+      <LpBootSkeleton visible={showSkeleton} />
+      <Hero onStart={start} onHeroReady={() => setHeroReady(true)} />
       <Identification />
       <TestSection onStart={start} />
       <HowItWorks />
