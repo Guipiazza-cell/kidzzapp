@@ -84,11 +84,22 @@ const AppShell = () => {
     };
   }, []);
 
+  if (isLandingQuiz) {
+    return (
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/lp" element={<LandingQuiz />} />
+          <Route path="*" element={<LandingQuiz />} />
+        </Routes>
+      </Suspense>
+    );
+  }
+
   return (
     <>
-      {!isLandingQuiz && !splashDone && <SplashScreen onFinish={handleSplashFinish} />}
+      {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       {/* Background global persistente — nunca remontado entre rotas/abas */}
-      {!isLandingQuiz && <MagicalBackground />}
+      <MagicalBackground />
       <AuthProvider>
         <Suspense fallback={null}>
           <Routes>
@@ -104,11 +115,11 @@ const AppShell = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-        {!isLandingQuiz && <AppUpdateBanner />}
-        {!isLandingQuiz && <InstallBanner />}
-        {!isLandingQuiz && <OfflineIndicator />}
-        {!isLandingQuiz && <KidzzShareTrigger />}
-        {!isLandingQuiz && <LevelUpOverlay />}
+        <AppUpdateBanner />
+        <InstallBanner />
+        <OfflineIndicator />
+        <KidzzShareTrigger />
+        <LevelUpOverlay />
       </AuthProvider>
     </>
   );
