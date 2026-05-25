@@ -162,7 +162,7 @@ const FadeIn = ({
    HERO
    ============================================================ */
 const Hero = ({ onStart }: { onStart: () => void }) => (
-  <section className="relative min-h-[74svh] px-5 pt-[max(env(safe-area-inset-top),24px)] pb-8 flex items-center">
+  <section className="relative min-h-[74svh] px-5 pt-[max(env(safe-area-inset-top),20px)] pb-8 flex items-center">
     <div className="relative z-10 max-w-2xl mx-auto text-center">
       <motion.p
         initial={{ opacity: 0, y: 10 }}
@@ -178,7 +178,7 @@ const Hero = ({ onStart }: { onStart: () => void }) => (
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-5 text-[28px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
+        className="mt-4 text-[27px] leading-[1.08] md:text-[54px] md:leading-[1.05] font-semibold"
         style={{ fontFamily: SERIF, color: C.ink }}
       >
         Seu filho faz perguntas.
@@ -201,7 +201,7 @@ const Hero = ({ onStart }: { onStart: () => void }) => (
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.45 }}
-        className="mt-9 flex flex-col items-center gap-3"
+        className="mt-8 flex flex-col items-center gap-3"
       >
         <CTA onClick={onStart}>
           Fazer o teste de 60 segundos
@@ -226,17 +226,17 @@ const PreviewQuestions = [
 ];
 
 const QuizSection = ({ onStart }: { onStart: () => void }) => (
-  <section className="px-5 py-10 md:py-16">
+  <section className="px-5 py-8 md:py-16">
     <div className="max-w-2xl mx-auto text-center">
       <FadeIn>
         <p
-          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-4"
+          className="text-[11px] uppercase tracking-[0.22em] font-semibold mb-3"
           style={{ color: `${C.greenDark}B0` }}
         >
           60 segundos
         </p>
         <h2
-          className="text-[26px] md:text-[42px] leading-[1.12] font-semibold"
+          className="text-[24px] md:text-[42px] leading-[1.12] font-semibold"
           style={{ fontFamily: SERIF, color: C.ink }}
         >
           Descubra o perfil emocional da sua família.
