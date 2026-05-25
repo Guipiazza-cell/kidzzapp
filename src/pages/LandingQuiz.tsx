@@ -521,9 +521,38 @@ function Result({ score, onClose }: { score: number; onClose: () => void }) {
   );
 }
 
+function LpBootSkeleton({ visible }: { visible: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-[60]"
+      style={{
+        background: `radial-gradient(circle at 50% 22%, ${S.off} 0%, ${S.bg} 62%)`,
+        opacity: visible ? 1 : 0,
+        transition: "opacity 380ms ease-out",
+        willChange: "opacity",
+      }}
+    >
+      <div
+        className="absolute left-1/2 top-[18%] -translate-x-1/2 flex flex-col items-center gap-5"
+        style={{ width: "min(86%, 420px)" }}
+      >
+        <div className="lp-skeleton h-7 w-32 rounded-full" />
+        <div className="lp-skeleton h-9 w-full rounded-2xl" />
+        <div className="lp-skeleton h-9 w-[88%] rounded-2xl" />
+        <div className="lp-skeleton h-5 w-[70%] rounded-full" />
+        <div className="lp-skeleton mt-6 h-14 w-[78%] rounded-full" />
+      </div>
+    </div>
+  );
+}
+
 export default function LandingQuiz() {
   const [phase, setPhase] = useState<"landing" | "quiz" | "result">("landing");
   const [score, setScore] = useState(0);
+  const [heroReady, setHeroReady] = useState(false);
+  const [fontsReady, setFontsReady] = useState(false);
+  const [minDelayPassed, setMinDelayPassed] = useState(false);
 
   useLayoutEffect(() => {
     document.documentElement.classList.add("lp-route");
