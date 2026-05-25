@@ -41,7 +41,6 @@ const MonthlyRetrospective = lazy(() => import("@/components/viral/MonthlyRetros
 import ChameleonMascot from "@/components/ChameleonMascot";
 import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
 import OnboardingWelcome from "@/components/onboarding/OnboardingWelcome";
-import EmotionalIntro from "@/components/onboarding/EmotionalIntro";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
 import BottomNav from "@/components/flow/BottomNav";
 import XpToast from "@/components/flow/XpToast";
@@ -88,10 +87,11 @@ const Index = () => {
     try { return window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
-  const [showEmotionalIntro, setShowEmotionalIntro] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    try { return window.localStorage.getItem("kidzz_emotional_intro_v1") !== "1"; } catch { return false; }
-  });
+  // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
+  // Mantemos a flag marcada como vista para não reintroduzir no futuro.
+  useEffect(() => {
+    try { localStorage.setItem("kidzz_emotional_intro_v1", "1"); } catch {}
+  }, []);
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -248,17 +248,8 @@ const Index = () => {
     return null;
   }
 
-  // Cinematic emotional intro — shown once before name collection
-  if (showEmotionalIntro && !profile?.child_name) {
-    return (
-      <EmotionalIntro
-        onDone={() => {
-          try { localStorage.setItem("kidzz_emotional_intro_v1", "1"); } catch {}
-          setShowEmotionalIntro(false);
-        }}
-      />
-    );
-  }
+  // EmotionalIntro removida do fluxo — OnboardingWelcome no fim cobre o momento emocional.
+
 
   // Onboarding gates: name → age → interests
   if (!profile?.child_name) {
