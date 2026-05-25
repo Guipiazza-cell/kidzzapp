@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -50,7 +50,8 @@ try {
 
 const AppShell = () => {
   const [splashDone, setSplashDone] = useState(SPLASH_SHOWN);
-  const isLandingQuiz = typeof window !== "undefined" && window.location.pathname === "/lp";
+  const { pathname } = useLocation();
+  const isLandingQuiz = pathname === "/lp";
 
   const handleSplashFinish = () => {
     SPLASH_SHOWN = true;
@@ -88,29 +89,27 @@ const AppShell = () => {
       {!isLandingQuiz && !splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       {/* Background global persistente — nunca remontado entre rotas/abas */}
       {!isLandingQuiz && <MagicalBackground />}
-      <BrowserRouter>
-        <AuthProvider>
-          <Suspense fallback={null}>
-            <Routes>
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/lp" element={<LandingQuiz />} />
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-          {!isLandingQuiz && <AppUpdateBanner />}
-          {!isLandingQuiz && <InstallBanner />}
-          {!isLandingQuiz && <OfflineIndicator />}
-          {!isLandingQuiz && <KidzzShareTrigger />}
-          {!isLandingQuiz && <LevelUpOverlay />}
-        </AuthProvider>
-      </BrowserRouter>
+      <AuthProvider>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/lp" element={<LandingQuiz />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+        {!isLandingQuiz && <AppUpdateBanner />}
+        {!isLandingQuiz && <InstallBanner />}
+        {!isLandingQuiz && <OfflineIndicator />}
+        {!isLandingQuiz && <KidzzShareTrigger />}
+        {!isLandingQuiz && <LevelUpOverlay />}
+      </AuthProvider>
     </>
   );
 };
@@ -121,7 +120,9 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <AppShell />
+        <BrowserRouter>
+          <AppShell />
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>
