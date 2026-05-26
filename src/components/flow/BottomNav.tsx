@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircleHeart, Target, BookOpen, Music2, Moon, Gamepad2, Crown, Shield, Disc3, Film, Leaf, ShieldCheck, Sparkles } from "lucide-react";
+import { MessageCircleHeart, Target, BookOpen, Music2, Crown, Shield, Disc3, Film, ShieldCheck, Sparkles } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 
@@ -12,31 +12,24 @@ interface Props {
 }
 
 /**
- * KIDZZ Premium Dock — 2 linhas (VisionOS / Apple style).
- *  Linha 1 (EXPERIÊNCIAS, destaque): Brincar · Sonhos · Wellness
- *  Linha 2 (NAVEGAÇÃO, discreta):     Perguntas · Histórias · Música · Rotina · Sessão · Momentos
+ * KIDZZ Dock — 6 abas (spec final): Perguntas · Histórias · Música · Rotina · Cinema · Momentos.
+ * Estilo: glass branco premium sobre paleta Cinema v2.0 (#F7F6F2 / #8FBF7F / #355B45 / #D8B36A).
  */
 
 type Tab = {
   id: string;
   label: string;
   icon: typeof MessageCircleHeart;
-  tint: string;       // hsl ring/glow color
+  tint: string;
 };
 
-const EXPERIENCES: Tab[] = [
-  { id: "play",     label: "Brincar",  icon: Gamepad2, tint: "hsl(28 85% 60%)" },
-  { id: "dreams",   label: "Sonhos",   icon: Moon,     tint: "hsl(265 60% 68%)" },
-  { id: "wellness", label: "Wellness", icon: Leaf,     tint: "hsl(150 45% 50%)" },
-];
-
 const NAVIGATION: Tab[] = [
-  { id: "chat",     label: "Perguntas", icon: MessageCircleHeart, tint: "hsl(200 70% 55%)" },
-  { id: "explore",  label: "Histórias", icon: BookOpen,           tint: "hsl(25 85% 58%)" },
-  { id: "music",    label: "Música",    icon: Music2,             tint: "hsl(85 50% 55%)" },
-  { id: "routine",  label: "Rotina",    icon: Target,             tint: "hsl(145 45% 48%)" },
-  { id: "cinema",   label: "Cinema",    icon: Film,               tint: "hsl(330 60% 65%)" },
-  { id: "moments",  label: "Momentos",  icon: Disc3,              tint: "hsl(45 70% 60%)" },
+  { id: "chat",     label: "Perguntas", icon: MessageCircleHeart, tint: "hsl(145 26% 28%)" }, // greenDeep
+  { id: "explore",  label: "Histórias", icon: BookOpen,           tint: "hsl(38 57% 50%)"  }, // gold
+  { id: "music",    label: "Música",    icon: Music2,             tint: "hsl(105 33% 50%)" }, // greenSage
+  { id: "routine",  label: "Rotina",    icon: Target,             tint: "hsl(145 35% 40%)" },
+  { id: "cinema",   label: "Cinema",    icon: Film,               tint: "hsl(0 65% 57%)"   }, // redDeep
+  { id: "moments",  label: "Momentos",  icon: Disc3,              tint: "hsl(38 57% 55%)"  }, // gold
 ];
 
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
@@ -52,14 +45,14 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       className="fixed bottom-0 left-0 right-0 z-50"
       style={{
         paddingBottom: "max(env(safe-area-inset-bottom, 6px), 6px)",
-        background: "hsl(0 0% 100% / 0.82)",
-        backdropFilter: "blur(12px) saturate(1.1)",
-        WebkitBackdropFilter: "blur(12px) saturate(1.1)",
-        borderTop: "1px solid hsl(0 0% 100% / 0.7)",
-        boxShadow: "0 -8px 28px -16px hsl(100 15% 18% / 0.18)",
+        background: "hsl(48 36% 98% / 0.88)", // FDFCF8 glass
+        backdropFilter: "blur(14px) saturate(1.1)",
+        WebkitBackdropFilter: "blur(14px) saturate(1.1)",
+        borderTop: "1px solid hsl(0 0% 100% / 0.75)",
+        boxShadow: "0 -10px 32px -18px hsl(145 26% 28% / 0.22)",
       }}
     >
-      {/* Optional secondary actions (Pais / Assinatura) — discreto, acima do dock */}
+      {/* Ações secundárias discretas */}
       {(onOpenParents || (onOpenPlans && !isPremium)) && (
         <div className="flex items-center justify-center gap-2 px-3 pt-1.5">
           {onOpenParents && (
@@ -68,13 +61,13 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               onClick={() => { haptic("light"); sfx("click"); onOpenParents(); }}
               className="min-h-[30px] rounded-full px-3 text-[10px] font-black flex items-center gap-1 active:scale-95"
               style={{
-                background: "hsl(0 0% 100% / 0.75)",
+                background: "hsl(0 0% 100% / 0.85)",
                 border: "1px solid hsl(0 0% 100% / 0.7)",
-                color: "hsl(var(--premium-ink))",
+                color: "hsl(0 0% 18%)",
                 backdropFilter: "blur(10px)",
               }}
             >
-              <Shield size={11} className="text-[hsl(var(--wellness-deep))]" />
+              <Shield size={11} style={{ color: "hsl(145 26% 28%)" }} />
               Pais
             </button>
           )}
@@ -82,7 +75,10 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
             <button
               type="button"
               onClick={() => { haptic("medium"); sfx("click"); onOpenPlans(); }}
-              className="min-h-[30px] rounded-full kid-gradient-premium px-3 text-[10px] font-black text-white shadow-md flex items-center gap-1 active:scale-95 relative overflow-hidden"
+              className="min-h-[30px] rounded-full px-3 text-[10px] font-black text-white shadow-md flex items-center gap-1 active:scale-95 relative overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, hsl(38 57% 63%), hsl(38 57% 50%))",
+              }}
             >
               <span className="shine-overlay" aria-hidden />
               <Crown size={11} className="relative z-10" />
@@ -92,52 +88,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         </div>
       )}
 
-      {/* LINHA 1 — EXPERIÊNCIAS (destaque, cards maiores) */}
-      <div className="flex items-stretch justify-center gap-2 px-3 pt-2">
-        {EXPERIENCES.map((tab) => {
-          const isActive = activeTab === tab.id;
-          const Icon = tab.icon;
-          return (
-            <motion.button
-              key={tab.id}
-              onClick={() => handle(tab.id)}
-              whileTap={{ scale: 0.95 }}
-              className="flex-1 max-w-[120px] relative flex items-center justify-center gap-1.5 py-2 rounded-2xl overflow-hidden"
-              style={{
-                background: isActive
-                  ? `linear-gradient(135deg, hsl(0 0% 100% / 0.95), ${tab.tint.replace(")", " / 0.18)")})`
-                  : "hsl(0 0% 100% / 0.55)",
-                border: `1px solid ${isActive ? tab.tint.replace(")", " / 0.35)") : "hsl(0 0% 100% / 0.65)"}`,
-                boxShadow: isActive
-                  ? `0 6px 18px -8px ${tab.tint.replace(")", " / 0.45)")}`
-                  : "0 2px 8px -4px hsl(100 15% 18% / 0.08)",
-              }}
-              aria-label={tab.label}
-              aria-current={isActive ? "page" : undefined}
-            >
-              {isActive && (
-                <motion.span
-                  aria-hidden
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full pointer-events-none"
-                  style={{ background: `radial-gradient(circle, ${tab.tint.replace(")", " / 0.35)")}, transparent 70%)`, filter: "blur(8px)" }}
-                  animate={{ opacity: [0.7, 1, 0.7] }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-                />
-              )}
-              <Icon size={16} style={{ color: tab.tint }} strokeWidth={2.2} />
-              <span
-                className="text-[11px] font-black tracking-tight"
-                style={{ color: isActive ? "hsl(var(--premium-ink))" : "hsl(var(--premium-ink-soft))" }}
-              >
-                {tab.label}
-              </span>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* LINHA 2 — NAVEGAÇÃO (discreta) */}
-      <div className="flex items-center justify-around px-1 pt-1.5">
+      {/* DOCK — 6 abas */}
+      <div className="flex items-center justify-around px-1 pt-2 pb-1">
         {NAVIGATION.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -146,18 +98,20 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               key={tab.id}
               onClick={() => handle(tab.id)}
               whileTap={{ scale: 0.88 }}
-              className="relative flex flex-col items-center gap-0.5 px-1 py-1 min-w-[44px] rounded-xl"
+              animate={isActive ? { scale: [0.8, 1.1, 1] } : { scale: 1 }}
+              transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex flex-col items-center gap-1 px-1.5 py-1.5 min-w-[48px] min-h-[44px] rounded-xl"
               aria-label={tab.label}
               aria-current={isActive ? "page" : undefined}
             >
               <Icon
-                size={17}
+                size={20}
                 strokeWidth={isActive ? 2.4 : 1.9}
-                style={{ color: isActive ? tab.tint : "hsl(var(--premium-ink-soft) / 0.7)" }}
+                style={{ color: isActive ? tab.tint : "hsl(0 0% 48% / 0.75)" }}
               />
               <span
-                className="text-[9px] font-extrabold leading-tight tracking-tight"
-                style={{ color: isActive ? "hsl(var(--premium-ink))" : "hsl(var(--premium-ink-soft) / 0.7)" }}
+                className="text-[10px] font-extrabold leading-tight tracking-tight"
+                style={{ color: isActive ? "hsl(0 0% 18%)" : "hsl(0 0% 48% / 0.8)" }}
               >
                 {tab.label}
               </span>
@@ -166,7 +120,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                   <motion.span
                     layoutId="kidzz-tab-underline-v2"
                     className="absolute -bottom-0.5 h-[3px] rounded-full"
-                    style={{ background: tab.tint, width: 16, boxShadow: `0 0 6px ${tab.tint}` }}
+                    style={{ background: tab.tint, width: 18, boxShadow: `0 0 8px ${tab.tint}` }}
                     initial={{ opacity: 0, scaleX: 0 }}
                     animate={{ opacity: 1, scaleX: 1 }}
                     exit={{ opacity: 0, scaleX: 0 }}
@@ -179,22 +133,22 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         })}
       </div>
 
-      {/* Trust badge — Ambiente 100% seguro */}
-      <div className="flex items-center justify-center px-3 pt-1.5 pb-0.5">
+      {/* Trust badge */}
+      <div className="flex items-center justify-center px-3 pt-1 pb-0.5">
         <div
           className="flex items-center gap-1.5 px-3 py-1 rounded-full"
           style={{
-            background: "hsl(0 0% 100% / 0.78)",
+            background: "hsl(0 0% 100% / 0.82)",
             border: "1px solid hsl(0 0% 100% / 0.7)",
             backdropFilter: "blur(10px)",
-            boxShadow: "0 2px 8px -4px hsl(100 15% 18% / 0.12)",
+            boxShadow: "0 2px 8px -4px hsl(145 26% 28% / 0.14)",
           }}
         >
           <ShieldCheck size={11} style={{ color: "hsl(145 55% 42%)" }} />
-          <span className="text-[10px] font-black" style={{ color: "hsl(var(--premium-ink))" }}>
+          <span className="text-[10px] font-black" style={{ color: "hsl(0 0% 18%)" }}>
             Ambiente 100% seguro para crianças
           </span>
-          <Sparkles size={9} style={{ color: "hsl(145 55% 42%)" }} />
+          <Sparkles size={9} style={{ color: "hsl(38 57% 55%)" }} />
         </div>
       </div>
     </nav>
