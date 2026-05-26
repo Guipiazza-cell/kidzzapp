@@ -39,7 +39,12 @@ type: feature
 ### Wellness (src/components/wellness/WellnessHub.tsx)
 - Sounds: 4 grátis + 4 premium (lareira, trem, espaço, rio).
 - Sleep: items com `premium: true` disparam paywall.
-- Journey/Jornada: ainda 100% acessível — próxima iteração deve gate atrás de `wellness_journey`.
+- Journey: FREE vê o gráfico de humor + streak, mas a lista de atividades vem com `blur(6px)` e overlay glass emocional "Transforme isso em ritual para {nome} ✨" → paywall `wellness_journey`. PREMIUM vê tudo.
+
+### Perguntas (src/components/ChatScreen.tsx)
+- **Memória contextual premium**: ao montar empty state, busca a última pergunta de dia(s) anterior(es) em `kidzz_questions_log` (janela 7d, exclui hoje). Mostra chip glass "Ontem {nome} perguntou — {pergunta}" acima das sugestões. Tap repõe a pergunta. Disponível apenas se `is_premium=true`.
+- FREE não tem memória contextual — apenas as sugestões fixas por idade.
+
 
 ## Regras visuais dos paywalls
 - Glassmorphism premium, blur cinematográfico, glow verde-sálvia ou roxo-rosa.

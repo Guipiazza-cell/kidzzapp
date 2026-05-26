@@ -49,6 +49,7 @@ const ChatScreen = ({
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [connectionCount, setConnectionCount] = useState(0);
+  const [lastTopic, setLastTopic] = useState<{ question: string; when: string } | null>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const { speak, stop: stopTTS } = useTTS();
   const lastAssistantTextRef = useRef("");
@@ -66,6 +67,32 @@ const ChatScreen = ({
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  // Memória contextual premium: busca última pergunta de dia anterior
+  useEffect(() => {
+    if (!isPremium || !user || messages.length > 0) return;
+    let cancelled = false;
+    (async () => {
+      const sinceIso = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const { data } = await supabase
+        .from("kidzz_questions_log")
+        .select("question, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", sinceIso)
+        .lt("created_at", todayStart.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (cancelled || !data?.[0]) return;
+      const row = data[0];
+      const created = new Date(row.created_at);
+      const diffDays = Math.floor((todayStart.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+      const when = diffDays <= 1 ? "Ontem" : `${diffDays} dias atrás`;
+      setLastTopic({ question: row.question, when });
+    })();
+    return () => { cancelled = true; };
+  }, [isPremium, user, messages.length]);
 
   const initialQuestionSentRef = useRef(false);
   useEffect(() => {
@@ -315,6 +342,34 @@ const ChatScreen = ({
             >
               🎤 Toque para falar
             </motion.p>
+
+            {/* Memória contextual premium */}
+            {isPremium && lastTopic && (
+              <motion.button
+                onClick={() => sendMessage(lastTopic.question)}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                whileTap={{ scale: 0.97 }}
+                className="mt-4 mb-1 px-4 py-2.5 rounded-2xl flex items-center gap-2 text-left max-w-xs"
+                style={{
+                  background: "linear-gradient(135deg, rgba(95,140,110,0.28), rgba(168,140,200,0.22))",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                }}
+              >
+                <span className="text-base">🦕</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary-foreground/60">
+                    {lastTopic.when} {childName} perguntou
+                  </p>
+                  <p className="text-[12px] font-bold text-primary-foreground/90 truncate">
+                    {lastTopic.question}
+                  </p>
+                </div>
+              </motion.button>
+            )}
 
             {/* Suggestion chips */}
             <motion.div
