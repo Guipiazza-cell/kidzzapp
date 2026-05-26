@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,21 +15,11 @@ serve(async (req) => {
   }
 
   try {
-    // Require a valid Supabase JWT (paid TTS — never anonymous).
+    // Accept any Bearer token (anon key for guests OR user JWT).
+    // SOS voice must work even when the user isn't logged in.
     const authHeader = req.headers.get("Authorization") || req.headers.get("authorization");
     const token = authHeader?.replace(/^Bearer\s+/i, "");
     if (!token) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-    const { data: userData, error: userErr } = await supabase.auth.getUser(token);
-    if (userErr || !userData?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
