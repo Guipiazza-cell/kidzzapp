@@ -34,6 +34,8 @@ const ICONS = {
 } as const;
 
 const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
+  const { profile } = useAuth();
+  const isPremium = profile?.is_premium ?? false;
   const [step, setStep] = useState<Step>("acolhimento");
   const [muted, setMuted] = useState(false);
   const { speak, stop, loading } = useSosVoice();
