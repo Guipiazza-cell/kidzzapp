@@ -275,8 +275,12 @@ const HomeScreen = ({
           <span
             className="relative text-[19px] font-black tracking-[0.2em]"
             style={{
-              color: "hsl(var(--premium-ink))",
-              textShadow: "0 1px 0 hsl(0 0% 100% / 0.9), 0 0 12px hsl(0 0% 100% / 0.6)",
+              background:
+                "linear-gradient(90deg, hsl(0 75% 62%), hsl(35 90% 58%), hsl(48 90% 55%), hsl(140 55% 48%), hsl(200 75% 55%), hsl(265 60% 62%))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              filter: "drop-shadow(0 1px 0 hsl(0 0% 100% / 0.9)) drop-shadow(0 0 10px hsl(0 0% 100% / 0.5))",
             }}
           >
             KIDZZ
