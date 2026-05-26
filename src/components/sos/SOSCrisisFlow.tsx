@@ -8,6 +8,7 @@ import {
 import { useSosVoice } from "./useSosVoice";
 import { haptic } from "@/lib/haptics";
 import { trackConnection } from "@/lib/connection";
+import { useAuth } from "@/contexts/AuthContext";
 import type { SosSituation } from "./situations";
 
 /**
@@ -33,6 +34,8 @@ const ICONS = {
 } as const;
 
 const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
+  const { profile } = useAuth();
+  const isPremium = profile?.is_premium ?? false;
   const [step, setStep] = useState<Step>("acolhimento");
   const [muted, setMuted] = useState(false);
   const { speak, stop, loading } = useSosVoice();
@@ -214,7 +217,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                 {situation.practical.title}
               </h3>
               <div className="space-y-2.5 mb-5">
-                {situation.practical.tips.map((tip, i) => {
+                {(isPremium ? situation.practical.tips : situation.practical.tips.slice(0, 1)).map((tip, i) => {
                   const Icon = ICONS[tip.iconKey];
                   return (
                     <motion.div
@@ -253,17 +256,58 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                   );
                 })}
               </div>
-              <button
-                type="button"
-                onClick={() => goNext("apoio")}
-                className="w-full py-3 rounded-2xl text-white text-[14px] font-black tracking-tight flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
-                style={{
-                  background: `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
-                  boxShadow: `0 8px 22px -8px ${situation.tint.replace(")", " / 0.5)")}`,
-                }}
-              >
-                Continuar <ChevronRight size={14} />
-              </button>
+              {isPremium ? (
+                <button
+                  type="button"
+                  onClick={() => goNext("apoio")}
+                  className="w-full py-3 rounded-2xl text-white text-[14px] font-black tracking-tight flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
+                  style={{
+                    background: `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
+                    boxShadow: `0 8px 22px -8px ${situation.tint.replace(")", " / 0.5)")}`,
+                  }}
+                >
+                  Continuar <ChevronRight size={14} />
+                </button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="rounded-2xl p-4 text-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${situation.tint.replace(")", " / 0.16)")}, hsl(0 0% 100% / 0.5))`,
+                    border: "1px solid hsl(0 0% 100% / 0.6)",
+                    backdropFilter: "blur(16px)",
+                    WebkitBackdropFilter: "blur(16px)",
+                  }}
+                >
+                  <p
+                    className="text-[14px] font-black leading-snug"
+                    style={{ color: "hsl(var(--premium-ink))" }}
+                  >
+                    Vocês estão criando algo lindo 💚
+                  </p>
+                  <p
+                    className="text-[12px] font-medium mt-1.5 leading-relaxed"
+                    style={{ color: "hsl(var(--premium-ink-soft))" }}
+                  >
+                    Continue a jornada calmante com técnicas guiadas e playlist contextual.
+                  </p>
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => {
+                      haptic("medium");
+                      stop();
+                      window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "sos_journey" } }));
+                    }}
+                    className="mt-3 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-white font-extrabold text-[12px] shadow-lg"
+                    style={{ background: `linear-gradient(135deg, ${situation.tint}, hsl(var(--sos-from)))` }}
+                  >
+                    🌙 Continuar a jornada
+                  </motion.button>
+                </motion.div>
+              )}
             </motion.div>
           )}
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap, Check } from "lucide-react";
+import { ArrowLeft, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap, Check } from "lucide-react";
 import MagicalBackground from "../MagicalBackground";
 import { useAuth } from "@/contexts/AuthContext";
 import { MISSIONS, type Mission } from "./MissionsData";
@@ -143,8 +143,18 @@ const MomentsFactory = ({ onBack }: Props) => {
                 whileTap={unlocked ? { scale: 0.97 } : {}}
               >
                 {!unlocked && (
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 rounded-2xl flex items-center justify-center">
-                    <Lock size={20} className="text-gray-400" />
+                  <div className="absolute inset-0 z-10 rounded-2xl flex flex-col items-center justify-center px-4 text-center"
+                       style={{
+                         background: "linear-gradient(135deg, rgba(255,255,255,0.7), rgba(232,236,231,0.78))",
+                         backdropFilter: "blur(6px)",
+                         WebkitBackdropFilter: "blur(6px)",
+                       }}>
+                    <p className="text-[12px] font-black text-gray-700 leading-tight">
+                      Continue criando memórias 💛
+                    </p>
+                    <p className="text-[10px] font-bold text-gray-500 mt-0.5">
+                      Toque para desbloquear
+                    </p>
                   </div>
                 )}
 

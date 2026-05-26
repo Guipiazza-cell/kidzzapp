@@ -246,7 +246,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
             onUpgrade={() => window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }))}
           />
         )}
-        {step === "display" && <StoryDisplay story={story} images={images} onReset={handleReset} onSpeak={handleSpeak} />}
+        {step === "display" && <StoryDisplay story={story} images={images} onReset={handleReset} onSpeak={handleSpeak} isPremium={tier !== "free"} />}
       </div>
 
       <GeneratingOverlay open={isGenerating} progress={progress} />

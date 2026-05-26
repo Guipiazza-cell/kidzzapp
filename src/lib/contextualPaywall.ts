@@ -1,6 +1,7 @@
 export type PaywallContext =
   | "question_limit"
   | "story_limit"
+  | "story_continuation"
   | "sleep_story"
   | "sleep_sound"
   | "achievement"
@@ -8,6 +9,8 @@ export type PaywallContext =
   | "memories_old"
   | "travel"
   | "moments"
+  | "sos_journey"
+  | "wellness_journey"
   | "premium_feature";
 
 export interface PaywallCopy {
@@ -105,5 +108,30 @@ export function getPaywallCopy(
         cta: "👑 Ver assinatura",
         highlight: "Kidzz Premium completo",
       };
+    case "story_continuation":
+      return {
+        emoji: "🌙",
+        headline: `Amanhã a aventura de ${name} continua… ✨`,
+        subheadline: "Capítulos contínuos, universo persistente e narração avançada esperam vocês.",
+        cta: "📖 Continuar essa história",
+        highlight: "Histórias com capítulos",
+      };
+    case "sos_journey":
+      return {
+        emoji: "🌿",
+        headline: `Vocês estão criando algo lindo 💚`,
+        subheadline: "Continue a jornada calmante com técnicas guiadas, playlists contextuais e acompanhamento leve.",
+        cta: "🌙 Continuar a jornada",
+        highlight: "SOS completo",
+      };
+    case "wellness_journey":
+      return {
+        emoji: "🌳",
+        headline: `Transforme isso em ritual para ${name} ✨`,
+        subheadline: "Sleep Ritual completo, soundscapes e jornadas emocionais cinematográficas.",
+        cta: "✨ Ativar ritual completo",
+        highlight: "Wellness Premium",
+      };
   }
 }
+
