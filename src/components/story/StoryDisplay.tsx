@@ -203,6 +203,45 @@ const StoryDisplay = ({ story, images, onReset, onSpeak, isPremium = false }: St
         </motion.button>
       </div>
 
+      {/* Continuidade emocional — paywall após momento positivo */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2, duration: 0.6 }}
+        className="mt-4 rounded-3xl p-5 text-center relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(95,140,110,0.22), rgba(168,140,200,0.18))",
+          border: "1px solid rgba(255,255,255,0.25)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          boxShadow: "0 8px 30px -12px rgba(95,140,110,0.4)",
+        }}
+      >
+        <p className="text-base font-black text-white drop-shadow-md leading-tight">
+          {isPremium
+            ? "🌙 O universo de " + childName + " continua amanhã"
+            : "Amanhã a aventura continua ✨"}
+        </p>
+        <p className="text-xs text-white/85 font-medium mt-1.5 leading-relaxed">
+          {isPremium
+            ? "Volte para escrever o próximo capítulo dessa história."
+            : "Transforme isso em ritual — capítulos contínuos esperam vocês 🌿"}
+        </p>
+        {!isPremium && (
+          <motion.button
+            onClick={() => {
+              haptic("medium");
+              window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_continuation" } }));
+            }}
+            whileTap={{ scale: 0.96 }}
+            className="mt-3 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-white font-extrabold text-xs shadow-lg"
+            style={{ background: "linear-gradient(135deg, #5A8F77, #8B6FB8)" }}
+          >
+            📖 Continuar essa história
+          </motion.button>
+        )}
+      </motion.div>
+
       {/* Off-screen capture target */}
       <div
         style={{ position: "fixed", left: "-9999px", top: 0, pointerEvents: "none" }}
