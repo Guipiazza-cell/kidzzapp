@@ -608,7 +608,7 @@ const HomeScreen = ({
                       background: b.bg,
                       border: "1px solid hsl(0 0% 100% / 0.7)",
                       backdropFilter: "blur(22px)",
-                      boxShadow: `0 12px 32px -18px ${b.tint.replace(")", " / 0.4)")}`,
+                      boxShadow: `0 22px 40px -20px ${b.tint.replace(")", " / 0.55)")}, 0 6px 14px -8px hsl(140 30% 20% / 0.22), inset 0 1px 0 hsl(0 0% 100% / 0.9), inset 0 -1px 0 hsl(140 20% 80% / 0.3)`,
                       borderRadius: 24,
                     }}
                     initial={{ opacity: 0, x: 20 }}
