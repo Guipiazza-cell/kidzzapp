@@ -178,7 +178,26 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
           );
         })}
       </div>
-    </nav>
+
+      {/* Trust badge — Ambiente 100% seguro */}
+      <div className="flex items-center justify-center px-3 pt-1.5 pb-0.5">
+        <div
+          className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+          style={{
+            background: "hsl(0 0% 100% / 0.78)",
+            border: "1px solid hsl(0 0% 100% / 0.7)",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 2px 8px -4px hsl(100 15% 18% / 0.12)",
+          }}
+        >
+          <ShieldCheck size={11} style={{ color: "hsl(145 55% 42%)" }} />
+          <span className="text-[10px] font-black" style={{ color: "hsl(var(--premium-ink))" }}>
+            Ambiente 100% seguro para crianças
+          </span>
+          <Sparkles size={9} style={{ color: "hsl(145 55% 42%)" }} />
+        </div>
+      </div>
+    </nav>);
   );
 };
 
