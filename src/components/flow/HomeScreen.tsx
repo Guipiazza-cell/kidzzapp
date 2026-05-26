@@ -716,12 +716,15 @@ const HomeScreen = ({
                   disabled={submitting || isFreeLimitReached}
                   className="flex items-center gap-3 px-4 py-3 text-left active:scale-[0.98] transition-transform disabled:opacity-40 rounded-2xl"
                   style={{
-                    background: "hsl(0 0% 100% / 0.82)",
-                    border: "1px solid hsl(0 0% 100% / 0.7)",
+                    background:
+                      "linear-gradient(180deg, hsl(0 0% 100% / 0.95) 0%, hsl(85 25% 96% / 0.88) 100%)",
+                    border: "1px solid hsl(0 0% 100% / 0.85)",
                     backdropFilter: "blur(20px)",
-                    boxShadow: "0 6px 18px -12px hsl(100 15% 18% / 0.15)",
+                    boxShadow:
+                      "0 14px 28px -16px hsl(140 30% 20% / 0.28), 0 4px 10px -6px hsl(140 30% 20% / 0.18), inset 0 1px 0 hsl(0 0% 100% / 0.9), inset 0 -1px 0 hsl(140 20% 80% / 0.3)",
                   }}
                   whileTap={{ scale: 0.98 }}
+                  whileHover={{ y: -2 }}
                 >
                   <span className="text-xl flex-shrink-0">{q.emoji}</span>
                   <div className="min-w-0 flex-1">
