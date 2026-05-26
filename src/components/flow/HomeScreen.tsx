@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogIn, Shield, Crown, Gift, Bell, Mic, Sparkles, Leaf, Heart, ChevronRight } from "lucide-react";
 import StreakCelebration from "./StreakCelebration";
@@ -166,6 +167,33 @@ const HomeScreen = ({
     return h >= 20 || h < 5; // janela noturna
   }, []);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [lastTopic, setLastTopic] = useState<{ question: string; when: string } | null>(null);
+  const isPremium = profile?.is_premium ?? false;
+
+  // Memória contextual premium — busca última pergunta dos últimos 7 dias (exceto hoje)
+  useEffect(() => {
+    if (!isPremium || !user) return;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    (async () => {
+      const { data } = await supabase
+        .from("kidzz_questions_log")
+        .select("question, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", sevenDaysAgo.toISOString())
+        .lt("created_at", today.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (data && data[0]) {
+        const d = new Date(data[0].created_at);
+        const diff = Math.floor((today.getTime() - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86400000);
+        const when = diff === 1 ? "Ontem" : `Há ${diff} dias`;
+        setLastTopic({ question: data[0].question, when });
+      }
+    })();
+  }, [isPremium, user]);
 
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
@@ -554,6 +582,36 @@ const HomeScreen = ({
             </motion.button>
           </div>
         </motion.section>
+        {/* ── MEMÓRIA CONTEXTUAL PREMIUM — continua a conversa de ontem ── */}
+        {isPremium && lastTopic && (
+          <motion.button
+            type="button"
+            onClick={() => submit(lastTopic.question)}
+            className="w-full max-w-sm mb-3 text-left px-4 py-3 rounded-2xl flex items-center gap-3"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              background: "linear-gradient(135deg, hsl(0 0% 100% / 0.85) 0%, hsl(280 40% 96% / 0.82) 100%)",
+              border: "1px solid hsl(280 30% 88% / 0.7)",
+              backdropFilter: "blur(18px)",
+              boxShadow: "0 10px 24px -14px hsl(280 30% 30% / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.9)",
+            }}
+          >
+            <span className="text-xl flex-shrink-0">💭</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "hsl(280 45% 50%)" }}>
+                {lastTopic.when} {childName} perguntou
+              </p>
+              <p className="text-[13px] font-semibold leading-snug truncate" style={{ color: "hsl(var(--premium-ink))" }}>
+                {lastTopic.question}
+              </p>
+            </div>
+            <ChevronRight size={16} style={{ color: "hsl(280 30% 55%)" }} />
+          </motion.button>
+        )}
+
 
         {/* ── 3.5 SOS KIDZZ — acolhimento emocional ── */}
         <SOSCard onOpen={() => setSosOpen(true)} />
