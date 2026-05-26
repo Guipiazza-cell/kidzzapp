@@ -1,6 +1,7 @@
 export type PaywallContext =
   | "question_limit"
   | "story_limit"
+  | "story_continuation"
   | "sleep_story"
   | "sleep_sound"
   | "achievement"
@@ -8,6 +9,8 @@ export type PaywallContext =
   | "memories_old"
   | "travel"
   | "moments"
+  | "sos_journey"
+  | "wellness_journey"
   | "premium_feature";
 
 export interface PaywallCopy {
