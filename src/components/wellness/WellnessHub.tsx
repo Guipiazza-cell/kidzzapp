@@ -1440,6 +1440,9 @@ const RealWorldView = ({ onBack }: { onBack: () => void }) => (
 const JourneyView = ({ onBack }: { onBack: () => void }) => {
   const { week } = useMoodWeek();
   const { streak } = useWellnessStreak();
+  const { profile } = useAuth();
+  const isPremium = profile?.is_premium ?? false;
+  const childName = profile?.child_name || "seu filho";
   const avg = week.filter(w => w.v > 0).reduce((s, w) => s + w.v, 0) / Math.max(week.filter(w => w.v > 0).length, 1);
   return (
   <>
@@ -1453,7 +1456,7 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
         Humor médio {avg.toFixed(1)}/5 · {streak.count} {streak.count === 1 ? "dia" : "dias"} de calma seguidos
       </p>
     </div>
-    <div className="px-5 pt-6 pb-10 space-y-3">
+    <div className="px-5 pt-6 pb-10 space-y-3 relative">
       <Surface className="p-5">
         <div className="flex items-end justify-between gap-2 h-28">
           {week.map((m, i) => (
@@ -1474,30 +1477,71 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
         </div>
       </Surface>
 
+      <div className={isPremium ? "" : "relative"}>
+        <div className={isPremium ? "space-y-3" : "space-y-3 pointer-events-none select-none"} style={isPremium ? undefined : { filter: "blur(6px)", opacity: 0.55 }}>
+          {[
+            { icon: HandHeart, t: "5 respirações guiadas", s: "Esta semana" },
+            { icon: BookOpen,  t: "3 leituras antes de dormir", s: "Rotina noturna" },
+            { icon: Music2,    t: "2 sessões de sons calmos", s: "Tarde" },
+          ].map((a, i) => {
+            const Icon = a.icon;
+            return (
+              <Surface key={i} className="p-4 flex items-center gap-4">
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: `${serenity}33` }}>
+                  <Icon size={20} style={{ color: ink }} strokeWidth={1.7} />
+                </div>
+                <div className="flex-1">
+                  <div className="text-[15px] font-semibold" style={{ color: ink }}>{a.t}</div>
+                  <div className="text-[12px]" style={{ color: inkSoft }}>{a.s}</div>
+                </div>
+                <Star size={16} style={{ color: clay }} fill="currentColor" stroke="none" />
+              </Surface>
+            );
+          })}
+        </div>
 
-      {[
-        { icon: HandHeart, t: "5 respirações guiadas", s: "Esta semana" },
-        { icon: BookOpen,  t: "3 leituras antes de dormir", s: "Rotina noturna" },
-        { icon: Music2,    t: "2 sessões de sons calmos", s: "Tarde" },
-      ].map((a, i) => {
-        const Icon = a.icon;
-        return (
-          <Surface key={i} className="p-4 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: `${serenity}33` }}>
-              <Icon size={20} style={{ color: ink }} strokeWidth={1.7} />
-            </div>
-            <div className="flex-1">
-              <div className="text-[15px] font-semibold" style={{ color: ink }}>{a.t}</div>
-              <div className="text-[12px]" style={{ color: inkSoft }}>{a.s}</div>
-            </div>
-            <Star size={16} style={{ color: clay }} fill="currentColor" stroke="none" />
-          </Surface>
-        );
-      })}
+        {!isPremium && (
+          <motion.button
+            type="button"
+            onClick={() => {
+              haptic("medium");
+              window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_journey" } }));
+            }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            whileTap={{ scale: 0.97 }}
+            className="absolute inset-x-0 top-0 mx-auto rounded-3xl p-5 text-center"
+            style={{
+              background: `linear-gradient(135deg, ${emerald}1a, ${sage}26)`,
+              border: `1px solid ${stroke}`,
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              boxShadow: `0 10px 32px -14px ${emerald}66`,
+              maxWidth: 360,
+            }}
+          >
+            <p className="text-[15px] font-black leading-snug" style={{ color: ink }}>
+              Transforme isso em ritual para {childName} ✨
+            </p>
+            <p className="text-[12px] font-medium mt-1.5" style={{ color: inkSoft }}>
+              Jornada emocional completa, soundscapes e sleep ritual esperam vocês.
+            </p>
+            <span
+              className="mt-3 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-white font-extrabold text-[12px] shadow-lg"
+              style={{ background: `linear-gradient(135deg, ${emerald}, ${sage})` }}
+            >
+              ✨ Ativar ritual completo
+            </span>
+          </motion.button>
+        )}
+      </div>
     </div>
   </>
   );
 };
+
+
 
 
 /* ────────────── ROOT ────────────── */
