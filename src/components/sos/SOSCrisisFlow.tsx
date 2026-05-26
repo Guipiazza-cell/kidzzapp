@@ -8,6 +8,7 @@ import {
 import { useSosVoice } from "./useSosVoice";
 import { haptic } from "@/lib/haptics";
 import { trackConnection } from "@/lib/connection";
+import { useAuth } from "@/contexts/AuthContext";
 import type { SosSituation } from "./situations";
 
 /**
