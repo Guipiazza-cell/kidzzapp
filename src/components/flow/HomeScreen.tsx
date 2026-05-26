@@ -582,6 +582,36 @@ const HomeScreen = ({
             </motion.button>
           </div>
         </motion.section>
+        {/* ── MEMÓRIA CONTEXTUAL PREMIUM — continua a conversa de ontem ── */}
+        {isPremium && lastTopic && (
+          <motion.button
+            type="button"
+            onClick={() => submit(lastTopic.question)}
+            className="w-full max-w-sm mb-3 text-left px-4 py-3 rounded-2xl flex items-center gap-3"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              background: "linear-gradient(135deg, hsl(0 0% 100% / 0.85) 0%, hsl(280 40% 96% / 0.82) 100%)",
+              border: "1px solid hsl(280 30% 88% / 0.7)",
+              backdropFilter: "blur(18px)",
+              boxShadow: "0 10px 24px -14px hsl(280 30% 30% / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.9)",
+            }}
+          >
+            <span className="text-xl flex-shrink-0">💭</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "hsl(280 45% 50%)" }}>
+                {lastTopic.when} {childName} perguntou
+              </p>
+              <p className="text-[13px] font-semibold leading-snug truncate" style={{ color: "hsl(var(--premium-ink))" }}>
+                {lastTopic.question}
+              </p>
+            </div>
+            <ChevronRight size={16} style={{ color: "hsl(280 30% 55%)" }} />
+          </motion.button>
+        )}
+
 
         {/* ── 3.5 SOS KIDZZ — acolhimento emocional ── */}
         <SOSCard onOpen={() => setSosOpen(true)} />
