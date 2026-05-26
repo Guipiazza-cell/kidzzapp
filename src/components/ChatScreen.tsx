@@ -49,6 +49,7 @@ const ChatScreen = ({
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [connectionCount, setConnectionCount] = useState(0);
+  const [lastTopic, setLastTopic] = useState<{ question: string; when: string } | null>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const { speak, stop: stopTTS } = useTTS();
   const lastAssistantTextRef = useRef("");
