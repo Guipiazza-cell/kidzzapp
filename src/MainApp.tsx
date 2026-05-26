@@ -70,6 +70,7 @@ const MainApp = () => {
     <>
       {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       <CinemaBackground />
+      <MagicalBackground />
       <AuthProvider>
         <Suspense fallback={null}>
           <Routes>
