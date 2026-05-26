@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import SplashScreen from "@/components/SplashScreen";
 import { lazy, Suspense, useEffect, useState } from "react";
 import CinemaBackground from "@/components/CinemaBackground";
+import MagicalBackground from "@/components/MagicalBackground";
 import AppUpdateBanner from "./components/AppUpdateBanner";
 import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
