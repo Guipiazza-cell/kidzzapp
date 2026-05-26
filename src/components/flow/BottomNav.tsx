@@ -200,7 +200,5 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     </nav>
   );
 };
-  );
-};
 
 export default BottomNav;
