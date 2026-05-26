@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import SplashScreen from "@/components/SplashScreen";
 import { lazy, Suspense, useEffect, useState } from "react";
-import MagicalBackground from "@/components/MagicalBackground";
 import CinemaBackground from "@/components/CinemaBackground";
 import AppUpdateBanner from "./components/AppUpdateBanner";
 import InstallBanner from "./components/InstallBanner";
@@ -70,7 +69,6 @@ const MainApp = () => {
     <>
       {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
       <CinemaBackground />
-      <MagicalBackground />
       <AuthProvider>
         <Suspense fallback={null}>
           <Routes>
