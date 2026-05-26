@@ -15,6 +15,7 @@ import { getTotalXp } from "@/lib/dailyMission";
 import explorerImg from "@/assets/kidzz/explorer.webp";
 import moonImg from "@/assets/kidzz/moon.webp";
 import wellnessImg from "@/assets/kidzz/wellness.png";
+import chameleonHero from "@/assets/kidzz/chameleon-hero.png";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 import SOSCard from "@/components/sos/SOSCard";
@@ -357,67 +358,57 @@ const HomeScreen = ({
       />
 
       <div
-        className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain pb-44"
+        className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain pb-44 relative"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
-        {/* ── 1. HERO — greeting clean + camaleão invadindo ── */}
-        <section className="w-full max-w-sm relative pt-3 pb-2">
-          <div className="relative flex items-start gap-2">
-            <motion.div
-              className="flex-1 min-w-0 pt-1"
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1, duration: 0.4 }}
-            >
-              <h1
-                className="text-[26px] font-black leading-[1.1] tracking-tight"
-                style={{ color: "hsl(var(--premium-ink))" }}
-              >
-                {greeting.title.split(",")[0]},{" "}
-                <span style={{ color: "hsl(var(--kidzz-green-deep))" }}>
-                  {greeting.title.split(",")[1]?.trim() || childName}
-                </span>
-              </h1>
-              <p
-                className="text-[13px] font-medium leading-snug mt-1.5"
-                style={{ color: "hsl(var(--premium-ink-soft))" }}
-              >
-                {greeting.subtitle}
-              </p>
-            </motion.div>
+        {/* Camaleão hero — flutuante, sobre os cards */}
+        <motion.img
+          src={chameleonHero}
+          alt=""
+          aria-hidden
+          initial={{ opacity: 0, scale: 0.85, rotate: -4 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 180, damping: 18, delay: 0.05 }}
+          style={{
+            position: "absolute",
+            right: "-8%",
+            top: "3%",
+            width: "300px",
+            height: "340px",
+            zIndex: 20,
+            pointerEvents: "none",
+            objectFit: "contain",
+            filter:
+              "drop-shadow(0 20px 50px rgba(0,0,0,0.15)) drop-shadow(0 0 30px rgba(143,191,127,0.2))",
+          }}
+        />
 
-            {/* Camaleão invadindo o lado direito do hero — efeito 3D volumétrico */}
-            <motion.div
-              className="flex-shrink-0 -mr-3 -mt-2 relative"
-              initial={{ scale: 0.7, opacity: 0, rotate: -8 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
-              style={{
-                filter:
-                  "drop-shadow(0 18px 22px hsl(140 40% 25% / 0.32)) drop-shadow(0 6px 10px hsl(140 40% 25% / 0.22)) drop-shadow(0 0 22px hsl(140 70% 55% / 0.35))",
-                transform: "perspective(800px) rotateX(6deg) rotateY(-8deg)",
-                transformStyle: "preserve-3d",
-              }}
+        {/* ── 1. HERO — greeting clean ── */}
+        <section className="w-full max-w-sm relative pt-3 pb-2">
+          <motion.div
+            className="min-w-0 pt-1 pr-[42%]"
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+          >
+            <h1
+              className="text-[26px] font-black leading-[1.1] tracking-tight"
+              style={{ color: "hsl(var(--premium-ink))" }}
             >
-              {/* contact shadow elíptica abaixo */}
-              <div
-                aria-hidden
-                className="absolute left-1/2 -translate-x-1/2 bottom-1 w-[78%] h-3 rounded-[50%] pointer-events-none"
-                style={{
-                  background: "radial-gradient(ellipse, hsl(140 40% 20% / 0.35), transparent 70%)",
-                  filter: "blur(6px)",
-                }}
-              />
-              <KidzzChameleon
-                state={greeting.mascot}
-                mood="curious"
-                size="lg"
-                showParticles={false}
-                interactive={false}
-              />
-            </motion.div>
-          </div>
+              {greeting.title.split(",")[0]},{" "}
+              <span style={{ color: "hsl(var(--kidzz-green-deep))" }}>
+                {greeting.title.split(",")[1]?.trim() || childName}
+              </span>
+            </h1>
+            <p
+              className="text-[13px] font-medium leading-snug mt-1.5"
+              style={{ color: "hsl(var(--premium-ink-soft))" }}
+            >
+              {greeting.subtitle}
+            </p>
+          </motion.div>
         </section>
+
 
         {/* ── 1.5 TERMÔMETRO DE CONEXÃO — coração emocional da família ── */}
         <div className="mb-3">
