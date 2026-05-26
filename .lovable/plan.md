@@ -1,50 +1,85 @@
+# Redesign Visual Cinematográfico v2.0 — KIDZZ
 
+Este plano aplica a especificação enviada (paleta exata, background em camadas, camaleão central, Home reestruturada, animações premium) sem quebrar fluxos existentes (onboarding, chat, paywall, rotas). O foco é **camada visual e Home** — lógica de negócio fica intocada.
 
-## Diagnosis
+## Escopo
 
-The root cause of the "invalid credentials" error is clear: **email confirmation is required but not enabled as auto-confirm**. The database shows:
+### 1. Design tokens (base de tudo)
+- `src/index.css`: atualizar variáveis HSL para refletir a paleta exata:
+  - `--background` → #F7F6F2, `--card`/`bgSecondary` → #FDFCF8
+  - `--primary` (greenSage) → #8FBF7F, `--accent` (greenDeep) → #355B45, hover → #D1E8CA
+  - `--kidzz-gold` → #D8B36A, `--sos-from/to` mantém #FF7A7A / #D94B4B
+  - texts: #2E2E2E / #7A7A7A / #B0B0B0
+  - shadows + glows (green/red/gold) como utilitários
+- `tailwind.config.ts`: expor `kidzz-sage`, `kidzz-deep`, `kidzz-gold`, `kidzz-coral` + sombras `shadow-cinema-sm/md/lg` + easings `ease-snappy`, `ease-bounce` + durations.
+- Raios: `rounded-cinema` (28px) e `rounded-cinema-xl` (32px).
 
-- User `guipiazza@icloud.com` exists with `email_confirmed_at: NULL` and `last_sign_in_at: NULL`
-- Supabase blocks `signInWithPassword` for unconfirmed emails, returning "Invalid login credentials"
+### 2. Background global cinematográfico
+- Novo componente `src/components/CinemaBackground.tsx` — 3 camadas fixed:
+  1. gradient base 135° (#F7F6F2 → #FDFCF8 → #EFF1EC)
+  2. blur atmosférico com `breatheBackground` keyframe (8s)
+  3. glow radial verde sutil (8% opacity) em 30% 50%
+- Montado uma vez em `src/MainApp.tsx` (atrás de tudo, `z-[-10]`).
+- Respeita `prefers-reduced-motion` (já globalizado no index.css).
 
-This is not a code bug — it's a configuration issue.
+### 3. Camaleão como elemento central
+- Reaproveitar `src/components/kidzz/KidzzChameleon.tsx` (já existe).
+- Novo wrapper `ChameleonHero` com:
+  - posição `absolute right-[-8%] top-[3%]`, 320×340
+  - filtro drop-shadow triplo (volumétrico + glow verde + sombra inferior)
+  - `glowBreath` 6s + `eyesBlink` 4s controlados por prop `mood`
+- Usado na Home, no topo direito do hero.
 
-## Plan
+### 4. Home Screen reestruturada
+Arquivo: `src/components/flow/HomeScreen.tsx` (refator visual, mesma lógica).
+Nova hierarquia:
+1. **Header premium**: sino/configs à direita, badge "Premium" com sound toggle à esquerda, logo "KIDZZ" centralizado.
+2. **Greeting emocional**: "Olá, {nome} ✨" + subtítulo + pill "KIDZZ Ativo · N perguntas".
+3. **Hero Input IA** (card surface-premium + glow breathing): título "Me pergunte qualquer coisa!", input com botão mic verde metálico embutido + CTA "Perguntar ✨".
+4. **SOS Card**: gradiente coral (#FF7A7A → #D94B4B), ícone pulsante, CTA "SOS Kidzz ✨".
+5. **Carrossel "Explore Juntos"**: 3 cards (Histórias, Viagem, Wellness) com ícones e descrições.
+6. **"Hoje para Você"**: grid 2 col com perguntas sugeridas + tag de categoria.
+7. **Dock menu inferior** (`BottomNav` já existe — apenas refinar estilo: blur 24px, raio 32, sombra cinema, ícones com `popIn` 0.3s no ativo).
 
-### 1. Enable auto-confirm for email signups
-Use `configure_auth` to disable email confirmation requirement. Since you chose "acesso imediato", users will be able to login immediately after signup. This single change fixes the core auth issue.
+### 5. Animações premium
+- Tokens em tailwind:
+  - `ease-snappy: cubic-bezier(0.22,1,0.36,1)`
+  - `ease-bounce: cubic-bezier(0.34,1.56,0.64,1)`
+- `pageEnter`: já coberto por `PageTransition.tsx` (ajustar duration 0.6s).
+- `cardHover`: utilitário `.card-cinema` (y-translate -4px + shadow-cinema-lg em 0.3s).
+- `glowBreath`: keyframe novo no index.css aplicado ao Hero Input e ao camaleão.
+- Botão CTA: scale 1 → 1.02 hover, 0.98 active.
 
-### 2. Auto-login after signup
-Update `Auth.tsx` so that after successful signup, the user is automatically logged in (Supabase does this natively when auto-confirm is on — the `onAuthStateChange` listener will pick up the session). Add a success toast and let the auth state change handle navigation.
+### 6. Estados interativos
+- Input: 3 estados (default / focus / typing) via classes utilitárias.
+- Botões verdes: sombra `0 4px 12px glowGreen` default, eleva no hover.
+- Cards Explore/Today: hover translateY -2px + scale 1.02.
 
-### 3. Better error logging
-Add `console.error` with the actual Supabase error message in both `signUp` and `signIn` handlers, so errors are visible in the browser console for debugging. Show the real error to the user instead of the generic "Email ou senha incorretos".
+## Detalhes técnicos
 
-### 4. Fix existing unconfirmed user
-The existing user `guipiazza@icloud.com` will start working once auto-confirm is enabled, as Supabase will no longer check for email confirmation.
+- **Sem mudanças** em: rotas, AuthContext, quotas, paywall, edge functions, schema.
+- **Tokens HSL** mantidos (regra do projeto) — hex do brief convertidos para HSL no `:root`.
+- **Mobile-first** (viewport atual 430px): hero input full-width, camaleão escala para 240×260 em <430px para não cobrir o saudação.
+- **Performance**: backdrop-filter já capado em 10px no mobile (regra existente). `will-change: transform` apenas no camaleão.
+- **Acessibilidade**: contraste textDark/bgPrimary OK (>10:1); botões mantêm 44×44.
 
-### 5. Remove chameleon emoji from Auth page title
-Remove the `ChameleonMascot` component rendering and the 🦎 emoji from the "Bem-vindo de volta!" heading on the Auth page. Instead, use the actual chameleon image (`chameleon-main.jpeg`) integrated naturally into the jungle background — positioned behind/within the forest scene rather than as a floating circular avatar.
+## Arquivos tocados
 
-### 6. Integrate chameleons into the jungle scene
-Refactor `ChameleonMascot` or the Auth/ChatScreen pages to position the chameleon image more organically within the jungle background — larger, with transparency/blending, no circular crop, and positioned as if it's sitting on a branch or peeking from foliage. Apply subtle parallax or breathing animation.
+Edits:
+- `src/index.css` (tokens + keyframes glow/breath)
+- `tailwind.config.ts` (cores, sombras, easings, durations)
+- `src/MainApp.tsx` (montar CinemaBackground)
+- `src/components/flow/HomeScreen.tsx` (refator visual completo)
+- `src/components/flow/BottomNav.tsx` (estilo dock cinema)
+- `src/components/PageTransition.tsx` (duration 0.6s, ease snappy)
 
----
+Novos:
+- `src/components/CinemaBackground.tsx`
+- `src/components/kidzz/ChameleonHero.tsx`
 
-### Technical Details
+## Fora de escopo (próximas iterações)
+- Telas internas (Chat, Stories, Dreams) recebem só o background global agora; refator visual completo dessas telas em fase 2.
+- Editar imagem do camaleão (SVG/PNG) — usaremos o asset atual.
 
-**Files to modify:**
-- `supabase/config.toml` — no change needed (auth config is separate)
-- `cloud--configure_auth` — enable auto-confirm
-- `src/pages/Auth.tsx` — improve error handling, remove standalone ChameleonMascot, integrate chameleon into jungle scene
-- `src/components/ChameleonMascot.tsx` — remove circular crop (`rounded-full`), add organic positioning variant
-- `src/components/ChatScreen.tsx` — same chameleon integration improvement
-- `src/components/NameOnboarding.tsx` — same treatment
-
-**No changes to:**
-- Paywall/questions system
-- Parental controls
-- Stripe integration
-- TTS system
-- Database schema or RLS policies
-
+## Resultado esperado
+Home com sensação Apple/Pixar: fundo respirando, camaleão volumétrico no topo, hero input com glow verde, SOS coral pulsante, carrossel + grid de sugestões, dock flutuante. Zero flicker, transições 300–600ms, paleta consistente em todo o app.
