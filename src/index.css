@@ -6,35 +6,37 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 30% 12%;
+    /* ── Cinematic v2.0 — paleta exata do brief ── */
+    --background: 48 21% 96%;          /* #F7F6F2 creme premium */
+    --foreground: 0 0% 18%;            /* #2E2E2E texto principal */
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 30% 15%;
+    --card: 48 36% 98%;                /* #FDFCF8 branco gelo */
+    --card-foreground: 0 0% 18%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 15%;
+    --popover: 48 36% 98%;
+    --popover-foreground: 0 0% 18%;
 
-    --primary: 25 90% 55%;
+    --primary: 105 33% 62%;            /* #8FBF7F greenSage */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 200 80% 55%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 105 41% 85%;          /* #D1E8CA greenLight */
+    --secondary-foreground: 145 26% 28%;
 
-    --muted: 220 15% 92%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 48 18% 92%;
+    --muted-foreground: 0 0% 48%;      /* #7A7A7A */
 
-    --accent: 145 60% 45%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 145 26% 28%;             /* #355B45 greenDeep */
+    --accent-foreground: 48 36% 98%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 65% 57%;          /* #D94B4B redDeep */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 25 90% 55%;
+    --border: 48 15% 88%;
+    --input: 48 15% 88%;
+    --ring: 105 33% 62%;
 
     --radius: 1.25rem;
+
 
     --kid-orange: 25 90% 55%;
     --kid-blue: 200 80% 55%;
