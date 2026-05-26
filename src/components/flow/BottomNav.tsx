@@ -197,7 +197,9 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
           <Sparkles size={9} style={{ color: "hsl(145 55% 42%)" }} />
         </div>
       </div>
-    </nav>);
+    </nav>
+  );
+};
   );
 };
 
