@@ -262,25 +262,19 @@ const HomeScreen = ({
           )}
         </div>
 
-        {/* centro — KIDZZ wordmark com glow branco suave */}
+        {/* centro — KIDZZ wordmark GLASS (camaleão se adapta ao fundo) */}
         <div className="relative flex-shrink-0 select-none pointer-events-none">
-          <div
-            aria-hidden
-            className="absolute inset-0 -m-2 rounded-full"
-            style={{
-              background: "radial-gradient(ellipse, hsl(0 0% 100% / 0.7), transparent 70%)",
-              filter: "blur(10px)",
-            }}
-          />
           <span
-            className="relative text-[19px] font-black tracking-[0.2em]"
+            className="relative text-[22px] tracking-[0.18em]"
             style={{
-              background:
-                "linear-gradient(90deg, hsl(0 75% 62%), hsl(35 90% 58%), hsl(48 90% 55%), hsl(140 55% 48%), hsl(200 75% 55%), hsl(265 60% 62%))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              filter: "drop-shadow(0 1px 0 hsl(0 0% 100% / 0.9)) drop-shadow(0 0 10px hsl(0 0% 100% / 0.5))",
+              fontWeight: 900,
+              color: "hsl(0 0% 100% / 0.15)",
+              WebkitTextStroke: "1.2px hsl(0 0% 100% / 0.9)",
+              textShadow:
+                "0 1px 0 hsl(0 0% 100% / 0.9), 0 2px 6px hsl(0 0% 0% / 0.15), 0 0 18px hsl(0 0% 100% / 0.5)",
+              mixBlendMode: "overlay",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
             }}
           >
             KIDZZ
