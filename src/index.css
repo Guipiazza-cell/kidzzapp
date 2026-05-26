@@ -52,17 +52,23 @@
     --warm-white: 60 30% 99%;       /* premium white (#FEFEFC) */
     --soft-gold: 85 28% 60%;        /* sage-gold accent (replaces yellow) */
     --soft-gold-glow: 90 35% 75%;   /* mint glow */
-    --kidzz-green: 85 30% 60%;      /* primary brand green #A8C686 */
-    --kidzz-green-deep: 90 28% 56%; /* #95B86D */
-    --kidzz-green-soft: 90 40% 86%; /* #DCEBCB */
-    --wellness-green: 140 28% 76%;  /* #D8EBDD */
-    --wellness-deep: 150 25% 35%;   /* deep sage text */
-    --soft-lilac: 270 35% 88%;      /* discrete lilac */
-    --peach-soft: 22 40% 92%;       /* very soft peach (muted) */
-    --sky-soft: 205 30% 92%;        /* very soft sky */
-    --warm-shadow: 100 15% 18%;     /* cool sage shadow */
-    --premium-ink: 60 8% 11%;       /* primary text #1E1E1A */
-    --premium-ink-soft: 80 5% 38%;  /* secondary text #5E6258 */
+    --kidzz-green: 105 33% 62%;      /* #8FBF7F greenSage (spec v2.0) */
+    --kidzz-green-deep: 145 26% 28%; /* #355B45 greenDeep */
+    --kidzz-green-soft: 105 41% 85%; /* #D1E8CA greenLight */
+    --wellness-green: 105 41% 85%;   /* alinhado */
+    --wellness-deep: 145 26% 28%;    /* deep sage text */
+    --soft-lilac: 270 35% 88%;       /* discrete lilac */
+    --peach-soft: 22 40% 92%;        /* very soft peach (muted) */
+    --sky-soft: 205 30% 92%;         /* very soft sky */
+    --warm-shadow: 100 15% 18%;      /* cool sage shadow */
+    --premium-ink: 0 0% 18%;         /* #2E2E2E (spec textDark) */
+    --premium-ink-soft: 0 0% 48%;    /* #7A7A7A (spec textGray) */
+
+    /* ── Cinematic v2.0 — accents & glows ── */
+    --cinema-gold: 38 57% 63%;       /* #D8B36A goldEmotional */
+    --cinema-coral: 0 100% 74%;      /* #FF7A7A redCoral */
+    --cinema-coral-deep: 0 65% 57%;  /* #D94B4B redDeep */
+
 
     /* ── SOS Kidzz — acolhimento de emergência emocional ── */
     --sos-from: 0 100% 73%;          /* #FF7A7A */
