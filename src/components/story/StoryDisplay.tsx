@@ -15,9 +15,10 @@ interface StoryDisplayProps {
   images: string[];
   onReset: () => void;
   onSpeak?: (text: string) => Promise<void>;
+  isPremium?: boolean;
 }
 
-const StoryDisplay = ({ story, images, onReset, onSpeak }: StoryDisplayProps) => {
+const StoryDisplay = ({ story, images, onReset, onSpeak, isPremium = false }: StoryDisplayProps) => {
   const scenes = story.split(/\[CENA \d+\]/).filter((s) => s.trim());
   const [playingScene, setPlayingScene] = useState<number | null>(null);
   const [sharing, setSharing] = useState(false);
