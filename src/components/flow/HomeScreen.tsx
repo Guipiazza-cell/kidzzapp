@@ -484,7 +484,17 @@ const HomeScreen = ({
               filter: "blur(20px)",
             }}
           />
-          <div className="relative surface-premium px-5 py-5">
+          <div
+            className="relative surface-premium px-5 py-5"
+            style={{
+              borderRadius: 28,
+              background:
+                "linear-gradient(180deg, hsl(0 0% 100% / 0.96) 0%, hsl(85 30% 97% / 0.92) 100%)",
+              border: "1px solid hsl(0 0% 100% / 0.9)",
+              boxShadow:
+                "0 24px 48px -22px hsl(140 40% 20% / 0.32), 0 8px 18px -12px hsl(140 40% 20% / 0.22), inset 0 1px 0 hsl(0 0% 100% / 0.95), inset 0 -1px 0 hsl(140 25% 80% / 0.35)",
+            }}
+          >
             <div className="flex items-start gap-2 mb-3">
               <Sparkles size={16} className="mt-1 flex-shrink-0" style={{ color: "hsl(var(--kidzz-green-deep))" }} />
               <div className="min-w-0">
