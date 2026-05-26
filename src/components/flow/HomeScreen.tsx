@@ -392,13 +392,28 @@ const HomeScreen = ({
               </p>
             </motion.div>
 
-            {/* Camaleão invadindo o lado direito do hero */}
+            {/* Camaleão invadindo o lado direito do hero — efeito 3D volumétrico */}
             <motion.div
-              className="flex-shrink-0 -mr-3 -mt-2"
+              className="flex-shrink-0 -mr-3 -mt-2 relative"
               initial={{ scale: 0.7, opacity: 0, rotate: -8 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
+              style={{
+                filter:
+                  "drop-shadow(0 18px 22px hsl(140 40% 25% / 0.32)) drop-shadow(0 6px 10px hsl(140 40% 25% / 0.22)) drop-shadow(0 0 22px hsl(140 70% 55% / 0.35))",
+                transform: "perspective(800px) rotateX(6deg) rotateY(-8deg)",
+                transformStyle: "preserve-3d",
+              }}
             >
+              {/* contact shadow elíptica abaixo */}
+              <div
+                aria-hidden
+                className="absolute left-1/2 -translate-x-1/2 bottom-1 w-[78%] h-3 rounded-[50%] pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse, hsl(140 40% 20% / 0.35), transparent 70%)",
+                  filter: "blur(6px)",
+                }}
+              />
               <KidzzChameleon
                 state={greeting.mascot}
                 mood="curious"
@@ -469,7 +484,17 @@ const HomeScreen = ({
               filter: "blur(20px)",
             }}
           />
-          <div className="relative surface-premium px-5 py-5">
+          <div
+            className="relative surface-premium px-5 py-5"
+            style={{
+              borderRadius: 28,
+              background:
+                "linear-gradient(180deg, hsl(0 0% 100% / 0.96) 0%, hsl(85 30% 97% / 0.92) 100%)",
+              border: "1px solid hsl(0 0% 100% / 0.9)",
+              boxShadow:
+                "0 24px 48px -22px hsl(140 40% 20% / 0.32), 0 8px 18px -12px hsl(140 40% 20% / 0.22), inset 0 1px 0 hsl(0 0% 100% / 0.95), inset 0 -1px 0 hsl(140 25% 80% / 0.35)",
+            }}
+          >
             <div className="flex items-start gap-2 mb-3">
               <Sparkles size={16} className="mt-1 flex-shrink-0" style={{ color: "hsl(var(--kidzz-green-deep))" }} />
               <div className="min-w-0">
@@ -583,7 +608,7 @@ const HomeScreen = ({
                       background: b.bg,
                       border: "1px solid hsl(0 0% 100% / 0.7)",
                       backdropFilter: "blur(22px)",
-                      boxShadow: `0 12px 32px -18px ${b.tint.replace(")", " / 0.4)")}`,
+                      boxShadow: `0 22px 40px -20px ${b.tint.replace(")", " / 0.55)")}, 0 6px 14px -8px hsl(140 30% 20% / 0.22), inset 0 1px 0 hsl(0 0% 100% / 0.9), inset 0 -1px 0 hsl(140 20% 80% / 0.3)`,
                       borderRadius: 24,
                     }}
                     initial={{ opacity: 0, x: 20 }}
@@ -691,12 +716,15 @@ const HomeScreen = ({
                   disabled={submitting || isFreeLimitReached}
                   className="flex items-center gap-3 px-4 py-3 text-left active:scale-[0.98] transition-transform disabled:opacity-40 rounded-2xl"
                   style={{
-                    background: "hsl(0 0% 100% / 0.82)",
-                    border: "1px solid hsl(0 0% 100% / 0.7)",
+                    background:
+                      "linear-gradient(180deg, hsl(0 0% 100% / 0.95) 0%, hsl(85 25% 96% / 0.88) 100%)",
+                    border: "1px solid hsl(0 0% 100% / 0.85)",
                     backdropFilter: "blur(20px)",
-                    boxShadow: "0 6px 18px -12px hsl(100 15% 18% / 0.15)",
+                    boxShadow:
+                      "0 14px 28px -16px hsl(140 30% 20% / 0.28), 0 4px 10px -6px hsl(140 30% 20% / 0.18), inset 0 1px 0 hsl(0 0% 100% / 0.9), inset 0 -1px 0 hsl(140 20% 80% / 0.3)",
                   }}
                   whileTap={{ scale: 0.98 }}
+                  whileHover={{ y: -2 }}
                 >
                   <span className="text-xl flex-shrink-0">{q.emoji}</span>
                   <div className="min-w-0 flex-1">
