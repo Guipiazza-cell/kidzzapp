@@ -392,13 +392,28 @@ const HomeScreen = ({
               </p>
             </motion.div>
 
-            {/* Camaleão invadindo o lado direito do hero */}
+            {/* Camaleão invadindo o lado direito do hero — efeito 3D volumétrico */}
             <motion.div
-              className="flex-shrink-0 -mr-3 -mt-2"
+              className="flex-shrink-0 -mr-3 -mt-2 relative"
               initial={{ scale: 0.7, opacity: 0, rotate: -8 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
+              style={{
+                filter:
+                  "drop-shadow(0 18px 22px hsl(140 40% 25% / 0.32)) drop-shadow(0 6px 10px hsl(140 40% 25% / 0.22)) drop-shadow(0 0 22px hsl(140 70% 55% / 0.35))",
+                transform: "perspective(800px) rotateX(6deg) rotateY(-8deg)",
+                transformStyle: "preserve-3d",
+              }}
             >
+              {/* contact shadow elíptica abaixo */}
+              <div
+                aria-hidden
+                className="absolute left-1/2 -translate-x-1/2 bottom-1 w-[78%] h-3 rounded-[50%] pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse, hsl(140 40% 20% / 0.35), transparent 70%)",
+                  filter: "blur(6px)",
+                }}
+              />
               <KidzzChameleon
                 state={greeting.mascot}
                 mood="curious"
