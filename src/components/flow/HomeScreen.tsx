@@ -167,6 +167,33 @@ const HomeScreen = ({
     return h >= 20 || h < 5; // janela noturna
   }, []);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [lastTopic, setLastTopic] = useState<{ question: string; when: string } | null>(null);
+  const isPremium = profile?.is_premium ?? false;
+
+  // Memória contextual premium — busca última pergunta dos últimos 7 dias (exceto hoje)
+  useEffect(() => {
+    if (!isPremium || !user) return;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    (async () => {
+      const { data } = await supabase
+        .from("kidzz_questions_log")
+        .select("question, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", sevenDaysAgo.toISOString())
+        .lt("created_at", today.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (data && data[0]) {
+        const d = new Date(data[0].created_at);
+        const diff = Math.floor((today.getTime() - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86400000);
+        const when = diff === 1 ? "Ontem" : `Há ${diff} dias`;
+        setLastTopic({ question: data[0].question, when });
+      }
+    })();
+  }, [isPremium, user]);
 
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
