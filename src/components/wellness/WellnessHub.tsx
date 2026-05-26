@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
+import { useAuth } from "@/contexts/AuthContext";
 import wellnessMascot from "@/assets/kidzz/wellness.png";
 import WellnessCinema from "./WellnessCinema";
 
