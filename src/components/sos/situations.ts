@@ -55,6 +55,26 @@ export type SosSituation = {
     parentNote: string;  // mini bilhete pros pais no final
     closeCta: string;
   };
+  /** Etapa "Continuidade" — mini experiências embutidas */
+  continuity?: {
+    eyebrow: string;
+    title: string;     // ex: "Vamos passar por isso juntos"
+    subtitle: string;
+    options: Array<{
+      iconKey: "music" | "book" | "hug" | "moon";
+      title: string;
+      desc: string;
+    }>;
+  };
+  /** Etapa "Fechamento emocional" — desaceleração + memória */
+  closing?: {
+    eyebrow: string;     // ex: "Momentos difíceis passam"
+    title: string;       // frase principal (1 linha emocional)
+    subtitle: string;    // 2ª frase (pausa de 1.2s no UI)
+    shareable: string;   // frase compartilhável
+    recap: string[];     // "Hoje vocês:" bullets curtos (3 itens)
+    saveCta: string;     // ex: "Salvar esse momento"
+  };
 };
 
 export const SOS_SITUATIONS: SosSituation[] = [
@@ -363,3 +383,191 @@ export const SOS_SITUATIONS: SosSituation[] = [
     },
   },
 ];
+
+/* ──────────────────────────────────────────────────────────────────
+   Continuidade + Fechamento — preenchidos para todas as situações.
+   Visual mantido; o conteúdo aparece nas novas etapas do SOS Flow.
+   ─────────────────────────────────────────────────────────────── */
+
+type ContinuityClosing = Pick<SosSituation, "continuity" | "closing">;
+
+const SOS_EXTRAS: Record<string, ContinuityClosing> = {
+  crying: {
+    continuity: {
+      eyebrow: "Continuidade",
+      title: "Agora vamos passar por isso juntos",
+      subtitle: "Escolha uma experiência pra fazer aqui, sem sair do fluxo.",
+      options: [
+        { iconKey: "music", title: "Sons para desacelerar", desc: "trilha curta pra baixar o corpo" },
+        { iconKey: "book",  title: "História para reorganizar", desc: "narrativa curta sobre emoções" },
+        { iconKey: "hug",   title: "Ritual de reconexão", desc: "3 gestos simples de presença" },
+        { iconKey: "moon",  title: "Encerrar juntos", desc: "fechar esse momento com calma" },
+      ],
+    },
+    closing: {
+      eyebrow: "Momentos difíceis passam",
+      title: "Mas a segurança que você oferece fica.",
+      subtitle: "Você ficou. Isso é o que ele vai lembrar.",
+      shareable: "Seu filho não precisa de perfeição.\nPrecisa de presença.",
+      recap: ["respiraram juntos", "desaceleraram juntos", "passaram por isso juntos"],
+      saveCta: "Salvar esse momento",
+    },
+  },
+  tantrum: {
+    continuity: {
+      eyebrow: "Continuidade",
+      title: "Hoje você sustentou o caos",
+      subtitle: "Escolha uma experiência pra fechar com leveza.",
+      options: [
+        { iconKey: "music", title: "Modo pós-birra", desc: "som ambiente pra desacelerar" },
+        { iconKey: "hug",   title: "Reconexão silenciosa", desc: "3 gestos sem palavras" },
+        { iconKey: "book",  title: "História curta",      desc: "narrativa que reorganiza" },
+        { iconKey: "moon",  title: "Encerrar juntos",    desc: "fechar esse ciclo" },
+      ],
+    },
+    closing: {
+      eyebrow: "Hoje você sustentou o caos",
+      title: "A sua calma virou a referência dele.",
+      subtitle: "Isso ensina mais do que mil palavras depois.",
+      shareable: "Birra é cérebro em construção.\nA calma do adulto é a sala de aula.",
+      recap: ["sustentou o caos", "ficou perto", "ensinou regulação"],
+      saveCta: "Salvar esse momento",
+    },
+  },
+  sleep: {
+    continuity: {
+      eyebrow: "Ritual da noite",
+      title: "Boa noite começa antes do sono",
+      subtitle: "Uma experiência curta pra preparar a noite.",
+      options: [
+        { iconKey: "music", title: "Trilha de pré-sono", desc: "som suave de descida" },
+        { iconKey: "book",  title: "História do sono",   desc: "narrativa curta pra fechar o dia" },
+        { iconKey: "moon",  title: "Countdown gentil",   desc: "contagem visual pra desacelerar" },
+        { iconKey: "hug",   title: "Encerrar juntos",    desc: "fechar com presença" },
+      ],
+    },
+    closing: {
+      eyebrow: "Boa noite começa antes do sono",
+      title: "O quarto agora está pronto.",
+      subtitle: "Você criou o ritmo. Ele só precisa segui-lo.",
+      shareable: "Adormecer é uma habilidade.\nVocê está ensinando, noite após noite.",
+      recap: ["baixaram o ritmo", "criaram segurança", "fecharam o dia juntos"],
+      saveCta: "Salvar essa noite",
+    },
+  },
+  fear: {
+    continuity: {
+      eyebrow: "Transformar medo em aventura",
+      title: "O escuro não é vazio. É onde as estrelas aparecem.",
+      subtitle: "Escolha como continuar essa pequena travessia.",
+      options: [
+        { iconKey: "book",  title: "Mini história de coragem", desc: "narrativa curta e gentil" },
+        { iconKey: "music", title: "Som de proteção",          desc: "trilha pra ambiente seguro" },
+        { iconKey: "hug",   title: "Estrela de coragem",       desc: "gesto simbólico juntos" },
+        { iconKey: "moon",  title: "Encerrar juntos",          desc: "fechar com calma" },
+      ],
+    },
+    closing: {
+      eyebrow: "O medo passou",
+      title: "Você foi o lugar seguro.",
+      subtitle: "É assim que a coragem nasce — perto de quem fica.",
+      shareable: "O medo das crianças cabe nos braços de quem fica.",
+      recap: ["nomearam o medo", "ficaram juntos", "viraram coragem"],
+      saveCta: "Guardar essa coragem",
+    },
+  },
+  anxiety: {
+    continuity: {
+      eyebrow: "Continuidade",
+      title: "Voltar ao agora, juntos",
+      subtitle: "Uma experiência curta pra ancorar o corpo.",
+      options: [
+        { iconKey: "music", title: "Sons do presente",    desc: "ondas, floresta, respiração" },
+        { iconKey: "hug",   title: "Toque âncora",        desc: "mão sua, ritmo previsível" },
+        { iconKey: "book",  title: "História curta",      desc: "fim previsível, voz gentil" },
+        { iconKey: "moon",  title: "Encerrar juntos",     desc: "fechar com presença" },
+      ],
+    },
+    closing: {
+      eyebrow: "Vocês voltaram ao agora",
+      title: "Regulação compartilhada é cuidado.",
+      subtitle: "Você emprestou seu sistema nervoso. Ele aprendeu o caminho.",
+      shareable: "Ansiedade infantil baixa\nquando o adulto também desce.",
+      recap: ["aterrissaram juntos", "trouxeram o corpo de volta", "respiraram presente"],
+      saveCta: "Salvar esse momento",
+    },
+  },
+  exhausted: {
+    continuity: {
+      eyebrow: "2 minutos pra respirar",
+      title: "Pais cansados também merecem acolhimento",
+      subtitle: "Escolha como cuidar de você agora.",
+      options: [
+        { iconKey: "music", title: "Pausa de adulto",  desc: "ambient íntimo e silêncio" },
+        { iconKey: "hug",   title: "Soltar o peso",    desc: "gesto curto de descarga" },
+        { iconKey: "book",  title: "Bilhete pra você", desc: "leitura curta, sem culpa" },
+        { iconKey: "moon",  title: "Encerrar comigo",  desc: "fechar esse minuto" },
+      ],
+    },
+    closing: {
+      eyebrow: "Hoje foi pesado",
+      title: "Mas você ficou.",
+      subtitle: "Suficiente é amor de verdade.",
+      shareable: "Cuidar de quem cuida\nnão é luxo. É manutenção.",
+      recap: ["pausaram pra você", "soltaram o peso", "voltaram mais inteiros"],
+      saveCta: "Guardar essa pausa",
+    },
+  },
+  overwhelm: {
+    continuity: {
+      eyebrow: "Reduzir o mundo",
+      title: "Um passo por vez ainda é movimento",
+      subtitle: "Uma experiência curta, simples, sem decisão.",
+      options: [
+        { iconKey: "music", title: "Foco gentil",      desc: "trilha que organiza" },
+        { iconKey: "hug",   title: "Movimento curto",  desc: "sala–cozinha, sem pressa" },
+        { iconKey: "book",  title: "Uma coisa só",     desc: "escolher a menor ação" },
+        { iconKey: "moon",  title: "Encerrar juntos",  desc: "fechar com calma" },
+      ],
+    },
+    closing: {
+      eyebrow: "Você reduziu o mundo",
+      title: "Um passo por vez ainda é movimento.",
+      subtitle: "Reconhecer o peso já alivia metade dele.",
+      shareable: "Sobrecarga não é fraqueza.\nÉ sinal de quem está carregando demais.",
+      recap: ["baixaram o ruído", "escolheram uma coisa", "voltaram ao foco"],
+      saveCta: "Salvar esse alívio",
+    },
+  },
+  lost: {
+    continuity: {
+      eyebrow: "Próximo passo possível",
+      title: "Não precisa de resposta. Só do próximo passo",
+      subtitle: "Uma experiência curta pra clarear o caminho.",
+      options: [
+        { iconKey: "book",  title: "Vozes de outros pais", desc: "histórias breves e reais" },
+        { iconKey: "music", title: "Trilha de clareza",    desc: "som que abre espaço" },
+        { iconKey: "hug",   title: "Gesto pequeno",        desc: "água, abraço, pausa" },
+        { iconKey: "moon",  title: "Encerrar comigo",      desc: "fechar com presença" },
+      ],
+    },
+    closing: {
+      eyebrow: "Você escolheu presença",
+      title: "Em vez de pânico. Isso é tudo.",
+      subtitle: "Pais perfeitos não existem. Pais presentes, sim.",
+      shareable: "Não saber é honesto.\nFicar é o que cura.",
+      recap: ["escolheram presença", "deram um passo", "voltaram inteiros"],
+      saveCta: "Salvar esse passo",
+    },
+  },
+};
+
+// hidrata as situações com continuity + closing
+SOS_SITUATIONS.forEach((s) => {
+  const extra = SOS_EXTRAS[s.id];
+  if (extra) {
+    s.continuity = extra.continuity;
+    s.closing = extra.closing;
+  }
+});
+

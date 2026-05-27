@@ -272,6 +272,53 @@
     border: 1px solid hsl(0 0% 100% / 0.7);
   }
 
+  /* SOS metallic round button — Apple Wellness vibe, red glossy */
+  .sos-btn-metallic {
+    background:
+      radial-gradient(circle at 32% 26%, hsl(0 100% 86%) 0%, hsl(0 95% 70%) 22%, hsl(0 78% 55%) 60%, hsl(0 68% 42%) 100%);
+    box-shadow:
+      /* inner top highlight */
+      0 1px 0 hsl(0 0% 100% / 0.55) inset,
+      /* inner bottom shadow for metallic depth */
+      0 -6px 14px hsl(0 70% 22% / 0.55) inset,
+      /* primary lift */
+      0 12px 40px hsl(0 80% 55% / 0.32),
+      /* warm halo */
+      0 0 36px hsl(0 90% 65% / 0.28),
+      /* soft ring */
+      0 0 0 4px hsl(0 0% 100% / 0.55);
+    position: relative;
+    isolation: isolate;
+  }
+  .sos-btn-metallic::after {
+    /* glossy reflection cap */
+    content: "";
+    position: absolute;
+    top: 8%;
+    left: 14%;
+    width: 46%;
+    height: 26%;
+    border-radius: 50%;
+    background: linear-gradient(180deg, hsl(0 0% 100% / 0.7), hsl(0 0% 100% / 0));
+    filter: blur(2px);
+    pointer-events: none;
+  }
+  @keyframes sos-breath {
+    0%, 100% { transform: scale(1); box-shadow:
+      0 1px 0 hsl(0 0% 100% / 0.55) inset,
+      0 -6px 14px hsl(0 70% 22% / 0.55) inset,
+      0 12px 40px hsl(0 80% 55% / 0.28),
+      0 0 30px hsl(0 90% 65% / 0.22),
+      0 0 0 4px hsl(0 0% 100% / 0.55); }
+    50% { transform: scale(1.035); box-shadow:
+      0 1px 0 hsl(0 0% 100% / 0.6) inset,
+      0 -6px 16px hsl(0 70% 22% / 0.55) inset,
+      0 16px 48px hsl(0 80% 55% / 0.38),
+      0 0 42px hsl(0 90% 65% / 0.32),
+      0 0 0 5px hsl(0 0% 100% / 0.55); }
+  }
+  .sos-breath { animation: sos-breath 4s ease-in-out infinite; }
+
   .glass-card-light {
     background: hsl(0 0% 100% / 0.65);
     backdrop-filter: blur(16px);
