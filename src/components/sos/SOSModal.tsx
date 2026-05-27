@@ -168,12 +168,18 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
                   </div>
                 </>
               ) : (
-                <SOSCrisisFlow
-                  situation={selected}
+                <TabErrorBoundary
+                  resetKey={selected.id}
+                  label={`sos:${selected.id}`}
                   onBack={() => setSelected(null)}
-                  onClose={onClose}
-                  onGoWellness={onGoWellness}
-                />
+                >
+                  <SOSCrisisFlow
+                    situation={selected}
+                    onBack={() => setSelected(null)}
+                    onClose={onClose}
+                    onGoWellness={onGoWellness}
+                  />
+                </TabErrorBoundary>
               )}
             </div>
           </motion.div>
