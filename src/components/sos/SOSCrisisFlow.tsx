@@ -380,108 +380,271 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
             </motion.div>
           )}
 
-          {step === "apoio" && (
+          {step === "continuidade" && situation.continuity && (
             <motion.div
-              key="apoio"
+              key="continuidade"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.35 }}
+              transition={{ duration: 0.45 }}
               className="pt-2"
             >
-              <p
+              <motion.p
                 className="text-[11px] font-black uppercase tracking-[0.16em] text-center mb-1"
                 style={{ color: situation.tint }}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
               >
-                {situation.support.eyebrow}
-              </p>
-              <h3
-                className="text-[20px] font-black text-center mb-1 leading-tight"
+                {situation.continuity.eyebrow}
+              </motion.p>
+              <motion.h3
+                className="text-[20px] font-black text-center mb-2 leading-tight max-w-[300px] mx-auto"
                 style={{ color: "hsl(var(--premium-ink))" }}
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.6 }}
               >
-                {situation.support.title}
-              </h3>
-              <p
-                className="text-[13px] text-center mb-5 max-w-[280px] mx-auto"
+                {situation.continuity.title}
+              </motion.h3>
+              <motion.p
+                className="text-[12.5px] text-center mb-5 max-w-[280px] mx-auto"
                 style={{ color: "hsl(var(--premium-ink-soft))" }}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.6 }}
               >
-                {situation.support.intro}
-              </p>
+                {situation.continuity.subtitle}
+              </motion.p>
 
-              {/* Playlist sugerida */}
-              <button
-                type="button"
-                onClick={() => { haptic("medium"); onGoWellness?.(); onClose(); }}
-                className="w-full text-left flex items-center gap-3 p-4 rounded-2xl mb-3 active:scale-[0.98] transition-transform"
-                style={{
-                  background: `linear-gradient(135deg, hsl(${situation.support.playlist.from} / 0.9), hsl(${situation.support.playlist.to} / 0.9))`,
-                  border: "1px solid hsl(0 0% 100% / 0.7)",
-                  boxShadow: `0 6px 20px -10px hsl(${situation.support.playlist.accent} / 0.4)`,
-                }}
-              >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `hsl(${situation.support.playlist.accent})` }}
-                >
-                  <Music2 size={20} className="text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="text-[11px] font-black uppercase tracking-wider"
-                    style={{ color: `hsl(${situation.support.playlist.accent})` }}
-                  >
-                    Wellness · {situation.support.playlist.tracks} faixas
-                  </p>
-                  <p
-                    className="text-[15px] font-black leading-tight"
-                    style={{ color: "hsl(var(--premium-ink))" }}
-                  >
-                    {situation.support.playlist.label}
-                  </p>
-                  <p
-                    className="text-[11px] font-medium"
-                    style={{ color: "hsl(var(--premium-ink-soft))" }}
-                  >
-                    {situation.support.playlist.desc}
-                  </p>
-                </div>
-                <ChevronRight size={16} style={{ color: "hsl(var(--premium-ink-soft))" }} />
-              </button>
-
-              {/* Mini bilhete pros pais */}
-              <div
-                className="p-4 rounded-2xl mb-4"
-                style={{
-                  background: "hsl(0 0% 100% / 0.82)",
-                  border: "1px solid hsl(0 0% 100% / 0.7)",
-                }}
-              >
-                <p
-                  className="text-[10px] font-black uppercase tracking-[0.16em] mb-1"
-                  style={{ color: "hsl(var(--kidzz-green-deep))" }}
-                >
-                  Pra você, mãe / pai
-                </p>
-                <p
-                  className="text-[13px] leading-relaxed"
-                  style={{ color: "hsl(var(--premium-ink))" }}
-                >
-                  {situation.support.parentNote}
-                </p>
+              <div className="grid grid-cols-2 gap-2.5 mb-4">
+                {situation.continuity.options.map((opt, i) => {
+                  const Icon = CONTINUITY_ICONS[opt.iconKey];
+                  const isSel = selectedContinuity === opt.title;
+                  return (
+                    <motion.button
+                      key={opt.title}
+                      type="button"
+                      onClick={() => {
+                        haptic("medium");
+                        sfx("click");
+                        setSelectedContinuity(opt.title);
+                      }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.4 + i * 0.12, duration: 0.45 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="text-left p-3.5 rounded-2xl relative overflow-hidden"
+                      style={{
+                        background: isSel
+                          ? `linear-gradient(135deg, ${situation.tint.replace(")", " / 0.18)")}, hsl(0 0% 100% / 0.7))`
+                          : "hsl(0 0% 100% / 0.82)",
+                        border: `1px solid ${isSel ? situation.tint.replace(")", " / 0.55)") : "hsl(0 0% 100% / 0.7)"}`,
+                        boxShadow: `0 6px 18px -12px ${situation.tint.replace(")", " / 0.35)")}`,
+                        minHeight: 96,
+                      }}
+                    >
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center mb-1.5"
+                        style={{ background: situation.tint.replace(")", " / 0.14)") }}
+                      >
+                        <Icon size={15} style={{ color: situation.tint }} />
+                      </div>
+                      <p className="text-[13px] font-black leading-tight" style={{ color: "hsl(var(--premium-ink))" }}>
+                        {opt.title}
+                      </p>
+                      <p className="text-[10.5px] font-medium leading-snug mt-0.5" style={{ color: "hsl(var(--premium-ink-soft))" }}>
+                        {opt.desc}
+                      </p>
+                    </motion.button>
+                  );
+                })}
               </div>
 
-              <button
+              <motion.button
                 type="button"
-                onClick={() => { haptic("light"); onClose(); }}
-                className="w-full py-3 rounded-2xl text-[14px] font-black tracking-tight active:scale-[0.98] transition-transform"
+                onClick={() => goNext("fechamento")}
+                disabled={!selectedContinuity}
+                className="w-full py-3 rounded-2xl text-white text-[14px] font-black tracking-tight flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform disabled:opacity-40"
                 style={{
-                  background: "hsl(0 0% 100% / 0.7)",
-                  border: "1px solid hsl(0 0% 100% / 0.7)",
-                  color: "hsl(var(--premium-ink))",
+                  background: `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
+                  boxShadow: `0 8px 22px -8px ${situation.tint.replace(")", " / 0.5)")}`,
                 }}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 }}
               >
-                {situation.support.closeCta}
-              </button>
+                {selectedContinuity ? "Continuar juntos" : "Escolha uma experiência"} <ChevronRight size={14} />
+              </motion.button>
+            </motion.div>
+          )}
+
+          {step === "fechamento" && (
+            <motion.div
+              key="fechamento"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.55 }}
+              className="pt-2 flex flex-col items-center text-center"
+            >
+              {/* Halo quente de fechamento */}
+              <div className="relative flex items-center justify-center mb-5" style={{ width: 120, height: 120 }}>
+                <motion.span
+                  aria-hidden
+                  className="absolute rounded-full"
+                  style={{
+                    width: 120, height: 120,
+                    background: `radial-gradient(circle, ${situation.tint.replace(")", " / 0.35)")}, transparent 70%)`,
+                    filter: "blur(20px)",
+                  }}
+                  animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.85, 0.5] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="relative w-16 h-16 rounded-full flex items-center justify-center"
+                  style={{
+                    background: `linear-gradient(180deg, hsl(var(--sos-from)) 0%, ${situation.tint} 100%)`,
+                    boxShadow: `0 0 28px ${situation.tint.replace(")", " / 0.45)")}, inset 0 2px 8px hsl(0 0% 100% / 0.5)`,
+                  }}
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 180, damping: 22 }}
+                >
+                  <Sparkles size={22} className="text-white" />
+                </motion.div>
+              </div>
+
+              {situation.closing && (
+                <>
+                  <motion.p
+                    className="text-[10px] font-black uppercase tracking-[0.22em] mb-2"
+                    style={{ color: situation.tint }}
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+                  >
+                    {situation.closing.eyebrow}
+                  </motion.p>
+                  <motion.p
+                    className="text-[20px] font-black leading-snug max-w-[300px] mb-3 tracking-tight"
+                    style={{ color: "hsl(var(--premium-ink))" }}
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9, duration: 0.6 }}
+                  >
+                    {situation.closing.title}
+                  </motion.p>
+                  <motion.p
+                    className="text-[14px] font-medium leading-relaxed max-w-[300px] mb-5"
+                    style={{ color: "hsl(var(--premium-ink-soft))" }}
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2.1, duration: 0.7 }}
+                  >
+                    {situation.closing.subtitle}
+                  </motion.p>
+
+                  {/* Memória emocional — "Hoje vocês:" */}
+                  <motion.div
+                    className="w-full p-4 rounded-2xl mb-3 text-left"
+                    style={{
+                      background: "hsl(0 0% 100% / 0.82)",
+                      border: "1px solid hsl(0 0% 100% / 0.7)",
+                      boxShadow: `0 8px 20px -14px ${situation.tint.replace(")", " / 0.3)")}`,
+                    }}
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 3.0, duration: 0.6 }}
+                  >
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-2" style={{ color: situation.tint }}>
+                      ✨ Hoje vocês
+                    </p>
+                    <ul className="space-y-1.5">
+                      {situation.closing.recap.map((r, i) => (
+                        <motion.li
+                          key={r}
+                          className="flex items-center gap-2 text-[13px] font-medium"
+                          style={{ color: "hsl(var(--premium-ink))" }}
+                          initial={{ opacity: 0, x: -6 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 3.2 + i * 0.18 }}
+                        >
+                          <Check size={13} style={{ color: situation.tint }} />
+                          {r}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+
+                  {/* Bilhete pros pais */}
+                  <motion.div
+                    className="w-full p-4 rounded-2xl mb-3 text-left"
+                    style={{
+                      background: `linear-gradient(135deg, ${situation.tint.replace(")", " / 0.10)")}, hsl(0 0% 100% / 0.6))`,
+                      border: "1px solid hsl(0 0% 100% / 0.7)",
+                    }}
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    transition={{ delay: 3.9, duration: 0.6 }}
+                  >
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: "hsl(var(--kidzz-green-deep))" }}>
+                      Pra você
+                    </p>
+                    <p className="text-[12.5px] leading-relaxed whitespace-pre-line italic" style={{ color: "hsl(var(--premium-ink))" }}>
+                      “{situation.closing.shareable}”
+                    </p>
+                  </motion.div>
+
+                  {/* Ações de fechamento */}
+                  <motion.div
+                    className="w-full grid grid-cols-2 gap-2 mb-2"
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 4.3, duration: 0.5 }}
+                  >
+                    <button
+                      type="button"
+                      onClick={saveEmotionalMemory}
+                      disabled={memorySaved}
+                      className="py-2.5 rounded-2xl text-[12.5px] font-black flex items-center justify-center gap-1.5 active:scale-[0.97] transition-transform"
+                      style={{
+                        background: memorySaved ? "hsl(0 0% 100% / 0.5)" : `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
+                        color: memorySaved ? "hsl(var(--premium-ink-soft))" : "white",
+                        border: "1px solid hsl(0 0% 100% / 0.7)",
+                        boxShadow: memorySaved ? "none" : `0 8px 22px -10px ${situation.tint.replace(")", " / 0.55)")}`,
+                      }}
+                    >
+                      {memorySaved ? <><Check size={14} /> Guardado</> : <><BookmarkPlus size={14} /> {situation.closing.saveCta}</>}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={shareMoment}
+                      className="py-2.5 rounded-2xl text-[12.5px] font-black flex items-center justify-center gap-1.5 active:scale-[0.97] transition-transform"
+                      style={{
+                        background: "hsl(0 0% 100% / 0.8)",
+                        border: "1px solid hsl(0 0% 100% / 0.7)",
+                        color: "hsl(var(--premium-ink))",
+                      }}
+                    >
+                      <Share2 size={14} /> Compartilhar
+                    </button>
+                  </motion.div>
+
+                  {/* Continuação OPCIONAL pra Wellness */}
+                  <motion.button
+                    type="button"
+                    onClick={() => { haptic("light"); onGoWellness?.(); onClose(); }}
+                    className="w-full mt-1 py-2.5 rounded-2xl text-[12px] font-bold flex items-center justify-center gap-1.5 active:scale-[0.97] transition-transform"
+                    style={{
+                      background: "transparent",
+                      color: "hsl(var(--premium-ink-soft))",
+                    }}
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4.7 }}
+                  >
+                    <Music2 size={13} /> Continuar com {situation.support.playlist.label} no Wellness
+                  </motion.button>
+
+                  <motion.button
+                    type="button"
+                    onClick={() => { haptic("light"); onClose(); }}
+                    className="w-full mt-2 py-3 rounded-2xl text-[14px] font-black tracking-tight active:scale-[0.98] transition-transform"
+                    style={{
+                      background: "hsl(0 0% 100% / 0.7)",
+                      border: "1px solid hsl(0 0% 100% / 0.7)",
+                      color: "hsl(var(--premium-ink))",
+                    }}
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4.9 }}
+                  >
+                    {situation.support.closeCta}
+                  </motion.button>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
