@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight } from "lucide-react";
 import { SOS_SITUATIONS, type SosSituation } from "./situations";
 import SOSCrisisFlow from "./SOSCrisisFlow";
+import TabErrorBoundary from "@/components/TabErrorBoundary";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 
