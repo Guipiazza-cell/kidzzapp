@@ -473,7 +473,7 @@ const Index = () => {
   return (
     <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden">
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
-      <div className="flex-1 flex flex-col min-h-0 pb-[112px] relative">
+      <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative">
         {/* Troca de aba: sem AnimatePresence mode="wait" — evita o "flash vazio".
             Conteúdo anterior fica até o novo montar (cross-fade suave via CSS). */}
         <motion.div

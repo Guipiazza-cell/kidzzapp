@@ -69,7 +69,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
           style={{ color: isActive ? tab.tint : "hsl(0 0% 48% / 0.75)" }}
         />
         <span
-          className="text-[9.5px] font-extrabold leading-tight tracking-tight"
+          className="text-[9.5px] font-extrabold leading-tight tracking-tight whitespace-nowrap"
           style={{ color: isActive ? "hsl(0 0% 18%)" : "hsl(0 0% 48% / 0.8)" }}
         >
           {tab.label}
