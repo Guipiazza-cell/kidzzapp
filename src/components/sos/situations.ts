@@ -55,6 +55,26 @@ export type SosSituation = {
     parentNote: string;  // mini bilhete pros pais no final
     closeCta: string;
   };
+  /** Etapa "Continuidade" — mini experiências embutidas */
+  continuity?: {
+    eyebrow: string;
+    title: string;     // ex: "Vamos passar por isso juntos"
+    subtitle: string;
+    options: Array<{
+      iconKey: "music" | "book" | "hug" | "moon";
+      title: string;
+      desc: string;
+    }>;
+  };
+  /** Etapa "Fechamento emocional" — desaceleração + memória */
+  closing?: {
+    eyebrow: string;     // ex: "Momentos difíceis passam"
+    title: string;       // frase principal (1 linha emocional)
+    subtitle: string;    // 2ª frase (pausa de 1.2s no UI)
+    shareable: string;   // frase compartilhável
+    recap: string[];     // "Hoje vocês:" bullets curtos (3 itens)
+    saveCta: string;     // ex: "Salvar esse momento"
+  };
 };
 
 export const SOS_SITUATIONS: SosSituation[] = [
