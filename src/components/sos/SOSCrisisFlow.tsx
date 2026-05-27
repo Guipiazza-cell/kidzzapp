@@ -41,10 +41,13 @@ const CONTINUITY_ICONS = {
 } as const;
 
 const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
+  const { toast } = useToast();
   const isPremium = profile?.is_premium ?? false;
   const [step, setStep] = useState<Step>("acolhimento");
   const [muted, setMuted] = useState(false);
+  const [selectedContinuity, setSelectedContinuity] = useState<string | null>(null);
+  const [memorySaved, setMemorySaved] = useState(false);
   const { speak, stop, loading } = useSosVoice();
 
   useEffect(() => () => stop(), [stop]);
@@ -59,10 +62,60 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
 
   const goNext = (next: Step) => {
     haptic("light");
+    sfx("click");
     stop();
     setStep(next);
-    if (next === "apoio") trackConnection("sos_used");
+    if (next === "fechamento") trackConnection("sos_used");
   };
+
+  const saveEmotionalMemory = async () => {
+    if (memorySaved) return;
+    haptic("success");
+    sfx("reward");
+    setMemorySaved(true);
+    if (!user) return;
+    try {
+      const closing = situation.closing;
+      await supabase.from("memories").insert({
+        user_id: user.id,
+        type: "sos",
+        title: `SOS · ${situation.label}`,
+        content: closing
+          ? `${closing.title} ${closing.subtitle}`
+          : situation.support.parentNote,
+        is_special: true,
+        metadata: {
+          situation_id: situation.id,
+          recap: closing?.recap ?? [],
+          shareable: closing?.shareable,
+        },
+      });
+      toast({
+        title: "Momento salvo 💚",
+        description: "Está guardado em Momentos.",
+      });
+    } catch (err) {
+      console.warn("[sos] memory save failed", err);
+    }
+  };
+
+  const shareMoment = async () => {
+    haptic("light");
+    sfx("click");
+    const text = situation.closing?.shareable ?? situation.support.parentNote;
+    try {
+      if (typeof navigator !== "undefined" && (navigator as any).share) {
+        await (navigator as any).share({ text: `${text}\n\n— Kidzz` });
+      } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(`${text}\n\n— Kidzz`);
+        toast({ title: "Copiado", description: "Frase pronta pra compartilhar." });
+      }
+    } catch {
+      /* user cancelled or unsupported */
+    }
+  };
+
+  const STEPS: Step[] = ["acolhimento", "respiracao", "pratico", "continuidade", "fechamento"];
 
   return (
     <div className="flex flex-col h-full">
