@@ -2,21 +2,21 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Volume2, VolumeX, ChevronRight,
-  Heart, Wind, Hand, Music2, Loader2,
-  Moon, Shield, Leaf, Sun, Compass,
+  Heart, Wind, Hand, Music2, Loader2, Share2, BookmarkPlus, Check,
+  Moon, Shield, Leaf, Sun, Compass, BookOpen, Sparkles,
 } from "lucide-react";
 import { useSosVoice } from "./useSosVoice";
 import { haptic } from "@/lib/haptics";
+import { sfx } from "@/lib/sfx";
 import { trackConnection } from "@/lib/connection";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import type { SosSituation } from "./situations";
 
 /**
- * Fluxo emocional genérico do SOS — alimentado por uma `SosSituation`.
- * 1) Acolhimento (narração ElevenLabs + pausa contemplativa)
- * 2) Respiração guiada (padrão dinâmico por situação)
- * 3) Orientação prática (3 cards)
- * 4) Conteúdo de apoio (playlist + bilhete pros pais)
+ * Fluxo emocional SOS — 6 etapas, sem redirecionamento seco pra Wellness.
+ * acolhimento → respiração → prático → continuidade → fechamento → (memória/share)
  */
 interface Props {
   situation: SosSituation;
@@ -25,12 +25,19 @@ interface Props {
   onGoWellness?: () => void;
 }
 
-type Step = "acolhimento" | "respiracao" | "pratico" | "apoio";
+type Step = "acolhimento" | "respiracao" | "pratico" | "continuidade" | "fechamento";
 
 const ICONS = {
   hand: Hand, wind: Wind, heart: Heart,
   moon: Moon, shield: Shield, leaf: Leaf,
   sun: Sun, compass: Compass,
+} as const;
+
+const CONTINUITY_ICONS = {
+  music: Music2,
+  book: BookOpen,
+  hug: Heart,
+  moon: Moon,
 } as const;
 
 const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
