@@ -152,10 +152,10 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
 
       {/* Stepper */}
       <div className="flex items-center justify-center gap-1.5 mb-4">
-        {(["acolhimento", "respiracao", "pratico", "apoio"] as Step[]).map((s) => (
+        {STEPS.map((s) => (
           <span
             key={s}
-            className="h-1 rounded-full transition-all"
+            className="h-1 rounded-full transition-all duration-500"
             style={{
               width: s === step ? 22 : 6,
               background: s === step ? situation.tint : "hsl(0 0% 80% / 0.6)",
