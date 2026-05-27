@@ -68,28 +68,35 @@ const ChatScreen = ({
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  // Memória contextual premium: busca última pergunta de dia anterior
+  // Memória contextual premium: busca última pergunta de dia anterior (falha silenciosa)
   useEffect(() => {
     if (!isPremium || !user || messages.length > 0) return;
     let cancelled = false;
     (async () => {
-      const sinceIso = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      const { data } = await supabase
-        .from("kidzz_questions_log")
-        .select("question, created_at")
-        .eq("user_id", user.id)
-        .gte("created_at", sinceIso)
-        .lt("created_at", todayStart.toISOString())
-        .order("created_at", { ascending: false })
-        .limit(1);
-      if (cancelled || !data?.[0]) return;
-      const row = data[0];
-      const created = new Date(row.created_at);
-      const diffDays = Math.floor((todayStart.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-      const when = diffDays <= 1 ? "Ontem" : `${diffDays} dias atrás`;
-      setLastTopic({ question: row.question, when });
+      try {
+        const sinceIso = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const { data, error } = await supabase
+          .from("kidzz_questions_log")
+          .select("question, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", sinceIso)
+          .lt("created_at", todayStart.toISOString())
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (cancelled || error || !data?.[0]) {
+          if (error) console.warn("[Kidzz] chat memória indisponível:", error.message);
+          return;
+        }
+        const row = data[0];
+        const created = new Date(row.created_at);
+        const diffDays = Math.floor((todayStart.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+        const when = diffDays <= 1 ? "Ontem" : `${diffDays} dias atrás`;
+        setLastTopic({ question: row.question, when });
+      } catch (e: any) {
+        console.warn("[Kidzz] chat memória falhou (fallback silencioso):", e?.message ?? e);
+      }
     })();
     return () => { cancelled = true; };
   }, [isPremium, user, messages.length]);

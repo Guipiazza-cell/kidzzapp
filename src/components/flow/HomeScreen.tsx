@@ -171,28 +171,40 @@ const HomeScreen = ({
   const isPremium = profile?.is_premium ?? false;
 
   // Memória contextual premium — busca última pergunta dos últimos 7 dias (exceto hoje)
+  // Falha silenciosa: se a query quebrar, o chip simplesmente não aparece — Home nunca quebra.
   useEffect(() => {
     if (!isPremium || !user) return;
+    let cancelled = false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     (async () => {
-      const { data } = await supabase
-        .from("kidzz_questions_log")
-        .select("question, created_at")
-        .eq("user_id", user.id)
-        .gte("created_at", sevenDaysAgo.toISOString())
-        .lt("created_at", today.toISOString())
-        .order("created_at", { ascending: false })
-        .limit(1);
-      if (data && data[0]) {
-        const d = new Date(data[0].created_at);
-        const diff = Math.floor((today.getTime() - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86400000);
-        const when = diff === 1 ? "Ontem" : `Há ${diff} dias`;
-        setLastTopic({ question: data[0].question, when });
+      try {
+        const { data, error } = await supabase
+          .from("kidzz_questions_log")
+          .select("question, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", sevenDaysAgo.toISOString())
+          .lt("created_at", today.toISOString())
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (cancelled) return;
+        if (error) {
+          console.warn("[Kidzz] memória premium indisponível:", error.message);
+          return;
+        }
+        if (data && data[0]) {
+          const d = new Date(data[0].created_at);
+          const diff = Math.floor((today.getTime() - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86400000);
+          const when = diff === 1 ? "Ontem" : `Há ${diff} dias`;
+          setLastTopic({ question: data[0].question, when });
+        }
+      } catch (e: any) {
+        console.warn("[Kidzz] memória premium falhou (fallback silencioso):", e?.message ?? e);
       }
     })();
+    return () => { cancelled = true; };
   }, [isPremium, user]);
 
   const childName = profile?.child_name || "amigo";
