@@ -328,7 +328,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
               {isPremium ? (
                 <button
                   type="button"
-                  onClick={() => goNext("apoio")}
+                  onClick={() => goNext("continuidade")}
                   className="w-full py-3 rounded-2xl text-white text-[14px] font-black tracking-tight flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
                   style={{
                     background: `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
