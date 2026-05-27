@@ -212,18 +212,24 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                 </motion.div>
               </div>
 
-              <p
+              <motion.p
                 className="text-[22px] font-black leading-snug max-w-[280px] mb-3 tracking-tight"
                 style={{ color: "hsl(var(--premium-ink))" }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
               >
                 {situation.acolhimento.title}
-              </p>
-              <p
+              </motion.p>
+              <motion.p
                 className="text-[15px] font-medium leading-relaxed max-w-[300px] mb-6 whitespace-pre-line"
                 style={{ color: "hsl(var(--premium-ink-soft))" }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5, duration: 0.7 }}
               >
                 {situation.acolhimento.subtitle}
-              </p>
+              </motion.p>
               {loading && (
                 <span
                   className="text-[11px] font-medium flex items-center gap-1 mb-4"
@@ -232,7 +238,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                   <Loader2 size={11} className="animate-spin" /> preparando voz acolhedora…
                 </span>
               )}
-              <button
+              <motion.button
                 type="button"
                 onClick={() => goNext("respiracao")}
                 className="px-6 py-3 rounded-full text-white text-[14px] font-black tracking-tight flex items-center gap-1.5 active:scale-95 transition-transform"
@@ -240,9 +246,12 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                   background: `linear-gradient(180deg, hsl(var(--sos-from)), ${situation.tint})`,
                   boxShadow: `0 8px 22px -8px ${situation.tint.replace(")", " / 0.5)")}`,
                 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2.6, duration: 0.5 }}
               >
                 {situation.acolhimento.cta} <ChevronRight size={14} />
-              </button>
+              </motion.button>
             </motion.div>
           )}
 
