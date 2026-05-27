@@ -670,6 +670,9 @@ const BreathingScene = ({
     let timer: ReturnType<typeof setTimeout>;
     const tick = (p: "in" | "hold" | "out") => {
       setPhase(p);
+      // feedback respiratório orgânico — apenas no início de in/out
+      if (p === "in") haptic("light");
+      else if (p === "out") haptic("light");
       const durMs = (p === "in" ? inSec : p === "hold" ? holdSec : outSec) * 1000;
       timer = setTimeout(() => {
         if (p === "in") tick("hold");
@@ -678,7 +681,7 @@ const BreathingScene = ({
           setCycle((c) => {
             const next = c + 1;
             if (next >= TARGET_CYCLES) {
-              setTimeout(onDone, 600);
+              setTimeout(onDone, 800);
               return next;
             }
             tick("in");
