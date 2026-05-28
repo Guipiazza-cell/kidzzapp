@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import KidzzChameleon from "./kidzz/KidzzChameleon";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
@@ -26,15 +26,15 @@ const InterestsOnboarding = () => {
   const [saving, setSaving] = useState(false);
   const childName = profile?.child_name || "amigo";
 
-  const toggle = (id: string) => {
+  const toggle = useCallback((id: string) => {
     sfx("click");
     haptic("light");
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (selected.length === 0 || saving) return;
     setSaving(true);
     sfx("reward");
@@ -44,10 +44,11 @@ const InterestsOnboarding = () => {
       await updateProfile({ child_interests: selected } as any);
     } catch (e) {
       console.error("InterestsOnboarding error", e);
+      await updateProfile({ child_interests: selected } as any);
       setSaving(false);
       sfx("error");
     }
-  };
+  }, [saving, selected, updateProfile]);
 
   const ready = selected.length > 0;
 
