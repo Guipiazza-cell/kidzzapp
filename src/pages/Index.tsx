@@ -52,6 +52,20 @@ import { showXpGained } from "@/components/flow/XpToast";
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
+const INTRO_SETTLE_KEY = "kidzz_intro_settled_v2";
+const markIntroSettled = () => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(INTRO_SETTLE_KEY, "1");
+    window.localStorage.setItem("kidzz_onboarding_welcomed", "1");
+    window.localStorage.setItem("kidzz_states_intro_seen", "1");
+    window.localStorage.setItem("kidzz_emotional_intro_v1", "1");
+  } catch {}
+};
+const hasIntroSettled = () => {
+  if (typeof window === "undefined") return false;
+  try { return window.localStorage.getItem(INTRO_SETTLE_KEY) === "1"; } catch { return false; }
+};
 
 const Index = () => {
   const navigate = useNavigate();
@@ -81,10 +95,10 @@ const Index = () => {
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
-  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasSeenKidzzStatesIntro());
+  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasIntroSettled() && !hasSeenKidzzStatesIntro());
   const [showWelcome, setShowWelcome] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
-    try { return window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
+    try { return !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
   // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
@@ -268,15 +282,16 @@ const Index = () => {
       <OnboardingWelcome
         childName={profile.child_name}
         onEnter={() => {
-          try { localStorage.setItem("kidzz_onboarding_welcomed", "1"); } catch {}
+          markIntroSettled();
           setShowWelcome(false);
+          setShowStatesIntro(false);
         }}
       />
     );
   }
   // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
   if (showStatesIntro) {
-    return <KidzzStatesIntro onDone={() => setShowStatesIntro(false)} />;
+    return <KidzzStatesIntro onDone={() => { markIntroSettled(); setShowStatesIntro(false); }} />;
   }
   // Notification time prompt is now contextual (after first answer), not blocking onboarding
 
@@ -327,6 +342,7 @@ const Index = () => {
   };
 
   const handleTabChange = (tab: string) => {
+    markIntroSettled();
     // Fecha overlays ao trocar de aba
     setShowLab(false);
     setShowPlay(false);
