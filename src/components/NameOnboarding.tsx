@@ -94,7 +94,7 @@ const NameOnboarding = () => {
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="Seu nome"
-              className="w-full py-5 px-6 rounded-2xl text-gray-900 text-xl font-bold text-center placeholder:text-gray-400 focus:outline-none transition-all"
+              className="w-full py-5 px-6 rounded-2xl text-gray-900 text-xl font-bold text-center placeholder:text-gray-400 focus:outline-none transition-[opacity,transform,box-shadow]"
               style={{
                 background: "rgba(255,255,255,0.65)",
                 backdropFilter: "blur(12px)",
