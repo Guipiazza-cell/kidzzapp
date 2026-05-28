@@ -53,7 +53,7 @@ class ErrorBoundary extends Component<Props, State> {
             Tentar novamente 🔄
           </motion.button>
           <button
-            onClick={() => window.location.reload()}
+            onClick={this.handleRetry}
             className="mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Recarregar página
