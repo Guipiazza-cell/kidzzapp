@@ -119,6 +119,12 @@ const Index = () => {
     window.localStorage.setItem(AGE_STORAGE_KEY, profile.age_range);
   }, [profile?.age_range]);
 
+  useEffect(() => {
+    const interests = (profile as any)?.child_interests as string[] | undefined;
+    if (!profile?.child_name || !profile?.age_range || !interests?.length) return;
+    if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
+  }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
+
   // Prefetch leve apenas em desktop. No Safari/mobile o preload agressivo travava o início
   // e trazia chunks pesados (PDF, jogos, cinema) antes do usuário tocar nas abas.
   useEffect(() => {
