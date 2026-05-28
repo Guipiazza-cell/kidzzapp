@@ -135,6 +135,23 @@ const Index = () => {
     setActiveTab(tab);
   }, []);
 
+  const handleTabChange = useCallback((tab: string) => {
+    markIntroSettled();
+    setActiveTab(tab);
+    setShowLab(false);
+    setShowPlay(false);
+    setShowTravel(false);
+    setShowChallenge(false);
+    setShowReferral(false);
+    setShowRetrospective(false);
+    if (tab === "chat") setStep("home");
+  }, []);
+
+  const backToHome = useCallback(() => {
+    switchTab("chat");
+    setStep("home");
+  }, [switchTab]);
+
   // Keep-alive: cada aba já visitada permanece montada (visibility:hidden) — evita pisca.
   const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
   useEffect(() => {
