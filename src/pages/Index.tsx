@@ -61,6 +61,7 @@ const markIntroSettled = () => {
     window.localStorage.setItem("kidzz_onboarding_welcomed", "1");
     window.localStorage.setItem("kidzz_states_intro_seen", "1");
     window.localStorage.setItem("kidzz_emotional_intro_v1", "1");
+    window.sessionStorage.removeItem(JUST_COMPLETED_ONBOARDING_KEY);
   } catch {}
 };
 const hasIntroSettled = () => {
