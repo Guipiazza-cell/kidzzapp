@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useTransition, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -131,8 +131,10 @@ const Index = () => {
     if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
   }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
 
-  const lastStableContentRef = useRef<JSX.Element | null>(null);
-  const TabSuspenseFallback = () => lastStableContentRef.current;
+  const [, startTabTransition] = useTransition();
+  const switchTab = useCallback((tab: string) => {
+    startTabTransition(() => setActiveTab(tab));
+  }, [startTabTransition]);
 
   // Pré-carrega as abas gradualmente no idle, sem bloquear a Home no Safari.
   useEffect(() => {
