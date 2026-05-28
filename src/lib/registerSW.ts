@@ -36,7 +36,9 @@ export async function registerServiceWorker() {
       if (reloading) return;
       reloading = true;
       await clearAppCaches({ unregisterServiceWorkers: true });
-      setTimeout(() => window.location.reload(), 30);
+      const url = new URL(window.location.href);
+      url.searchParams.set("kidzz_reload", Date.now().toString());
+      window.location.replace(url.toString());
     };
 
     const updateSW = registerSW({
@@ -89,7 +91,11 @@ export async function registerServiceWorker() {
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (refreshed) return;
       refreshed = true;
-      void clearAppCaches().finally(() => window.location.reload());
+      void clearAppCaches().finally(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set("kidzz_reload", Date.now().toString());
+        window.location.replace(url.toString());
+      });
     });
 
     (window as any).__updateSW = updateSW;
