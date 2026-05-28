@@ -41,21 +41,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Require a valid Supabase JWT.
+  // Accept any Bearer token (anon key OR user JWT) — atividades semanais funcionam
+  // também em modo convidado. Sem validação rigorosa de sub claim.
   const authHeader = req.headers.get("Authorization") || req.headers.get("authorization");
   const token = authHeader?.replace(/^Bearer\s+/i, "");
   if (!token) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-  const supabaseAuth = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-    { auth: { persistSession: false } }
-  );
-  const { data: userData, error: userErr } = await supabaseAuth.auth.getUser(token);
-  if (userErr || !userData?.user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
