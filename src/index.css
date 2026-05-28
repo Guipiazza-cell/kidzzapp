@@ -99,10 +99,14 @@
     @apply border-border;
   }
 
-  html, body {
+  html, body, #root {
     /* Smooth momentum scroll on iOS + contain overscroll bounce that breaks fixed UIs */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
+    width: 100%;
+    max-width: 100vw;
+    min-height: 100dvh;
+    overflow-x: hidden;
   }
 
   html.lp-route {
@@ -170,7 +174,11 @@
   }
 
   /* Prevent layout-shift flicker on images while they decode */
-  img { content-visibility: auto; }
+  img {
+    content-visibility: auto;
+    max-width: 100%;
+    object-fit: cover;
+  }
 }
 
 @layer utilities {
