@@ -50,7 +50,7 @@ interface Props {
 }
 
 const CharacterParticles = ({ particles }: Props) => (
-  <div className="fixed inset-0 pointer-events-none z-50">
+  <div className="fixed inset-0 pointer-events-none z-[65]">
     <AnimatePresence>
       {particles.map((p) => {
         const rad = (p.angle * Math.PI) / 180;
