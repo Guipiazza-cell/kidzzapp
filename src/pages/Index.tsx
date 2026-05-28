@@ -461,10 +461,7 @@ const Index = () => {
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative">
         {/* Troca de aba sem fade/crossfade: Safari estava mostrando um pisca entre telas. */}
-        <div
-          key={activeTab}
-          className="flex-1 flex flex-col min-h-0"
-        >
+        <div className="flex-1 flex flex-col min-h-0">
           <TabErrorBoundary
             resetKey={activeTab}
             label={activeTab}
