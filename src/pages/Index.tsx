@@ -131,8 +131,27 @@ const Index = () => {
     if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
   }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
 
-  // Abas principais são importadas estaticamente para evitar flash/falha de chunk no Safari.
-  // Mantemos lazy apenas para overlays raros e realmente secundários.
+  const lastStableContentRef = useRef<JSX.Element | null>(null);
+  const TabSuspenseFallback = () => lastStableContentRef.current;
+
+  // Pré-carrega as abas gradualmente no idle, sem bloquear a Home no Safari.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
+    let cancelled = false;
+    let index = 0;
+    const runNext = () => {
+      if (cancelled || index >= loaders.length) return;
+      void loaders[index++]().catch(() => undefined).finally(() => {
+        if (cancelled) return;
+        const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, opts?: { timeout?: number }) => number);
+        if (ric) ric(runNext, { timeout: 2500 });
+        else window.setTimeout(runNext, 900);
+      });
+    };
+    const start = window.setTimeout(runNext, 1200);
+    return () => { cancelled = true; window.clearTimeout(start); };
+  }, []);
 
   // Auto monthly retrospective: day 1 + activity + not seen this month
   useEffect(() => {
