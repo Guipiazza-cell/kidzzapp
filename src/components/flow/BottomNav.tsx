@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useRef } from "react";
 import {
   MessageCircleHeart, BookOpen, Music2, Target, Film, Disc3,
   Moon, Gamepad2, Heart, Crown, Shield,
@@ -43,7 +43,13 @@ const ROW_BOTTOM: Tab[] = [
 ];
 
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
+  const lastTapRef = useRef<{ id: string; at: number } | null>(null);
+
   const handle = useCallback((id: string) => {
+    const now = Date.now();
+    const last = lastTapRef.current;
+    if (last?.id === id && now - last.at < 350) return;
+    lastTapRef.current = { id, at: now };
     if (activeTab === id) return;
     haptic("light");
     sfx("click");
@@ -57,6 +63,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       <motion.button
         key={tab.id}
         type="button"
+        onPointerUp={(event) => { event.preventDefault(); handle(tab.id); }}
+        onTouchEnd={(event) => { event.preventDefault(); handle(tab.id); }}
         onClick={() => handle(tab.id)}
         whileTap={{ scale: 0.88 }}
         animate={isActive ? { scale: [0.8, 1.1, 1] } : { scale: 1 }}
@@ -100,6 +108,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       style={{
         position: "fixed",
         bottom: 0,
+        zIndex: 2147483647,
         paddingBottom: "max(env(safe-area-inset-bottom, 6px), 6px)",
         background: "hsl(48 36% 98% / 0.88)",
         backdropFilter: "blur(14px) saturate(1.1)",
