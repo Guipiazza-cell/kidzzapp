@@ -598,6 +598,67 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                     </p>
                   </motion.div>
 
+                  {/* Feedback emocional — "Como vocês estão agora?" */}
+                  <motion.div
+                    className="w-full p-4 rounded-2xl mb-3"
+                    style={{
+                      background: "hsl(0 0% 100% / 0.78)",
+                      border: "1px solid hsl(0 0% 100% / 0.7)",
+                    }}
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 4.1, duration: 0.6 }}
+                  >
+                    <p
+                      className="text-[12.5px] font-black text-center mb-3"
+                      style={{ color: "hsl(var(--premium-ink))" }}
+                    >
+                      Como vocês estão agora?
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { key: "better", emoji: "💚", label: "Melhor" },
+                        { key: "still_hard", emoji: "🫂", label: "Ainda difícil" },
+                        { key: "helped", emoji: "✨", label: "Ajudou bastante" },
+                        { key: "continue", emoji: "🌙", label: "Quero continuar" },
+                      ].map((opt) => {
+                        const selected = feedback === opt.key;
+                        const dimmed = feedback && !selected;
+                        return (
+                          <motion.button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => sendFeedback(opt.key, opt.label)}
+                            whileTap={{ scale: 0.96 }}
+                            disabled={!!feedback}
+                            className="py-2.5 px-2 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all"
+                            style={{
+                              background: selected
+                                ? `linear-gradient(135deg, ${situation.tint.replace(")", " / 0.22)")}, hsl(0 0% 100% / 0.6))`
+                                : "hsl(0 0% 100% / 0.7)",
+                              border: selected
+                                ? `1px solid ${situation.tint.replace(")", " / 0.55)")}`
+                                : "1px solid hsl(0 0% 100% / 0.6)",
+                              color: "hsl(var(--premium-ink))",
+                              opacity: dimmed ? 0.5 : 1,
+                            }}
+                          >
+                            <span aria-hidden>{opt.emoji}</span>
+                            <span className="truncate">{opt.label}</span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                    {feedback && (
+                      <motion.p
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className="text-[11px] text-center mt-2.5 font-medium"
+                        style={{ color: "hsl(var(--premium-ink-soft))" }}
+                      >
+                        Obrigado por compartilhar 💚
+                      </motion.p>
+                    )}
+                  </motion.div>
+
                   {/* Ações de fechamento */}
                   <motion.div
                     className="w-full grid grid-cols-2 gap-2 mb-2"
