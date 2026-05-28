@@ -38,8 +38,8 @@ const OnboardingShell = ({ children, tone = "warm" }: Props) => {
 
   return (
     <motion.div
-      className="min-h-screen flex flex-col relative overflow-hidden"
-      style={{ background: TONES[tone] }}
+      className="min-h-[100dvh] flex flex-col relative overflow-hidden max-w-[100vw]"
+      style={{ background: TONES[tone], height: "auto", overflowX: "hidden" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
