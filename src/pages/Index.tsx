@@ -56,8 +56,15 @@ import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCar
 import { showXpGained } from "@/components/flow/XpToast";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
+const KNOWN_TABS = ["chat", "explore", "routine", "play", "memories", "moments", "cinema", "wellness", "achievements", "dreams", "music"];
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
+const getHashTab = () => {
+  if (typeof window === "undefined") return null;
+  const tab = window.location.hash.match(/tab=([\w-]+)/)?.[1];
+  return tab && KNOWN_TABS.includes(tab) ? tab : null;
+};
+const getInitialTab = () => getHashTab() ?? "chat";
 const INTRO_SETTLE_KEY = "kidzz_intro_settled_v2";
 const JUST_COMPLETED_ONBOARDING_KEY = "kidzz_just_completed_onboarding";
 const markIntroSettled = () => {
@@ -87,7 +94,7 @@ const Index = () => {
   const [step, setStep] = useState<FlowStep>("home");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [activeTab, setActiveTab] = useState("chat");
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [showLab, setShowLab] = useState(false);
   const [showPlay, setShowPlay] = useState(false);
   const [showTravel, setShowTravel] = useState(false);
@@ -132,10 +139,7 @@ const Index = () => {
   }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
 
   const switchTab = useCallback((tab: string) => {
-    setActiveTab(tab);
-  }, []);
-
-  const handleTabChange = useCallback((tab: string) => {
+    if (!KNOWN_TABS.includes(tab)) return;
     markIntroSettled();
     setActiveTab(tab);
     setShowLab(false);
@@ -146,6 +150,8 @@ const Index = () => {
     setShowRetrospective(false);
     if (tab === "chat") setStep("home");
   }, []);
+
+  const handleTabChange = switchTab;
 
   const backToHome = useCallback(() => {
     switchTab("chat");
@@ -249,21 +255,14 @@ const Index = () => {
 
   // Tab <-> URL hash sync. Lets the browser back button + share links work
   // without rewriting the routing layer. Hash format: `#tab=dreams`.
-  const KNOWN_TABS = ["chat","explore","routine","play","memories","moments","cinema","wellness","achievements","dreams","music"];
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const parseHash = () => {
-      const m = window.location.hash.match(/tab=([\w-]+)/);
-      return m && KNOWN_TABS.includes(m[1]) ? m[1] : null;
-    };
-    const initial = parseHash();
+    const initial = getHashTab();
     if (initial && initial !== activeTab) switchTab(initial);
 
     const onPop = () => {
-      const t = parseHash() ?? "chat";
+      const t = getHashTab() ?? "chat";
       switchTab(t);
-      setShowLab(false); setShowPlay(false); setShowTravel(false);
-      setShowChallenge(false); setShowReferral(false); setShowRetrospective(false);
       if (t === "chat") setStep("home");
     };
     window.addEventListener("popstate", onPop);
