@@ -369,24 +369,31 @@ const Index = () => {
     switchTab(tab);
   };
 
-  const renderContent = () => {
-    // ABA: Histórias (📖)
-    if (activeTab === "explore") {
-      return <StoryFactory key="stories" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
-    }
-    // ABA: Rotina (🎯 — substitui "Brincar" na tab bar; pilar de hábito)
-    if (activeTab === "routine") {
-      return <RoutineScreen key="routine" />;
-    }
-    // Brincar permanece acessível via Home (botão), apenas removido da tab bar
-    if (activeTab === "play") {
-      return (
-        <KidzzPlay
-          key="play"
-          onBack={() => { switchTab("chat"); setStep("home"); }}
-          onGameComplete={() => evolution.evolve("game")}
+  // Keep-alive: cada aba já visitada permanece montada em background (display:none)
+  // para evitar remount/pisca ao alternar. Só montamos sob demanda na primeira visita.
+  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
+  useEffect(() => {
+    setMountedTabs((prev) => {
+      if (prev.has(activeTab)) return prev;
+      const next = new Set(prev);
+      next.add(activeTab);
+      return next;
+    });
+  }, [activeTab]);
+
+  const backToHome = useCallback(() => { switchTab("chat"); setStep("home"); }, [switchTab]);
+
+  const renderChatTab = () => (
+    <AnimatePresence mode="wait">
+      {step === "home" && (
+        <HomeScreen
+          key="home"
+          onSubmit={handleQuestionSubmit}
+          onOpenStoryFactory={() => switchTab("explore")}
+          onOpenMoments={() => switchTab("moments")}
           onOpenAchievements={() => switchTab("achievements")}
           onOpenLab={() => setShowLab(true)}
+          onOpenPlay={() => switchTab("play")}
           onOpenTravel={() => {
             if (!profile?.is_premium) {
               setContextualPaywall({ open: true, context: "travel" });
@@ -394,114 +401,106 @@ const Index = () => {
             }
             setShowTravel(true);
           }}
+          onOpenChallenge={() => setShowChallenge(true)}
+          onOpenReferral={() => setShowReferral(true)}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          hideBottomNav
+          characterEvolution={evolution as any}
         />
-      );
-    }
-    // ABA: Memórias (acessada via botão da Home, não está na tab bar)
-    if (activeTab === "memories") {
-      return <MemoriesAlbum key="memories" onBack={() => { switchTab("chat"); setStep("home"); }} onNavigateToChat={() => { switchTab("chat"); setStep("home"); }} onNavigateToStories={() => switchTab("explore")} />;
-    }
-    if (activeTab === "moments") {
-      return <MomentsPlaylists key="moments" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
-    }
-    if (activeTab === "cinema") {
-      return <FamilyCinema key="cinema" onBack={() => { switchTab("chat"); setStep("home"); }} />;
-    }
-    if (activeTab === "wellness") {
-      return <WellnessHub key="wellness" onBack={() => { switchTab("chat"); setStep("home"); }} />;
-    }
-    if (activeTab === "achievements") {
-      // Conquistas vivem como subaba dentro de Memórias
-      return <MemoriesAlbum key="memories-ach" onBack={() => { switchTab("chat"); setStep("home"); }} onNavigateToChat={() => { switchTab("chat"); setStep("home"); }} onNavigateToStories={() => switchTab("explore")} />;
-    }
-    // ABA: Sonhos (🌙 — fundo próprio escuro)
-    if (activeTab === "dreams") {
-      return <DreamWorld key="dreams" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
-    }
-    // ABA: Música (🌿)
-    if (activeTab === "music") {
-      return (
-        <MusicForest
-          key="music"
-          onBack={() => { switchTab("chat"); setStep("home"); }}
-          onNavigateToDreams={() => switchTab("dreams")}
-          onXpEarned={() => evolution.evolve("game")}
+      )}
+      {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } })} />}
+      {step === "celebrating" && (
+        <CelebrationScreen
+          key="celebrating"
+          childName={childName}
+          pointsEarned={1}
+          streakDays={profile.streak_days ?? 0}
+          interests={(profile as any)?.child_interests as string[] | undefined}
+          onContinue={handleCelebrationDone}
+          onSave={() => {
+            addMemory({
+              type: "question",
+              title: question,
+              content: answer.slice(0, 500),
+              is_special: true,
+              image_url: null,
+              metadata: { saved_from: "celebration" },
+            });
+          }}
+          type="answer"
         />
-      );
-    }
+      )}
+      {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => switchTab("explore")} />}
+      {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); switchTab("chat"); }} />}
+    </AnimatePresence>
+  );
 
-    return (
-      <AnimatePresence mode="wait">
-        {step === "home" && (
-          <HomeScreen
-            key="home"
-            onSubmit={handleQuestionSubmit}
-            onOpenStoryFactory={() => switchTab("explore")}
-            onOpenMoments={() => switchTab("moments")}
-            onOpenAchievements={() => switchTab("achievements")}
-            onOpenLab={() => setShowLab(true)}
-            onOpenPlay={() => switchTab("play")}
-            onOpenTravel={() => {
-              if (!profile?.is_premium) {
-                setContextualPaywall({ open: true, context: "travel" });
-                return;
-              }
-              setShowTravel(true);
-            }}
-            onOpenChallenge={() => setShowChallenge(true)}
-            onOpenReferral={() => setShowReferral(true)}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            hideBottomNav
-            characterEvolution={evolution as any}
-          />
-        )}
-        {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } })} />}
-        {step === "celebrating" && (
-          <CelebrationScreen
-            key="celebrating"
-            childName={childName}
-            pointsEarned={1}
-            streakDays={profile.streak_days ?? 0}
-            interests={(profile as any)?.child_interests as string[] | undefined}
-            onContinue={handleCelebrationDone}
-            onSave={() => {
-              addMemory({
-                type: "question",
-                title: question,
-                content: answer.slice(0, 500),
-                is_special: true,
-                image_url: null,
-                metadata: { saved_from: "celebration" },
-              });
-            }}
-            type="answer"
-          />
-        )}
-        {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => switchTab("explore")} />}
-        {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); switchTab("chat"); }} />}
-      </AnimatePresence>
-    );
+  // Cada aba é renderizada uma vez (lazy, sob demanda) e mantida montada.
+  // O wrapper KeepAlive esconde/exibe sem desmontar — evita remount, refetch e flash branco.
+  const TAB_RENDERERS: Record<string, () => JSX.Element> = {
+    chat: renderChatTab,
+    explore: () => <StoryFactory onBack={() => { backToHome(); evolution.evolve("story"); }} />,
+    routine: () => <RoutineScreen />,
+    play: () => (
+      <KidzzPlay
+        onBack={backToHome}
+        onGameComplete={() => evolution.evolve("game")}
+        onOpenAchievements={() => switchTab("achievements")}
+        onOpenLab={() => setShowLab(true)}
+        onOpenTravel={() => {
+          if (!profile?.is_premium) {
+            setContextualPaywall({ open: true, context: "travel" });
+            return;
+          }
+          setShowTravel(true);
+        }}
+      />
+    ),
+    memories: () => <MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} />,
+    moments: () => <MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} />,
+    cinema: () => <FamilyCinema onBack={backToHome} />,
+    wellness: () => <WellnessHub onBack={backToHome} />,
+    achievements: () => <MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} />,
+    dreams: () => <DreamWorld onBack={() => { backToHome(); evolution.evolve("story"); }} />,
+    music: () => (
+      <MusicForest
+        onBack={backToHome}
+        onNavigateToDreams={() => switchTab("dreams")}
+        onXpEarned={() => evolution.evolve("game")}
+      />
+    ),
   };
 
   return (
     <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden">
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative">
-        {/* Troca de aba sem fade/crossfade: Safari estava mostrando um pisca entre telas. */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <TabErrorBoundary
-            resetKey={activeTab}
-            label={activeTab}
-            onBack={() => { switchTab("chat"); setStep("home"); }}
-          >
-            {/* Transição React mantém a tela anterior enquanto a próxima aba lazy carrega — sem pisca. */}
-            <Suspense fallback={null}>
-              {renderContent()}
-            </Suspense>
-          </TabErrorBoundary>
+        <div className="flex-1 flex flex-col min-h-0 relative">
+          {Array.from(mountedTabs).map((tab) => {
+            const renderer = TAB_RENDERERS[tab];
+            if (!renderer) return null;
+            const isActive = tab === activeTab;
+            return (
+              <div
+                key={tab}
+                className="absolute inset-0 flex flex-col min-h-0"
+                style={{
+                  visibility: isActive ? "visible" : "hidden",
+                  pointerEvents: isActive ? "auto" : "none",
+                  zIndex: isActive ? 2 : 1,
+                }}
+                aria-hidden={!isActive}
+              >
+                <TabErrorBoundary resetKey={tab} label={tab} onBack={backToHome}>
+                  <Suspense fallback={null}>{renderer()}</Suspense>
+                </TabErrorBoundary>
+              </div>
+            );
+          })}
         </div>
       </div>
+
       <BottomNav
         activeTab={activeTab}
         onTabChange={handleTabChange}
