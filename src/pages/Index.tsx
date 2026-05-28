@@ -353,7 +353,7 @@ const Index = () => {
   };
 
   const handleNewQuestion = () => {
-    setQuestion(""); setAnswer(""); setStep("home"); setActiveTab("chat");
+    setQuestion(""); setAnswer(""); setStep("home"); switchTab("chat");
   };
 
   const handleTabChange = (tab: string) => {
@@ -365,14 +365,14 @@ const Index = () => {
     setShowChallenge(false);
     setShowReferral(false);
     setShowRetrospective(false);
-    setActiveTab(tab);
     if (tab === "chat") setStep("home");
+    switchTab(tab);
   };
 
   const renderContent = () => {
     // ABA: Histórias (📖)
     if (activeTab === "explore") {
-      return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
+      return <StoryFactory key="stories" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     // ABA: Rotina (🎯 — substitui "Brincar" na tab bar; pilar de hábito)
     if (activeTab === "routine") {
@@ -496,7 +496,7 @@ const Index = () => {
             onBack={() => { setActiveTab("chat"); setStep("home"); }}
           >
             {/* Suspense fallback = null nos overlays lazy; abas principais não são lazy. */}
-            <Suspense fallback={null}>
+            <Suspense fallback={renderContent()}>
               {renderContent()}
             </Suspense>
           </TabErrorBoundary>
