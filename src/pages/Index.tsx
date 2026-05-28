@@ -101,7 +101,7 @@ const Index = () => {
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
-  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasIntroSettled() && !hasSeenKidzzStatesIntro());
+  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => justCompletedOnboarding() && !hasIntroSettled() && !hasSeenKidzzStatesIntro());
   const [showWelcome, setShowWelcome] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
