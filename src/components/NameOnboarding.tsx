@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import KidzzChameleon from "./kidzz/KidzzChameleon";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
@@ -27,7 +27,7 @@ const NameOnboarding = () => {
     if (ric) ric(run); else setTimeout(run, 400);
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const trimmed = name.trim();
     if (!trimmed) {
       setError("Digite seu nome 😊");
@@ -42,14 +42,14 @@ const NameOnboarding = () => {
     haptic("medium");
     try {
       await updateProfile({ child_name: trimmed });
-      setTimeout(() => setSaving(false), 3000);
+      setSaving(false);
     } catch (e) {
       console.error("NameOnboarding: updateProfile error", e);
-      setError("Algo deu errado. Tente novamente!");
       setSaving(false);
+      await updateProfile({ child_name: trimmed });
       sfx("error");
     }
-  };
+  }, [name, saving, updateProfile]);
 
   const filled = !!name.trim();
 
@@ -94,7 +94,7 @@ const NameOnboarding = () => {
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               placeholder="Seu nome"
-              className="w-full py-5 px-6 rounded-2xl text-gray-900 text-xl font-bold text-center placeholder:text-gray-400 focus:outline-none transition-all"
+              className="w-full py-5 px-6 rounded-2xl text-gray-900 text-xl font-bold text-center placeholder:text-gray-400 focus:outline-none transition-[opacity,transform,box-shadow]"
               style={{
                 background: "rgba(255,255,255,0.65)",
                 backdropFilter: "blur(12px)",

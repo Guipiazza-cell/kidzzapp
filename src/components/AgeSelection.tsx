@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Check } from "lucide-react";
 import KidzzChameleon from "./kidzz/KidzzChameleon";
@@ -22,16 +22,16 @@ const AgeSelection = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
-  const handleSelectAge = async (range: string) => {
+  const handleSelectAge = useCallback(async (range: string) => {
     setSelected(range);
     sfx("click");
     haptic("medium");
-    setTimeout(async () => {
+    await updateProfile({ age_range: range });
+    setTimeout(() => {
       sfx("reward");
       haptic("success");
-      await updateProfile({ age_range: range });
     }, 450);
-  };
+  }, [updateProfile]);
 
   return (
     <OnboardingShell tone="sky">
