@@ -124,29 +124,8 @@ const Index = () => {
     if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
   }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
 
-  // Prefetch leve apenas em desktop. No Safari/mobile o preload agressivo travava o início
-  // e trazia chunks pesados (PDF, jogos, cinema) antes do usuário tocar nas abas.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mobileLike = window.matchMedia?.("(max-width: 767px), (pointer: coarse)")?.matches;
-    if (mobileLike) return;
-    const idle = (cb: () => void) =>
-      (window as any).requestIdleCallback
-        ? (window as any).requestIdleCallback(cb, { timeout: 9000 })
-        : setTimeout(cb, 7000);
-    const handle = idle(() => {
-      // Desktop somente: prepara abas comuns sem bloquear o thread principal.
-      import("@/components/story/StoryFactory");
-      import("@/components/routine/RoutineScreen");
-      import("@/components/dreams/DreamWorld");
-      import("@/components/music/MusicForest");
-    });
-    return () => {
-      if ((window as any).cancelIdleCallback && typeof handle === "number") {
-        (window as any).cancelIdleCallback(handle);
-      }
-    };
-  }, []);
+  // Abas principais são importadas estaticamente para evitar flash/falha de chunk no Safari.
+  // Mantemos lazy apenas para overlays raros e realmente secundários.
 
   // Auto monthly retrospective: day 1 + activity + not seen this month
   useEffect(() => {
