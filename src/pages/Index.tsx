@@ -383,9 +383,9 @@ const Index = () => {
       return (
         <KidzzPlay
           key="play"
-          onBack={() => { setActiveTab("chat"); setStep("home"); }}
+          onBack={() => { switchTab("chat"); setStep("home"); }}
           onGameComplete={() => evolution.evolve("game")}
-          onOpenAchievements={() => setActiveTab("achievements")}
+          onOpenAchievements={() => switchTab("achievements")}
           onOpenLab={() => setShowLab(true)}
           onOpenTravel={() => {
             if (!profile?.is_premium) {
@@ -399,32 +399,32 @@ const Index = () => {
     }
     // ABA: Memórias (acessada via botão da Home, não está na tab bar)
     if (activeTab === "memories") {
-      return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
+      return <MemoriesAlbum key="memories" onBack={() => { switchTab("chat"); setStep("home"); }} onNavigateToChat={() => { switchTab("chat"); setStep("home"); }} onNavigateToStories={() => switchTab("explore")} />;
     }
     if (activeTab === "moments") {
-      return <MomentsPlaylists key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
+      return <MomentsPlaylists key="moments" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "cinema") {
-      return <FamilyCinema key="cinema" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <FamilyCinema key="cinema" onBack={() => { switchTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "wellness") {
-      return <WellnessHub key="wellness" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <WellnessHub key="wellness" onBack={() => { switchTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "achievements") {
       // Conquistas vivem como subaba dentro de Memórias
-      return <MemoriesAlbum key="memories-ach" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
+      return <MemoriesAlbum key="memories-ach" onBack={() => { switchTab("chat"); setStep("home"); }} onNavigateToChat={() => { switchTab("chat"); setStep("home"); }} onNavigateToStories={() => switchTab("explore")} />;
     }
     // ABA: Sonhos (🌙 — fundo próprio escuro)
     if (activeTab === "dreams") {
-      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
+      return <DreamWorld key="dreams" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     // ABA: Música (🌿)
     if (activeTab === "music") {
       return (
         <MusicForest
           key="music"
-          onBack={() => { setActiveTab("chat"); setStep("home"); }}
-          onNavigateToDreams={() => setActiveTab("dreams")}
+          onBack={() => { switchTab("chat"); setStep("home"); }}
+          onNavigateToDreams={() => switchTab("dreams")}
           onXpEarned={() => evolution.evolve("game")}
         />
       );
