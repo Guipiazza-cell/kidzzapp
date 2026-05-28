@@ -48,7 +48,23 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
   const [muted, setMuted] = useState(false);
   const [selectedContinuity, setSelectedContinuity] = useState<string | null>(null);
   const [memorySaved, setMemorySaved] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const { speak, stop, loading } = useSosVoice();
+
+  const sendFeedback = (key: string, label: string) => {
+    if (feedback) return;
+    haptic("light");
+    sfx("click");
+    setFeedback(key);
+    try {
+      const log = JSON.parse(localStorage.getItem("kidzz_sos_feedback") || "[]");
+      log.push({ ts: Date.now(), situation: situation.id, feedback: key, label });
+      localStorage.setItem("kidzz_sos_feedback", JSON.stringify(log.slice(-50)));
+    } catch { /* noop */ }
+    if (key === "continue") {
+      setTimeout(() => { onGoWellness?.(); onClose(); }, 600);
+    }
+  };
 
   useEffect(() => () => stop(), [stop]);
 
