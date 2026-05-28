@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useTransition, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -131,10 +131,9 @@ const Index = () => {
     if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
   }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
 
-  const [, startTabTransition] = useTransition();
   const switchTab = useCallback((tab: string) => {
-    startTabTransition(() => setActiveTab(tab));
-  }, [startTabTransition]);
+    setActiveTab(tab);
+  }, []);
 
   // Keep-alive: cada aba já visitada permanece montada (visibility:hidden) — evita pisca.
   const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
@@ -367,8 +366,9 @@ const Index = () => {
     setQuestion(""); setAnswer(""); setStep("home"); switchTab("chat");
   };
 
-  const handleTabChange = (tab: string) => {
+  const handleTabChange = useCallback((tab: string) => {
     markIntroSettled();
+    setActiveTab(tab);
     // Fecha overlays ao trocar de aba
     setShowLab(false);
     setShowPlay(false);
@@ -377,8 +377,7 @@ const Index = () => {
     setShowReferral(false);
     setShowRetrospective(false);
     if (tab === "chat") setStep("home");
-    switchTab(tab);
-  };
+  }, []);
 
   const backToHome = useCallback(() => { switchTab("chat"); setStep("home"); }, [switchTab]);
 
@@ -472,10 +471,10 @@ const Index = () => {
   };
 
   return (
-    <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden">
+    <div className="min-h-[100dvh] flex flex-col overflow-hidden max-w-[100vw]" style={{ height: "auto", overflowX: "hidden" }}>
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
-      <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative">
-        <div className="flex-1 flex flex-col min-h-0 relative">
+      <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           {Array.from(mountedTabs).map((tab) => {
             const renderer = TAB_RENDERERS[tab];
             if (!renderer) return null;
@@ -492,7 +491,7 @@ const Index = () => {
                 aria-hidden={!isActive}
               >
                 <TabErrorBoundary resetKey={tab} label={tab} onBack={backToHome}>
-                  <Suspense fallback={null}>{renderer()}</Suspense>
+                  <Suspense fallback={<div className="min-h-[100dvh] w-full" aria-hidden />}>{renderer()}</Suspense>
                 </TabErrorBoundary>
               </div>
             );
