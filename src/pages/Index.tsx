@@ -208,7 +208,7 @@ const Index = () => {
       setShowChallenge(false);
       setShowReferral(false);
       setShowRetrospective(false);
-      setActiveTab("chat");
+      switchTab("chat");
       setStep("paywall");
     };
     window.addEventListener("kidzz:open-plans", openPlans);
@@ -230,11 +230,11 @@ const Index = () => {
       return m && KNOWN_TABS.includes(m[1]) ? m[1] : null;
     };
     const initial = parseHash();
-    if (initial && initial !== activeTab) setActiveTab(initial);
+    if (initial && initial !== activeTab) switchTab(initial);
 
     const onPop = () => {
       const t = parseHash() ?? "chat";
-      setActiveTab(t);
+      switchTab(t);
       setShowLab(false); setShowPlay(false); setShowTravel(false);
       setShowChallenge(false); setShowReferral(false); setShowRetrospective(false);
       if (t === "chat") setStep("home");
@@ -436,11 +436,11 @@ const Index = () => {
           <HomeScreen
             key="home"
             onSubmit={handleQuestionSubmit}
-            onOpenStoryFactory={() => setActiveTab("explore")}
-            onOpenMoments={() => setActiveTab("moments")}
-            onOpenAchievements={() => setActiveTab("achievements")}
+            onOpenStoryFactory={() => switchTab("explore")}
+            onOpenMoments={() => switchTab("moments")}
+            onOpenAchievements={() => switchTab("achievements")}
             onOpenLab={() => setShowLab(true)}
-            onOpenPlay={() => setActiveTab("play")}
+            onOpenPlay={() => switchTab("play")}
             onOpenTravel={() => {
               if (!profile?.is_premium) {
                 setContextualPaywall({ open: true, context: "travel" });
@@ -478,8 +478,8 @@ const Index = () => {
             type="answer"
           />
         )}
-        {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
-        {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); setActiveTab("chat"); }} />}
+        {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => switchTab("explore")} />}
+        {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); switchTab("chat"); }} />}
       </AnimatePresence>
     );
   };
@@ -493,9 +493,9 @@ const Index = () => {
           <TabErrorBoundary
             resetKey={activeTab}
             label={activeTab}
-            onBack={() => { setActiveTab("chat"); setStep("home"); }}
+            onBack={() => { switchTab("chat"); setStep("home"); }}
           >
-            {/* Suspense fallback = null nos overlays lazy; abas principais não são lazy. */}
+            {/* Transição React mantém a tela anterior enquanto a próxima aba lazy carrega — sem pisca. */}
             <Suspense fallback={null}>
               {renderContent()}
             </Suspense>
