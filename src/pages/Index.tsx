@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useTransition, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,21 +16,27 @@ import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
 import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
-import AchievementsScreen from "@/components/flow/AchievementsScreen";
 import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
 // Heavy/secondary screens are lazy-loaded — only the chat home ships in the initial bundle.
-const DreamWorld = lazy(() => import("@/components/dreams/DreamWorld"));
+const loadDreamWorld = () => import("@/components/dreams/DreamWorld");
+const loadStoryFactory = () => import("@/components/story/StoryFactory");
+const loadKidzzPlay = () => import("@/components/play/KidzzPlay");
+const loadRoutineScreen = () => import("@/components/routine/RoutineScreen");
+const loadMomentsPlaylists = () => import("@/components/moments/MomentsPlaylists");
+const loadFamilyCinema = () => import("@/components/cinema/FamilyCinema");
+const loadMusicForest = () => import("@/components/music/MusicForest");
+const loadWellnessHub = () => import("@/components/wellness/WellnessHub");
+const DreamWorld = lazy(loadDreamWorld);
+const StoryFactory = lazy(loadStoryFactory);
 const JourneyScreen = lazy(() => import("@/components/flow/JourneyScreen"));
-const StoryFactory = lazy(() => import("@/components/story/StoryFactory"));
+const KidzzPlay = lazy(loadKidzzPlay);
+const RoutineScreen = lazy(loadRoutineScreen);
+const MomentsPlaylists = lazy(loadMomentsPlaylists);
+const FamilyCinema = lazy(loadFamilyCinema);
 const KidzzLab = lazy(() => import("@/components/lab/KidzzLab"));
-const KidzzPlay = lazy(() => import("@/components/play/KidzzPlay"));
-const RoutineScreen = lazy(() => import("@/components/routine/RoutineScreen"));
-const MomentsFactory = lazy(() => import("@/components/moments/MomentsFactory"));
-const MomentsPlaylists = lazy(() => import("@/components/moments/MomentsPlaylists"));
-const FamilyCinema = lazy(() => import("@/components/cinema/FamilyCinema"));
 const TravelMode = lazy(() => import("@/components/travel/TravelMode"));
-const MusicForest = lazy(() => import("@/components/music/MusicForest"));
-const WellnessHub = lazy(() => import("@/components/wellness/WellnessHub"));
+const MusicForest = lazy(loadMusicForest);
+const WellnessHub = lazy(loadWellnessHub);
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
@@ -125,28 +131,28 @@ const Index = () => {
     if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
   }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
 
-  // Prefetch leve apenas em desktop. No Safari/mobile o preload agressivo travava o início
-  // e trazia chunks pesados (PDF, jogos, cinema) antes do usuário tocar nas abas.
+  const [, startTabTransition] = useTransition();
+  const switchTab = useCallback((tab: string) => {
+    startTabTransition(() => setActiveTab(tab));
+  }, [startTabTransition]);
+
+  // Pré-carrega as abas gradualmente no idle, sem bloquear a Home no Safari.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const mobileLike = window.matchMedia?.("(max-width: 767px), (pointer: coarse)")?.matches;
-    if (mobileLike) return;
-    const idle = (cb: () => void) =>
-      (window as any).requestIdleCallback
-        ? (window as any).requestIdleCallback(cb, { timeout: 9000 })
-        : setTimeout(cb, 7000);
-    const handle = idle(() => {
-      // Desktop somente: prepara abas comuns sem bloquear o thread principal.
-      import("@/components/story/StoryFactory");
-      import("@/components/routine/RoutineScreen");
-      import("@/components/dreams/DreamWorld");
-      import("@/components/music/MusicForest");
-    });
-    return () => {
-      if ((window as any).cancelIdleCallback && typeof handle === "number") {
-        (window as any).cancelIdleCallback(handle);
-      }
+    const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
+    let cancelled = false;
+    let index = 0;
+    const runNext = () => {
+      if (cancelled || index >= loaders.length) return;
+      void loaders[index++]().catch(() => undefined).finally(() => {
+        if (cancelled) return;
+        const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, opts?: { timeout?: number }) => number);
+        if (ric) ric(runNext, { timeout: 2500 });
+        else window.setTimeout(runNext, 900);
+      });
     };
+    const start = window.setTimeout(runNext, 1200);
+    return () => { cancelled = true; window.clearTimeout(start); };
   }, []);
 
   // Auto monthly retrospective: day 1 + activity + not seen this month
@@ -202,7 +208,7 @@ const Index = () => {
       setShowChallenge(false);
       setShowReferral(false);
       setShowRetrospective(false);
-      setActiveTab("chat");
+      switchTab("chat");
       setStep("paywall");
     };
     window.addEventListener("kidzz:open-plans", openPlans);
@@ -224,11 +230,11 @@ const Index = () => {
       return m && KNOWN_TABS.includes(m[1]) ? m[1] : null;
     };
     const initial = parseHash();
-    if (initial && initial !== activeTab) setActiveTab(initial);
+    if (initial && initial !== activeTab) switchTab(initial);
 
     const onPop = () => {
       const t = parseHash() ?? "chat";
-      setActiveTab(t);
+      switchTab(t);
       setShowLab(false); setShowPlay(false); setShowTravel(false);
       setShowChallenge(false); setShowReferral(false); setShowRetrospective(false);
       if (t === "chat") setStep("home");
@@ -347,7 +353,7 @@ const Index = () => {
   };
 
   const handleNewQuestion = () => {
-    setQuestion(""); setAnswer(""); setStep("home"); setActiveTab("chat");
+    setQuestion(""); setAnswer(""); setStep("home"); switchTab("chat");
   };
 
   const handleTabChange = (tab: string) => {
@@ -359,14 +365,14 @@ const Index = () => {
     setShowChallenge(false);
     setShowReferral(false);
     setShowRetrospective(false);
-    setActiveTab(tab);
     if (tab === "chat") setStep("home");
+    switchTab(tab);
   };
 
   const renderContent = () => {
     // ABA: Histórias (📖)
     if (activeTab === "explore") {
-      return <StoryFactory key="stories" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
+      return <StoryFactory key="stories" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     // ABA: Rotina (🎯 — substitui "Brincar" na tab bar; pilar de hábito)
     if (activeTab === "routine") {
@@ -377,9 +383,9 @@ const Index = () => {
       return (
         <KidzzPlay
           key="play"
-          onBack={() => { setActiveTab("chat"); setStep("home"); }}
+          onBack={() => { switchTab("chat"); setStep("home"); }}
           onGameComplete={() => evolution.evolve("game")}
-          onOpenAchievements={() => setActiveTab("achievements")}
+          onOpenAchievements={() => switchTab("achievements")}
           onOpenLab={() => setShowLab(true)}
           onOpenTravel={() => {
             if (!profile?.is_premium) {
@@ -393,49 +399,32 @@ const Index = () => {
     }
     // ABA: Memórias (acessada via botão da Home, não está na tab bar)
     if (activeTab === "memories") {
-      return <MemoriesAlbum key="memories" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
+      return <MemoriesAlbum key="memories" onBack={() => { switchTab("chat"); setStep("home"); }} onNavigateToChat={() => { switchTab("chat"); setStep("home"); }} onNavigateToStories={() => switchTab("explore")} />;
     }
     if (activeTab === "moments") {
-      return <MomentsPlaylists key="moments" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
+      return <MomentsPlaylists key="moments" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("moment"); }} />;
     }
     if (activeTab === "cinema") {
-      return <FamilyCinema key="cinema" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <FamilyCinema key="cinema" onBack={() => { switchTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "wellness") {
-      return <WellnessHub key="wellness" onBack={() => { setActiveTab("chat"); setStep("home"); }} />;
+      return <WellnessHub key="wellness" onBack={() => { switchTab("chat"); setStep("home"); }} />;
     }
     if (activeTab === "achievements") {
       // Conquistas vivem como subaba dentro de Memórias
-      return <MemoriesAlbum key="memories-ach" onBack={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToChat={() => { setActiveTab("chat"); setStep("home"); }} onNavigateToStories={() => setActiveTab("explore")} />;
+      return <MemoriesAlbum key="memories-ach" onBack={() => { switchTab("chat"); setStep("home"); }} onNavigateToChat={() => { switchTab("chat"); setStep("home"); }} onNavigateToStories={() => switchTab("explore")} />;
     }
     // ABA: Sonhos (🌙 — fundo próprio escuro)
     if (activeTab === "dreams") {
-      return (
-        <Suspense
-          key="dreams"
-          fallback={
-            <div
-              className="fixed inset-0 z-40 flex items-center justify-center"
-              style={{ background: "linear-gradient(180deg,#0f1535 0%,#1e1145 50%,#0d1b2a 100%)" }}
-            >
-              <div className="text-center text-white/70">
-                <div className="text-5xl mb-3">🌙</div>
-                <p className="text-sm">Preparando o Mundo dos Sonhos…</p>
-              </div>
-            </div>
-          }
-        >
-          <DreamWorld onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />
-        </Suspense>
-      );
+      return <DreamWorld key="dreams" onBack={() => { switchTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     // ABA: Música (🌿)
     if (activeTab === "music") {
       return (
         <MusicForest
           key="music"
-          onBack={() => { setActiveTab("chat"); setStep("home"); }}
-          onNavigateToDreams={() => setActiveTab("dreams")}
+          onBack={() => { switchTab("chat"); setStep("home"); }}
+          onNavigateToDreams={() => switchTab("dreams")}
           onXpEarned={() => evolution.evolve("game")}
         />
       );
@@ -447,11 +436,11 @@ const Index = () => {
           <HomeScreen
             key="home"
             onSubmit={handleQuestionSubmit}
-            onOpenStoryFactory={() => setActiveTab("explore")}
-            onOpenMoments={() => setActiveTab("moments")}
-            onOpenAchievements={() => setActiveTab("achievements")}
+            onOpenStoryFactory={() => switchTab("explore")}
+            onOpenMoments={() => switchTab("moments")}
+            onOpenAchievements={() => switchTab("achievements")}
             onOpenLab={() => setShowLab(true)}
-            onOpenPlay={() => setActiveTab("play")}
+            onOpenPlay={() => switchTab("play")}
             onOpenTravel={() => {
               if (!profile?.is_premium) {
                 setContextualPaywall({ open: true, context: "travel" });
@@ -489,8 +478,8 @@ const Index = () => {
             type="answer"
           />
         )}
-        {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => setActiveTab("explore")} />}
-        {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); setActiveTab("chat"); }} />}
+        {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => switchTab("explore")} />}
+        {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); switchTab("chat"); }} />}
       </AnimatePresence>
     );
   };
@@ -499,27 +488,19 @@ const Index = () => {
     <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden">
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative">
-        {/* Troca de aba: sem AnimatePresence mode="wait" — evita o "flash vazio".
-            Conteúdo anterior fica até o novo montar (cross-fade suave via CSS). */}
-        <motion.div
-          key={activeTab}
-          className="flex-1 flex flex-col min-h-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        >
+        {/* Troca de aba sem fade/crossfade: Safari estava mostrando um pisca entre telas. */}
+        <div className="flex-1 flex flex-col min-h-0">
           <TabErrorBoundary
             resetKey={activeTab}
             label={activeTab}
-            onBack={() => { setActiveTab("chat"); setStep("home"); }}
+            onBack={() => { switchTab("chat"); setStep("home"); }}
           >
-            {/* Suspense fallback = null → não pisca spinner ao trocar de aba.
-                A aba anterior permanece visível até a próxima estar pronta. */}
+            {/* Transição React mantém a tela anterior enquanto a próxima aba lazy carrega — sem pisca. */}
             <Suspense fallback={null}>
               {renderContent()}
             </Suspense>
           </TabErrorBoundary>
-        </motion.div>
+        </div>
       </div>
       <BottomNav
         activeTab={activeTab}
