@@ -119,25 +119,22 @@ const Index = () => {
     window.localStorage.setItem(AGE_STORAGE_KEY, profile.age_range);
   }, [profile?.age_range]);
 
-  // Prefetch lazy tab chunks in idle time → trocar de aba fica instantâneo após a 1ª carga
+  // Prefetch leve apenas em desktop. No Safari/mobile o preload agressivo travava o início
+  // e trazia chunks pesados (PDF, jogos, cinema) antes do usuário tocar nas abas.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const mobileLike = window.matchMedia?.("(max-width: 767px), (pointer: coarse)")?.matches;
+    if (mobileLike) return;
     const idle = (cb: () => void) =>
       (window as any).requestIdleCallback
-        ? (window as any).requestIdleCallback(cb, { timeout: 2500 })
-        : setTimeout(cb, 1200);
+        ? (window as any).requestIdleCallback(cb, { timeout: 9000 })
+        : setTimeout(cb, 7000);
     const handle = idle(() => {
-      // Carrega em paralelo, sem bloquear o thread principal
+      // Desktop somente: prepara abas comuns sem bloquear o thread principal.
       import("@/components/story/StoryFactory");
       import("@/components/routine/RoutineScreen");
-      import("@/components/play/KidzzPlay");
-      import("@/components/moments/MomentsPlaylists");
       import("@/components/dreams/DreamWorld");
       import("@/components/music/MusicForest");
-      import("@/components/lab/KidzzLab");
-      import("@/components/travel/TravelMode");
-      import("@/components/cinema/FamilyCinema");
-      import("@/components/wellness/WellnessHub");
     });
     return () => {
       if ((window as any).cancelIdleCallback && typeof handle === "number") {
