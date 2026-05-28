@@ -53,6 +53,7 @@ type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "payw
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 const INTRO_SETTLE_KEY = "kidzz_intro_settled_v2";
+const JUST_COMPLETED_ONBOARDING_KEY = "kidzz_just_completed_onboarding";
 const markIntroSettled = () => {
   if (typeof window === "undefined") return;
   try {
@@ -65,6 +66,10 @@ const markIntroSettled = () => {
 const hasIntroSettled = () => {
   if (typeof window === "undefined") return false;
   try { return window.localStorage.getItem(INTRO_SETTLE_KEY) === "1"; } catch { return false; }
+};
+const justCompletedOnboarding = () => {
+  if (typeof window === "undefined") return false;
+  try { return window.sessionStorage.getItem(JUST_COMPLETED_ONBOARDING_KEY) === "1"; } catch { return false; }
 };
 
 const Index = () => {
@@ -98,7 +103,7 @@ const Index = () => {
   const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasIntroSettled() && !hasSeenKidzzStatesIntro());
   const [showWelcome, setShowWelcome] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
-    try { return !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
+    try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
   // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
