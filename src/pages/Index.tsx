@@ -136,6 +136,17 @@ const Index = () => {
     startTabTransition(() => setActiveTab(tab));
   }, [startTabTransition]);
 
+  // Keep-alive: cada aba já visitada permanece montada (visibility:hidden) — evita pisca.
+  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
+  useEffect(() => {
+    setMountedTabs((prev) => {
+      if (prev.has(activeTab)) return prev;
+      const next = new Set(prev);
+      next.add(activeTab);
+      return next;
+    });
+  }, [activeTab]);
+
   // Pré-carrega as abas gradualmente no idle, sem bloquear a Home no Safari.
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -368,18 +379,6 @@ const Index = () => {
     if (tab === "chat") setStep("home");
     switchTab(tab);
   };
-
-  // Keep-alive: cada aba já visitada permanece montada em background (display:none)
-  // para evitar remount/pisca ao alternar. Só montamos sob demanda na primeira visita.
-  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
-  useEffect(() => {
-    setMountedTabs((prev) => {
-      if (prev.has(activeTab)) return prev;
-      const next = new Set(prev);
-      next.add(activeTab);
-      return next;
-    });
-  }, [activeTab]);
 
   const backToHome = useCallback(() => { switchTab("chat"); setStep("home"); }, [switchTab]);
 
