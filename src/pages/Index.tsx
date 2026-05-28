@@ -292,14 +292,14 @@ const Index = () => {
 
   // Onboarding gates: name → age → interests
   if (!profile?.child_name) {
-    return <NameOnboarding />;
+    return <NameOnboarding key="nome-unico" />;
   }
   if (!profile?.age_range) {
-    return <AgeSelection />;
+    return <AgeSelection key="idade-unica" />;
   }
   const interests = (profile as any)?.child_interests as string[] | undefined;
   if (!interests || interests.length === 0) {
-    return <InterestsOnboarding />;
+    return <InterestsOnboarding key="interesses-unico" />;
   }
   // Tela final emocional do onboarding (uma vez, após interests)
   if (showWelcome) {
