@@ -383,20 +383,8 @@ const Index = () => {
     setQuestion(""); setAnswer(""); setStep("home"); switchTab("chat");
   };
 
-  const handleTabChange = useCallback((tab: string) => {
-    markIntroSettled();
-    setActiveTab(tab);
-    // Fecha overlays ao trocar de aba
-    setShowLab(false);
-    setShowPlay(false);
-    setShowTravel(false);
-    setShowChallenge(false);
-    setShowReferral(false);
-    setShowRetrospective(false);
-    if (tab === "chat") setStep("home");
-  }, []);
 
-  const backToHome = useCallback(() => { switchTab("chat"); setStep("home"); }, [switchTab]);
+
 
   const renderChatTab = () => (
     <AnimatePresence mode="wait">
