@@ -93,7 +93,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50"
+      className="fixed bottom-0 left-0 right-0 z-[70]"
       style={{
         paddingBottom: "max(env(safe-area-inset-bottom, 6px), 6px)",
         background: "hsl(48 36% 98% / 0.88)",
@@ -101,6 +101,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         WebkitBackdropFilter: "blur(14px) saturate(1.1)",
         borderTop: "1px solid hsl(0 0% 100% / 0.75)",
         boxShadow: "0 -10px 32px -18px hsl(145 26% 28% / 0.22)",
+        pointerEvents: "auto",
+        touchAction: "manipulation",
       }}
     >
       {/* Ações secundárias */}
