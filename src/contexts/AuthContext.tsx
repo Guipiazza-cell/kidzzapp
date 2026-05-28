@@ -473,19 +473,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (user) {
-      try {
-        const { error } = await supabase.from("profiles").update(updates as any).eq("id", user.id);
-        if (error) {
-          const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates } as any);
-          if (upsertErr) console.error("updateProfile upsert error:", upsertErr.message);
-        }
-      } catch (e) {
-        console.error("updateProfile exception:", e);
-      }
       setProfile(prev => {
         const base = prev ?? createDefaultProfile();
         return { ...base, ...updates };
       });
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("updateProfile timeout")), 2800)
+      );
+      try {
+        await Promise.race([
+          (async () => {
+            const { error } = await supabase.from("profiles").update(updates as any).eq("id", user.id);
+            if (error) {
+              const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates } as any);
+              if (upsertErr) console.error("updateProfile upsert error:", upsertErr.message);
+            }
+          })(),
+          timeout,
+        ]);
+      } catch (e) {
+        console.warn("updateProfile fallback local:", e);
+      }
       return;
     }
     setProfile(prev => {
