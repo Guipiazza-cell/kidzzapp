@@ -496,7 +496,7 @@ const Index = () => {
             onBack={() => { setActiveTab("chat"); setStep("home"); }}
           >
             {/* Suspense fallback = null nos overlays lazy; abas principais não são lazy. */}
-            <Suspense fallback={renderContent()}>
+            <Suspense fallback={null}>
               {renderContent()}
             </Suspense>
           </TabErrorBoundary>
