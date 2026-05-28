@@ -7,7 +7,8 @@ import explorerMascot from "@/assets/kidzz/explorer.webp";
 import musicMascot from "@/assets/kidzz/music.webp";
 
 // Splash + bg + 4 estados do mascote = essencial para zero-flicker em qualquer aba.
-const CRITICAL_ASSETS = [forestBg, cosmicMascot, moonMascot, explorerMascot, musicMascot];
+const CRITICAL_ASSETS = [forestBg, cosmicMascot];
+const SECONDARY_ASSETS = [moonMascot, explorerMascot, musicMascot];
 
 export function preloadAssets() {
   if (typeof window === "undefined") return;
@@ -17,6 +18,14 @@ export function preloadAssets() {
       img.decoding = "async";
       img.src = src;
       // Força o decode pra ficar pronto no cache do compositor (evita flash ao re-mountar).
+      if ("decode" in img) (img as any).decode?.().catch(() => {});
+    });
+    const mobileLike = window.matchMedia?.("(max-width: 767px), (pointer: coarse)")?.matches;
+    if (mobileLike) return;
+    SECONDARY_ASSETS.forEach((src) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
       if ("decode" in img) (img as any).decode?.().catch(() => {});
     });
   };

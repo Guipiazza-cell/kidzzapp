@@ -52,6 +52,26 @@ import { showXpGained } from "@/components/flow/XpToast";
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
+const INTRO_SETTLE_KEY = "kidzz_intro_settled_v2";
+const JUST_COMPLETED_ONBOARDING_KEY = "kidzz_just_completed_onboarding";
+const markIntroSettled = () => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(INTRO_SETTLE_KEY, "1");
+    window.localStorage.setItem("kidzz_onboarding_welcomed", "1");
+    window.localStorage.setItem("kidzz_states_intro_seen", "1");
+    window.localStorage.setItem("kidzz_emotional_intro_v1", "1");
+    window.sessionStorage.removeItem(JUST_COMPLETED_ONBOARDING_KEY);
+  } catch {}
+};
+const hasIntroSettled = () => {
+  if (typeof window === "undefined") return false;
+  try { return window.localStorage.getItem(INTRO_SETTLE_KEY) === "1"; } catch { return false; }
+};
+const justCompletedOnboarding = () => {
+  if (typeof window === "undefined") return false;
+  try { return window.sessionStorage.getItem(JUST_COMPLETED_ONBOARDING_KEY) === "1"; } catch { return false; }
+};
 
 const Index = () => {
   const navigate = useNavigate();
@@ -81,10 +101,10 @@ const Index = () => {
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
-  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => !hasSeenKidzzStatesIntro());
+  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => justCompletedOnboarding() && !hasIntroSettled() && !hasSeenKidzzStatesIntro());
   const [showWelcome, setShowWelcome] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
-    try { return window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
+    try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
   // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
@@ -99,25 +119,28 @@ const Index = () => {
     window.localStorage.setItem(AGE_STORAGE_KEY, profile.age_range);
   }, [profile?.age_range]);
 
-  // Prefetch lazy tab chunks in idle time → trocar de aba fica instantâneo após a 1ª carga
+  useEffect(() => {
+    const interests = (profile as any)?.child_interests as string[] | undefined;
+    if (!profile?.child_name || !profile?.age_range || !interests?.length) return;
+    if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
+  }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
+
+  // Prefetch leve apenas em desktop. No Safari/mobile o preload agressivo travava o início
+  // e trazia chunks pesados (PDF, jogos, cinema) antes do usuário tocar nas abas.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const mobileLike = window.matchMedia?.("(max-width: 767px), (pointer: coarse)")?.matches;
+    if (mobileLike) return;
     const idle = (cb: () => void) =>
       (window as any).requestIdleCallback
-        ? (window as any).requestIdleCallback(cb, { timeout: 2500 })
-        : setTimeout(cb, 1200);
+        ? (window as any).requestIdleCallback(cb, { timeout: 9000 })
+        : setTimeout(cb, 7000);
     const handle = idle(() => {
-      // Carrega em paralelo, sem bloquear o thread principal
+      // Desktop somente: prepara abas comuns sem bloquear o thread principal.
       import("@/components/story/StoryFactory");
       import("@/components/routine/RoutineScreen");
-      import("@/components/play/KidzzPlay");
-      import("@/components/moments/MomentsPlaylists");
       import("@/components/dreams/DreamWorld");
       import("@/components/music/MusicForest");
-      import("@/components/lab/KidzzLab");
-      import("@/components/travel/TravelMode");
-      import("@/components/cinema/FamilyCinema");
-      import("@/components/wellness/WellnessHub");
     });
     return () => {
       if ((window as any).cancelIdleCallback && typeof handle === "number") {
@@ -268,15 +291,16 @@ const Index = () => {
       <OnboardingWelcome
         childName={profile.child_name}
         onEnter={() => {
-          try { localStorage.setItem("kidzz_onboarding_welcomed", "1"); } catch {}
+          markIntroSettled();
           setShowWelcome(false);
+          setShowStatesIntro(false);
         }}
       />
     );
   }
   // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
   if (showStatesIntro) {
-    return <KidzzStatesIntro onDone={() => setShowStatesIntro(false)} />;
+    return <KidzzStatesIntro onDone={() => { markIntroSettled(); setShowStatesIntro(false); }} />;
   }
   // Notification time prompt is now contextual (after first answer), not blocking onboarding
 
@@ -327,6 +351,7 @@ const Index = () => {
   };
 
   const handleTabChange = (tab: string) => {
+    markIntroSettled();
     // Fecha overlays ao trocar de aba
     setShowLab(false);
     setShowPlay(false);

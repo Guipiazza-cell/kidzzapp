@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useRef } from "react";
 import {
   MessageCircleHeart, BookOpen, Music2, Target, Film, Disc3,
   Moon, Gamepad2, Heart, Crown, Shield,
@@ -42,8 +43,13 @@ const ROW_BOTTOM: Tab[] = [
 ];
 
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
+  const lastTouchRef = useRef<{ id: string; at: number } | null>(null);
+
   const handle = (id: string) => {
     if (activeTab === id) return;
+    const now = Date.now();
+    if (lastTouchRef.current?.id === id && now - lastTouchRef.current.at < 320) return;
+    lastTouchRef.current = { id, at: now };
     haptic("light");
     sfx("click");
     onTabChange(id);
@@ -55,11 +61,17 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     return (
       <motion.button
         key={tab.id}
+        type="button"
         onClick={() => handle(tab.id)}
+        onTouchEnd={(event) => {
+          event.preventDefault();
+          handle(tab.id);
+        }}
         whileTap={{ scale: 0.88 }}
         animate={isActive ? { scale: [0.8, 1.1, 1] } : { scale: 1 }}
         transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
-        className="relative flex flex-col items-center gap-0.5 px-1 py-1 min-w-[44px] min-h-[44px] rounded-xl flex-1"
+        className="relative flex flex-col items-center gap-0.5 px-1 py-1 min-w-[44px] min-h-[44px] rounded-xl flex-1 touch-manipulation select-none"
+        style={{ WebkitTapHighlightColor: "transparent" }}
         aria-label={tab.label}
         aria-current={isActive ? "page" : undefined}
       >

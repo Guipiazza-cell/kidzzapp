@@ -7,10 +7,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 
-// Preload das próximas telas do onboarding
-import("./AgeSelection");
-import("./InterestsOnboarding");
-
 const NameOnboarding = () => {
   const { updateProfile } = useAuth();
   const [name, setName] = useState("");
@@ -21,6 +17,8 @@ const NameOnboarding = () => {
   useEffect(() => {
     const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void) => void);
     const run = () => {
+      import("./AgeSelection");
+      import("./InterestsOnboarding");
       ["explorer", "music", "moon"].forEach((s) => {
         const img = new Image();
         img.src = `/src/assets/kidzz/${s}.webp`;

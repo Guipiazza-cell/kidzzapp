@@ -18,6 +18,8 @@ const INTEREST_OPTIONS = [
   { id: "oceano", label: "Oceano", emoji: "🌊" },
 ];
 
+const JUST_COMPLETED_ONBOARDING_KEY = "kidzz_just_completed_onboarding";
+
 const InterestsOnboarding = () => {
   const { profile, updateProfile } = useAuth();
   const [selected, setSelected] = useState<string[]>([]);
@@ -38,6 +40,7 @@ const InterestsOnboarding = () => {
     sfx("reward");
     haptic("success");
     try {
+      try { sessionStorage.setItem(JUST_COMPLETED_ONBOARDING_KEY, "1"); } catch { /* noop */ }
       await updateProfile({ child_interests: selected } as any);
     } catch (e) {
       console.error("InterestsOnboarding error", e);
