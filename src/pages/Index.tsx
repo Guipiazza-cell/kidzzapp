@@ -136,6 +136,17 @@ const Index = () => {
     startTabTransition(() => setActiveTab(tab));
   }, [startTabTransition]);
 
+  // Keep-alive: cada aba já visitada permanece montada (visibility:hidden) — evita pisca.
+  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
+  useEffect(() => {
+    setMountedTabs((prev) => {
+      if (prev.has(activeTab)) return prev;
+      const next = new Set(prev);
+      next.add(activeTab);
+      return next;
+    });
+  }, [activeTab]);
+
   // Pré-carrega as abas gradualmente no idle, sem bloquear a Home no Safari.
   useEffect(() => {
     if (typeof window === "undefined") return;
