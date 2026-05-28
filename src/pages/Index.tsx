@@ -380,18 +380,6 @@ const Index = () => {
     switchTab(tab);
   };
 
-  // Keep-alive: cada aba já visitada permanece montada em background (display:none)
-  // para evitar remount/pisca ao alternar. Só montamos sob demanda na primeira visita.
-  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
-  useEffect(() => {
-    setMountedTabs((prev) => {
-      if (prev.has(activeTab)) return prev;
-      const next = new Set(prev);
-      next.add(activeTab);
-      return next;
-    });
-  }, [activeTab]);
-
   const backToHome = useCallback(() => { switchTab("chat"); setStep("home"); }, [switchTab]);
 
   const renderChatTab = () => (
