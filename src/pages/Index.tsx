@@ -388,24 +388,7 @@ const Index = () => {
     }
     // ABA: Sonhos (🌙 — fundo próprio escuro)
     if (activeTab === "dreams") {
-      return (
-        <Suspense
-          key="dreams"
-          fallback={
-            <div
-              className="fixed inset-0 z-40 flex items-center justify-center"
-              style={{ background: "linear-gradient(180deg,#0f1535 0%,#1e1145 50%,#0d1b2a 100%)" }}
-            >
-              <div className="text-center text-white/70">
-                <div className="text-5xl mb-3">🌙</div>
-                <p className="text-sm">Preparando o Mundo dos Sonhos…</p>
-              </div>
-            </div>
-          }
-        >
-          <DreamWorld onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />
-        </Suspense>
-      );
+      return <DreamWorld key="dreams" onBack={() => { setActiveTab("chat"); setStep("home"); evolution.evolve("story"); }} />;
     }
     // ABA: Música (🌿)
     if (activeTab === "music") {
@@ -477,27 +460,22 @@ const Index = () => {
     <div className="h-[100dvh] min-h-[100dvh] flex flex-col overflow-hidden">
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative">
-        {/* Troca de aba: sem AnimatePresence mode="wait" — evita o "flash vazio".
-            Conteúdo anterior fica até o novo montar (cross-fade suave via CSS). */}
-        <motion.div
+        {/* Troca de aba sem fade/crossfade: Safari estava mostrando um pisca entre telas. */}
+        <div
           key={activeTab}
           className="flex-1 flex flex-col min-h-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
         >
           <TabErrorBoundary
             resetKey={activeTab}
             label={activeTab}
             onBack={() => { setActiveTab("chat"); setStep("home"); }}
           >
-            {/* Suspense fallback = null → não pisca spinner ao trocar de aba.
-                A aba anterior permanece visível até a próxima estar pronta. */}
+            {/* Suspense fallback = null nos overlays lazy; abas principais não são lazy. */}
             <Suspense fallback={null}>
               {renderContent()}
             </Suspense>
           </TabErrorBoundary>
-        </motion.div>
+        </div>
       </div>
       <BottomNav
         activeTab={activeTab}
