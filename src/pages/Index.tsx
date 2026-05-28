@@ -120,6 +120,9 @@ const Index = () => {
     try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
+  // Keep-alive: a aba ativa entra no cache ANTES de virar visível.
+  // Isso evita depender de reload/hash para a tela aparecer no Safari/PWA.
+  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat", getInitialTab()]));
   // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
   // Mantemos a flag marcada como vista para não reintroduzir no futuro.
   useEffect(() => {
@@ -141,6 +144,12 @@ const Index = () => {
   const switchTab = useCallback((tab: string) => {
     if (!KNOWN_TABS.includes(tab)) return;
     markIntroSettled();
+    setMountedTabs((prev) => {
+      if (prev.has(tab)) return prev;
+      const next = new Set(prev);
+      next.add(tab);
+      return next;
+    });
     setActiveTab(tab);
     setShowLab(false);
     setShowPlay(false);
@@ -159,7 +168,6 @@ const Index = () => {
   }, [switchTab]);
 
   // Keep-alive: cada aba já visitada permanece montada (visibility:hidden) — evita pisca.
-  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat"]));
   useEffect(() => {
     setMountedTabs((prev) => {
       if (prev.has(activeTab)) return prev;
@@ -479,7 +487,7 @@ const Index = () => {
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
-          {Array.from(mountedTabs).map((tab) => {
+          {Array.from(new Set([...mountedTabs, activeTab])).map((tab) => {
             const renderer = TAB_RENDERERS[tab];
             if (!renderer) return null;
             const isActive = tab === activeTab;
