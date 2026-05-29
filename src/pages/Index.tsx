@@ -177,23 +177,13 @@ const Index = () => {
     });
   }, [activeTab]);
 
-  // Pré-carrega as abas gradualmente no idle, sem bloquear a Home no Safari.
+  // Pré-carrega TODAS as abas imediatamente, em paralelo, para que o clique
+  // no dock troque a tela instantaneamente — antes o chunk demorava a baixar
+  // e dava a sensação de "só funciona após refresh".
   useEffect(() => {
     if (typeof window === "undefined") return;
     const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
-    let cancelled = false;
-    let index = 0;
-    const runNext = () => {
-      if (cancelled || index >= loaders.length) return;
-      void loaders[index++]().catch(() => undefined).finally(() => {
-        if (cancelled) return;
-        const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, opts?: { timeout?: number }) => number);
-        if (ric) ric(runNext, { timeout: 2500 });
-        else window.setTimeout(runNext, 900);
-      });
-    };
-    const start = window.setTimeout(runNext, 1200);
-    return () => { cancelled = true; window.clearTimeout(start); };
+    loaders.forEach((l) => { void l().catch(() => undefined); });
   }, []);
 
   // Auto monthly retrospective: day 1 + activity + not seen this month
@@ -503,7 +493,7 @@ const Index = () => {
                 aria-hidden={!isActive}
               >
                 <TabErrorBoundary resetKey={tab} label={tab} onBack={backToHome}>
-                  <Suspense fallback={<div className="min-h-[100dvh] w-full" aria-hidden />}>{renderer()}</Suspense>
+                  <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>{renderer()}</Suspense>
                 </TabErrorBoundary>
               </div>
             );
