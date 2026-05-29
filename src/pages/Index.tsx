@@ -493,7 +493,7 @@ const Index = () => {
                 aria-hidden={!isActive}
               >
                 <TabErrorBoundary resetKey={tab} label={tab} onBack={backToHome}>
-                  <Suspense fallback={<div className="min-h-[100dvh] w-full" aria-hidden />}>{renderer()}</Suspense>
+                  <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>{renderer()}</Suspense>
                 </TabErrorBoundary>
               </div>
             );
