@@ -136,12 +136,6 @@ const Index = () => {
   const switchTab = useCallback((tab: string) => {
     if (!KNOWN_TABS.includes(tab)) return;
     markIntroSettled();
-    setMountedTabs((prev) => {
-      if (prev.has(tab)) return prev;
-      const next = new Set(prev);
-      next.add(tab);
-      return next;
-    });
     setActiveTab(tab);
     setShowLab(false);
     setShowPlay(false);
@@ -158,16 +152,6 @@ const Index = () => {
     switchTab("chat");
     setStep("home");
   }, [switchTab]);
-
-  // Keep-alive: cada aba já visitada permanece montada (visibility:hidden) — evita pisca.
-  useEffect(() => {
-    setMountedTabs((prev) => {
-      if (prev.has(activeTab)) return prev;
-      const next = new Set(prev);
-      next.add(activeTab);
-      return next;
-    });
-  }, [activeTab]);
 
   // Pré-carrega TODAS as abas imediatamente, em paralelo, para que o clique
   // no dock troque a tela instantaneamente — antes o chunk demorava a baixar
@@ -242,34 +226,6 @@ const Index = () => {
       window.removeEventListener("kidzz:open-journey", openJourney);
     };
   }, []);
-
-  // Tab <-> URL hash sync. Lets the browser back button + share links work
-  // without rewriting the routing layer. Hash format: `#tab=dreams`.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const initial = getHashTab();
-    if (initial && initial !== activeTab) switchTab(initial);
-
-    const onPop = () => {
-      const t = getHashTab() ?? "chat";
-      switchTab(t);
-      if (t === "chat") setStep("home");
-    };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const current = window.location.hash.match(/tab=([\w-]+)/)?.[1];
-    if (activeTab === "chat") {
-      if (current) window.history.replaceState(null, "", window.location.pathname);
-    } else if (current !== activeTab) {
-      // pushState so the back button returns to the previous tab.
-      window.history.pushState({ tab: activeTab }, "", `#tab=${activeTab}`);
-    }
-  }, [activeTab]);
 
   // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
   useEffect(() => {
