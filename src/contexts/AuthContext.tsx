@@ -117,13 +117,13 @@ const clearGuestProfile = () => {
   window.localStorage.removeItem(GUEST_PROFILE_STORAGE_KEY);
 };
 
-const getProfileDraft = (): Partial<Profile> | null => {
+const getProfileDraft = (userId: string | null = null): Partial<Profile> | null => {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(PROFILE_DRAFT_STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<Profile> & { ts?: number };
-    if (!parsed.ts || Date.now() - parsed.ts > PROFILE_DRAFT_TTL) {
+    const parsed = JSON.parse(raw) as Partial<Profile> & { ts?: number; user_id?: string | null };
+    if (!parsed.ts || Date.now() - parsed.ts > PROFILE_DRAFT_TTL || (parsed.user_id ?? null) !== userId) {
       window.localStorage.removeItem(PROFILE_DRAFT_STORAGE_KEY);
       return null;
     }
@@ -133,18 +133,18 @@ const getProfileDraft = (): Partial<Profile> | null => {
   }
 };
 
-const saveProfileDraft = (updates: Partial<Profile>) => {
+const saveProfileDraft = (updates: Partial<Profile>, userId: string | null = null) => {
   if (typeof window === "undefined") return;
   try {
-    const previous = getProfileDraft() ?? {};
-    window.localStorage.setItem(PROFILE_DRAFT_STORAGE_KEY, JSON.stringify({ ...previous, ...updates, ts: Date.now() }));
+    const previous = getProfileDraft(userId) ?? {};
+    window.localStorage.setItem(PROFILE_DRAFT_STORAGE_KEY, JSON.stringify({ ...previous, ...updates, user_id: userId, ts: Date.now() }));
   } catch {
     // local fallback is best-effort only
   }
 };
 
-const mergeProfileDraft = (profile: Profile): Profile => {
-  const draft = getProfileDraft();
+const mergeProfileDraft = (profile: Profile, userId: string | null = null): Profile => {
+  const draft = getProfileDraft(userId);
   if (!draft) return profile;
   return normalizeProfile({
     ...profile,
