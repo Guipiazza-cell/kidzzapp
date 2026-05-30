@@ -223,9 +223,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           last_usage_date: prof.last_usage_date,
         }).eq("id", userId).then(() => {});
       }
-      return mergeProfileDraft(prof);
+      return mergeProfileDraft(prof, userId);
     }
-    return mergeProfileDraft(getGuestProfile());
+    return mergeProfileDraft(getGuestProfile(), userId);
   }, [resetDailyIfNeeded]);
 
   const checkSubscription = useCallback(async (
@@ -511,7 +511,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
-    saveProfileDraft(updates);
+    saveProfileDraft(updates, user?.id ?? null);
     if (user) {
       setProfile(prev => {
         const base = prev ?? createDefaultProfile();
