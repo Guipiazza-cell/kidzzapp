@@ -59,12 +59,7 @@ type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "payw
 const KNOWN_TABS = ["chat", "explore", "routine", "play", "memories", "moments", "cinema", "wellness", "achievements", "dreams", "music"];
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
-const getHashTab = () => {
-  if (typeof window === "undefined") return null;
-  const tab = window.location.hash.match(/tab=([\w-]+)/)?.[1];
-  return tab && KNOWN_TABS.includes(tab) ? tab : null;
-};
-const getInitialTab = () => getHashTab() ?? "chat";
+const getInitialTab = () => "chat";
 const INTRO_SETTLE_KEY = "kidzz_intro_settled_v2";
 const JUST_COMPLETED_ONBOARDING_KEY = "kidzz_just_completed_onboarding";
 const markIntroSettled = () => {
@@ -120,9 +115,6 @@ const Index = () => {
     try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
-  // Keep-alive: a aba ativa entra no cache ANTES de virar visível.
-  // Isso evita depender de reload/hash para a tela aparecer no Safari/PWA.
-  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat", getInitialTab()]));
   // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
   // Mantemos a flag marcada como vista para não reintroduzir no futuro.
   useEffect(() => {
