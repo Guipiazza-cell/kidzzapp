@@ -513,21 +513,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateProfile = async (updates: Partial<Profile>) => {
     saveProfileDraft(updates, user?.id ?? null);
     if (user) {
-      setProfile(prev => {
-        const base = prev ?? createDefaultProfile();
-        return normalizeProfile({ ...base, ...updates });
-      });
+      const optimisticProfile = normalizeProfile({ ...(profile ?? createDefaultProfile()), ...updates });
+      setProfile(optimisticProfile);
       const timeout = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("updateProfile timeout")), 2800)
       );
       try {
         await Promise.race([
           (async () => {
-            const { error } = await supabase.from("profiles").update(updates as any).eq("id", user.id);
-            if (error) {
-              const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates } as any);
-              if (upsertErr) console.error("updateProfile upsert error:", upsertErr.message);
-            }
+            const { error } = await supabase
+              .from("profiles")
+              .upsert({ id: user.id, ...optimisticProfile } as any, { onConflict: "id" });
+            if (error) console.error("updateProfile upsert error:", error.message);
           })(),
           timeout,
         ]);
