@@ -223,9 +223,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           last_usage_date: prof.last_usage_date,
         }).eq("id", userId).then(() => {});
       }
-      return prof;
+      return mergeProfileDraft(prof);
     }
-    return getGuestProfile();
+    return mergeProfileDraft(getGuestProfile());
   }, [resetDailyIfNeeded]);
 
   const checkSubscription = useCallback(async (
@@ -511,10 +511,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
+    saveProfileDraft(updates);
     if (user) {
       setProfile(prev => {
         const base = prev ?? createDefaultProfile();
-        return { ...base, ...updates };
+        return normalizeProfile({ ...base, ...updates });
       });
       const timeout = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("updateProfile timeout")), 2800)
