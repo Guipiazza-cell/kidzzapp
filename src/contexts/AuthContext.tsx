@@ -54,8 +54,10 @@ const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-s
 const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`;
 const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-portal`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
+const PROFILE_DRAFT_STORAGE_KEY = "kidzz_profile_draft";
 const SUB_CACHE_KEY = "kidzz_sub_cache";
 const SUB_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const PROFILE_DRAFT_TTL = 7 * 24 * 60 * 60 * 1000;
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -113,6 +115,43 @@ const saveGuestProfile = (profile: Profile) => {
 const clearGuestProfile = () => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(GUEST_PROFILE_STORAGE_KEY);
+};
+
+const getProfileDraft = (): Partial<Profile> | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(PROFILE_DRAFT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<Profile> & { ts?: number };
+    if (!parsed.ts || Date.now() - parsed.ts > PROFILE_DRAFT_TTL) {
+      window.localStorage.removeItem(PROFILE_DRAFT_STORAGE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const saveProfileDraft = (updates: Partial<Profile>) => {
+  if (typeof window === "undefined") return;
+  try {
+    const previous = getProfileDraft() ?? {};
+    window.localStorage.setItem(PROFILE_DRAFT_STORAGE_KEY, JSON.stringify({ ...previous, ...updates, ts: Date.now() }));
+  } catch {
+    // local fallback is best-effort only
+  }
+};
+
+const mergeProfileDraft = (profile: Profile): Profile => {
+  const draft = getProfileDraft();
+  if (!draft) return profile;
+  return normalizeProfile({
+    ...profile,
+    child_name: profile.child_name || draft.child_name || "",
+    age_range: profile.age_range || draft.age_range || null,
+    child_interests: profile.child_interests?.length ? profile.child_interests : (draft.child_interests ?? []),
+  });
 };
 
 // --- Subscription cache helpers ---
