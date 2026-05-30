@@ -425,27 +425,13 @@ const Index = () => {
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
-          {Array.from(new Set([...mountedTabs, activeTab])).map((tab) => {
-            const renderer = TAB_RENDERERS[tab];
-            if (!renderer) return null;
-            const isActive = tab === activeTab;
-            return (
-              <div
-                key={tab}
-                className="absolute inset-0 flex flex-col min-h-0"
-                style={{
-                  visibility: isActive ? "visible" : "hidden",
-                  pointerEvents: isActive ? "auto" : "none",
-                  zIndex: isActive ? 2 : 1,
-                }}
-                aria-hidden={!isActive}
-              >
-                <TabErrorBoundary resetKey={tab} label={tab} onBack={backToHome}>
-                  <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>{renderer()}</Suspense>
-                </TabErrorBoundary>
-              </div>
-            );
-          })}
+          <div className="absolute inset-0 flex flex-col min-h-0">
+            <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
+              <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>
+                {TAB_RENDERERS[activeTab]?.()}
+              </Suspense>
+            </TabErrorBoundary>
+          </div>
         </div>
       </div>
 
