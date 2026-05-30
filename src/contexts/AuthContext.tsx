@@ -54,8 +54,10 @@ const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-s
 const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`;
 const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-portal`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
+const PROFILE_DRAFT_STORAGE_KEY = "kidzz_profile_draft";
 const SUB_CACHE_KEY = "kidzz_sub_cache";
 const SUB_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const PROFILE_DRAFT_TTL = 7 * 24 * 60 * 60 * 1000;
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -113,6 +115,43 @@ const saveGuestProfile = (profile: Profile) => {
 const clearGuestProfile = () => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(GUEST_PROFILE_STORAGE_KEY);
+};
+
+const getProfileDraft = (userId: string | null = null): Partial<Profile> | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(PROFILE_DRAFT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<Profile> & { ts?: number; user_id?: string | null };
+    if (!parsed.ts || Date.now() - parsed.ts > PROFILE_DRAFT_TTL || (parsed.user_id ?? null) !== userId) {
+      window.localStorage.removeItem(PROFILE_DRAFT_STORAGE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const saveProfileDraft = (updates: Partial<Profile>, userId: string | null = null) => {
+  if (typeof window === "undefined") return;
+  try {
+    const previous = getProfileDraft(userId) ?? {};
+    window.localStorage.setItem(PROFILE_DRAFT_STORAGE_KEY, JSON.stringify({ ...previous, ...updates, user_id: userId, ts: Date.now() }));
+  } catch {
+    // local fallback is best-effort only
+  }
+};
+
+const mergeProfileDraft = (profile: Profile, userId: string | null = null): Profile => {
+  const draft = getProfileDraft(userId);
+  if (!draft) return profile;
+  return normalizeProfile({
+    ...profile,
+    child_name: profile.child_name || draft.child_name || "",
+    age_range: profile.age_range || draft.age_range || null,
+    child_interests: profile.child_interests?.length ? profile.child_interests : (draft.child_interests ?? []),
+  });
 };
 
 // --- Subscription cache helpers ---
@@ -184,9 +223,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           last_usage_date: prof.last_usage_date,
         }).eq("id", userId).then(() => {});
       }
-      return prof;
+      return mergeProfileDraft(prof, userId);
     }
-    return getGuestProfile();
+    return mergeProfileDraft(getGuestProfile(), userId);
   }, [resetDailyIfNeeded]);
 
   const checkSubscription = useCallback(async (
@@ -472,20 +511,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
+    saveProfileDraft(updates, user?.id ?? null);
     if (user) {
-      setProfile(prev => {
-        const base = prev ?? createDefaultProfile();
-        return { ...base, ...updates };
-      });
+      setProfile(prev => normalizeProfile({ ...(prev ?? profile ?? createDefaultProfile()), ...updates }));
       const timeout = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("updateProfile timeout")), 2800)
       );
       try {
         await Promise.race([
           (async () => {
-            const { error } = await supabase.from("profiles").update(updates as any).eq("id", user.id);
-            if (error) {
-              const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates } as any);
+            const { data, error } = await supabase
+              .from("profiles")
+              .update(updates as any)
+              .eq("id", user.id)
+              .select("id")
+              .maybeSingle();
+            if (error || !data) {
+              const { error: upsertErr } = await supabase.from("profiles").upsert({ id: user.id, ...updates } as any, { onConflict: "id" });
               if (upsertErr) console.error("updateProfile upsert error:", upsertErr.message);
             }
           })(),

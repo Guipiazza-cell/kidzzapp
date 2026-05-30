@@ -59,12 +59,7 @@ type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "payw
 const KNOWN_TABS = ["chat", "explore", "routine", "play", "memories", "moments", "cinema", "wellness", "achievements", "dreams", "music"];
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
-const getHashTab = () => {
-  if (typeof window === "undefined") return null;
-  const tab = window.location.hash.match(/tab=([\w-]+)/)?.[1];
-  return tab && KNOWN_TABS.includes(tab) ? tab : null;
-};
-const getInitialTab = () => getHashTab() ?? "chat";
+const getInitialTab = () => "chat";
 const INTRO_SETTLE_KEY = "kidzz_intro_settled_v2";
 const JUST_COMPLETED_ONBOARDING_KEY = "kidzz_just_completed_onboarding";
 const markIntroSettled = () => {
@@ -120,9 +115,6 @@ const Index = () => {
     try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
-  // Keep-alive: a aba ativa entra no cache ANTES de virar visível.
-  // Isso evita depender de reload/hash para a tela aparecer no Safari/PWA.
-  const [mountedTabs, setMountedTabs] = useState<Set<string>>(() => new Set(["chat", getInitialTab()]));
   // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
   // Mantemos a flag marcada como vista para não reintroduzir no futuro.
   useEffect(() => {
@@ -144,12 +136,6 @@ const Index = () => {
   const switchTab = useCallback((tab: string) => {
     if (!KNOWN_TABS.includes(tab)) return;
     markIntroSettled();
-    setMountedTabs((prev) => {
-      if (prev.has(tab)) return prev;
-      const next = new Set(prev);
-      next.add(tab);
-      return next;
-    });
     setActiveTab(tab);
     setShowLab(false);
     setShowPlay(false);
@@ -166,16 +152,6 @@ const Index = () => {
     switchTab("chat");
     setStep("home");
   }, [switchTab]);
-
-  // Keep-alive: cada aba já visitada permanece montada (visibility:hidden) — evita pisca.
-  useEffect(() => {
-    setMountedTabs((prev) => {
-      if (prev.has(activeTab)) return prev;
-      const next = new Set(prev);
-      next.add(activeTab);
-      return next;
-    });
-  }, [activeTab]);
 
   // Pré-carrega TODAS as abas imediatamente, em paralelo, para que o clique
   // no dock troque a tela instantaneamente — antes o chunk demorava a baixar
@@ -250,34 +226,6 @@ const Index = () => {
       window.removeEventListener("kidzz:open-journey", openJourney);
     };
   }, []);
-
-  // Tab <-> URL hash sync. Lets the browser back button + share links work
-  // without rewriting the routing layer. Hash format: `#tab=dreams`.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const initial = getHashTab();
-    if (initial && initial !== activeTab) switchTab(initial);
-
-    const onPop = () => {
-      const t = getHashTab() ?? "chat";
-      switchTab(t);
-      if (t === "chat") setStep("home");
-    };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const current = window.location.hash.match(/tab=([\w-]+)/)?.[1];
-    if (activeTab === "chat") {
-      if (current) window.history.replaceState(null, "", window.location.pathname);
-    } else if (current !== activeTab) {
-      // pushState so the back button returns to the previous tab.
-      window.history.pushState({ tab: activeTab }, "", `#tab=${activeTab}`);
-    }
-  }, [activeTab]);
 
   // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
   useEffect(() => {
@@ -477,27 +425,13 @@ const Index = () => {
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 pb-[148px] relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
-          {Array.from(new Set([...mountedTabs, activeTab])).map((tab) => {
-            const renderer = TAB_RENDERERS[tab];
-            if (!renderer) return null;
-            const isActive = tab === activeTab;
-            return (
-              <div
-                key={tab}
-                className="absolute inset-0 flex flex-col min-h-0"
-                style={{
-                  visibility: isActive ? "visible" : "hidden",
-                  pointerEvents: isActive ? "auto" : "none",
-                  zIndex: isActive ? 2 : 1,
-                }}
-                aria-hidden={!isActive}
-              >
-                <TabErrorBoundary resetKey={tab} label={tab} onBack={backToHome}>
-                  <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>{renderer()}</Suspense>
-                </TabErrorBoundary>
-              </div>
-            );
-          })}
+          <div className="absolute inset-0 flex flex-col min-h-0">
+            <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
+              <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>
+                {TAB_RENDERERS[activeTab]?.()}
+              </Suspense>
+            </TabErrorBoundary>
+          </div>
         </div>
       </div>
 
