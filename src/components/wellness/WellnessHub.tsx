@@ -11,6 +11,7 @@ import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
 import { useAuth } from "@/contexts/AuthContext";
 import wellnessMascot from "@/assets/kidzz/wellness.png";
 import WellnessCinema from "./WellnessCinema";
+import WellnessGrowth from "./WellnessGrowth";
 
 /* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
    Paleta sálvia + esmeralda + creme + dourado fosco.
@@ -456,6 +457,9 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
           </div>
         </div>
       </div>
+
+      {/* Crescimento da família — 10 camadas premium de engajamento */}
+      <WellnessGrowth />
 
       {/* 2 · Bem-estar diário */}
       <SectionTitle kicker="Bem-estar diário" title="Pequenos rituais" sub="Cada toque conta como um dia de calma." />
