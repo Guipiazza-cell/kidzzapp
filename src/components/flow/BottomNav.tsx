@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { memo, useCallback } from "react";
 import {
   MessageCircleHeart, BookOpen, Music2, Target, Film, Disc3,
-  Moon, Gamepad2, Heart, Crown, Shield,
+  Moon, Gamepad2, Heart, Crown, Shield, Leaf,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
