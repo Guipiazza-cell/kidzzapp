@@ -1581,7 +1581,7 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            {view === "home"       && <Home go={go} onBack={onBack} />}
+            {view === "home"       && <Home go={go} onBack={onBack} initialExperienceId={initialExperienceId} onConsumedInitial={onConsumedInitial} />}
             {view === "sos"        && <BreathView onBack={back} sos />}
             {view === "breath"     && <BreathView onBack={back} />}
             {view === "sounds"     && <SoundsView onBack={back} />}
