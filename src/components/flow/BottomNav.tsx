@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { memo, useCallback } from "react";
 import {
   MessageCircleHeart, BookOpen, Music2, Target, Film, Disc3,
-  Moon, Gamepad2, Heart, Crown, Shield,
+  Moon, Gamepad2, Heart, Crown, Shield, Leaf,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
@@ -28,10 +28,11 @@ type Tab = {
 };
 
 const ROW_TOP: Tab[] = [
-  { id: "chat",    label: "Perguntas", icon: MessageCircleHeart, tint: "hsl(145 26% 28%)" },
-  { id: "explore", label: "Histórias", icon: BookOpen,           tint: "hsl(38 57% 50%)"  },
-  { id: "music",   label: "Música",    icon: Music2,             tint: "hsl(105 33% 50%)" },
-  { id: "routine", label: "Rotina",    icon: Target,             tint: "hsl(145 35% 40%)" },
+  { id: "chat",     label: "Perguntas", icon: MessageCircleHeart, tint: "hsl(145 26% 28%)" },
+  { id: "explore",  label: "Histórias", icon: BookOpen,           tint: "hsl(38 57% 50%)"  },
+  { id: "music",    label: "Música",    icon: Music2,             tint: "hsl(105 33% 50%)" },
+  { id: "routine",  label: "Rotina",    icon: Target,             tint: "hsl(145 35% 40%)" },
+  { id: "wellness", label: "KALM",      icon: Leaf,               tint: "hsl(150 38% 36%)" },
 ];
 
 const ROW_BOTTOM: Tab[] = [

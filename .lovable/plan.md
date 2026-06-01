@@ -1,85 +1,64 @@
-# Redesign Visual Cinematográfico v2.0 — KIDZZ
+# KALM by Kidzz — Plano de Implementação
 
-Este plano aplica a especificação enviada (paleta exata, background em camadas, camaleão central, Home reestruturada, animações premium) sem quebrar fluxos existentes (onboarding, chat, paywall, rotas). O foco é **camada visual e Home** — lógica de negócio fica intocada.
+Vou implementar **sem reconstruir** o SOS nem o Wellness existente. Tudo é **aditivo** (novos componentes, novo arquivo de dados, hooks de mapeamento). Identidade visual atual do Wellness é preservada como base — só recebe a marca "KALM by Kidzz" + as novas seções.
 
-## Escopo
+## 1. Identidade KALM
+- `src/components/kalm/kalmBrand.ts` — tokens (verde sálvia → esmeralda, gradientes, ícone folha), texto: **KALM by Kidzz** / "Seu espaço de calma para toda a família."
+- Renomear visualmente o topo do `WellnessHub` (sem trocar rota, sem renomear arquivos).
+- Label da aba na `BottomNav` muda de "Wellness" → "KALM" (mesma cor verde do Wellness atual). Ícone passa para `Leaf` com gradiente verde.
 
-### 1. Design tokens (base de tudo)
-- `src/index.css`: atualizar variáveis HSL para refletir a paleta exata:
-  - `--background` → #F7F6F2, `--card`/`bgSecondary` → #FDFCF8
-  - `--primary` (greenSage) → #8FBF7F, `--accent` (greenDeep) → #355B45, hover → #D1E8CA
-  - `--kidzz-gold` → #D8B36A, `--sos-from/to` mantém #FF7A7A / #D94B4B
-  - texts: #2E2E2E / #7A7A7A / #B0B0B0
-  - shadows + glows (green/red/gold) como utilitários
-- `tailwind.config.ts`: expor `kidzz-sage`, `kidzz-deep`, `kidzz-gold`, `kidzz-coral` + sombras `shadow-cinema-sm/md/lg` + easings `ease-snappy`, `ease-bounce` + durations.
-- Raios: `rounded-cinema` (28px) e `rounded-cinema-xl` (32px).
+## 2. Catálogo único de experiências
+- `src/components/kalm/experiences.ts` — define 4 grupos × cards (Quick Relief, Parent Reset, Connection, Soundscapes) + Journeys, cada experiência com `id`, `title`, `desc`, `duration`, `tier` (`free` | `premium`), `tint`, `icon`.
+- `src/components/kalm/sosMap.ts` — mapeia `situation.id` → `experienceId` inicial (crying→emotional-recovery, tantrum→post-tantrum, sleep→sleep-ritual, fear→building-courage, exhausted→parent-pause, overwhelm→reduce-noise; fallback para outras).
 
-### 2. Background global cinematográfico
-- Novo componente `src/components/CinemaBackground.tsx` — 3 camadas fixed:
-  1. gradient base 135° (#F7F6F2 → #FDFCF8 → #EFF1EC)
-  2. blur atmosférico com `breatheBackground` keyframe (8s)
-  3. glow radial verde sutil (8% opacity) em 30% 50%
-- Montado uma vez em `src/MainApp.tsx` (atrás de tudo, `z-[-10]`).
-- Respeita `prefers-reduced-motion` (já globalizado no index.css).
+## 3. Renderer de experiências
+- `src/components/kalm/ExperiencePlayer.tsx` — sheet/modal que abre uma experiência específica (timer/respiração/soundscape/journey day). Reusa `AmbientSoundEngine` para soundscapes; usa lógica de respiração existente.
+- `src/components/kalm/SectionRow.tsx` + `ExperienceCard.tsx` — visual premium (sálvia/esmeralda, glass), com `Lock` para premium quando free.
 
-### 3. Camaleão como elemento central
-- Reaproveitar `src/components/kidzz/KidzzChameleon.tsx` (já existe).
-- Novo wrapper `ChameleonHero` com:
-  - posição `absolute right-[-8%] top-[3%]`, 320×340
-  - filtro drop-shadow triplo (volumétrico + glow verde + sombra inferior)
-  - `glowBreath` 6s + `eyesBlink` 4s controlados por prop `mood`
-- Usado na Home, no topo direito do hero.
+## 4. Seções no Hub
+Em `WellnessHub.tsx`, na view `home`, adicionar (abaixo do Hero, antes do `WellnessGrowth`):
+1. **Quick Relief** (4 cards)
+2. **Parent Reset** (4 cards, visual mais sóbrio — fundo mais escuro/aveludado)
+3. **Connection** (4 cards família)
+4. **Soundscapes** (5 cards com player)
+5. **Journeys** (4 jornadas, todas premium exceto preview do dia 1)
 
-### 4. Home Screen reestruturada
-Arquivo: `src/components/flow/HomeScreen.tsx` (refator visual, mesma lógica).
-Nova hierarquia:
-1. **Header premium**: sino/configs à direita, badge "Premium" com sound toggle à esquerda, logo "KIDZZ" centralizado.
-2. **Greeting emocional**: "Olá, {nome} ✨" + subtítulo + pill "KIDZZ Ativo · N perguntas".
-3. **Hero Input IA** (card surface-premium + glow breathing): título "Me pergunte qualquer coisa!", input com botão mic verde metálico embutido + CTA "Perguntar ✨".
-4. **SOS Card**: gradiente coral (#FF7A7A → #D94B4B), ícone pulsante, CTA "SOS Kidzz ✨".
-5. **Carrossel "Explore Juntos"**: 3 cards (Histórias, Viagem, Wellness) com ícones e descrições.
-6. **"Hoje para Você"**: grid 2 col com perguntas sugeridas + tag de categoria.
-7. **Dock menu inferior** (`BottomNav` já existe — apenas refinar estilo: blur 24px, raio 32, sombra cinema, ícones com `popIn` 0.3s no ativo).
+Cada seção: header com kicker + título + scroll horizontal de cards.
 
-### 5. Animações premium
-- Tokens em tailwind:
-  - `ease-snappy: cubic-bezier(0.22,1,0.36,1)`
-  - `ease-bounce: cubic-bezier(0.34,1.56,0.64,1)`
-- `pageEnter`: já coberto por `PageTransition.tsx` (ajustar duration 0.6s).
-- `cardHover`: utilitário `.card-cinema` (y-translate -4px + shadow-cinema-lg em 0.3s).
-- `glowBreath`: keyframe novo no index.css aplicado ao Hero Input e ao camaleão.
-- Botão CTA: scale 1 → 1.02 hover, 0.98 active.
+## 5. Ponte SOS → KALM
+Em `SOSCrisisFlow.tsx`, na etapa `fechamento`, **adicionar nova micro-etapa antes do recap**:
+- Frase: "Você conseguiu desacelerar este momento." → pausa 1.2s → "Agora podemos cuidar do restante."
+- Card premium **🌿 Continuar no Kalm** com botão **✨ Abrir Kalm**.
+- Ao clicar: dispara `window.dispatchEvent(new CustomEvent("kidzz:open-kalm", { detail: { experienceId } }))` usando `sosMap[situation.id]`.
 
-### 6. Estados interativos
-- Input: 3 estados (default / focus / typing) via classes utilitárias.
-- Botões verdes: sombra `0 4px 12px glowGreen` default, eleva no hover.
-- Cards Explore/Today: hover translateY -2px + scale 1.02.
+Em `Index.tsx`: listener `kidzz:open-kalm` → `switchTab("wellness")` + `setKalmInitialExperience(id)` → passado como prop para `WellnessHub` → abre direto o `ExperiencePlayer` daquela experiência (não abre home).
 
-## Detalhes técnicos
+## 6. Botão fixo KALM no menu
+- O slot já existe no `BottomNav` (`wellness`). Atualizo `id: "wellness"`, `label: "KALM"`, `icon: Leaf`, `tint: hsl(150 45% 42%)` (esmeralda).
 
-- **Sem mudanças** em: rotas, AuthContext, quotas, paywall, edge functions, schema.
-- **Tokens HSL** mantidos (regra do projeto) — hex do brief convertidos para HSL no `:root`.
-- **Mobile-first** (viewport atual 430px): hero input full-width, camaleão escala para 240×260 em <430px para não cobrir o saudação.
-- **Performance**: backdrop-filter já capado em 10px no mobile (regra existente). `will-change: transform` apenas no camaleão.
-- **Acessibilidade**: contraste textDark/bgPrimary OK (>10:1); botões mantêm 44×44.
+## 7. Freemium
+Helper `canUseKalm(experience, profile)` em `kalm/access.ts`:
+- **Free:** preview de qualquer experiência (mostra descrição), **1 experiência curta/dia** + **1 soundscape/dia** + **1 parent reset/dia** (localStorage por dia: `kidzz_kalm_usage_YYYY-MM-DD`).
+- **Premium:** tudo liberado + histórico emocional + continuidade.
+- Quando bloqueado: dispara paywall existente `kidzz:open-paywall` com contexto `kalm`.
 
-## Arquivos tocados
+## Arquivos criados
+- `src/components/kalm/kalmBrand.ts`
+- `src/components/kalm/experiences.ts`
+- `src/components/kalm/sosMap.ts`
+- `src/components/kalm/access.ts`
+- `src/components/kalm/ExperienceCard.tsx`
+- `src/components/kalm/SectionRow.tsx`
+- `src/components/kalm/ExperiencePlayer.tsx`
+- `src/components/kalm/KalmSections.tsx` (compõe as 5 seções)
 
-Edits:
-- `src/index.css` (tokens + keyframes glow/breath)
-- `tailwind.config.ts` (cores, sombras, easings, durations)
-- `src/MainApp.tsx` (montar CinemaBackground)
-- `src/components/flow/HomeScreen.tsx` (refator visual completo)
-- `src/components/flow/BottomNav.tsx` (estilo dock cinema)
-- `src/components/PageTransition.tsx` (duration 0.6s, ease snappy)
+## Arquivos editados (pontuais, mínimos)
+- `src/components/wellness/WellnessHub.tsx` — header com brand KALM + `<KalmSections />` + suporte a `initialExperience`.
+- `src/components/sos/SOSCrisisFlow.tsx` — adicionar bloco "Continuar no Kalm" na etapa `fechamento`.
+- `src/components/flow/BottomNav.tsx` — label/ícone da aba para KALM.
+- `src/pages/Index.tsx` — listener `kidzz:open-kalm` + prop `initialExperience` para `WellnessHub`.
 
-Novos:
-- `src/components/CinemaBackground.tsx`
-- `src/components/kidzz/ChameleonHero.tsx`
+## Não muda
+- Rotas, schema do banco, design existente do Wellness (apenas aditivo), fluxo SOS atual (só ganha etapa final), conteúdo das `SOS_SITUATIONS`.
 
-## Fora de escopo (próximas iterações)
-- Telas internas (Chat, Stories, Dreams) recebem só o background global agora; refator visual completo dessas telas em fase 2.
-- Editar imagem do camaleão (SVG/PNG) — usaremos o asset atual.
-
-## Resultado esperado
-Home com sensação Apple/Pixar: fundo respirando, camaleão volumétrico no topo, hero input com glow verde, SOS coral pulsante, carrossel + grid de sugestões, dock flutuante. Zero flicker, transições 300–600ms, paleta consistente em todo o app.
+Posso prosseguir?

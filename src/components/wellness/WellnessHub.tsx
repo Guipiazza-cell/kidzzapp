@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import wellnessMascot from "@/assets/kidzz/wellness.png";
 import WellnessCinema from "./WellnessCinema";
 import WellnessGrowth from "./WellnessGrowth";
+import KalmSections from "@/components/kalm/KalmSections";
 
 /* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
    Paleta sálvia + esmeralda + creme + dourado fosco.
@@ -20,7 +21,7 @@ import WellnessGrowth from "./WellnessGrowth";
    de sons expandida e área Dormir premium.
 */
 
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; initialExperienceId?: string | null; onConsumedInitial?: () => void; }
 
 type View =
   | "home"
@@ -371,7 +372,7 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
 };
 
 /* ────────────── HOME ────────────── */
-const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => {
+const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: View) => void; onBack: () => void; initialExperienceId?: string | null; onConsumedInitial?: () => void }) => {
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
   const { streak } = useWellnessStreak();
@@ -457,6 +458,9 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
           </div>
         </div>
       </div>
+
+      {/* KALM — seções premium (Quick Relief, Parent Reset, Connection, Soundscapes, Journeys) */}
+      <KalmSections initialExperienceId={initialExperienceId} onConsumedInitial={onConsumedInitial} />
 
       {/* Crescimento da família — 10 camadas premium de engajamento */}
       <WellnessGrowth />
@@ -1549,11 +1553,14 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
 
 
 /* ────────────── ROOT ────────────── */
-const WellnessHub = ({ onBack }: Props) => {
+const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) => {
   const [view, setView] = useState<View>("home");
   const [cinemaOpen, setCinemaOpen] = useState(false);
   const go = useCallback((v: View) => setView(v), []);
   const back = useCallback(() => setView("home"), []);
+
+  // Quando vier uma experiência inicial (do SOS), garante que estamos na home
+  useEffect(() => { if (initialExperienceId) setView("home"); }, [initialExperienceId]);
 
   return (
     <div
@@ -1574,7 +1581,7 @@ const WellnessHub = ({ onBack }: Props) => {
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            {view === "home"       && <Home go={go} onBack={onBack} />}
+            {view === "home"       && <Home go={go} onBack={onBack} initialExperienceId={initialExperienceId} onConsumedInitial={onConsumedInitial} />}
             {view === "sos"        && <BreathView onBack={back} sos />}
             {view === "breath"     && <BreathView onBack={back} />}
             {view === "sounds"     && <SoundsView onBack={back} />}
