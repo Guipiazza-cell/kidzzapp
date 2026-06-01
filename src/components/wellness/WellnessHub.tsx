@@ -372,7 +372,7 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
 };
 
 /* ────────────── HOME ────────────── */
-const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => {
+const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: View) => void; onBack: () => void; initialExperienceId?: string | null; onConsumedInitial?: () => void }) => {
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
   const { streak } = useWellnessStreak();
@@ -460,7 +460,7 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
       </div>
 
       {/* KALM — seções premium (Quick Relief, Parent Reset, Connection, Soundscapes, Journeys) */}
-      <KalmSections />
+      <KalmSections initialExperienceId={initialExperienceId} onConsumedInitial={onConsumedInitial} />
 
       {/* Crescimento da família — 10 camadas premium de engajamento */}
       <WellnessGrowth />
