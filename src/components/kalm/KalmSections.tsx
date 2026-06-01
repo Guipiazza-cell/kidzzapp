@@ -21,7 +21,7 @@ const KalmSections = ({ initialExperienceId, onConsumedInitial }: Props) => {
 
   const openExperience = useCallback((exp: KalmExperience) => {
     const access = checkKalmAccess(exp, isPremium);
-    if (!access.allowed) {
+    if (access.allowed === false) {
       if (access.reason === "premium") {
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "kalm_journey" } }));
       } else {
