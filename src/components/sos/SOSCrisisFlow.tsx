@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { SosSituation } from "./situations";
+import { kalmTargetFor } from "@/components/kalm/sosMap";
 
 /**
  * Fluxo emocional SOS — 6 etapas, sem redirecionamento seco pra Wellness.
@@ -693,19 +694,69 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                     </button>
                   </motion.div>
 
-                  {/* Continuação OPCIONAL pra Wellness */}
-                  <motion.button
-                    type="button"
-                    onClick={() => { haptic("light"); onGoWellness?.(); onClose(); }}
-                    className="w-full mt-1 py-2.5 rounded-2xl text-[12px] font-bold flex items-center justify-center gap-1.5 active:scale-[0.97] transition-transform"
+                  {/* Ponte SOS → KALM */}
+                  <motion.div
+                    className="w-full mt-3 p-4 rounded-3xl text-left relative overflow-hidden"
                     style={{
-                      background: "transparent",
-                      color: "hsl(var(--premium-ink-soft))",
+                      background: "linear-gradient(135deg, hsl(150 30% 96%) 0%, hsl(140 35% 88%) 60%, hsl(150 38% 78%) 100%)",
+                      border: "1px solid hsl(0 0% 100% / 0.8)",
+                      boxShadow: "0 14px 32px -14px hsl(150 35% 25% / 0.45)",
                     }}
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 4.7 }}
+                    initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 4.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <Music2 size={13} /> Continuar com {situation.support.playlist.label} no Wellness
-                  </motion.button>
+                    <motion.p
+                      className="text-[13px] font-semibold leading-snug mb-1.5"
+                      style={{ color: "hsl(150 35% 18%)" }}
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      transition={{ delay: 4.7, duration: 0.5 }}
+                    >
+                      Você conseguiu desacelerar este momento.
+                    </motion.p>
+                    <motion.p
+                      className="text-[13px] font-medium leading-snug mb-3"
+                      style={{ color: "hsl(150 22% 32%)" }}
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      transition={{ delay: 5.9, duration: 0.5 }}
+                    >
+                      Agora podemos cuidar do restante.
+                    </motion.p>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
+                        style={{
+                          background: "linear-gradient(135deg, hsl(150 30% 92%), hsl(150 38% 36%))",
+                          boxShadow: "inset 0 2px 8px hsl(0 0% 100% / 0.4)",
+                        }}
+                      >
+                        <Leaf size={20} color="#fff" strokeWidth={2} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-black uppercase tracking-[0.2em]" style={{ color: "hsl(150 35% 24%)" }}>
+                          🌿 Continuar no Kalm
+                        </p>
+                        <p className="text-[11.5px] font-medium leading-snug mt-0.5" style={{ color: "hsl(150 22% 36%)" }}>
+                          Experiências guiadas para restaurar calma, conexão e equilíbrio.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        haptic("medium"); sfx("click");
+                        const experienceId = kalmTargetFor(situation.id);
+                        window.dispatchEvent(new CustomEvent("kidzz:open-kalm", { detail: { experienceId } }));
+                        onClose();
+                      }}
+                      className="mt-3 w-full py-3 rounded-2xl text-white text-[13px] font-black tracking-tight flex items-center justify-center gap-1.5 active:scale-[0.97] transition-transform"
+                      style={{
+                        background: "linear-gradient(135deg, hsl(150 38% 36%), hsl(150 35% 22%))",
+                        boxShadow: "0 10px 28px -12px hsl(150 38% 22% / 0.6)",
+                      }}
+                    >
+                      ✨ Abrir Kalm
+                    </button>
+                  </motion.div>
 
                   <motion.button
                     type="button"
