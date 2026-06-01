@@ -115,6 +115,7 @@ const Index = () => {
     try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
   });
   const [showJourney, setShowJourney] = useState(false);
+  const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
   // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
   // Mantemos a flag marcada como vista para não reintroduzir no futuro.
   useEffect(() => {
@@ -221,9 +222,17 @@ const Index = () => {
     window.addEventListener("kidzz:open-plans", openPlans);
     const openJourney = () => setShowJourney(true);
     window.addEventListener("kidzz:open-journey", openJourney);
+    const openKalm = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      const expId = (detail.experienceId as string) || null;
+      setKalmInitialExperience(expId);
+      switchTab("wellness");
+    };
+    window.addEventListener("kidzz:open-kalm", openKalm);
     return () => {
       window.removeEventListener("kidzz:open-plans", openPlans);
       window.removeEventListener("kidzz:open-journey", openJourney);
+      window.removeEventListener("kidzz:open-kalm", openKalm);
     };
   }, []);
 
@@ -408,7 +417,7 @@ const Index = () => {
     memories: () => <MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} />,
     moments: () => <MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} />,
     cinema: () => <FamilyCinema onBack={backToHome} />,
-    wellness: () => <WellnessHub onBack={backToHome} />,
+    wellness: () => <WellnessHub onBack={backToHome} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} />,
     achievements: () => <MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} />,
     dreams: () => <DreamWorld onBack={() => { backToHome(); evolution.evolve("story"); }} />,
     music: () => (
