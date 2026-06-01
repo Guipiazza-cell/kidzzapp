@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import wellnessMascot from "@/assets/kidzz/wellness.png";
 import WellnessCinema from "./WellnessCinema";
 import WellnessGrowth from "./WellnessGrowth";
+import KalmSections from "@/components/kalm/KalmSections";
 
 /* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
    Paleta sálvia + esmeralda + creme + dourado fosco.
@@ -20,7 +21,7 @@ import WellnessGrowth from "./WellnessGrowth";
    de sons expandida e área Dormir premium.
 */
 
-interface Props { onBack: () => void; }
+interface Props { onBack: () => void; initialExperienceId?: string | null; onConsumedInitial?: () => void; }
 
 type View =
   | "home"
@@ -457,6 +458,9 @@ const Home = ({ go, onBack }: { go: (v: View) => void; onBack: () => void }) => 
           </div>
         </div>
       </div>
+
+      {/* KALM — seções premium (Quick Relief, Parent Reset, Connection, Soundscapes, Journeys) */}
+      <KalmSections />
 
       {/* Crescimento da família — 10 camadas premium de engajamento */}
       <WellnessGrowth />
@@ -1549,11 +1553,14 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
 
 
 /* ────────────── ROOT ────────────── */
-const WellnessHub = ({ onBack }: Props) => {
+const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) => {
   const [view, setView] = useState<View>("home");
   const [cinemaOpen, setCinemaOpen] = useState(false);
   const go = useCallback((v: View) => setView(v), []);
   const back = useCallback(() => setView("home"), []);
+
+  // Quando vier uma experiência inicial (do SOS), garante que estamos na home
+  useEffect(() => { if (initialExperienceId) setView("home"); }, [initialExperienceId]);
 
   return (
     <div
