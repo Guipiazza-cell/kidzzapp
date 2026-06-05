@@ -513,3 +513,9 @@ html[data-app-hidden="true"] *::after {
 }
 
 
+
+/* Hide the bottom dock while a fullscreen modal/sheet is open
+   (e.g. KALM ExperiencePlayer) so it doesn't cover sheet content. */
+body.kidzz-modal-open nav[data-kidzz-dock] {
+  display: none !important;
+}
