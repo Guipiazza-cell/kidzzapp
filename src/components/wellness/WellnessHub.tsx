@@ -1572,7 +1572,10 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
       } as React.CSSProperties}
     >
       <Atmosphere />
-      <div className="relative max-w-[520px] mx-auto pb-28">
+      <div
+        className="relative max-w-[520px] mx-auto"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)" }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
