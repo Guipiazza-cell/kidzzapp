@@ -170,7 +170,7 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
         <>
           <motion.div
             key="kalm-backdrop"
-            className="fixed inset-0 z-[120]"
+            className="fixed inset-0 z-[2147483646]"
             style={{ background: "hsl(150 30% 12% / 0.45)", backdropFilter: "blur(10px)" }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={close}
@@ -178,9 +178,10 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
           />
           <motion.div
             key="kalm-sheet"
-            className="fixed inset-x-0 bottom-0 z-[121] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[2147483647] flex flex-col"
             style={{
-              maxHeight: "94vh",
+              maxHeight: "92dvh",
+              height: "92dvh",
               borderTopLeftRadius: 32,
               borderTopRightRadius: 32,
               background: "linear-gradient(180deg, hsl(48 36% 98%) 0%, hsl(150 28% 94%) 100%)",
@@ -223,8 +224,12 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
 
             {/* Scroll com fundo seguro pra notch + bottom inset */}
             <div
-              className="flex-1 min-h-0 overflow-y-auto px-5 pb-8"
-              style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}
+              className="flex-1 min-h-0 overflow-y-auto px-5"
+              style={{
+                WebkitOverflowScrolling: "touch",
+                overscrollBehavior: "contain",
+                paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)",
+              }}
             >
               {!completed && (
                 <>
