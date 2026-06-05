@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { memo, useCallback } from "react";
 import {
   MessageCircleHeart, BookOpen, Music2, Target, Film, Disc3,
@@ -55,15 +54,21 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     const isActive = activeTab === tab.id;
     const Icon = tab.icon;
     return (
-      <motion.button
+      <button
         key={tab.id}
         type="button"
         onClick={() => handle(tab.id)}
-        whileTap={{ scale: 0.88 }}
-        animate={isActive ? { scale: [0.8, 1.1, 1] } : { scale: 1 }}
-        transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
-        className="relative flex flex-col items-center justify-center gap-0.5 px-1 py-1 min-w-[44px] min-h-[56px] rounded-xl flex-1 touch-manipulation select-none"
-        style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation", userSelect: "none", willChange: "auto" }}
+        className="relative flex flex-col items-center justify-center gap-0.5 px-1 py-1 min-w-[44px] min-h-[56px] rounded-xl flex-1 touch-manipulation select-none active:opacity-70 transition-opacity"
+        style={{
+          WebkitTapHighlightColor: "transparent",
+          touchAction: "manipulation",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+          WebkitTouchCallout: "none",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+        }}
         aria-label={tab.label}
         aria-current={isActive ? "page" : undefined}
       >
@@ -78,20 +83,14 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         >
           {tab.label}
         </span>
-        <AnimatePresence>
-          {isActive && (
-            <motion.span
-              layoutId="kidzz-tab-underline-v2"
-              className="absolute -bottom-0.5 h-[3px] rounded-full"
-              style={{ background: tab.tint, width: 16, boxShadow: `0 0 8px ${tab.tint}` }}
-              initial={{ opacity: 0, scaleX: 0 }}
-              animate={{ opacity: 1, scaleX: 1 }}
-              exit={{ opacity: 0, scaleX: 0 }}
-              transition={{ type: "spring", stiffness: 340, damping: 26 }}
-            />
-          )}
-        </AnimatePresence>
-      </motion.button>
+        {isActive && (
+          <span
+            aria-hidden
+            className="absolute -bottom-0.5 h-[3px] rounded-full"
+            style={{ background: tab.tint, width: 16, boxShadow: `0 0 8px ${tab.tint}` }}
+          />
+        )}
+      </button>
     );
   };
 
