@@ -87,6 +87,8 @@ const KalmSections = ({ initialExperienceId, onConsumedInitial }: Props) => {
         />
       ))}
 
+      <div aria-hidden style={{ height: "calc(40px + env(safe-area-inset-bottom, 0px))" }} />
+
       <ExperiencePlayer exp={active} onClose={() => setActive(null)} />
     </>
   );
