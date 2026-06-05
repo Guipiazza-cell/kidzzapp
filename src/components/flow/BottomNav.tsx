@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { memo, useCallback } from "react";
 import {
   MessageCircleHeart, BookOpen, Music2, Target, Film, Disc3,
