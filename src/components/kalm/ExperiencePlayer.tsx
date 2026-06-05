@@ -84,6 +84,18 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
     setFeedback(null);
   }, [exp?.id]);
 
+  // Hide bottom dock + lock body scroll while player is open
+  useEffect(() => {
+    if (!open) return;
+    document.body.classList.add("kidzz-modal-open");
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.classList.remove("kidzz-modal-open");
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open]);
+
   // Timer
   useEffect(() => {
     if (!exp || !active || completed) return;
