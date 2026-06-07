@@ -97,11 +97,11 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
   return (
     <nav
       data-kidzz-dock
-      className="fixed bottom-0 left-0 right-0 z-[9999]"
+      className="fixed bottom-0 left-0 right-0 z-[50]"
       style={{
         position: "fixed",
         bottom: 0,
-        zIndex: 2147483647,
+        zIndex: 50,
         paddingBottom: "max(env(safe-area-inset-bottom, 6px), 6px)",
         background: "hsl(48 36% 98% / 0.88)",
         backdropFilter: "blur(14px) saturate(1.1)",
