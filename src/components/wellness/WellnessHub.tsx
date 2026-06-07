@@ -1556,19 +1556,26 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
 const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) => {
   const [view, setView] = useState<View>("home");
   const [cinemaOpen, setCinemaOpen] = useState(false);
-  const go = useCallback((v: View) => setView(v), []);
-  const back = useCallback(() => setView("home"), []);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const resetScroll = useCallback(() => {
+    requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" }));
+  }, []);
+  const go = useCallback((v: View) => { setView(v); resetScroll(); }, [resetScroll]);
+  const back = useCallback(() => { setView("home"); resetScroll(); }, [resetScroll]);
 
   // Quando vier uma experiência inicial (do SOS), garante que estamos na home
   useEffect(() => { if (initialExperienceId) setView("home"); }, [initialExperienceId]);
 
   return (
     <div
+      ref={scrollRef}
       className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain relative"
       style={{
         background: "linear-gradient(180deg, hsl(38 55% 96% / 0.78) 0%, hsl(150 28% 90% / 0.72) 100%)",
         color: ink,
         WebkitOverflowScrolling: "touch",
+        touchAction: "pan-y",
+        scrollPaddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)",
       } as React.CSSProperties}
     >
       <Atmosphere />
@@ -1606,12 +1613,13 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
         <motion.button
           type="button"
           onClick={() => { haptic("medium"); setCinemaOpen(true); }}
-          className="fixed left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 px-5 py-3 rounded-full active:scale-[0.97] transition-transform"
+          className="fixed left-1/2 -translate-x-1/2 z-[40] flex items-center gap-2 px-5 py-3 rounded-full active:scale-[0.97] transition-transform touch-manipulation"
           style={{
-            bottom: "calc(env(safe-area-inset-bottom, 0px) + 92px)",
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 172px)",
             background: "linear-gradient(135deg, hsl(150 30% 96%) 0%, hsl(140 35% 88%) 60%, hsl(150 35% 80%) 100%)",
             border: "1px solid hsl(0 0% 100% / 0.85)",
             boxShadow: "0 1px 0 hsl(0 0% 100% / 0.9) inset, 0 14px 32px -14px hsl(150 30% 25% / 0.4)",
+            touchAction: "manipulation",
           }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
