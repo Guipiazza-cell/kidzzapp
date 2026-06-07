@@ -171,12 +171,32 @@
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     touch-action: manipulation;
+    cursor: pointer;
+    position: relative;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: default;
+  }
+
+  button > svg,
+  button > span[aria-hidden="true"] {
+    pointer-events: none;
   }
 
   [class*="overflow-y-auto"],
   [class*="overflow-x-auto"] {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+  }
+
+  [class*="overflow-y-auto"] {
+    touch-action: pan-y;
+  }
+
+  [class*="overflow-x-auto"] {
+    touch-action: pan-x;
   }
 
   /* Prevent layout-shift flicker on images while they decode */
@@ -518,4 +538,8 @@ html[data-app-hidden="true"] *::after {
    (e.g. KALM ExperiencePlayer) so it doesn't cover sheet content. */
 body.kidzz-modal-open nav[data-kidzz-dock] {
   display: none !important;
+}
+
+body.kidzz-modal-open {
+  overscroll-behavior: none;
 }

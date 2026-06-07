@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Lock, ChevronRight } from "lucide-react";
 import { memo } from "react";
 import type { KalmExperience } from "./experiences";
@@ -24,12 +23,10 @@ const ExperienceCard = ({ exp, isPremium, tone, onOpen }: Props) => {
   const subColor   = isAdult ? "hsl(48 20% 78%)" : "hsl(150 12% 38%)";
 
   return (
-    <motion.button
+    <button
       type="button"
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 360, damping: 26 }}
       onClick={() => { haptic("light"); sfx("click"); onOpen(exp); }}
-      className="snap-start shrink-0 w-[230px] text-left p-4 rounded-3xl relative overflow-hidden"
+      className="snap-start shrink-0 w-[230px] text-left p-4 rounded-3xl relative overflow-hidden active:scale-[0.98] transition-transform touch-manipulation"
       style={{
         background: bg,
         border: `1px solid ${stroke}`,
@@ -39,6 +36,7 @@ const ExperienceCard = ({ exp, isPremium, tone, onOpen }: Props) => {
           ? "0 14px 36px -16px hsl(150 30% 10% / 0.55)"
           : "0 10px 28px -18px hsl(150 30% 25% / 0.25)",
         minHeight: 144,
+        touchAction: "manipulation",
       }}
       aria-label={exp.title}
     >
@@ -78,7 +76,7 @@ const ExperienceCard = ({ exp, isPremium, tone, onOpen }: Props) => {
       >
         {locked ? "Desbloquear" : "Começar"} <ChevronRight size={11} />
       </span>
-    </motion.button>
+    </button>
   );
 };
 

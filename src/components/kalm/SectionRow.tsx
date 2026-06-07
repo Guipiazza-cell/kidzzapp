@@ -28,7 +28,10 @@ const SectionRow = ({ section, isPremium, onOpen }: Props) => {
           {section.subtitle}
         </p>
       </header>
-      <div className="pl-5 pr-3 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none">
+      <div
+        className="pl-5 pr-3 flex gap-3 overflow-x-auto pb-4 snap-x scrollbar-none"
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x", scrollPaddingLeft: 20 }}
+      >
         {section.items.map((exp) => (
           <ExperienceCard
             key={exp.id}

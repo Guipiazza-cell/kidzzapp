@@ -73,6 +73,7 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
   const [stepDone, setStepDone] = useState<Set<number>>(new Set());
   const [completed, setCompleted] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
 
   // Reset on open
   useEffect(() => {
@@ -122,6 +123,10 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
 
   useEffect(() => () => { engineRef.current?.stopAll?.(); }, []);
 
+  useEffect(() => () => {
+    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+  }, []);
+
   const breathing = useBreathing(
     exp && exp.kind === "breathing" ? exp : null,
     active && open && !completed,
@@ -154,6 +159,7 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
   const close = () => {
     haptic("light");
     engineRef.current?.stopAll?.();
+    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
     onClose();
   };
 
@@ -170,24 +176,25 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
         <>
           <motion.div
             key="kalm-backdrop"
-            className="fixed inset-0 z-[2147483646]"
-            style={{ background: "hsl(150 30% 12% / 0.45)", backdropFilter: "blur(10px)" }}
+            className="fixed inset-0 z-[190]"
+            style={{ background: "hsl(150 30% 12% / 0.45)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={close}
             aria-hidden
           />
           <motion.div
             key="kalm-sheet"
-            className="fixed inset-x-0 bottom-0 z-[2147483647] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[200] flex flex-col"
             style={{
-              maxHeight: "92dvh",
-              height: "92dvh",
+              maxHeight: "min(92dvh, 92vh)",
+              height: "min(92dvh, 92vh)",
               borderTopLeftRadius: 32,
               borderTopRightRadius: 32,
               background: "linear-gradient(180deg, hsl(48 36% 98%) 0%, hsl(150 28% 94%) 100%)",
               border: "1px solid hsl(0 0% 100% / 0.7)",
               boxShadow: "0 -20px 60px -20px hsl(150 30% 18% / 0.35)",
-              paddingBottom: "max(env(safe-area-inset-bottom, 16px), 16px)",
+              paddingBottom: "env(safe-area-inset-bottom, 0px)",
+              transform: "translateZ(0)",
             }}
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
             transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
@@ -228,7 +235,8 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
               style={{
                 WebkitOverflowScrolling: "touch",
                 overscrollBehavior: "contain",
-                paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)",
+                paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 96px)",
+                touchAction: "pan-y",
               }}
             >
               {!completed && (
@@ -482,13 +490,12 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
                         const selected = feedback === opt.key;
                         const dimmed = feedback && !selected;
                         return (
-                          <motion.button
+                          <button
                             key={opt.key}
                             type="button"
                             onClick={() => sendFeedback(opt.key, opt.label)}
-                            whileTap={{ scale: 0.96 }}
                             disabled={!!feedback}
-                            className="py-2.5 px-2 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all"
+                            className="py-2.5 px-2 rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] touch-manipulation"
                             style={{
                               background: selected
                                 ? `linear-gradient(135deg, ${exp.tint.replace(")", " / 0.22)")}, hsl(0 0% 100% / 0.6))`
@@ -498,11 +505,12 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
                                 : "1px solid hsl(0 0% 100% / 0.6)",
                               color: "hsl(150 35% 18%)",
                               opacity: dimmed ? 0.5 : 1,
+                              touchAction: "manipulation",
                             }}
                           >
                             <span aria-hidden>{opt.emoji}</span>
                             <span className="truncate">{opt.label}</span>
-                          </motion.button>
+                          </button>
                         );
                       })}
                     </div>
@@ -539,8 +547,8 @@ const PlayPauseButton = ({ active, onToggle, label }: { active: boolean; onToggl
   <button
     type="button"
     onClick={onToggle}
-    className="mt-2 px-6 h-12 rounded-full flex items-center gap-2 font-semibold text-[14px]"
-    style={{ background: "hsl(150 35% 22%)", color: "#fff" }}
+    className="mt-2 px-6 h-12 rounded-full flex items-center gap-2 font-semibold text-[14px] active:scale-[0.98] touch-manipulation"
+    style={{ background: "hsl(150 35% 22%)", color: "#fff", touchAction: "manipulation" }}
   >
     {active ? <Pause size={16} /> : <Play size={16} />}
     {label ?? (active ? "Pausar" : "Retomar")}
