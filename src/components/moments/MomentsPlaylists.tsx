@@ -260,8 +260,8 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           <ArrowLeft size={22} />
         </motion.button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-gray-900 text-lg font-bold leading-tight">Momentos</h1>
-          <p className="text-gray-700 text-[11.5px] font-medium">Curadoria musical em família</p>
+          <h1 className="text-white text-lg font-bold leading-tight">Momentos</h1>
+          <p className="text-white/75 text-[11.5px] font-medium">Curadoria musical em família</p>
         </div>
       </header>
 
