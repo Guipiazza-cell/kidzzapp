@@ -42,12 +42,10 @@ const NameOnboarding = () => {
     haptic("medium");
     try {
       await updateProfile({ child_name: trimmed });
-      setSaving(false);
     } catch (e) {
       console.error("NameOnboarding: updateProfile error", e);
+    } finally {
       setSaving(false);
-      await updateProfile({ child_name: trimmed });
-      sfx("error");
     }
   }, [name, saving, updateProfile]);
 

@@ -44,9 +44,8 @@ const InterestsOnboarding = () => {
       await updateProfile({ child_interests: selected } as any);
     } catch (e) {
       console.error("InterestsOnboarding error", e);
-      await updateProfile({ child_interests: selected } as any);
+    } finally {
       setSaving(false);
-      sfx("error");
     }
   }, [saving, selected, updateProfile]);
 
