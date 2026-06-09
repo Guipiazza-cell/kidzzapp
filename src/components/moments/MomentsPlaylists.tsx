@@ -197,7 +197,7 @@ const ListRow = ({
     initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.35, delay: 0.04 * index }}
-    className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.06] active:bg-white/[0.07] transition"
+    className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-black/5 active:bg-white shadow-sm transition"
   >
     <div
       className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${playlist.gradient} flex-shrink-0`}
@@ -206,13 +206,13 @@ const ListRow = ({
       {playlist.emoji}
     </div>
     <div className="flex-1 min-w-0 text-left">
-      <h4 className="text-white text-sm font-bold leading-tight truncate">{playlist.title}</h4>
-      <p className="text-white/80 text-[11.5px] italic truncate">"{playlist.emotionalLine}"</p>
-      <p className="text-white/70 text-[10.5px] font-semibold mt-0.5">
+      <h4 className="text-gray-900 text-sm font-bold leading-tight truncate">{playlist.title}</h4>
+      <p className="text-gray-700 text-[11.5px] italic truncate">"{playlist.emotionalLine}"</p>
+      <p className="text-gray-600 text-[10.5px] font-semibold mt-0.5">
         {playlist.approxTracks} músicas · {playlist.approxMinutes} min
       </p>
     </div>
-    <div className="flex-shrink-0 w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center">
+    <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center">
       <Play size={14} fill="currentColor" className="ml-0.5" />
     </div>
   </motion.button>
@@ -237,12 +237,12 @@ const MomentsPlaylists = ({ onBack }: Props) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Fundo cinematográfico discreto */}
+      {/* Fundo claro e suave — texto preto legível */}
       <div
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(120% 50% at 50% 0%, rgba(255,214,107,0.10), transparent 60%), linear-gradient(180deg, #0a0c1f 0%, #0e1126 50%, #07091a 100%)",
+            "radial-gradient(120% 50% at 50% 0%, rgba(255,214,107,0.18), transparent 60%), linear-gradient(180deg, #fff7e8 0%, #fdeed3 50%, #fce7c1 100%)",
         }}
       />
 
@@ -254,14 +254,14 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         <motion.button
           onClick={onBack}
           whileTap={{ scale: 0.9 }}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/[0.06] text-white border border-white/10"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/70 text-gray-900 border border-black/10 shadow-sm"
           aria-label="Voltar"
         >
           <ArrowLeft size={22} />
         </motion.button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-white text-lg font-bold leading-tight">Momentos</h1>
-          <p className="text-white/75 text-[11.5px] font-medium">Curadoria musical em família</p>
+          <h1 className="text-gray-900 text-lg font-bold leading-tight">Momentos</h1>
+          <p className="text-gray-700 text-[11.5px] font-medium">Curadoria musical em família</p>
         </div>
       </header>
 
@@ -275,10 +275,10 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           <div className="flex justify-center">
             <KidzzChameleon state="music" mood="happy" size="md" interactive={false} showParticles={false} />
           </div>
-          <h2 className="mt-3 text-white font-bold text-[26px] tracking-tight leading-tight">
+          <h2 className="mt-3 text-gray-900 font-bold text-[26px] tracking-tight leading-tight">
             Momentos que ficam.
           </h2>
-          <p className="mt-1.5 text-white/80 text-[13px] font-medium max-w-xs mx-auto leading-snug">
+          <p className="mt-1.5 text-gray-700 text-[13px] font-medium max-w-xs mx-auto leading-snug">
             Música para viver a infância com presença.
           </p>
         </section>
@@ -291,8 +291,8 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         {/* Carrossel editorial */}
         <section className="mb-7">
           <div className="flex items-baseline justify-between px-5 mb-3">
-            <h3 className="text-white font-bold text-[15px]">Para cada momento</h3>
-            <span className="text-white/65 text-[10px] font-bold uppercase tracking-[0.18em]">
+            <h3 className="text-gray-900 font-bold text-[15px]">Para cada momento</h3>
+            <span className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.18em]">
               Curadoria
             </span>
           </div>
@@ -308,7 +308,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
 
         {/* Lista completa */}
         <section className="px-5">
-          <h3 className="text-white font-bold text-[15px] mb-3">Todas as playlists</h3>
+          <h3 className="text-gray-900 font-bold text-[15px] mb-3">Todas as playlists</h3>
           <div className="space-y-2.5">
             {PLAYLISTS.map((p, i) => (
               <ListRow key={p.id} playlist={p} onOpen={() => open(p)} index={i} />
@@ -316,7 +316,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           </div>
         </section>
 
-        <p className="mt-8 text-center text-white/60 text-[11px] font-medium px-6">
+        <p className="mt-8 text-center text-gray-600 text-[11px] font-medium px-6">
           Curadoria KIDZZ · Atualizada direto pelo Spotify
         </p>
       </div>

@@ -109,17 +109,21 @@ const Index = () => {
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
-  const [showStatesIntro, setShowStatesIntro] = useState<boolean>(() => justCompletedOnboarding() && !hasIntroSettled() && !hasSeenKidzzStatesIntro());
-  const [showWelcome, setShowWelcome] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    try { return justCompletedOnboarding() && !hasIntroSettled() && window.localStorage.getItem("kidzz_onboarding_welcomed") !== "1"; } catch { return false; }
-  });
+  // Telas "welcome / states intro" removidas — fluxo de onboarding finaliza
+  // direto na home (sem duplicação de boas-vindas).
+  const showStatesIntro = false;
+  const showWelcome = false;
   const [showJourney, setShowJourney] = useState(false);
   const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
-  // EmotionalIntro removida — duplicava a sensação do OnboardingWelcome.
-  // Mantemos a flag marcada como vista para não reintroduzir no futuro.
+  // EmotionalIntro / OnboardingWelcome / KidzzStatesIntro: removidas do fluxo
   useEffect(() => {
-    try { localStorage.setItem("kidzz_emotional_intro_v1", "1"); } catch {}
+    try {
+      localStorage.setItem("kidzz_emotional_intro_v1", "1");
+      localStorage.setItem("kidzz_onboarding_welcomed", "1");
+      localStorage.setItem("kidzz_states_intro_seen", "1");
+      localStorage.setItem("kidzz_intro_settled_v2", "1");
+      sessionStorage.removeItem("kidzz_just_completed_onboarding");
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -127,12 +131,6 @@ const Index = () => {
     setSelectedAgeRange(profile.age_range);
     window.localStorage.setItem(AGE_STORAGE_KEY, profile.age_range);
   }, [profile?.age_range]);
-
-  useEffect(() => {
-    const interests = (profile as any)?.child_interests as string[] | undefined;
-    if (!profile?.child_name || !profile?.age_range || !interests?.length) return;
-    if (justCompletedOnboarding() && !hasIntroSettled()) setShowWelcome(true);
-  }, [profile?.child_name, profile?.age_range, (profile as any)?.child_interests]);
 
   const switchTab = useCallback((tab: string) => {
     if (!KNOWN_TABS.includes(tab)) return;
@@ -272,24 +270,8 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding key="interesses-unico" />;
   }
-  // Tela final emocional do onboarding (uma vez, após interests)
-  if (showWelcome) {
-    return (
-      <OnboardingWelcome
-        childName={profile.child_name}
-        onEnter={() => {
-          markIntroSettled();
-          setShowWelcome(false);
-          setShowStatesIntro(false);
-        }}
-      />
-    );
-  }
-  // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
-  if (showStatesIntro) {
-    return <KidzzStatesIntro onDone={() => { markIntroSettled(); setShowStatesIntro(false); }} />;
-  }
-  // Notification time prompt is now contextual (after first answer), not blocking onboarding
+  // Onboarding completo → entra direto na home, sem telas extras.
+
 
   const childName = profile.child_name;
 
