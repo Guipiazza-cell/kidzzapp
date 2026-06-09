@@ -197,7 +197,7 @@ const ListRow = ({
     initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.35, delay: 0.04 * index }}
-    className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.06] active:bg-white/[0.07] transition"
+    className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-black/5 active:bg-white shadow-sm transition"
   >
     <div
       className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${playlist.gradient} flex-shrink-0`}
@@ -206,13 +206,13 @@ const ListRow = ({
       {playlist.emoji}
     </div>
     <div className="flex-1 min-w-0 text-left">
-      <h4 className="text-white text-sm font-bold leading-tight truncate">{playlist.title}</h4>
-      <p className="text-white/80 text-[11.5px] italic truncate">"{playlist.emotionalLine}"</p>
-      <p className="text-white/70 text-[10.5px] font-semibold mt-0.5">
+      <h4 className="text-gray-900 text-sm font-bold leading-tight truncate">{playlist.title}</h4>
+      <p className="text-gray-700 text-[11.5px] italic truncate">"{playlist.emotionalLine}"</p>
+      <p className="text-gray-600 text-[10.5px] font-semibold mt-0.5">
         {playlist.approxTracks} músicas · {playlist.approxMinutes} min
       </p>
     </div>
-    <div className="flex-shrink-0 w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center">
+    <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center">
       <Play size={14} fill="currentColor" className="ml-0.5" />
     </div>
   </motion.button>
