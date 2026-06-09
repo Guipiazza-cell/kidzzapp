@@ -237,12 +237,12 @@ const MomentsPlaylists = ({ onBack }: Props) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Fundo cinematográfico discreto */}
+      {/* Fundo claro e suave — texto preto legível */}
       <div
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(120% 50% at 50% 0%, rgba(255,214,107,0.10), transparent 60%), linear-gradient(180deg, #0a0c1f 0%, #0e1126 50%, #07091a 100%)",
+            "radial-gradient(120% 50% at 50% 0%, rgba(255,214,107,0.18), transparent 60%), linear-gradient(180deg, #fff7e8 0%, #fdeed3 50%, #fce7c1 100%)",
         }}
       />
 
