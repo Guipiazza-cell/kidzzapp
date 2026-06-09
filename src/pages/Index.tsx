@@ -270,14 +270,8 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding key="interesses-unico" />;
   }
-  // Tela "Tudo pronto" e apresentação dos estados removidas — usuário entra
-  // direto na home após preencher nome → idade → interesses (sem duplicação).
-  if (showWelcome || showStatesIntro) {
-    markIntroSettled();
-    if (showWelcome) setShowWelcome(false);
-    if (showStatesIntro) setShowStatesIntro(false);
-  }
-  // Notification time prompt is now contextual (after first answer), not blocking onboarding
+  // Onboarding completo → entra direto na home, sem telas extras.
+
 
   const childName = profile.child_name;
 
