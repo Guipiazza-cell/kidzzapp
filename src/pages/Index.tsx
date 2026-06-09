@@ -272,22 +272,12 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding key="interesses-unico" />;
   }
-  // Tela final emocional do onboarding (uma vez, após interests)
-  if (showWelcome) {
-    return (
-      <OnboardingWelcome
-        childName={profile.child_name}
-        onEnter={() => {
-          markIntroSettled();
-          setShowWelcome(false);
-          setShowStatesIntro(false);
-        }}
-      />
-    );
-  }
-  // Apresentação dos 4 estados do Kidzz (1ª vez, após onboarding completo)
-  if (showStatesIntro) {
-    return <KidzzStatesIntro onDone={() => { markIntroSettled(); setShowStatesIntro(false); }} />;
+  // Tela "Tudo pronto" e apresentação dos estados removidas — usuário entra
+  // direto na home após preencher nome → idade → interesses (sem duplicação).
+  if (showWelcome || showStatesIntro) {
+    markIntroSettled();
+    if (showWelcome) setShowWelcome(false);
+    if (showStatesIntro) setShowStatesIntro(false);
   }
   // Notification time prompt is now contextual (after first answer), not blocking onboarding
 
