@@ -90,8 +90,12 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         {isActive && (
           <span
             aria-hidden
-            className="absolute -bottom-0.5 h-[3px] rounded-full"
-            style={{ background: tab.tint, width: 16, boxShadow: `0 0 8px ${tab.tint}` }}
+            className="absolute inset-0 rounded-xl"
+            style={{
+              background: `${tab.tint}18`,
+              border: `1px solid ${tab.tint}30`,
+              transition: "all 0.2s ease",
+            }}
           />
         )}
       </button>
