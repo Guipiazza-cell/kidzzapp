@@ -425,7 +425,7 @@ const Index = () => {
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
             <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
-              <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>
+              <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><div className="flex flex-col items-center gap-3"><div className="w-12 h-12 rounded-2xl animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-24 rounded-full animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-16 rounded-full animate-pulse" style={{background:"hsl(145 26% 90%)"}} /></div></div>}>
                 {KNOWN_TABS.map((tab) => (
                   <div
                     key={tab}
