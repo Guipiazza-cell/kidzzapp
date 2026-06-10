@@ -419,16 +419,12 @@ const Index = () => {
                   <div
                     key={tab}
                     style={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
+                      display: activeTab === tab ? "flex" : "none",
                       flexDirection: "column",
                       flex: 1,
                       minHeight: 0,
-                      opacity: activeTab === tab ? 1 : 0,
-                      pointerEvents: activeTab === tab ? "auto" : "none",
-                      transition: "opacity 0.18s ease",
-                      willChange: "opacity",
+                      position: "absolute",
+                      inset: 0,
                     }}
                   >
                     {TAB_RENDERERS[tab]?.()}
