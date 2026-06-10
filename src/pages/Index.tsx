@@ -438,7 +438,7 @@ const Index = () => {
                       inset: 0,
                     }}
                   >
-                    {TAB_RENDERERS[tab]?.()}
+                    {mountedTabs.has(tab) && TAB_RENDERERS[tab]?.()}
                   </div>
                 ))}
               </Suspense>
