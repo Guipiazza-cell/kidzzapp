@@ -250,11 +250,7 @@ const Index = () => {
     }
   }, [profile?.questions_used, profile?.is_premium]);
 
-  if (loading) {
-    // Sem fundo/loading screen próprio — o MagicalBackground global e o SplashScreen
-    // cobrem a tela. Retornar null evita o flash branco/cinza durante o hidrate.
-    return null;
-  }
+  if (loading) return null;
 
   // EmotionalIntro removida do fluxo — OnboardingWelcome no fim cobre o momento emocional.
 
