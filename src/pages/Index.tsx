@@ -436,13 +436,11 @@ const Index = () => {
                       minHeight: 0,
                       position: "absolute",
                       inset: 0,
-                      animation: activeTab === tab ? "tabFadeIn 0.3s ease-out" : "none",
                     }}
                   >
                     {mountedTabs.has(tab) && TAB_RENDERERS[tab]?.()}
                   </div>
                 ))}
-                <style>{`@keyframes tabFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }`}</style>
               </Suspense>
             </TabErrorBoundary>
           </div>
