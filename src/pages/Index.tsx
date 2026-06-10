@@ -415,7 +415,28 @@ const Index = () => {
           <div className="absolute inset-0 flex flex-col min-h-0">
             <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
               <Suspense fallback={<div className="min-h-[60vh] w-full flex items-center justify-center text-sm font-bold text-gray-600">Carregando… ✨</div>}>
-                {KNOWN_TABS.map((tab) => (<div key={tab} style={{ display: activeTab === tab ? "flex" : "none", flexDirection: "column", flex: 1, minHeight: 0, position: "absolute", inset: 0 }}>{TAB_RENDERERS[tab]?.()}</div>))}
+{KNOWN_TABS.map((tab) => (
+                <motion.div
+                  key={tab}
+                  animate={{
+                    opacity: activeTab === tab ? 1 : 0,
+                    scale: activeTab === tab ? 1 : 0.97,
+                    pointerEvents: activeTab === tab ? "auto" : "none",
+                  }}
+                  transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    minHeight: 0,
+                    position: "absolute",
+                    inset: 0,
+                    willChange: "opacity, transform",
+                  }}
+                >
+                  {TAB_RENDERERS[tab]?.()}
+                </motion.div>
+              ))}
               </Suspense>
             </TabErrorBoundary>
           </div>
