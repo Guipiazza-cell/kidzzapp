@@ -58,7 +58,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         key={tab.id}
         type="button"
         onClick={() => handle(tab.id)}
-        className="relative flex flex-col items-center justify-center gap-0.5 px-1 py-1 min-w-[44px] min-h-[56px] rounded-xl flex-1 touch-manipulation select-none active:opacity-70 transition-opacity"
+        className="relative flex flex-col items-center justify-center gap-0.5 px-1 py-1 min-w-[44px] min-h-[56px] rounded-xl flex-1 touch-manipulation select-none transition-all duration-150 active:scale-90"
         style={{
           WebkitTapHighlightColor: "transparent",
           touchAction: "manipulation",
@@ -73,9 +73,13 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         aria-current={isActive ? "page" : undefined}
       >
         <Icon
-          size={18}
+          size={isActive ? 20 : 18}
           strokeWidth={isActive ? 2.4 : 1.9}
-          style={{ color: isActive ? tab.tint : "hsl(0 0% 48% / 0.75)" }}
+          style={{
+            color: isActive ? tab.tint : "hsl(0 0% 48% / 0.75)",
+            transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            transform: isActive ? "scale(1.15)" : "scale(1)",
+          }}
         />
         <span
           className="text-[9.5px] font-extrabold leading-tight tracking-tight whitespace-nowrap"
