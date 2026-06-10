@@ -99,9 +99,29 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
 
 const getGuestProfile = (): Profile => {
   if (typeof window === "undefined") return createDefaultProfile();
+
   try {
-    const stored = window.localStorage.getItem(GUEST_PROFILE_STORAGE_KEY);
-    return stored ? normalizeProfile(JSON.parse(stored)) : createDefaultProfile();
+    const keys = [
+      GUEST_PROFILE_STORAGE_KEY,
+      "kidzz_guest_profile_backup",
+      "kidzz_guest_profile_v2",
+    ];
+
+    for (const key of keys) {
+      const stored = window.localStorage.getItem(key) 
+        || window.sessionStorage.getItem(key);
+
+      if (stored) {
+        const parsed = normalizeProfile(JSON.parse(stored));
+
+        if (parsed.child_name) {
+          saveGuestProfile(parsed);
+          return parsed;
+        }
+      }
+    }
+
+    return createDefaultProfile();
   } catch {
     return createDefaultProfile();
   }
