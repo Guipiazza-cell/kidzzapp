@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -377,7 +377,7 @@ const Index = () => {
 
   // Cada aba é renderizada uma vez (lazy, sob demanda) e mantida montada.
   // O wrapper KeepAlive esconde/exibe sem desmontar — evita remount, refetch e flash branco.
-  const TAB_RENDERERS: Record<string, () => JSX.Element> = {
+  const TAB_RENDERERS: Record<string, () => JSX.Element> = useMemo(() => ({
     chat: renderChatTab,
     explore: () => <StoryFactory onBack={() => { backToHome(); evolution.evolve("story"); }} />,
     routine: () => <RoutineScreen />,
@@ -400,7 +400,7 @@ const Index = () => {
     moments: () => <MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} />,
     cinema: () => <FamilyCinema onBack={backToHome} />,
     wellness: () => <WellnessHub onBack={backToHome} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} />,
-    achievements: () => <MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} />,
+    achievements: () => <Suspense fallback={null}><SevenDayChallenge onClose={backToHome} /></Suspense>,
     dreams: () => <DreamWorld onBack={() => { backToHome(); evolution.evolve("story"); }} />,
     music: () => (
       <MusicForest
@@ -409,7 +409,7 @@ const Index = () => {
         onXpEarned={() => evolution.evolve("game")}
       />
     ),
-  };
+  }), [backToHome, switchTab, evolution, profile, kalmInitialExperience, setContextualPaywall, setShowLab, setShowTravel]);
 
   return (
     <div className="min-h-[100dvh] flex flex-col overflow-hidden max-w-[100vw]" style={{ height: "auto", overflowX: "hidden" }}>
