@@ -109,7 +109,14 @@ const getGuestProfile = (): Profile => {
 
 const saveGuestProfile = (profile: Profile) => {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(GUEST_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+
+  const data = JSON.stringify(profile);
+
+  window.localStorage.setItem(GUEST_PROFILE_STORAGE_KEY, data);
+  window.localStorage.setItem("kidzz_guest_profile_backup", data);
+  window.localStorage.setItem("kidzz_guest_profile_v2", data);
+
+  try { window.sessionStorage.setItem(GUEST_PROFILE_STORAGE_KEY, data); } catch {}
 };
 
 const clearGuestProfile = () => {
