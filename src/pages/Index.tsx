@@ -115,6 +115,17 @@ const Index = () => {
   const showWelcome = false;
   const [showJourney, setShowJourney] = useState(false);
   const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
+  const [mountedTabs, setMountedTabs] = useState<Set<string>>(
+    () => new Set(["chat"])
+  );
+  useEffect(() => {
+    setMountedTabs(prev => {
+      if (prev.has(activeTab)) return prev;
+      const next = new Set(prev);
+      next.add(activeTab);
+      return next;
+    });
+  }, [activeTab]);
   // EmotionalIntro / OnboardingWelcome / KidzzStatesIntro: removidas do fluxo
   useEffect(() => {
     try {
