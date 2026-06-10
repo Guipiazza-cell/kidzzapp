@@ -56,7 +56,7 @@ import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCar
 import { showXpGained } from "@/components/flow/XpToast";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
-const KNOWN_TABS = ["chat", "explore", "routine", "play", "memories", "moments", "cinema", "wellness", "achievements", "dreams", "music"];
+const KNOWN_TABS = ["chat", "explore", "music", "routine", "wellness", "cinema", "moments", "dreams", "play", "memories", "achievements"];
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 const getInitialTab = () => "chat";
