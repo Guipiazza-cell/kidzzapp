@@ -360,10 +360,10 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                     {billingPeriod === "annual" ? (
                       <>
                         <p className="text-xs text-muted-foreground">
-                          <span className="font-extrabold text-foreground">R$ 19,90</span>/mês
+                          <span className="font-extrabold text-foreground">R$ 20,83</span>/mês
                           <span className="text-[10px] line-through text-muted-foreground ml-1">R$ 24,90</span>
                         </p>
-                        <p className="text-[10px] text-amber-600 font-bold">Cobrado R$ 238,80/ano</p>
+                        <p className="text-[10px] text-amber-600 font-bold">Cobrado R$ 249,90/ano · 2 meses grátis 🎁</p>
                       </>
                     ) : (
                       <p className="text-xs text-muted-foreground">
