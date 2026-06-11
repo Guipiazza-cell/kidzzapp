@@ -11,22 +11,22 @@ const corsHeaders = {
 // Aliases keep backward compatibility with old keys (premium → kidzz, super_premium → premium)
 const PRICES: Record<string, string> = {
   // New canonical keys
-  kidzz: "price_1TUdKp8nR9x8D1BWZgsv3iAT",                 // R$19,90/mês  prod_UTaV3ceAAUThlX
-  kidzz_annual: "price_1TUdLb8nR9x8D1BWSr7AXj1Z",          // R$199/ano    prod_UTaW2oqm99hFrj
-  premium: "price_1TUdM98nR9x8D1BWTTxnuNRI",               // R$24,90/mês  prod_UTaXRFmVOR4wia
-  premium_annual: "price_1TUdMk8nR9x8D1BW9JrzxlB2",        // R$249/ano    prod_UTaXJcEbqCrQtO
-  // Legacy aliases (rename: premium → kidzz, super_premium → premium)
+  kidzz: "price_1TUdKp8nR9x8D1BWZgsv3iAT",                 // R$19,90/mês
+  kidzz_annual: "price_1ThDUR8nR9x8D1BWXc4JbuWM",          // R$199,90/ano (2 meses grátis)
+  premium: "price_1TUdM98nR9x8D1BWTTxnuNRI",               // R$24,90/mês
+  premium_annual: "price_1ThDVE8nR9x8D1BWpQdE3ZyM",        // R$249,90/ano (2 meses grátis)
+  // Legacy aliases
   super_premium: "price_1TUdM98nR9x8D1BWTTxnuNRI",
-  super_premium_annual: "price_1TUdMk8nR9x8D1BW9JrzxlB2",
+  super_premium_annual: "price_1ThDVE8nR9x8D1BWpQdE3ZyM",
 };
 
 const PLAN_AMOUNTS: Record<string, number> = {
   kidzz: 19.90,
-  kidzz_annual: 199.00,
+  kidzz_annual: 199.90,
   premium: 24.90,
-  premium_annual: 249.00,
+  premium_annual: 249.90,
   super_premium: 24.90,
-  super_premium_annual: 249.00,
+  super_premium_annual: 249.90,
 };
 
 serve(async (req) => {

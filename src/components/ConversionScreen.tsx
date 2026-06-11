@@ -76,7 +76,7 @@ const ConversionScreen = ({ childName, onSubscribe, loading }: ConversionScreenP
             </div>
           </div>
           <p className="text-2xl font-black text-primary-foreground">
-            R$ 14,90<span className="text-xs font-bold text-primary-foreground/40">/mês</span>
+            R$ 19,90<span className="text-xs font-bold text-primary-foreground/40">/mês</span>
           </p>
           <div className="mt-2 space-y-1">
             {["10 perguntas por dia", "Narração por voz", "3 personagens"].map((f) => (
