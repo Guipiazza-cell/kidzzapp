@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
 import { useMemories } from "@/hooks/useMemories";
+import { usePWAUpdate } from "@/hooks/usePWAUpdate";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
@@ -86,6 +87,7 @@ const Index = () => {
   const { profile, loading, updateProfile, canAskQuestion } = useAuth();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
+  usePWAUpdate();
   const [step, setStep] = useState<FlowStep>("home");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
