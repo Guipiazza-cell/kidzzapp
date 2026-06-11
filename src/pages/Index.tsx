@@ -288,6 +288,20 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding key="interesses-unico" />;
   }
+  const firstMagicDone = typeof window !== "undefined" && !!window.localStorage.getItem("kidzz_first_magic_done");
+  if (!firstMagicDone) {
+    return (
+      <FirstMagicMoment
+        key="first-magic-unico"
+        onComplete={() => {
+          try { window.localStorage.setItem("kidzz_first_magic_done", "1"); } catch {}
+          markIntroSettled();
+          setStep("home");
+          setActiveTab("chat");
+        }}
+      />
+    );
+  }
   // Onboarding completo → entra direto na home, sem telas extras.
 
 
