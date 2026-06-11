@@ -100,6 +100,9 @@ const Index = () => {
   const { addMemory } = useMemories();
   usePWAUpdate();
   const [step, setStep] = useState<FlowStep>("home");
+  const [accountStepDone, setAccountStepDone] = useState<boolean>(() =>
+    typeof window !== "undefined" && !!window.localStorage.getItem("kidzz_account_step_done")
+  );
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [activeTab, setActiveTab] = useState(getInitialTab);
