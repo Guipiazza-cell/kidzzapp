@@ -74,9 +74,9 @@ const PLANS: PlanCard[] = [
     tier: "premium",
     billing: "annual",
     title: "Premium",
-    monthlyDisplay: 20.75,
-    totalLabel: "R$ 249/ano · 2 meses grátis 🎁",
-    savings: "Economize R$ 49,80",
+    monthlyDisplay: 20.83,
+    totalLabel: "R$ 249,90/ano · 2 meses grátis 🎁",
+    savings: "Economize R$ 48,90",
     benefits: [
       "60 perguntas/dia",
       "5 histórias/dia",
