@@ -8,6 +8,7 @@ import { usePWAUpdate } from "@/hooks/usePWAUpdate";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
+import AccountSetup from "@/components/onboarding/AccountSetup";
 
 import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
 import ContextualPaywallModal from "@/components/ContextualPaywallModal";
@@ -94,11 +95,14 @@ const markIntroSettled = () => {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { profile, loading, updateProfile, canAskQuestion } = useAuth();
+  const { profile, loading, updateProfile, canAskQuestion, user } = useAuth();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
   usePWAUpdate();
   const [step, setStep] = useState<FlowStep>("home");
+  const [accountStepDone, setAccountStepDone] = useState<boolean>(() =>
+    typeof window !== "undefined" && !!window.localStorage.getItem("kidzz_account_step_done")
+  );
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [activeTab, setActiveTab] = useState(getInitialTab);
@@ -287,6 +291,19 @@ const Index = () => {
   const interests = (profile as any)?.child_interests as string[] | undefined;
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding key="interesses-unico" />;
+  }
+  const hasSession = !!user;
+  if (!hasSession && !accountStepDone) {
+    return (
+      <AccountSetup
+        key="account-unico"
+        childName={profile.child_name}
+        onDone={() => {
+          try { window.localStorage.setItem("kidzz_account_step_done", "1"); } catch {}
+          setAccountStepDone(true);
+        }}
+      />
+    );
   }
   // Onboarding completo → entra direto na home, sem telas extras.
 
