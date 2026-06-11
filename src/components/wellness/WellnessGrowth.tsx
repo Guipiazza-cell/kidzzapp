@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Star, Heart, Quote, Wind, Trophy, Share2, Plus, X, Check } from "lucide-react";
 import { haptic } from "@/lib/haptics";
+import kalmChameleon from "@/assets/kalm-chameleon.png.asset.json";
 
 /* ───────── Design tokens (aligned with WellnessHub) ───────── */
 const ink = "#27302A";
@@ -432,8 +433,8 @@ const GratitudeJar = () => {
             />
             <motion.div
               initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
-              className="fixed inset-x-4 bottom-6 z-[100] rounded-3xl p-5"
-              style={{ background: "#fff", border: `1px solid ${stroke}` }}
+              className="fixed inset-x-4 z-[100] rounded-3xl p-5"
+              style={{ background: "#fff", border: `1px solid ${stroke}`, bottom: "calc(env(safe-area-inset-bottom, 0px) + 160px)" }}
             >
               <div className="flex items-center justify-between">
                 <Eyebrow>O que foi bom hoje?</Eyebrow>
@@ -722,13 +723,15 @@ const BreatheChameleon = () => {
                 className="absolute inset-0 rounded-full"
                 style={{ background: `radial-gradient(circle, ${sage}55, transparent 70%)`, filter: "blur(10px)" }}
               />
-              <motion.div
+              <motion.img
+                src={kalmChameleon.url}
+                alt="Camaleão Kidzz"
+                draggable={false}
                 animate={{ scale: phase === "in" ? 1.2 : 0.9 }}
                 transition={{ duration: 4, ease: [0.45, 0, 0.55, 1] }}
-                className="text-[78px] relative"
-              >
-                🦎
-              </motion.div>
+                className="relative w-[160px] h-[160px] object-contain"
+                style={{ filter: "drop-shadow(0 12px 24px rgba(90,143,119,0.35))" }}
+              />
             </div>
             <div className="mt-1 text-[15px] font-semibold" style={{ color: ink }}>
               {phase === "in" ? "Inspire…" : "Expire…"}
