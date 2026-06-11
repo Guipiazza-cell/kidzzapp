@@ -95,7 +95,7 @@ const markIntroSettled = () => {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { profile, loading, updateProfile, canAskQuestion } = useAuth();
+  const { profile, loading, updateProfile, canAskQuestion, user } = useAuth();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
   usePWAUpdate();
