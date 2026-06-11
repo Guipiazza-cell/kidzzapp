@@ -297,7 +297,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                     <div>
                       <p className="font-extrabold text-sm text-foreground">Plano KIDZZ</p>
                       <p className="text-xs text-muted-foreground">
-                        <span className="font-extrabold text-foreground">R$ 14,90</span>/mês
+                        <span className="font-extrabold text-foreground">R$ 19,90</span>/mês
                       </p>
                     </div>
                   </div>
