@@ -1,21 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import MagicalBackground from "@/components/MagicalBackground";
 import { toast } from "sonner";
-import pixelImg from "@/assets/pixel-chameleon.webp";
-import aneImg from "@/assets/ane-chameleon.webp";
+import chameleonMain from "@/assets/chameleon-main.webp";
 
 type Mode = "login" | "signup" | "forgot";
 
 const Auth = () => {
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Já logado? Vai direto pra home (evita tela "travada")
+  useEffect(() => {
+    if (user) navigate("/", { replace: true });
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
