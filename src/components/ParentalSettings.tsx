@@ -246,14 +246,14 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                     <div>
                       <p className="font-extrabold text-sm text-foreground">Plano KIDZZ Anual</p>
                       <p className="text-xs text-muted-foreground">
-                        <span className="font-extrabold text-foreground">R$ 9,90</span>/mês
-                        <span className="text-[10px] line-through text-muted-foreground ml-1">R$ 14,90</span>
+                        <span className="font-extrabold text-foreground">R$ 16,66</span>/mês
+                        <span className="text-[10px] line-through text-muted-foreground ml-1">R$ 19,90</span>
                       </p>
-                      <p className="text-[10px] text-amber-600 font-bold">Cobrado R$ 119,90/ano</p>
+                      <p className="text-[10px] text-amber-600 font-bold">Cobrado R$ 199,90/ano</p>
                     </div>
                   </div>
                   <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold mb-2" style={{ background: "rgba(212,168,71,0.15)", color: "#B8860B" }}>
-                    💰 Economize R$ 58,90 por ano
+                    💰 Economize R$ 38,90 por ano · 2 meses grátis 🎁
                   </div>
                   <ul className="space-y-1">
                     {["10 perguntas por dia", "Narração por voz amigável", "🎯 Fábrica de Momentos (missões)", "Respostas adaptadas por idade", "Filtro de conteúdo avançado"].map((f) => (
