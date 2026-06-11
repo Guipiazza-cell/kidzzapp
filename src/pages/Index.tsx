@@ -349,63 +349,29 @@ const Index = () => {
 
 
 
-  const renderChatTab = () => (
-    <AnimatePresence mode="wait">
-      {step === "home" && (
-        <HomeScreen
-          key="home"
-          onSubmit={handleQuestionSubmit}
-          onOpenStoryFactory={() => switchTab("explore")}
-          onOpenMoments={() => switchTab("moments")}
-          onOpenAchievements={() => switchTab("achievements")}
-          onOpenLab={() => setShowLab(true)}
-          onOpenPlay={() => switchTab("play")}
-          onOpenTravel={() => {
-            if (!profile?.is_premium) {
-              setContextualPaywall({ open: true, context: "travel" });
-              return;
-            }
-            setShowTravel(true);
-          }}
-          onOpenChallenge={() => setShowChallenge(true)}
-          onOpenReferral={() => setShowReferral(true)}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          hideBottomNav
-          characterEvolution={evolution as any}
-        />
-      )}
-      {step === "generating" && <GeneratingScreen key="generating" question={question} ageRange={profile.age_range || "3-7"} onComplete={handleAnswerReady} onError={() => setStep("home")} onLimitReached={() => setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } })} />}
-      {step === "celebrating" && (
-        <CelebrationScreen
-          key="celebrating"
-          childName={childName}
-          pointsEarned={1}
-          streakDays={profile.streak_days ?? 0}
-          interests={(profile as any)?.child_interests as string[] | undefined}
-          onContinue={handleCelebrationDone}
-          onSave={() => {
-            addMemory({
-              type: "question",
-              title: question,
-              content: answer.slice(0, 500),
-              is_special: true,
-              image_url: null,
-              metadata: { saved_from: "celebration" },
-            });
-          }}
-          type="answer"
-        />
-      )}
-      {step === "answer" && <AnswerScreen key="answer" question={question} answer={answer} onNewQuestion={handleNewQuestion} onOpenStoryFactory={() => switchTab("explore")} />}
-      {step === "paywall" && <Paywall key="paywall" onLogin={() => navigate("/auth")} onBack={() => { setStep("home"); switchTab("chat"); }} />}
-    </AnimatePresence>
-  );
-
-  // Cada aba é renderizada uma vez (lazy, sob demanda) e mantida montada.
-  // O wrapper KeepAlive esconde/exibe sem desmontar — evita remount, refetch e flash branco.
   const TAB_RENDERERS: Record<string, () => JSX.Element> = useMemo(() => ({
-    chat: renderChatTab,
+    chat: () => (
+      <ChatFlow
+        step={step} question={question} answer={answer}
+        childName={childName} profile={profile} evolution={evolution}
+        activeTab={activeTab}
+        onSubmit={handleQuestionSubmit}
+        onAnswerReady={handleAnswerReady}
+        onCelebrationDone={handleCelebrationDone}
+        onNewQuestion={handleNewQuestion}
+        onSaveMemory={() => addMemory({ type: "question", title: question, content: answer.slice(0, 500), is_special: true, image_url: null, metadata: { saved_from: "celebration" } })}
+        onTabChange={handleTabChange}
+        onSwitchTab={switchTab}
+        onOpenLab={() => setShowLab(true)}
+        onOpenTravel={() => { if (!profile?.is_premium) { setContextualPaywall({ open: true, context: "travel" }); return; } setShowTravel(true); }}
+        onOpenChallenge={() => setShowChallenge(true)}
+        onOpenReferral={() => setShowReferral(true)}
+        onOpenPaywall={(context, meta) => setContextualPaywall({ open: true, context: context as any, meta })}
+        onLogin={() => navigate("/auth")}
+        onBackFromPaywall={() => { setStep("home"); switchTab("chat"); }}
+        onGeneratingError={() => setStep("home")}
+      />
+    ),
     explore: () => <StoryFactory onBack={() => { backToHome(); evolution.evolve("story"); }} />,
     routine: () => <RoutineScreen />,
     play: () => (
