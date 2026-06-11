@@ -130,12 +130,12 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
                 </div>
                 <p className="font-extrabold text-gray-900 text-base mt-1">KIDZZ Premium Anual</p>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl font-black text-gray-900">R$ 19,90</span>
+                  <span className="text-2xl font-black text-gray-900">R$ 20,83</span>
                   <span className="text-xs font-bold text-gray-400">/mês</span>
                   <span className="text-xs line-through text-gray-400">R$ 24,90</span>
                 </div>
                 <p className="text-[11px] text-amber-700 font-bold mt-0.5">
-                  💰 Economize R$ 60 por ano · Cobrado R$ 238,80/ano
+                  💰 Economize R$ 48,90 por ano · Cobrado R$ 249,90/ano
                 </p>
               </div>
 
