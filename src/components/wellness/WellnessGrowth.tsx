@@ -723,13 +723,15 @@ const BreatheChameleon = () => {
                 className="absolute inset-0 rounded-full"
                 style={{ background: `radial-gradient(circle, ${sage}55, transparent 70%)`, filter: "blur(10px)" }}
               />
-              <motion.div
+              <motion.img
+                src={kalmChameleon.url}
+                alt="Camaleão Kidzz"
+                draggable={false}
                 animate={{ scale: phase === "in" ? 1.2 : 0.9 }}
                 transition={{ duration: 4, ease: [0.45, 0, 0.55, 1] }}
-                className="text-[78px] relative"
-              >
-                🦎
-              </motion.div>
+                className="relative w-[160px] h-[160px] object-contain"
+                style={{ filter: "drop-shadow(0 12px 24px rgba(90,143,119,0.35))" }}
+              />
             </div>
             <div className="mt-1 text-[15px] font-semibold" style={{ color: ink }}>
               {phase === "in" ? "Inspire…" : "Expire…"}
