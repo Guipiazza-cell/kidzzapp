@@ -47,7 +47,7 @@ serve(async (req) => {
     }
 
     // Use "Alice" voice - warm, clear, great for kids
-    const voiceId = "Xb7hH8MSUJpSbSDYk0k2";
+    const voiceId = "TX3LPaxmHKxFdv7VOQHJ";
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_22050_32`,
