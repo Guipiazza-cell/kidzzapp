@@ -19,6 +19,24 @@ import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
 // Heavy/secondary screens are lazy-loaded — only the chat home ships in the initial bundle.
+const lazyRetry = (importFn: () => Promise<any>) =>
+  lazy(() =>
+    importFn()
+      .then((mod) => {
+        try { sessionStorage.removeItem("kidzz_chunk_reload"); } catch {}
+        return mod;
+      })
+      .catch((err) => {
+        try {
+          if (!sessionStorage.getItem("kidzz_chunk_reload")) {
+            sessionStorage.setItem("kidzz_chunk_reload", "1");
+            window.location.reload();
+            return new Promise(() => {});
+          }
+        } catch {}
+        throw err;
+      })
+  );
 const loadDreamWorld = () => import("@/components/dreams/DreamWorld");
 const loadStoryFactory = () => import("@/components/story/StoryFactory");
 const loadKidzzPlay = () => import("@/components/play/KidzzPlay");
@@ -27,24 +45,24 @@ const loadMomentsPlaylists = () => import("@/components/moments/MomentsPlaylists
 const loadFamilyCinema = () => import("@/components/cinema/FamilyCinema");
 const loadMusicForest = () => import("@/components/music/MusicForest");
 const loadWellnessHub = () => import("@/components/wellness/WellnessHub");
-const DreamWorld = lazy(loadDreamWorld);
-const StoryFactory = lazy(loadStoryFactory);
-const JourneyScreen = lazy(() => import("@/components/flow/JourneyScreen"));
-const KidzzPlay = lazy(loadKidzzPlay);
-const RoutineScreen = lazy(loadRoutineScreen);
-const MomentsPlaylists = lazy(loadMomentsPlaylists);
-const FamilyCinema = lazy(loadFamilyCinema);
-const KidzzLab = lazy(() => import("@/components/lab/KidzzLab"));
-const TravelMode = lazy(() => import("@/components/travel/TravelMode"));
-const MusicForest = lazy(loadMusicForest);
-const WellnessHub = lazy(loadWellnessHub);
+const DreamWorld = lazyRetry(loadDreamWorld);
+const StoryFactory = lazyRetry(loadStoryFactory);
+const JourneyScreen = lazyRetry(() => import("@/components/flow/JourneyScreen"));
+const KidzzPlay = lazyRetry(loadKidzzPlay);
+const RoutineScreen = lazyRetry(loadRoutineScreen);
+const MomentsPlaylists = lazyRetry(loadMomentsPlaylists);
+const FamilyCinema = lazyRetry(loadFamilyCinema);
+const KidzzLab = lazyRetry(() => import("@/components/lab/KidzzLab"));
+const TravelMode = lazyRetry(() => import("@/components/travel/TravelMode"));
+const MusicForest = lazyRetry(loadMusicForest);
+const WellnessHub = lazyRetry(loadWellnessHub);
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
-const ParentDashboard = lazy(() => import("@/components/parental/ParentDashboard"));
-const SevenDayChallenge = lazy(() => import("@/components/viral/SevenDayChallenge"));
-const ReferralProgram = lazy(() => import("@/components/viral/ReferralProgram"));
-const MonthlyRetrospective = lazy(() => import("@/components/viral/MonthlyRetrospective"));
+const ParentDashboard = lazyRetry(() => import("@/components/parental/ParentDashboard"));
+const SevenDayChallenge = lazyRetry(() => import("@/components/viral/SevenDayChallenge"));
+const ReferralProgram = lazyRetry(() => import("@/components/viral/ReferralProgram"));
+const MonthlyRetrospective = lazyRetry(() => import("@/components/viral/MonthlyRetrospective"));
 import ChameleonMascot from "@/components/ChameleonMascot";
 import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
 import OnboardingWelcome from "@/components/onboarding/OnboardingWelcome";
