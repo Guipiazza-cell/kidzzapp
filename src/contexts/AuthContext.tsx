@@ -504,15 +504,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [session]);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) console.error("Signup error:", error.message);
-    return { error: error?.message ?? null };
+    const cleanEmail = email.trim().toLowerCase();
+    const { data, error } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/` },
+    });
+
+    if (error) {
+      const m = error.message.toLowerCase();
+      // Conta já existe → tenta logar direto (fluxo rápido)
+      if (m.includes("already registered") || m.includes("already exists")) {
+        const { error: siErr } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+        if (!siErr) return { error: null };
+        return { error: "Este email já tem conta, mas a senha não confere. Tente entrar ou recuperar a senha." };
+      }
+      console.error("Signup error:", error.message);
+      return { error: error.message };
+    }
+
+    // Auto-confirm ativo deveria retornar sessão; se não veio, força login
+    if (!data.session) {
+      const { error: siErr } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+      if (siErr) console.warn("Post-signup signIn fallback:", siErr.message);
+    }
+    return { error: null };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) console.error("Login error:", error.message);
-    return { error: error?.message ?? null };
+    const cleanEmail = email.trim().toLowerCase();
+    const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+    if (error) {
+      console.error("Login error:", error.message);
+      const m = error.message.toLowerCase();
+      if (m.includes("invalid login credentials")) {
+        return { error: "Email ou senha incorretos. Confira e tente novamente." };
+      }
+      return { error: error.message };
+    }
+    return { error: null };
   };
 
   const signOut = async () => {
