@@ -397,8 +397,8 @@ const HomeScreen = ({
       />
 
       <div
-        className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain pb-44"
-        style={{ WebkitOverflowScrolling: "touch" }}
+        className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain"
+        style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 210px)" }}
       >
         {/* ── 1. HERO — greeting clean + camaleão invadindo ── */}
         <section className="w-full max-w-sm relative pt-3 pb-2">
