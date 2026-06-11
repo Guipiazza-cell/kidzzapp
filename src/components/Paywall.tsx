@@ -44,9 +44,9 @@ const PLANS: PlanCard[] = [
     tier: "kidzz",
     billing: "annual",
     title: "KIDZZ",
-    monthlyDisplay: 16.58,
-    totalLabel: "R$ 199/ano · 2 meses grátis 🎁",
-    savings: "Economize R$ 39,80",
+    monthlyDisplay: 16.66,
+    totalLabel: "R$ 199,90/ano · 2 meses grátis 🎁",
+    savings: "Economize R$ 38,90",
     benefits: [
       "30 perguntas/dia",
       "3 histórias/dia",
