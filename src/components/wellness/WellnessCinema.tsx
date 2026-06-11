@@ -183,7 +183,7 @@ const WellnessCinema = ({ open, onClose }: Props) => {
 
           <motion.div
             key="wc-stage"
-            className="fixed inset-x-2 top-4 bottom-4 z-[100] overflow-hidden flex flex-col"
+            className="fixed inset-x-2 top-4 bottom-4 z-[100] overflow-y-auto overscroll-contain max-h-[90vh] flex flex-col"
             style={{
               borderRadius: 36,
               background: mode
@@ -191,6 +191,7 @@ const WellnessCinema = ({ open, onClose }: Props) => {
                 : "linear-gradient(180deg, hsl(60 30% 99%) 0%, hsl(150 28% 92%) 100%)",
               boxShadow: "0 30px 80px -20px hsl(0 0% 0% / 0.4)",
               maxWidth: 560, margin: "0 auto",
+              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 100px)",
             }}
             initial={{ y: 24, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
