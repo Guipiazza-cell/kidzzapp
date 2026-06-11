@@ -12,7 +12,7 @@ import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding"
 import ContextualPaywallModal from "@/components/ContextualPaywallModal";
 import type { PaywallContext } from "@/lib/contextualPaywall";
 import HomeScreen from "@/components/flow/HomeScreen";
-import AgePickerScreen from "@/components/flow/AgePickerScreen";
+
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import AnswerScreen from "@/components/flow/AnswerScreen";
 import CelebrationScreen from "@/components/flow/CelebrationScreen";
@@ -64,10 +64,8 @@ const ParentDashboard = lazyRetry(() => import("@/components/parental/ParentDash
 const SevenDayChallenge = lazyRetry(() => import("@/components/viral/SevenDayChallenge"));
 const ReferralProgram = lazyRetry(() => import("@/components/viral/ReferralProgram"));
 const MonthlyRetrospective = lazyRetry(() => import("@/components/viral/MonthlyRetrospective"));
-import ChameleonMascot from "@/components/ChameleonMascot";
-import KidzzStatesIntro, { hasSeenKidzzStatesIntro } from "@/components/kidzz/KidzzStatesIntro";
-import OnboardingWelcome from "@/components/onboarding/OnboardingWelcome";
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
+
 import BottomNav from "@/components/flow/BottomNav";
 import XpToast from "@/components/flow/XpToast";
 import TabErrorBoundary from "@/components/TabErrorBoundary";
@@ -92,14 +90,6 @@ const markIntroSettled = () => {
     window.sessionStorage.removeItem(JUST_COMPLETED_ONBOARDING_KEY);
   } catch {}
 };
-const hasIntroSettled = () => {
-  if (typeof window === "undefined") return false;
-  try { return window.localStorage.getItem(INTRO_SETTLE_KEY) === "1"; } catch { return false; }
-};
-const justCompletedOnboarding = () => {
-  if (typeof window === "undefined") return false;
-  try { return window.sessionStorage.getItem(JUST_COMPLETED_ONBOARDING_KEY) === "1"; } catch { return false; }
-};
 
 const Index = () => {
   const navigate = useNavigate();
@@ -112,8 +102,8 @@ const Index = () => {
   const [answer, setAnswer] = useState("");
   const [activeTab, setActiveTab] = useState(getInitialTab);
   const [showLab, setShowLab] = useState(false);
-  const [showPlay, setShowPlay] = useState(false);
   const [showTravel, setShowTravel] = useState(false);
+
   const [showChallenge, setShowChallenge] = useState(false);
   const [showReferral, setShowReferral] = useState(false);
   const [showRetrospective, setShowRetrospective] = useState(false);
@@ -132,9 +122,8 @@ const Index = () => {
   const [showConversionNudge, setShowConversionNudge] = useState(false);
   // Telas "welcome / states intro" removidas — fluxo de onboarding finaliza
   // direto na home (sem duplicação de boas-vindas).
-  const showStatesIntro = false;
-  const showWelcome = false;
   const [showJourney, setShowJourney] = useState(false);
+
   const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
   const [mountedTabs, setMountedTabs] = useState<Set<string>>(
     () => new Set(["chat"])
@@ -169,13 +158,13 @@ const Index = () => {
     markIntroSettled();
     setActiveTab(tab);
     setShowLab(false);
-    setShowPlay(false);
     setShowTravel(false);
     setShowChallenge(false);
     setShowReferral(false);
     setShowRetrospective(false);
     if (tab === "chat") setStep("home");
   }, []);
+
 
   const handleTabChange = switchTab;
 
@@ -241,7 +230,6 @@ const Index = () => {
     const openPlans = () => {
       setContextualPaywall((p) => ({ ...p, open: false }));
       setShowLab(false);
-      setShowPlay(false);
       setShowTravel(false);
       setShowChallenge(false);
       setShowReferral(false);
@@ -249,6 +237,7 @@ const Index = () => {
       switchTab("chat");
       setStep("paywall");
     };
+
     window.addEventListener("kidzz:open-plans", openPlans);
     const openJourney = () => setShowJourney(true);
     window.addEventListener("kidzz:open-journey", openJourney);
@@ -266,7 +255,7 @@ const Index = () => {
     };
   }, []);
 
-  // Soft reminder: depois de cada 5 perguntas (free), mostra paywall contextual leve
+  // Soft reminder: na 2ª pergunta (última grátis), mostra paywall contextual leve
   useEffect(() => {
     if (profile?.is_premium) return;
     const used = profile?.questions_used ?? 0;
