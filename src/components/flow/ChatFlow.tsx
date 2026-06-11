@@ -78,6 +78,7 @@ const ChatFlow = ({
         key="generating"
         question={question}
         ageRange={profile.age_range || "3-7"}
+        childName={childName}
         onComplete={onAnswerReady}
         onError={onGeneratingError}
         onLimitReached={() => onOpenPaywall("question_limit", { count: profile.questions_used ?? 0 })}
