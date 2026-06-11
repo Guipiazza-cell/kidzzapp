@@ -289,6 +289,20 @@ const Index = () => {
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding key="interesses-unico" />;
   }
+  const accountStepDone = typeof window !== "undefined" &&
+    !!window.localStorage.getItem("kidzz_account_step_done");
+  const hasSession = !!user;
+  if (!hasSession && !accountStepDone) {
+    return (
+      <AccountSetup
+        key="account-unico"
+        childName={profile.child_name}
+        onDone={() => {
+          try { window.localStorage.setItem("kidzz_account_step_done", "1"); } catch {}
+        }}
+      />
+    );
+  }
   // Onboarding completo → entra direto na home, sem telas extras.
 
 
