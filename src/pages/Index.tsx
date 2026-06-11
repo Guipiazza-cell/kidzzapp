@@ -403,7 +403,7 @@ const Index = () => {
         onXpEarned={() => evolution.evolve("game")}
       />
     ),
-  }), [backToHome, switchTab, evolution, profile, kalmInitialExperience, setContextualPaywall, setShowLab, setShowTravel]);
+  }), [backToHome, switchTab, evolution, profile, kalmInitialExperience, setContextualPaywall, setShowLab, setShowTravel, step, question, answer, childName]);
 
   return (
     <div className="min-h-[100dvh] flex flex-col overflow-hidden max-w-[100vw]" style={{ height: "auto", overflowX: "hidden" }}>
