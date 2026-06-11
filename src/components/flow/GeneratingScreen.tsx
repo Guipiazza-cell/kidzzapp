@@ -17,12 +17,13 @@ const LOADING_PHRASES = [
 interface Props {
   question: string;
   ageRange: string;
+  childName: string;
   onComplete: (answer: string) => void;
   onError: () => void;
   onLimitReached?: () => void;
 }
 
-const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReached }: Props) => {
+const GeneratingScreen = ({ question, ageRange, childName, onComplete, onError, onLimitReached }: Props) => {
   const { user, session, incrementQuestions } = useAuth();
   const calledRef = useRef(false);
   const [phraseIdx, setPhraseIdx] = useState(0);
@@ -61,6 +62,7 @@ const GeneratingScreen = ({ question, ageRange, onComplete, onError, onLimitReac
           body: JSON.stringify({
             messages: [{ role: "user", content: question }],
             ageRange,
+            childName,
           }),
           signal: controller.signal,
         });
