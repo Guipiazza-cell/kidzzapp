@@ -230,7 +230,7 @@ const FirstMagicMoment = ({ onComplete }: Props) => {
           transition={{ type: "spring", stiffness: 180, damping: 14 }}
         >
           <KidzzChameleon
-            state={phase === "answer" ? "story" : "music"}
+            state="music"
             mood={phase === "loading" ? "curious" : "happy"}
             size="lg"
             interactive
