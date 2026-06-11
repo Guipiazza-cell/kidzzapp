@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import pixel3dHeart from "@/assets/pixel-3d-heart.png";
 
 interface AccountSetupProps {
   childName: string;
@@ -270,14 +271,20 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         </div>
       )}
 
-      <motion.div
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        style={{ fontSize: 64, lineHeight: 1, marginTop: 12 }}
-        aria-hidden
-      >
-        🦎
-      </motion.div>
+      <motion.img
+        src={pixel3dHeart}
+        alt="Pixel"
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          width: 240,
+          height: 240,
+          objectFit: "contain",
+          marginTop: 8,
+          filter: "drop-shadow(0 20px 30px rgba(46, 68, 56, 0.35))",
+        }}
+        draggable={false}
+      />
 
       <h1
         className="text-center font-black mt-4 leading-tight"
