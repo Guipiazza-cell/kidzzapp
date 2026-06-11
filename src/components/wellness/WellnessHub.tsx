@@ -650,10 +650,10 @@ const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean
 /* ────────────── SOUNDS — 8 atmosferas (4 grátis + 4 premium) ────────────── */
 type Sound = { id: string; label: string; url: string; icon: string; premium?: boolean; tint: string };
 const SOUND_LIST: Sound[] = [
-  { id: "rain",   label: "Chuva suave",    url: "/audio/rain-soft.mp3",   icon: "🌧",  tint: serenity },
-  { id: "ocean",  label: "Oceano",         url: "/audio/ocean-waves.mp3", icon: "🌊",  tint: serenity },
-  { id: "forest", label: "Floresta",       url: "/audio/forest-calm.mp3", icon: "🌿",  tint: sage },
-  { id: "white",  label: "Brisa branca",   url: "/audio/white-noise.mp3", icon: "☁️",  tint: pearl },
+  { id: "rain",   label: "Chuva suave",    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_1648d7e3cd.mp3",   icon: "🌧",  tint: serenity },
+  { id: "ocean",  label: "Oceano",         url: "https://cdn.pixabay.com/audio/2021/09/06/audio_e1b0956a16.mp3", icon: "🌊",  tint: serenity },
+  { id: "forest", label: "Floresta",       url: "https://cdn.pixabay.com/audio/2022/03/10/audio_270f49c32b.mp3", icon: "🌿",  tint: sage },
+  { id: "white",  label: "Brisa branca",   url: "https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bfefcb.mp3", icon: "☁️",  tint: pearl },
   { id: "fire",   label: "Lareira",        url: "/audio/rain-soft.mp3",   icon: "🔥",  tint: clay,    premium: true },
   { id: "train",  label: "Trem distante",  url: "/audio/white-noise.mp3", icon: "🚂",  tint: clay,    premium: true },
   { id: "space",  label: "Espaço",         url: "/audio/ocean-waves.mp3", icon: "🌌",  tint: lilac,   premium: true },
@@ -781,7 +781,7 @@ const SleepView = ({ onBack, go }: { onBack: () => void; go: (v: View) => void }
   const playRain = () => {
     haptic("light");
     if (playing) { stopEverything(); return; }
-    (engineRef.current as any)?.start?.("rain", "/audio/rain-soft.mp3", 0.35);
+    (engineRef.current as any)?.start?.("rain", "https://cdn.pixabay.com/audio/2022/03/10/audio_1648d7e3cd.mp3", 0.35);
     setPlaying("rain");
     if (timer) startTimer(timer);
   };
@@ -1020,7 +1020,7 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
     setActive(id);
     setLineIdx(0);
     if (ambient) {
-      (engineRef.current as any)?.start?.("forest", "/audio/forest-calm.mp3", 0.18);
+      (engineRef.current as any)?.start?.("forest", "https://cdn.pixabay.com/audio/2022/03/10/audio_270f49c32b.mp3", 0.18);
     }
     let idx = 0;
     const speakNext = () => {
