@@ -312,6 +312,14 @@ const FirstMagicMoment = ({ onComplete }: Props) => {
               >
                 Descobrir com o Kidzz! ✨
               </motion.button>
+
+              <button
+                type="button"
+                onClick={onComplete}
+                className="mt-3 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                PULAR E IR PARA A HOME
+              </button>
             </motion.div>
           )}
 
