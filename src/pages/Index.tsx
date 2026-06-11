@@ -18,6 +18,7 @@ import AnswerScreen from "@/components/flow/AnswerScreen";
 import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
+import ChatFlow from "@/components/flow/ChatFlow";
 // Heavy/secondary screens are lazy-loaded — only the chat home ships in the initial bundle.
 const lazyRetry = (importFn: () => Promise<any>) =>
   lazy(() =>
