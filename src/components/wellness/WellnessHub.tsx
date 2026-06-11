@@ -981,23 +981,15 @@ const MED_TRACKS = [
   },
 ];
 
-const speakLine = async (text: string, onEnd?: () => void) => {
-  try {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data, error } = await supabase.functions.invoke("elevenlabs-tts", {
-      body: { text },
-    });
-    if (error || !data?.audioContent) throw new Error("TTS failed");
-    const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
-    audio.onended = () => onEnd?.();
-    audio.play();
-  } catch {
-    if (typeof window === "undefined" || !window.speechSynthesis) { onEnd?.(); return; }
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "pt-BR"; u.rate = 0.88; u.pitch = 1.05; u.volume = 0.9;
-    if (onEnd) u.onend = onEnd;
-    window.speechSynthesis.speak(u);
-  }
+const speakLine = (text: string, onEnd?: () => void) => {
+  if (typeof window === "undefined" || !window.speechSynthesis) { onEnd?.(); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "pt-BR";
+  u.rate = 0.88;
+  u.pitch = 1.05;
+  u.volume = 0.9;
+  if (onEnd) u.onend = onEnd;
+  window.speechSynthesis.speak(u);
 };
 
 const MeditationView = ({ onBack }: { onBack: () => void }) => {
