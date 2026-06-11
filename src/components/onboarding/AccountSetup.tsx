@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import pixel3dHeart from "@/assets/pixel-3d-heart.png";
+import chameleonImg from "@/assets/chameleon-main.webp";
 
 interface AccountSetupProps {
   childName: string;
@@ -145,10 +145,31 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           options: { emailRedirectTo: `${window.location.origin}/` },
         });
         if (err) {
+          // If the email already exists, try sign-in transparently
+          const m = (err.message || "").toLowerCase();
+          if (m.includes("already") || m.includes("registered") || m.includes("exists")) {
+            const { data: signInData, error: signInErr } =
+              await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+            if (signInErr) {
+              setError(translateAuthError(signInErr.message));
+              return;
+            }
+            await finishSuccess(signInData.user?.id);
+            return;
+          }
           setError(translateAuthError(err.message));
           return;
         }
-        await finishSuccess(data.user?.id);
+        // Ensure we have a session (if email confirmation is on, signUp returns no session)
+        if (!data.session) {
+          const { data: signInData } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password,
+          });
+          await finishSuccess(signInData.user?.id ?? data.user?.id);
+        } else {
+          await finishSuccess(data.user?.id);
+        }
       } else {
         const { data, error: err } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
@@ -272,16 +293,17 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       )}
 
       <motion.img
-        src={pixel3dHeart}
-        alt="Pixel"
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        src={chameleonImg}
+        alt="Kidzz - camaleão mascote"
+        animate={{ y: [0, -12, 0], rotate: [0, -2, 2, 0] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
         style={{
-          width: 240,
-          height: 240,
+          width: 260,
+          height: 260,
           objectFit: "contain",
           marginTop: 8,
-          filter: "drop-shadow(0 20px 30px rgba(46, 68, 56, 0.35))",
+          background: "transparent",
+          filter: "drop-shadow(0 24px 36px rgba(46, 68, 56, 0.30))",
         }}
         draggable={false}
       />
