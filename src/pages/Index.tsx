@@ -8,6 +8,7 @@ import { usePWAUpdate } from "@/hooks/usePWAUpdate";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
+import FirstMagicMoment from "@/components/onboarding/FirstMagicMoment";
 import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
 import ContextualPaywallModal from "@/components/ContextualPaywallModal";
 import type { PaywallContext } from "@/lib/contextualPaywall";
@@ -286,6 +287,20 @@ const Index = () => {
   const interests = (profile as any)?.child_interests as string[] | undefined;
   if (!interests || interests.length === 0) {
     return <InterestsOnboarding key="interesses-unico" />;
+  }
+  const firstMagicDone = typeof window !== "undefined" && !!window.localStorage.getItem("kidzz_first_magic_done");
+  if (!firstMagicDone) {
+    return (
+      <FirstMagicMoment
+        key="first-magic-unico"
+        onComplete={() => {
+          try { window.localStorage.setItem("kidzz_first_magic_done", "1"); } catch {}
+          markIntroSettled();
+          setStep("home");
+          setActiveTab("chat");
+        }}
+      />
+    );
   }
   // Onboarding completo → entra direto na home, sem telas extras.
 
