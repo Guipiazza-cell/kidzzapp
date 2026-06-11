@@ -8,6 +8,7 @@ import { usePWAUpdate } from "@/hooks/usePWAUpdate";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
+import AccountSetup from "@/components/onboarding/AccountSetup";
 
 import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
 import ContextualPaywallModal from "@/components/ContextualPaywallModal";
