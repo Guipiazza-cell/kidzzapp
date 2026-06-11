@@ -150,7 +150,7 @@ serve(async (req) => {
     }
     const userId = userData.user.id;
 
-    const { messages, ageRange = "3-7" } = await req.json();
+    const { messages, ageRange = "3-7", childName = "" } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -204,7 +204,21 @@ serve(async (req) => {
       }
     }
 
-    const systemPrompt = AGE_PROMPTS[ageRange] || AGE_PROMPTS["3-7"];
+    const agePrompt = AGE_PROMPTS[ageRange] || AGE_PROMPTS["3-7"];
+    const name = childName && childName.trim() ? childName.trim() : "amigo";
+    const ageLabel = ageRange === "0-3" ? "0 a 3" : ageRange === "3-7" ? "3 a 7" : ageRange === "7-10" ? "7 a 10" : "3 a 7";
+    const praisePrefix = `Eu sou o Kidzz, um companheiro mágico de crianças brasileiras.
+
+SEMPRE comece sua resposta elogiando a pergunta da criança de forma calorosa e personalizada usando o nome ${name}. Exemplos:
+- "Nossa, ${name}, que pergunta incrível! Você é muito curioso!"
+- "Uau, ${name}! Só mentes brilhantes fazem perguntas assim!"
+- "Que pergunta fantástica, ${name}! Isso mostra como você é inteligente!"
+Varie sempre o elogio. Depois responda de forma lúdica, educativa e encantadora para uma criança de ${ageLabel} anos. No final, diga algo como:
+"O que você acha de contar para seus amigos sobre isso? E sobre o Kidzz? 😊"
+Use emojis com moderação. Máximo 150 palavras na resposta.
+
+`;
+    const systemPrompt = praisePrefix + agePrompt;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
