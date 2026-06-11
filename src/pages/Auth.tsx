@@ -50,12 +50,15 @@ const Auth = () => {
           toast.error(error);
         } else {
           toast.success("Conta criada! Entrando... 🎉");
+          navigate("/", { replace: true });
         }
       } else {
         const { error } = await signIn(email, password);
         if (error) {
           console.error("Login error:", error);
           toast.error(error);
+        } else {
+          navigate("/", { replace: true });
         }
       }
     } catch {
@@ -70,25 +73,25 @@ const Auth = () => {
       <MagicalBackground />
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
-        {/* Characters */}
-        <div className="flex items-end justify-center gap-4 mb-2">
-          <motion.img
-            src={aneImg}
-            alt="Ane"
-            className="w-16 h-16 object-contain drop-shadow-xl"
-            initial={{ opacity: 0, x: -40, rotate: -15 }}
-            animate={{ opacity: 1, x: 0, rotate: [0, -3, 3, 0] }}
-            transition={{ type: "spring", stiffness: 180, damping: 14 }}
-          />
-          <motion.img
-            src={pixelImg}
-            alt="Pixel"
-            className="w-16 h-16 object-contain drop-shadow-xl"
-            initial={{ opacity: 0, x: 40, rotate: 15 }}
-            animate={{ opacity: 1, x: 0, rotate: [0, 3, -3, 0] }}
-            transition={{ type: "spring", stiffness: 180, damping: 14, delay: 0.1 }}
-          />
-        </div>
+        {/* Mascote oficial */}
+        <motion.img
+          src={chameleonMain}
+          alt="Camaleão Kidzz"
+          className="w-32 h-32 object-contain"
+          style={{
+            background: "transparent",
+            filter: "drop-shadow(0 24px 36px rgba(46, 68, 56, 0.30))",
+          }}
+          draggable={false}
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1, y: [0, -12, 0], rotate: [0, -2, 2, 0] }}
+          transition={{
+            opacity: { duration: 0.4 },
+            scale: { type: "spring", stiffness: 180, damping: 14 },
+            y: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
+            rotate: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
+          }}
+        />
 
         <motion.h1
           className="text-3xl font-extrabold text-gray-800 text-center mt-3 drop-shadow-sm"
@@ -96,7 +99,7 @@ const Auth = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          {mode === "login" ? "Bem-vindo de volta! 🦎" : mode === "signup" ? "Crie sua conta! 🌟" : "Recuperar senha 🔑"}
+          {mode === "login" ? "Bem-vindo de volta!" : mode === "signup" ? "Crie sua conta! 🌟" : "Recuperar senha 🔑"}
         </motion.h1>
 
         <motion.p
