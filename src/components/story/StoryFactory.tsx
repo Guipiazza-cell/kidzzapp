@@ -192,9 +192,30 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               initial={{ scale: 0.7, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 16 }}
+              className="relative w-28 h-28 rounded-[2rem] bg-gradient-to-br from-amber-300 via-orange-400 to-pink-500 flex items-center justify-center shadow-2xl"
             >
-              <KidzzChameleon state="cosmic" mood="curious" size="xl" interactive showParticles />
+              <motion.div
+                animate={{ rotate: [-3, 3, -3], y: [0, -4, 0] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <span className="text-5xl drop-shadow-lg">📖</span>
+              </motion.div>
+              <motion.span
+                className="absolute -top-2 -right-2 text-2xl"
+                animate={{ scale: [1, 1.3, 1], rotate: [0, 18, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                ✨
+              </motion.span>
+              <motion.span
+                className="absolute -bottom-1 -left-2 text-lg"
+                animate={{ scale: [1, 1.25, 1], rotate: [0, -15, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 }}
+              >
+                💫
+              </motion.span>
             </motion.div>
+
             <h2 className="text-2xl font-extrabold text-gray-800 drop-shadow-sm">Uma história especial para {childName} 📖</h2>
             <p className="text-gray-500 text-sm max-w-[280px]">
               Crie histórias personalizadas com ilustrações exclusivas!
