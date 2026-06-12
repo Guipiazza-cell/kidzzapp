@@ -277,10 +277,6 @@ const HomeScreen = ({
   return (
     <motion.div
       className="flex-1 flex flex-col relative min-h-0"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
       <CharacterParticles particles={particles} />
 

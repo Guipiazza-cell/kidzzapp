@@ -1,4 +1,4 @@
-import { AnimatePresence } from "framer-motion";
+// AnimatePresence removido propositalmente: causava flash branco entre home → generating → answer.
 import HomeScreen from "@/components/flow/HomeScreen";
 import GeneratingScreen from "@/components/flow/GeneratingScreen";
 import CelebrationScreen from "@/components/flow/CelebrationScreen";
@@ -54,7 +54,7 @@ const ChatFlow = ({
   onBackFromPaywall,
   onGeneratingError,
 }: ChatFlowProps) => (
-  <AnimatePresence mode="wait">
+  <>
     {step === "home" && (
       <HomeScreen
         key="home"
@@ -106,7 +106,7 @@ const ChatFlow = ({
       />
     )}
     {step === "paywall" && <Paywall key="paywall" onLogin={onLogin} onBack={onBackFromPaywall} />}
-  </AnimatePresence>
+  </>
 );
 
 export default ChatFlow;
