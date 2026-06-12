@@ -616,14 +616,22 @@ const HomeScreen = ({
               {/* MIC verde metalizado premium */}
               <motion.button
                 type="button"
-                aria-label="Falar com Kidzz"
-                onClick={() => { haptic("medium"); sfx("click"); }}
+                aria-label={isListening ? "Parar de ouvir" : "Falar com Kidzz"}
+                onClick={toggleMic}
                 className="mic-metallic relative w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-white"
                 whileTap={{ scale: 0.92 }}
-                animate={{ scale: [1, 1.04, 1] }}
-                transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+                animate={isListening ? { scale: [1, 1.12, 1] } : { scale: [1, 1.04, 1] }}
+                transition={{ duration: isListening ? 1 : 3.6, repeat: Infinity, ease: "easeInOut" }}
+                style={isListening ? { boxShadow: "0 0 0 4px hsl(0 80% 60% / 0.35), 0 0 20px hsl(0 80% 60% / 0.5)" } : undefined}
               >
-                <Mic size={18} strokeWidth={2.4} />
+                {isListening && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 rounded-full pointer-events-none animate-ping"
+                    style={{ background: "hsl(0 80% 60% / 0.25)" }}
+                  />
+                )}
+                <Mic size={18} strokeWidth={2.4} className={isListening ? "animate-pulse" : undefined} />
               </motion.button>
 
               <input
