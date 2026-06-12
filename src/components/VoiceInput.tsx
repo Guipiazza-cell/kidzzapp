@@ -100,14 +100,6 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
       return;
     }
 
-    try {
-      // Request mic for audio visualization
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      startAudioAnalysis(stream);
-    } catch {
-      // Visualization not critical, continue without it
-    }
 
     recognition.lang = "pt-BR";
     recognition.continuous = false;
@@ -143,8 +135,17 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
     };
 
     try {
+      // IMPORTANT: start synchronously within the tap gesture (iOS requirement)
       recognition.start();
       setIsListening(true);
+      // Request mic for audio visualization AFTER starting (non-blocking, not critical)
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          streamRef.current = stream;
+          startAudioAnalysis(stream);
+        })
+        .catch(() => {});
     } catch (err) {
       console.error("Recognition start error:", err);
       toast.error("Erro ao iniciar reconhecimento de voz. Tente novamente! 🎤");

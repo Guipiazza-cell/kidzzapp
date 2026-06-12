@@ -261,6 +261,74 @@ const HomeScreen = ({
     onSubmit(text.trim());
   };
 
+  /* ── Voice input (Web Speech API) ── */
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    return () => {
+      try { recognitionRef.current?.stop(); } catch {}
+    };
+  }, []);
+
+  const toggleMic = () => {
+    haptic("medium");
+    sfx("click");
+    if (isFreeLimitReached || submitting) return;
+
+    if (isListening) {
+      try { recognitionRef.current?.stop(); } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    const w = window as any;
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) {
+      import("sonner").then(({ toast }) =>
+        toast.error("Seu navegador não suporta voz. Use Chrome ou Safari! 🎤")
+      );
+      return;
+    }
+
+    const recognition = new SR();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results?.[event.results.length - 1]?.[0]?.transcript?.trim();
+      if (transcript) {
+        setInput(transcript);
+        submit(transcript);
+      }
+    };
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      recognitionRef.current = null;
+      import("sonner").then(({ toast }) => {
+        if (event.error === "not-allowed") toast.error("Permita o acesso ao microfone! 🎤");
+        else if (event.error === "no-speech") toast.error("Não ouvi nada. Tente de novo! 🎤");
+        else if (event.error !== "aborted") toast.error("Erro no reconhecimento de voz. 🎤");
+      });
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = recognition;
+    // IMPORTANT: start synchronously inside the tap handler (iOS requirement)
+    try {
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+      recognitionRef.current = null;
+    }
+  };
+
   const openPlans = () => {
     haptic("medium");
     sfx("click");
@@ -548,14 +616,22 @@ const HomeScreen = ({
               {/* MIC verde metalizado premium */}
               <motion.button
                 type="button"
-                aria-label="Falar com Kidzz"
-                onClick={() => { haptic("medium"); sfx("click"); }}
+                aria-label={isListening ? "Parar de ouvir" : "Falar com Kidzz"}
+                onClick={toggleMic}
                 className="mic-metallic relative w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-white"
                 whileTap={{ scale: 0.92 }}
-                animate={{ scale: [1, 1.04, 1] }}
-                transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+                animate={isListening ? { scale: [1, 1.12, 1] } : { scale: [1, 1.04, 1] }}
+                transition={{ duration: isListening ? 1 : 3.6, repeat: Infinity, ease: "easeInOut" }}
+                style={isListening ? { boxShadow: "0 0 0 4px hsl(0 80% 60% / 0.35), 0 0 20px hsl(0 80% 60% / 0.5)" } : undefined}
               >
-                <Mic size={18} strokeWidth={2.4} />
+                {isListening && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 rounded-full pointer-events-none animate-ping"
+                    style={{ background: "hsl(0 80% 60% / 0.25)" }}
+                  />
+                )}
+                <Mic size={18} strokeWidth={2.4} className={isListening ? "animate-pulse" : undefined} />
               </motion.button>
 
               <input
