@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -136,17 +136,14 @@ const Index = () => {
   const [showJourney, setShowJourney] = useState(false);
 
   const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
-  const [mountedTabs, setMountedTabs] = useState<Set<string>>(
-    () => new Set(["chat"])
-  );
-  useEffect(() => {
-    setMountedTabs(prev => {
-      if (prev.has(activeTab)) return prev;
-      const next = new Set(prev);
-      next.add(activeTab);
-      return next;
-    });
-  }, [activeTab]);
+  // Tabs are mounted on first visit and kept alive. Compute synchronously
+  // during render (no useEffect lag) so the tapped tab paints on the same
+  // frame the user changes activeTab — fixes "tab feels frozen on first tap".
+  const mountedTabsRef = useRef<Set<string>>(new Set(["chat"]));
+  if (!mountedTabsRef.current.has(activeTab)) {
+    mountedTabsRef.current.add(activeTab);
+  }
+  const mountedTabs = mountedTabsRef.current;
   // EmotionalIntro / OnboardingWelcome / KidzzStatesIntro: removidas do fluxo
   useEffect(() => {
     try {
@@ -418,23 +415,25 @@ const Index = () => {
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
             <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
-              <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><div className="flex flex-col items-center gap-3"><div className="w-12 h-12 rounded-2xl animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-24 rounded-full animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-16 rounded-full animate-pulse" style={{background:"hsl(145 26% 90%)"}} /></div></div>}>
-                {KNOWN_TABS.map((tab) => (
-                  <div
-                    key={tab}
-                    style={{
-                      display: activeTab === tab ? "flex" : "none",
-                      flexDirection: "column",
-                      flex: 1,
-                      minHeight: 0,
-                      position: "absolute",
-                      inset: 0,
-                    }}
-                  >
-                    {mountedTabs.has(tab) && TAB_RENDERERS[tab]?.()}
-                  </div>
-                ))}
-              </Suspense>
+              {KNOWN_TABS.map((tab) => (
+                <div
+                  key={tab}
+                  style={{
+                    display: activeTab === tab ? "flex" : "none",
+                    flexDirection: "column",
+                    flex: 1,
+                    minHeight: 0,
+                    position: "absolute",
+                    inset: 0,
+                  }}
+                >
+                  {mountedTabs.has(tab) && (
+                    <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><div className="flex flex-col items-center gap-3"><div className="w-12 h-12 rounded-2xl animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-24 rounded-full animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-16 rounded-full animate-pulse" style={{background:"hsl(145 26% 90%)"}} /></div></div>}>
+                      {TAB_RENDERERS[tab]?.()}
+                    </Suspense>
+                  )}
+                </div>
+              ))}
             </TabErrorBoundary>
           </div>
         </div>
