@@ -17,7 +17,7 @@ export default function ConversionNudgeCard({ open, childName, onUpgrade, onClos
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed bottom-[88px] left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-32px)] max-w-sm pointer-events-auto"
+          className="fixed bottom-[200px] left-1/2 -translate-x-1/2 z-[45] w-[calc(100%-32px)] max-w-sm pointer-events-auto"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 30 }}
