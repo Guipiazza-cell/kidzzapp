@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import chameleonImg from "@/assets/chameleon-main.webp";
+
 
 interface AccountSetupProps {
   childName: string;
@@ -292,34 +292,21 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         </div>
       )}
 
-      <motion.img
-        src={chameleonImg}
-        alt="Kidzz - camaleão mascote"
-        animate={{ y: [0, -12, 0], rotate: [0, -2, 2, 0] }}
-        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          width: 260,
-          height: 260,
-          objectFit: "contain",
-          marginTop: 8,
-          background: "transparent",
-          filter: "drop-shadow(0 24px 36px rgba(46, 68, 56, 0.30))",
-        }}
-        draggable={false}
-      />
+      <div style={{ height: 24 }} />
 
       <h1
         className="text-center font-black mt-4 leading-tight"
-        style={{ color: "#2E4438", fontSize: 26, maxWidth: 360 }}
+        style={{ color: "#2E4438", fontSize: 28, maxWidth: 360 }}
       >
-        Vamos guardar as memórias do {childName || "seu pequeno"}?
+        Guarde as memórias do {childName || "seu pequeno"} ✨
       </h1>
       <p
-        className="text-center mt-2 font-semibold"
-        style={{ color: "#5A7A66", fontSize: 15, maxWidth: 340 }}
+        className="text-center mt-3 font-semibold"
+        style={{ color: "#5A7A66", fontSize: 16, maxWidth: 340, lineHeight: 1.4 }}
       >
-        Crie uma conta gratuita para nunca perder nada e usar em qualquer aparelho.
+        Crie sua conta gratuita em segundos e acesse de qualquer aparelho.
       </p>
+
 
       <div
         className="w-full max-w-md mt-6 p-5"
