@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ChameleonMascot from "../ChameleonMascot";
+import { BookOpen, Sparkles } from "lucide-react";
+
 
 interface GeneratingOverlayProps {
   open: boolean;
@@ -91,7 +92,28 @@ const GeneratingOverlay = ({ open, progress }: GeneratingOverlayProps) => {
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 className={`absolute inset-1 rounded-full border-2 border-dashed border-white/20`}
               />
-              <ChameleonMascot size="lg" isTalking />
+              <motion.div
+                className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-300 via-orange-400 to-pink-500 flex items-center justify-center shadow-2xl"
+                animate={{ rotate: [-4, 4, -4], y: [0, -6, 0] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <BookOpen size={44} className="text-white drop-shadow-lg" strokeWidth={2.2} />
+                <motion.div
+                  className="absolute -top-2 -right-2 text-yellow-200"
+                  animate={{ scale: [1, 1.3, 1], rotate: [0, 20, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Sparkles size={20} fill="currentColor" />
+                </motion.div>
+                <motion.div
+                  className="absolute -bottom-1 -left-2 text-white/90"
+                  animate={{ scale: [1, 1.25, 1], rotate: [0, -15, 0] }}
+                  transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 }}
+                >
+                  <Sparkles size={14} fill="currentColor" />
+                </motion.div>
+              </motion.div>
+
             </div>
 
             {/* Title with gradient */}
