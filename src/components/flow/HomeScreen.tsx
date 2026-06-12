@@ -261,6 +261,74 @@ const HomeScreen = ({
     onSubmit(text.trim());
   };
 
+  /* ── Voice input (Web Speech API) ── */
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    return () => {
+      try { recognitionRef.current?.stop(); } catch {}
+    };
+  }, []);
+
+  const toggleMic = () => {
+    haptic("medium");
+    sfx("click");
+    if (isFreeLimitReached || submitting) return;
+
+    if (isListening) {
+      try { recognitionRef.current?.stop(); } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    const w = window as any;
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) {
+      import("sonner").then(({ toast }) =>
+        toast.error("Seu navegador não suporta voz. Use Chrome ou Safari! 🎤")
+      );
+      return;
+    }
+
+    const recognition = new SR();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results?.[event.results.length - 1]?.[0]?.transcript?.trim();
+      if (transcript) {
+        setInput(transcript);
+        submit(transcript);
+      }
+    };
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      recognitionRef.current = null;
+      import("sonner").then(({ toast }) => {
+        if (event.error === "not-allowed") toast.error("Permita o acesso ao microfone! 🎤");
+        else if (event.error === "no-speech") toast.error("Não ouvi nada. Tente de novo! 🎤");
+        else if (event.error !== "aborted") toast.error("Erro no reconhecimento de voz. 🎤");
+      });
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = recognition;
+    // IMPORTANT: start synchronously inside the tap handler (iOS requirement)
+    try {
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+      recognitionRef.current = null;
+    }
+  };
+
   const openPlans = () => {
     haptic("medium");
     sfx("click");
