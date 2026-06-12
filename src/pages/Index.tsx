@@ -136,17 +136,14 @@ const Index = () => {
   const [showJourney, setShowJourney] = useState(false);
 
   const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
-  const [mountedTabs, setMountedTabs] = useState<Set<string>>(
-    () => new Set(["chat"])
-  );
-  useEffect(() => {
-    setMountedTabs(prev => {
-      if (prev.has(activeTab)) return prev;
-      const next = new Set(prev);
-      next.add(activeTab);
-      return next;
-    });
-  }, [activeTab]);
+  // Tabs are mounted on first visit and kept alive. Compute synchronously
+  // during render (no useEffect lag) so the tapped tab paints on the same
+  // frame the user changes activeTab — fixes "tab feels frozen on first tap".
+  const mountedTabsRef = useRef<Set<string>>(new Set(["chat"]));
+  if (!mountedTabsRef.current.has(activeTab)) {
+    mountedTabsRef.current.add(activeTab);
+  }
+  const mountedTabs = mountedTabsRef.current;
   // EmotionalIntro / OnboardingWelcome / KidzzStatesIntro: removidas do fluxo
   useEffect(() => {
     try {
