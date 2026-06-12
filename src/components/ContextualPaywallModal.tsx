@@ -149,10 +149,11 @@ const ContextualPaywallModal = ({ open, context, meta, onClose, onLogin }: Props
                 style={{ background: "linear-gradient(135deg, #6B3FA0 0%, #E8821A 100%)" }}
               >
                 <motion.div
-                  className="absolute inset-0 bg-white/20"
+                  className="absolute inset-0 bg-white/20 pointer-events-none"
                   animate={{ x: ["-100%", "100%"] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 />
+
                 <Crown size={20} className="relative" fill="white" />
                 <span className="relative">Quero continuar a aventura! 🚀</span>
               </motion.button>
