@@ -94,6 +94,14 @@ const markIntroSettled = () => {
 };
 
 const Index = () => {
+  // ============================================================
+  // REGRA DE OURO DESTE ARQUIVO (não mover!):
+  // TODOS os hooks (useState/useEffect/useCallback/useMemo) ficam
+  // AQUI EM CIMA, antes de QUALQUER `return` condicional.
+  // O React exige a mesma quantidade/ordem de hooks em todo render.
+  // Hooks depois de um return condicional = crash na transição de
+  // onboarding ("Ops! Algo deu errado"). Esse era o bug raiz.
+  // ============================================================
   const navigate = useNavigate();
   const { profile, loading, updateProfile, canAskQuestion, user } = useAuth();
   const evolution = useCharacterEvolution();
@@ -125,8 +133,6 @@ const Index = () => {
   const [showNotifPrompt, setShowNotifPrompt] = useState(false);
   const [contextualPaywall, setContextualPaywall] = useState<{ open: boolean; context: PaywallContext; meta?: Record<string, string | number> }>({ open: false, context: "question_limit" });
   const [showConversionNudge, setShowConversionNudge] = useState(false);
-  // Telas "welcome / states intro" removidas — fluxo de onboarding finaliza
-  // direto na home (sem duplicação de boas-vindas).
   const [showJourney, setShowJourney] = useState(false);
 
   const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
@@ -170,7 +176,6 @@ const Index = () => {
     if (tab === "chat") setStep("home");
   }, []);
 
-
   const handleTabChange = switchTab;
 
   const backToHome = useCallback(() => {
@@ -179,8 +184,7 @@ const Index = () => {
   }, [switchTab]);
 
   // Pré-carrega TODAS as abas imediatamente, em paralelo, para que o clique
-  // no dock troque a tela instantaneamente — antes o chunk demorava a baixar
-  // e dava a sensação de "só funciona após refresh".
+  // no dock troque a tela instantaneamente.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
@@ -258,14 +262,13 @@ const Index = () => {
       window.removeEventListener("kidzz:open-journey", openJourney);
       window.removeEventListener("kidzz:open-kalm", openKalm);
     };
-  }, []);
+  }, [switchTab]);
 
   // Soft reminder: na 2ª pergunta (última grátis), mostra paywall contextual leve
   useEffect(() => {
     if (profile?.is_premium) return;
     const used = profile?.questions_used ?? 0;
     if (used > 0 && used === 2) {
-      // Última pergunta grátis: aviso suave
       const key = "kidzz_warned_last_free";
       if (!localStorage.getItem(key)) {
         localStorage.setItem(key, "1");
@@ -276,62 +279,29 @@ const Index = () => {
     }
   }, [profile?.questions_used, profile?.is_premium]);
 
-  if (loading) return null;
+  // Derivação segura: funciona mesmo durante o onboarding (profile parcial)
+  const childName = profile?.child_name ?? "";
 
-  // EmotionalIntro removida do fluxo — OnboardingWelcome no fim cobre o momento emocional.
-
-
-  // Onboarding gates: name → age → interests
-  if (!profile?.child_name) {
-    return <NameOnboarding key="nome-unico" />;
-  }
-  if (!profile?.age_range) {
-    return <AgeSelection key="idade-unica" />;
-  }
-  const interests = (profile as any)?.child_interests as string[] | undefined;
-  if (!interests || interests.length === 0) {
-    return <InterestsOnboarding key="interesses-unico" />;
-  }
-  const hasSession = !!user;
-  if (!hasSession && !accountStepDone) {
-    return (
-      <AccountSetup
-        key="account-unico"
-        childName={profile.child_name}
-        onDone={() => {
-          try { window.localStorage.setItem("kidzz_account_step_done", "1"); } catch {}
-          setAccountStepDone(true);
-        }}
-      />
-    );
-  }
-  // Onboarding completo → entra direto na home, sem telas extras.
-
-
-  const childName = profile.child_name;
-
-  const handleQuestionSubmit = (q: string) => {
+  const handleQuestionSubmit = useCallback((q: string) => {
     if (!canAskQuestion()) {
-      setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile.questions_used ?? 0 } });
+      setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile?.questions_used ?? 0 } });
       return;
     }
     setQuestion(q);
     setStep("generating");
-  };
+  }, [canAskQuestion, profile?.questions_used]);
 
-  const handleAnswerReady = (text: string) => {
+  const handleAnswerReady = useCallback((text: string) => {
     setAnswer(text);
     setStep("celebrating");
     evolution.evolve("question");
     kidzzMemory.recordQuestion(question);
-    // Daily mission + XP
     const { newlyMarked } = completeMissionStep("question");
     if (newlyMarked) {
       const { gained } = addXp("question");
       showXpGained(gained, "pergunta");
     }
     bumpSessionActions();
-    // Auto-save as memory
     addMemory({
       type: "question",
       title: question,
@@ -340,23 +310,21 @@ const Index = () => {
       image_url: null,
       metadata: {},
     });
-  };
+  }, [question, evolution, addMemory]);
 
-  const handleCelebrationDone = () => {
+  const handleCelebrationDone = useCallback(() => {
     setStep("answer");
-    // Strategic moment: trigger notification setup AFTER first emotional success
     if (!notifPromptDismissed) {
       setTimeout(() => setShowNotifPrompt(true), 800);
     }
-  };
+  }, [notifPromptDismissed]);
 
-  const handleNewQuestion = () => {
+  const handleNewQuestion = useCallback(() => {
     setQuestion(""); setAnswer(""); setStep("home"); switchTab("chat");
-  };
+  }, [switchTab]);
 
-
-
-
+  // Cada aba é renderizada uma vez (lazy, sob demanda) e mantida montada.
+  // ESTE useMemo PRECISA ficar antes dos returns condicionais (regra de hooks).
   const TAB_RENDERERS: Record<string, () => JSX.Element> = useMemo(() => ({
     chat: () => (
       <ChatFlow
@@ -410,7 +378,38 @@ const Index = () => {
         onXpEarned={() => evolution.evolve("game")}
       />
     ),
-  }), [backToHome, switchTab, evolution, profile, kalmInitialExperience, setContextualPaywall, setShowLab, setShowTravel, step, question, answer, childName, handleQuestionSubmit, handleAnswerReady, handleCelebrationDone, handleNewQuestion]);
+  }), [step, question, answer, childName, profile, evolution, activeTab, handleQuestionSubmit, handleAnswerReady, handleCelebrationDone, handleNewQuestion, handleTabChange, switchTab, backToHome, kalmInitialExperience, addMemory, navigate]);
+
+  // ============================================================
+  // A PARTIR DAQUI: returns condicionais (gates de onboarding).
+  // Nenhum hook pode ser declarado abaixo desta linha.
+  // ============================================================
+  if (loading) return null;
+
+  if (!profile?.child_name) {
+    return <NameOnboarding key="nome-unico" />;
+  }
+  if (!profile?.age_range) {
+    return <AgeSelection key="idade-unica" />;
+  }
+  const interests = (profile as any)?.child_interests as string[] | undefined;
+  if (!interests || interests.length === 0) {
+    return <InterestsOnboarding key="interesses-unico" />;
+  }
+  const hasSession = !!user;
+  if (!hasSession && !accountStepDone) {
+    return (
+      <AccountSetup
+        key="account-unico"
+        childName={profile.child_name}
+        onDone={() => {
+          try { window.localStorage.setItem("kidzz_account_step_done", "1"); } catch {}
+          setAccountStepDone(true);
+        }}
+      />
+    );
+  }
+  // Onboarding completo → entra direto na home, sem telas extras.
 
   return (
     <div className="min-h-[100dvh] flex flex-col overflow-hidden max-w-[100vw]" style={{ height: "auto", overflowX: "hidden" }}>
@@ -451,7 +450,6 @@ const Index = () => {
       <Suspense fallback={null}><AnimatePresence>
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}
-        {/* showPlay overlay descontinuado: Brincar agora é aba inline */}
         {showChallenge && <SevenDayChallenge onClose={() => setShowChallenge(false)} />}
         {showReferral && <ReferralProgram onBack={() => setShowReferral(false)} />}
         {showRetrospective && <MonthlyRetrospective onClose={() => setShowRetrospective(false)} />}
