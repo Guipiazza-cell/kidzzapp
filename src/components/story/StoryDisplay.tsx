@@ -91,11 +91,11 @@ const StoryDisplay = ({ story, images, onReset, onSpeak, isPremium = false }: St
       className="space-y-4"
     >
       <div className="text-center">
-        <ChameleonMascot size="md" isTalking />
         <h2 className="text-xl font-extrabold text-white drop-shadow-lg mt-2">
           Uma Aventura Mágica! ✨
         </h2>
       </div>
+
 
       {/* CTA Modo Leitura imersivo */}
       <motion.button
