@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ChameleonMascot from "../ChameleonMascot";
+import { BookOpen, Sparkles } from "lucide-react";
+
 
 interface GeneratingOverlayProps {
   open: boolean;
