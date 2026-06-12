@@ -100,14 +100,6 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
       return;
     }
 
-    try {
-      // Request mic for audio visualization
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      startAudioAnalysis(stream);
-    } catch {
-      // Visualization not critical, continue without it
-    }
 
     recognition.lang = "pt-BR";
     recognition.continuous = false;
