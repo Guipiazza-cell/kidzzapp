@@ -174,12 +174,12 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
       {isListening && (
         <>
           <motion.div
-            className="absolute inset-0 rounded-full bg-kid-green/30"
+            className="absolute inset-0 rounded-full bg-kid-green/30 pointer-events-none"
             animate={{ scale: [1, 1.6], opacity: [0.5, 0] }}
             transition={{ duration: 1, repeat: Infinity, ease: "easeOut" }}
           />
           <motion.div
-            className="absolute inset-0 rounded-full bg-kid-green/20"
+            className="absolute inset-0 rounded-full bg-kid-green/20 pointer-events-none"
             animate={{ scale: [1, 2], opacity: [0.3, 0] }}
             transition={{ duration: 1, repeat: Infinity, ease: "easeOut", delay: 0.3 }}
           />
@@ -188,14 +188,14 @@ const VoiceInput = ({ onResult, disabled, large }: VoiceInputProps) => {
       {/* Idle pulse */}
       {!isActive && !disabled && large && (
         <motion.div
-          className="absolute inset-0 rounded-full bg-kid-orange/30"
+          className="absolute inset-0 rounded-full bg-kid-orange/30 pointer-events-none"
           animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.2, 0.6] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
       {!isActive && !disabled && !large && (
         <motion.div
-          className="absolute inset-0 rounded-full bg-kid-blue/25"
+          className="absolute inset-0 rounded-full bg-kid-blue/25 pointer-events-none"
           animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.2, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
