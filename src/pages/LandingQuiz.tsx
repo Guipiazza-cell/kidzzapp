@@ -1,644 +1,1553 @@
-import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import heroImage from "@/assets/lp-kidzz-wellness-hero.webp";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import kikoAsset from "@/assets/kiko-hero.png.asset.json";
 import { haptic } from "@/lib/haptics";
 import { captureAttribution, track, withAttribution } from "@/lib/lpAnalytics";
 
 const APP_URL = "https://kidzz.app";
-const EASE = [0.42, 0, 0.58, 1] as const;
+
+// Brand palette
+const C = {
+  sage: "#7FB069",
+  sageDark: "#5E9550",
+  amber: "#E8821A",
+  amberDark: "#C96F12",
+  gold: "#E2B64C",
+  cream: "#FFF8F0",
+  deep: "#1B3A2F",
+  ink: "#1A1410",
+  inkSoft: "rgba(26,20,16,0.72)",
+  inkMuted: "rgba(26,20,16,0.55)",
+};
+
+const display = '"Sora", "Fredoka", -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const body = '"Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
 const lpVars = {
-  "--lp-bg": "48 24% 96%",
-  "--lp-green": "105 33% 62%",
-  "--lp-green-dark": "145 26% 28%",
-  "--lp-off": "48 56% 98%",
-  "--lp-ink": "0 0% 18%",
-  "--lp-glow": "105 33% 62% / 0.18",
+  "--c-sage": C.sage,
+  "--c-amber": C.amber,
+  "--c-gold": C.gold,
+  "--c-cream": C.cream,
+  "--c-deep": C.deep,
 } as CSSProperties & Record<string, string>;
 
-const S = {
-  bg: "hsl(var(--lp-bg))",
-  green: "hsl(var(--lp-green))",
-  greenDark: "hsl(var(--lp-green-dark))",
-  off: "hsl(var(--lp-off))",
-  ink: "hsl(var(--lp-ink))",
-  inkSoft: "hsl(var(--lp-ink) / 0.68)",
-  inkMuted: "hsl(var(--lp-ink) / 0.52)",
-  glow: "hsl(var(--lp-glow))",
-};
+// ─────────────────────────────────────────────
+// Kiko — animated mascot with cursor eye-tracking
+// ─────────────────────────────────────────────
+type KikoMood = "idle" | "happy" | "empathy" | "thinking" | "wave";
 
-const displayFont = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif';
-const bodyFont = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif';
-
-const fade = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.34, ease: EASE } },
-};
-
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function Icon({ name }: { name: "heart" | "moon" | "book" | "spark" | "wave" | "family" | "sos" | "question" | "check" }) {
-  const paths: Record<typeof name, string> = {
-    heart: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z",
-    moon: "M19 14.5A7.5 7.5 0 0 1 9.5 5a7.8 7.8 0 1 0 9.5 9.5Z",
-    book: "M5 5.5A2.5 2.5 0 0 1 7.5 3H20v16H7.5A2.5 2.5 0 0 0 5 21V5.5Zm0 0V21m3-14h8m-8 4h8",
-    spark: "M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2Zm7 13l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z",
-    wave: "M4 14c2.5-4 5.5-4 8 0s5.5 4 8 0M4 18c2.5-2.5 5.5-2.5 8 0s5.5 2.5 8 0M6 9c1.8-2 3.8-2 6 0s4.2 2 6 0",
-    family: "M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3 20a5 5 0 0 1 10 0m1.5 0a4 4 0 0 1 6.5 0",
-    sos: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13v5m0 3h.01",
-    question: "M9.5 8.5A2.7 2.7 0 0 1 12.2 6c1.7 0 3.1 1.1 3.1 2.7 0 2.2-2.5 2.3-2.5 4.5M12 17h.01",
-    check: "M20 6 9 17l-5-5",
-  };
-
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d={paths[name]} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CTA({ children, onClick, variant = "primary", large = false }: { children: React.ReactNode; onClick?: () => void; variant?: "primary" | "secondary"; large?: boolean }) {
-  const primary = variant === "primary";
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        haptic(primary ? "medium" : "light");
-        onClick?.();
-      }}
-      className="relative inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full px-6 font-semibold transition-transform duration-300 ease-in-out active:scale-[0.98]"
-      style={{
-        minWidth: large ? 230 : undefined,
-        color: primary ? S.off : S.greenDark,
-        background: primary
-          ? `linear-gradient(180deg, ${S.green} 0%, ${S.greenDark} 100%)`
-          : "hsl(var(--lp-off) / 0.84)",
-        border: primary ? "1px solid hsl(var(--lp-green) / 0.34)" : "1px solid hsl(var(--lp-green-dark) / 0.14)",
-        boxShadow: primary
-          ? "0 18px 36px -20px hsl(var(--lp-green-dark) / 0.58), inset 0 1px 0 hsl(var(--lp-off) / 0.34)"
-          : "0 10px 24px -20px hsl(var(--lp-ink) / 0.24)",
-      }}
-    >
-      <span>{children}</span>
-    </button>
-  );
-}
-
-function FadeIn({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+function Kiko({
+  size = 360,
+  mood = "idle",
+  reactive = true,
+}: {
+  size?: number;
+  mood?: KikoMood;
+  reactive?: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
   const reduced = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={reduced ? false : "hidden"}
-      whileInView="show"
-      viewport={{ once: true, margin: "-8% 0px" }}
-      variants={{
-        hidden: { opacity: 0, y: 10 },
-        show: { opacity: 1, y: 0, transition: { duration: 0.34, delay, ease: EASE } },
-      }}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
-function Glass({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  useEffect(() => {
+    if (!reactive || reduced) return;
+    const onMove = (e: MouseEvent) => {
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = (e.clientX - cx) / window.innerWidth;
+      const dy = (e.clientY - cy) / window.innerHeight;
+      setOffset({ x: Math.max(-1, Math.min(1, dx * 2)), y: Math.max(-1, Math.min(1, dy * 2)) });
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [reactive, reduced]);
+
+  const breath = reduced ? {} : { y: [0, -8, 0], rotate: [0, mood === "wave" ? 4 : 1.2, 0] };
+  const breathTr = { duration: mood === "happy" ? 1.6 : 3.4, repeat: Infinity, ease: "easeInOut" as const };
+
+  // Mood-driven head tilt
+  const tilt = mood === "empathy" ? -4 : mood === "happy" ? 3 : 0;
+
   return (
-    <div
-      className={`rounded-[28px] ${className}`}
-      style={{
-        background: "linear-gradient(180deg, hsl(var(--lp-off) / 0.72), hsl(var(--lp-off) / 0.48))",
-        border: "1px solid hsl(var(--lp-off) / 0.88)",
-        boxShadow: "0 18px 42px -32px hsl(var(--lp-ink) / 0.28)",
-      }}
-    >
-      {children}
+    <div ref={ref} style={{ width: size, height: size, position: "relative" }} aria-hidden>
+      {/* Halo */}
+      <motion.div
+        style={{
+          position: "absolute",
+          inset: "-12%",
+          borderRadius: "50%",
+          background: `radial-gradient(closest-side, ${C.amber}33, transparent 70%)`,
+          filter: "blur(8px)",
+        }}
+        animate={reduced ? {} : { scale: [1, 1.08, 1], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        style={{ width: "100%", height: "100%", position: "relative", transform: `rotate(${tilt}deg)` }}
+        animate={breath}
+        transition={breathTr}
+      >
+        <img
+          src={kikoAsset.url}
+          alt="Kiko, o camaleão do Kidzz"
+          width={size}
+          height={size}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            filter: "drop-shadow(0 30px 40px rgba(27,58,47,0.35))",
+            transform: `translate(${offset.x * 8}px, ${offset.y * 6}px)`,
+            transition: "transform 0.4s cubic-bezier(.2,.8,.2,1)",
+          }}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
+        {/* Eye-tracking overlays */}
+        {reactive && !reduced && (
+          <>
+            <EyeDot baseLeft="33%" baseTop="29%" offset={offset} size={size * 0.022} />
+            <EyeDot baseLeft="55%" baseTop="29%" offset={offset} size={size * 0.022} />
+          </>
+        )}
+      </motion.div>
+      {/* Sparkles for happy */}
+      {mood === "happy" && !reduced && (
+        <>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <motion.div
+              key={i}
+              style={{
+                position: "absolute",
+                left: `${15 + i * 16}%`,
+                top: `${10 + (i % 2) * 12}%`,
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: C.gold,
+                boxShadow: `0 0 12px ${C.gold}`,
+                pointerEvents: "none",
+              }}
+              animate={{ y: [0, -20, 0], opacity: [0, 1, 0], scale: [0.6, 1.2, 0.6] }}
+              transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.18 }}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 }
 
-function Atmosphere() {
-  const reduced = useReducedMotion();
-  const particles = [
-    [18, 28, 0],
-    [72, 18, 0.12],
-    [84, 58, 0.24],
-    [31, 72, 0.08],
-    [58, 38, 0.2],
-  ];
+function EyeDot({ baseLeft, baseTop, offset, size }: { baseLeft: string; baseTop: string; offset: { x: number; y: number }; size: number }) {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <motion.div
-        className="absolute left-[8%] top-[18%] h-28 w-28 rounded-full"
-        style={{ background: S.glow, filter: "blur(26px)" }}
-        animate={reduced ? undefined : { opacity: [0.38, 0.62, 0.38], scale: [1, 1.04, 1] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-      />
-      {particles.map(([left, top, delay], i) => (
+    <div
+      style={{
+        position: "absolute",
+        left: baseLeft,
+        top: baseTop,
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: "rgba(10,10,30,0.85)",
+        transform: `translate(${offset.x * 6}px, ${offset.y * 4}px)`,
+        transition: "transform 0.35s cubic-bezier(.2,.8,.2,1)",
+        pointerEvents: "none",
+        boxShadow: "0 0 4px rgba(255,255,255,0.4) inset",
+      }}
+    />
+  );
+}
+
+// ─────────────────────────────────────────────
+// Floating golden firefly particles
+// ─────────────────────────────────────────────
+function Fireflies({ count = 22, color = C.gold }: { count?: number; color?: string }) {
+  const reduced = useReducedMotion();
+  const flies = useMemo(
+    () =>
+      Array.from({ length: count }).map((_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        d: 6 + Math.random() * 14,
+        s: 4 + Math.random() * 8,
+        delay: Math.random() * 4,
+      })),
+    [count],
+  );
+  if (reduced) return null;
+  return (
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+      {flies.map((f) => (
         <motion.span
-          key={i}
-          className="absolute h-1.5 w-1.5 rounded-full"
-          style={{ left: `${left}%`, top: `${top}%`, background: "hsl(var(--lp-off) / 0.9)", boxShadow: "0 0 14px hsl(var(--lp-off) / 0.72)" }}
-          animate={reduced ? undefined : { opacity: [0.16, 0.62, 0.16], y: [0, -8, 0] }}
-          transition={{ duration: 3.8, repeat: Infinity, delay, ease: "easeInOut" }}
+          key={f.id}
+          style={{
+            position: "absolute",
+            left: `${f.x}%`,
+            top: `${f.y}%`,
+            width: f.d,
+            height: f.d,
+            borderRadius: "50%",
+            background: color,
+            boxShadow: `0 0 ${f.d * 1.6}px ${color}, 0 0 ${f.d * 0.6}px #fff`,
+            opacity: 0.6,
+          }}
+          animate={{
+            y: [0, -30, 10, 0],
+            x: [0, 12, -8, 0],
+            opacity: [0.2, 0.9, 0.4, 0.2],
+            scale: [1, 1.3, 0.9, 1],
+          }}
+          transition={{ duration: f.s, repeat: Infinity, delay: f.delay, ease: "easeInOut" }}
         />
       ))}
     </div>
   );
 }
 
-function HeroBackdrop({ onLoad }: { onLoad: () => void }) {
+// ─────────────────────────────────────────────
+// Tilt card (CSS 3D)
+// ─────────────────────────────────────────────
+function TiltCard({ children, intensity = 8, style }: { children: React.ReactNode; intensity?: number; style?: CSSProperties }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const [t, setT] = useState({ rx: 0, ry: 0 });
+
+  const onMove = (e: React.MouseEvent) => {
+    if (reduced) return;
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    setT({ rx: -py * intensity, ry: px * intensity });
+  };
+  const onLeave = () => setT({ rx: 0, ry: 0 });
+
   return (
-    <div aria-hidden className="absolute inset-0 overflow-hidden" style={{ background: S.bg }}>
-      <img
-        src={heroImage}
-        alt=""
-        className="lp-hero-image absolute inset-0 h-full w-full scale-[1.03] object-cover object-top opacity-45"
-        style={{ filter: "blur(10px) saturate(1.04)" }}
-        decoding="async"
-        draggable={false}
-      />
-      <img
-        src={heroImage}
-        alt=""
-        className="lp-hero-image absolute inset-0 h-full w-full object-contain object-top md:object-cover"
-        style={{ filter: "saturate(1.03) contrast(0.99)", transform: "translateZ(0)" }}
-        width={1054}
-        height={1492}
-        loading="eager"
-        decoding="async"
-        {...({ fetchpriority: "high" } as Record<string, string>)}
-        draggable={false}
-        onLoad={onLoad}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(247,246,242,0.08) 0%, rgba(247,246,242,0.16) 25%, rgba(247,246,242,0.42) 70%, rgba(247,246,242,0.78) 100%)",
-        }}
-      />
-      <Atmosphere />
+    <div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{
+        transformStyle: "preserve-3d",
+        transform: `perspective(900px) rotateX(${t.rx}deg) rotateY(${t.ry}deg)`,
+        transition: "transform 0.3s cubic-bezier(.2,.8,.2,1)",
+        ...style,
+      }}
+    >
+      {children}
     </div>
   );
 }
 
-function Hero({ onStart, onHeroReady }: { onStart: () => void; onHeroReady?: () => void }) {
-  const [loaded, setLoaded] = useState(false);
+// ─────────────────────────────────────────────
+// Quiz data
+// ─────────────────────────────────────────────
+type QOption = { key: string; label: string };
+type Question = { id: string; title: string; mood: KikoMood; options: QOption[] };
+
+const QUESTIONS: Question[] = [
+  {
+    id: "q1",
+    title: "Como está a rotina aí em casa hoje?",
+    mood: "empathy",
+    options: [
+      { key: "a", label: "Corrida, mal tenho tempo de respirar" },
+      { key: "b", label: "Tranquila na maioria dos dias" },
+      { key: "c", label: "Um caos do acordar ao dormir" },
+      { key: "d", label: "Depende do dia — montanha-russa" },
+    ],
+  },
+  {
+    id: "q2",
+    title: "Qual desses momentos mais te aperta o coração?",
+    mood: "empathy",
+    options: [
+      { key: "a", label: "Dar o celular pra ter um minuto de paz e depois me sentir culpado(a)" },
+      { key: "b", label: "Meu filho pedindo atenção enquanto tento dar conta de tudo" },
+      { key: "c", label: "A hora de dormir virar batalha todo dia" },
+      { key: "d", label: "Sentir que estamos juntos, mas cada um no seu mundo" },
+    ],
+  },
+  {
+    id: "q3",
+    title: "Quanto tempo seu filho passa em telas por dia?",
+    mood: "thinking",
+    options: [
+      { key: "a", label: "Mais do que eu gostaria de admitir" },
+      { key: "b", label: "Umas 2 horas, mais ou menos" },
+      { key: "c", label: "Pouco, mas brigamos pra controlar" },
+      { key: "d", label: "Não faço ideia, perdi a conta" },
+    ],
+  },
+  {
+    id: "q4",
+    title: "O que você sente que falta na relação de vocês?",
+    mood: "empathy",
+    options: [
+      { key: "a", label: "Tempo de qualidade de verdade" },
+      { key: "b", label: "Paciência (a minha acaba rápido)" },
+      { key: "c", label: "Conversas que vão além do 'como foi a escola'" },
+      { key: "d", label: "Momentos de calma sem briga" },
+    ],
+  },
+  {
+    id: "q5",
+    title: "Se pudesse mudar UMA coisa nas telas do seu filho, seria:",
+    mood: "thinking",
+    options: [
+      { key: "a", label: "Que ensinassem algo de verdade" },
+      { key: "b", label: "Que acalmassem em vez de agitar" },
+      { key: "c", label: "Que aproximassem a gente em vez de afastar" },
+      { key: "d", label: "Que eu não precisasse me sentir culpado(a) por usar" },
+    ],
+  },
+  {
+    id: "q6",
+    title: "Quando seu filho te faz uma pergunta difícil, você:",
+    mood: "happy",
+    options: [
+      { key: "a", label: "Respondo como dá, mas nem sempre sei" },
+      { key: "b", label: "Às vezes não tenho tempo ou paciência" },
+      { key: "c", label: "Adoro, mas queria respostas melhores" },
+      { key: "d", label: "Uso o Google e torço pra acertar" },
+    ],
+  },
+];
+
+// ─────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────
+export default function LandingQuiz() {
   const reduced = useReducedMotion();
-  return (
-    <section
-      className="relative isolate min-h-[100svh] overflow-hidden"
-      style={{ minHeight: "100dvh", background: S.bg }}
-    >
-      <HeroBackdrop onLoad={() => { setLoaded(true); onHeroReady?.(); }} />
-      {!loaded && (
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{ background: `radial-gradient(circle at 50% 22%, ${S.off} 0%, ${S.bg} 62%)` }}
-        />
-      )}
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+58px)] text-center md:min-h-screen md:justify-center md:pt-16" style={{ minHeight: "100dvh" }}>
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.36, ease: EASE }}
-          className="w-full max-w-[370px] md:max-w-2xl"
-        >
-          <div
-            className="mx-auto mb-5 inline-flex items-center rounded-full px-4 py-2 text-[12px] font-semibold"
-            style={{ color: S.greenDark, background: "hsl(var(--lp-off) / 0.74)", border: "1px solid hsl(var(--lp-green-dark) / 0.12)" }}
-          >
-            Kidzz.app
-          </div>
-          <h1 className="text-[29px] font-semibold leading-[1.04] min-[390px]:text-[31px] md:text-[62px]" style={{ fontFamily: displayFont, color: S.ink, letterSpacing: 0 }}>
-            Seu filho faz perguntas…
-            <span className="block" style={{ color: S.greenDark }}>
-              mas talvez o que ele mais precise é conexão.
-            </span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-[340px] text-[15px] leading-relaxed md:max-w-lg md:text-[19px]" style={{ color: S.inkSoft }}>
-            Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado.
-          </p>
-          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:mt-8">
-            <CTA onClick={() => { track("lp_cta_click", { location: "hero" }); onStart(); }} large>Começar teste gratuito ✨</CTA>
-            <CTA variant="secondary" onClick={() => { track("lp_cta_click", { location: "hero_secondary" }); scrollToId("como-funciona"); }}>Entender como funciona</CTA>
-          </div>
-        </motion.div>
-        <div className="mt-auto pt-8 text-[11px] font-medium uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.48)", letterSpacing: "0.2em" }}>
-          60 segundos
-        </div>
-      </div>
-    </section>
-  );
-}
 
-const painCards = [
-  "Seu filho pede atenção enquanto você tenta sobreviver ao dia.",
-  "Às vezes não falta amor. Falta respiro.",
-  "A tela vira pausa, mas a culpa continua.",
-  "A casa precisa de menos cobrança e mais presença.",
-];
+  useEffect(() => {
+    captureAttribution();
+    track("lp_view", { variant: "quiz_3d_v2" });
+    document.title = "Kidzz — Transforme telas em conexão";
+  }, []);
 
-function Identification() {
-  return (
-    <section className="px-5 py-16 md:py-24">
-      <div className="mx-auto max-w-4xl">
-        <FadeIn className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
-            Identificação
-          </p>
-          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[50px]" style={{ fontFamily: displayFont, color: S.ink }}>
-            A rotina moderna cansou pais e filhos.
-          </h2>
-          <p className="mx-auto mt-5 max-w-lg text-[16px] leading-relaxed" style={{ color: S.inkSoft }}>
-            O Kidzz começa onde muitas famílias estão: tentando amar bem, mesmo no meio do caos.
-          </p>
-        </FadeIn>
-        <div className="mt-10 grid gap-3 md:grid-cols-2">
-          {painCards.map((card, index) => (
-            <FadeIn key={card} delay={index * 0.04}>
-              <Glass className="min-h-[116px] p-6">
-                <p className="text-[18px] font-semibold leading-snug md:text-[21px]" style={{ fontFamily: displayFont, color: index === 1 ? S.greenDark : S.ink }}>
-                  “{card}”
-                </p>
-              </Glass>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+  // SEO meta
+  useEffect(() => {
+    const setMeta = (name: string, content: string) => {
+      let m = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+      if (!m) {
+        m = document.createElement("meta");
+        m.name = name;
+        document.head.appendChild(m);
+      }
+      m.content = content;
+    };
+    setMeta("description", "Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado com o Kidzz. Teste grátis.");
+    setMeta("theme-color", C.amber);
+  }, []);
 
-function TestSection({ onStart }: { onStart: () => void }) {
-  return (
-    <section id="teste" className="px-5 py-14 md:py-20">
-      <div className="mx-auto max-w-3xl text-center">
-        <FadeIn>
-          <Glass className="p-7 md:p-10">
-            <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.68)", letterSpacing: "0.22em" }}>
-              Quiz emocional
-            </p>
-            <h2 className="text-[30px] font-semibold leading-[1.08] md:text-[48px]" style={{ fontFamily: displayFont, color: S.ink }}>
-              Em 60 segundos vamos mostrar:
-            </h2>
-            <div className="mx-auto mt-7 grid max-w-xl gap-3 text-left">
-              {["como sua família está hoje", "o que mais gera desconexão", "e como transformar isso em vínculo"].map((item) => (
-                <div key={item} className="flex items-center gap-3 rounded-2xl px-4 py-4" style={{ background: "hsl(var(--lp-green) / 0.11)", color: S.greenDark }}>
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full" style={{ background: "hsl(var(--lp-off) / 0.8)" }}>
-                    <Icon name="check" />
-                  </span>
-                  <span className="text-[15px] font-semibold">{item}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-8">
-              <CTA onClick={() => { track("lp_cta_click", { location: "test_section" }); onStart(); }} large>Fazer teste agora ✨</CTA>
-            </div>
-          </Glass>
-        </FadeIn>
-      </div>
-    </section>
-  );
-}
+  // Scroll-driven hero parallax
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroOp = useTransform(scrollYProgress, [0, 1], [1, 0.2]);
 
-function HowItWorks() {
-  const steps = [
-    ["01", "Responda rápido", "Perguntas simples sobre rotina, telas, sono e vínculo."],
-    ["02", "Descubra o perfil emocional da família", "Um retrato leve do que está pedindo mais cuidado agora."],
-    ["03", "Receba experiências personalizadas", "SOS, histórias, sono e brincadeiras dentro do Kidzz."],
-  ];
-  return (
-    <section id="como-funciona" className="px-5 py-16 md:py-24">
-      <div className="mx-auto max-w-5xl">
-        <FadeIn className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
-            Como funciona
-          </p>
-          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[50px]" style={{ fontFamily: displayFont, color: S.ink }}>
-            Tecnologia invisível. Cuidado visível.
-          </h2>
-        </FadeIn>
-        <div className="mt-10 grid gap-3 md:grid-cols-3">
-          {steps.map(([n, title, desc], index) => (
-            <FadeIn key={title} delay={index * 0.05}>
-              <Glass className="h-full p-6">
-                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-full text-[12px] font-bold" style={{ color: S.greenDark, background: "hsl(var(--lp-green) / 0.16)" }}>
-                  {n}
-                </div>
-                <h3 className="text-[20px] font-semibold" style={{ color: S.ink }}>{title}</h3>
-                <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: S.inkSoft }}>{desc}</p>
-              </Glass>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+  // Quiz state
+  const [quizIdx, setQuizIdx] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [direction, setDirection] = useState(1);
+  const [quizDone, setQuizDone] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
 
-const experiences = [
-  ["sos", "SOS emocional", "Respirar junto nos picos de crise."],
-  ["moon", "Ritual do sono", "Desacelerar a casa no fim do dia."],
-  ["book", "Histórias guiadas", "Narrativas que acolhem e ensinam."],
-  ["question", "Perguntas mágicas", "Curiosidade que vira conversa real."],
-  ["wave", "Wellness cinematográfico", "Pausas de calma para a família."],
-  ["family", "Conexão pai e filho", "Momentos pequenos que ficam."],
-] as const;
-
-function Experiences() {
-  return (
-    <section className="px-5 py-16 md:py-24">
-      <div className="mx-auto max-w-5xl">
-        <FadeIn className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
-            Experiências
-          </p>
-          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[50px]" style={{ fontFamily: displayFont, color: S.ink }}>
-            Não é catálogo. É presença em formatos diferentes.
-          </h2>
-        </FadeIn>
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {experiences.map(([icon, title, desc], index) => (
-            <FadeIn key={title} delay={index * 0.035}>
-              <Glass className="h-full p-6">
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl" style={{ color: S.greenDark, background: "linear-gradient(180deg, hsl(var(--lp-green) / 0.22), hsl(var(--lp-green-dark) / 0.08))" }}>
-                  <Icon name={icon} />
-                </div>
-                <h3 className="text-[19px] font-semibold" style={{ color: S.ink }}>{title}</h3>
-                <p className="mt-2 text-[14.5px] leading-relaxed" style={{ color: S.inkSoft }}>{desc}</p>
-              </Glass>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SocialProof() {
-  const reviews = [
-    ["A primeira vez que meu filho pediu uma história em vez de outro vídeo, eu entendi.", "Marina, mãe do Theo"],
-    ["Parece pequeno, mas mudou o clima da noite aqui em casa.", "Rafael, pai da Nina"],
-    ["É acolhedor sem parecer infantilizado. Eu uso junto com ela.", "Camila, mãe da Lis"],
-  ];
-  return (
-    <section className="px-5 py-16 md:py-24">
-      <div className="mx-auto max-w-5xl">
-        <FadeIn className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>
-            Confiança emocional
-          </p>
-          <h2 className="text-[31px] font-semibold leading-[1.08] md:text-[48px]" style={{ fontFamily: displayFont, color: S.ink }}>
-            Famílias usando Kidzz para transformar o caos em conexão.
-          </h2>
-        </FadeIn>
-        <div className="mt-10 grid gap-3 md:grid-cols-3">
-          {reviews.map(([text, author], index) => (
-            <FadeIn key={author} delay={index * 0.05}>
-              <Glass className="h-full p-6">
-                <p className="text-[18px] font-semibold leading-snug" style={{ fontFamily: displayFont, color: S.ink }}>“{text}”</p>
-                <p className="mt-6 text-[13px] font-semibold" style={{ color: "hsl(var(--lp-green-dark) / 0.72)" }}>{author}</p>
-              </Glass>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FinalCTA({ onStart }: { onStart: () => void }) {
-  return (
-    <section className="px-5 py-16 md:py-24">
-      <FadeIn>
-        <div className="mx-auto max-w-3xl overflow-hidden rounded-[34px] p-8 text-center md:p-12" style={{ background: `radial-gradient(circle at 50% 0%, hsl(var(--lp-green) / 0.2), transparent 54%), linear-gradient(180deg, ${S.greenDark}, hsl(var(--lp-green-dark) / 0.92))`, color: S.off, boxShadow: "0 26px 70px -44px hsl(var(--lp-green-dark) / 0.72)" }}>
-          <h2 className="text-[34px] font-semibold leading-[1.04] md:text-[54px]" style={{ fontFamily: displayFont }}>
-            Talvez seu filho não precise de mais tela. Talvez precise de momentos que fiquem.
-          </h2>
-          <p className="mx-auto mt-5 max-w-md text-[16px] leading-relaxed" style={{ color: "hsl(var(--lp-off) / 0.72)" }}>
-            Comece pelo teste. O próximo momento de conexão pode nascer hoje.
-          </p>
-          <div className="mt-8">
-            <CTA onClick={() => { track("lp_cta_click", { location: "final_cta" }); onStart(); }} large>Começar agora ✨</CTA>
-          </div>
-        </div>
-      </FadeIn>
-    </section>
-  );
-}
-
-type QuizAnswer = { label: string; weight: number };
-const QUESTIONS: { q: string; options: QuizAnswer[] }[] = [
-  { q: "Hoje, qual sensação mais aparece na rotina da sua casa?", options: [{ label: "Calma, na maior parte do tempo", weight: 0 }, { label: "Oscila entre leve e cansativa", weight: 1 }, { label: "Sobrecarga quase diária", weight: 2 }] },
-  { q: "Quando seu filho pede tela, o que normalmente está por trás?", options: [{ label: "Curiosidade ou lazer", weight: 0 }, { label: "Tédio e busca por atenção", weight: 1 }, { label: "Cansaço, birra ou fuga do caos", weight: 2 }] },
-  { q: "Como costuma ser a hora de dormir?", options: [{ label: "Um ritual previsível", weight: 0 }, { label: "Depende do dia", weight: 1 }, { label: "Uma batalha emocional", weight: 2 }] },
-  { q: "Quanto espaço existe para presença real sem tela?", options: [{ label: "Todos os dias", weight: 0 }, { label: "Alguns dias", weight: 1 }, { label: "Quase nunca", weight: 2 }] },
-  { q: "O que sua família mais precisa agora?", options: [{ label: "Ideias leves para se conectar", weight: 0 }, { label: "Ajuda para criar rituais", weight: 1 }, { label: "Um respiro emocional urgente", weight: 2 }] },
-];
-
-function QuizExperience({ onClose, onFinish }: { onClose: () => void; onFinish: (score: number) => void }) {
-  const [idx, setIdx] = useState(0);
-  const [score, setScore] = useState(0);
-  const progress = ((idx + 1) / QUESTIONS.length) * 100;
-
-  const pick = (weight: number) => {
-    haptic("medium");
-    const next = score + weight;
-    setScore(next);
-    track("lp_quiz_question_answered", { question_index: idx, question_number: idx + 1, weight, running_score: next });
-    if (idx + 1 >= QUESTIONS.length) window.setTimeout(() => onFinish(next), 260);
-    else setIdx((value) => value + 1);
+  const startQuiz = () => {
+    track("lp_quiz_start", {});
+    haptic("light");
+    document.getElementById("quiz")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  return (
-    <main className="min-h-[100svh] px-5 pb-12 pt-[calc(env(safe-area-inset-top)+18px)]" style={{ ...lpVars, minHeight: "100dvh", background: S.bg, color: S.ink, fontFamily: bodyFont }}>
-      <div className="mx-auto flex max-w-xl items-center gap-4">
-        <button type="button" onClick={onClose} className="min-h-[44px] text-[14px] font-semibold" style={{ color: S.inkSoft }}>Fechar</button>
-        <div className="h-1 flex-1 overflow-hidden rounded-full" style={{ background: "hsl(var(--lp-green-dark) / 0.12)" }}>
-          <motion.div className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${S.green}, ${S.greenDark})` }} animate={{ width: `${progress}%` }} transition={{ duration: 0.28, ease: EASE }} />
-        </div>
-        <span className="text-[12px] font-semibold tabular-nums" style={{ color: S.inkMuted }}>{idx + 1}/{QUESTIONS.length}</span>
-      </div>
+  const answer = (qid: string, key: string) => {
+    haptic("light");
+    setAnswers((a) => ({ ...a, [qid]: key }));
+    setDirection(1);
+    setTimeout(() => {
+      if (quizIdx < QUESTIONS.length - 1) {
+        setQuizIdx((i) => i + 1);
+      } else {
+        setQuizDone(true);
+        track("lp_quiz_complete", { answers: { ...answers, [qid]: key } });
+        setTimeout(() => document.getElementById("capture")?.scrollIntoView({ behavior: "smooth" }), 240);
+      }
+    }, 260);
+  };
 
-      <div className="mx-auto flex min-h-[calc(100dvh-92px)] max-w-xl flex-col justify-center py-10">
-        <AnimatePresence mode="wait">
-          <motion.div key={idx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.28, ease: EASE }}>
-            <p className="mb-4 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>Pergunta {idx + 1}</p>
-            <h1 className="text-[31px] font-semibold leading-[1.08]" style={{ fontFamily: displayFont, color: S.ink }}>{QUESTIONS[idx].q}</h1>
-            <div className="mt-9 space-y-3">
-              {QUESTIONS[idx].options.map((opt) => (
-                <button key={opt.label} type="button" onClick={() => pick(opt.weight)} className="min-h-[58px] w-full rounded-2xl px-5 text-left text-[15.5px] font-semibold transition-transform duration-300 active:scale-[0.99]" style={{ color: S.ink, background: "hsl(var(--lp-off) / 0.88)", border: "1px solid hsl(var(--lp-off) / 0.92)", boxShadow: "0 14px 34px -28px hsl(var(--lp-ink) / 0.28)" }}>
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+  const back = () => {
+    if (quizIdx === 0) return;
+    setDirection(-1);
+    setQuizIdx((i) => i - 1);
+  };
+
+  const submitEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !/.+@.+\..+/.test(email)) return;
+    track("lp_lead_capture", { email_domain: email.split("@")[1], name: !!firstName });
+    setEmailSubmitted(true);
+    haptic("medium");
+    try {
+      const stored = JSON.parse(localStorage.getItem("kidzz_lp_leads") || "[]");
+      stored.push({ email, firstName, answers, ts: Date.now() });
+      localStorage.setItem("kidzz_lp_leads", JSON.stringify(stored));
+    } catch {
+      // ignore
+    }
+    setTimeout(() => document.getElementById("resultado")?.scrollIntoView({ behavior: "smooth" }), 240);
+  };
+
+  const goApp = (where: string) => {
+    track("lp_app_redirect", { where });
+    window.location.href = withAttribution(APP_URL);
+  };
+
+  const current = QUESTIONS[quizIdx];
+
+  return (
+    <main
+      style={{
+        ...lpVars,
+        background: C.cream,
+        color: C.ink,
+        fontFamily: body,
+        minHeight: "100vh",
+        overflowX: "hidden",
+      }}
+    >
+      {/* Font load */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+
+      {/* NAV */}
+      <Nav onCta={startQuiz} />
+
+      {/* HERO */}
+      <section
+        ref={heroRef}
+        style={{
+          position: "relative",
+          minHeight: "100vh",
+          paddingTop: 96,
+          background: `radial-gradient(ellipse at 70% 20%, ${C.amber}1f, transparent 60%),
+                       radial-gradient(ellipse at 10% 80%, ${C.sage}26, transparent 55%),
+                       linear-gradient(180deg, #FFF4E2 0%, ${C.cream} 100%)`,
+          overflow: "hidden",
+        }}
+      >
+        <Fireflies count={26} />
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "40px 24px 80px",
+            display: "grid",
+            gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)",
+            gap: 40,
+            alignItems: "center",
+          }}
+          className="hero-grid"
+        >
+          <motion.div style={{ y: heroY, opacity: heroOp }}>
+            <motion.span
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "8px 14px",
+                borderRadius: 999,
+                background: "rgba(232,130,26,0.12)",
+                color: C.amberDark,
+                fontWeight: 700,
+                fontSize: 13,
+                letterSpacing: 0.2,
+              }}
+            >
+              <span style={{ width: 8, height: 8, borderRadius: 999, background: C.amber }} />
+              Feito para a família brasileira
+            </motion.span>
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.08 }}
+              style={{
+                fontFamily: display,
+                fontWeight: 800,
+                fontSize: "clamp(36px, 5.4vw, 64px)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.02em",
+                color: C.deep,
+                margin: "22px 0 18px",
+              }}
+            >
+              Seu filho faz mil perguntas. Mas e se o que ele mais precisa for{" "}
+              <span style={{ color: C.amber }}>você?</span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.16 }}
+              style={{ fontSize: "clamp(16px, 1.6vw, 19px)", color: C.inkSoft, maxWidth: 540, lineHeight: 1.55 }}
+            >
+              Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado — com o Kidzz.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.24 }}
+              style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}
+            >
+              <PrimaryButton onClick={startQuiz}>Fazer o teste grátis ✨</PrimaryButton>
+              <SecondaryButton onClick={() => document.getElementById("solucao")?.scrollIntoView({ behavior: "smooth" })}>
+                Como funciona
+              </SecondaryButton>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              style={{ display: "flex", gap: 18, marginTop: 28, color: C.inkMuted, fontSize: 13, flexWrap: "wrap" }}
+            >
+              <span>⭐ 4.9 nas avaliações</span>
+              <span>👨‍👩‍👧 +12 mil famílias</span>
+              <span>🇧🇷 100% em português</span>
+            </motion.div>
           </motion.div>
-        </AnimatePresence>
-      </div>
-    </main>
-  );
-}
 
-function Result({ score, onClose }: { score: number; onClose: () => void }) {
-  const profile = useMemo(() => {
-    const pct = score / (QUESTIONS.length * 2);
-    if (pct < 0.34) return { title: "Sua família já respira presença.", sub: "O Kidzz pode transformar essa base em pequenos rituais memoráveis.", tips: ["Perguntas mágicas semanais", "Histórias guiadas", "Brincadeiras de presença"] };
-    if (pct < 0.67) return { title: "Sua família precisa de mais respiros.", sub: "Há sinais de cansaço invisível, mas pequenos rituais podem mudar o clima da casa.", tips: ["Ritual do sono", "Wellness de 3 minutos", "Conexão pai e filho"] };
-    return { title: "A rotina está pedindo pausa.", sub: "O excesso de tela e a sobrecarga emocional estão falando alto. O próximo passo pode ser leve.", tips: ["SOS emocional", "Ritual de desaceleração", "Histórias para acolher"] };
-  }, [score]);
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+            style={{ display: "flex", justifyContent: "center", position: "relative" }}
+          >
+            <Kiko size={460} mood="happy" />
+          </motion.div>
+        </div>
 
-  return (
-    <main className="min-h-[100svh] px-5 pb-14 pt-[calc(env(safe-area-inset-top)+18px)]" style={{ ...lpVars, minHeight: "100dvh", background: S.bg, color: S.ink, fontFamily: bodyFont }}>
-      <div className="mx-auto max-w-xl">
-        <button type="button" onClick={onClose} className="min-h-[44px] text-[14px] font-semibold" style={{ color: S.inkSoft }}>Voltar</button>
-        <motion.div initial="hidden" animate="show" variants={fade} className="pt-8 text-center">
-          <p className="mb-3 text-[11px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.22em" }}>Resultado personalizado</p>
-          <h1 className="text-[34px] font-semibold leading-[1.05]" style={{ fontFamily: displayFont, color: S.ink }}>{profile.title}</h1>
-          <p className="mx-auto mt-5 max-w-md text-[16px] leading-relaxed" style={{ color: S.inkSoft }}>{profile.sub}</p>
-        </motion.div>
-        <Glass className="mt-9 p-6">
-          <p className="mb-5 text-[12px] font-semibold uppercase" style={{ color: "hsl(var(--lp-green-dark) / 0.66)", letterSpacing: "0.18em" }}>O Kidzz recomenda</p>
-          <div className="space-y-4">
-            {profile.tips.map((tip) => (
-              <div key={tip} className="flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ color: S.greenDark, background: "hsl(var(--lp-green) / 0.18)" }}><Icon name="check" /></span>
-                <span className="text-[15.5px] font-semibold" style={{ color: S.ink }}>{tip}</span>
+        {/* Scroll indicator */}
+        {!reduced && (
+          <motion.div
+            style={{
+              position: "absolute",
+              bottom: 24,
+              left: "50%",
+              transform: "translateX(-50%)",
+              color: C.deep,
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: 1,
+              textTransform: "uppercase",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+              opacity: 0.6,
+            }}
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            Role para descobrir
+            <span style={{ width: 1, height: 28, background: C.deep, opacity: 0.5 }} />
+          </motion.div>
+        )}
+      </section>
+
+      {/* QUIZ */}
+      <section
+        id="quiz"
+        style={{
+          padding: "100px 24px",
+          background: `linear-gradient(180deg, ${C.cream} 0%, #FBEDD6 100%)`,
+          position: "relative",
+        }}
+      >
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          {!quizDone ? (
+            <>
+              <ProgressBar value={(quizIdx + 1) / QUESTIONS.length} label={`Pergunta ${quizIdx + 1} de ${QUESTIONS.length}`} />
+              <div style={{ position: "relative", minHeight: 480, marginTop: 36 }}>
+                <AnimatePresence mode="wait" custom={direction}>
+                  <motion.div
+                    key={current.id}
+                    custom={direction}
+                    initial={{ x: direction * 60, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -direction * 60, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+                  >
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, alignItems: "center" }} className="quiz-grid">
+                      <div>
+                        <h2
+                          style={{
+                            fontFamily: display,
+                            fontWeight: 800,
+                            fontSize: "clamp(26px, 3.4vw, 38px)",
+                            lineHeight: 1.15,
+                            color: C.deep,
+                            letterSpacing: "-0.015em",
+                            margin: 0,
+                          }}
+                        >
+                          {current.title}
+                        </h2>
+                        <p style={{ marginTop: 12, color: C.inkSoft, fontSize: 15 }}>
+                          Sem certo ou errado. Só o seu retrato de hoje. 💛
+                        </p>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "center" }} className="quiz-kiko">
+                        <Kiko size={220} mood={current.mood} reactive={false} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: "grid", gap: 14, marginTop: 28 }}>
+                      {current.options.map((opt) => {
+                        const selected = answers[current.id] === opt.key;
+                        return (
+                          <motion.button
+                            key={opt.key}
+                            onClick={() => answer(current.id, opt.key)}
+                            whileTap={{ scale: 0.98 }}
+                            whileHover={{ y: -2 }}
+                            style={{
+                              width: "100%",
+                              textAlign: "left",
+                              padding: "20px 22px",
+                              borderRadius: 18,
+                              border: `2px solid ${selected ? C.amber : "rgba(27,58,47,0.1)"}`,
+                              background: selected ? `${C.amber}15` : "#fff",
+                              color: C.deep,
+                              fontSize: 16,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 14,
+                              transition: "all .2s",
+                              boxShadow: selected ? `0 12px 28px ${C.amber}33` : "0 4px 14px rgba(27,58,47,0.06)",
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 10,
+                                background: selected ? C.amber : "rgba(127,176,105,0.18)",
+                                color: selected ? "#fff" : C.sageDark,
+                                fontWeight: 800,
+                                display: "grid",
+                                placeItems: "center",
+                                flexShrink: 0,
+                                fontSize: 14,
+                              }}
+                            >
+                              {selected ? "✓" : opt.key.toUpperCase()}
+                            </span>
+                            <span style={{ flex: 1, lineHeight: 1.4 }}>{opt.label}</span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+
+                    {quizIdx > 0 && (
+                      <button
+                        onClick={back}
+                        style={{
+                          marginTop: 24,
+                          background: "transparent",
+                          border: "none",
+                          color: C.inkMuted,
+                          fontSize: 14,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        ← Voltar
+                      </button>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{ textAlign: "center", padding: "40px 0" }}
+            >
+              <Kiko size={200} mood="happy" reactive={false} />
+              <h2 style={{ fontFamily: display, fontSize: 32, fontWeight: 800, color: C.deep, marginTop: 16 }}>
+                Quase lá... ✨
+              </h2>
+              <p style={{ color: C.inkSoft, marginTop: 8 }}>Role para ver seu resultado.</p>
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* EMAIL CAPTURE */}
+      {quizDone && (
+        <section
+          id="capture"
+          style={{
+            padding: "100px 24px",
+            background: `linear-gradient(180deg, #FBEDD6 0%, ${C.cream} 100%)`,
+          }}
+        >
+          <div style={{ maxWidth: 560, margin: "0 auto", textAlign: "center" }}>
+            {!emailSubmitted ? (
+              <>
+                <motion.h2
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  style={{ fontFamily: display, fontWeight: 800, fontSize: "clamp(28px, 4vw, 42px)", color: C.deep, letterSpacing: "-0.015em" }}
+                >
+                  Seu resultado está pronto! 🎉
+                </motion.h2>
+                <p style={{ color: C.inkSoft, fontSize: 17, marginTop: 14, lineHeight: 1.5 }}>
+                  Vamos te mostrar o retrato da sua família hoje — e o caminho pra transformar telas em conexão. Pra onde
+                  enviamos?
+                </p>
+                <form
+                  onSubmit={submitEmail}
+                  style={{
+                    marginTop: 28,
+                    background: "#fff",
+                    padding: 24,
+                    borderRadius: 24,
+                    boxShadow: "0 24px 60px rgba(27,58,47,0.12)",
+                    display: "grid",
+                    gap: 12,
+                    textAlign: "left",
+                  }}
+                >
+                  <Input placeholder="Seu primeiro nome (opcional)" value={firstName} onChange={setFirstName} />
+                  <Input placeholder="seu@email.com" value={email} onChange={setEmail} type="email" required />
+                  <PrimaryButton type="submit" full>
+                    Ver meu resultado ✨
+                  </PrimaryButton>
+                  <p style={{ color: C.inkMuted, fontSize: 12, textAlign: "center", margin: "4px 0 0" }}>
+                    Sem spam. Só o seu resultado e dicas de verdade.
+                  </p>
+                </form>
+              </>
+            ) : (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: C.sageDark, fontWeight: 700 }}>
+                ✓ Recebido! Role para baixo.
+              </motion.p>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* RESULT */}
+      {emailSubmitted && (
+        <section id="resultado" style={{ padding: "100px 24px", background: C.deep, color: C.cream, position: "relative", overflow: "hidden" }}>
+          <Fireflies count={18} color={C.gold} />
+          <div style={{ maxWidth: 880, margin: "0 auto", textAlign: "center", position: "relative" }}>
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              style={{
+                display: "inline-block",
+                padding: "8px 16px",
+                borderRadius: 999,
+                background: "rgba(226,182,76,0.18)",
+                color: C.gold,
+                fontWeight: 700,
+                fontSize: 13,
+                letterSpacing: 0.4,
+              }}
+            >
+              {firstName ? `${firstName.toUpperCase()}, ` : ""}SEU RETRATO DE HOJE
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              style={{
+                fontFamily: display,
+                fontWeight: 800,
+                fontSize: "clamp(32px, 5vw, 52px)",
+                marginTop: 18,
+                lineHeight: 1.1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              A sua família precisa de mais <span style={{ color: C.gold }}>momentos que ficam.</span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              style={{ fontSize: 19, lineHeight: 1.6, color: "rgba(255,248,240,0.85)", marginTop: 22, maxWidth: 680, marginLeft: "auto", marginRight: "auto" }}
+            >
+              Você ama, mas a rotina cansa. As telas viraram muleta e fonte de culpa. A boa notícia: dá pra mudar o clima
+              da sua casa começando hoje — sem mais uma obrigação na sua lista.
+            </motion.p>
+            <div style={{ marginTop: 40, display: "flex", justifyContent: "center" }}>
+              <Kiko size={260} mood="happy" reactive={false} />
+            </div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              style={{ marginTop: 16, fontSize: 18, fontWeight: 600, color: C.gold }}
+            >
+              "O Kidzz transforma o tempo de tela do seu filho em curiosidade, calma e vínculo."
+            </motion.p>
+            <div style={{ marginTop: 28 }}>
+              <PrimaryButton onClick={() => goApp("result_cta")}>Conhecer o Kidzz ✨</PrimaryButton>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SOLUÇÃO */}
+      <section id="solucao" style={{ padding: "120px 24px", background: C.cream }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <SectionHeader
+            eyebrow="A solução"
+            title="Três forças que cabem no bolso da família."
+            subtitle="Tudo em português do Brasil, com cuidado emocional e na medida da idade."
+          />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24, marginTop: 56 }}>
+            <FeatureCard
+              emoji="🧠"
+              color={C.amber}
+              title="Responde"
+              text="Curiosidade que vira conversa. O Kiko responde qualquer pergunta do seu filho com carinho e na medida da idade."
+            />
+            <FeatureCard
+              emoji="📖"
+              color={C.sage}
+              title="Acolhe"
+              text="Histórias onde seu filho é o herói, narradas com voz real em português — pra imaginar e dormir em paz."
+            />
+            <FeatureCard
+              emoji="🌙"
+              color={C.gold}
+              title="Acalma"
+              text="Respiração e rituais de sono pros momentos em que a criança (e você) precisam de calma."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* DEMO */}
+      <DemoSection />
+
+      {/* FOR PARENTS */}
+      <section style={{ padding: "120px 24px", background: C.cream }}>
+        <div style={{ maxWidth: 980, margin: "0 auto", textAlign: "center" }}>
+          <h2
+            style={{
+              fontFamily: display,
+              fontSize: "clamp(30px, 4vw, 46px)",
+              fontWeight: 800,
+              color: C.deep,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+              maxWidth: 800,
+              margin: "0 auto",
+            }}
+          >
+            Você não está comprando um joguinho. Está investindo no desenvolvimento e na conexão com seu filho.
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginTop: 56 }}>
+            {[
+              { i: "🛡️", t: "Seguro e sem anúncios" },
+              { i: "💛", t: "Cuidado emocional" },
+              { i: "🎙️", t: "Voz em PT-BR" },
+              { i: "🇧🇷", t: "Feito no Brasil" },
+            ].map((b) => (
+              <div
+                key={b.t}
+                style={{
+                  padding: "24px 18px",
+                  background: "#fff",
+                  borderRadius: 18,
+                  border: `1px solid ${C.sage}22`,
+                  boxShadow: "0 8px 24px rgba(27,58,47,0.05)",
+                }}
+              >
+                <div style={{ fontSize: 32 }}>{b.i}</div>
+                <div style={{ marginTop: 10, fontWeight: 700, color: C.deep, fontSize: 15 }}>{b.t}</div>
               </div>
             ))}
           </div>
-        </Glass>
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <CTA onClick={() => { track("lp_app_redirect", { score, location: "result" }); window.location.href = withAttribution(APP_URL); }} large>Entrar no Kidzz agora ✨</CTA>
-          <p className="text-[12px]" style={{ color: S.inkMuted }}>Menos caos. Mais conexão.</p>
         </div>
-      </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <TestimonialsSection />
+
+      {/* PRICING */}
+      <section style={{ padding: "120px 24px", background: `linear-gradient(180deg, ${C.cream} 0%, #FBEDD6 100%)` }}>
+        <div style={{ maxWidth: 980, margin: "0 auto" }}>
+          <SectionHeader eyebrow="Planos" title="Comece grátis. Continue por menos de R$ 0,66 por dia." />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24, marginTop: 48 }}>
+            <PriceCard
+              name="Mensal"
+              price="R$ 19,90"
+              suffix="/mês"
+              perks={["Tudo do Kidzz", "Cancele quando quiser", "Garantia de 7 dias"]}
+              onClick={() => goApp("price_monthly")}
+            />
+            <PriceCard
+              highlight
+              name="Anual"
+              price="R$ 149"
+              suffix="/ano"
+              badge="Mais escolhido"
+              perks={["Equivale a R$ 12,42/mês", "2 meses grátis", "Garantia de 7 dias"]}
+              onClick={() => goApp("price_annual")}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section style={{ padding: "120px 24px", background: C.deep, color: C.cream, position: "relative", overflow: "hidden" }}>
+        <Fireflies count={20} color={C.gold} />
+        <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", position: "relative" }}>
+          <Kiko size={240} mood="wave" reactive={false} />
+          <h2
+            style={{
+              fontFamily: display,
+              fontWeight: 800,
+              fontSize: "clamp(32px, 5vw, 52px)",
+              marginTop: 20,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+            }}
+          >
+            A infância passa rápido. Faça dela uma jornada de descobertas — juntos.
+          </h2>
+          <div style={{ marginTop: 36 }}>
+            <PrimaryButton onClick={() => goApp("final_cta")}>Começar agora ✨</PrimaryButton>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+
+      {/* responsive helpers */}
+      <style>{`
+        @media (max-width: 820px) {
+          .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
+          .hero-grid > div:last-child { order: -1; }
+          .quiz-grid { grid-template-columns: 1fr !important; }
+          .quiz-kiko { display: none !important; }
+        }
+      `}</style>
     </main>
   );
 }
 
-function LpBootSkeleton({ visible }: { visible: boolean }) {
+// ─────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────
+function Nav({ onCta }: { onCta: () => void }) {
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-[60]"
+    <header
       style={{
-        background: `radial-gradient(circle at 50% 22%, ${S.off} 0%, ${S.bg} 62%)`,
-        opacity: visible ? 1 : 0,
-        transition: "opacity 380ms ease-out",
-        willChange: "opacity",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        backdropFilter: "saturate(180%) blur(14px)",
+        background: "rgba(255,248,240,0.78)",
+        borderBottom: `1px solid ${C.sage}22`,
       }}
     >
-      <div
-        className="absolute left-1/2 top-[18%] -translate-x-1/2 flex flex-col items-center gap-5"
-        style={{ width: "min(86%, 420px)" }}
-      >
-        <div className="lp-skeleton h-7 w-32 rounded-full" />
-        <div className="lp-skeleton h-9 w-full rounded-2xl" />
-        <div className="lp-skeleton h-9 w-[88%] rounded-2xl" />
-        <div className="lp-skeleton h-5 w-[70%] rounded-full" />
-        <div className="lp-skeleton mt-6 h-14 w-[78%] rounded-full" />
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 10,
+              background: `linear-gradient(135deg, ${C.amber}, ${C.gold})`,
+              display: "grid",
+              placeItems: "center",
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: 18,
+              fontFamily: display,
+              boxShadow: `0 6px 18px ${C.amber}55`,
+            }}
+          >
+            K
+          </div>
+          <span style={{ fontFamily: display, fontWeight: 800, fontSize: 20, color: C.deep, letterSpacing: "-0.01em" }}>
+            Kidzz
+          </span>
+        </div>
+        <button
+          onClick={onCta}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 999,
+            background: C.amber,
+            color: "#fff",
+            border: "none",
+            fontWeight: 700,
+            fontSize: 14,
+            cursor: "pointer",
+            boxShadow: `0 6px 16px ${C.amber}55`,
+          }}
+        >
+          Fazer o teste
+        </button>
+      </div>
+    </header>
+  );
+}
+
+function PrimaryButton({
+  children,
+  onClick,
+  type = "button",
+  full,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: "button" | "submit";
+  full?: boolean;
+}) {
+  return (
+    <motion.button
+      type={type}
+      onClick={onClick}
+      whileHover={{ y: -3, boxShadow: `0 18px 36px ${C.amber}66` }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 260, damping: 18 }}
+      style={{
+        padding: "16px 28px",
+        borderRadius: 16,
+        background: `linear-gradient(180deg, ${C.amber}, ${C.amberDark})`,
+        color: "#fff",
+        border: "none",
+        fontWeight: 800,
+        fontSize: 17,
+        cursor: "pointer",
+        boxShadow: `0 10px 24px ${C.amber}55, inset 0 1px 0 rgba(255,255,255,0.3)`,
+        fontFamily: display,
+        letterSpacing: "-0.005em",
+        width: full ? "100%" : "auto",
+      }}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
+function SecondaryButton({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.97 }}
+      style={{
+        padding: "16px 24px",
+        borderRadius: 16,
+        background: "transparent",
+        color: C.deep,
+        border: `2px solid ${C.deep}33`,
+        fontWeight: 700,
+        fontSize: 16,
+        cursor: "pointer",
+        fontFamily: display,
+      }}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
+function Input({
+  placeholder,
+  value,
+  onChange,
+  type = "text",
+  required,
+}: {
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <input
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      type={type}
+      required={required}
+      style={{
+        padding: "16px 18px",
+        borderRadius: 12,
+        border: `2px solid ${C.sage}33`,
+        fontSize: 16,
+        outline: "none",
+        fontFamily: body,
+        background: "#FFFCF7",
+        transition: "border .2s",
+      }}
+      onFocus={(e) => (e.currentTarget.style.borderColor = C.amber)}
+      onBlur={(e) => (e.currentTarget.style.borderColor = `${C.sage}33`)}
+    />
+  );
+}
+
+function ProgressBar({ value, label }: { value: number; label: string }) {
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700, color: C.inkSoft, marginBottom: 8 }}>
+        <span>{label}</span>
+        <span style={{ color: C.amber }}>{Math.round(value * 100)}%</span>
+      </div>
+      <div style={{ height: 8, background: "rgba(27,58,47,0.08)", borderRadius: 999, overflow: "hidden" }}>
+        <motion.div
+          initial={false}
+          animate={{ width: `${value * 100}%` }}
+          transition={{ type: "spring", stiffness: 160, damping: 22 }}
+          style={{ height: "100%", background: `linear-gradient(90deg, ${C.sage}, ${C.amber})` }}
+        />
       </div>
     </div>
   );
 }
 
-export default function LandingQuiz() {
-  const [phase, setPhase] = useState<"landing" | "quiz" | "result">("landing");
-  const [score, setScore] = useState(0);
-  const [heroReady, setHeroReady] = useState(false);
-  const [fontsReady, setFontsReady] = useState(false);
-  const [minDelayPassed, setMinDelayPassed] = useState(false);
+function SectionHeader({ eyebrow, title, subtitle }: { eyebrow?: string; title: string; subtitle?: string }) {
+  return (
+    <div style={{ textAlign: "center" }}>
+      {eyebrow && (
+        <span
+          style={{
+            display: "inline-block",
+            padding: "6px 14px",
+            borderRadius: 999,
+            background: `${C.sage}22`,
+            color: C.sageDark,
+            fontWeight: 700,
+            fontSize: 12,
+            letterSpacing: 1,
+            textTransform: "uppercase",
+            marginBottom: 16,
+          }}
+        >
+          {eyebrow}
+        </span>
+      )}
+      <motion.h2
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        style={{
+          fontFamily: display,
+          fontSize: "clamp(28px, 4vw, 44px)",
+          fontWeight: 800,
+          color: C.deep,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.1,
+          maxWidth: 720,
+          margin: "0 auto",
+        }}
+      >
+        {title}
+      </motion.h2>
+      {subtitle && (
+        <p style={{ color: C.inkSoft, marginTop: 14, fontSize: 17, maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
+          {subtitle}
+        </p>
+      )}
+    </div>
+  );
+}
 
-  useLayoutEffect(() => {
-    document.documentElement.classList.add("lp-route");
-    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+function FeatureCard({ emoji, color, title, text }: { emoji: string; color: string; title: string; text: string }) {
+  return (
+    <TiltCard intensity={6}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        style={{
+          background: "#fff",
+          padding: 28,
+          borderRadius: 24,
+          border: `1px solid ${color}22`,
+          boxShadow: `0 16px 40px ${color}1f`,
+          minHeight: 240,
+          transform: "translateZ(0)",
+        }}
+      >
+        <div
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 16,
+            background: `${color}22`,
+            display: "grid",
+            placeItems: "center",
+            fontSize: 30,
+            marginBottom: 16,
+          }}
+        >
+          {emoji}
+        </div>
+        <h3 style={{ fontFamily: display, fontWeight: 800, fontSize: 22, color: C.deep, margin: "0 0 10px" }}>{title}</h3>
+        <p style={{ color: C.inkSoft, lineHeight: 1.55, margin: 0, fontSize: 15 }}>{text}</p>
+      </motion.div>
+    </TiltCard>
+  );
+}
 
-    const preload = document.createElement("link");
-    preload.rel = "preload";
-    preload.as = "image";
-    preload.href = heroImage;
-    preload.setAttribute("fetchpriority", "high");
-    document.head.appendChild(preload);
+function DemoSection() {
+  const [msgIdx, setMsgIdx] = useState(0);
+  const reduced = useReducedMotion();
+  const sequence = useMemo(
+    () => [
+      { who: "kid", text: "Por que as estrelas brilham?" },
+      { who: "kiko", text: "Porque elas são sóis gigantes muito longe! ✨" },
+      { who: "kiko", text: "Quer ouvir uma história sobre uma estrelinha curiosa?" },
+    ],
+    [],
+  );
 
-    document.title = "Kidzz — Sistema emocional para famílias modernas";
-    const meta = document.querySelector('meta[name="description"]') || document.createElement("meta");
-    meta.setAttribute("name", "description");
-    meta.setAttribute("content", "Faça o teste emocional de 60 segundos do Kidzz e descubra experiências de calma, vínculo e aprendizado para sua família.");
-    if (!meta.parentElement) document.head.appendChild(meta);
-
-    captureAttribution();
-    track("lp_view", { section: "landing" });
-
-    return () => {
-      document.documentElement.classList.remove("lp-route");
-      preload.remove();
-    };
-  }, []);
-
-  // Fonts ready signal (system stack resolves instantly, but await for safety on first paint)
   useEffect(() => {
-    let cancelled = false;
-    const fonts = (document as Document & { fonts?: { ready?: Promise<unknown> } }).fonts;
-    if (fonts?.ready) {
-      fonts.ready.then(() => { if (!cancelled) setFontsReady(true); }).catch(() => setFontsReady(true));
-    } else {
-      setFontsReady(true);
+    if (reduced) {
+      setMsgIdx(sequence.length);
+      return;
     }
-    return () => { cancelled = true; };
-  }, []);
-
-  // Minimum elegance delay so skeleton doesn't flash on instant loads
-  useEffect(() => {
-    const t = window.setTimeout(() => setMinDelayPassed(true), 220);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  // Hard fallback: never block UI more than 2.5s even if hero/fonts misbehave
-  useEffect(() => {
-    const t = window.setTimeout(() => { setHeroReady(true); setFontsReady(true); }, 2500);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-  }, [phase]);
-
-  const start = () => {
-    track("lp_quiz_start");
-    setPhase("quiz");
-  };
-
-  if (phase === "quiz") {
-    return <QuizExperience onClose={() => { track("lp_quiz_abandon"); setPhase("landing"); }} onFinish={(value) => { track("lp_quiz_complete", { score: value, max_score: QUESTIONS.length * 2 }); setScore(value); setPhase("result"); }} />;
-  }
-
-  if (phase === "result") {
-    return <Result score={score} onClose={() => setPhase("landing")} />;
-  }
-
-  const showSkeleton = !(heroReady && fontsReady && minDelayPassed);
+    const id = setInterval(() => setMsgIdx((i) => (i >= sequence.length ? 1 : i + 1)), 2200);
+    return () => clearInterval(id);
+  }, [sequence, reduced]);
 
   return (
-    <main className="relative min-h-screen overflow-x-clip" style={{ ...lpVars, background: S.bg, color: S.ink, fontFamily: bodyFont }}>
-      <LpBootSkeleton visible={showSkeleton} />
-      <Hero onStart={start} onHeroReady={() => setHeroReady(true)} />
-      <Identification />
-      <TestSection onStart={start} />
-      <HowItWorks />
-      <Experiences />
-      <SocialProof />
-      <FinalCTA onStart={start} />
-      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+30px)] pt-2 text-center">
-        <p className="text-[12px]" style={{ color: "hsl(var(--lp-ink) / 0.45)" }}>© {new Date().getFullYear()} Kidzz — Sistema emocional inteligente para famílias modernas.</p>
-      </footer>
-    </main>
+    <section style={{ padding: "120px 24px", background: `linear-gradient(180deg, ${C.cream} 0%, #F3E7D2 100%)` }}>
+      <div
+        style={{
+          maxWidth: 1100,
+          margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 60,
+          alignItems: "center",
+        }}
+        className="hero-grid"
+      >
+        <div>
+          <SectionHeader eyebrow="Demonstração" title="Veja o Kiko em ação." />
+          <p style={{ color: C.inkSoft, marginTop: 16, fontSize: 17, lineHeight: 1.55 }}>
+            Uma conversa real entre uma criança curiosa e o Kiko. Sem propaganda. Sem violência. Só descoberta.
+          </p>
+          <ul style={{ marginTop: 22, padding: 0, listStyle: "none", display: "grid", gap: 12 }}>
+            {["Respostas adaptadas à idade", "Tom carinhoso e sem julgamento", "Você acompanha tudo pelo painel dos pais"].map((t) => (
+              <li key={t} style={{ display: "flex", alignItems: "center", gap: 10, color: C.deep, fontWeight: 600 }}>
+                <span
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 999,
+                    background: C.sage,
+                    color: "#fff",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: 13,
+                  }}
+                >
+                  ✓
+                </span>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <PhoneMock>
+          <div style={{ padding: 18, display: "grid", gap: 10 }}>
+            {sequence.slice(0, msgIdx).map((m, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  alignSelf: m.who === "kid" ? "flex-end" : "flex-start",
+                  background: m.who === "kid" ? C.amber : "#fff",
+                  color: m.who === "kid" ? "#fff" : C.deep,
+                  padding: "12px 16px",
+                  borderRadius: 18,
+                  maxWidth: "85%",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  boxShadow: "0 6px 14px rgba(27,58,47,0.08)",
+                }}
+              >
+                {m.text}
+              </motion.div>
+            ))}
+          </div>
+        </PhoneMock>
+      </div>
+    </section>
+  );
+}
+
+function PhoneMock({ children }: { children: React.ReactNode }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      animate={reduced ? {} : { rotateY: [-6, 6, -6], y: [0, -8, 0] }}
+      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      style={{
+        margin: "0 auto",
+        width: 280,
+        height: 560,
+        borderRadius: 42,
+        background: "#1b1b1b",
+        padding: 12,
+        boxShadow: `0 40px 80px rgba(27,58,47,0.35), 0 0 0 1px rgba(255,255,255,0.05) inset`,
+        transformStyle: "preserve-3d",
+        perspective: 1000,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: 32,
+          background: `linear-gradient(180deg, ${C.cream}, #F3E7D2)`,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            padding: "14px 18px",
+            background: C.deep,
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontWeight: 700,
+            fontSize: 14,
+          }}
+        >
+          <span style={{ width: 8, height: 8, borderRadius: 999, background: C.sage }} />
+          Kiko • online
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>{children}</div>
+      </div>
+    </motion.div>
+  );
+}
+
+function TestimonialsSection() {
+  const items = [
+    { quote: "A primeira vez que meu filho pediu uma história em vez de outro vídeo, eu entendi.", who: "Marina, mãe do Theo" },
+    { quote: "Parece pequeno, mas mudou o clima da noite aqui em casa.", who: "Rafael, pai da Nina" },
+    { quote: "É acolhedor sem parecer infantilizado. Eu uso junto com ela.", who: "Camila, mãe da Lis" },
+  ];
+  return (
+    <section style={{ padding: "120px 24px", background: C.cream }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <SectionHeader eyebrow="Famílias reais" title="O que pais e mães estão dizendo." />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginTop: 48 }}>
+          {items.map((t, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+              style={{
+                background: "#fff",
+                padding: 28,
+                borderRadius: 22,
+                border: `1px solid ${C.sage}22`,
+                boxShadow: "0 12px 30px rgba(27,58,47,0.06)",
+              }}
+            >
+              <div style={{ color: C.gold, fontSize: 18 }}>★★★★★</div>
+              <p style={{ marginTop: 14, color: C.deep, lineHeight: 1.55, fontSize: 16, fontWeight: 500 }}>"{t.quote}"</p>
+              <p style={{ marginTop: 14, color: C.inkMuted, fontSize: 13, fontWeight: 700 }}>— {t.who}</p>
+            </motion.div>
+          ))}
+        </div>
+        <div
+          style={{
+            marginTop: 56,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+            gap: 20,
+            textAlign: "center",
+          }}
+        >
+          {[
+            { n: "+12 mil", t: "famílias" },
+            { n: "4.9★", t: "avaliação" },
+            { n: "+1M", t: "perguntas respondidas" },
+            { n: "98%", t: "recomendam" },
+          ].map((s) => (
+            <div key={s.t}>
+              <div style={{ fontFamily: display, fontWeight: 800, fontSize: 32, color: C.amber, letterSpacing: "-0.02em" }}>{s.n}</div>
+              <div style={{ color: C.inkMuted, fontSize: 13, fontWeight: 600, marginTop: 4 }}>{s.t}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PriceCard({
+  name,
+  price,
+  suffix,
+  perks,
+  highlight,
+  badge,
+  onClick,
+}: {
+  name: string;
+  price: string;
+  suffix: string;
+  perks: string[];
+  highlight?: boolean;
+  badge?: string;
+  onClick: () => void;
+}) {
+  return (
+    <TiltCard intensity={highlight ? 6 : 4}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        style={{
+          background: highlight ? `linear-gradient(180deg, #fff, #FFF4E2)` : "#fff",
+          padding: 32,
+          borderRadius: 24,
+          border: `2px solid ${highlight ? C.gold : `${C.sage}22`}`,
+          boxShadow: highlight ? `0 30px 60px ${C.gold}33` : "0 12px 30px rgba(27,58,47,0.08)",
+          position: "relative",
+          transform: highlight ? "scale(1.03)" : "none",
+        }}
+      >
+        {badge && (
+          <span
+            style={{
+              position: "absolute",
+              top: -14,
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: C.gold,
+              color: C.deep,
+              padding: "6px 14px",
+              borderRadius: 999,
+              fontWeight: 800,
+              fontSize: 12,
+              letterSpacing: 0.5,
+              textTransform: "uppercase",
+              boxShadow: `0 6px 16px ${C.gold}66`,
+            }}
+          >
+            {badge}
+          </span>
+        )}
+        <div style={{ fontWeight: 700, color: C.inkSoft, fontSize: 14, letterSpacing: 1, textTransform: "uppercase" }}>{name}</div>
+        <div style={{ marginTop: 12, display: "flex", alignItems: "baseline", gap: 4 }}>
+          <span style={{ fontFamily: display, fontSize: 44, fontWeight: 800, color: C.deep, letterSpacing: "-0.02em" }}>{price}</span>
+          <span style={{ color: C.inkMuted, fontWeight: 600 }}>{suffix}</span>
+        </div>
+        <ul style={{ marginTop: 20, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
+          {perks.map((p) => (
+            <li key={p} style={{ display: "flex", alignItems: "center", gap: 10, color: C.deep, fontSize: 15, fontWeight: 500 }}>
+              <span style={{ color: C.sage, fontWeight: 800 }}>✓</span>
+              {p}
+            </li>
+          ))}
+        </ul>
+        <div style={{ marginTop: 24 }}>
+          <PrimaryButton onClick={onClick} full>
+            {highlight ? "Quero o anual ✨" : "Quero o mensal"}
+          </PrimaryButton>
+        </div>
+      </motion.div>
+    </TiltCard>
+  );
+}
+
+function Footer() {
+  return (
+    <footer style={{ padding: "40px 24px", background: C.deep, color: "rgba(255,248,240,0.7)", fontSize: 13 }}>
+      <div
+        style={{
+          maxWidth: 1100,
+          margin: "0 auto",
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 16,
+          alignItems: "center",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              background: `linear-gradient(135deg, ${C.amber}, ${C.gold})`,
+              color: "#fff",
+              fontWeight: 800,
+              display: "grid",
+              placeItems: "center",
+              fontFamily: display,
+            }}
+          >
+            K
+          </div>
+          <span style={{ color: C.cream, fontWeight: 700 }}>Kidzz</span>
+        </div>
+        <nav style={{ display: "flex", gap: 22 }}>
+          <a href="/privacy" style={{ color: "inherit", textDecoration: "none" }}>
+            Privacidade
+          </a>
+          <a href="/privacy" style={{ color: "inherit", textDecoration: "none" }}>
+            Termos
+          </a>
+          <a href="mailto:kidzz.ia@icloud.com" style={{ color: "inherit", textDecoration: "none" }}>
+            Contato
+          </a>
+        </nav>
+        <span>© 2026 Kidzz · Feito com 💛 no Brasil</span>
+      </div>
+    </footer>
   );
 }
