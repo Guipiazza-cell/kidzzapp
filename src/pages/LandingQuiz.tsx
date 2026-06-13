@@ -1274,7 +1274,7 @@ function DemoSection() {
         <div>
           <SectionHeader eyebrow="Demonstração" title="Veja o Kidzz em ação." />
           <p style={{ color: C.inkSoft, marginTop: 16, fontSize: 17, lineHeight: 1.55 }}>
-            Uma conversa real entre uma criança curiosa e o Kiko. Sem propaganda. Sem violência. Só descoberta.
+            Uma conversa real entre uma criança curiosa e o Kidzz. Sem propaganda. Sem violência. Só descoberta.
           </p>
           <ul style={{ marginTop: 22, padding: 0, listStyle: "none", display: "grid", gap: 12 }}>
             {["Respostas adaptadas à idade", "Tom carinhoso e sem julgamento", "Você acompanha tudo pelo painel dos pais"].map((t) => (
