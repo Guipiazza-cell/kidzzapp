@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import mascotAsset from "@/assets/kidzz-mascot.png.asset.json";
+import mascotAsset from "@/assets/kidzz-chameleon.png.asset.json";
 import { haptic } from "@/lib/haptics";
 import { captureAttribution, track, withAttribution } from "@/lib/lpAnalytics";
 
