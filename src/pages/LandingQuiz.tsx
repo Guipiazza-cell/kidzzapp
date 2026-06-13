@@ -901,30 +901,6 @@ export default function LandingQuiz() {
       {/* TESTIMONIALS */}
       <TestimonialsSection />
 
-      {/* PRICING */}
-      <section style={{ padding: "120px 24px", background: `linear-gradient(180deg, ${C.cream} 0%, #FBEDD6 100%)` }}>
-        <div style={{ maxWidth: 980, margin: "0 auto" }}>
-          <SectionHeader eyebrow="Planos" title="Comece grátis. Continue por menos de R$ 0,66 por dia." />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24, marginTop: 48 }}>
-            <PriceCard
-              name="Mensal"
-              price="R$ 19,90"
-              suffix="/mês"
-              perks={["Tudo do Kidzz", "Cancele quando quiser", "Garantia de 7 dias"]}
-              onClick={() => goApp("price_monthly")}
-            />
-            <PriceCard
-              highlight
-              name="Anual"
-              price="R$ 149"
-              suffix="/ano"
-              badge="Mais escolhido"
-              perks={["Equivale a R$ 12,42/mês", "2 meses grátis", "Garantia de 7 dias"]}
-              onClick={() => goApp("price_annual")}
-            />
-          </div>
-        </div>
-      </section>
 
       {/* FINAL CTA */}
       <section style={{ padding: "120px 24px", background: C.deep, color: C.cream, position: "relative", overflow: "hidden" }}>
