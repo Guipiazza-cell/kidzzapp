@@ -520,6 +520,7 @@ export default function LandingQuiz() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.24 }}
+              className="cta-row"
               style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}
             >
               <PrimaryButton onClick={startQuiz}>Fazer o teste grátis ✨</PrimaryButton>
@@ -531,6 +532,7 @@ export default function LandingQuiz() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
+              className="meta-row"
               style={{ display: "flex", gap: 18, marginTop: 28, color: C.inkMuted, fontSize: 13, flexWrap: "wrap" }}
             >
               <span>⭐ 4.9 nas avaliações</span>
@@ -965,6 +967,8 @@ export default function LandingQuiz() {
         @media (max-width: 820px) {
           .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
           .hero-grid > div:last-child { order: -1; }
+          .hero-grid h1, .hero-grid p { margin-left: auto !important; margin-right: auto !important; }
+          .hero-grid .cta-row, .hero-grid .meta-row { justify-content: center !important; }
           .quiz-grid { grid-template-columns: 1fr !important; }
           .quiz-kiko { display: none !important; }
         }
