@@ -119,14 +119,16 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
                     <button
                       type="button"
                       onClick={onClose}
-                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+                      className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
                       style={{
                         background: "hsl(0 0% 100% / 0.75)",
                         border: "1px solid hsl(0 0% 100% / 0.7)",
+                        position: "relative",
+                        top: "calc(env(safe-area-inset-top, 0px) + 12px)",
                       }}
                       aria-label="Fechar"
                     >
-                      <X size={16} style={{ color: "hsl(var(--premium-ink))" }} />
+                      <X size={20} style={{ color: "hsl(var(--premium-ink))" }} />
                     </button>
                   </header>
 
@@ -140,7 +142,7 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.04, duration: 0.3 }}
                         whileTap={{ scale: 0.97 }}
-                        className="relative text-left p-3.5 rounded-3xl overflow-hidden"
+                        className="relative text-left p-3.5 rounded-3xl overflow-hidden min-h-14"
                         style={{
                           background: "hsl(0 0% 100% / 0.82)",
                           backdropFilter: "blur(10px)",
