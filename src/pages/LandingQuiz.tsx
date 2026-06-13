@@ -171,25 +171,6 @@ function Kiko({
   );
 }
 
-function EyeDot({ baseLeft, baseTop, offset, size }: { baseLeft: string; baseTop: string; offset: { x: number; y: number }; size: number }) {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: baseLeft,
-        top: baseTop,
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        background: "rgba(10,10,30,0.85)",
-        transform: `translate(${offset.x * 6}px, ${offset.y * 4}px)`,
-        transition: "transform 0.35s cubic-bezier(.2,.8,.2,1)",
-        pointerEvents: "none",
-        boxShadow: "0 0 4px rgba(255,255,255,0.4) inset",
-      }}
-    />
-  );
-}
 
 // ─────────────────────────────────────────────
 // Floating golden firefly particles
@@ -863,7 +844,7 @@ export default function LandingQuiz() {
               emoji="🧠"
               color={C.amber}
               title="Responde"
-              text="Curiosidade que vira conversa. O Kiko responde qualquer pergunta do seu filho com carinho e na medida da idade."
+              text="Curiosidade que vira conversa. O Kidzz responde qualquer pergunta do seu filho com carinho e na medida da idade."
             />
             <FeatureCard
               emoji="📖"
@@ -1291,7 +1272,7 @@ function DemoSection() {
         className="hero-grid"
       >
         <div>
-          <SectionHeader eyebrow="Demonstração" title="Veja o Kiko em ação." />
+          <SectionHeader eyebrow="Demonstração" title="Veja o Kidzz em ação." />
           <p style={{ color: C.inkSoft, marginTop: 16, fontSize: 17, lineHeight: 1.55 }}>
             Uma conversa real entre uma criança curiosa e o Kiko. Sem propaganda. Sem violência. Só descoberta.
           </p>
@@ -1389,7 +1370,7 @@ function PhoneMock({ children }: { children: React.ReactNode }) {
           }}
         >
           <span style={{ width: 8, height: 8, borderRadius: 999, background: C.sage }} />
-          Kiko • online
+          Kidzz • online
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>{children}</div>
       </div>
