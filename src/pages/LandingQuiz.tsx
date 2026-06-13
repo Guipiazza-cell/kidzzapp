@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import kikoAsset from "@/assets/kiko-hero.png.asset.json";
+import mascotAsset from "@/assets/kidzz-mascot.png.asset.json";
 import { haptic } from "@/lib/haptics";
 import { captureAttribution, track, withAttribution } from "@/lib/lpAnalytics";
 
@@ -32,7 +32,7 @@ const lpVars = {
 } as CSSProperties & Record<string, string>;
 
 // ─────────────────────────────────────────────
-// Kiko — animated mascot with cursor eye-tracking
+// Kidzz — animated mascot with ambient forest backdrop
 // ─────────────────────────────────────────────
 type KikoMood = "idle" | "happy" | "empathy" | "thinking" | "wave";
 
@@ -40,10 +40,12 @@ function Kiko({
   size = 360,
   mood = "idle",
   reactive = true,
+  ambient = true,
 }: {
   size?: number;
   mood?: KikoMood;
   reactive?: boolean;
+  ambient?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -67,53 +69,79 @@ function Kiko({
 
   const breath = reduced ? {} : { y: [0, -8, 0], rotate: [0, mood === "wave" ? 4 : 1.2, 0] };
   const breathTr = { duration: mood === "happy" ? 1.6 : 3.4, repeat: Infinity, ease: "easeInOut" as const };
-
-  // Mood-driven head tilt
   const tilt = mood === "empathy" ? -4 : mood === "happy" ? 3 : 0;
 
   return (
     <div ref={ref} style={{ width: size, height: size, position: "relative" }} aria-hidden>
-      {/* Halo */}
-      <motion.div
-        style={{
-          position: "absolute",
-          inset: "-12%",
-          borderRadius: "50%",
-          background: `radial-gradient(closest-side, ${C.amber}33, transparent 70%)`,
-          filter: "blur(8px)",
-        }}
-        animate={reduced ? {} : { scale: [1, 1.08, 1], opacity: [0.7, 1, 0.7] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* Ambient forest backdrop — soft glowing clearing */}
+      {ambient && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              inset: "-6%",
+              borderRadius: "50%",
+              background: `radial-gradient(closest-side, ${C.sage}55 0%, ${C.sage}22 38%, transparent 70%)`,
+              filter: "blur(2px)",
+            }}
+          />
+          <motion.div
+            style={{
+              position: "absolute",
+              inset: "8%",
+              borderRadius: "50%",
+              background: `radial-gradient(closest-side, ${C.gold}55, ${C.amber}22 55%, transparent 75%)`,
+              filter: "blur(10px)",
+              mixBlendMode: "screen",
+            }}
+            animate={reduced ? {} : { scale: [1, 1.08, 1], opacity: [0.75, 1, 0.75] }}
+            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+          {/* Subtle leaf silhouettes for forest framing */}
+          <svg
+            viewBox="0 0 200 200"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", opacity: 0.55 }}
+          >
+            <defs>
+              <radialGradient id="leafFade" cx="50%" cy="55%" r="55%">
+                <stop offset="60%" stopColor={C.sageDark} stopOpacity="0" />
+                <stop offset="100%" stopColor={C.sageDark} stopOpacity="0.55" />
+              </radialGradient>
+            </defs>
+            <g fill={C.sageDark}>
+              <ellipse cx="22" cy="60" rx="22" ry="10" transform="rotate(-30 22 60)" opacity="0.35" />
+              <ellipse cx="178" cy="70" rx="24" ry="11" transform="rotate(28 178 70)" opacity="0.35" />
+              <ellipse cx="32" cy="150" rx="26" ry="11" transform="rotate(18 32 150)" opacity="0.30" />
+              <ellipse cx="172" cy="160" rx="22" ry="10" transform="rotate(-20 172 160)" opacity="0.30" />
+            </g>
+            <circle cx="100" cy="105" r="98" fill="url(#leafFade)" />
+          </svg>
+        </>
+      )}
       <motion.div
         style={{ width: "100%", height: "100%", position: "relative", transform: `rotate(${tilt}deg)` }}
         animate={breath}
         transition={breathTr}
       >
         <img
-          src={kikoAsset.url}
-          alt="Kiko, o camaleão do Kidzz"
+          src={mascotAsset.url}
+          alt="Kidzz, o amiguinho da floresta"
           width={size}
           height={size}
           style={{
             width: "100%",
             height: "100%",
             objectFit: "contain",
-            filter: "drop-shadow(0 30px 40px rgba(27,58,47,0.35))",
+            filter: `drop-shadow(0 18px 26px rgba(27,58,47,0.35)) drop-shadow(0 0 22px ${C.gold}55)`,
             transform: `translate(${offset.x * 8}px, ${offset.y * 6}px)`,
             transition: "transform 0.4s cubic-bezier(.2,.8,.2,1)",
+            position: "relative",
+            zIndex: 2,
           }}
           loading="eager"
           decoding="async"
           fetchPriority="high"
         />
-        {/* Eye-tracking overlays */}
-        {reactive && !reduced && (
-          <>
-            <EyeDot baseLeft="33%" baseTop="29%" offset={offset} size={size * 0.022} />
-            <EyeDot baseLeft="55%" baseTop="29%" offset={offset} size={size * 0.022} />
-          </>
-        )}
       </motion.div>
       {/* Sparkles for happy */}
       {mood === "happy" && !reduced && (
@@ -131,6 +159,7 @@ function Kiko({
                 background: C.gold,
                 boxShadow: `0 0 12px ${C.gold}`,
                 pointerEvents: "none",
+                zIndex: 3,
               }}
               animate={{ y: [0, -20, 0], opacity: [0, 1, 0], scale: [0.6, 1.2, 0.6] }}
               transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.18 }}
