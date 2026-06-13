@@ -73,49 +73,31 @@ function Kiko({
 
   return (
     <div ref={ref} style={{ width: size, height: size, position: "relative" }} aria-hidden>
-      {/* Ambient forest backdrop — soft glowing clearing */}
+      {/* Ambient glow that bleeds the mascot into the page */}
       {ambient && (
         <>
-          <div
-            style={{
-              position: "absolute",
-              inset: "-6%",
-              borderRadius: "50%",
-              background: `radial-gradient(closest-side, ${C.sage}55 0%, ${C.sage}22 38%, transparent 70%)`,
-              filter: "blur(2px)",
-            }}
-          />
           <motion.div
             style={{
               position: "absolute",
-              inset: "8%",
+              inset: "-10%",
               borderRadius: "50%",
-              background: `radial-gradient(closest-side, ${C.gold}55, ${C.amber}22 55%, transparent 75%)`,
-              filter: "blur(10px)",
-              mixBlendMode: "screen",
+              background: `radial-gradient(closest-side, ${C.gold}40 0%, ${C.amber}1f 40%, transparent 72%)`,
+              filter: "blur(14px)",
+              pointerEvents: "none",
             }}
-            animate={reduced ? {} : { scale: [1, 1.08, 1], opacity: [0.75, 1, 0.75] }}
-            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+            animate={reduced ? {} : { scale: [1, 1.06, 1], opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
           />
-          {/* Subtle leaf silhouettes for forest framing */}
-          <svg
-            viewBox="0 0 200 200"
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", opacity: 0.55 }}
-          >
-            <defs>
-              <radialGradient id="leafFade" cx="50%" cy="55%" r="55%">
-                <stop offset="60%" stopColor={C.sageDark} stopOpacity="0" />
-                <stop offset="100%" stopColor={C.sageDark} stopOpacity="0.55" />
-              </radialGradient>
-            </defs>
-            <g fill={C.sageDark}>
-              <ellipse cx="22" cy="60" rx="22" ry="10" transform="rotate(-30 22 60)" opacity="0.35" />
-              <ellipse cx="178" cy="70" rx="24" ry="11" transform="rotate(28 178 70)" opacity="0.35" />
-              <ellipse cx="32" cy="150" rx="26" ry="11" transform="rotate(18 32 150)" opacity="0.30" />
-              <ellipse cx="172" cy="160" rx="22" ry="10" transform="rotate(-20 172 160)" opacity="0.30" />
-            </g>
-            <circle cx="100" cy="105" r="98" fill="url(#leafFade)" />
-          </svg>
+          <div
+            style={{
+              position: "absolute",
+              inset: "-4%",
+              borderRadius: "50%",
+              background: `radial-gradient(closest-side, ${C.sage}33 0%, transparent 68%)`,
+              filter: "blur(6px)",
+              pointerEvents: "none",
+            }}
+          />
         </>
       )}
       <motion.div
@@ -125,14 +107,21 @@ function Kiko({
       >
         <img
           src={mascotAsset.url}
-          alt="Kidzz, o amiguinho da floresta"
+          alt="Kidzz, o camaleão da floresta"
           width={size}
           height={size}
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "contain",
-            filter: `drop-shadow(0 18px 26px rgba(27,58,47,0.35)) drop-shadow(0 0 22px ${C.gold}55)`,
+            objectFit: "cover",
+            objectPosition: "center",
+            borderRadius: "50%",
+            // Soft circular vignette so the image's forest background fades into the page
+            WebkitMaskImage:
+              "radial-gradient(circle at 50% 50%, #000 52%, rgba(0,0,0,0.85) 64%, rgba(0,0,0,0.35) 80%, transparent 96%)",
+            maskImage:
+              "radial-gradient(circle at 50% 50%, #000 52%, rgba(0,0,0,0.85) 64%, rgba(0,0,0,0.35) 80%, transparent 96%)",
+            filter: `drop-shadow(0 22px 30px rgba(27,58,47,0.30))`,
             transform: `translate(${offset.x * 8}px, ${offset.y * 6}px)`,
             transition: "transform 0.4s cubic-bezier(.2,.8,.2,1)",
             position: "relative",
