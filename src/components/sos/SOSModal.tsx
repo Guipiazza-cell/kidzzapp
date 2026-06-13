@@ -88,7 +88,14 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
               <span className="block w-10 h-1 rounded-full" style={{ background: "hsl(0 0% 70%)" }} />
             </div>
 
-            <div className="flex-1 min-h-0 px-5 pt-2">
+            <div
+              className="flex-1 min-h-0 px-5 pt-2 overflow-y-auto overscroll-contain"
+              style={{
+                maxHeight: "88vh",
+                WebkitOverflowScrolling: "touch",
+                paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 32px)",
+              }}
+            >
               {!selected ? (
                 <>
                   <header className="flex items-start justify-between mb-4">
