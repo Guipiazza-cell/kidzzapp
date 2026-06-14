@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import MagicalBackground from "@/components/MagicalBackground";
 import { toast } from "sonner";
@@ -12,7 +12,9 @@ type Mode = "login" | "signup" | "forgot";
 const Auth = () => {
   const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>("login");
+  const location = useLocation();
+  const isCheckoutFlow = new URLSearchParams(location.search).get("checkout") === "1";
+  const [mode, setMode] = useState<Mode>(() => isCheckoutFlow ? "signup" : "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -20,8 +22,8 @@ const Auth = () => {
 
   // Já logado? Vai direto pra home (evita tela "travada")
   useEffect(() => {
-    if (user) navigate("/", { replace: true });
-  }, [user, navigate]);
+    if (user && !isCheckoutFlow) navigate("/", { replace: true });
+  }, [user, isCheckoutFlow, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +52,7 @@ const Auth = () => {
           toast.error(error);
         } else {
           toast.success("Conta criada! Entrando... 🎉");
-          navigate("/", { replace: true });
+          if (!isCheckoutFlow) navigate("/", { replace: true });
         }
       } else {
         const { error } = await signIn(email, password);
@@ -58,7 +60,7 @@ const Auth = () => {
           console.error("Login error:", error);
           toast.error(error);
         } else {
-          navigate("/", { replace: true });
+          if (!isCheckoutFlow) navigate("/", { replace: true });
         }
       }
     } catch {
