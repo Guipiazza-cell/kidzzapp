@@ -75,8 +75,9 @@ serve(async (req) => {
     if (!response.ok) {
       const errText = await response.text();
       console.error("ElevenLabs STT error:", response.status, errText);
+      // SECURITY: never expose upstream API error bodies to the client.
       return new Response(
-        JSON.stringify({ error: "Transcription failed", details: errText }),
+        JSON.stringify({ error: "Transcription failed" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

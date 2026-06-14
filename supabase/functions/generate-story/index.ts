@@ -38,7 +38,44 @@ serve(async (req) => {
       });
     }
 
-    const { childName, childAvatar, age, interests, ageRange } = await req.json();
+    const body = await req.json().catch(() => ({}));
+
+    // SECURITY: sanitize all user-controlled strings to prevent prompt injection.
+    const sanitize = (s: unknown, max: number) =>
+      String(s ?? "")
+        .replace(/[\r\n\t]+/g, " ")
+        .replace(/[`<>{}]/g, "")
+        .replace(/\b(ignore|disregard|forget|system prompt|jailbreak|act as)\b/gi, "")
+        .trim()
+        .slice(0, max);
+
+    const ALLOWED = {
+      skinTone: ["light", "medium", "tan", "dark", "claro", "moreno", "negro", "pardo"],
+      hairColor: ["black", "brown", "blonde", "red", "preto", "castanho", "loiro", "ruivo", "branco"],
+      eyeColor: ["brown", "blue", "green", "hazel", "castanho", "azul", "verde", "mel"],
+      clothingStyle: ["casual", "esportivo", "elegante", "fantasia", "aventura", "princesa"],
+    } as const;
+    const pickAllowed = (v: unknown, allowed: readonly string[]) => {
+      const s = String(v ?? "").toLowerCase().slice(0, 30);
+      return allowed.find((a) => a === s) ?? null;
+    };
+
+    const childName = sanitize(body.childName, 50);
+    const interests = sanitize(body.interests, 200);
+    const ageRange = sanitize(body.ageRange, 10);
+    const ageNum = Math.max(0, Math.min(18, Number(body.age) || 0));
+    const age = ageNum || "";
+
+    const rawAvatar = body.childAvatar && typeof body.childAvatar === "object" ? body.childAvatar : null;
+    const childAvatar = rawAvatar
+      ? {
+          skinTone: pickAllowed(rawAvatar.skinTone, ALLOWED.skinTone),
+          hairColor: pickAllowed(rawAvatar.hairColor, ALLOWED.hairColor),
+          eyeColor: pickAllowed(rawAvatar.eyeColor, ALLOWED.eyeColor),
+          clothingStyle: pickAllowed(rawAvatar.clothingStyle, ALLOWED.clothingStyle),
+        }
+      : null;
+    const avatarValid = childAvatar && childAvatar.skinTone && childAvatar.hairColor && childAvatar.eyeColor && childAvatar.clothingStyle;
 
     if (!childName || !age || !interests) {
       return new Response(
@@ -107,8 +144,8 @@ serve(async (req) => {
 
 REGRA DE OURO: antes de entregar, imagine um pai/mãe lendo em voz alta pro filho dormir. Se não for encantadora, calorosa e fluida assim, reescreva.`;
 
-    const avatarDesc = childAvatar
-      ? `com tom de pele ${childAvatar.skinTone}, cabelo ${childAvatar.hairColor}, olhos ${childAvatar.eyeColor}, vestindo ${childAvatar.clothingStyle}`
+    const avatarDesc = avatarValid
+      ? `com tom de pele ${childAvatar!.skinTone}, cabelo ${childAvatar!.hairColor}, olhos ${childAvatar!.eyeColor}, vestindo ${childAvatar!.clothingStyle}`
       : "";
 
     const userPrompt = `Crie uma história INESQUECÍVEL para ${childName} (${age} anos${avatarDesc ? `, ${avatarDesc}` : ""}) que adora ${interests}.
