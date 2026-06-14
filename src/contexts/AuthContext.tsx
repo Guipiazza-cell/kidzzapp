@@ -501,6 +501,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [session]);
 
+  // Retoma o checkout automaticamente após o login (se havia plano pendente)
+  useEffect(() => {
+    if (!session?.access_token) return;
+    let pending: string | null = null;
+    try { pending = sessionStorage.getItem("kidzz_pending_plan"); } catch {}
+    if (!pending) return;
+    try { sessionStorage.removeItem("kidzz_pending_plan"); } catch {}
+    // pequena espera pra garantir que profile/sub estejam prontos
+    const t = setTimeout(() => {
+      handleCheckout(pending as CheckoutPlan);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [session, handleCheckout]);
+
   const openCustomerPortal = useCallback(async () => {
     if (!session?.access_token) {
       const { toast } = await import("sonner");
