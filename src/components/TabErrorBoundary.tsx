@@ -11,6 +11,7 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error?: string;
 }
 
 /**
