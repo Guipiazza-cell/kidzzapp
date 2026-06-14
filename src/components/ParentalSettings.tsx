@@ -16,11 +16,8 @@ const AGE_RANGES = [
 { range: "3-7", label: "3 a 7 anos", emoji: "🧒", description: "Historinhas e exemplos do dia a dia." },
 { range: "7-10", label: "7 a 10 anos", emoji: "🧑‍🎓", description: "Curiosidades e desafios científicos." }];
 
-type BillingPeriod = "monthly" | "annual";
-
-
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
-  const { user, profile, tier, updateProfile, signOut, signIn, signUp, handleCheckout, openCustomerPortal } = useAuth();
+  const { user, profile, tier, updateProfile, signOut, signIn, signUp, openCustomerPortal } = useAuth();
   const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
   const navigate = useNavigate();
   const currentAge = profile?.age_range || "3-7";
@@ -32,12 +29,8 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [affInput, setAffInput] = useState("");
   const [copied, setCopied] = useState(false);
-  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("annual");
-
-  const currentPlan = tier === "premium" ? "super_premium" : isPremium ? "premium" : "free";
 
   const handleAgeChange = async (range: string) => {
     await updateProfile({ age_range: range });
@@ -55,12 +48,12 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
     try {
       if (authMode === "signup") {
         const { error } = await signUp(email, password);
-        if (error) toast.error(error);else
-        toast.success("Conta criada com sucesso! 🎉");
+        if (error) toast.error(error);
+        else toast.success("Conta criada com sucesso! 🎉");
       } else {
         const { error } = await signIn(email, password);
-        if (error) toast.error(error);else
-        toast.success("Login realizado! 🎉");
+        if (error) toast.error(error);
+        else toast.success("Login realizado! 🎉");
       }
       setShowAuth(false);
     } catch {
@@ -70,20 +63,6 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
     }
   };
 
-  const onPlanCheckout = async (planId: string) => {
-    if (planId === "free") return;
-    if (!user) {
-      toast.error("Crie uma conta primeiro para assinar!");
-      setShowAuth(true);
-      return;
-    }
-    setCheckoutLoading(planId);
-    try {
-      await handleCheckout(planId as any);
-    } finally {
-      setCheckoutLoading(null);
-    }
-  };
 
   return (
     <motion.div
