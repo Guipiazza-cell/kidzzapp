@@ -348,7 +348,11 @@ const Wrapper = ({ onClose, children }: { onClose: () => void; children: React.R
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 40, opacity: 0 }}
       transition={{ type: "spring", stiffness: 240, damping: 26 }}
-      className="bg-card w-full max-w-md sm:rounded-3xl rounded-t-3xl p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto"
+      className="bg-card w-full max-w-md sm:rounded-3xl rounded-t-3xl p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto overscroll-contain"
+      style={{
+        WebkitOverflowScrolling: "touch",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
+      }}
     >
       <button
         onClick={onClose}
