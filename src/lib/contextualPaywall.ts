@@ -31,10 +31,10 @@ export function getPaywallCopy(
     case "question_limit":
       return {
         emoji: "🔥",
-        headline: `Você já fez ${meta?.count ?? "várias"} perguntas com ${name} hoje! 🔥`,
-        subheadline: "Continue alimentando essa curiosidade — desbloqueie 10 perguntas por dia.",
+        headline: `O Kidzz ficou um pouco sonolento por aqui 😴`,
+        subheadline: `Vamos descansar e voltar amanhã? Ou desbloqueie e siga a aventura com ${name} à vontade.`,
         cta: "✨ Continuar a aventura",
-        highlight: "+10 perguntas/dia",
+        highlight: "Perguntas à vontade",
       };
     case "story_limit":
       return {
