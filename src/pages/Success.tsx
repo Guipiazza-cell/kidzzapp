@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { Sparkles, Check, Crown, Loader2 } from "lucide-react";
 import MagicalBackground from "@/components/MagicalBackground";
 import pixelImg from "@/assets/pixel-chameleon.webp";
