@@ -44,7 +44,9 @@ const CONTINUITY_ICONS = {
 const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
   const { profile, user } = useAuth();
   const { toast } = useToast();
-  const isPremium = profile?.is_premium ?? false;
+  const { canUse } = useEntitlement();
+  // SOS Emocional exige Premium.
+  const isPremium = canUse("sos");
   const [step, setStep] = useState<Step>("acolhimento");
   const [muted, setMuted] = useState(false);
   const [selectedContinuity, setSelectedContinuity] = useState<string | null>(null);

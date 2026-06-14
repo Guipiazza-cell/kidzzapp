@@ -286,8 +286,10 @@ const PeriodSection = ({
 const RoutineScreen = () => {
   const { profile } = useAuth();
   const { addMemory } = useMemories();
+  const { canUse } = useEntitlement();
   const childName = profile?.child_name || "amigo";
-  const isPremium = profile?.is_premium ?? false;
+  // Rotina exige Premium.
+  const isPremium = canUse("rotina");
   const mascotConfig = useMemo(() => loadMascotConfig(), []);
   const hue = HUE_MAP[mascotConfig.colorId] ?? 0;
 

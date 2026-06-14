@@ -19,7 +19,9 @@ const FREE_MISSIONS = 1;
 
 const MomentsFactory = ({ onBack }: Props) => {
   const { profile } = useAuth();
-  const isPremium = profile?.is_premium ?? false;
+  const { canUse } = useEntitlement();
+  // Momentos exige Premium.
+  const isPremium = canUse("momentos");
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [purchasing, setPurchasing] = useState<string | null>(null);

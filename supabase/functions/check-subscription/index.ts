@@ -145,6 +145,18 @@ serve(async (req) => {
             plan_end_date: subscriptionEnd,
             tier: bestTier,
           }).eq("id", user.id);
+
+          // CRITICAL: sync the `subscriptions` table — useEntitlement / get_effective_plan reads from here.
+          // Without this row, kidzz/premium users fall back to "free" in the entitlement system.
+          await supabaseClient.from("subscriptions").upsert({
+            user_id: user.id,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: allSubs[0]?.id ?? null,
+            plan: bestTier,
+            status: "active",
+            current_period_end: subscriptionEnd,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: "user_id" });
         }
       } else {
         logStep("No Stripe customer found");

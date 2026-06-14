@@ -4,6 +4,7 @@ import ExperiencePlayer from "./ExperiencePlayer";
 import { KALM_SECTIONS, findExperience, type KalmExperience } from "./experiences";
 import { checkKalmAccess, recordKalmUsage } from "./access";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { useToast } from "@/hooks/use-toast";
 import { KALM_BRAND } from "./kalmBrand";
 import { Leaf } from "lucide-react";
@@ -16,7 +17,9 @@ interface Props {
 const KalmSections = ({ initialExperienceId, onConsumedInitial }: Props) => {
   const { profile } = useAuth();
   const { toast } = useToast();
-  const isPremium = profile?.is_premium ?? false;
+  const { canUse } = useEntitlement();
+  // KALM completo exige Premium (kidzz não libera).
+  const isPremium = canUse("kalm");
   const [active, setActive] = useState<KalmExperience | null>(null);
 
   const openExperience = useCallback((exp: KalmExperience) => {

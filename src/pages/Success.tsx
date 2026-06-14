@@ -108,8 +108,9 @@ const Success = () => {
   }, [profile?.is_premium, confirmed]);
 
   const childName = profile?.child_name || "seu filho";
-  const planKey = tier === "premium" ? "super_premium" : "premium";
-  const plan = PLAN_INFO[planKey];
+  // Mostra os perks reais do plano contratado (kidzz ≠ premium).
+  const planKey = tier === "premium" ? "premium" : "kidzz";
+  const plan = PLAN_INFO[planKey] ?? PLAN_INFO.kidzz;
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden relative bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 
 export interface Memory {
   id: string;
@@ -17,11 +18,13 @@ export interface Memory {
 type MemoryFilter = "all" | "question" | "story" | "mission" | "achievement";
 
 export function useMemories() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { canUse } = useEntitlement();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<MemoryFilter>("all");
-  const isPremium = profile?.is_premium ?? false;
+  // Memórias completas liberadas no Kidzz e no Premium.
+  const isPremium = canUse("memorias");
 
   const fetchMemories = useCallback(async () => {
     if (!user) { setMemories([]); setLoading(false); return; }

@@ -190,7 +190,9 @@ type DreamView = "main" | "story" | "playing" | "presleep";
 
 const DreamWorld = ({ onBack }: Props) => {
   const { profile, handleCheckout } = useAuth();
-  const isPremium = profile?.is_premium === true;
+  const { canUse } = useEntitlement();
+  // Sonhos exige plano Premium (kidzz NÃO libera).
+  const isPremium = canUse("sonhos");
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
   const interests = (profile as any)?.child_interests as string[] | undefined;
