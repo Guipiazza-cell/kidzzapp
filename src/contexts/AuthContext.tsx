@@ -527,7 +527,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         data = await attempt();
       }
       if (data?.url) {
-        window.location.href = data.url;
+        console.log("[Checkout] Redirecting to Stripe:", data.url);
+        // Stripe Checkout sends X-Frame-Options: DENY → can't load in iframe (preview/PWA).
+        // Try top-window navigation first; fall back to a new tab if blocked by sandbox.
+        try {
+          if (window.top && window.top !== window.self) {
+            window.top.location.href = data.url;
+          } else {
+            window.location.href = data.url;
+          }
+        } catch {
+          const opened = window.open(data.url, "_blank", "noopener,noreferrer");
+          if (!opened) {
+            const { toast } = await import("sonner");
+            toast.error("Permita pop-ups para abrir o pagamento", {
+              description: "Ou copie e cole: " + data.url,
+            });
+          }
+        }
         return;
       }
       const { toast } = await import("sonner");
