@@ -27,6 +27,7 @@ import {
 import { showXpGained } from "@/components/flow/XpToast";
 import { haptic } from "@/lib/haptics";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { useMemories } from "@/hooks/useMemories";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";

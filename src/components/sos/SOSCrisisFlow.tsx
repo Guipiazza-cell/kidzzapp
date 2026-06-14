@@ -10,6 +10,7 @@ import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { trackConnection } from "@/lib/connection";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { SosSituation } from "./situations";

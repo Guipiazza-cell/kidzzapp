@@ -15,6 +15,7 @@ import {
 const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
 const cardTap = { scale: 0.975 };
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { Slider } from "@/components/ui/slider";
 import { AmbientSoundEngine } from "./AmbientSoundEngine";
 import { DreamNarrator } from "./DreamNarrator";
