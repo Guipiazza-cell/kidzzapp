@@ -70,8 +70,12 @@ const normalizeCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_pre
 const savePendingCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
   if (typeof window === "undefined") return;
   const normalized = normalizeCheckoutPlan(plan);
-  try { window.sessionStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {}
-  try { window.localStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {}
+  try { window.sessionStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {
+    // Storage can be unavailable in private browsing.
+  }
+  try { window.localStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {
+    // Storage can be unavailable in private browsing.
+  }
 };
 
 const readPendingCheckoutPlan = (): CheckoutPlan | null => {
@@ -88,8 +92,12 @@ const readPendingCheckoutPlan = (): CheckoutPlan | null => {
 
 const clearPendingCheckoutPlan = () => {
   if (typeof window === "undefined") return;
-  try { window.sessionStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {}
-  try { window.localStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {}
+  try { window.sessionStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {
+    // Storage can be unavailable in private browsing.
+  }
+  try { window.localStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {
+    // Storage can be unavailable in private browsing.
+  }
 };
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -547,7 +555,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       handleCheckout(pending);
     }, 400);
     return () => clearTimeout(t);
-  }, [session, handleCheckout]);
+  }, [session, handleCheckout, navigate]);
 
   const openCustomerPortal = useCallback(async () => {
     if (!session?.access_token) {
