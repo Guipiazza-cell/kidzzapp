@@ -177,7 +177,9 @@ const saveGuestProfile = (profile: Profile) => {
   window.localStorage.setItem("kidzz_guest_profile_backup", data);
   window.localStorage.setItem("kidzz_guest_profile_v2", data);
 
-  try { window.sessionStorage.setItem(GUEST_PROFILE_STORAGE_KEY, data); } catch {}
+  try { window.sessionStorage.setItem(GUEST_PROFILE_STORAGE_KEY, data); } catch {
+    // Storage can be unavailable in private browsing.
+  }
 };
 
 const clearGuestProfile = () => {
