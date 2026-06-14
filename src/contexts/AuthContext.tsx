@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
 
 export type SubscriptionTier = "free" | "kidzz" | "premium";
 
@@ -56,8 +57,40 @@ const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-p
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
 const PROFILE_DRAFT_STORAGE_KEY = "kidzz_profile_draft";
 const SUB_CACHE_KEY = "kidzz_sub_cache";
+const PENDING_PLAN_STORAGE_KEY = "kidzz_pending_plan";
 const SUB_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const PROFILE_DRAFT_TTL = 7 * 24 * 60 * 60 * 1000;
+
+const normalizeCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_premium_annual"): CheckoutPlan => {
+  if (plan === "super_premium") return "premium";
+  if (plan === "super_premium_annual") return "premium_annual";
+  return plan;
+};
+
+const savePendingCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
+  if (typeof window === "undefined") return;
+  const normalized = normalizeCheckoutPlan(plan);
+  try { window.sessionStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {}
+  try { window.localStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {}
+};
+
+const readPendingCheckoutPlan = (): CheckoutPlan | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = window.sessionStorage.getItem(PENDING_PLAN_STORAGE_KEY)
+      || window.localStorage.getItem(PENDING_PLAN_STORAGE_KEY);
+    if (!stored) return null;
+    return normalizeCheckoutPlan(stored as CheckoutPlan | "super_premium" | "super_premium_annual");
+  } catch {
+    return null;
+  }
+};
+
+const clearPendingCheckoutPlan = () => {
+  if (typeof window === "undefined") return;
+  try { window.sessionStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {}
+  try { window.localStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {}
+};
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -216,6 +249,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
