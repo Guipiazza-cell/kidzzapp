@@ -27,6 +27,7 @@ import {
 import { showXpGained } from "@/components/flow/XpToast";
 import { haptic } from "@/lib/haptics";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { useMemories } from "@/hooks/useMemories";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
@@ -286,8 +287,10 @@ const PeriodSection = ({
 const RoutineScreen = () => {
   const { profile } = useAuth();
   const { addMemory } = useMemories();
+  const { canUse } = useEntitlement();
   const childName = profile?.child_name || "amigo";
-  const isPremium = profile?.is_premium ?? false;
+  // Rotina exige Premium.
+  const isPremium = canUse("rotina");
   const mascotConfig = useMemo(() => loadMascotConfig(), []);
   const hue = HUE_MAP[mascotConfig.colorId] ?? 0;
 

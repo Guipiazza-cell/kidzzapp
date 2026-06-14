@@ -15,6 +15,7 @@ import {
 const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
 const cardTap = { scale: 0.975 };
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { Slider } from "@/components/ui/slider";
 import { AmbientSoundEngine } from "./AmbientSoundEngine";
 import { DreamNarrator } from "./DreamNarrator";
@@ -190,7 +191,9 @@ type DreamView = "main" | "story" | "playing" | "presleep";
 
 const DreamWorld = ({ onBack }: Props) => {
   const { profile, handleCheckout } = useAuth();
-  const isPremium = profile?.is_premium === true;
+  const { canUse } = useEntitlement();
+  // Sonhos exige plano Premium (kidzz NÃO libera).
+  const isPremium = canUse("sonhos");
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
   const interests = (profile as any)?.child_interests as string[] | undefined;

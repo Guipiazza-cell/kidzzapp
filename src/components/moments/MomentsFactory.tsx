@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap, Check } from "lucide-react";
 import MagicalBackground from "../MagicalBackground";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { MISSIONS, type Mission } from "./MissionsData";
 import MissionDetail from "./MissionDetail";
 import ContextualPaywallModal from "../ContextualPaywallModal";
@@ -19,7 +20,9 @@ const FREE_MISSIONS = 1;
 
 const MomentsFactory = ({ onBack }: Props) => {
   const { profile } = useAuth();
-  const isPremium = profile?.is_premium ?? false;
+  const { canUse } = useEntitlement();
+  // Momentos exige Premium.
+  const isPremium = canUse("momentos");
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [purchasing, setPurchasing] = useState<string | null>(null);
