@@ -84,6 +84,7 @@ function dayName(d: Date) {
 }
 
 const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const ent = useEntitlement();
   const isPremium = ent.plan !== "free";
