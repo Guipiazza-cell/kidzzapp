@@ -142,10 +142,14 @@ const Paywall = ({ onLogin, onBack }: PaywallProps) => {
 
   return (
     <motion.div
-      className="flex-1 min-h-0 flex flex-col overflow-y-auto pb-8"
+      className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      style={{
+        WebkitOverflowScrolling: "touch",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
+      }}
     >
       {/* Top bar */}
       <div className="sticky top-0 z-30 flex items-center justify-between px-4 pt-3 pb-2 bg-white/85 backdrop-blur-md border-b border-gray-100">

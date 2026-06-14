@@ -373,8 +373,12 @@ const RoutineScreen = () => {
   }, [addMemory, childName]);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto px-3 pb-6"
-         style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
+    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overscroll-contain px-3"
+         style={{
+           paddingTop: "max(env(safe-area-inset-top, 12px), 12px)",
+           WebkitOverflowScrolling: "touch",
+           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+         }}>
       {/* ─── Hero: KIDZZ + Greeting ─── */}
       <header className="relative flex flex-col items-center text-center pt-2 pb-3">
         <motion.div

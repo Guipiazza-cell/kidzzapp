@@ -267,8 +267,11 @@ const MomentsPlaylists = ({ onBack }: Props) => {
 
       {/* Scroll */}
       <div
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-32 pt-1 relative z-10"
-        style={{ WebkitOverflowScrolling: "touch" }}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain pt-1 relative z-10"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+        }}
       >
         {/* Hero editorial */}
         <section className="px-5 mt-3 mb-6 text-center">

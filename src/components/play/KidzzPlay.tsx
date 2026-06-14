@@ -198,7 +198,11 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="flex-1 flex flex-col overflow-y-auto px-4 pb-6"
+      className="flex-1 flex flex-col overflow-y-auto overscroll-contain px-4"
+      style={{
+        WebkitOverflowScrolling: "touch",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+      }}
     >
       {/* KIDZZ — menor, deixa o palco para a curadoria editorial */}
       <div className="relative flex justify-center pt-1 pb-2">
@@ -503,7 +507,11 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
-            className="flex-1 overflow-y-auto pb-24"
+            className="flex-1 overflow-y-auto overscroll-contain"
+            style={{
+              WebkitOverflowScrolling: "touch",
+              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+            }}
           >
             <Suspense fallback={<div className="flex items-center justify-center py-16 text-sm font-bold text-gray-600">Carregando jogo… ✨</div>}>
             {activeGame === "pixel-pula" && (

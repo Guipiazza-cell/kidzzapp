@@ -298,7 +298,13 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       </div>
 
       {section === "achievements" ? (
-        <div className="flex-1 overflow-y-auto -mt-2">
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain -mt-2"
+          style={{
+            WebkitOverflowScrolling: "touch",
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+          }}
+        >
           <AchievementsScreen onBack={() => setSection("memories")} />
         </div>
       ) : (
@@ -331,7 +337,13 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 pb-6">
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain px-4"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+        }}
+      >
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <motion.p

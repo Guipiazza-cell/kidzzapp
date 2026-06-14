@@ -181,7 +181,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       </header>
 
       {/* Content */}
-      <div className="flex-1 relative z-10 overflow-y-auto px-4 pb-6">
+      <div
+        className="flex-1 relative z-10 overflow-y-auto overscroll-contain px-4"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+        }}
+      >
         {step === "intro" &&
         <motion.div
           initial={{ opacity: 0, y: 20 }}

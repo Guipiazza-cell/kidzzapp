@@ -333,7 +333,11 @@ const DreamWorld = ({ onBack }: Props) => {
     };
     return (
       <motion.div
-        className="fixed inset-0 z-50 overflow-y-auto"
+        className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
+        }}
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       >
         <CinematicBackdrop phase="night" sleepy={sleepyMode} />
@@ -478,9 +482,12 @@ const DreamWorld = ({ onBack }: Props) => {
   /* ============ MAIN ============ */
   return (
     <motion.div
-      className="fixed inset-0 z-40 overflow-y-auto pb-24"
+      className="fixed inset-0 z-40 overflow-y-auto overscroll-contain"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ WebkitOverflowScrolling: "touch" }}
+      style={{
+        WebkitOverflowScrolling: "touch",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+      }}
     >
       <CinematicBackdrop phase={phase} sleepy={sleepyMode} />
 
