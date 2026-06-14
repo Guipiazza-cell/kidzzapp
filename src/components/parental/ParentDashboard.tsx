@@ -11,6 +11,7 @@ import { getToday as getRoutineToday } from "@/lib/routine";
 import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   onClose: () => void;
