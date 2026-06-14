@@ -12,6 +12,7 @@ import AccountSetup from "@/components/onboarding/AccountSetup";
 
 import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
 import ContextualPaywallModal from "@/components/ContextualPaywallModal";
+import AreaGate from "@/components/paywall/AreaGate";
 import type { PaywallContext } from "@/lib/contextualPaywall";
 import HomeScreen from "@/components/flow/HomeScreen";
 
@@ -345,35 +346,39 @@ const Index = () => {
         onGeneratingError={() => setStep("home")}
       />
     ),
-    explore: () => <StoryFactory onBack={() => { backToHome(); evolution.evolve("story"); }} />,
-    routine: () => <RoutineScreen />,
+    explore: () => <AreaGate area="historias" fullOnSample><StoryFactory onBack={() => { backToHome(); evolution.evolve("story"); }} /></AreaGate>,
+    routine: () => <AreaGate area="rotina"><RoutineScreen /></AreaGate>,
     play: () => (
-      <KidzzPlay
-        onBack={backToHome}
-        onGameComplete={() => evolution.evolve("game")}
-        onOpenAchievements={() => switchTab("achievements")}
-        onOpenLab={() => setShowLab(true)}
-        onOpenTravel={() => {
-          if (!profile?.is_premium) {
-            setContextualPaywall({ open: true, context: "travel" });
-            return;
-          }
-          setShowTravel(true);
-        }}
-      />
+      <AreaGate area="brincar">
+        <KidzzPlay
+          onBack={backToHome}
+          onGameComplete={() => evolution.evolve("game")}
+          onOpenAchievements={() => switchTab("achievements")}
+          onOpenLab={() => setShowLab(true)}
+          onOpenTravel={() => {
+            if (!profile?.is_premium) {
+              setContextualPaywall({ open: true, context: "travel" });
+              return;
+            }
+            setShowTravel(true);
+          }}
+        />
+      </AreaGate>
     ),
-    memories: () => <MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} />,
-    moments: () => <MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} />,
-    cinema: () => <FamilyCinema onBack={backToHome} />,
-    wellness: () => <WellnessHub onBack={backToHome} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} />,
+    memories: () => <AreaGate area="memorias"><MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} /></AreaGate>,
+    moments: () => <AreaGate area="momentos"><MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} /></AreaGate>,
+    cinema: () => <AreaGate area="cinema"><FamilyCinema onBack={backToHome} /></AreaGate>,
+    wellness: () => <AreaGate area="kalm"><WellnessHub onBack={backToHome} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} /></AreaGate>,
     achievements: () => <Suspense fallback={null}><SevenDayChallenge onClose={backToHome} /></Suspense>,
-    dreams: () => <DreamWorld onBack={() => { backToHome(); evolution.evolve("story"); }} />,
+    dreams: () => <AreaGate area="sonhos"><DreamWorld onBack={() => { backToHome(); evolution.evolve("story"); }} /></AreaGate>,
     music: () => (
-      <MusicForest
-        onBack={backToHome}
-        onNavigateToDreams={() => switchTab("dreams")}
-        onXpEarned={() => evolution.evolve("game")}
-      />
+      <AreaGate area="musica">
+        <MusicForest
+          onBack={backToHome}
+          onNavigateToDreams={() => switchTab("dreams")}
+          onXpEarned={() => evolution.evolve("game")}
+        />
+      </AreaGate>
     ),
   }), [step, question, answer, childName, profile, evolution, activeTab, handleQuestionSubmit, handleAnswerReady, handleCelebrationDone, handleNewQuestion, handleTabChange, switchTab, backToHome, kalmInitialExperience, addMemory, navigate]);
 

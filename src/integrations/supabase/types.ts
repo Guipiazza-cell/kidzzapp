@@ -352,11 +352,86 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          plan: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      usage: {
+        Row: {
+          date: string
+          historias_count: number
+          perguntas_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          date: string
+          historias_count?: number
+          perguntas_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          date?: string
+          historias_count?: number
+          perguntas_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_effective_plan: {
+        Args: { _user_id: string }
+        Returns: {
+          current_period_end: string
+          in_grace: boolean
+          plan: string
+          status: string
+        }[]
+      }
+      increment_usage: {
+        Args: { _tipo: string }
+        Returns: {
+          allowed: boolean
+          historias_count: number
+          perguntas_count: number
+          plan: string
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {

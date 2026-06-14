@@ -34,16 +34,16 @@ const lpVars = {
 // ─────────────────────────────────────────────
 // Kidzz — animated mascot with ambient forest backdrop
 // ─────────────────────────────────────────────
-type KikoMood = "idle" | "happy" | "empathy" | "thinking" | "wave";
+type KidzzMood = "idle" | "happy" | "empathy" | "thinking" | "wave";
 
-function Kiko({
+function Kidzz({
   size = 360,
   mood = "idle",
   reactive = true,
   ambient = true,
 }: {
   size?: number;
-  mood?: KikoMood;
+  mood?: KidzzMood;
   reactive?: boolean;
   ambient?: boolean;
 }) {
@@ -248,7 +248,7 @@ function TiltCard({ children, intensity = 8, style }: { children: React.ReactNod
 // Quiz data
 // ─────────────────────────────────────────────
 type QOption = { key: string; label: string };
-type Question = { id: string; title: string; mood: KikoMood; options: QOption[] };
+type Question = { id: string; title: string; mood: KidzzMood; options: QOption[] };
 
 const QUESTIONS: Question[] = [
   {
@@ -536,7 +536,7 @@ export default function LandingQuiz() {
             transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
             style={{ display: "flex", justifyContent: "center", position: "relative" }}
           >
-            <Kiko size={460} mood="happy" />
+            <Kidzz size={460} mood="happy" />
           </motion.div>
         </div>
 
@@ -611,7 +611,7 @@ export default function LandingQuiz() {
                         </p>
                       </div>
                       <div style={{ display: "flex", justifyContent: "center" }} className="quiz-kiko">
-                        <Kiko size={220} mood={current.mood} reactive={false} />
+                        <Kidzz size={220} mood={current.mood} reactive={false} />
                       </div>
                     </div>
 
@@ -690,7 +690,7 @@ export default function LandingQuiz() {
               animate={{ opacity: 1, y: 0 }}
               style={{ textAlign: "center", padding: "40px 0" }}
             >
-              <Kiko size={200} mood="happy" reactive={false} />
+              <Kidzz size={200} mood="happy" reactive={false} />
               <h2 style={{ fontFamily: display, fontSize: 32, fontWeight: 800, color: C.deep, marginTop: 16 }}>
                 Quase lá... ✨
               </h2>
@@ -805,7 +805,7 @@ export default function LandingQuiz() {
               da sua casa começando hoje — sem mais uma obrigação na sua lista.
             </motion.p>
             <div style={{ marginTop: 40, display: "flex", justifyContent: "center" }}>
-              <Kiko size={260} mood="happy" reactive={false} />
+              <Kidzz size={260} mood="happy" reactive={false} />
             </div>
             <motion.p
               initial={{ opacity: 0 }}
@@ -906,7 +906,7 @@ export default function LandingQuiz() {
       <section style={{ padding: "120px 24px", background: C.deep, color: C.cream, position: "relative", overflow: "hidden" }}>
         <Fireflies count={20} color={C.gold} />
         <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", position: "relative" }}>
-          <Kiko size={240} mood="wave" reactive={false} />
+          <Kidzz size={240} mood="wave" reactive={false} />
           <h2
             style={{
               fontFamily: display,
