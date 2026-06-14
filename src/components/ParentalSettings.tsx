@@ -181,235 +181,45 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           {/* Current plan highlight */}
           <div className={`rounded-2xl p-4 text-center ${isPremium ? "kid-gradient-premium text-white" : "bg-muted"}`}>
             <p className="font-extrabold text-lg">
-              {tier === "premium" ? "⚡ KIDZZ Premium Ativo" : isPremium ? "⭐ Plano KIDZZ Ativo" : "Plano Gratuito"}
+              {tier === "premium"
+                ? "⚡ Kidzz Premium Ativo"
+                : isPremium
+                ? "⭐ Plano Kidzz Ativo"
+                : "Plano Gratuito"}
             </p>
             <p className="text-sm opacity-80">
-              {tier === "premium"
-                ? `${10 - (profile?.questions_used ?? 0)} perguntas • ${3 - (profile?.stories_used ?? 0)} histórias hoje`
-                : isPremium
-                ? `${10 - (profile?.questions_used ?? 0)} de 10 perguntas restantes hoje`
-                : `${Math.max(0, 3 - (profile?.questions_used ?? 0))} de 3 perguntas restantes`}
+              {isPremium
+                ? "Você tem acesso completo. ✨"
+                : "Experimente algumas perguntas e 1 história por dia."}
             </p>
           </div>
 
-          {/* Plans */}
-          <div>
-            <label className="font-bold text-foreground text-sm block mb-2">
-              <Crown size={14} className="inline mr-1" />
-              Planos disponíveis
-            </label>
-
-            {/* Billing toggle */}
-            <div className="flex items-center justify-center gap-1 bg-muted rounded-full p-1 mb-3">
+          {/* Plans — CTA unificado para a tela canônica */}
+          {!isPremium && (
+            <div>
+              <label className="font-bold text-foreground text-sm block mb-2">
+                <Crown size={14} className="inline mr-1" />
+                Assinatura Kidzz
+              </label>
               <button
-                onClick={() => setBillingPeriod("monthly")}
-                className={`flex-1 py-2 rounded-full text-xs font-extrabold transition-all ${
-                  billingPeriod === "monthly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-                }`}
+                onClick={() => {
+                  if (!user) {
+                    toast.error("Crie uma conta primeiro para assinar!");
+                    setShowAuth(true);
+                    return;
+                  }
+                  onClose();
+                  navigate("/?paywall=1");
+                }}
+                className="w-full py-3 rounded-2xl kid-gradient-premium text-white font-extrabold text-sm shadow-lg active:scale-[0.98] transition-transform"
               >
-                Mensal
+                ✨ Ver planos e começar
               </button>
-              <button
-                onClick={() => setBillingPeriod("annual")}
-                className={`flex-1 py-2 rounded-full text-xs font-extrabold transition-all flex items-center justify-center gap-1 ${
-                  billingPeriod === "annual" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-                }`}
-              >
-                Anual
-                <span className="text-[8px] font-black text-kid-green bg-kid-green/10 px-1.5 py-0.5 rounded-full">
-                  -33%
-                </span>
-              </button>
+              <p className="text-[10px] text-muted-foreground text-center mt-2">
+                Pagamento seguro via Stripe · Cancele quando quiser · Você não será cobrado hoje sem confirmar
+              </p>
             </div>
-
-            <div className="space-y-3">
-              {/* ① KIDZZ Annual — MAX HIGHLIGHT */}
-              {billingPeriod === "annual" && (
-                <div className={`relative rounded-2xl p-4 transition-all ${
-                  currentPlan === "premium" ? "border-2 border-primary shadow-lg" : ""
-                }`} style={{ border: currentPlan !== "premium" ? "2px solid #D4A847" : undefined, background: "linear-gradient(135deg, rgba(212,168,71,0.08), rgba(240,200,90,0.04))" }}>
-                  <span className="absolute -top-2.5 right-3 text-[10px] font-extrabold px-3 py-0.5 rounded-full shadow-md text-white" style={{ background: "linear-gradient(135deg, #D4A847, #F0C85A)" }}>
-                    MELHOR VALOR 💛
-                  </span>
-                  <span className="absolute -top-2.5 left-3 text-[10px] font-extrabold bg-kid-purple text-white px-3 py-0.5 rounded-full shadow-md">
-                    MAIS POPULAR
-                  </span>
-                  {currentPlan === "premium" && (
-                    <span className="absolute top-3 right-3 text-[9px] font-extrabold bg-kid-green text-white px-2 py-0.5 rounded-full">
-                      SEU PLANO
-                    </span>
-                  )}
-                  <div className="flex items-center gap-2 mb-2 mt-3">
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #D4A847, #F0C85A)" }}>
-                      <Crown size={16} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="font-extrabold text-sm text-foreground">Plano KIDZZ Anual</p>
-                      <p className="text-xs text-muted-foreground">
-                        <span className="font-extrabold text-foreground">R$ 16,66</span>/mês
-                        <span className="text-[10px] line-through text-muted-foreground ml-1">R$ 19,90</span>
-                      </p>
-                      <p className="text-[10px] text-amber-600 font-bold">Cobrado R$ 199,90/ano</p>
-                    </div>
-                  </div>
-                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold mb-2" style={{ background: "rgba(212,168,71,0.15)", color: "#B8860B" }}>
-                    💰 Economize R$ 38,90 por ano · 2 meses grátis 🎁
-                  </div>
-                  <ul className="space-y-1">
-                    {["10 perguntas por dia", "Narração por voz amigável", "🎯 Fábrica de Momentos (missões)", "Respostas adaptadas por idade", "Filtro de conteúdo avançado"].map((f) => (
-                      <li key={f} className="flex items-start gap-1.5 text-xs text-foreground">
-                        <Star size={10} className="text-kid-yellow mt-0.5 flex-shrink-0" />{f}
-                      </li>
-                    ))}
-                  </ul>
-                  {currentPlan !== "premium" && currentPlan !== "super_premium" && (
-                    <>
-                      <button
-                        onClick={() => onPlanCheckout("premium_annual")}
-                        disabled={checkoutLoading === "premium_annual"}
-                        className="mt-3 w-full py-2.5 rounded-xl font-bold text-sm text-white transition-all active:scale-95 disabled:opacity-50"
-                        style={{ background: "linear-gradient(135deg, #D4A847, #B8860B)" }}
-                      >
-                        {checkoutLoading === "premium_annual" ? "Abrindo..." : "✨ Começar Nossa Aventura"}
-                      </button>
-                      <p className="text-center text-muted-foreground text-[10px] font-bold mt-1.5">
-                        🛡️ Garantia de 7 dias. Se não amar, devolvemos 100%.
-                      </p>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* ② KIDZZ Monthly */}
-              {billingPeriod === "monthly" && (
-                <div className={`relative rounded-2xl border-2 p-4 transition-all ${
-                  currentPlan === "premium" ? "border-primary shadow-lg" : "border-border"
-                }`}>
-                  {currentPlan === "premium" && (
-                    <span className="absolute -top-2.5 left-3 text-[10px] font-extrabold bg-kid-green text-white px-3 py-0.5 rounded-full shadow-md">
-                      SEU PLANO
-                    </span>
-                  )}
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-xl kid-gradient-premium flex items-center justify-center">
-                      <Crown size={16} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="font-extrabold text-sm text-foreground">Plano KIDZZ</p>
-                      <p className="text-xs text-muted-foreground">
-                        <span className="font-extrabold text-foreground">R$ 19,90</span>/mês
-                      </p>
-                    </div>
-                  </div>
-                  <ul className="space-y-1">
-                    {["10 perguntas por dia", "Narração por voz amigável", "🎯 Fábrica de Momentos", "Respostas adaptadas por idade"].map((f) => (
-                      <li key={f} className="flex items-start gap-1.5 text-xs text-foreground">
-                        <Star size={10} className="text-kid-yellow mt-0.5 flex-shrink-0" />{f}
-                      </li>
-                    ))}
-                  </ul>
-                  {currentPlan === "free" && (
-                    <>
-                      <button
-                        onClick={() => onPlanCheckout("premium")}
-                        disabled={checkoutLoading === "premium"}
-                        className="mt-3 w-full py-2.5 rounded-xl font-bold text-sm text-white transition-all active:scale-95 disabled:opacity-50 kid-gradient-premium"
-                      >
-                        {checkoutLoading === "premium" ? "Abrindo..." : "✨ Começar Nossa Aventura"}
-                      </button>
-                      <p className="text-center text-muted-foreground text-[10px] font-bold mt-1.5">
-                        🛡️ Garantia de 7 dias. Se não amar, devolvemos 100%.
-                      </p>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Social proof */}
-              <div className="rounded-2xl p-3 text-center" style={{ background: "rgba(245,240,230,0.6)" }}>
-                <p className="text-xs font-bold text-foreground leading-relaxed">
-                  ⭐⭐⭐⭐⭐
-                </p>
-                <p className="text-[11px] text-muted-foreground italic leading-relaxed mt-1">
-                  "Minha filha de 6 anos me perguntou de volta: 'Pai, e você? O que mudaria no mundo?' Não esperava isso de um app."
-                </p>
-                <p className="text-[10px] text-muted-foreground font-bold mt-1">— Ricardo M.</p>
-                <p className="text-[10px] text-foreground font-bold mt-1.5">
-                  🌟 Mais de 3.400 famílias já na aventura KIDZZ
-                </p>
-              </div>
-
-              {/* ③ KIDZZ Premium */}
-              <div className={`relative rounded-2xl border-2 p-4 transition-all ${
-                currentPlan === "super_premium" ? "border-primary shadow-lg" : "border-kid-yellow/40"
-              }`}>
-                <span className="absolute -top-2.5 right-3 text-[10px] font-extrabold bg-kid-orange text-white px-3 py-0.5 rounded-full shadow-md">
-                  COMPLETO
-                </span>
-                {currentPlan === "super_premium" && (
-                  <span className="absolute -top-2.5 left-3 text-[10px] font-extrabold bg-kid-green text-white px-3 py-0.5 rounded-full shadow-md">
-                    SEU PLANO
-                  </span>
-                )}
-                <div className="flex items-center gap-2 mb-2 mt-1">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-kid-yellow via-kid-orange to-kid-red flex items-center justify-center">
-                    <Zap size={16} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-sm text-foreground">KIDZZ Premium</p>
-                    {billingPeriod === "annual" ? (
-                      <>
-                        <p className="text-xs text-muted-foreground">
-                          <span className="font-extrabold text-foreground">R$ 20,83</span>/mês
-                          <span className="text-[10px] line-through text-muted-foreground ml-1">R$ 24,90</span>
-                        </p>
-                        <p className="text-[10px] text-amber-600 font-bold">Cobrado R$ 249,90/ano · 2 meses grátis 🎁</p>
-                      </>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        <span className="font-extrabold text-foreground">R$ 24,90</span>/mês
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <ul className="space-y-1">
-                  {["Tudo do Plano KIDZZ +", "🏭 3 histórias por dia", "🎯 Fábrica de Momentos completa", "Avatar personalizado", "Narração por voz Premium", "Suporte prioritário"].map((f) => (
-                    <li key={f} className="flex items-start gap-1.5 text-xs text-foreground">
-                      <Star size={10} className="text-kid-yellow mt-0.5 flex-shrink-0" />{f}
-                    </li>
-                  ))}
-                </ul>
-                {currentPlan !== "super_premium" && (
-                  <>
-                    <button
-                      onClick={() => onPlanCheckout(billingPeriod === "annual" ? "super_premium_annual" : "super_premium")}
-                      disabled={checkoutLoading === "super_premium" || checkoutLoading === "super_premium_annual"}
-                      className="mt-3 w-full py-2.5 rounded-xl font-bold text-sm text-white transition-all active:scale-95 disabled:opacity-50 bg-gradient-to-r from-kid-yellow via-kid-orange to-kid-red"
-                    >
-                      {checkoutLoading ? "Abrindo..." : "🚀 Desbloquear Tudo"}
-                    </button>
-                    <p className="text-center text-muted-foreground text-[10px] font-bold mt-1.5">
-                      🛡️ Garantia de 7 dias. Se não amar, devolvemos 100%.
-                    </p>
-                  </>
-                )}
-              </div>
-
-              {/* ④ Gratuito — minimal */}
-              <div className="relative rounded-2xl border border-border p-3 opacity-70">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center">
-                    <MessageCircle size={12} className="text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-xs text-muted-foreground">Gratuito</p>
-                    <p className="text-[10px] text-muted-foreground">3 perguntas para experimentar</p>
-                  </div>
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-1">Comece aqui, sem cartão</p>
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Age range */}
           <div>
