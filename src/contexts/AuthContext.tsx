@@ -540,6 +540,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!session?.access_token) return;
     const pending = readPendingCheckoutPlan();
     if (!pending) return;
+    navigate("/auth?checkout=1", { replace: true });
     // pequena espera pra garantir que profile/sub estejam prontos
     const t = setTimeout(() => {
       clearPendingCheckoutPlan();
