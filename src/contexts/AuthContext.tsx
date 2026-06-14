@@ -241,6 +241,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .eq("id", userId)
       .single();
 
+    const guest = getGuestProfile();
+
     if (data) {
       const prof = resetDailyIfNeeded(data as unknown as Profile);
       if (prof !== data) {
@@ -250,9 +252,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           last_usage_date: prof.last_usage_date,
         }).eq("id", userId).then(() => {});
       }
-      return mergeProfileDraft(prof, userId);
+      // Preserve guest profile fields when cloud profile is still missing them
+      const merged: Profile = {
+        ...prof,
+        child_name: prof.child_name || guest.child_name || "",
+        age_range: prof.age_range || guest.age_range || null,
+        child_interests: prof.child_interests?.length
+          ? prof.child_interests
+          : (guest.child_interests ?? []),
+      };
+      return mergeProfileDraft(merged, userId);
     }
-    return mergeProfileDraft(getGuestProfile(), userId);
+    return mergeProfileDraft(guest, userId);
   }, [resetDailyIfNeeded]);
 
   const checkSubscription = useCallback(async (
