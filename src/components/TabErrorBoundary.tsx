@@ -11,6 +11,7 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error?: string;
 }
 
 /**
@@ -21,12 +22,12 @@ interface State {
 class TabErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error: error.message };
   }
 
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error(`[TabErrorBoundary:${this.props.label ?? "tab"}]`, error, info.componentStack);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("KIDZZ_TAB_ERROR:", error?.message, error?.stack, errorInfo);
   }
 
   componentDidUpdate(prev: Props) {
@@ -63,6 +64,14 @@ class TabErrorBoundary extends Component<Props, State> {
             </button>
           )}
         </div>
+        {this.state.error && (
+          <p
+            className="text-[10px] text-[#B0A89A] px-6 break-words text-center"
+            style={{ maxWidth: "100%" }}
+          >
+            {this.state.error.slice(0, 220)}
+          </p>
+        )}
       </div>
     );
   }
