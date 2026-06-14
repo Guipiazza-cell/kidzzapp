@@ -116,7 +116,7 @@ serve(async (req) => {
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/`,
+      cancel_url: `${origin}/?paywall=1`,
       metadata,
     });
     logStep("Stripe checkout session created", { sessionId: session.id, hasUrl: Boolean(session.url), customerId: customerId || "new", origin });
