@@ -58,6 +58,7 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
   const onSubscribe = async () => {
     setLoading(true);
     try {
+      if (!user) onClose?.();
       await handleCheckout(planKey);
     } finally {
       setLoading(false);
