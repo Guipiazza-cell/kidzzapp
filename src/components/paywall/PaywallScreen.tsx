@@ -74,7 +74,7 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
         background: `linear-gradient(180deg, ${CREAM} 0%, #FBF6EE 100%)`,
         color: INK,
         paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
       }}
     >
       <div className="max-w-md mx-auto px-5">
