@@ -341,7 +341,7 @@ const Success = () => {
                 A aventura de {childName} acaba de ficar ilimitada 🌟
               </motion.p>
 
-              {/* Daily quota highlight */}
+              {/* "À vontade" highlight */}
               <motion.div
                 className="mt-5 w-full grid grid-cols-2 gap-3"
                 initial={{ opacity: 0, y: 15 }}
@@ -355,13 +355,11 @@ const Success = () => {
                     background: "linear-gradient(135deg, rgba(255,255,255,0.7), rgba(245,158,11,0.08))",
                   }}
                 >
-                  <div className="text-3xl font-black text-amber-600 leading-none">
-                    {plan.questionsPerDay}
+                  <div className="text-2xl">💬</div>
+                  <div className="text-[12px] font-extrabold text-amber-800 mt-1 uppercase tracking-wide">
+                    Perguntas
                   </div>
-                  <div className="text-[11px] font-extrabold text-amber-800 mt-1 uppercase tracking-wide">
-                    perguntas/dia
-                  </div>
-                  <div className="text-[10px] font-bold text-gray-500 mt-0.5">💬 mágicas</div>
+                  <div className="text-[11px] font-bold text-amber-700 mt-0.5">À vontade</div>
                 </div>
                 <div
                   className="rounded-2xl p-4 border-2 text-center backdrop-blur-sm"
@@ -370,15 +368,14 @@ const Success = () => {
                     background: "linear-gradient(135deg, rgba(255,255,255,0.7), rgba(236,72,153,0.08))",
                   }}
                 >
-                  <div className="text-3xl font-black text-pink-600 leading-none">
-                    {plan.storiesPerDay}
+                  <div className="text-2xl">📖</div>
+                  <div className="text-[12px] font-extrabold text-pink-800 mt-1 uppercase tracking-wide">
+                    Histórias
                   </div>
-                  <div className="text-[11px] font-extrabold text-pink-800 mt-1 uppercase tracking-wide">
-                    histórias/dia
-                  </div>
-                  <div className="text-[10px] font-bold text-gray-500 mt-0.5">📖 personalizadas</div>
+                  <div className="text-[11px] font-bold text-pink-700 mt-0.5">À vontade</div>
                 </div>
               </motion.div>
+
 
               {/* Unlocks list — staggered with checkmark burst */}
               <motion.div
