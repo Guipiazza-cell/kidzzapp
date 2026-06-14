@@ -241,6 +241,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .eq("id", userId)
       .single();
 
+    const guest = getGuestProfile();
+
     if (data) {
       const prof = resetDailyIfNeeded(data as unknown as Profile);
       if (prof !== data) {
@@ -250,9 +252,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           last_usage_date: prof.last_usage_date,
         }).eq("id", userId).then(() => {});
       }
-      return mergeProfileDraft(prof, userId);
+      // Preserve guest profile fields when cloud profile is still missing them
+      const merged: Profile = {
+        ...prof,
+        child_name: prof.child_name || guest.child_name || "",
+        age_range: prof.age_range || guest.age_range || null,
+        child_interests: prof.child_interests?.length
+          ? prof.child_interests
+          : (guest.child_interests ?? []),
+      };
+      return mergeProfileDraft(merged, userId);
     }
-    return mergeProfileDraft(getGuestProfile(), userId);
+    return mergeProfileDraft(guest, userId);
   }, [resetDailyIfNeeded]);
 
   const checkSubscription = useCallback(async (
@@ -376,6 +387,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(nextSession?.user ?? null);
 
       if (nextSession?.user) {
+        // Keep loading=true during transition so consumers never see profile=null with loading=false
+        setLoading(true);
         // On login, force refresh subscription
         clearSubCache();
         fetchProfile(nextSession.user.id).then(prof => {
@@ -387,12 +400,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (subResult.isPremium !== prof.is_premium) {
               setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
             }
+          }).finally(() => {
+            if (mounted) setLoading(false);
           });
+        }).catch(() => {
+          if (mounted) setLoading(false);
         });
       } else {
+        setLoading(true);
         clearSubCache();
         setProfile(getGuestProfile());
         setTier("free");
+        setLoading(false);
       }
     });
 
