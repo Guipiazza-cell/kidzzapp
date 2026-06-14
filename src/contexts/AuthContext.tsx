@@ -532,13 +532,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) {
       const m = error.message.toLowerCase();
+      const code = (error as any).code?.toLowerCase?.() || "";
       // Conta já existe → tenta logar direto (fluxo rápido)
-      if (m.includes("already registered") || m.includes("already exists")) {
+      if (m.includes("already registered") || m.includes("already exists") || code === "user_already_exists") {
         const { error: siErr } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
         if (!siErr) return { error: null };
         return { error: "Este email já tem conta, mas a senha não confere. Tente entrar ou recuperar a senha." };
       }
-      console.error("Signup error:", error.message);
+      // Senha vazada (HIBP) ou senha fraca
+      if (code === "weak_password" || m.includes("pwned") || m.includes("compromised") || m.includes("weak password") || m.includes("has been found")) {
+        return { error: "Essa senha foi encontrada em vazamentos públicos e não é segura. Crie uma senha mais forte (use letras, números e símbolos)." };
+      }
+      if (m.includes("password should be at least") || m.includes("password is too short")) {
+        return { error: "A senha precisa ter pelo menos 6 caracteres." };
+      }
+      if (m.includes("invalid email") || code === "validation_failed") {
+        return { error: "Email inválido. Verifique e tente novamente." };
+      }
+      if (m.includes("rate limit") || code === "over_email_send_rate_limit") {
+        return { error: "Muitas tentativas. Aguarde alguns segundos e tente novamente." };
+      }
+      console.error("Signup error:", error.message, code);
       return { error: error.message };
     }
 
