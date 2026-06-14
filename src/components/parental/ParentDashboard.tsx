@@ -405,17 +405,20 @@ const Wrapper = ({ onClose, children }: { onClose: () => void; children: React.R
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
-    className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-end sm:items-center justify-center z-50 sm:p-4"
+    className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-center justify-center z-[100] p-4"
+    style={{
+      paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
+      paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
+    }}
   >
     <motion.div
       initial={{ y: 40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 40, opacity: 0 }}
       transition={{ type: "spring", stiffness: 240, damping: 26 }}
-      className="bg-card w-full max-w-md sm:rounded-3xl rounded-t-3xl p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto overscroll-contain"
+      className="bg-card w-full max-w-md rounded-3xl p-5 shadow-2xl relative max-h-full overflow-y-auto overscroll-contain"
       style={{
         WebkitOverflowScrolling: "touch",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
       }}
     >
       <button
