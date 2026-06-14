@@ -460,10 +460,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(nextSession?.user ?? null);
 
       if (nextSession?.user) {
-        // Keep loading=true during transition so consumers never see profile=null with loading=false
-        setLoading(true);
-        // On login, force refresh subscription
+        // IMPORTANT: do NOT flip loading=true here. Index gates the UI on
+        // `loading` and the Stripe check-subscription call can be slow or
+        // hang inside the preview iframe, leaving the user stuck on a blank
+        // screen right after signup. Keep loading=false; render falls back
+        // to NameOnboarding until the cloud profile resolves.
         clearSubCache();
+        // Seed profile immediately from guest cache so onboarding gates
+        // (child_name / age_range / interests) can paint without waiting.
+        setProfile(prev => prev ?? getGuestProfile());
         fetchProfile(nextSession.user.id).then(prof => {
           if (!mounted) return;
           setProfile(prof);
@@ -471,20 +476,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (!mounted) return;
             setTier(subResult.tier);
             if (subResult.isPremium !== prof.is_premium) {
-              setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
+              setProfile(curr => curr ? { ...curr, is_premium: subResult.isPremium } : curr);
             }
-          }).finally(() => {
-            if (mounted) setLoading(false);
+          }).catch(err => {
+            console.warn("[Auth] post-login subscription check failed", err);
           });
-        }).catch(() => {
-          if (mounted) setLoading(false);
+        }).catch(err => {
+          console.warn("[Auth] post-login profile fetch failed", err);
         });
       } else {
-        setLoading(true);
         clearSubCache();
         setProfile(getGuestProfile());
         setTier("free");
-        setLoading(false);
       }
     });
 
