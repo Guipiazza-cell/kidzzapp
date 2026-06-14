@@ -528,8 +528,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       if (data?.url) {
         console.log("[Checkout] Redirecting to Stripe:", data.url);
-        // Stripe Checkout sends X-Frame-Options: DENY → can't load in iframe (preview/PWA).
-        // Try top-window navigation first; fall back to a new tab if blocked by sandbox.
+        // Always navigate in the same tab (top window if inside an iframe like preview/PWA).
+        // Stripe Checkout sends X-Frame-Options: DENY, so we must break out of any iframe.
         try {
           if (window.top && window.top !== window.self) {
             window.top.location.href = data.url;
@@ -537,16 +537,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             window.location.href = data.url;
           }
         } catch {
-          const opened = window.open(data.url, "_blank", "noopener,noreferrer");
-          if (!opened) {
-            const { toast } = await import("sonner");
-            toast.error("Permita pop-ups para abrir o pagamento", {
-              description: "Ou copie e cole: " + data.url,
-            });
-          }
+          // Sandboxed iframe blocked top navigation → fallback to current window
+          window.location.href = data.url;
         }
         return;
       }
+
       const { toast } = await import("sonner");
       toast.error("Não conseguimos abrir o checkout 💛", {
         description: data?.error || "Tente novamente em instantes — nada foi cobrado.",
