@@ -435,10 +435,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const handleCheckout = useCallback(async (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
     if (!session?.access_token) {
+      // Não logado: guarda o plano e manda pro /auth. Depois do login, retomamos o checkout.
+      try { sessionStorage.setItem("kidzz_pending_plan", plan); } catch {}
       const { toast } = await import("sonner");
-      toast.error("Crie uma conta para assinar 💛", {
-        description: "Acesse o controle parental para fazer login.",
+      toast("Crie sua conta pra continuar 💛", {
+        description: "Em 1 minuto você volta direto pro pagamento.",
       });
+      if (typeof window !== "undefined") {
+        window.location.href = "/auth";
+      }
       return;
     }
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
