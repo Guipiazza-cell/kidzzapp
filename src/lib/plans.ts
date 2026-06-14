@@ -42,12 +42,14 @@ export const PLAN_ACCESS: Record<Plan, Record<Area, AccessLevel>> = {
     musica:    "full",
     brincar:   "full",
     memorias:  "full",
-    sonhos:    "locked",
-    rotina:    "locked",
-    momentos:  "locked",
-    kalm:      "locked",
-    sos:       "locked",
-    cinema:    "locked",
+    // Áreas exclusivas do Premium: assinante Kidzz vê a MESMA amostra que o usuário Free
+    // (nunca menos), com convite elegante para upgrade dentro da própria tela.
+    sonhos:    "sample",
+    rotina:    "sample",
+    momentos:  "sample",
+    kalm:      "sample",
+    sos:       "sample",
+    cinema:    "sample",
   },
   premium: {
     perguntas: "full",

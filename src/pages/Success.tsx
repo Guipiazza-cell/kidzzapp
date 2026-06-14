@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { Sparkles, Check, Crown, Loader2 } from "lucide-react";
 import MagicalBackground from "@/components/MagicalBackground";
 import pixelImg from "@/assets/pixel-chameleon.webp";
@@ -65,6 +66,7 @@ const Success = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { refreshSubscription, profile, tier } = useAuth();
+  const { plan: effectivePlan, refresh: refreshEntitlement } = useEntitlement();
   const [confirming, setConfirming] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -78,11 +80,11 @@ const Success = () => {
       attempts += 1;
       try {
         await refreshSubscription();
+        await refreshEntitlement();
       } catch {
         /* noop */
       }
       if (cancelled) return;
-      // We re-check via the next render's `tier`/`profile`; stop polling after maxAttempts
       if (attempts >= maxAttempts) {
         if (!cancelled) setConfirming(false);
         return;
@@ -94,7 +96,7 @@ const Success = () => {
     return () => {
       cancelled = true;
     };
-  }, [refreshSubscription]);
+  }, [refreshSubscription, refreshEntitlement]);
 
   // Detect activation
   useEffect(() => {
@@ -108,8 +110,16 @@ const Success = () => {
   }, [profile?.is_premium, confirmed]);
 
   const childName = profile?.child_name || "seu filho";
-  // Mostra os perks reais do plano contratado (kidzz ≠ premium).
-  const planKey = tier === "premium" ? "premium" : "kidzz";
+  // Fonte autoritativa: useEntitlement().plan (lê de subscriptions via get_effective_plan).
+  // Fallback para tier do AuthContext caso ainda esteja propagando.
+  const planKey =
+    effectivePlan === "premium"
+      ? "premium"
+      : effectivePlan === "kidzz"
+      ? "kidzz"
+      : tier === "premium"
+      ? "premium"
+      : "kidzz";
   const plan = PLAN_INFO[planKey] ?? PLAN_INFO.kidzz;
 
   return (
