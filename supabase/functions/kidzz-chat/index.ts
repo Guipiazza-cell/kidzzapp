@@ -217,7 +217,7 @@ Use emojis com moderação. Máximo 150 palavras na resposta.
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...safeMessages,
         ],
         stream: true,
       }),
