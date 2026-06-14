@@ -468,16 +468,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // No periodic refresh — only on login and manual refresh (cost optimization)
 
   const handleCheckout = useCallback(async (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
+    const checkoutPlan = normalizeCheckoutPlan(plan);
+
     if (!session?.access_token) {
       // Não logado: guarda o plano e manda pro /auth. Depois do login, retomamos o checkout.
-      try { sessionStorage.setItem("kidzz_pending_plan", plan); } catch {}
+      savePendingCheckoutPlan(checkoutPlan);
       const { toast } = await import("sonner");
       toast("Crie sua conta pra continuar 💛", {
         description: "Em 1 minuto você volta direto pro pagamento.",
       });
-      if (typeof window !== "undefined") {
-        window.location.href = "/auth";
-      }
+      navigate("/auth?checkout=1", { replace: false });
       return;
     }
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
@@ -499,7 +499,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ plan, ref }),
+            body: JSON.stringify({ plan: checkoutPlan, ref }),
           signal: ctrl.signal,
         });
         const data = await resp.json().catch(() => ({}));
@@ -533,18 +533,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           : "Tente novamente em instantes.",
       });
     }
-  }, [session]);
+  }, [navigate, session]);
 
   // Retoma o checkout automaticamente após o login (se havia plano pendente)
   useEffect(() => {
     if (!session?.access_token) return;
-    let pending: string | null = null;
-    try { pending = sessionStorage.getItem("kidzz_pending_plan"); } catch {}
+    const pending = readPendingCheckoutPlan();
     if (!pending) return;
-    try { sessionStorage.removeItem("kidzz_pending_plan"); } catch {}
     // pequena espera pra garantir que profile/sub estejam prontos
     const t = setTimeout(() => {
-      handleCheckout(pending as CheckoutPlan);
+      clearPendingCheckoutPlan();
+      handleCheckout(pending);
     }, 400);
     return () => clearTimeout(t);
   }, [session, handleCheckout]);
