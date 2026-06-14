@@ -37,7 +37,16 @@ serve(async (req) => {
       throw new Error("Nenhuma assinatura encontrada");
     }
 
-    const origin = req.headers.get("origin") || "https://kidzzapp.lovable.app";
+    // SECURITY: never trust the Origin header — validate against an allowlist to prevent open-redirect phishing.
+    const ALLOWED_ORIGINS = new Set([
+      "https://kidzzapp.lovable.app",
+      "https://kidzz.app",
+      "https://www.kidzz.app",
+      "http://localhost:8080",
+      "http://localhost:5173",
+    ]);
+    const rawOrigin = req.headers.get("origin") || "";
+    const origin = ALLOWED_ORIGINS.has(rawOrigin) ? rawOrigin : "https://kidzzapp.lovable.app";
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,
       return_url: `${origin}/`,

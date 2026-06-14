@@ -150,7 +150,17 @@ serve(async (req) => {
       });
     }
 
-    const { messages, ageRange = "3-7", childName = "" } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const rawMessages = Array.isArray(body?.messages) ? body.messages : [];
+    const ageRange = typeof body?.ageRange === "string" ? body.ageRange : "3-7";
+    const childName = typeof body?.childName === "string" ? body.childName : "";
+
+    // SECURITY: only accept user/assistant messages from client; cap count and content length.
+    const safeMessages = rawMessages
+      .filter((m: any) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+      .slice(-20)
+      .map((m: any) => ({ role: m.role, content: String(m.content).slice(0, 4000) }));
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -207,7 +217,7 @@ Use emojis com moderação. Máximo 150 palavras na resposta.
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...safeMessages,
         ],
         stream: true,
       }),
