@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Star, Heart, Quote, Wind, Trophy, Share2, Plus, X, Check } from "lucide-react";
 import { haptic } from "@/lib/haptics";
-import kalmChameleon from "@/assets/kalm-chameleon.png.asset.json";
+import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 
 /* ───────── Design tokens (aligned with WellnessHub) ───────── */
 const ink = "#27302A";
