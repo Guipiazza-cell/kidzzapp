@@ -6,10 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// 2026 limits per tier
-const FREE_LIMIT = 3;          // lifetime para guests/free
-const KIDZZ_DAILY_LIMIT = 30;  // perguntas KIDZZ
-const PREMIUM_DAILY_LIMIT = 60; // perguntas PREMIUM
+// Quotas são validadas e incrementadas via RPC `increment_usage` (fonte única).
 
 // IMPORTANT: respostas devem priorizar TEXTO LIMPO. Emojis são opcionais
 // (no máximo 1 por resposta) — a narração em voz não lê emojis e o texto
@@ -137,70 +134,50 @@ serve(async (req) => {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const supabaseAuth = createClient(
+    // User-scoped client (auth.uid() funciona dentro do RPC)
+    const supabaseUser = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { auth: { persistSession: false } }
+      {
+        auth: { persistSession: false },
+        global: { headers: { Authorization: `Bearer ${token}` } },
+      }
     );
-    const { data: userData, error: userErr } = await supabaseAuth.auth.getUser(token);
+    const { data: userData, error: userErr } = await supabaseUser.auth.getUser(token);
     if (userErr || !userData?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const userId = userData.user.id;
 
     const { messages, ageRange = "3-7", childName = "" } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Server-side quota validation (userId comes from verified JWT, never client body).
+    // Defesa em profundidade: incrementa via RPC (fonte única).
     {
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-        { auth: { persistSession: false } }
+      const { data: quotaData, error: quotaErr } = await (supabaseUser as any).rpc(
+        "increment_usage",
+        { _tipo: "perguntas" }
       );
-
-      const { data: profile, error: profileError } = await supabaseAdmin
-        .from("profiles")
-        .select("questions_used, is_premium, last_usage_date, tier")
-        .eq("id", userId)
-        .single();
-
-      if (profileError) {
-        console.error("[KIDZZ-CHAT] Profile fetch error:", profileError.message);
+      if (quotaErr) {
+        console.error("[KIDZZ-CHAT] increment_usage error:", quotaErr.message);
+        return new Response(JSON.stringify({ error: "QUOTA_ERROR" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
-
-      if (profile) {
-        const today = new Date().toISOString().slice(0, 10);
-        let questionsUsed = profile.questions_used;
-        const tier = (profile.tier as string) || (profile.is_premium ? "kidzz" : "free");
-
-        if (profile.is_premium) {
-          if (profile.last_usage_date !== today) questionsUsed = 0;
-          const dailyLimit = tier === "premium" ? PREMIUM_DAILY_LIMIT : KIDZZ_DAILY_LIMIT;
-          if (questionsUsed >= dailyLimit) {
-            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite diário atingido. Volte amanhã!" }), {
-              status: 403,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-        } else {
-          if (questionsUsed >= FREE_LIMIT) {
-            return new Response(JSON.stringify({ error: "LIMIT_REACHED", message: "Limite de perguntas gratuitas atingido." }), {
-              status: 403,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-        }
-
-        // Increment server-side
-        const updateData: Record<string, unknown> = {
-          questions_used: questionsUsed + 1,
-          last_usage_date: today,
-        };
-        await supabaseAdmin.from("profiles").update(updateData).eq("id", userId);
+      const row = Array.isArray(quotaData) ? quotaData[0] : quotaData;
+      if (!row?.allowed) {
+        const plan = row?.plan ?? "free";
+        return new Response(JSON.stringify({
+          error: "LIMIT_REACHED",
+          plan,
+          message: plan === "free"
+            ? "Você atingiu o limite gratuito. Assine para continuar."
+            : "Kidzz está sonolento. Volte amanhã!",
+        }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
     }
 
