@@ -11,6 +11,7 @@ import { getToday as getRoutineToday } from "@/lib/routine";
 import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   onClose: () => void;
@@ -83,6 +84,7 @@ function dayName(d: Date) {
 }
 
 const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const ent = useEntitlement();
   const isPremium = ent.plan !== "free";
@@ -198,13 +200,22 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
   if (!user) {
     return (
       <Wrapper onClose={onClose}>
-        <div className="text-center py-8 px-4">
-          <div className="text-5xl mb-3">🔐</div>
+        <div className="text-center py-8 px-4 space-y-4">
+          <div className="text-5xl">🔐</div>
           <h3 className="text-lg font-extrabold text-foreground">Crie uma conta para ver o painel</h3>
-          <p className="text-sm text-muted-foreground mt-2 mb-4">Acompanhe o progresso de {childName} de forma segura.</p>
-          <button onClick={onOpenSettings} className="px-5 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-sm">
-            Fazer login / Criar conta
-          </button>
+          <p className="text-sm text-muted-foreground">Acompanhe o progresso de {childName} de forma segura.</p>
+          <motion.button
+            onClick={() => { onClose(); navigate("/auth"); }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-3.5 rounded-2xl font-extrabold text-white text-sm flex items-center justify-center gap-2"
+            style={{
+              background: "linear-gradient(180deg, #E8821A 0%, #C96B0E 100%)",
+              boxShadow: "0 8px 20px -8px rgba(232,130,26,0.55), inset 0 1px 0 rgba(255,255,255,0.25)",
+            }}
+          >
+            <ExternalLink size={16} />
+            Entrar ou criar conta
+          </motion.button>
         </div>
       </Wrapper>
     );
