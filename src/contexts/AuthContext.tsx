@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
 
 export type SubscriptionTier = "free" | "kidzz" | "premium";
 
@@ -56,8 +57,48 @@ const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-p
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
 const PROFILE_DRAFT_STORAGE_KEY = "kidzz_profile_draft";
 const SUB_CACHE_KEY = "kidzz_sub_cache";
+const PENDING_PLAN_STORAGE_KEY = "kidzz_pending_plan";
 const SUB_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const PROFILE_DRAFT_TTL = 7 * 24 * 60 * 60 * 1000;
+
+const normalizeCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_premium_annual"): CheckoutPlan => {
+  if (plan === "super_premium") return "premium";
+  if (plan === "super_premium_annual") return "premium_annual";
+  return plan;
+};
+
+const savePendingCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
+  if (typeof window === "undefined") return;
+  const normalized = normalizeCheckoutPlan(plan);
+  try { window.sessionStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {
+    // Storage can be unavailable in private browsing.
+  }
+  try { window.localStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {
+    // Storage can be unavailable in private browsing.
+  }
+};
+
+const readPendingCheckoutPlan = (): CheckoutPlan | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = window.sessionStorage.getItem(PENDING_PLAN_STORAGE_KEY)
+      || window.localStorage.getItem(PENDING_PLAN_STORAGE_KEY);
+    if (!stored) return null;
+    return normalizeCheckoutPlan(stored as CheckoutPlan | "super_premium" | "super_premium_annual");
+  } catch {
+    return null;
+  }
+};
+
+const clearPendingCheckoutPlan = () => {
+  if (typeof window === "undefined") return;
+  try { window.sessionStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {
+    // Storage can be unavailable in private browsing.
+  }
+  try { window.localStorage.removeItem(PENDING_PLAN_STORAGE_KEY); } catch {
+    // Storage can be unavailable in private browsing.
+  }
+};
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -136,7 +177,9 @@ const saveGuestProfile = (profile: Profile) => {
   window.localStorage.setItem("kidzz_guest_profile_backup", data);
   window.localStorage.setItem("kidzz_guest_profile_v2", data);
 
-  try { window.sessionStorage.setItem(GUEST_PROFILE_STORAGE_KEY, data); } catch {}
+  try { window.sessionStorage.setItem(GUEST_PROFILE_STORAGE_KEY, data); } catch {
+    // Storage can be unavailable in private browsing.
+  }
 };
 
 const clearGuestProfile = () => {
@@ -216,6 +259,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -434,16 +478,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // No periodic refresh — only on login and manual refresh (cost optimization)
 
   const handleCheckout = useCallback(async (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
+    const checkoutPlan = normalizeCheckoutPlan(plan);
+
     if (!session?.access_token) {
       // Não logado: guarda o plano e manda pro /auth. Depois do login, retomamos o checkout.
-      try { sessionStorage.setItem("kidzz_pending_plan", plan); } catch {}
+      savePendingCheckoutPlan(checkoutPlan);
       const { toast } = await import("sonner");
       toast("Crie sua conta pra continuar 💛", {
         description: "Em 1 minuto você volta direto pro pagamento.",
       });
-      if (typeof window !== "undefined") {
-        window.location.href = "/auth";
-      }
+      navigate("/auth?checkout=1", { replace: false });
       return;
     }
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
@@ -465,7 +509,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ plan, ref }),
+            body: JSON.stringify({ plan: checkoutPlan, ref }),
           signal: ctrl.signal,
         });
         const data = await resp.json().catch(() => ({}));
@@ -499,21 +543,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           : "Tente novamente em instantes.",
       });
     }
-  }, [session]);
+  }, [navigate, session]);
 
   // Retoma o checkout automaticamente após o login (se havia plano pendente)
   useEffect(() => {
     if (!session?.access_token) return;
-    let pending: string | null = null;
-    try { pending = sessionStorage.getItem("kidzz_pending_plan"); } catch {}
+    const pending = readPendingCheckoutPlan();
     if (!pending) return;
-    try { sessionStorage.removeItem("kidzz_pending_plan"); } catch {}
+    navigate("/auth?checkout=1", { replace: true });
     // pequena espera pra garantir que profile/sub estejam prontos
     const t = setTimeout(() => {
-      handleCheckout(pending as CheckoutPlan);
+      clearPendingCheckoutPlan();
+      handleCheckout(pending);
     }, 400);
     return () => clearTimeout(t);
-  }, [session, handleCheckout]);
+  }, [session, handleCheckout, navigate]);
 
   const openCustomerPortal = useCallback(async () => {
     if (!session?.access_token) {
