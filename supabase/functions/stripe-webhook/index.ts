@@ -17,8 +17,10 @@ const corsHeaders = {
 const PRODUCT_TO_PLAN: Record<string, "kidzz" | "premium"> = {
   prod_UTaV3ceAAUThlX: "kidzz",
   prod_UTaW2oqm99hFrj: "kidzz",
+  prod_UgafeRPgM3wShx: "kidzz",
   prod_UTaXRFmVOR4wia: "premium",
   prod_UTaXJcEbqCrQtO: "premium",
+  prod_UgagQHpcdShKz8: "premium",
   prod_UDg1BKoaDApx46: "kidzz",
   prod_UKyyAWU5fNnNai: "kidzz",
   prod_UDg2zSZBKNtI2i: "premium",
