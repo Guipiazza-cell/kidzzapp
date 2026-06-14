@@ -17,18 +17,12 @@ const AGE_RANGES = [
 { range: "7-10", label: "7 a 10 anos", emoji: "🧑‍🎓", description: "Curiosidades e desafios científicos." }];
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
-  const { user, profile, tier, updateProfile, signOut, signIn, signUp, openCustomerPortal } = useAuth();
+  const { user, profile, tier, updateProfile, signOut, openCustomerPortal } = useAuth();
   const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
   const navigate = useNavigate();
   const currentAge = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
 
-  // Auth form state
-  const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [authLoading, setAuthLoading] = useState(false);
   const [affInput, setAffInput] = useState("");
   const [copied, setCopied] = useState(false);
 
