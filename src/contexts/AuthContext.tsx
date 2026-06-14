@@ -387,6 +387,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(nextSession?.user ?? null);
 
       if (nextSession?.user) {
+        // Keep loading=true during transition so consumers never see profile=null with loading=false
+        setLoading(true);
         // On login, force refresh subscription
         clearSubCache();
         fetchProfile(nextSession.user.id).then(prof => {
@@ -398,12 +400,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (subResult.isPremium !== prof.is_premium) {
               setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
             }
+          }).finally(() => {
+            if (mounted) setLoading(false);
           });
+        }).catch(() => {
+          if (mounted) setLoading(false);
         });
       } else {
+        setLoading(true);
         clearSubCache();
         setProfile(getGuestProfile());
         setTier("free");
+        setLoading(false);
       }
     });
 
