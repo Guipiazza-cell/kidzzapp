@@ -100,6 +100,35 @@ const clearPendingCheckoutPlan = () => {
   }
 };
 
+const submitCheckoutRedirectForm = (plan: CheckoutPlan, accessToken: string, ref?: string) => {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = CHECKOUT_URL;
+  form.target = "_top";
+  form.style.display = "none";
+
+  const fields: Record<string, string> = {
+    checkout_transport: "form_redirect",
+    access_token: accessToken,
+    plan,
+    return_origin: window.location.origin,
+  };
+  if (ref) fields.ref = ref;
+
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  console.log("[Checkout] Submitting same-tab Stripe redirect form", { plan, hasRef: Boolean(ref) });
+  form.submit();
+  window.setTimeout(() => form.remove(), 5000);
+};
+
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 const createDefaultProfile = (): Profile => ({
@@ -499,61 +528,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     const ref = sessionStorage.getItem("kidzz_ref") || undefined;
 
-    const attempt = async (): Promise<{ url?: string; error?: string }> => {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 12000);
-      try {
-        const resp = await fetch(CHECKOUT_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-            body: JSON.stringify({ plan: checkoutPlan, ref }),
-          signal: ctrl.signal,
-        });
-        const data = await resp.json().catch(() => ({}));
-        return data;
-      } finally {
-        clearTimeout(t);
-      }
-    };
-
     try {
-      let data = await attempt();
-      if (!data?.url) {
-        // gentle one-shot retry for transient errors
-        await new Promise((r) => setTimeout(r, 800));
-        data = await attempt();
-      }
-      if (data?.url) {
-        console.log("[Checkout] Redirecting to Stripe:", data.url);
-        // Always navigate in the same tab (top window if inside an iframe like preview/PWA).
-        // Stripe Checkout sends X-Frame-Options: DENY, so we must break out of any iframe.
-        try {
-          if (window.top && window.top !== window.self) {
-            window.top.location.href = data.url;
-          } else {
-            window.location.href = data.url;
-          }
-        } catch {
-          // Sandboxed iframe blocked top navigation → fallback to current window
-          window.location.href = data.url;
-        }
-        return;
-      }
-
-      const { toast } = await import("sonner");
-      toast.error("Não conseguimos abrir o checkout 💛", {
-        description: data?.error || "Tente novamente em instantes — nada foi cobrado.",
-      });
+      submitCheckoutRedirectForm(checkoutPlan, session.access_token, ref);
     } catch (err) {
       const { toast } = await import("sonner");
-      const aborted = (err as Error)?.name === "AbortError";
-      toast.error(aborted ? "A conexão demorou demais ⏳" : "Erro ao iniciar pagamento", {
-        description: aborted
-          ? "Verifique sua internet e tente de novo — nada foi cobrado."
-          : "Tente novamente em instantes.",
+      console.error("[Checkout] Failed to submit redirect form", err);
+      toast.error("Erro ao iniciar pagamento", {
+        description: "Tente novamente em instantes — nada foi cobrado.",
       });
     }
   }, [navigate, session]);

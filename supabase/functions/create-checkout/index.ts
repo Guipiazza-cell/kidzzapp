@@ -29,14 +29,29 @@ const PLAN_AMOUNTS: Record<string, number> = {
   super_premium_annual: 249.90,
 };
 
+const logStep = (step: string, details?: Record<string, unknown>) => {
+  console.log(`[CREATE-CHECKOUT] ${step}${details ? ` - ${JSON.stringify(details)}` : ""}`);
+};
+
+const htmlEscape = (value: string) => value
+  .replaceAll("&", "&amp;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#039;");
+
+const redirectHtml = (url: string) => `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=${htmlEscape(url)}"><title>Abrindo checkout</title><script>window.location.replace(${JSON.stringify(url)});</script></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;background:#fffcf8;color:#2a2a2a"><p style="font-size:16px;font-weight:700">Abrindo checkout seguro…</p></body></html>`;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    logStep("Function started", { method: req.method });
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    logStep("Stripe key loaded", { prefix: stripeKey.slice(0, 7), accountHint: stripeKey.includes("live") ? "live" : "unknown" });
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -48,17 +63,24 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
+    const contentType = req.headers.get("content-type") || "";
+    const isFormRedirect = contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data");
+    const body = isFormRedirect
+      ? Object.fromEntries((await req.formData()).entries())
+      : await req.json().catch(() => ({}));
+    const authHeader = req.headers.get("Authorization") || "";
+    const bodyToken = typeof body.access_token === "string" ? body.access_token : "";
+    const token = (authHeader.startsWith("Bearer ") ? authHeader.replace("Bearer ", "") : bodyToken).trim();
+    if (!token) throw new Error("Missing user token");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const body = await req.json().catch(() => ({}));
-    const plan = body.plan || "premium";
-    const refCode = body.ref || null;
+    const plan = typeof body.plan === "string" ? body.plan : "premium";
+    const refCode = typeof body.ref === "string" ? body.ref : null;
     const priceId = PRICES[plan];
     if (!priceId) throw new Error(`Invalid plan: ${plan}`);
+    logStep("Request validated", { userId: user.id, email: user.email, plan, priceId, transport: isFormRedirect ? "form_redirect" : "json" });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
@@ -73,11 +95,16 @@ serve(async (req) => {
       "https://kidzzapp.lovable.app",
       "https://kidzz.app",
       "https://www.kidzz.app",
+      "https://id-preview--19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovable.app",
+      "https://19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovableproject.com",
       "http://localhost:8080",
       "http://localhost:5173",
     ]);
     const rawOrigin = req.headers.get("origin") || "";
-    const origin = ALLOWED_ORIGINS.has(rawOrigin) ? rawOrigin : "https://kidzzapp.lovable.app";
+    const requestedReturnOrigin = typeof body.return_origin === "string" ? body.return_origin : "";
+    const origin = ALLOWED_ORIGINS.has(requestedReturnOrigin)
+      ? requestedReturnOrigin
+      : ALLOWED_ORIGINS.has(rawOrigin) ? rawOrigin : "https://kidzzapp.lovable.app";
 
     const metadata: Record<string, string> = { user_id: user.id, plan };
     if (refCode) metadata.ref = refCode;
@@ -92,6 +119,7 @@ serve(async (req) => {
       cancel_url: `${origin}/`,
       metadata,
     });
+    logStep("Stripe checkout session created", { sessionId: session.id, hasUrl: Boolean(session.url), customerId: customerId || "new", origin });
 
     if (refCode && session.id) {
       try {
@@ -118,6 +146,16 @@ serve(async (req) => {
       } catch (e) {
         console.error("Referral tracking error (non-blocking):", e);
       }
+    }
+
+    if (!session.url) throw new Error("Stripe returned checkout session without URL");
+
+    if (isFormRedirect) {
+      logStep("Returning HTML same-tab redirect", { sessionId: session.id });
+      return new Response(redirectHtml(session.url), {
+        headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
+        status: 200,
+      });
     }
 
     return new Response(JSON.stringify({ url: session.url }), {

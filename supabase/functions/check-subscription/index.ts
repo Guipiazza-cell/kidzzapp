@@ -14,8 +14,10 @@ const PRODUCT_TIERS: Record<string, string> = {
   // New (2026)
   "prod_UTaV3ceAAUThlX": "kidzz",            // KIDZZ Mensal R$19,90
   "prod_UTaW2oqm99hFrj": "kidzz",            // KIDZZ Anual R$199
+  "prod_UgafeRPgM3wShx": "kidzz",            // KIDZZ Anual R$199,90
   "prod_UTaXRFmVOR4wia": "premium",          // KIDZZ Premium Mensal R$24,90
   "prod_UTaXJcEbqCrQtO": "premium",          // KIDZZ Premium Anual R$249
+  "prod_UgagQHpcdShKz8": "premium",          // KIDZZ Premium Anual R$249,90
   // Legacy (renamed: old premium → kidzz, old super_premium → premium)
   "prod_UDg1BKoaDApx46": "kidzz",
   "prod_UKyyAWU5fNnNai": "kidzz",
