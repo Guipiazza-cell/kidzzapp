@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PaywallScreen from "./PaywallScreen";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,18 @@ export const PaywallProvider = ({ children }: { children: ReactNode }) => {
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
+
+  // Suporte a ?paywall=1 — qualquer link/CTA legado abre o paywall canônico
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("paywall") === "1") {
+      setIsOpen(true);
+      params.delete("paywall");
+      const q = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (q ? `?${q}` : ""));
+    }
+  }, []);
 
   return (
     <PaywallContext.Provider value={{ open, close }}>
