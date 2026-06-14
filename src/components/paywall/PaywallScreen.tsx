@@ -12,17 +12,17 @@ interface PaywallScreenProps {
 type Cycle = "monthly" | "annual";
 
 const FEATURES: Array<{ row: string; free: string; kidzz: string; premium: string }> = [
-  { row: "Para quê",          free: "Experimentar",     kidzz: "Aprender todo dia",  premium: "Desenvolver e conectar" },
-  { row: "Perguntas",         free: "Algumas",          kidzz: "À vontade",          premium: "À vontade" },
-  { row: "Histórias com voz", free: "1 por dia",        kidzz: "À vontade",          premium: "À vontade" },
-  { row: "Floresta Musical",  free: "🔒",               kidzz: "✅",                  premium: "✅" },
-  { row: "Jogos Kidzz Play",  free: "🔒",               kidzz: "✅",                  premium: "✅" },
-  { row: "Memórias",          free: "🔒",               kidzz: "✅",                  premium: "✅" },
-  { row: "Ritual de Sono 🌙", free: "🔒",               kidzz: "🔒",                  premium: "✅" },
-  { row: "Rotina e Momentos", free: "🔒",               kidzz: "🔒",                  premium: "✅" },
-  { row: "KALM completo",     free: "Amostra",          kidzz: "🔒",                  premium: "✅" },
-  { row: "SOS Emocional 🆘",  free: "🔒",               kidzz: "🔒",                  premium: "✅" },
-  { row: "Cinema",            free: "Amostra",          kidzz: "🔒",                  premium: "✅" },
+  { row: "Para quê",          free: "Experimentar",     kidzz: "O dia a dia da curiosidade",  premium: "A experiência completa" },
+  { row: "Perguntas",         free: "Algumas",          kidzz: "À vontade",                   premium: "À vontade" },
+  { row: "Histórias com voz", free: "1 por dia",        kidzz: "À vontade",                   premium: "À vontade" },
+  { row: "Floresta Musical",  free: "🔒",               kidzz: "✅",                          premium: "✅" },
+  { row: "Jogos Kidzz Play",  free: "🔒",               kidzz: "✅",                          premium: "✅" },
+  { row: "Memórias",          free: "🔒",               kidzz: "✅",                          premium: "✅" },
+  { row: "Ritual de Sono 🌙", free: "🔒",               kidzz: "🔒",                          premium: "✅" },
+  { row: "Rotina e Momentos", free: "🔒",               kidzz: "🔒",                          premium: "✅" },
+  { row: "KALM completo",     free: "Amostra",          kidzz: "🔒",                          premium: "✅" },
+  { row: "SOS Emocional 🆘",  free: "🔒",               kidzz: "🔒",                          premium: "✅" },
+  { row: "Cinema",            free: "Amostra",          kidzz: "🔒",                          premium: "✅" },
 ];
 
 const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
@@ -120,7 +120,7 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
           >
             <div className="flex items-center justify-between mb-1">
               <div>
-                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Aprender todo dia</p>
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">O dia a dia da curiosidade</p>
                 <p className="text-lg font-black text-gray-800">Kidzz</p>
               </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -131,7 +131,7 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
             </div>
             <p className="text-xl font-black text-gray-900 mt-1">{priceLabel("kidzz")}</p>
             <p className="text-xs text-gray-700 mt-2">
-              Perguntas e histórias à vontade · Música · Brincar · Memórias
+              Perguntas à vontade · Histórias à vontade com voz · Floresta Musical · Todos os jogos Kidzz Play · Memórias
             </p>
           </motion.button>
 
@@ -148,7 +148,7 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
             </span>
             <div className="flex items-center justify-between mb-1">
               <div>
-                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Desenvolver e conectar</p>
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">A experiência completa</p>
                 <p className="text-lg font-black text-gray-800">Premium</p>
               </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -159,7 +159,7 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
             </div>
             <p className="text-xl font-black text-gray-900 mt-1">{priceLabel("premium")}</p>
             <p className="text-xs text-gray-700 mt-2">
-              Tudo do Kidzz + Sono, Rotina, Momentos, KALM completo, SOS e Cinema
+              Tudo do Kidzz + Mundo dos Sonhos · Rotina e Momentos · KALM completo · SOS Emocional · Cinema · Relatório para os pais
             </p>
           </motion.button>
         </div>
