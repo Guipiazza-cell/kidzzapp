@@ -67,7 +67,7 @@ const QuotaReachedCard = ({ tipo, isFree, onUpgrade, onAck }: QuotaReachedCardPr
       className="relative max-w-sm mx-auto p-6 rounded-3xl glass-card text-center space-y-4"
     >
       <div className="relative mx-auto w-fit">
-        <ChameleonMascot size="md" mood="sleepy" />
+        <ChameleonMascot size="md" mood="thinking" />
         <Moon size={20} className="absolute -top-1 -right-1 text-kid-purple" />
       </div>
       <h3 className="text-lg font-extrabold text-gray-800">{titulo}</h3>
