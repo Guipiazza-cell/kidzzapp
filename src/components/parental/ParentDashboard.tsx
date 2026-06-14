@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   X, Flame, MessageCircleHeart, BookOpen, Clock, Share2,
-  Lock, Settings, ChevronRight, Sun, CloudSun, Moon, Loader2,
+  Lock, Settings, ChevronRight, Sun, CloudSun, Moon, Loader2, Crown, ExternalLink,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { getToday as getRoutineToday } from "@/lib/routine";
 import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
