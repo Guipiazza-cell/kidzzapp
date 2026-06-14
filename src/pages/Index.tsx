@@ -12,6 +12,7 @@ import AccountSetup from "@/components/onboarding/AccountSetup";
 
 import NotificationTimeOnboarding from "@/components/NotificationTimeOnboarding";
 import ContextualPaywallModal from "@/components/ContextualPaywallModal";
+import AreaGate from "@/components/paywall/AreaGate";
 import type { PaywallContext } from "@/lib/contextualPaywall";
 import HomeScreen from "@/components/flow/HomeScreen";
 
