@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Sparkles, ShieldCheck, X } from "lucide-react";
-import ChameleonMascot from "@/components/ChameleonMascot";
+import { Check, Sparkles, Lock, X } from "lucide-react";
 import { useAuth, type CheckoutPlan } from "@/contexts/AuthContext";
 
 interface PaywallScreenProps {
@@ -10,6 +9,15 @@ interface PaywallScreenProps {
 }
 
 type Cycle = "monthly" | "annual";
+
+// Brand palette (visual only — no logic changes)
+const AMBER = "#E8821A";
+const AMBER_DEEP = "#C96B0E";
+const SAGE = "#7FB069";
+const GOLD = "#E2B64C";
+const CREAM = "#FFFCF8";
+const INK = "#2A2A2A";
+const INK_SOFT = "#5B5B5B";
 
 const FEATURES: Array<{ row: string; free: string; kidzz: string; premium: string }> = [
   { row: "Para quê",          free: "Experimentar",     kidzz: "O dia a dia da curiosidade",  premium: "A experiência completa" },
@@ -27,7 +35,7 @@ const FEATURES: Array<{ row: string; free: string; kidzz: string; premium: strin
 
 const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
   const { handleCheckout, user } = useAuth();
-  const [cycle, setCycle] = useState<Cycle>("monthly");
+  const [cycle, setCycle] = useState<Cycle>("annual");
   const [selected, setSelected] = useState<"kidzz" | "premium">("premium");
   const [loading, setLoading] = useState(false);
 
@@ -36,9 +44,15 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
       ? cycle === "annual" ? "kidzz_annual" : "kidzz"
       : cycle === "annual" ? "premium_annual" : "premium";
 
-  const priceLabel = (plan: "kidzz" | "premium") => {
-    if (plan === "kidzz") return cycle === "annual" ? "R$ 199,90/ano" : "R$ 19,90/mês";
-    return cycle === "annual" ? "R$ 249,90/ano" : "R$ 24,90/mês";
+  const priceParts = (plan: "kidzz" | "premium") => {
+    if (plan === "kidzz") {
+      return cycle === "annual"
+        ? { big: "R$ 199,90", small: "/ano", hint: "≈ R$ 16,66/mês" }
+        : { big: "R$ 19,90", small: "/mês", hint: "" };
+    }
+    return cycle === "annual"
+      ? { big: "R$ 249,90", small: "/ano", hint: "≈ R$ 20,82/mês" }
+      : { big: "R$ 24,90", small: "/mês", hint: "" };
   };
 
   const onSubscribe = async () => {
@@ -57,19 +71,21 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
       className="min-h-screen w-full overflow-y-auto overscroll-contain"
       style={{
         WebkitOverflowScrolling: "touch",
+        background: `linear-gradient(180deg, ${CREAM} 0%, #FBF6EE 100%)`,
+        color: INK,
         paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)",
       }}
     >
-      <div className="max-w-md mx-auto px-5 space-y-5">
+      <div className="max-w-md mx-auto px-5">
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-11 h-11 rounded-full glass-card flex items-center justify-center"
+            className="absolute right-4 w-11 h-11 rounded-full flex items-center justify-center bg-white/80 backdrop-blur shadow-sm border border-black/5"
             style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
             aria-label="Fechar"
           >
-            <X size={20} className="text-gray-700" />
+            <X size={20} style={{ color: INK }} />
           </button>
         )}
 
@@ -77,136 +93,275 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center pt-6 space-y-3"
+          className="text-center pt-8 pb-2"
         >
-          <ChameleonMascot size="md" className="mx-auto" mood="happy" />
-          <h1 className="text-2xl font-black text-gray-800 leading-tight px-2">
+          <h1
+            className="text-[26px] leading-[1.15] font-extrabold px-1"
+            style={{ color: INK, letterSpacing: "-0.01em" }}
+          >
             Escolha como o Kidzz vai cuidar do {nome}
           </h1>
-          <p className="text-sm text-gray-700">
+          <p className="text-[14px] mt-3" style={{ color: INK_SOFT }}>
             Comece grátis. Cancele quando quiser. Sem letras miúdas.
           </p>
         </motion.div>
 
         {/* Cycle toggle */}
-        <div className="glass-card rounded-2xl p-1 flex">
-          {(["monthly", "annual"] as Cycle[]).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCycle(c)}
-              className={`flex-1 min-h-[44px] rounded-xl text-sm font-bold transition-all ${
-                cycle === c ? "bg-white text-gray-900 shadow" : "text-gray-700"
-              }`}
-            >
-              {c === "monthly" ? "Mensal" : "Anual"}
-              {c === "annual" && (
-                <span className="ml-1 text-[10px] text-kid-green font-black">
-                  2 meses grátis
-                </span>
-              )}
-            </button>
-          ))}
+        <div
+          className="mt-7 p-1 rounded-full flex relative"
+          style={{
+            background: "#F1EADC",
+            border: "1px solid rgba(0,0,0,0.04)",
+          }}
+        >
+          {(["monthly", "annual"] as Cycle[]).map((c) => {
+            const active = cycle === c;
+            return (
+              <button
+                key={c}
+                onClick={() => setCycle(c)}
+                className="flex-1 min-h-[44px] rounded-full text-[14px] font-bold transition-all flex items-center justify-center gap-2"
+                style={{
+                  background: active ? "#FFFFFF" : "transparent",
+                  color: active ? INK : INK_SOFT,
+                  boxShadow: active ? "0 2px 10px rgba(42,42,42,0.08)" : "none",
+                }}
+              >
+                {c === "monthly" ? "Mensal" : "Anual"}
+                {c === "annual" && (
+                  <span
+                    className="text-[10px] font-black px-2 py-[2px] rounded-full"
+                    style={{
+                      background: active ? `${SAGE}22` : `${SAGE}33`,
+                      color: "#4A7A38",
+                    }}
+                  >
+                    2 meses grátis
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Plan cards */}
-        <div className="space-y-3">
+        <div className="mt-7 space-y-4">
           {/* Kidzz */}
-          <motion.button
+          <PlanCard
+            label="O DIA A DIA DA CURIOSIDADE"
+            name="Kidzz"
+            price={priceParts("kidzz")}
+            description="Perguntas à vontade · Histórias à vontade com voz · Floresta Musical · Todos os jogos Kidzz Play · Memórias"
+            selected={selected === "kidzz"}
             onClick={() => setSelected("kidzz")}
-            className={`w-full text-left rounded-2xl p-5 glass-card transition-all ${
-              selected === "kidzz" ? "ring-2 ring-kid-purple/70" : ""
-            }`}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <div>
-                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">O dia a dia da curiosidade</p>
-                <p className="text-lg font-black text-gray-800">Kidzz</p>
-              </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                selected === "kidzz" ? "bg-kid-purple border-kid-purple" : "border-gray-300"
-              }`}>
-                {selected === "kidzz" && <Check size={12} className="text-white" />}
-              </div>
-            </div>
-            <p className="text-xl font-black text-gray-900 mt-1">{priceLabel("kidzz")}</p>
-            <p className="text-xs text-gray-700 mt-2">
-              Perguntas à vontade · Histórias à vontade com voz · Floresta Musical · Todos os jogos Kidzz Play · Memórias
-            </p>
-          </motion.button>
+            accent={SAGE}
+          />
 
-          {/* Premium */}
-          <motion.button
+          {/* Premium — hero */}
+          <PlanCard
+            label="A EXPERIÊNCIA COMPLETA"
+            name="Premium"
+            price={priceParts("premium")}
+            description="Tudo do Kidzz + Mundo dos Sonhos · Rotina e Momentos · KALM completo · SOS Emocional · Cinema · Relatório para os pais"
+            selected={selected === "premium"}
             onClick={() => setSelected("premium")}
-            className={`w-full text-left rounded-2xl p-5 glass-card transition-all relative ${
-              selected === "premium" ? "ring-2 ring-kid-yellow/70" : ""
-            }`}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span className="absolute -top-2 right-4 text-[10px] font-black bg-kid-orange text-white px-2 py-1 rounded-full">
-              RECOMENDADO
-            </span>
-            <div className="flex items-center justify-between mb-1">
-              <div>
-                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">A experiência completa</p>
-                <p className="text-lg font-black text-gray-800">Premium</p>
-              </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                selected === "premium" ? "bg-kid-yellow border-kid-yellow" : "border-gray-300"
-              }`}>
-                {selected === "premium" && <Check size={12} className="text-gray-900" />}
-              </div>
-            </div>
-            <p className="text-xl font-black text-gray-900 mt-1">{priceLabel("premium")}</p>
-            <p className="text-xs text-gray-700 mt-2">
-              Tudo do Kidzz + Mundo dos Sonhos · Rotina e Momentos · KALM completo · SOS Emocional · Cinema · Relatório para os pais
-            </p>
-          </motion.button>
+            accent={AMBER}
+            recommended
+          />
         </div>
 
         {/* CTA */}
         <motion.button
           onClick={onSubscribe}
           disabled={loading}
-          className="w-full min-h-[56px] rounded-2xl kid-gradient-premium text-white font-extrabold text-base shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98] transition-transform"
-          whileTap={{ scale: 0.97 }}
+          className="mt-7 w-full min-h-[58px] rounded-2xl font-extrabold text-[17px] flex items-center justify-center gap-2 disabled:opacity-60 transition-transform"
+          whileTap={{ scale: 0.98 }}
+          style={{
+            background: `linear-gradient(180deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
+            color: "#FFFFFF",
+            boxShadow: `0 12px 28px -10px ${AMBER}99, inset 0 1px 0 rgba(255,255,255,0.25)`,
+            letterSpacing: "-0.01em",
+          }}
         >
           <Sparkles size={18} />
-          {loading ? "Abrindo..." : user ? "Assinar agora" : "Criar conta e assinar"}
+          {loading ? "Abrindo checkout..." : user ? "Assinar agora" : "Criar conta e assinar"}
+          <span aria-hidden>✨</span>
         </motion.button>
 
-        <div className="flex items-center justify-center gap-2 text-[11px] text-gray-600">
-          <ShieldCheck size={14} className="text-gray-600" />
+        <div
+          className="mt-4 flex items-center justify-center gap-2 text-[12px]"
+          style={{ color: INK_SOFT }}
+        >
+          <Lock size={13} />
           <span>Pagamento seguro via Stripe · Cancele quando quiser</span>
         </div>
-        <p className="text-[11px] text-gray-600 text-center -mt-2">
+        <p
+          className="text-[12px] text-center mt-1"
+          style={{ color: INK_SOFT }}
+        >
           Você não será cobrado hoje sem confirmar.
         </p>
 
         {/* Comparativo */}
-        <div className="glass-card rounded-2xl p-4 mt-2">
-          <p className="text-xs font-bold text-gray-700 mb-3 text-center">
-            O que muda em cada plano
+        <div
+          className="mt-8 rounded-3xl p-5"
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid rgba(0,0,0,0.06)",
+            boxShadow: "0 8px 24px -16px rgba(42,42,42,0.18)",
+          }}
+        >
+          <p
+            className="text-[13px] font-extrabold text-center mb-4"
+            style={{ color: INK, letterSpacing: "0.02em" }}
+          >
+            O QUE MUDA EM CADA PLANO
           </p>
-          <div className="space-y-2">
-            <div className="grid grid-cols-4 gap-1 text-[10px] font-black text-gray-700">
-              <div></div>
-              <div className="text-center">Grátis</div>
-              <div className="text-center">Kidzz</div>
-              <div className="text-center">Premium</div>
-            </div>
-            {FEATURES.map((f) => (
-              <div key={f.row} className="grid grid-cols-4 gap-1 text-[11px] py-1.5 border-t border-gray-300/30">
-                <div className="font-bold text-gray-800">{f.row}</div>
-                <div className="text-center text-gray-700">{f.free}</div>
-                <div className="text-center text-gray-700">{f.kidzz}</div>
-                <div className="text-center text-gray-700">{f.premium}</div>
-              </div>
-            ))}
+
+          <div
+            className="grid gap-2 pb-3 mb-1 text-[11px] font-black uppercase tracking-wider"
+            style={{ gridTemplateColumns: "1.3fr 1fr 1fr 1fr", color: INK_SOFT }}
+          >
+            <div></div>
+            <div className="text-center">Grátis</div>
+            <div className="text-center" style={{ color: "#4A7A38" }}>Kidzz</div>
+            <div className="text-center" style={{ color: AMBER_DEEP }}>Premium</div>
           </div>
+
+          {FEATURES.map((f, i) => (
+            <div
+              key={f.row}
+              className="grid gap-2 py-3 text-[13px] items-center"
+              style={{
+                gridTemplateColumns: "1.3fr 1fr 1fr 1fr",
+                borderTop: i === 0 ? "1px solid rgba(0,0,0,0.06)" : "1px solid rgba(0,0,0,0.04)",
+              }}
+            >
+              <div className="font-semibold" style={{ color: INK }}>{f.row}</div>
+              <div className="text-center" style={{ color: INK_SOFT }}>{f.free}</div>
+              <div className="text-center font-medium" style={{ color: INK }}>{f.kidzz}</div>
+              <div
+                className="text-center font-bold"
+                style={{ color: INK, background: `${AMBER}0D`, borderRadius: 8, padding: "4px 2px" }}
+              >
+                {f.premium}
+              </div>
+            </div>
+          ))}
         </div>
+
+        <p
+          className="text-center text-[11px] mt-6"
+          style={{ color: INK_SOFT }}
+        >
+          Renovação automática · Cancele a qualquer momento nas configurações.
+        </p>
       </div>
     </div>
+  );
+};
+
+// --- Plan card ---
+interface PlanCardProps {
+  label: string;
+  name: string;
+  price: { big: string; small: string; hint?: string };
+  description: string;
+  selected: boolean;
+  onClick: () => void;
+  accent: string;
+  recommended?: boolean;
+}
+
+const PlanCard = ({
+  label, name, price, description, selected, onClick, accent, recommended,
+}: PlanCardProps) => {
+  return (
+    <motion.button
+      onClick={onClick}
+      whileTap={{ scale: 0.985 }}
+      className="w-full text-left rounded-3xl relative transition-all"
+      style={{
+        padding: recommended ? "22px 20px 20px" : "20px",
+        background: "#FFFFFF",
+        border: selected
+          ? `2px solid ${accent}`
+          : "1.5px solid rgba(0,0,0,0.07)",
+        boxShadow: recommended
+          ? `0 18px 40px -22px ${accent}88, 0 2px 0 rgba(255,255,255,0.6) inset`
+          : selected
+          ? `0 10px 26px -18px ${accent}66`
+          : "0 4px 14px -10px rgba(42,42,42,0.15)",
+      }}
+    >
+      {recommended && (
+        <span
+          className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-black px-3 py-[6px] rounded-full whitespace-nowrap"
+          style={{
+            background: `linear-gradient(180deg, ${GOLD} 0%, ${accent} 100%)`,
+            color: "#FFFFFF",
+            letterSpacing: "0.08em",
+            boxShadow: `0 8px 18px -8px ${accent}AA`,
+          }}
+        >
+          ⭐ RECOMENDADO
+        </span>
+      )}
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p
+            className="text-[10px] font-black tracking-[0.1em]"
+            style={{ color: accent }}
+          >
+            {label}
+          </p>
+          <p
+            className="text-[22px] font-extrabold mt-1"
+            style={{ color: INK, letterSpacing: "-0.01em" }}
+          >
+            {name}
+          </p>
+        </div>
+
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-1"
+          style={{
+            background: selected ? accent : "#FFFFFF",
+            border: selected ? `2px solid ${accent}` : "1.5px solid rgba(0,0,0,0.18)",
+          }}
+        >
+          {selected && <Check size={14} strokeWidth={3} color="#FFFFFF" />}
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-baseline gap-1.5 flex-wrap">
+        <span
+          className="text-[28px] font-black leading-none"
+          style={{ color: INK, letterSpacing: "-0.02em" }}
+        >
+          {price.big}
+        </span>
+        <span className="text-[14px] font-bold" style={{ color: INK_SOFT }}>
+          {price.small}
+        </span>
+        {price.hint && (
+          <span
+            className="text-[11px] font-bold ml-1 px-2 py-[2px] rounded-full"
+            style={{ background: `${SAGE}22`, color: "#4A7A38" }}
+          >
+            {price.hint}
+          </span>
+        )}
+      </div>
+
+      <p
+        className="text-[13px] mt-3 leading-relaxed"
+        style={{ color: INK_SOFT }}
+      >
+        {description}
+      </p>
+    </motion.button>
   );
 };
 
