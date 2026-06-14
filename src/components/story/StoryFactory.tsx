@@ -44,12 +44,11 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
     if (!avatar) return;
     if (!canGenerateStory()) {
       if (tier === "premium") {
-        toast.error("Você atingiu o limite de 5 histórias por hoje! Volte amanhã 💛");
+        toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
       } else if (tier === "kidzz") {
-        toast.info("Você usou suas 3 histórias de hoje! Faça upgrade para Premium e libere 5/dia ✨");
-        window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
+        toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
       } else {
-        toast.info("Sua história grátis já foi criada! Desbloqueie o KIDZZ e crie histórias todos os dias ✨");
+        toast.info("Sua história de hoje já foi criada! Desbloqueie o Kidzz e crie histórias à vontade ✨");
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       }
       return;
