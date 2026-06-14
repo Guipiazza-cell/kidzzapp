@@ -104,41 +104,45 @@ serve(async (req) => {
     }
 
     const ageGuidelines =
-      age <= 3
-        ? "Frases muito curtas (5-8 palavras), vocabulário básico, repetições rítmicas, sons suaves."
+      age <= 5
+        ? "4-5 anos: frases curtas, repetição gostosa (refrões), sons e onomatopeias (toc-toc, splash, zzz), vocabulário concreto, história curta (2-3 min)."
         : age <= 7
-        ? "Frases simples (8-12 palavras), vocabulário do dia a dia, diálogos curtos e animados, humor simples."
-        : "Frases variadas (12-18 palavras), vocabulário expandido, descrições detalhadas, diálogos com nuances emocionais.";
+        ? "6-7 anos: frases um pouco maiores, humor e surpresa, 1-2 palavras novas no contexto, pequenas reviravoltas (3-4 min)."
+        : "8-10 anos: enredo mais rico, sentimentos mais complexos, desafios reais mas seguros, lição sutil (4-6 min).";
 
-    const systemPrompt = `Você é um autor best-seller de literatura infantil. Crie histórias que encantam crianças e adultos.
+    const systemPrompt = `Você é o Kidzz, um camaleão contador de histórias caloroso, mágico e sábio. Você escreve histórias para crianças brasileiras que encantam a criança E tocam o coração de quem lê junto. Toda história deve seguir estes princípios:
 
-CALIBRAÇÃO PARA ${age} ANOS:
-${ageGuidelines}
+1. A CRIANÇA É A HEROÍNA: use o nome (${childName}) como protagonista que age, decide e supera — nunca espectadora. Incorpore o que se sabe dela (${age} anos, gosta de ${interests}) pra parecer feita só pra ela.
 
-TÉCNICAS:
-- Engajamento com perguntas retóricas
-- Imersão sensorial com cores e sons
-- Valores universais (amizade, coragem, empatia) de forma orgânica
-- Diálogos vivos com personalidade
-- Estrutura: Introdução → Desenvolvimento → Clímax → Desfecho`;
+2. LINGUAGEM NA MEDIDA DA IDADE — ${ageGuidelines}
+
+3. ARCO COMPLETO SEMPRE: abertura mágica que fisga em 1 frase → um desejo/probleminha com que a criança se identifica → jornada com 2-3 momentos onde ela age e cresce → clímax gentil onde supera usando uma qualidade boa → final reconfortante e feliz.
+
+4. UM VALOR SEM SERMÃO: cada história planta UMA semente (coragem, empatia, amizade, gentileza, perseverança), mostrada pela AÇÃO, JAMAIS explicada como moral no fim.
+
+5. ENCANTAMENTO SENSORIAL: cores, sons, texturas pra criança VER na cabeça; 1-2 elementos mágicos memoráveis; momentos lúdicos e divertidos.
+
+6. TOM ACOLHEDOR E SEGURO: sem violência, medo real, vilões assustadores ou finais tristes. Conflitos leves e sempre resolvidos. A criança termina se sentindo segura, amada, feliz.
+
+7. PRA LER EM VOZ ALTA: ritmo e musicalidade, frases que fluem faladas, ganchos de cumplicidade entre quem lê e a criança.
+
+REGRA DE OURO: antes de entregar, imagine um pai/mãe lendo em voz alta pro filho dormir. Se não for encantadora, calorosa e fluida assim, reescreva.`;
 
     const avatarDesc = childAvatar
       ? `com tom de pele ${childAvatar.skinTone}, cabelo ${childAvatar.hairColor}, olhos ${childAvatar.eyeColor}, vestindo ${childAvatar.clothingStyle}`
       : "";
 
-    const userPrompt = `Crie uma história INESQUECÍVEL para ${childName} (${age} anos, ${avatarDesc}) que adora ${interests}!
+    const userPrompt = `Crie uma história INESQUECÍVEL para ${childName} (${age} anos${avatarDesc ? `, ${avatarDesc}` : ""}) que adora ${interests}.
 
-O camaleão Kidzz é o amigo mágico da história.
+Você (Kidzz, o camaleão amigo mágico) participa da história junto com ${childName}.
 
-ESTRUTURA - 4 CENAS:
-[CENA 1] O ENCONTRO MÁGICO (3 parágrafos)
-[CENA 2] O GRANDE DESAFIO (3 parágrafos)
-[CENA 3] A SOLUÇÃO CRIATIVA (3 parágrafos)
-[CENA 4] A CELEBRAÇÃO (3 parágrafos)
+ESTRUTURA — divida em 4 cenas, marcadas com [CENA 1], [CENA 2], [CENA 3], [CENA 4]:
+[CENA 1] — O ENCONTRO MÁGICO (abertura que fisga em 1 frase + apresentação do desejo/probleminha).
+[CENA 2] — A JORNADA COMEÇA (${childName} age, descobre, escolhe).
+[CENA 3] — O DESAFIO E A QUALIDADE BOA (${childName} usa coragem/empatia/etc para superar, sem sermão).
+[CENA 4] — O FINAL ACONCHEGANTE (celebração quente, sensação de segurança e felicidade).
 
-Marque cada cena com [CENA 1], [CENA 2], etc.
-Use linguagem adequada para ${age} anos.
-Incorpore ${interests} na trama.`;
+Varie cenários, personagens e enredos a cada história — não comece toda igual. Nunca explique a moral. Nunca termine de forma abrupta.`;
 
     // Generate story text
     const storyResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
