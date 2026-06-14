@@ -9,6 +9,7 @@ import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
 import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
 import LevelUpOverlay from "./components/flow/LevelUpOverlay";
+import { PaywallProvider } from "@/components/paywall/PaywallProvider";
 import { markSeen, markLevelUp } from "@/lib/emotionalState";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -77,24 +78,26 @@ const MainApp = () => {
       <CinemaBackground />
       <MagicalBackground />
       <AuthProvider>
-        <Suspense fallback={null}>
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-        <AppUpdateBanner />
-        <InstallBanner />
-        <OfflineIndicator />
-        <KidzzShareTrigger />
-        <LevelUpOverlay />
+        <PaywallProvider>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/index" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+          <AppUpdateBanner />
+          <InstallBanner />
+          <OfflineIndicator />
+          <KidzzShareTrigger />
+          <LevelUpOverlay />
+        </PaywallProvider>
       </AuthProvider>
     </>
   );
