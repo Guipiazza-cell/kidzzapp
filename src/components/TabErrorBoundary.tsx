@@ -64,6 +64,14 @@ class TabErrorBoundary extends Component<Props, State> {
             </button>
           )}
         </div>
+        {this.state.error && (
+          <p
+            className="text-[10px] text-[#B0A89A] px-6 break-words text-center"
+            style={{ maxWidth: "100%" }}
+          >
+            {this.state.error.slice(0, 220)}
+          </p>
+        )}
       </div>
     );
   }
