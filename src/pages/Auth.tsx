@@ -3,24 +3,28 @@ import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import MagicalBackground from "@/components/MagicalBackground";
 import { toast } from "sonner";
-import chameleonMain from "@/assets/chameleon-main.webp";
 
 type Mode = "login" | "signup" | "forgot";
+
+// Brand palette (matches PaywallScreen)
+const AMBER = "#E8821A";
+const AMBER_DEEP = "#C96B0E";
+const CREAM = "#FFFCF8";
+const INK = "#2A2A2A";
+const INK_SOFT = "#5B5B5B";
 
 const Auth = () => {
   const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isCheckoutFlow = new URLSearchParams(location.search).get("checkout") === "1";
-  const [mode, setMode] = useState<Mode>(() => isCheckoutFlow ? "signup" : "login");
+  const [mode, setMode] = useState<Mode>(() => (isCheckoutFlow ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Já logado? Vai direto pra home (evita tela "travada")
   useEffect(() => {
     if (user && !isCheckoutFlow) navigate("/", { replace: true });
   }, [user, isCheckoutFlow, navigate]);
@@ -39,8 +43,8 @@ const Auth = () => {
         return;
       }
 
-      if (!password.trim() || password.length < 6) {
-        toast.error("A senha deve ter pelo menos 6 caracteres");
+      if (!password.trim() || password.length < 8) {
+        toast.error("A senha deve ter pelo menos 8 caracteres");
         setLoading(false);
         return;
       }
@@ -70,88 +74,97 @@ const Auth = () => {
     }
   };
 
+  const title =
+    mode === "login" ? "Bem-vindo de volta!" : mode === "signup" ? "Crie sua conta ✨" : "Recuperar senha 🔑";
+  const subtitle =
+    mode === "login"
+      ? "Entre para continuar a aventura"
+      : mode === "signup"
+      ? "Os pais criam a conta, as crianças se divertem!"
+      : "Enviaremos um link para redefinir sua senha";
+  const cta =
+    loading ? "Carregando..." : mode === "login" ? "Entrar" : mode === "signup" ? "Criar conta" : "Enviar link";
+
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden relative bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
-      <MagicalBackground />
-
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
-        {/* Mascote oficial */}
-        <motion.img
-          src={chameleonMain}
-          alt="Camaleão Kidzz"
-          className="w-32 h-32 object-contain"
-          style={{
-            background: "transparent",
-            filter: "drop-shadow(0 24px 36px rgba(46, 68, 56, 0.30))",
-          }}
-          draggable={false}
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1, y: [0, -12, 0], rotate: [0, -2, 2, 0] }}
-          transition={{
-            opacity: { duration: 0.4 },
-            scale: { type: "spring", stiffness: 180, damping: 14 },
-            y: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
-            rotate: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
-          }}
-        />
-
+    <div
+      className="min-h-screen w-full flex flex-col items-center px-6"
+      style={{
+        background: `linear-gradient(180deg, ${CREAM} 0%, #FBF6EE 100%)`,
+        color: INK,
+        paddingTop: "calc(env(safe-area-inset-top, 0px) + 48px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 32px)",
+      }}
+    >
+      <div className="w-full max-w-sm flex flex-col items-center">
         <motion.h1
-          className="text-3xl font-extrabold text-gray-800 text-center mt-3 drop-shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
+          className="text-3xl font-extrabold text-center tracking-tight"
+          style={{ color: INK, fontWeight: 800 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ duration: 0.35 }}
         >
-          {mode === "login" ? "Bem-vindo de volta!" : mode === "signup" ? "Crie sua conta! 🌟" : "Recuperar senha 🔑"}
+          {title}
         </motion.h1>
 
         <motion.p
-          className="text-gray-500 text-center text-sm mt-1 max-w-xs"
+          className="text-center text-[15px] mt-2"
+          style={{ color: INK_SOFT }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.15 }}
         >
-          {mode === "login"
-            ? "Entre para continuar a aventura"
-            : mode === "signup"
-            ? "Os pais criam a conta, as crianças se divertem!"
-            : "Enviaremos um link para redefinir sua senha"}
+          {subtitle}
         </motion.p>
 
         <motion.form
           onSubmit={handleSubmit}
-          className="w-full max-w-sm mt-6 space-y-3"
-          initial={{ opacity: 0, y: 30 }}
+          className="w-full mt-8 space-y-3"
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.25 }}
         >
           <div className="relative">
-            <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "#A38B6B" }} />
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Email dos pais"
-              className="w-full py-4 pl-11 pr-5 rounded-2xl glass-card text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-kid-orange/40 transition-all"
+              autoComplete="email"
+              className="w-full py-4 pl-11 pr-4 rounded-2xl bg-white text-[15px] placeholder:text-[#A89C8A] focus:outline-none transition-all"
+              style={{
+                color: INK,
+                border: "1px solid #EADFCC",
+                boxShadow: "0 1px 2px rgba(40,30,15,0.04)",
+              }}
               required
             />
           </div>
 
           {mode !== "forgot" && (
             <div className="relative">
-              <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "#A38B6B" }} />
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Senha (mínimo 6 caracteres)"
-                className="w-full py-4 pl-11 pr-12 rounded-2xl glass-card text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-kid-orange/40 transition-all"
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Senha (mínimo 8 caracteres)"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                className="w-full py-4 pl-11 pr-12 rounded-2xl bg-white text-[15px] placeholder:text-[#A89C8A] focus:outline-none transition-all"
+                style={{
+                  color: INK,
+                  border: "1px solid #EADFCC",
+                  boxShadow: "0 1px 2px rgba(40,30,15,0.04)",
+                }}
                 required
-                minLength={6}
+                minLength={8}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-1/2 -translate-y-1/2"
+                style={{ color: "#A38B6B" }}
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -161,23 +174,23 @@ const Auth = () => {
           <motion.button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-pink text-white font-extrabold text-lg shadow-2xl disabled:opacity-50 transition-all active:scale-95"
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-4 rounded-2xl font-extrabold text-white text-[17px] disabled:opacity-60 transition-all mt-2"
+            style={{
+              background: `linear-gradient(180deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
+              boxShadow: "0 8px 20px -8px rgba(232,130,26,0.55), inset 0 1px 0 rgba(255,255,255,0.25)",
+              letterSpacing: 0.2,
+            }}
           >
-            {loading
-              ? "Carregando..."
-              : mode === "login"
-              ? "Entrar 🚀"
-              : mode === "signup"
-              ? "Criar conta 🎉"
-              : "Enviar link 📧"}
+            {cta}
           </motion.button>
 
           {mode === "login" && (
             <button
               type="button"
               onClick={() => setMode("forgot")}
-              className="w-full text-gray-400 text-xs text-center hover:text-gray-600 transition-colors"
+              className="w-full text-center text-[13px] pt-1 hover:underline"
+              style={{ color: INK_SOFT }}
             >
               Esqueceu a senha?
             </button>
@@ -188,12 +201,13 @@ const Auth = () => {
           className="mt-6 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 0.4 }}
         >
           {mode === "forgot" ? (
             <button
               onClick={() => setMode("login")}
-              className="flex items-center gap-2 text-gray-500 text-sm hover:text-gray-700 transition-colors mx-auto"
+              className="flex items-center gap-2 text-[14px] mx-auto hover:underline"
+              style={{ color: INK_SOFT }}
             >
               <ArrowLeft size={16} />
               Voltar ao login
@@ -201,22 +215,34 @@ const Auth = () => {
           ) : (
             <button
               onClick={() => setMode(mode === "login" ? "signup" : "login")}
-              className="text-gray-500 text-sm hover:text-gray-700 transition-colors"
+              className="text-[14px]"
+              style={{ color: INK_SOFT }}
             >
               {mode === "login" ? (
-                <>Não tem conta? <span className="font-bold text-kid-orange">Criar conta</span></>
+                <>
+                  Não tem conta?{" "}
+                  <span className="font-bold" style={{ color: AMBER_DEEP }}>
+                    Criar conta
+                  </span>
+                </>
               ) : (
-                <>Já tem conta? <span className="font-bold text-kid-orange">Entrar</span></>
+                <>
+                  Já tem conta?{" "}
+                  <span className="font-bold" style={{ color: AMBER_DEEP }}>
+                    Entrar
+                  </span>
+                </>
               )}
             </button>
           )}
         </motion.div>
 
         <motion.p
-          className="text-gray-400 text-xs mt-4 text-center"
+          className="text-[12px] mt-8 text-center"
+          style={{ color: "#8A8170" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.3 }}
+          transition={{ delay: 0.55 }}
         >
           🔒 Seus dados estão seguros e protegidos
         </motion.p>
