@@ -7,10 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// 2026 limits: Free 1/dia · Kidzz 3/dia · Premium 5/dia
-const FREE_STORY_LIMIT = 1;
-const KIDZZ_DAILY_STORY_LIMIT = 3;
-const PREMIUM_DAILY_STORY_LIMIT = 5;
+// Quotas validadas/incrementadas via RPC `increment_usage` (fonte única).
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -26,18 +23,20 @@ serve(async (req) => {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const supabaseAuth = createClient(
+    const supabaseUser = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { auth: { persistSession: false } }
+      {
+        auth: { persistSession: false },
+        global: { headers: { Authorization: `Bearer ${token}` } },
+      }
     );
-    const { data: userData, error: userErr } = await supabaseAuth.auth.getUser(token);
+    const { data: userData, error: userErr } = await supabaseUser.auth.getUser(token);
     if (userErr || !userData?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const userId = userData.user.id;
 
     const { childName, childAvatar, age, interests, ageRange } = await req.json();
 
@@ -48,50 +47,30 @@ serve(async (req) => {
       );
     }
 
-    // Server-side quota validation (defense in depth)
+    // Defesa em profundidade: incrementa via RPC (fonte única).
     {
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-        { auth: { persistSession: false } }
+      const { data: quotaData, error: quotaErr } = await (supabaseUser as any).rpc(
+        "increment_usage",
+        { _tipo: "historias" }
       );
-
-      const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("stories_used, is_premium, premium_source, last_usage_date, tier")
-        .eq("id", userId)
-        .single();
-
-      if (profile) {
-        const today = new Date().toISOString().slice(0, 10);
-        let storiesUsed = profile.stories_used ?? 0;
-        const isPremium = !!profile.is_premium;
-        const tier = (profile.tier as string) || (isPremium ? "kidzz" : "free");
-        const limit =
-          tier === "premium" ? PREMIUM_DAILY_STORY_LIMIT
-            : tier === "kidzz" ? KIDZZ_DAILY_STORY_LIMIT
-            : FREE_STORY_LIMIT;
-
-        if (isPremium && profile.last_usage_date !== today) {
-          storiesUsed = 0;
-        }
-
-        if (storiesUsed >= limit) {
-          return new Response(
-            JSON.stringify({
-              error: "LIMIT_REACHED",
-              message: isPremium
-                ? "Limite diário de histórias atingido. Volte amanhã!"
-                : "Você já usou sua história gratuita de hoje. Assine para criar mais histórias!",
-            }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        await supabaseAdmin
-          .from("profiles")
-          .update({ stories_used: storiesUsed + 1, last_usage_date: today })
-          .eq("id", userId);
+      if (quotaErr) {
+        console.error("[GENERATE-STORY] increment_usage error:", quotaErr.message);
+        return new Response(JSON.stringify({ error: "QUOTA_ERROR" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const row = Array.isArray(quotaData) ? quotaData[0] : quotaData;
+      if (!row?.allowed) {
+        const plan = row?.plan ?? "free";
+        return new Response(JSON.stringify({
+          error: "LIMIT_REACHED",
+          plan,
+          message: plan === "free"
+            ? "Você já usou sua história gratuita de hoje. Assine para criar mais."
+            : "Kidzz está sonolento. Volte amanhã!",
+        }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
     }
 

@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   X, Flame, MessageCircleHeart, BookOpen, Clock, Share2,
-  Lock, Settings, ChevronRight, Sun, CloudSun, Moon, Loader2,
+  Lock, Settings, ChevronRight, Sun, CloudSun, Moon, Loader2, Crown, ExternalLink,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { getToday as getRoutineToday } from "@/lib/routine";
 import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
@@ -83,11 +84,29 @@ function dayName(d: Date) {
 
 const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
   const { user, profile } = useAuth();
-  const isPremium = profile?.is_premium ?? false;
+  const ent = useEntitlement();
+  const isPremium = ent.plan !== "free";
   const childName = profile?.child_name || "criança";
   const streak = profile?.streak_days ?? 0;
   const shareRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const openPortal = async () => {
+    if (portalLoading) return;
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      const url = (data as any)?.url;
+      if (url) window.location.href = url;
+      else toast.error("Não foi possível abrir a gestão da assinatura.");
+    } catch (e) {
+      toast.error("Não foi possível abrir a gestão da assinatura.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const [loading, setLoading] = useState(true);
   const [weekQs, setWeekQs] = useState<QRow[]>([]);
@@ -281,6 +300,51 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
               <PeriodPill icon={<Moon size={14} className="text-indigo-500" />} label="Noite" stat={periodBreakdown.night} />
             </div>
           </Section>
+
+          {/* Acompanhe o [NOME] — assinatura */}
+          <Section title={`Acompanhe ${childName}`} emoji="👨‍👩‍👧">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Crown className={`w-4 h-4 ${ent.plan === "premium" ? "text-amber-500" : ent.plan === "kidzz" ? "text-emerald-600" : "text-muted-foreground"}`} />
+                <span className="text-[13px] font-extrabold text-foreground">
+                  Plano {ent.plan === "free" ? "Grátis" : ent.plan === "kidzz" ? "Kidzz" : "Premium"}
+                </span>
+                {ent.inGracePeriod && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">renovação pendente</span>
+                )}
+              </div>
+              {ent.periodEnd && ent.plan !== "free" && (
+                <span className="text-[10px] text-muted-foreground font-semibold">
+                  Próx.: {ent.periodEnd.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-snug mb-3">
+              {ent.plan === "free"
+                ? `Você está acompanhando ${childName} no plano gratuito.`
+                : `Obrigado por apoiar o desenvolvimento de ${childName}. ❤️`}
+            </p>
+            {ent.plan === "free" ? (
+              <button
+                onClick={onOpenUpgrade}
+                className="w-full py-2.5 rounded-xl text-white font-extrabold text-[13px] flex items-center justify-center gap-2"
+                style={{ background: "linear-gradient(135deg, #F4C430, #E8821A)" }}
+              >
+                Ver planos
+              </button>
+            ) : (
+              <button
+                onClick={openPortal}
+                disabled={portalLoading}
+                className="w-full py-2.5 rounded-xl bg-muted hover:bg-muted/70 text-foreground font-extrabold text-[13px] flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {portalLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
+                Gerenciar assinatura
+              </button>
+            )}
+          </Section>
+
+
 
           {/* Premium-only section */}
           {!isPremium && (
