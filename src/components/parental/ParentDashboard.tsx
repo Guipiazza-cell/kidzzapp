@@ -84,11 +84,29 @@ function dayName(d: Date) {
 
 const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
   const { user, profile } = useAuth();
-  const isPremium = profile?.is_premium ?? false;
+  const ent = useEntitlement();
+  const isPremium = ent.plan !== "free";
   const childName = profile?.child_name || "criança";
   const streak = profile?.streak_days ?? 0;
   const shareRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const openPortal = async () => {
+    if (portalLoading) return;
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      const url = (data as any)?.url;
+      if (url) window.location.href = url;
+      else toast.error("Não foi possível abrir a gestão da assinatura.");
+    } catch (e) {
+      toast.error("Não foi possível abrir a gestão da assinatura.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const [loading, setLoading] = useState(true);
   const [weekQs, setWeekQs] = useState<QRow[]>([]);
