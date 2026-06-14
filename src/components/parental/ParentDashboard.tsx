@@ -301,6 +301,51 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
             </div>
           </Section>
 
+          {/* Acompanhe o [NOME] — assinatura */}
+          <Section title={`Acompanhe ${childName}`} emoji="👨‍👩‍👧">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Crown className={`w-4 h-4 ${ent.plan === "premium" ? "text-amber-500" : ent.plan === "kidzz" ? "text-emerald-600" : "text-muted-foreground"}`} />
+                <span className="text-[13px] font-extrabold text-foreground">
+                  Plano {ent.plan === "free" ? "Grátis" : ent.plan === "kidzz" ? "Kidzz" : "Premium"}
+                </span>
+                {ent.inGracePeriod && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">renovação pendente</span>
+                )}
+              </div>
+              {ent.periodEnd && ent.plan !== "free" && (
+                <span className="text-[10px] text-muted-foreground font-semibold">
+                  Próx.: {ent.periodEnd.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-snug mb-3">
+              {ent.plan === "free"
+                ? `Você está acompanhando ${childName} no plano gratuito.`
+                : `Obrigado por apoiar o desenvolvimento de ${childName}. ❤️`}
+            </p>
+            {ent.plan === "free" ? (
+              <button
+                onClick={onOpenUpgrade}
+                className="w-full py-2.5 rounded-xl text-white font-extrabold text-[13px] flex items-center justify-center gap-2"
+                style={{ background: "linear-gradient(135deg, #F4C430, #E8821A)" }}
+              >
+                Ver planos
+              </button>
+            ) : (
+              <button
+                onClick={openPortal}
+                disabled={portalLoading}
+                className="w-full py-2.5 rounded-xl bg-muted hover:bg-muted/70 text-foreground font-extrabold text-[13px] flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {portalLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
+                Gerenciar assinatura
+              </button>
+            )}
+          </Section>
+
+
+
           {/* Premium-only section */}
           {!isPremium && (
             <button
