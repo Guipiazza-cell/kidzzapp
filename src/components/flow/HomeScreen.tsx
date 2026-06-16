@@ -428,7 +428,7 @@ const HomeScreen = ({
 
 
         {/* direita — gift + bell + parental (island glass) */}
-        <div className="flex items-center gap-1.5 flex-1 justify-end">
+        <div className="flex items-center gap-1.5 flex-1 justify-end pointer-events-auto">
           <div
             style={{
               borderRadius: 999,
