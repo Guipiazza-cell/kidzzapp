@@ -117,25 +117,46 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
     >
       <LivingForest variant="light">
-        {/* Header */}
-        <div className="flex items-center gap-3 px-4 pb-3 border-b border-white/30 bg-white/30 backdrop-blur-md"
+        {/* Header — dynamic island */}
+        <div className="flex items-center gap-2 px-3 pb-2 relative z-10"
           style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
-          <button onClick={onBack} className="w-11 h-11 rounded-full bg-white/60 backdrop-blur flex items-center justify-center shadow" aria-label="Voltar">
+          <button
+            onClick={onBack}
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
+            style={{
+              background: "rgba(255,255,255,0.65)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              border: "1px solid rgba(255,255,255,0.55)",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+            }}
+            aria-label="Voltar"
+          >
             <ArrowLeft size={20} className="text-gray-700" />
           </button>
-          <div className="flex-1">
-            <h1 className="text-gray-800 text-lg font-extrabold leading-tight flex items-center gap-2 drop-shadow-sm">
-              <Music2 size={18} className="text-amber-600" /> Floresta Musical
-            </h1>
-            <p className="text-gray-700 text-xs font-semibold">Onde a música nasce 🌿</p>
+          <div
+            className="flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full"
+            style={{
+              background: "rgba(255,255,255,0.65)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              border: "1px solid rgba(255,255,255,0.55)",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+            }}
+          >
+            <Music2 size={16} className="text-amber-600 shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-gray-800 text-[15px] font-extrabold leading-tight truncate">Floresta Musical</h1>
+              <p className="text-gray-600 text-[10.5px] font-semibold leading-tight truncate">Onde a música nasce 🌿</p>
+            </div>
           </div>
           {/* XP & streak chips */}
           <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-1 bg-amber-400/80 backdrop-blur rounded-full px-2.5 py-1 border border-amber-500/40 shadow">
+            <div className="flex items-center gap-1 bg-amber-400/85 backdrop-blur rounded-full px-2.5 py-1 border border-amber-500/40 shadow">
               <span className="text-amber-900 text-[10px] font-extrabold">✨ {xp}</span>
             </div>
             {streak > 0 && (
-              <div className="flex items-center gap-1 bg-pink-400/80 backdrop-blur rounded-full px-2.5 py-1 border border-pink-500/40 shadow">
+              <div className="flex items-center gap-1 bg-pink-400/85 backdrop-blur rounded-full px-2.5 py-1 border border-pink-500/40 shadow">
                 <span className="text-pink-900 text-[10px] font-extrabold">🎵 {streak}d</span>
               </div>
             )}
