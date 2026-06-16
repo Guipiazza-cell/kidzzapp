@@ -106,7 +106,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     >
       {/* Secondary actions (Pais / Assinar) */}
       {(onOpenParents || (onOpenPlans && !isPremium)) && (
-        <div className="flex items-center justify-center gap-2 pb-2">
+        <div className="flex items-center justify-center gap-2 pb-1">
           {onOpenParents && (
             <button
               type="button"
