@@ -37,8 +37,8 @@ const TABS: Tab[] = [
   { id: "memories", label: "Memórias",  icon: ImageIcon,      c: "#C2787F", cl: "#D89BA0" },
 ];
 
-const PILL_W = 54;
-const ITEM_MIN_W = 62;
+const PILL_W = 50;
+const ITEM_MIN_W = 58;
 
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
