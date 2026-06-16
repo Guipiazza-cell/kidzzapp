@@ -122,32 +122,16 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
           <button
             onClick={onBack}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
-            style={{
-              background: "rgba(255,255,255,0.65)",
-              backdropFilter: "blur(20px) saturate(180%)",
-              WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              border: "1px solid rgba(255,255,255,0.55)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-            }}
+            className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
             aria-label="Voltar"
           >
             <ArrowLeft size={20} className="text-gray-700" />
           </button>
-          <div
-            className="flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full"
-            style={{
-              background: "rgba(255,255,255,0.65)",
-              backdropFilter: "blur(20px) saturate(180%)",
-              WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              border: "1px solid rgba(255,255,255,0.55)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-            }}
-          >
+          <div className="glass-island flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full font-ui">
             <Music2 size={16} className="text-amber-600 shrink-0" />
             <div className="min-w-0">
-              <h1 className="text-gray-800 text-[15px] font-extrabold leading-tight truncate">Floresta Musical</h1>
-              <p className="text-gray-600 text-[10.5px] font-semibold leading-tight truncate">Onde a música nasce 🌿</p>
+              <h1 className="font-display text-[17px] font-semibold leading-tight truncate">Floresta Musical</h1>
+              <p className="text-[10.5px] font-semibold leading-tight truncate opacity-75">Onde a música nasce 🌿</p>
             </div>
           </div>
           {/* XP & streak chips */}

@@ -169,48 +169,23 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           else onBack();
           setActiveGame(null);
         }}
-        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
-        style={{
-          background: "rgba(255,255,255,0.65)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          border: "1px solid rgba(255,255,255,0.55)",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-        }}
+        className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
         whileTap={{ scale: 0.9 }}
         aria-label="Voltar"
       >
         <ArrowLeft size={20} className="text-gray-700" />
       </motion.button>
-      <div
-        className="flex-1 min-w-0 text-center px-3.5 py-1.5 rounded-2xl"
-        style={{
-          background: "rgba(255,255,255,0.65)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          border: "1px solid rgba(255,255,255,0.55)",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-        }}
-      >
-        <h1 className="text-[14px] font-extrabold text-gray-800 flex items-center justify-center gap-1 leading-tight">
+      <div className="glass-island flex-1 min-w-0 text-center px-3.5 py-1.5 rounded-2xl font-ui">
+        <h1 className="font-display text-[16px] font-semibold flex items-center justify-center gap-1 leading-tight">
           🎮 Brincar
         </h1>
-        <p className="text-[10.5px] text-gray-600 font-semibold leading-tight">
+        <p className="text-[10.5px] font-semibold leading-tight opacity-80">
           {view === "menu" ? "Escolha sua aventura" : "Jogos rápidos"}
         </p>
       </div>
-      <div
-        className="flex items-center gap-1.5 px-3 py-2 rounded-full min-h-[44px]"
-        style={{
-          background: "rgba(255,255,255,0.65)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          border: "1px solid rgba(255,255,255,0.55)",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-        }}
-      >
+      <div className="glass-island flex items-center gap-1.5 px-3 py-2 rounded-full min-h-[44px] font-ui">
         <Trophy size={14} className="text-amber-500" />
-        <span className="text-xs font-extrabold text-gray-700">{sessionScore}</span>
+        <span className="text-xs font-extrabold">{sessionScore}</span>
       </div>
     </div>
   );

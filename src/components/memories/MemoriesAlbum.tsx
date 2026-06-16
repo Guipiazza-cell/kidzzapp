@@ -256,32 +256,16 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       >
         <motion.button
           onClick={onBack}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
-          style={{
-            background: "rgba(255,255,255,0.65)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.55)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-          }}
+          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
           whileTap={{ scale: 0.9 }}
         >
           <ArrowLeft size={20} />
         </motion.button>
-        <div
-          className="flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl"
-          style={{
-            background: "rgba(255,255,255,0.65)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.55)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-          }}
-        >
-          <h1 className="text-[15px] font-black text-gray-800 leading-tight truncate">
+        <div className="glass-island flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl font-ui">
+          <h1 className="font-display text-[17px] font-semibold leading-tight truncate">
             Memórias de {childName} 💛
           </h1>
-          <p className="text-[10.5px] text-gray-600 font-semibold leading-tight truncate">
+          <p className="text-[10.5px] font-semibold leading-tight truncate opacity-80">
             {totalCount} memórias criadas
           </p>
         </div>
@@ -292,16 +276,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         className="absolute left-0 right-0 z-30 px-4 pb-2"
         style={{ top: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
       >
-        <div
-          className="flex gap-2 p-1 rounded-2xl max-w-sm mx-auto"
-          style={{
-            background: "rgba(255,255,255,0.55)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.50)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-          }}
-        >
+        <div className="glass-island flex gap-2 p-1 rounded-2xl max-w-sm mx-auto">
           {([
             { id: "memories", label: "💛 Conteúdos" },
             { id: "achievements", label: "🏆 Conquistas" },
