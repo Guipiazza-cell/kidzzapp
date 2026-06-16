@@ -192,7 +192,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
       <div
         className="flex-1 overflow-y-auto overscroll-contain px-5"
         style={{
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           WebkitOverflowScrolling: "touch",
         }}
       >
