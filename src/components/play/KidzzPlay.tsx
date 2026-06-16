@@ -160,7 +160,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
   /* ── HEADER comum ── */
   const Header = (
     <div
-      className="relative z-20 flex items-center gap-2 px-3 pt-3 pb-2"
+      className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pt-3 pb-2"
       style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
     >
       <motion.button
