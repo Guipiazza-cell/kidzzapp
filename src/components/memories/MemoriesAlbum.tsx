@@ -249,23 +249,39 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Header */}
+      {/* Header — dynamic island */}
       <header
-        className="flex items-center gap-3 px-4 pb-2 relative z-10"
+        className="flex items-center gap-2 px-3 pb-2 relative z-10"
         style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
       >
         <motion.button
           onClick={onBack}
-          className="p-2 rounded-xl glass-card text-gray-600"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
           whileTap={{ scale: 0.9 }}
         >
           <ArrowLeft size={20} />
         </motion.button>
-        <div className="flex-1">
-          <h1 className="text-lg font-black text-gray-800">
+        <div
+          className="flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
+        >
+          <h1 className="text-[15px] font-black text-gray-800 leading-tight truncate">
             Memórias de {childName} 💛
           </h1>
-          <p className="text-[10px] text-gray-500 font-semibold">
+          <p className="text-[10.5px] text-gray-600 font-semibold leading-tight truncate">
             {totalCount} memórias criadas
           </p>
         </div>
