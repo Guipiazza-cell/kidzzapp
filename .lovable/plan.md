@@ -1,96 +1,78 @@
+# Refino Premium Global — Kidzz
 
-# Sistema de Monetização Kidzz — Plano de Implementação
+Escopo grande que afeta tipografia, sistema de cards/ilhas em todas as abas, e remoção dos camaleões intermediários. Quero alinhar antes de tocar em ~30+ arquivos.
 
-Este é um projeto grande. Vou implementá-lo em 7 blocos, na ordem em que cada peça desbloqueia a próxima. Cada bloco entrega valor sozinho, mas o conjunto só fica consistente no fim.
+## 1. Tipografia (global, `index.css` + `tailwind.config.ts`)
 
-## Bloco 1 — Configuração central de planos
+- Importar Fraunces (display) e Mulish (UI) do Google Fonts.
+- Adicionar famílias Tailwind: `font-display` (Fraunces, opsz auto, weight 500, `font-variation-settings: "SOFT" 50`), `font-ui` (Mulish 400/600/700/800).
+- Manter Nunito como fallback temporário (não vou caçar todos os `font-kids` — apenas trocar a base do `body` para Mulish e aplicar `font-display` nos títulos hero/seção das telas principais).
+- Definir utilitários: `.text-eyebrow` (12px uppercase tracking .13em, Mulish 800, cor = `var(--tab-accent)`).
+- Escala via classes utilitárias nas telas-chave (hero 30–34, card 24–26, body 15).
 
-Criar **um único arquivo** `src/lib/plans.ts` com:
-- Tipos `Plan = 'free' | 'kidzz' | 'premium'` e `Area = 'perguntas' | 'historias' | 'musica' | 'sonhos' | 'rotina' | 'kalm' | 'brincar' | 'cinema' | 'momentos' | 'memorias' | 'sos'`.
-- Mapa `PLAN_ACCESS[plan][area]` → `'full' | 'sample' | 'locked'`.
-- Mapa `DAILY_LIMITS[plan]` → `{ perguntas, historias }` (free=2/1, kidzz=10/5, premium=10/5). **Não exibidos na UI** dos pagos.
-- Função `minPlanFor(area)` para o cadeado dizer "essa parte é do plano X".
+## 2. Sistema "Vidro Vivo" (novo, em `index.css`)
 
-Esse arquivo é a ÚNICA fonte de regras. Qualquer tela que decida acesso por conta própria será refatorada para consultá-lo.
+Criar tokens CSS por aba (data-attribute no root da rota) e classes reutilizáveis:
 
-## Bloco 2 — Backend: tabelas + webhook + ciclo de pagamento
+```css
+[data-tab="perguntas"]  { --tab-accent: #E8915B; }
+[data-tab="kalm"]       { --tab-accent: #6FA86A; }
+[data-tab="sonhos"]     { --tab-accent: #B6A6E8; --tab-mode: dark; }
+[data-tab="historias"]  { --tab-accent: #D87A93; }
+[data-tab="musica"]     { --tab-accent: #6E86D6; }
+[data-tab="rotina"]     { --tab-accent: #5E9BC4; }
+[data-tab="brincar"]    { --tab-accent: #EE8A6A; }
+[data-tab="momentos"]   { --tab-accent: #D9A24E; }
+[data-tab="cinema"]     { --tab-accent: #5B7FA8; --tab-mode: dark; }
+[data-tab="memorias"]   { --tab-accent: #B07AA0; }
+```
 
-Migração Supabase:
-- `subscriptions` (user_id PK, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end, updated_at). RLS: SELECT próprio; INSERT/UPDATE só service_role.
-- `usage` (user_id, date, perguntas_count, historias_count, PK user_id+date). RLS: SELECT próprio; INSERT/UPDATE via RPC `increment_usage(tipo)` security definer.
-- Função `get_effective_plan(user_id)` que devolve `'free'|'kidzz'|'premium'` aplicando regra de ciclo:
-  - `active`/`trialing` + `current_period_end > now()` → plano contratado.
-  - `past_due` + dentro de 3 dias após `current_period_end` → plano contratado com flag de aviso.
-  - caso contrário → `free`.
+Variáveis de vidro com modo claro/escuro (via `[data-tab-mode="dark"]`):
+- `--glass`, `--glass-bd`, `--hi`, `--sheen`, `--ink`.
 
-Edge functions:
-- `create-checkout` (já existe — vou adaptar para usar os Price IDs do `PRICES`/env e marcar metadata `user_id`/`plan`).
-- `stripe-webhook` (novo): valida assinatura com `STRIPE_WEBHOOK_SECRET`, idempotente, trata `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`. Resolve usuário por `stripe_customer_id`. Usa service role.
-- `customer-portal` (já existe — verificar e expor botão).
-- `check-subscription` (já existe — vou simplificar para apenas sincronizar a tabela `subscriptions` a partir do Stripe, como fallback ao webhook).
+Classes novas:
+- `.glass-island` — header/dock/toggle (blur 22px, sheen + cor 10%).
+- `.glass-card` (sobrescrever a existente) — blur 20px saturate(180%), sheen + lavagem diagonal de cor (22% → 6%), borda, inset hi, shadow 3D, radius 26px.
+- `.glass-card-hero` — lavagem mais forte (variant para "Missão do Dia", "Filme da Semana", etc.).
+- `.glass-card::after` — brilho diagonal deslizante 9s linear infinite, baixa opacidade. Respeitar `prefers-reduced-motion`.
 
-Vou precisar do segredo **`STRIPE_WEBHOOK_SECRET`** — peço ao usuário depois que a função estiver criada, junto com a URL do webhook para colar no painel Stripe.
+Setar `data-tab` no wrapper de cada rota/aba (Index/MainApp já tem switch de tab — adicionar `data-tab` no root container conforme aba ativa).
 
-## Bloco 3 — Hook `useEntitlement`
+## 3. Ilhas (header, toggle Pais/Assinar, dock)
 
-`src/hooks/useEntitlement.ts` — única fonte de verdade no frontend.
-- Lê `subscriptions` + `usage` via Supabase.
-- Reavalia: on mount, on auth change, on focus, e quando uma área paga é acessada.
-- Expõe: `plan`, `isFree`, `isKidzz`, `isPremium`, `inGracePeriod`, `canUse(area)`, `accessLevel(area)` (`'full'|'sample'|'locked'`), `limiteAtingido(tipo)`, `gateInfo(area)` (plano mínimo + mensagem), `refresh()`.
-- Usuário grátis sem login: retorna plano `free` lendo `usage` do localStorage como fallback (mas perguntas/historias do logado vão pelo servidor).
+- Header das telas: já são "ilhas" depois do trabalho anterior — trocar o inline-style por `className="glass-island"` para padronizar.
+- `BottomNav`, `SubscribeBanner`, toggle Pais → `.glass-island`.
+- Em abas escuras (Sonhos, Cinema), o `data-tab-mode="dark"` já injeta vidro escuro + texto claro automaticamente.
 
-## Bloco 4 — Paywall único + cadeado
+## 4. Camaleão único na Home (por horário)
 
-- `src/components/paywall/PaywallScreen.tsx`: a tela "Assinatura Kidzz" com 3 cards (Grátis / Kidzz / Premium), toggle Mensal/Anual ("2 meses grátis"), comparativo por transformação (sem números nos pagos), microcopy de segurança, botão "Criar conta e assinar" que chama `create-checkout`.
-- `src/components/paywall/LockedCard.tsx`: card com mascote Kidzz, texto convidativo e CTA "Ver planos".
-- `src/components/paywall/QuotaReachedCard.tsx`: card carinhoso "Kidzz sonolento" para tetos atingidos (free → CTA paywall; pago → apenas "Combinado!").
-- Substituir/remover `Paywall.tsx`, `ConversionScreen.tsx`, `ContextualPaywallModal.tsx` antigos, redirecionando seus pontos de uso para `PaywallScreen`.
+- Manter herói grande SÓ na Home (`HomeScreen.tsx`).
+- Lógica por hora local: manhã (5–12), tarde (12–18), noite (18–5) → seleciona asset + saudação ("Bom dia, curioso!" / "Boa tarde, explorador!" / "Boa noite, sonhador!").
+- Reusar os 3 assets existentes do camaleão se possível. Se forem inconsistentes visualmente, registrar TODO (não gero 3 novos sem aprovação, pra não estourar custo de imagem).
+- Remover renderizações do `ChameleonMascot`/`KidzzChameleon` em: `WellnessHub` (KALM), `KidzzPlay` (Brincar), `FamilyCinema`, `StoryFactory`, e qualquer outra aba onde apareça como mascote grande. Manter só ícones pequenos de UI se forem essenciais.
+- Banco/storage: a memória só menciona `character_profiles` (avatar do filho — não é o camaleão). Não há tabela "chameleons" para limpar. Vou apenas remover do código.
 
-## Bloco 5 — Travas em TODAS as abas
+## 5. Arquivos a editar (estimativa)
 
-Em cada tela de aba, no topo, consultar `useEntitlement().accessLevel(area)`:
-- `'full'` → conteúdo normal.
-- `'sample'` (só free) → mostra 1 item liberado + `LockedCard` no resto.
-- `'locked'` → `LockedCard` ocupando a tela.
+- `index.css` — tokens, fontes, `.glass-*`, animações.
+- `tailwind.config.ts` — famílias `display`/`ui`.
+- `src/MainApp.tsx` ou `src/pages/Index.tsx` — setar `data-tab` no root.
+- `BottomNav.tsx`, `SubscribeBanner.tsx` — trocar inline styles por `.glass-island`.
+- Headers das telas (`MusicForest`, `StoryFactory`, `FamilyCinema`, `MomentsPlaylists`, `MemoriesAlbum`, `KidzzPlay`, `WellnessHub`, `AchievementsScreen`) — substituir inline glass por classe.
+- Cards principais (Missão do Dia, Filme da Semana, Streak, etc.) — aplicar `.glass-card` / `.glass-card-hero`.
+- `HomeScreen.tsx` — lógica de horário + saudação.
+- Remover camaleões intermediários nas abas listadas acima.
 
-Telas a tocar:
-`MusicForest`, `DreamWorld`, `RoutineScreen`, `KalmSections`/wellness, `KidzzPlay`, `FamilyCinema`, `MomentsPlaylists`, `MemoriesAlbum`, `SOSModal`/`SOSCard`, `StoryFactory`, fluxo de Perguntas (`ChatFlow`/`AnswerScreen`).
+## 6. O que NÃO vou tocar
 
-## Bloco 6 — Limites invisíveis (perguntas/histórias)
+- Fundo da floresta (intacto).
+- Lógica de negócio, paywall, quotas, auth.
+- `character_profiles` (avatar do filho, não confundir com camaleão Pixel).
+- Não vou caçar todos os ~200 arquivos para trocar `font-kids` → `font-ui`; deixo Mulish como base do `body` e aplico `font-display` cirurgicamente em hero/títulos.
 
-- Antes de gerar pergunta/história: chamar RPC `increment_usage('perguntas'|'historias')` que devolve `{ allowed, count }` baseado no `DAILY_LIMITS` do plano efetivo.
-- Se bloqueado e plano = free → `QuotaReachedCard` modo "convite paywall".
-- Se bloqueado e plano pago → `QuotaReachedCard` modo "Kidzz sonolento".
-- Reler histórias/respostas existentes nunca conta.
-- Edge functions `kidzz-chat` e `generate-story` também checam (defesa em profundidade — server é a fonte de verdade).
+## Pergunta antes de começar
 
-## Bloco 7 — Histórias de qualidade + "Kiko" → "Kidzz" + painel dos pais
-
-- Atualizar `supabase/functions/generate-story/index.ts` com o system prompt completo do Bloco 6 do briefing (princípios 1–7, modos DORMIR/DIA/TEMÁTICA, regra de variedade, regra de ouro). Idade do filho e nome injetados.
-- `rg -i "kiko"` no projeto e substituir todas as ocorrências de "Kiko" por "Kidzz" (texto e identificadores de UI; preservar nomes de assets já renomeados).
-- `ParentDashboard.tsx`: adicionar bloco "Acompanhe o [NOME]" com status da assinatura, próxima cobrança, botão "Gerenciar assinatura" (chama `customer-portal`) e sinais de uso positivos (perguntas exploradas na semana, histórias vividas, temas favoritos) lidos de `kidzz_questions_log`/`memories`.
-
-## Detalhes técnicos
-
-- Stack atual: React + Vite + Tailwind + Supabase + Stripe já configurado (chaves Stripe live presentes nos edge functions atuais; vou preservar os Price IDs já em `create-checkout`).
-- Webhook: vou criar `supabase/functions/stripe-webhook/index.ts` com `verify_jwt = false` no `config.toml` e usar `stripe.webhooks.constructEventAsync` para validar assinatura.
-- `usage` reseta por data (UTC-3 / Brasília) — chave composta `(user_id, date)` calculada com `to_char(now() at time zone 'America/Sao_Paulo','YYYY-MM-DD')`.
-- Segredos: Stripe key já existe; vou pedir `STRIPE_WEBHOOK_SECRET` após criar a função (e dar ao usuário a URL para colar no Stripe Dashboard → Developers → Webhooks).
-
-## Ordem de execução
-
-1. Migração (subscriptions + usage + RPCs).
-2. Edge functions (webhook + ajustes em create-checkout/check-subscription).
-3. `plans.ts` + `useEntitlement`.
-4. Paywall único + cadeado + quota card.
-5. Aplicar travas nas 11 telas.
-6. Limites invisíveis no fluxo de perguntas/histórias.
-7. Prompt de histórias + substituir "Kiko" + painel dos pais.
-
-## Pontos que preciso confirmar antes de começar
-
-1. **Price IDs**: os 4 atuais em `create-checkout/index.ts` (kidzz mensal/anual, premium mensal/anual) são os corretos para usar? Confirmo que sim e sigo?
-2. **Webhook**: posso criar a função e te passar a URL para colar no Stripe Dashboard e gerar o `STRIPE_WEBHOOK_SECRET`?
-3. **Migração destrutiva?** A tabela `profiles` hoje tem `is_premium`/`premium_source`/`tier`. Posso manter essas colunas como legado (read-only) e usar `subscriptions` como a nova fonte? Ou prefere migrar/limpar?
-
-Aprova o plano? Posso começar pelo Bloco 1+2 (config + backend) assim que confirmar — o resto flui em sequência.
+Confirma que posso prosseguir com TODO esse pacote num único turno? É grande — vai mudar visual de praticamente todas as telas de uma vez. Se preferir, divido em 3 entregas:
+1. Tipografia + tokens + classes de vidro (base, invisível até aplicar).
+2. Aplicar `.glass-island` / `.glass-card` em headers e cards principais.
+3. Camaleão único + remoção dos intermediários.
