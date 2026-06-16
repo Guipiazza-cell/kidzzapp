@@ -154,28 +154,51 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative min-h-0">
 
-      {/* Header */}
-      <header className="relative z-10 flex items-center gap-3 px-4 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
+      {/* Header — dynamic island */}
+      <header className="relative z-10 flex items-center gap-2 px-3 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
         <motion.button
           onClick={onBack}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl glass-card text-gray-600"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
           whileTap={{ scale: 0.9 }}>
-          <ArrowLeft size={22} />
+          <ArrowLeft size={20} />
         </motion.button>
-        <div className="flex items-center gap-2 flex-1">
-          <BookOpen size={18} className="text-kid-orange" />
-          <h1 className="text-lg font-extrabold text-gray-800 drop-shadow-sm">Fábrica de Histórias</h1>
-          <span className="text-[10px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-0.5 rounded-full">
+        <div
+          className="flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
+        >
+          <BookOpen size={16} className="text-kid-orange shrink-0" />
+          <h1 className="text-[15px] font-extrabold text-gray-800 truncate">Fábrica de Histórias</h1>
+          <span className="ml-auto text-[9.5px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-0.5 rounded-full shrink-0">
             EXCLUSIVO
           </span>
         </div>
         <motion.button
           onClick={() => setGalleryOpen(true)}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl glass-card text-amber-600"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-amber-600"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
           whileTap={{ scale: 0.9 }}
           aria-label="Galeria de histórias"
         >
-          <Library size={20} />
+          <Library size={18} />
         </motion.button>
       </header>
 
