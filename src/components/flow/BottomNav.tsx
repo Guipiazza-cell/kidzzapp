@@ -99,8 +99,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
         paddingLeft: 10,
         paddingRight: 10,
-        paddingBottom: "max(env(safe-area-inset-bottom, 8px), 8px)",
-        paddingTop: 8,
+        paddingBottom: "max(env(safe-area-inset-bottom, 4px), 4px)",
+        paddingTop: 4,
         pointerEvents: "auto",
       }}
     >
