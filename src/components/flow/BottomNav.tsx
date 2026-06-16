@@ -260,14 +260,14 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: 44,
-                      height: 44,
-                      transform: isActive ? "translateY(-2px) scale(1.05)" : "translateY(0) scale(1)",
+                      width: 38,
+                      height: 38,
+                      transform: isActive ? "translateY(-1px) scale(1.05)" : "translateY(0) scale(1)",
                       transition: "transform .35s cubic-bezier(.34,1.4,.5,1)",
                     }}
                   >
                     <Icon
-                      size={22}
+                      size={20}
                       strokeWidth={1.9}
                       style={{
                         color: isActive ? "#ffffff" : "#7d6e5b",
