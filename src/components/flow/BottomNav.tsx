@@ -1,7 +1,8 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
-  MessageCircleHeart, BookOpen, Music2, Target, Film, Disc3,
-  Moon, Gamepad2, Heart, Crown, Shield, Leaf,
+  MessageCircle, Leaf, Moon, BookOpen, Puzzle, CalendarDays,
+  Star, Clapperboard, Music2, Image as ImageIcon,
+  Crown, Shield, ChevronRight,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
@@ -14,35 +15,37 @@ interface Props {
   isPremium?: boolean;
 }
 
-/**
- * KIDZZ Dock — 9 abas em 2 fileiras (4 em cima · 5 embaixo).
- * Glass branco premium sobre paleta Cinema v2.0.
- */
-
 type Tab = {
   id: string;
   label: string;
-  icon: typeof MessageCircleHeart;
-  tint: string;
+  icon: typeof MessageCircle;
+  c: string;   // main color
+  cl: string;  // light color
 };
 
-const ROW_TOP: Tab[] = [
-  { id: "chat",     label: "Perguntas", icon: MessageCircleHeart, tint: "hsl(145 26% 28%)" },
-  { id: "explore",  label: "Histórias", icon: BookOpen,           tint: "hsl(38 57% 50%)"  },
-  { id: "music",    label: "Música",    icon: Music2,             tint: "hsl(105 33% 50%)" },
-  { id: "routine",  label: "Rotina",    icon: Target,             tint: "hsl(145 35% 40%)" },
-  { id: "wellness", label: "KALM",      icon: Leaf,               tint: "hsl(150 38% 36%)" },
+// Order: Perguntas, KALM, Sonhos, Histórias, Brincar, Rotina, Momentos, Cinema, Música, Memórias
+const TABS: Tab[] = [
+  { id: "chat",     label: "Perguntas", icon: MessageCircle,  c: "#E8821A", cl: "#F4A659" },
+  { id: "wellness", label: "KALM",      icon: Leaf,           c: "#3FA89B", cl: "#6BC7BC" },
+  { id: "dreams",   label: "Sonhos",    icon: Moon,           c: "#5E5CC2", cl: "#8987DA" },
+  { id: "explore",  label: "Histórias", icon: BookOpen,       c: "#C173A6", cl: "#D89BC2" },
+  { id: "play",     label: "Brincar",   icon: Puzzle,         c: "#DD6A36", cl: "#F08E5E" },
+  { id: "routine",  label: "Rotina",    icon: CalendarDays,   c: "#4F8FC9", cl: "#7DB0E0" },
+  { id: "moments",  label: "Momentos",  icon: Star,           c: "#E5912E", cl: "#F4B25E" },
+  { id: "cinema",   label: "Cinema",    icon: Clapperboard,   c: "#D6A634", cl: "#ECC766" },
+  { id: "music",    label: "Música",    icon: Music2,         c: "#5FA15A", cl: "#86C281" },
+  { id: "memories", label: "Memórias",  icon: ImageIcon,      c: "#C2787F", cl: "#D89BA0" },
 ];
 
-const ROW_BOTTOM: Tab[] = [
-  { id: "cinema",   label: "Cinema",    icon: Film,      tint: "hsl(0 65% 57%)"   },
-  { id: "moments",  label: "Momentos",  icon: Disc3,     tint: "hsl(38 57% 55%)"  },
-  { id: "dreams",   label: "Sonhos",    icon: Moon,      tint: "hsl(255 45% 55%)" },
-  { id: "play",     label: "Brincar",   icon: Gamepad2,  tint: "hsl(105 45% 45%)" },
-  { id: "memories", label: "Memórias",  icon: Heart,     tint: "hsl(335 60% 55%)" },
-];
+const PILL_W = 54;
+const ITEM_MIN_W = 62;
 
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [pill, setPill] = useState<{ left: number; color: string; light: string } | null>(null);
+  const [showFade, setShowFade] = useState(true);
+
   const handle = useCallback((id: string) => {
     if (activeTab === id) return;
     haptic("light");
@@ -50,94 +53,74 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     onTabChange(id);
   }, [activeTab, onTabChange]);
 
-  const renderTab = (tab: Tab) => {
-    const isActive = activeTab === tab.id;
-    const Icon = tab.icon;
-    return (
-      <button
-        key={tab.id}
-        type="button"
-        onClick={() => handle(tab.id)}
-        className="relative flex flex-col items-center justify-center gap-0.5 px-1 py-1 min-w-[44px] min-h-[56px] rounded-xl flex-1 touch-manipulation select-none transition-all duration-150 active:scale-90"
-        style={{
-          WebkitTapHighlightColor: "transparent",
-          touchAction: "manipulation",
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          WebkitTouchCallout: "none",
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-        }}
-        aria-label={tab.label}
-        aria-current={isActive ? "page" : undefined}
-      >
-        <Icon
-          size={isActive ? 20 : 18}
-          strokeWidth={isActive ? 2.4 : 1.9}
-          style={{
-            color: isActive ? tab.tint : "hsl(0 0% 48% / 0.75)",
-            transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
-            transform: isActive ? "scale(1.15)" : "scale(1)",
-          }}
-        />
-        <span
-          className="text-[9.5px] font-extrabold leading-tight tracking-tight whitespace-nowrap"
-          style={{ color: isActive ? "hsl(0 0% 18%)" : "hsl(0 0% 48% / 0.8)" }}
-        >
-          {tab.label}
-        </span>
-        {isActive && (
-          <span
-            aria-hidden
-            className="absolute inset-0 rounded-xl"
-            style={{
-              background: `${tab.tint}18`,
-              border: `1px solid ${tab.tint}30`,
-              transition: "all 0.2s ease",
-            }}
-          />
-        )}
-      </button>
-    );
-  };
+  const updatePill = useCallback(() => {
+    const tab = TABS.find((t) => t.id === activeTab);
+    const el = itemRefs.current[activeTab];
+    const scroller = scrollerRef.current;
+    if (!tab || !el || !scroller) return;
+    const left = el.offsetLeft + (el.offsetWidth - PILL_W) / 2;
+    setPill({ left, color: tab.c, light: tab.cl });
+  }, [activeTab]);
+
+  useLayoutEffect(() => {
+    updatePill();
+  }, [updatePill]);
+
+  useEffect(() => {
+    const onResize = () => updatePill();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [updatePill]);
+
+  // Scroll active into view + fade indicator
+  useEffect(() => {
+    const el = itemRefs.current[activeTab];
+    el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeTab]);
+
+  const onScroll = useCallback(() => {
+    const s = scrollerRef.current;
+    if (!s) return;
+    const atEnd = s.scrollLeft + s.clientWidth >= s.scrollWidth - 4;
+    setShowFade(!atEnd);
+  }, []);
+
+  useEffect(() => {
+    onScroll();
+  }, [onScroll]);
+
+  const activeColor = pill?.color ?? "#E8821A";
 
   return (
     <nav
       data-kidzz-dock
       className="fixed bottom-0 left-0 right-0 z-[90]"
       style={{
-        position: "fixed",
-        bottom: 0,
-        zIndex: 90,
-
-        paddingBottom: "max(env(safe-area-inset-bottom, 6px), 6px)",
-        background: "hsl(48 36% 98% / 0.88)",
-        backdropFilter: "blur(14px) saturate(1.1)",
-        WebkitBackdropFilter: "blur(14px) saturate(1.1)",
-        borderTop: "1px solid hsl(0 0% 100% / 0.75)",
-        boxShadow: "0 -10px 32px -18px hsl(145 26% 28% / 0.22)",
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingBottom: "max(env(safe-area-inset-bottom, 8px), 8px)",
+        paddingTop: 8,
         pointerEvents: "auto",
-        touchAction: "manipulation",
-        userSelect: "none",
       }}
     >
-      {/* Ações secundárias */}
+      {/* Secondary actions (Pais / Assinar) */}
       {(onOpenParents || (onOpenPlans && !isPremium)) && (
-        <div className="flex items-center justify-center gap-2 px-3 pt-1.5">
+        <div className="flex items-center justify-center gap-2 pb-2">
           {onOpenParents && (
             <button
               type="button"
               onClick={() => { haptic("light"); sfx("click"); onOpenParents(); }}
-              className="min-h-[28px] rounded-full px-3 text-[10px] font-black flex items-center gap-1 active:scale-95"
+              className="min-h-[28px] rounded-full px-3 text-[10px] font-bold flex items-center gap-1 active:scale-95"
               style={{
-                background: "hsl(0 0% 100% / 0.85)",
-                border: "1px solid hsl(0 0% 100% / 0.7)",
-                color: "hsl(0 0% 18%)",
+                background: "rgba(255,255,255,0.85)",
+                border: "1px solid rgba(255,255,255,0.7)",
+                color: "#3a2f23",
                 backdropFilter: "blur(10px)",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
-              <Shield size={11} style={{ color: "hsl(145 26% 28%)" }} />
+              <Shield size={11} style={{ color: "#3FA89B" }} />
               Pais
             </button>
           )}
@@ -145,26 +128,218 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
             <button
               type="button"
               onClick={() => { haptic("medium"); sfx("click"); onOpenPlans(); }}
-              className="min-h-[28px] rounded-full px-3 text-[10px] font-black text-white shadow-md flex items-center gap-1 active:scale-95 relative overflow-hidden"
-              style={{ background: "linear-gradient(135deg, hsl(38 57% 63%), hsl(38 57% 50%))" }}
+              className="min-h-[28px] rounded-full px-3 text-[10px] font-bold text-white shadow-md flex items-center gap-1 active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, #F4A659, #E8821A)",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+              }}
             >
-              <span className="shine-overlay" aria-hidden />
-              <Crown size={11} className="relative z-10" />
-              <span className="relative z-10">Assinar</span>
+              <Crown size={11} />
+              Assinar
             </button>
           )}
         </div>
       )}
 
-      {/* Fileira de cima (4) */}
-      <div className="flex items-stretch justify-around px-2 pt-1.5">
-        {ROW_TOP.map(renderTab)}
+      {/* Outer bezel (silver metallic frame) */}
+      <div
+        style={{
+          borderRadius: 36,
+          padding: 2,
+          background:
+            "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 12%, rgba(190,197,206,.82) 30%, rgba(150,158,168,.75) 46%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
+          boxShadow:
+            "0 22px 50px -10px rgba(60,40,15,.45), 0 8px 18px rgba(60,40,15,.24), 0 1px 0 rgba(255,255,255,.6), inset 0 1px 1px rgba(255,255,255,.9)",
+        }}
+      >
+        {/* Inner glass scroller wrapper */}
+        <div
+          style={{
+            position: "relative",
+            borderRadius: 32,
+            overflow: "hidden",
+            background:
+              "linear-gradient(150deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,.12) 48%, rgba(255,255,255,.28) 100%)",
+            backdropFilter: "blur(30px) saturate(200%) brightness(1.08)",
+            WebkitBackdropFilter: "blur(30px) saturate(200%) brightness(1.08)",
+            boxShadow:
+              "inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 -10px 22px rgba(255,255,255,.20), inset 2px 0 10px rgba(255,255,255,.28), inset -2px 0 10px rgba(255,255,255,.28), inset 0 0 0 1px rgba(255,255,255,.18)",
+          }}
+        >
+          {/* Top specular highlight */}
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0,
+              height: "44%",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.18) 55%, rgba(255,255,255,0) 100%)",
+              pointerEvents: "none",
+              borderTopLeftRadius: 32,
+              borderTopRightRadius: 32,
+            }}
+          />
+          {/* Bottom refraction tinted with active color */}
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              bottom: 0, left: 0, right: 0,
+              height: 14,
+              background: `linear-gradient(0deg, ${activeColor}33 0%, transparent 100%)`,
+              pointerEvents: "none",
+              transition: "background .35s ease",
+            }}
+          />
+
+          {/* Scroller */}
+          <div
+            ref={scrollerRef}
+            onScroll={onScroll}
+            className="kidzz-dock-scroller"
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "stretch",
+              gap: 2,
+              padding: "9px 34px 8px 8px",
+              overflowX: "auto",
+              overflowY: "hidden",
+              scrollbarWidth: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {/* Sliding pill behind active icon */}
+            {pill && (
+              <span
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  top: 5,
+                  left: pill.left,
+                  width: PILL_W,
+                  height: 44,
+                  borderRadius: 18,
+                  background: `linear-gradient(155deg, ${pill.light}, ${pill.color})`,
+                  boxShadow: `0 8px 20px -3px ${pill.color}99, inset 0 1.5px 2px rgba(255,255,255,.65), inset 0 -4px 9px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35)`,
+                  transition: "left .45s cubic-bezier(.34,1.4,.5,1), background .35s ease, box-shadow .35s ease",
+                  pointerEvents: "none",
+                }}
+              />
+            )}
+
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  ref={(el) => (itemRefs.current[tab.id] = el)}
+                  type="button"
+                  onClick={() => handle(tab.id)}
+                  className="relative flex flex-col items-center justify-start gap-1 py-1 px-1 rounded-2xl select-none active:scale-95"
+                  style={{
+                    minWidth: ITEM_MIN_W,
+                    flex: "0 0 auto",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    WebkitTapHighlightColor: "transparent",
+                    touchAction: "manipulation",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    transition: "transform .2s ease",
+                  }}
+                  aria-label={tab.label}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <span
+                    style={{
+                      position: "relative",
+                      zIndex: 1,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 44,
+                      height: 44,
+                      transform: isActive ? "translateY(-2px) scale(1.05)" : "translateY(0) scale(1)",
+                      transition: "transform .35s cubic-bezier(.34,1.4,.5,1)",
+                    }}
+                  >
+                    <Icon
+                      size={22}
+                      strokeWidth={1.9}
+                      style={{
+                        color: isActive ? "#ffffff" : "#7d6e5b",
+                        opacity: isActive ? 1 : 0.72,
+                        filter: isActive ? "drop-shadow(0 1px 1px rgba(0,0,0,.25))" : "none",
+                        transition: "color .25s ease, opacity .25s ease",
+                      }}
+                    />
+                  </span>
+                  <span
+                    style={{
+                      position: "relative",
+                      zIndex: 1,
+                      fontSize: 9.5,
+                      lineHeight: 1.1,
+                      letterSpacing: "-0.01em",
+                      fontWeight: isActive ? 700 : 600,
+                      color: isActive ? "#ffffff" : "#5a4d3d",
+                      textShadow: isActive ? "0 1px 1px rgba(0,0,0,.18)" : "none",
+                      whiteSpace: "nowrap",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      transition: "color .25s ease",
+                    }}
+                  >
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right scroll-fade indicator */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: 38,
+              pointerEvents: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              paddingRight: 6,
+              background:
+                "linear-gradient(270deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.30) 55%, rgba(255,255,255,0) 100%)",
+              opacity: showFade ? 1 : 0,
+              transition: "opacity .35s ease",
+            }}
+          >
+            <ChevronRight
+              size={16}
+              strokeWidth={2}
+              className="kidzz-dock-chev"
+              style={{ color: "#8a8f97" }}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Fileira de baixo (5) */}
-      <div className="flex items-stretch justify-around px-1 pt-1 pb-1">
-        {ROW_BOTTOM.map(renderTab)}
-      </div>
+      <style>{`
+        .kidzz-dock-scroller::-webkit-scrollbar { display: none; }
+        @keyframes kidzz-chev-pulse {
+          0%, 100% { opacity: .55; transform: translateX(0); }
+          50% { opacity: 1; transform: translateX(2px); }
+        }
+        .kidzz-dock-chev { animation: kidzz-chev-pulse 2.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .kidzz-dock-chev { animation: none !important; }
+        }
+      `}</style>
     </nav>
   );
 };
