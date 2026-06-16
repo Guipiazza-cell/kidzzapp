@@ -118,7 +118,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
     >
       <LivingForest variant="light">
         {/* Header — dynamic island */}
-        <div className="flex items-center gap-2 px-3 pb-2 relative z-10"
+        <div className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2"
           style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
           <button
             onClick={onBack}
@@ -164,9 +164,10 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
         </div>
 
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-4"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 space-y-4"
           style={{
             WebkitOverflowScrolling: "touch",
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
