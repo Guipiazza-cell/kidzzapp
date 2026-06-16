@@ -216,11 +216,11 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                 aria-hidden
                 style={{
                   position: "absolute",
-                  top: 5,
+                  top: 3,
                   left: pill.left,
                   width: PILL_W,
-                  height: 44,
-                  borderRadius: 18,
+                  height: 38,
+                  borderRadius: 16,
                   background: `linear-gradient(155deg, ${pill.light}, ${pill.color})`,
                   boxShadow: `0 8px 20px -3px ${pill.color}99, inset 0 1.5px 2px rgba(255,255,255,.65), inset 0 -4px 9px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35)`,
                   transition: "left .45s cubic-bezier(.34,1.4,.5,1), background .35s ease, box-shadow .35s ease",
