@@ -226,6 +226,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
       className="flex-1 flex flex-col overflow-y-auto overscroll-contain px-4"
       style={{
         WebkitOverflowScrolling: "touch",
+        paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
       }}
     >
