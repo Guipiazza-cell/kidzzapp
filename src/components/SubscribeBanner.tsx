@@ -22,10 +22,10 @@ const pillBase = {
 const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: SubscribeBannerProps) => {
   if (isPremium) {
     return (
-      <div className="flex items-center justify-between px-4 py-2">
+      <div className="flex items-center justify-between px-4 py-2 pointer-events-none">
         <motion.button
           onClick={onOpenParentalGate}
-          className="flex items-center gap-2 px-3 py-1.5"
+          className="flex items-center gap-2 px-3 py-1.5 pointer-events-auto"
           style={{
             ...pillBase,
             background: "rgba(255,255,255,0.70)",
@@ -48,10 +48,10 @@ const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: 
   const isOver = questionsRemaining <= 0;
 
   return (
-    <div className="flex items-center justify-between px-4 py-2">
+    <div className="flex items-center justify-between px-4 py-2 pointer-events-none">
       {/* Ilha esquerda — status de perguntas */}
       <motion.div
-        className="flex items-center gap-2 px-3 py-1.5"
+        className="flex items-center gap-2 px-3 py-1.5 pointer-events-auto"
         style={{
           ...pillBase,
           background: "rgba(255,255,255,0.70)",
@@ -73,7 +73,7 @@ const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: 
       {/* Ilha direita — CTA dourado */}
       <motion.button
         onClick={openPlans}
-        className="flex items-center gap-1 px-3 py-1.5 rounded-full shadow-sm"
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full shadow-sm pointer-events-auto"
         style={{ background: "linear-gradient(135deg, #D4A847, #F0C85A)" }}
         animate={isLastFree || isOver ? { scale: [1, 1.05, 1] } : {}}
         transition={{ duration: 1.4, repeat: Infinity }}
