@@ -246,22 +246,38 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         }}
       />
 
-      {/* Header */}
+      {/* Header — dynamic island */}
       <header
-        className="relative z-10 flex items-center gap-3 px-5 pb-2"
+        className="relative z-10 flex items-center gap-2 px-3 pb-2"
         style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}
       >
         <motion.button
           onClick={onBack}
           whileTap={{ scale: 0.9 }}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/70 text-gray-900 border border-black/10 shadow-sm"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-900"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
           aria-label="Voltar"
         >
-          <ArrowLeft size={22} />
+          <ArrowLeft size={20} />
         </motion.button>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-gray-900 text-lg font-bold leading-tight">Momentos</h1>
-          <p className="text-gray-700 text-[11.5px] font-medium">Curadoria musical em família</p>
+        <div
+          className="flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
+        >
+          <h1 className="text-gray-900 text-[15px] font-extrabold leading-tight truncate">Momentos</h1>
+          <p className="text-gray-700 text-[10.5px] font-semibold leading-tight truncate">Curadoria musical em família</p>
         </div>
       </header>
 
