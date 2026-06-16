@@ -160,7 +160,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
   /* ── HEADER comum ── */
   const Header = (
     <div
-      className="relative z-20 flex items-center justify-between px-4 pt-3 pb-2"
+      className="relative z-20 flex items-center gap-2 px-3 pt-3 pb-2"
       style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
     >
       <motion.button
@@ -169,21 +169,46 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
           else onBack();
           setActiveGame(null);
         }}
-        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/70 border border-white/40 backdrop-blur"
+        className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
+        style={{
+          background: "rgba(255,255,255,0.65)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          border: "1px solid rgba(255,255,255,0.55)",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+        }}
         whileTap={{ scale: 0.9 }}
         aria-label="Voltar"
       >
         <ArrowLeft size={20} className="text-gray-700" />
       </motion.button>
-      <div className="text-center flex-1">
-        <h1 className="text-base font-extrabold text-gray-800 flex items-center justify-center gap-1.5">
+      <div
+        className="flex-1 min-w-0 text-center px-3.5 py-1.5 rounded-2xl"
+        style={{
+          background: "rgba(255,255,255,0.65)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          border: "1px solid rgba(255,255,255,0.55)",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+        }}
+      >
+        <h1 className="text-[14px] font-extrabold text-gray-800 flex items-center justify-center gap-1 leading-tight">
           🎮 Brincar
         </h1>
-        <p className="text-[11px] text-gray-500 font-semibold">
+        <p className="text-[10.5px] text-gray-600 font-semibold leading-tight">
           {view === "menu" ? "Escolha sua aventura" : "Jogos rápidos"}
         </p>
       </div>
-      <div className="flex items-center gap-1.5 bg-white/70 border border-white/40 px-2.5 py-1.5 rounded-xl backdrop-blur min-w-[44px] min-h-[36px]">
+      <div
+        className="flex items-center gap-1.5 px-3 py-2 rounded-full min-h-[44px]"
+        style={{
+          background: "rgba(255,255,255,0.65)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          border: "1px solid rgba(255,255,255,0.55)",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+        }}
+      >
         <Trophy size={14} className="text-amber-500" />
         <span className="text-xs font-extrabold text-gray-700">{sessionScore}</span>
       </div>
