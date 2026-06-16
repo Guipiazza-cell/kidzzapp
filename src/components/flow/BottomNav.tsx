@@ -203,7 +203,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               display: "flex",
               alignItems: "stretch",
               gap: 2,
-              padding: "9px 34px 8px 8px",
+              padding: "5px 32px 4px 6px",
               overflowX: "auto",
               overflowY: "hidden",
               scrollbarWidth: "none",
