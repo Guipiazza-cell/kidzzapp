@@ -111,6 +111,7 @@ export default function DailyMissionCard({ childName, onAction }: Props) {
               );
             })}
           </div>
+          </div>
         </div>
       </motion.div>
 
