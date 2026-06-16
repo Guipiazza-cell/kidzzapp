@@ -104,40 +104,83 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         pointerEvents: "auto",
       }}
     >
-      {/* Secondary actions (Pais / Assinar) */}
+      {/* Secondary actions (Pais / Assinar) — own floating island */}
       {(onOpenParents || (onOpenPlans && !isPremium)) && (
-        <div className="flex items-center justify-center gap-2 pb-1">
-          {onOpenParents && (
-            <button
-              type="button"
-              onClick={() => { haptic("light"); sfx("click"); onOpenParents(); }}
-              className="min-h-[28px] rounded-full px-3 text-[10px] font-bold flex items-center gap-1 active:scale-95"
+        <div className="flex items-center justify-center pb-2">
+          <div
+            style={{
+              borderRadius: 28,
+              padding: 2,
+              background:
+                "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 12%, rgba(190,197,206,.82) 30%, rgba(150,158,168,.75) 46%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
+              boxShadow:
+                "0 14px 34px -10px rgba(60,40,15,.40), 0 4px 12px rgba(60,40,15,.20), 0 1px 0 rgba(255,255,255,.6), inset 0 1px 1px rgba(255,255,255,.9)",
+            }}
+          >
+            <div
               style={{
-                background: "rgba(255,255,255,0.85)",
-                border: "1px solid rgba(255,255,255,0.7)",
-                color: "#3a2f23",
-                backdropFilter: "blur(10px)",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                position: "relative",
+                borderRadius: 24,
+                overflow: "hidden",
+                background:
+                  "linear-gradient(150deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.14) 48%, rgba(255,255,255,.30) 100%)",
+                backdropFilter: "blur(30px) saturate(200%) brightness(1.08)",
+                WebkitBackdropFilter: "blur(30px) saturate(200%) brightness(1.08)",
+                boxShadow:
+                  "inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 -8px 18px rgba(255,255,255,.18), inset 0 0 0 1px rgba(255,255,255,.18)",
+                padding: "4px 6px",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
               }}
             >
-              <Shield size={11} style={{ color: "#3FA89B" }} />
-              Pais
-            </button>
-          )}
-          {onOpenPlans && !isPremium && (
-            <button
-              type="button"
-              onClick={() => { haptic("medium"); sfx("click"); onOpenPlans(); }}
-              className="min-h-[28px] rounded-full px-3 text-[10px] font-bold text-white shadow-md flex items-center gap-1 active:scale-95"
-              style={{
-                background: "linear-gradient(135deg, #F4A659, #E8821A)",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              <Crown size={11} />
-              Assinar
-            </button>
-          )}
+              <span
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  top: 0, left: 0, right: 0,
+                  height: "55%",
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.15) 60%, rgba(255,255,255,0) 100%)",
+                  pointerEvents: "none",
+                  borderTopLeftRadius: 24,
+                  borderTopRightRadius: 24,
+                }}
+              />
+              {onOpenParents && (
+                <button
+                  type="button"
+                  onClick={() => { haptic("light"); sfx("click"); onOpenParents(); }}
+                  className="relative min-h-[30px] rounded-full px-3 text-[10.5px] font-bold flex items-center gap-1 active:scale-95"
+                  style={{
+                    background: "rgba(255,255,255,0.55)",
+                    border: "1px solid rgba(255,255,255,0.75)",
+                    color: "#3a2f23",
+                    boxShadow: "inset 0 1px 1px rgba(255,255,255,.8), 0 2px 6px rgba(0,0,0,.06)",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  }}
+                >
+                  <Shield size={12} style={{ color: "#3FA89B" }} />
+                  Pais
+                </button>
+              )}
+              {onOpenPlans && !isPremium && (
+                <button
+                  type="button"
+                  onClick={() => { haptic("medium"); sfx("click"); onOpenPlans(); }}
+                  className="relative min-h-[30px] rounded-full px-3 text-[10.5px] font-bold text-white flex items-center gap-1 active:scale-95"
+                  style={{
+                    background: "linear-gradient(135deg, #F4A659, #E8821A)",
+                    boxShadow: "0 4px 10px -2px rgba(232,130,26,.55), inset 0 1px 1px rgba(255,255,255,.45)",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  }}
+                >
+                  <Crown size={12} />
+                  Assinar
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
