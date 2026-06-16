@@ -287,12 +287,21 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         </div>
       </header>
 
-      {/* Section toggle: Memórias / Conquistas (subaba) */}
+      {/* Section toggle: Memórias / Conquistas — dynamic island */}
       <div
-        className="px-4 pb-2 relative z-10"
-        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 72px)" }}
+        className="absolute left-0 right-0 z-30 px-4 pb-2"
+        style={{ top: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
       >
-        <div className="flex gap-2 p-1 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/40 max-w-sm">
+        <div
+          className="flex gap-2 p-1 rounded-2xl max-w-sm mx-auto"
+          style={{
+            background: "rgba(255,255,255,0.55)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.50)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
+        >
           {([
             { id: "memories", label: "💛 Conteúdos" },
             { id: "achievements", label: "🏆 Conquistas" },
@@ -318,9 +327,10 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
 
       {section === "achievements" ? (
         <div
-          className="flex-1 overflow-y-auto overscroll-contain -mt-2"
+          className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             WebkitOverflowScrolling: "touch",
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 64px)",
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
@@ -330,8 +340,11 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       <>
 
 
-      {/* Filters */}
-      <div className="px-4 pb-2">
+      {/* Filters — dynamic island */}
+      <div
+        className="absolute left-0 right-0 z-30 px-4 pb-2"
+        style={{ top: "calc(env(safe-area-inset-top, 0px) + 106px)" }}
+      >
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
           {FILTER_OPTIONS.map((opt) => {
             const isActive = filter === opt.id;
@@ -360,6 +373,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         className="flex-1 overflow-y-auto overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 148px)",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >

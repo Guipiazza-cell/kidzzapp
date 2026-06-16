@@ -91,33 +91,63 @@ const AchievementsScreen = ({ onBack }: Props) => {
       exit={{ opacity: 0, x: 30 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Header */}
+      {/* Header — dynamic island */}
       <header
-        className="flex items-center gap-3 px-5 pb-3 relative z-10"
+        className="absolute top-0 left-0 right-0 z-30 flex items-center gap-3 px-5 pb-3"
         style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
       >
         <motion.button
           onClick={onBack}
-          className="p-2.5 rounded-xl glass-card text-gray-700"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
           whileTap={{ scale: 0.9 }}
         >
           <ArrowLeft size={20} />
         </motion.button>
-        <div className="flex-1">
-          <h1 className="text-xl font-black text-gray-800">Conquistas de {profile?.child_name || "amigo"}</h1>
-          <p className="text-[11px] text-gray-500 font-bold">{unlockedCount}/{BADGES.length} desbloqueadas</p>
+        <div
+          className="flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
+        >
+          <h1 className="text-[15px] font-black text-gray-800 leading-tight truncate">
+            Conquistas de {profile?.child_name || "amigo"}
+          </h1>
+          <p className="text-[10.5px] text-gray-600 font-semibold leading-tight truncate">
+            {unlockedCount}/{BADGES.length} desbloqueadas
+          </p>
         </div>
         <motion.div
-          className="text-3xl"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
+          style={{
+            background: "rgba(255,255,255,0.65)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+          }}
           animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
         >
-          🏆
+          <span className="text-xl">🏆</span>
         </motion.div>
       </header>
 
       {/* Level progress card */}
-      <div className="px-5 mb-3 relative z-10">
+      <div
+        className="px-5 mb-3 relative z-10"
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 64px)" }}
+      >
         <div className="glass-card rounded-2xl p-4">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-2xl">{levelInfo.emoji}</span>
