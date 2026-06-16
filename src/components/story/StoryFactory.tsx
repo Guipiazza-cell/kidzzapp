@@ -155,7 +155,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
     <div className="flex-1 flex flex-col overflow-hidden relative min-h-0">
 
       {/* Header — dynamic island */}
-      <header className="relative z-10 flex items-center gap-2 px-3 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
+      <header className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
         <motion.button
           onClick={onBack}
           className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
@@ -207,6 +207,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         className="flex-1 relative z-10 overflow-y-auto overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >

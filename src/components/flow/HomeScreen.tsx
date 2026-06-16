@@ -345,7 +345,6 @@ const HomeScreen = ({
   return (
     <motion.div
       className="flex-1 flex flex-col relative min-h-0"
-      style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
     >
       <CharacterParticles particles={particles} />
 
@@ -516,15 +515,25 @@ const HomeScreen = ({
         </div>
       </header>
 
-      <SubscribeBanner
-        onOpenParentalGate={() => setShowParentalGateForSettings(true)}
-        questionsRemaining={questionsRemaining()}
-        isPremium={profile?.is_premium ?? false}
-      />
+      {/* Ilhas Pais/Assinar — flutuando logo abaixo do header */}
+      <div
+        className="fixed left-0 right-0 z-[70] pointer-events-none"
+        style={{ top: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
+      >
+        <SubscribeBanner
+          onOpenParentalGate={() => setShowParentalGateForSettings(true)}
+          questionsRemaining={questionsRemaining()}
+          isPremium={profile?.is_premium ?? false}
+        />
+      </div>
 
       <div
         className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain"
-        style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 140px)" }}
+        style={{
+          WebkitOverflowScrolling: "touch",
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 108px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 140px)",
+        }}
       >
         {/* ── 1. HERO — greeting clean + camaleão invadindo ── */}
         <section className="w-full max-w-sm relative pt-3 pb-2">

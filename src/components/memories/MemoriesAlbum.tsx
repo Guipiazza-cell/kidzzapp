@@ -251,7 +251,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
     >
       {/* Header — dynamic island */}
       <header
-        className="flex items-center gap-2 px-3 pb-2 relative z-10"
+        className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2"
         style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
       >
         <motion.button
@@ -288,7 +288,10 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       </header>
 
       {/* Section toggle: Memórias / Conquistas (subaba) */}
-      <div className="px-4 pb-2 relative z-10">
+      <div
+        className="px-4 pb-2 relative z-10"
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 72px)" }}
+      >
         <div className="flex gap-2 p-1 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/40 max-w-sm">
           {([
             { id: "memories", label: "💛 Conteúdos" },
