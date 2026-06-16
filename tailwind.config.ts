@@ -15,6 +15,8 @@ export default {
     extend: {
       fontFamily: {
         kids: ['"Nunito"', 'system-ui', 'sans-serif'],
+        display: ['"Fraunces"', '"Nunito"', 'Georgia', 'serif'],
+        ui: ['"Mulish"', '"Nunito"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
