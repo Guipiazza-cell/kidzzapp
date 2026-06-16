@@ -201,7 +201,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
       className="flex-1 flex flex-col overflow-y-auto overscroll-contain px-4"
       style={{
         WebkitOverflowScrolling: "touch",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
       }}
     >
       {/* KIDZZ — menor, deixa o palco para a curadoria editorial */}
@@ -510,7 +510,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
             className="flex-1 overflow-y-auto overscroll-contain"
             style={{
               WebkitOverflowScrolling: "touch",
-              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
             }}
           >
             <Suspense fallback={<div className="flex items-center justify-center py-16 text-sm font-bold text-gray-600">Carregando jogo… ✨</div>}>

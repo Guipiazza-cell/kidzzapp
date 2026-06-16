@@ -302,7 +302,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
           className="flex-1 overflow-y-auto overscroll-contain -mt-2"
           style={{
             WebkitOverflowScrolling: "touch",
-            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
           <AchievementsScreen onBack={() => setSection("memories")} />
@@ -341,7 +341,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         className="flex-1 overflow-y-auto overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >
         {loading ? (

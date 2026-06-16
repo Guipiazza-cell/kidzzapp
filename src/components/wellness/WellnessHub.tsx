@@ -1581,7 +1581,7 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
       <Atmosphere />
       <div
         className="relative max-w-[520px] mx-auto"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 240px)" }}
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)" }}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -1615,7 +1615,7 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
           onClick={() => { haptic("medium"); setCinemaOpen(true); }}
           className="fixed left-1/2 -translate-x-1/2 z-[40] flex items-center gap-2 px-5 py-3 rounded-full active:scale-[0.97] transition-transform touch-manipulation"
           style={{
-            bottom: "calc(env(safe-area-inset-bottom, 0px) + 172px)",
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 100px)",
             background: "linear-gradient(135deg, hsl(150 30% 96%) 0%, hsl(140 35% 88%) 60%, hsl(150 35% 80%) 100%)",
             border: "1px solid hsl(0 0% 100% / 0.85)",
             boxShadow: "0 1px 0 hsl(0 0% 100% / 0.9) inset, 0 14px 32px -14px hsl(150 30% 25% / 0.4)",

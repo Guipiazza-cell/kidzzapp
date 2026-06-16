@@ -355,7 +355,7 @@ const FamilyCinema = ({ onBack }: Props) => {
         className="flex-1 min-h-0 overflow-y-auto overscroll-contain pt-1 relative z-10"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >
         {/* Hero editorial */}

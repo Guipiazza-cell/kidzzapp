@@ -489,7 +489,7 @@ const DreamWorld = ({ onBack }: Props) => {
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       style={{
         WebkitOverflowScrolling: "touch",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
       }}
     >
       <CinematicBackdrop phase={phase} sleepy={sleepyMode} />

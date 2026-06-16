@@ -380,7 +380,7 @@ const RoutineScreen = () => {
          style={{
            paddingTop: "max(env(safe-area-inset-top, 12px), 12px)",
            WebkitOverflowScrolling: "touch",
-           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
          }}>
       {/* ─── Hero: KIDZZ + Greeting ─── */}
       <header className="relative flex flex-col items-center text-center pt-2 pb-3">

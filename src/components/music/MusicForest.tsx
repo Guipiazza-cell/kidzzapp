@@ -146,7 +146,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
           className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-4"
           style={{
             WebkitOverflowScrolling: "touch",
-            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
           {/* KIDZZ HERO — amarelo dominante (Music Soul), interface orbita */}

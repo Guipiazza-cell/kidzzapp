@@ -184,7 +184,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         className="flex-1 relative z-10 overflow-y-auto overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >
         {step === "intro" &&

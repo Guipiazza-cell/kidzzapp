@@ -434,7 +434,7 @@ const GratitudeJar = () => {
             <motion.div
               initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
               className="fixed inset-x-4 z-[100] rounded-3xl p-5"
-              style={{ background: "#fff", border: `1px solid ${stroke}`, bottom: "calc(env(safe-area-inset-bottom, 0px) + 160px)" }}
+              style={{ background: "#fff", border: `1px solid ${stroke}`, bottom: "calc(env(safe-area-inset-bottom, 0px) + 100px)" }}
             >
               <div className="flex items-center justify-between">
                 <Eyebrow>O que foi bom hoje?</Eyebrow>
