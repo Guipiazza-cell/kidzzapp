@@ -339,8 +339,11 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       <>
 
 
-      {/* Filters */}
-      <div className="px-4 pb-2">
+      {/* Filters — dynamic island */}
+      <div
+        className="absolute left-0 right-0 z-30 px-4 pb-2"
+        style={{ top: "calc(env(safe-area-inset-top, 0px) + 106px)" }}
+      >
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
           {FILTER_OPTIONS.map((opt) => {
             const isActive = filter === opt.id;
@@ -369,6 +372,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         className="flex-1 overflow-y-auto overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 148px)",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >
