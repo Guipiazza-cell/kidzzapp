@@ -416,7 +416,7 @@ const Index = () => {
   return (
     <div className="min-h-[100dvh] flex flex-col overflow-hidden max-w-[100vw]" style={{ height: "auto", overflowX: "hidden" }}>
       {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
-      <div className="flex-1 flex flex-col min-h-0 pb-[120px] relative overflow-hidden" style={{ paddingBottom: "calc(120px + env(safe-area-inset-bottom, 0px))" }}>
+      <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
             <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
