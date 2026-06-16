@@ -345,7 +345,6 @@ const HomeScreen = ({
   return (
     <motion.div
       className="flex-1 flex flex-col relative min-h-0"
-      style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
     >
       <CharacterParticles particles={particles} />
 
