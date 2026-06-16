@@ -385,72 +385,92 @@ const HomeScreen = ({
           </span>
         </div>
 
-        {/* direita — gift + bell + parental */}
+        {/* direita — gift + bell + parental (island glass) */}
         <div className="flex items-center gap-1.5 flex-1 justify-end">
-          {onOpenReferral && user && (
-            <motion.button
-              onClick={() => { haptic("light"); sfx("click"); onOpenReferral(); }}
-              className="relative w-9 h-9 rounded-full flex items-center justify-center"
+          <div
+            style={{
+              borderRadius: 999,
+              padding: 2,
+              background:
+                "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 12%, rgba(190,197,206,.82) 30%, rgba(150,158,168,.75) 46%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
+              boxShadow:
+                "0 10px 24px -8px rgba(60,40,15,.35), 0 3px 8px rgba(60,40,15,.18), inset 0 1px 1px rgba(255,255,255,.9)",
+            }}
+          >
+            <div
               style={{
-                background: "hsl(0 0% 100% / 0.8)",
-                border: "1px solid hsl(0 0% 100% / 0.7)",
-                boxShadow: "0 4px 12px -6px hsl(85 28% 40% / 0.25)",
-                backdropFilter: "blur(12px)",
+                position: "relative",
+                borderRadius: 999,
+                overflow: "hidden",
+                background:
+                  "linear-gradient(150deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.14) 48%, rgba(255,255,255,.30) 100%)",
+                backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                boxShadow:
+                  "inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.18)",
+                padding: "3px 5px",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
               }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Convide amigos"
             >
-              <Gift size={14} style={{ color: "hsl(var(--wellness-deep))" }} />
               <span
                 aria-hidden
-                className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
-                style={{ background: "hsl(var(--kidzz-green))", boxShadow: "0 0 6px hsl(var(--kidzz-green))" }}
+                style={{
+                  position: "absolute",
+                  top: 0, left: 0, right: 0,
+                  height: "55%",
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.15) 60%, rgba(255,255,255,0) 100%)",
+                  pointerEvents: "none",
+                  borderTopLeftRadius: 999,
+                  borderTopRightRadius: 999,
+                }}
               />
-            </motion.button>
-          )}
-          <motion.button
-            onClick={() => setShowParentalGateForDashboard(true)}
-            className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{
-              background: "hsl(0 0% 100% / 0.8)",
-              border: "1px solid hsl(0 0% 100% / 0.7)",
-              boxShadow: "0 4px 12px -6px hsl(100 15% 18% / 0.18)",
-              backdropFilter: "blur(12px)",
-            }}
-            whileTap={{ scale: 0.9 }}
-            aria-label="Notificações"
-          >
-            <Bell size={14} style={{ color: "hsl(var(--premium-ink-soft))" }} />
-          </motion.button>
-          {!user ? (
-            <motion.button
-              onClick={() => navigate("/auth")}
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{
-                background: "hsl(0 0% 100% / 0.8)",
-                border: "1px solid hsl(0 0% 100% / 0.7)",
-                backdropFilter: "blur(12px)",
-              }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Entrar"
-            >
-              <LogIn size={14} style={{ color: "hsl(var(--wellness-deep))" }} />
-            </motion.button>
-          ) : (
-            <motion.button
-              onClick={() => setShowParentalGateForSettings(true)}
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{
-                background: "hsl(0 0% 100% / 0.8)",
-                border: "1px solid hsl(0 0% 100% / 0.7)",
-                backdropFilter: "blur(12px)",
-              }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Controle parental"
-            >
-              <Shield size={14} style={{ color: "hsl(var(--premium-ink-soft))" }} />
-            </motion.button>
-          )}
+              {onOpenReferral && user && (
+                <motion.button
+                  onClick={() => { haptic("light"); sfx("click"); onOpenReferral(); }}
+                  className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Convide amigos"
+                >
+                  <Gift size={14} style={{ color: "hsl(var(--wellness-deep))" }} />
+                  <span
+                    aria-hidden
+                    className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full"
+                    style={{ background: "hsl(var(--kidzz-green))", boxShadow: "0 0 6px hsl(var(--kidzz-green))" }}
+                  />
+                </motion.button>
+              )}
+              <motion.button
+                onClick={() => setShowParentalGateForDashboard(true)}
+                className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                whileTap={{ scale: 0.9 }}
+                aria-label="Notificações"
+              >
+                <Bell size={14} style={{ color: "hsl(var(--premium-ink-soft))" }} />
+              </motion.button>
+              {!user ? (
+                <motion.button
+                  onClick={() => navigate("/auth")}
+                  className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Entrar"
+                >
+                  <LogIn size={14} style={{ color: "hsl(var(--wellness-deep))" }} />
+                </motion.button>
+              ) : (
+                <motion.button
+                  onClick={() => setShowParentalGateForSettings(true)}
+                  className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Controle parental"
+                >
+                  <Shield size={14} style={{ color: "hsl(var(--premium-ink-soft))" }} />
+                </motion.button>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 
