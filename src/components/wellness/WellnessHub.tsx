@@ -260,19 +260,35 @@ const Atmosphere = () => (
 
 /* ────────────── Top bar ────────────── */
 const TopBar = ({ title, onBack, right }: any) => (
-  <div className="px-4 pt-3 pb-2 flex items-center gap-3">
+  <div className="px-3 pt-3 pb-2 flex items-center gap-2">
     <button
       onClick={() => { haptic("light"); onBack(); }}
       className="w-11 h-11 rounded-full flex items-center justify-center"
-      style={{ background: surface, border: `1px solid ${stroke}` }}
+      style={{
+        background: "rgba(255,255,255,0.65)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        border: "1px solid rgba(255,255,255,0.55)",
+        boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+      }}
       aria-label="Voltar"
     >
       <ArrowLeft size={18} style={{ color: ink }} />
     </button>
-    <div className="flex-1 text-center text-[15px] font-semibold" style={{ color: ink }}>
+    <div
+      className="flex-1 min-w-0 text-center text-[14px] font-bold px-3.5 py-2 rounded-full truncate"
+      style={{
+        color: ink,
+        background: "rgba(255,255,255,0.65)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        border: "1px solid rgba(255,255,255,0.55)",
+        boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
+      }}
+    >
       {title}
     </div>
-    <div className="w-11 h-11">{right}</div>
+    <div className="w-11 h-11 flex items-center justify-center">{right}</div>
   </div>
 );
 
