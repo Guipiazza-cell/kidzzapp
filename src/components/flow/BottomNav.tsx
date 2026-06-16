@@ -37,8 +37,8 @@ const TABS: Tab[] = [
   { id: "memories", label: "Memórias",  icon: ImageIcon,      c: "#C2787F", cl: "#D89BA0" },
 ];
 
-const PILL_W = 54;
-const ITEM_MIN_W = 62;
+const PILL_W = 50;
+const ITEM_MIN_W = 58;
 
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -99,14 +99,14 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
         paddingLeft: 10,
         paddingRight: 10,
-        paddingBottom: "max(env(safe-area-inset-bottom, 8px), 8px)",
-        paddingTop: 8,
+        paddingBottom: "max(env(safe-area-inset-bottom, 4px), 4px)",
+        paddingTop: 4,
         pointerEvents: "auto",
       }}
     >
       {/* Secondary actions (Pais / Assinar) */}
       {(onOpenParents || (onOpenPlans && !isPremium)) && (
-        <div className="flex items-center justify-center gap-2 pb-2">
+        <div className="flex items-center justify-center gap-2 pb-1">
           {onOpenParents && (
             <button
               type="button"
@@ -203,7 +203,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               display: "flex",
               alignItems: "stretch",
               gap: 2,
-              padding: "9px 34px 8px 8px",
+              padding: "5px 32px 4px 6px",
               overflowX: "auto",
               overflowY: "hidden",
               scrollbarWidth: "none",
@@ -216,11 +216,11 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                 aria-hidden
                 style={{
                   position: "absolute",
-                  top: 5,
+                  top: 3,
                   left: pill.left,
                   width: PILL_W,
-                  height: 44,
-                  borderRadius: 18,
+                  height: 38,
+                  borderRadius: 16,
                   background: `linear-gradient(155deg, ${pill.light}, ${pill.color})`,
                   boxShadow: `0 8px 20px -3px ${pill.color}99, inset 0 1.5px 2px rgba(255,255,255,.65), inset 0 -4px 9px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35)`,
                   transition: "left .45s cubic-bezier(.34,1.4,.5,1), background .35s ease, box-shadow .35s ease",
@@ -238,7 +238,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                   ref={(el) => (itemRefs.current[tab.id] = el)}
                   type="button"
                   onClick={() => handle(tab.id)}
-                  className="relative flex flex-col items-center justify-start gap-1 py-1 px-1 rounded-2xl select-none active:scale-95"
+                  className="relative flex flex-col items-center justify-start gap-0.5 py-0.5 px-1 rounded-2xl select-none active:scale-95"
                   style={{
                     minWidth: ITEM_MIN_W,
                     flex: "0 0 auto",
@@ -260,14 +260,14 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: 44,
-                      height: 44,
-                      transform: isActive ? "translateY(-2px) scale(1.05)" : "translateY(0) scale(1)",
+                      width: 38,
+                      height: 38,
+                      transform: isActive ? "translateY(-1px) scale(1.05)" : "translateY(0) scale(1)",
                       transition: "transform .35s cubic-bezier(.34,1.4,.5,1)",
                     }}
                   >
                     <Icon
-                      size={22}
+                      size={20}
                       strokeWidth={1.9}
                       style={{
                         color: isActive ? "#ffffff" : "#7d6e5b",
