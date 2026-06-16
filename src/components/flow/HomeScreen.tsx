@@ -345,48 +345,90 @@ const HomeScreen = ({
   return (
     <motion.div
       className="flex-1 flex flex-col relative min-h-0"
+      style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
     >
       <CharacterParticles particles={particles} />
 
-      {/* ── HEADER PREMIUM: KIDZZ centralizado + ações discretas ── */}
+      {/* ── HEADER PREMIUM: ilhas flutuantes (Dynamic Island style) ── */}
       <header
-        className="relative flex items-center justify-between gap-2 px-4 pb-1 z-10"
-        style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 14px)" }}
+        className="fixed top-0 left-0 right-0 flex items-center justify-between gap-2 px-3 z-[80] pointer-events-none"
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)", paddingBottom: 4 }}
       >
-        {/* esquerda — sound + premium badge */}
-        <div className="flex items-center gap-1.5 flex-1">
-          {user && <SoundToggle size={14} />}
-          {profile?.is_premium && (
-            <span
-              className="text-[9px] text-white font-extrabold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm"
-              style={{ background: "linear-gradient(135deg, hsl(var(--kid-purple)), hsl(var(--kid-pink)))" }}
+        {/* esquerda — sound + premium badge (island) */}
+        <div className="flex items-center flex-1 pointer-events-auto">
+          {(user || profile?.is_premium) && (
+            <div
+              style={{
+                borderRadius: 999,
+                padding: 2,
+                background:
+                  "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 12%, rgba(190,197,206,.82) 30%, rgba(150,158,168,.75) 46%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
+                boxShadow:
+                  "0 10px 24px -8px rgba(60,40,15,.35), 0 3px 8px rgba(60,40,15,.18), inset 0 1px 1px rgba(255,255,255,.9)",
+              }}
             >
-              <Crown size={9} /> Premium
-            </span>
+              <div
+                style={{
+                  position: "relative",
+                  borderRadius: 999,
+                  overflow: "hidden",
+                  background:
+                    "linear-gradient(150deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.14) 48%, rgba(255,255,255,.30) 100%)",
+                  backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                  WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                  boxShadow:
+                    "inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.18)",
+                  padding: "4px 8px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                {user && <SoundToggle size={14} />}
+                {profile?.is_premium && (
+                  <span
+                    className="text-[9px] text-white font-extrabold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm"
+                    style={{ background: "linear-gradient(135deg, hsl(var(--kid-purple)), hsl(var(--kid-pink)))" }}
+                  >
+                    <Crown size={9} /> Premium
+                  </span>
+                )}
+              </div>
+            </div>
           )}
         </div>
 
-        {/* centro — KIDZZ wordmark GLASS (camaleão se adapta ao fundo) */}
-        <div className="relative flex-shrink-0 select-none pointer-events-none">
+        {/* centro — KIDZZ wordmark (island glass) */}
+        <div
+          className="relative flex-shrink-0 select-none pointer-events-none"
+          style={{
+            borderRadius: 999,
+            padding: "6px 14px",
+            background:
+              "linear-gradient(150deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.40) 100%)",
+            backdropFilter: "blur(24px) saturate(180%)",
+            WebkitBackdropFilter: "blur(24px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.55)",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.10), inset 0 1px 1px rgba(255,255,255,.9)",
+          }}
+        >
           <span
-            className="relative text-[22px] tracking-[0.18em]"
+            className="relative text-[18px] tracking-[0.18em] leading-none"
             style={{
               fontWeight: 900,
-              color: "hsl(0 0% 100% / 0.15)",
-              WebkitTextStroke: "1.2px hsl(0 0% 100% / 0.9)",
+              color: "hsl(0 0% 100% / 0.25)",
+              WebkitTextStroke: "1.1px hsl(0 0% 100% / 0.95)",
               textShadow:
-                "0 1px 0 hsl(0 0% 100% / 0.9), 0 2px 6px hsl(0 0% 0% / 0.15), 0 0 18px hsl(0 0% 100% / 0.5)",
-              mixBlendMode: "overlay",
-              backdropFilter: "blur(4px)",
-              WebkitBackdropFilter: "blur(4px)",
+                "0 1px 0 hsl(0 0% 100% / 0.9), 0 2px 6px hsl(0 0% 0% / 0.15), 0 0 14px hsl(0 0% 100% / 0.5)",
             }}
           >
             KIDZZ
           </span>
         </div>
 
+
         {/* direita — gift + bell + parental (island glass) */}
-        <div className="flex items-center gap-1.5 flex-1 justify-end">
+        <div className="flex items-center gap-1.5 flex-1 justify-end pointer-events-auto">
           <div
             style={{
               borderRadius: 999,
@@ -482,7 +524,7 @@ const HomeScreen = ({
 
       <div
         className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain"
-        style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)" }}
+        style={{ WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 140px)" }}
       >
         {/* ── 1. HERO — greeting clean + camaleão invadindo ── */}
         <section className="w-full max-w-sm relative pt-3 pb-2">

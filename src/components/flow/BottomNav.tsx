@@ -94,14 +94,16 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
   return (
     <nav
       data-kidzz-dock
-      className="fixed bottom-0 left-0 right-0 z-[90]"
+      className="fixed left-0 right-0 z-[90]"
       style={{
         fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-        paddingLeft: 10,
-        paddingRight: 10,
-        paddingBottom: "max(env(safe-area-inset-bottom, 4px), 4px)",
+        bottom: 0,
+        paddingLeft: 14,
+        paddingRight: 14,
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
         paddingTop: 4,
         pointerEvents: "auto",
+        background: "transparent",
       }}
     >
       {/* Secondary actions (Pais / Assinar) — own floating island */}
