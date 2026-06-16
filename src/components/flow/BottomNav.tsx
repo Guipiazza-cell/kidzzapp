@@ -238,7 +238,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                   ref={(el) => (itemRefs.current[tab.id] = el)}
                   type="button"
                   onClick={() => handle(tab.id)}
-                  className="relative flex flex-col items-center justify-start gap-1 py-1 px-1 rounded-2xl select-none active:scale-95"
+                  className="relative flex flex-col items-center justify-start gap-0.5 py-0.5 px-1 rounded-2xl select-none active:scale-95"
                   style={{
                     minWidth: ITEM_MIN_W,
                     flex: "0 0 auto",
