@@ -158,43 +158,20 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
         <motion.button
           onClick={onBack}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
-          style={{
-            background: "rgba(255,255,255,0.65)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.55)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-          }}
+          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
           whileTap={{ scale: 0.9 }}>
           <ArrowLeft size={20} />
         </motion.button>
-        <div
-          className="flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full"
-          style={{
-            background: "rgba(255,255,255,0.65)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.55)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-          }}
-        >
+        <div className="glass-island flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full font-ui">
           <BookOpen size={16} className="text-kid-orange shrink-0" />
-          <h1 className="text-[15px] font-extrabold text-gray-800 truncate">Fábrica de Histórias</h1>
+          <h1 className="font-display text-[17px] font-semibold truncate">Fábrica de Histórias</h1>
           <span className="ml-auto text-[9.5px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-0.5 rounded-full shrink-0">
             EXCLUSIVO
           </span>
         </div>
         <motion.button
           onClick={() => setGalleryOpen(true)}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-amber-600"
-          style={{
-            background: "rgba(255,255,255,0.65)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.55)",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.9)",
-          }}
+          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-amber-600"
           whileTap={{ scale: 0.9 }}
           aria-label="Galeria de histórias"
         >

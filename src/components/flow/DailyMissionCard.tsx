@@ -57,7 +57,8 @@ export default function DailyMissionCard({ childName, onAction }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="glass-card rounded-2xl px-4 py-3 border border-white/40 shadow-sm">
+        <div className="glass-card-hero px-4 py-3">
+          <div className="relative z-10">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
               <span className="text-[13px]">🎯</span>
@@ -109,6 +110,7 @@ export default function DailyMissionCard({ childName, onAction }: Props) {
                 </motion.button>
               );
             })}
+          </div>
           </div>
         </div>
       </motion.div>
