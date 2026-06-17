@@ -174,6 +174,7 @@ const Index = () => {
     if (!KNOWN_TABS.includes(tab)) return;
     markIntroSettled();
     setActiveTab(tab);
+    try { window.sessionStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
     setShowLab(false);
     setShowTravel(false);
     setShowChallenge(false);
