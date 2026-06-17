@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,9 +32,10 @@ const lazyRetry = (importFn: () => Promise<any>) =>
       })
       .catch((err) => {
         try {
+          persistActiveTab(getInitialTab());
           if (!sessionStorage.getItem("kidzz_chunk_reload")) {
             sessionStorage.setItem("kidzz_chunk_reload", "1");
-            window.location.reload();
+            window.location.replace(window.location.href);
             return new Promise(() => {});
           }
         } catch {}
@@ -75,17 +76,33 @@ import TabErrorBoundary from "@/components/TabErrorBoundary";
 import ConversionNudgeCard from "@/components/viral/ConversionNudgeCard";
 import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCard, markConversionCardShown } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
+import { APP_TAB_DATA, APP_TAB_IDS, normalizeAppTab, type AppTab } from "@/lib/appTabs";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
-const KNOWN_TABS = ["chat", "explore", "music", "routine", "wellness", "cinema", "moments", "dreams", "play", "memories", "achievements"];
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const ACTIVE_TAB_STORAGE_KEY = "kidzz_active_tab";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
-const getInitialTab = () => {
+const persistActiveTab = (tab: AppTab) => {
+  if (typeof window === "undefined") return;
+  try { window.sessionStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
+  try { window.localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
+  try {
+    const url = new URL(window.location.href);
+    if (tab === "chat") url.searchParams.delete("tab");
+    else url.searchParams.set("tab", tab);
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  } catch { /* noop */ }
+};
+const getInitialTab = (): AppTab => {
   if (typeof window === "undefined") return "chat";
   try {
-    const saved = window.sessionStorage.getItem(ACTIVE_TAB_STORAGE_KEY);
-    if (saved && KNOWN_TABS.includes(saved)) return saved;
+    const url = new URL(window.location.href);
+    const fromUrl = normalizeAppTab(url.searchParams.get("tab") || url.hash.replace(/^#\/?/, ""));
+    if (fromUrl) return fromUrl;
+    const fromSession = normalizeAppTab(window.sessionStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
+    if (fromSession) return fromSession;
+    const fromLocal = normalizeAppTab(window.localStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
+    if (fromLocal) return fromLocal;
   } catch { /* noop */ }
   return "chat";
 };
@@ -122,7 +139,7 @@ const Index = () => {
   );
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [activeTab, setActiveTab] = useState(getInitialTab);
+  const [activeTab, setActiveTab] = useState<AppTab>(getInitialTab);
   const [showLab, setShowLab] = useState(false);
   const [showTravel, setShowTravel] = useState(false);
 
@@ -145,14 +162,6 @@ const Index = () => {
   const [showJourney, setShowJourney] = useState(false);
 
   const [kalmInitialExperience, setKalmInitialExperience] = useState<string | null>(null);
-  // Tabs are mounted on first visit and kept alive. Compute synchronously
-  // during render (no useEffect lag) so the tapped tab paints on the same
-  // frame the user changes activeTab — fixes "tab feels frozen on first tap".
-  const mountedTabsRef = useRef<Set<string>>(new Set(["chat"]));
-  if (!mountedTabsRef.current.has(activeTab)) {
-    mountedTabsRef.current.add(activeTab);
-  }
-  const mountedTabs = mountedTabsRef.current;
   // EmotionalIntro / OnboardingWelcome / KidzzStatesIntro: removidas do fluxo
   useEffect(() => {
     try {
@@ -171,16 +180,17 @@ const Index = () => {
   }, [profile?.age_range]);
 
   const switchTab = useCallback((tab: string) => {
-    if (!KNOWN_TABS.includes(tab)) return;
+    const nextTab = normalizeAppTab(tab);
+    if (!nextTab) return;
     markIntroSettled();
-    setActiveTab(tab);
-    try { window.sessionStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
+    persistActiveTab(nextTab);
+    setActiveTab(nextTab);
     setShowLab(false);
     setShowTravel(false);
     setShowChallenge(false);
     setShowReferral(false);
     setShowRetrospective(false);
-    if (tab === "chat") setStep("home");
+    if (nextTab === "chat") setStep("home");
   }, []);
 
   const handleTabChange = switchTab;
@@ -332,7 +342,7 @@ const Index = () => {
 
   // Cada aba é renderizada uma vez (lazy, sob demanda) e mantida montada.
   // ESTE useMemo PRECISA ficar antes dos returns condicionais (regra de hooks).
-  const TAB_RENDERERS: Record<string, () => JSX.Element> = useMemo(() => ({
+  const TAB_RENDERERS: Record<AppTab, () => JSX.Element> = useMemo(() => ({
     chat: () => (
       <ChatFlow
         step={step} question={question} answer={answer}
@@ -390,6 +400,8 @@ const Index = () => {
       </AreaGate>
     ),
   }), [step, question, answer, childName, profile, evolution, activeTab, handleQuestionSubmit, handleAnswerReady, handleCelebrationDone, handleNewQuestion, handleTabChange, switchTab, backToHome, kalmInitialExperience, addMemory, navigate]);
+  const activeRenderer = TAB_RENDERERS[activeTab] ?? TAB_RENDERERS.chat;
+  const activeTabData = APP_TAB_DATA[activeTab] ?? APP_TAB_DATA.chat;
 
   // ============================================================
   // A PARTIR DAQUI: returns condicionais (gates de onboarding).
@@ -429,41 +441,15 @@ const Index = () => {
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
             <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
-              {KNOWN_TABS.map((tab) => {
-                const TAB_DATA: Record<string, string> = {
-                  chat: "perguntas",
-                  wellness: "kalm",
-                  dreams: "sonhos",
-                  explore: "historias",
-                  play: "brincar",
-                  routine: "rotina",
-                  moments: "momentos",
-                  cinema: "cinema",
-                  music: "musica",
-                  memories: "memorias",
-                  achievements: "memorias",
-                };
-                return (
-                  <div
-                    key={tab}
-                    data-tab={TAB_DATA[tab] ?? "kalm"}
-                    style={{
-                      display: activeTab === tab ? "flex" : "none",
-                      flexDirection: "column",
-                      flex: 1,
-                      minHeight: 0,
-                      position: "absolute",
-                      inset: 0,
-                    }}
-                  >
-                    {mountedTabs.has(tab) && (
-                      <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><div className="flex flex-col items-center gap-3"><div className="w-12 h-12 rounded-2xl animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-24 rounded-full animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-16 rounded-full animate-pulse" style={{background:"hsl(145 26% 90%)"}} /></div></div>}>
-                        {TAB_RENDERERS[tab]?.()}
-                      </Suspense>
-                    )}
-                  </div>
-                );
-              })}
+              <div
+                key={activeTab}
+                data-tab={activeTabData}
+                className="absolute inset-0 flex flex-col min-h-0"
+              >
+                <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><div className="flex flex-col items-center gap-3"><div className="w-12 h-12 rounded-2xl animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-24 rounded-full animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-16 rounded-full animate-pulse" style={{background:"hsl(145 26% 90%)"}} /></div></div>}>
+                  {activeRenderer()}
+                </Suspense>
+              </div>
             </TabErrorBoundary>
           </div>
         </div>

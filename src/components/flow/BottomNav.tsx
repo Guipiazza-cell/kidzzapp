@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
+import { APP_TABS, type AppTab } from "@/lib/appTabs";
 
 interface Props {
   activeTab: string;
@@ -16,26 +17,33 @@ interface Props {
 }
 
 type Tab = {
-  id: string;
+  id: Exclude<AppTab, "achievements">;
   label: string;
   icon: typeof MessageCircle;
   c: string;   // main color
   cl: string;  // light color
 };
 
-// Order: Perguntas, KALM, Sonhos, Histórias, Brincar, Rotina, Momentos, Cinema, Música, Memórias
-const TABS: Tab[] = [
-  { id: "chat",     label: "Perguntas", icon: MessageCircle,  c: "#E8821A", cl: "#F4A659" },
-  { id: "wellness", label: "KALM",      icon: Leaf,           c: "#3FA89B", cl: "#6BC7BC" },
-  { id: "dreams",   label: "Sonhos",    icon: Moon,           c: "#5E5CC2", cl: "#8987DA" },
-  { id: "explore",  label: "Histórias", icon: BookOpen,       c: "#C173A6", cl: "#D89BC2" },
-  { id: "play",     label: "Brincar",   icon: Puzzle,         c: "#DD6A36", cl: "#F08E5E" },
-  { id: "routine",  label: "Rotina",    icon: CalendarDays,   c: "#4F8FC9", cl: "#7DB0E0" },
-  { id: "moments",  label: "Momentos",  icon: Star,           c: "#E5912E", cl: "#F4B25E" },
-  { id: "cinema",   label: "Cinema",    icon: Clapperboard,   c: "#D6A634", cl: "#ECC766" },
-  { id: "music",    label: "Música",    icon: Music2,         c: "#5FA15A", cl: "#86C281" },
-  { id: "memories", label: "Memórias",  icon: ImageIcon,      c: "#C2787F", cl: "#D89BA0" },
-];
+const TAB_ICONS: Record<Exclude<AppTab, "achievements">, typeof MessageCircle> = {
+  chat: MessageCircle,
+  wellness: Leaf,
+  dreams: Moon,
+  explore: BookOpen,
+  play: Puzzle,
+  routine: CalendarDays,
+  moments: Star,
+  cinema: Clapperboard,
+  music: Music2,
+  memories: ImageIcon,
+};
+
+const TABS: Tab[] = APP_TABS.map((tab) => ({
+  id: tab.id,
+  label: tab.label,
+  icon: TAB_ICONS[tab.id],
+  c: tab.color,
+  cl: tab.light,
+}));
 
 const PILL_W = 50;
 const ITEM_MIN_W = 58;
