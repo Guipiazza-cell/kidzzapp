@@ -76,55 +76,11 @@ import TabErrorBoundary from "@/components/TabErrorBoundary";
 import ConversionNudgeCard from "@/components/viral/ConversionNudgeCard";
 import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCard, markConversionCardShown } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
+import { APP_TAB_DATA, APP_TAB_IDS, normalizeAppTab, type AppTab } from "@/lib/appTabs";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
 const ACTIVE_TAB_STORAGE_KEY = "kidzz_active_tab";
-const KNOWN_TABS = ["chat", "wellness", "dreams", "explore", "play", "routine", "moments", "cinema", "music", "memories", "achievements"] as const;
-type AppTab = (typeof KNOWN_TABS)[number];
-const TAB_DATA: Record<AppTab, string> = {
-  chat: "perguntas",
-  wellness: "kalm",
-  dreams: "sonhos",
-  explore: "historias",
-  play: "brincar",
-  routine: "rotina",
-  moments: "momentos",
-  cinema: "cinema",
-  music: "musica",
-  memories: "memorias",
-  achievements: "memorias",
-};
-const TAB_ALIASES: Record<string, AppTab> = {
-  perguntas: "chat",
-  kalm: "wellness",
-  wellness: "wellness",
-  sonhos: "dreams",
-  dreams: "dreams",
-  historias: "explore",
-  histórias: "explore",
-  explore: "explore",
-  brincar: "play",
-  play: "play",
-  rotina: "routine",
-  routine: "routine",
-  momentos: "moments",
-  moments: "moments",
-  cinema: "cinema",
-  musica: "music",
-  música: "music",
-  music: "music",
-  memorias: "memories",
-  memórias: "memories",
-  memories: "memories",
-  achievements: "achievements",
-};
-const normalizeTab = (tab: string | null | undefined): AppTab | null => {
-  if (!tab) return null;
-  const key = tab.trim().toLowerCase();
-  if ((KNOWN_TABS as readonly string[]).includes(key)) return key as AppTab;
-  return TAB_ALIASES[key] ?? null;
-};
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 const persistActiveTab = (tab: AppTab) => {
   if (typeof window === "undefined") return;
@@ -141,11 +97,11 @@ const getInitialTab = (): AppTab => {
   if (typeof window === "undefined") return "chat";
   try {
     const url = new URL(window.location.href);
-    const fromUrl = normalizeTab(url.searchParams.get("tab") || url.hash.replace(/^#\/?/, ""));
+    const fromUrl = normalizeAppTab(url.searchParams.get("tab") || url.hash.replace(/^#\/?/, ""));
     if (fromUrl) return fromUrl;
-    const fromSession = normalizeTab(window.sessionStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
+    const fromSession = normalizeAppTab(window.sessionStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
     if (fromSession) return fromSession;
-    const fromLocal = normalizeTab(window.localStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
+    const fromLocal = normalizeAppTab(window.localStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
     if (fromLocal) return fromLocal;
   } catch { /* noop */ }
   return "chat";
@@ -224,7 +180,7 @@ const Index = () => {
   }, [profile?.age_range]);
 
   const switchTab = useCallback((tab: string) => {
-    const nextTab = normalizeTab(tab);
+    const nextTab = normalizeAppTab(tab);
     if (!nextTab) return;
     markIntroSettled();
     persistActiveTab(nextTab);
@@ -445,7 +401,7 @@ const Index = () => {
     ),
   }), [step, question, answer, childName, profile, evolution, activeTab, handleQuestionSubmit, handleAnswerReady, handleCelebrationDone, handleNewQuestion, handleTabChange, switchTab, backToHome, kalmInitialExperience, addMemory, navigate]);
   const activeRenderer = TAB_RENDERERS[activeTab] ?? TAB_RENDERERS.chat;
-  const activeTabData = TAB_DATA[activeTab] ?? TAB_DATA.chat;
+  const activeTabData = APP_TAB_DATA[activeTab] ?? APP_TAB_DATA.chat;
 
   // ============================================================
   // A PARTIR DAQUI: returns condicionais (gates de onboarding).
