@@ -137,7 +137,7 @@ const persistActiveTab = (tab: AppTab) => {
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
   } catch { /* noop */ }
 };
-const getInitialTab = () => {
+const getInitialTab = (): AppTab => {
   if (typeof window === "undefined") return "chat";
   try {
     const url = new URL(window.location.href);
