@@ -79,8 +79,16 @@ import { showXpGained } from "@/components/flow/XpToast";
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const KNOWN_TABS = ["chat", "explore", "music", "routine", "wellness", "cinema", "moments", "dreams", "play", "memories", "achievements"];
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
+const ACTIVE_TAB_STORAGE_KEY = "kidzz_active_tab";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
-const getInitialTab = () => "chat";
+const getInitialTab = () => {
+  if (typeof window === "undefined") return "chat";
+  try {
+    const saved = window.sessionStorage.getItem(ACTIVE_TAB_STORAGE_KEY);
+    if (saved && KNOWN_TABS.includes(saved)) return saved;
+  } catch { /* noop */ }
+  return "chat";
+};
 const INTRO_SETTLE_KEY = "kidzz_intro_settled_v2";
 const JUST_COMPLETED_ONBOARDING_KEY = "kidzz_just_completed_onboarding";
 const markIntroSettled = () => {
@@ -166,6 +174,7 @@ const Index = () => {
     if (!KNOWN_TABS.includes(tab)) return;
     markIntroSettled();
     setActiveTab(tab);
+    try { window.sessionStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
     setShowLab(false);
     setShowTravel(false);
     setShowChallenge(false);
