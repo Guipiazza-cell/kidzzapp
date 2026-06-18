@@ -173,6 +173,14 @@ const Index = () => {
     } catch {}
   }, []);
 
+  // Garante que o tab inicial fique gravado (URL + storage) já no primeiro render,
+  // pra que qualquer refresh volte exatamente pra mesma aba.
+  useEffect(() => {
+    persistActiveTab(activeTab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
     setSelectedAgeRange(profile.age_range);
