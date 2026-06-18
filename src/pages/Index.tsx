@@ -450,11 +450,10 @@ const Index = () => {
           <div className="absolute inset-0 flex flex-col min-h-0">
             <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
               <div
-                key={activeTab}
                 data-tab={activeTabData}
                 className="absolute inset-0 flex flex-col min-h-0"
               >
-                <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><div className="flex flex-col items-center gap-3"><div className="w-12 h-12 rounded-2xl animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-24 rounded-full animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-16 rounded-full animate-pulse" style={{background:"hsl(145 26% 90%)"}} /></div></div>}>
+                <Suspense fallback={null}>
                   {activeRenderer()}
                 </Suspense>
               </div>
