@@ -448,16 +448,30 @@ const Index = () => {
       <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
-            <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
-              <div
-                data-tab={activeTabData}
-                className="absolute inset-0 flex flex-col min-h-0"
-              >
-                <Suspense fallback={null}>
-                  {activeRenderer()}
-                </Suspense>
-              </div>
-            </TabErrorBoundary>
+            {/* Todas as abas ficam MONTADAS ao mesmo tempo. Trocamos apenas
+                visibilidade — assim não há remount, Suspense fallback nem flash
+                ao alternar pelo dock. */}
+            {(Object.keys(TAB_RENDERERS) as AppTab[]).map((tabId) => {
+              const isActive = tabId === activeTab;
+              const render = TAB_RENDERERS[tabId];
+              return (
+                <div
+                  key={tabId}
+                  data-tab={APP_TAB_DATA[tabId] ?? tabId}
+                  aria-hidden={!isActive}
+                  className="absolute inset-0 flex flex-col min-h-0"
+                  style={{
+                    visibility: isActive ? "visible" : "hidden",
+                    pointerEvents: isActive ? "auto" : "none",
+                    zIndex: isActive ? 2 : 1,
+                  }}
+                >
+                  <TabErrorBoundary resetKey={tabId} label={tabId} onBack={backToHome}>
+                    <Suspense fallback={null}>{render()}</Suspense>
+                  </TabErrorBoundary>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
