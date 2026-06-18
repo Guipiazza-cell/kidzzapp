@@ -39,12 +39,13 @@ const TAB_ICONS: Partial<Record<AppTab, typeof MessageCircle>> = {
   memories: ImageIcon,
 };
 
-const TABS: Tab[] = APP_TABS.map((tab) => ({
+const TABS: Tab[] = APP_TABS_ALL.filter((t) => t.inDock).map((tab) => ({
   id: tab.id,
   label: tab.label,
-  icon: TAB_ICONS[tab.id],
+  icon: TAB_ICONS[tab.id] ?? Sparkles,
   c: tab.color,
   cl: tab.light,
+  featured: tab.featured,
 }));
 
 const PILL_W = 50;
