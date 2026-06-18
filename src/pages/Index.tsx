@@ -88,8 +88,8 @@ const persistActiveTab = (tab: AppTab) => {
   try { window.localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
   try {
     const url = new URL(window.location.href);
-    if (tab === "chat") url.searchParams.delete("tab");
-    else url.searchParams.set("tab", tab);
+    // Sempre grava o tab atual na URL — fonte da verdade ao recarregar.
+    url.searchParams.set("tab", tab);
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
   } catch { /* noop */ }
 };
@@ -172,6 +172,14 @@ const Index = () => {
       sessionStorage.removeItem("kidzz_just_completed_onboarding");
     } catch {}
   }, []);
+
+  // Garante que o tab inicial fique gravado (URL + storage) já no primeiro render,
+  // pra que qualquer refresh volte exatamente pra mesma aba.
+  useEffect(() => {
+    persistActiveTab(activeTab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   useEffect(() => {
     if (!profile?.age_range || typeof window === "undefined") return;
@@ -442,11 +450,10 @@ const Index = () => {
           <div className="absolute inset-0 flex flex-col min-h-0">
             <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
               <div
-                key={activeTab}
                 data-tab={activeTabData}
                 className="absolute inset-0 flex flex-col min-h-0"
               >
-                <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><div className="flex flex-col items-center gap-3"><div className="w-12 h-12 rounded-2xl animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-24 rounded-full animate-pulse" style={{background:"hsl(145 26% 85%)"}} /><div className="h-2 w-16 rounded-full animate-pulse" style={{background:"hsl(145 26% 90%)"}} /></div></div>}>
+                <Suspense fallback={null}>
                   {activeRenderer()}
                 </Suspense>
               </div>
