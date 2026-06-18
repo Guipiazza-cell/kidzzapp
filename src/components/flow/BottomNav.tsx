@@ -1,12 +1,12 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   MessageCircle, Leaf, Moon, BookOpen, Puzzle, CalendarDays,
-  Star, Clapperboard, Music2, Image as ImageIcon,
+  Star, Clapperboard, Music2, Image as ImageIcon, Sparkles,
   Crown, Shield, ChevronRight,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
-import { APP_TABS, type AppTab } from "@/lib/appTabs";
+import { APP_TABS_ALL, type AppTab } from "@/lib/appTabs";
 
 interface Props {
   activeTab: string;
@@ -17,19 +17,21 @@ interface Props {
 }
 
 type Tab = {
-  id: Exclude<AppTab, "achievements">;
+  id: AppTab;
   label: string;
   icon: typeof MessageCircle;
-  c: string;   // main color
-  cl: string;  // light color
+  c: string;
+  cl: string;
+  featured?: boolean;
 };
 
-const TAB_ICONS: Record<Exclude<AppTab, "achievements">, typeof MessageCircle> = {
+const TAB_ICONS: Partial<Record<AppTab, typeof MessageCircle>> = {
   chat: MessageCircle,
   wellness: Leaf,
   dreams: Moon,
   explore: BookOpen,
   play: Puzzle,
+  bora: Sparkles,
   routine: CalendarDays,
   moments: Star,
   cinema: Clapperboard,
