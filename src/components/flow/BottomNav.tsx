@@ -288,6 +288,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
               const Icon = tab.icon;
+              const featured = !!tab.featured;
               return (
                 <button
                   key={tab.id}
@@ -296,7 +297,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                   onClick={() => handle(tab.id)}
                   className="relative flex flex-col items-center justify-start gap-0.5 py-0.5 px-1 rounded-2xl select-none active:scale-95"
                   style={{
-                    minWidth: ITEM_MIN_W,
+                    minWidth: featured ? ITEM_MIN_W + 8 : ITEM_MIN_W,
                     flex: "0 0 auto",
                     background: "transparent",
                     border: "none",
@@ -316,19 +317,32 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: 38,
-                      height: 38,
-                      transform: isActive ? "translateY(-1px) scale(1.05)" : "translateY(0) scale(1)",
+                      width: featured ? 46 : 38,
+                      height: featured ? 46 : 38,
+                      marginTop: featured ? -12 : 0,
+                      borderRadius: featured ? 999 : 0,
+                      background: featured
+                        ? `linear-gradient(155deg, ${tab.cl}, ${tab.c})`
+                        : "transparent",
+                      boxShadow: featured
+                        ? `0 10px 22px -4px ${tab.c}99, inset 0 1.5px 2px rgba(255,255,255,.7), inset 0 -4px 9px rgba(0,0,0,.14), 0 0 0 3px #ffffff`
+                        : "none",
+                      transform: isActive
+                        ? `translateY(${featured ? -2 : -1}px) scale(${featured ? 1.08 : 1.05})`
+                        : `translateY(0) scale(${featured ? 1.02 : 1})`,
                       transition: "transform .35s cubic-bezier(.34,1.4,.5,1)",
                     }}
                   >
                     <Icon
-                      size={20}
-                      strokeWidth={1.9}
+                      size={featured ? 24 : 20}
+                      strokeWidth={featured ? 2.2 : 1.9}
                       style={{
-                        color: isActive ? "#ffffff" : "#7d6e5b",
-                        opacity: isActive ? 1 : 0.72,
-                        filter: isActive ? "drop-shadow(0 1px 1px rgba(0,0,0,.25))" : "none",
+                        color: featured ? "#ffffff" : isActive ? "#ffffff" : "#7d6e5b",
+                        opacity: featured ? 1 : isActive ? 1 : 0.72,
+                        filter:
+                          featured || isActive
+                            ? "drop-shadow(0 1px 1px rgba(0,0,0,.25))"
+                            : "none",
                         transition: "color .25s ease, opacity .25s ease",
                       }}
                     />
