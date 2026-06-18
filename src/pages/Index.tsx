@@ -22,6 +22,7 @@ import CelebrationScreen from "@/components/flow/CelebrationScreen";
 import WeeklySurpriseBox from "@/components/flow/WeeklySurpriseBox";
 import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
 import ChatFlow from "@/components/flow/ChatFlow";
+import BoraScreen from "@/components/bora/BoraScreen";
 // Heavy/secondary screens are lazy-loaded — only the chat home ships in the initial bundle.
 const lazyRetry = (importFn: () => Promise<any>) =>
   lazy(() =>
@@ -392,6 +393,7 @@ const Index = () => {
         />
       </AreaGate>
     ),
+    bora: () => <BoraScreen onBack={backToHome} />,
     memories: () => <AreaGate area="memorias"><MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} /></AreaGate>,
     moments: () => <AreaGate area="momentos"><MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} /></AreaGate>,
     cinema: () => <AreaGate area="cinema"><FamilyCinema onBack={backToHome} /></AreaGate>,

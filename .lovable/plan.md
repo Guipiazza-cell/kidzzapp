@@ -1,78 +1,54 @@
-# Refino Premium Global — Kidzz
+# Plano: Aba "Bora!" do Kidzz
 
-Escopo grande que afeta tipografia, sistema de cards/ilhas em todas as abas, e remoção dos camaleões intermediários. Quero alinhar antes de tocar em ~30+ arquivos.
+Vou implementar em 6 fases. Confirme antes de eu começar — ou peça pra eu rodar **fase por fase** (recomendado, porque é grande).
 
-## 1. Tipografia (global, `index.css` + `tailwind.config.ts`)
+## Fase 1 — Navegação (dock)
+- Remover **Música** do dock (`src/lib/appTabs.ts` + `BottomNav.tsx`).
+- Adicionar **Bora!** na posição central (5ª de 6), com tratamento visual de FAB elevado em laranja `#E8821A`, ícone sparkles.
+- **Brincar** continua; Música vira uma seção/botão dentro de `KidzzPlay.tsx`.
+- Redirecionar `?tab=musica` → `?tab=play` em `normalizeAppTab`.
 
-- Importar Fraunces (display) e Mulish (UI) do Google Fonts.
-- Adicionar famílias Tailwind: `font-display` (Fraunces, opsz auto, weight 500, `font-variation-settings: "SOFT" 50`), `font-ui` (Mulish 400/600/700/800).
-- Manter Nunito como fallback temporário (não vou caçar todos os `font-kids` — apenas trocar a base do `body` para Mulish e aplicar `font-display` nos títulos hero/seção das telas principais).
-- Definir utilitários: `.text-eyebrow` (12px uppercase tracking .13em, Mulish 800, cor = `var(--tab-accent)`).
-- Escala via classes utilitárias nas telas-chave (hero 30–34, card 24–26, body 15).
+Dock final: **Perguntas · Histórias · Brincar · Bora! · Cinema · Momentos** (mantendo padrão de 6, com Bora! central destacado).
 
-## 2. Sistema "Vidro Vivo" (novo, em `index.css`)
+## Fase 2 — Design system
+- Adicionar Google Fonts `Fredoka` + `Nunito` no `index.html`.
+- Tokens novos em `src/index.css` (cream `#FBF7EF`, dark green `#2F5E45`, 7 gradientes de categoria, selo verde sem-tela).
+- Classes utilitárias `.bora-card`, `.bora-cat-{ciencia|sensorial|...}`, `.bora-screenfree-badge`.
 
-Criar tokens CSS por aba (data-attribute no root da rota) e classes reutilizáveis:
+## Fase 3 — Supabase
+- Migração: tabela `activities` (com RLS leitura pública) + tabela `completions` (RLS por user_id) com GRANTs.
+- Seed com as 32 atividades do `kidzz_bora_v4.html` via insert tool.
 
-```css
-[data-tab="perguntas"]  { --tab-accent: #E8915B; }
-[data-tab="kalm"]       { --tab-accent: #6FA86A; }
-[data-tab="sonhos"]     { --tab-accent: #B6A6E8; --tab-mode: dark; }
-[data-tab="historias"]  { --tab-accent: #D87A93; }
-[data-tab="musica"]     { --tab-accent: #6E86D6; }
-[data-tab="rotina"]     { --tab-accent: #5E9BC4; }
-[data-tab="brincar"]    { --tab-accent: #EE8A6A; }
-[data-tab="momentos"]   { --tab-accent: #D9A24E; }
-[data-tab="cinema"]     { --tab-accent: #5B7FA8; --tab-mode: dark; }
-[data-tab="memorias"]   { --tab-accent: #B07AA0; }
-```
+**Preciso do arquivo `kidzz_bora_v4.html`** para extrair o objeto `ACTS`. Pode subir ele? Sem isso, faço seed com ~10 atividades placeholder e você sobe o HTML depois.
 
-Variáveis de vidro com modo claro/escuro (via `[data-tab-mode="dark"]`):
-- `--glass`, `--glass-bd`, `--hi`, `--sheen`, `--ink`.
+## Fase 4 — Edge function `surpresa-ia`
+- Criar `supabase/functions/surpresa-ia/index.ts` chamando Groq (`llama-3.3-70b-versatile`, JSON mode).
+- **Preciso da `GROQ_API_KEY`** — vou pedir via `add_secret` quando começar a fase.
+- Fallback: sorteia de `activities` se a API falhar.
 
-Classes novas:
-- `.glass-island` — header/dock/toggle (blur 22px, sheen + cor 10%).
-- `.glass-card` (sobrescrever a existente) — blur 20px saturate(180%), sheen + lavagem diagonal de cor (22% → 6%), borda, inset hi, shadow 3D, radius 26px.
-- `.glass-card-hero` — lavagem mais forte (variant para "Missão do Dia", "Filme da Semana", etc.).
-- `.glass-card::after` — brilho diagonal deslizante 9s linear infinite, baixa opacidade. Respeitar `prefers-reduced-motion`.
+## Fase 5 — Página `/bora` (`src/components/bora/BoraScreen.tsx`)
+Seções na ordem:
+1. Topo com saudação por hora do dia
+2. Faixa de tese "sem-tela"
+3. Hero "Pra fazer hoje" (categoria por hora + selo 🧠 + botão "🎲 Outra")
+4. Card "✨ Surpresa da IA" (gradiente animado + loading + selo "Criada pela IA agora")
+5. Finder: humor (3 cards) + tempo (3 pílulas)
+6. Carrossel de 7 coleções
+7. Destaque "💬 Pra conversar"
+8. Grade "🧺 Tudo pra fazer" com chips de categoria → bottom sheet de detalhe
+9. Contador 🌿 "sem tela" (soma `tela_min` de `completions` últimos 7 dias)
+10. Fechamento
 
-Setar `data-tab` no wrapper de cada rota/aba (Index/MainApp já tem switch de tab — adicionar `data-tab` no root container conforme aba ativa).
+## Fase 6 — Overlay "sem tela"
+- `ScreenFreeOverlay.tsx`: fullscreen verde gradiente + 🌿 + confete + botão "Tô indo! 🚀".
+- Dispara ao clicar "Bora fazer! 🌿" e registra `completions`.
+- Respeita `prefers-reduced-motion`.
 
-## 3. Ilhas (header, toggle Pais/Assinar, dock)
+---
 
-- Header das telas: já são "ilhas" depois do trabalho anterior — trocar o inline-style por `className="glass-island"` para padronizar.
-- `BottomNav`, `SubscribeBanner`, toggle Pais → `.glass-island`.
-- Em abas escuras (Sonhos, Cinema), o `data-tab-mode="dark"` já injeta vidro escuro + texto claro automaticamente.
+## Perguntas antes de começar
+1. **Tem o arquivo `kidzz_bora_v4.html`?** Suba ele para eu extrair as 32 atividades exatas. Sem ele, sigo com placeholders.
+2. **Já tem a `GROQ_API_KEY`?** Crie em https://console.groq.com/keys (grátis). Vou pedir via `add_secret` na Fase 4.
+3. Quer que eu **rode tudo de uma vez** ou **fase por fase** (recomendo fase por fase pra você validar o visual)?
 
-## 4. Camaleão único na Home (por horário)
-
-- Manter herói grande SÓ na Home (`HomeScreen.tsx`).
-- Lógica por hora local: manhã (5–12), tarde (12–18), noite (18–5) → seleciona asset + saudação ("Bom dia, curioso!" / "Boa tarde, explorador!" / "Boa noite, sonhador!").
-- Reusar os 3 assets existentes do camaleão se possível. Se forem inconsistentes visualmente, registrar TODO (não gero 3 novos sem aprovação, pra não estourar custo de imagem).
-- Remover renderizações do `ChameleonMascot`/`KidzzChameleon` em: `WellnessHub` (KALM), `KidzzPlay` (Brincar), `FamilyCinema`, `StoryFactory`, e qualquer outra aba onde apareça como mascote grande. Manter só ícones pequenos de UI se forem essenciais.
-- Banco/storage: a memória só menciona `character_profiles` (avatar do filho — não é o camaleão). Não há tabela "chameleons" para limpar. Vou apenas remover do código.
-
-## 5. Arquivos a editar (estimativa)
-
-- `index.css` — tokens, fontes, `.glass-*`, animações.
-- `tailwind.config.ts` — famílias `display`/`ui`.
-- `src/MainApp.tsx` ou `src/pages/Index.tsx` — setar `data-tab` no root.
-- `BottomNav.tsx`, `SubscribeBanner.tsx` — trocar inline styles por `.glass-island`.
-- Headers das telas (`MusicForest`, `StoryFactory`, `FamilyCinema`, `MomentsPlaylists`, `MemoriesAlbum`, `KidzzPlay`, `WellnessHub`, `AchievementsScreen`) — substituir inline glass por classe.
-- Cards principais (Missão do Dia, Filme da Semana, Streak, etc.) — aplicar `.glass-card` / `.glass-card-hero`.
-- `HomeScreen.tsx` — lógica de horário + saudação.
-- Remover camaleões intermediários nas abas listadas acima.
-
-## 6. O que NÃO vou tocar
-
-- Fundo da floresta (intacto).
-- Lógica de negócio, paywall, quotas, auth.
-- `character_profiles` (avatar do filho, não confundir com camaleão Pixel).
-- Não vou caçar todos os ~200 arquivos para trocar `font-kids` → `font-ui`; deixo Mulish como base do `body` e aplico `font-display` cirurgicamente em hero/títulos.
-
-## Pergunta antes de começar
-
-Confirma que posso prosseguir com TODO esse pacote num único turno? É grande — vai mudar visual de praticamente todas as telas de uma vez. Se preferir, divido em 3 entregas:
-1. Tipografia + tokens + classes de vidro (base, invisível até aplicar).
-2. Aplicar `.glass-island` / `.glass-card` em headers e cards principais.
-3. Camaleão único + remoção dos intermediários.
+Quando responder, começo pela Fase 1.
