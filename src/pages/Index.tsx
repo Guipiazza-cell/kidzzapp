@@ -88,8 +88,8 @@ const persistActiveTab = (tab: AppTab) => {
   try { window.localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
   try {
     const url = new URL(window.location.href);
-    if (tab === "chat") url.searchParams.delete("tab");
-    else url.searchParams.set("tab", tab);
+    // Sempre grava o tab atual na URL — fonte da verdade ao recarregar.
+    url.searchParams.set("tab", tab);
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
   } catch { /* noop */ }
 };
