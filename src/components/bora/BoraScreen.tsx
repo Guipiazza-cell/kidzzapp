@@ -414,6 +414,7 @@ const BoraScreen = ({ onBack }: Props) => {
       className="bora-screen flex-1 overflow-y-auto"
       style={{ paddingBottom: 180 }}
     >
+      <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       {/* Hero */}
       <header className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2">
