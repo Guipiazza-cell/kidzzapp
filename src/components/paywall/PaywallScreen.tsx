@@ -149,22 +149,66 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           </button>
         )}
 
-        {/* Header */}
+        {/* Header — contextual + emotional */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center pt-8 pb-2"
         >
+          {ctx.tag && (
+            <span
+              className="inline-flex items-center gap-1.5 text-[11px] font-black tracking-[0.12em] uppercase px-3 py-1.5 rounded-full mb-4"
+              style={{
+                background: `linear-gradient(135deg, ${SAGE}1A 0%, ${AMBER}1A 100%)`,
+                color: AMBER_DEEP,
+                border: `1px solid ${AMBER}33`,
+              }}
+            >
+              {ctx.tag}
+            </span>
+          )}
           <h1
             className="text-[26px] leading-[1.15] font-extrabold px-1"
             style={{ color: INK, letterSpacing: "-0.01em" }}
           >
-            Escolha como o Kidzz vai cuidar do {nome}
+            {ctx.headline}
           </h1>
-          <p className="text-[14px] mt-3" style={{ color: INK_SOFT }}>
-            Comece grátis. Cancele quando quiser. Sem letras miúdas.
+          <p className="text-[14px] mt-3 px-2" style={{ color: INK_SOFT, lineHeight: 1.5 }}>
+            {ctx.sub}
           </p>
+
+          {/* Mini stats strip — only if there's something to celebrate */}
+          {(diary.minutes > 0 || diary.streak > 0) && (
+            <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+              {diary.minutes > 0 && (
+                <span
+                  className="inline-flex items-center gap-1.5 text-[12px] font-bold px-2.5 py-1 rounded-full"
+                  style={{ background: `${SAGE}1A`, color: "#3F6B30" }}
+                >
+                  <Leaf size={12} strokeWidth={2.6} /> {diary.minutes} min sem tela
+                </span>
+              )}
+              {diary.streak > 0 && (
+                <span
+                  className="inline-flex items-center gap-1.5 text-[12px] font-bold px-2.5 py-1 rounded-full"
+                  style={{ background: `${AMBER}1A`, color: AMBER_DEEP }}
+                >
+                  <Flame size={12} strokeWidth={2.6} /> {diary.streak} {diary.streak === 1 ? "dia" : "dias"} seguidos
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Prova social — Movimento Menos Tela */}
+          <div
+            className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold"
+            style={{ color: INK_SOFT }}
+          >
+            <Users size={13} />
+            <span>+12.430 famílias no movimento Menos Tela</span>
+          </div>
         </motion.div>
+
 
         {/* Cycle toggle */}
         <div
