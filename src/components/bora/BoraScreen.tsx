@@ -774,7 +774,7 @@ const BoraScreen = ({ onBack }: Props) => {
 
         <div className="grid grid-cols-2 gap-3">
           {filteredCats.map((c) => (
-            <GlassCard key={c.key} c={c} locked={!!c.premium && !isPremium} />
+            <GlassCard key={c.key} c={c} locked={!!c.premium && !isPremium} onClick={() => handleCategoryTap(c)} />
           ))}
         </div>
 
