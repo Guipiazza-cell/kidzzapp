@@ -160,10 +160,13 @@ const PremiumBadge = () => (
 );
 
 /** 3D Glass category card. */
-const GlassCard = ({ c, locked }: { c: Cat; locked: boolean }) => {
+const GlassCard = ({ c, locked, onClick }: { c: Cat; locked: boolean; onClick?: () => void }) => {
   const Icon = c.icon;
   return (
-    <div
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-left w-full active:scale-[0.98] transition-transform"
       style={{
         position: "relative",
         borderRadius: 24,
@@ -183,6 +186,7 @@ const GlassCard = ({ c, locked }: { c: Cat; locked: boolean }) => {
           boxShadow:
             "inset 0 1.5px 2px rgba(255,255,255,.55), inset 0 -6px 14px rgba(0,0,0,.16), 0 1px 0 rgba(255,255,255,.35)",
           minHeight: 124,
+          filter: locked ? "saturate(0.85)" : "none",
         }}
       >
         <span
@@ -240,7 +244,7 @@ const GlassCard = ({ c, locked }: { c: Cat; locked: boolean }) => {
           {c.label}
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
