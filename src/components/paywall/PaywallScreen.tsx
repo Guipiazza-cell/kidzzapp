@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Sparkles, Lock, X } from "lucide-react";
+import { Check, Sparkles, Lock, X, Leaf, Flame, Users } from "lucide-react";
 import { useAuth, type CheckoutPlan } from "@/contexts/AuthContext";
+
+export type PaywallContextKind = "default" | "premium_locked" | "surprise_limit" | "streak_milestone" | "after_completion";
 
 interface PaywallScreenProps {
   childName?: string;
   onClose?: () => void;
+  context?: PaywallContextKind;
 }
 
 type Cycle = "monthly" | "annual";
