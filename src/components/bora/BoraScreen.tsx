@@ -386,7 +386,8 @@ const BoraScreen = ({ onBack }: Props) => {
 
   const firstCrianca = criancas[0];
   const childName = (firstCrianca?.nome || profile?.child_name || "").trim();
-  const ageRange = (profile?.age_range || "").trim();
+  const childAge = firstCrianca?.idade ?? null;
+  const ageRange = childAge != null ? `${childAge} anos` : (profile?.age_range || "").trim();
   const firstName = childName ? childName.split(" ")[0] : "";
   const personalTag = firstName
     ? ageRange
