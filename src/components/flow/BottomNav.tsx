@@ -259,9 +259,9 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               display: "flex",
               alignItems: "stretch",
               gap: 2,
-              padding: "5px 32px 4px 6px",
+              padding: "16px 32px 6px 6px",
               overflowX: "auto",
-              overflowY: "hidden",
+              overflowY: "visible",
               scrollbarWidth: "none",
               WebkitOverflowScrolling: "touch",
             }}
@@ -272,7 +272,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                 aria-hidden
                 style={{
                   position: "absolute",
-                  top: 3,
+                  top: 14,
                   left: pill.left,
                   width: PILL_W,
                   height: 38,
