@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          categoria: string
+          contexto: string | null
+          created_at: string | null
+          curiosidade: string | null
+          duracao_min: number | null
+          emoji: string
+          energia: string | null
+          gancho: string | null
+          id: string
+          materiais: Json | null
+          origem: string | null
+          passos: Json | null
+          tela_min: number | null
+          tempo: string | null
+          titulo: string
+        }
+        Insert: {
+          categoria: string
+          contexto?: string | null
+          created_at?: string | null
+          curiosidade?: string | null
+          duracao_min?: number | null
+          emoji: string
+          energia?: string | null
+          gancho?: string | null
+          id?: string
+          materiais?: Json | null
+          origem?: string | null
+          passos?: Json | null
+          tela_min?: number | null
+          tempo?: string | null
+          titulo: string
+        }
+        Update: {
+          categoria?: string
+          contexto?: string | null
+          created_at?: string | null
+          curiosidade?: string | null
+          duracao_min?: number | null
+          emoji?: string
+          energia?: string | null
+          gancho?: string | null
+          id?: string
+          materiais?: Json | null
+          origem?: string | null
+          passos?: Json | null
+          tela_min?: number | null
+          tempo?: string | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       affiliates: {
         Row: {
           affiliate_code: string
@@ -143,6 +197,140 @@ export type Database = {
           unlocked_outfits?: string[]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      conclusoes: {
+        Row: {
+          activity_id: string | null
+          crianca_id: string | null
+          feito_em: string | null
+          foto_url: string | null
+          id: string
+          tela_min: number | null
+          titulo_snapshot: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_id?: string | null
+          crianca_id?: string | null
+          feito_em?: string | null
+          foto_url?: string | null
+          id?: string
+          tela_min?: number | null
+          titulo_snapshot?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_id?: string | null
+          crianca_id?: string | null
+          feito_em?: string | null
+          foto_url?: string | null
+          id?: string
+          tela_min?: number | null
+          titulo_snapshot?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conclusoes_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conclusoes_crianca_id_fkey"
+            columns: ["crianca_id"]
+            isOneToOne: false
+            referencedRelation: "criancas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criancas: {
+        Row: {
+          created_at: string | null
+          id: string
+          idade: number | null
+          interesses: string[] | null
+          materiais_em_casa: string[] | null
+          nome: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          idade?: number | null
+          interesses?: string[] | null
+          materiais_em_casa?: string[] | null
+          nome: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          idade?: number | null
+          interesses?: string[] | null
+          materiais_em_casa?: string[] | null
+          nome?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favoritos: {
+        Row: {
+          activity_id: string
+          created_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favoritos_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicacoes: {
+        Row: {
+          codigo: string
+          convidado_id: string | null
+          created_at: string | null
+          id: string
+          indicador_id: string
+          recompensado: boolean | null
+        }
+        Insert: {
+          codigo: string
+          convidado_id?: string | null
+          created_at?: string | null
+          id?: string
+          indicador_id: string
+          recompensado?: boolean | null
+        }
+        Update: {
+          codigo?: string
+          convidado_id?: string | null
+          created_at?: string | null
+          id?: string
+          indicador_id?: string
+          recompensado?: boolean | null
         }
         Relationships: []
       }

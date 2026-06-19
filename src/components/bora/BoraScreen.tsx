@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useCriancas } from "@/hooks/useCriancas";
+import { CriancaOnboarding } from "./CriancaOnboarding";
 
 interface Props {
   onBack?: () => void;
@@ -371,11 +373,21 @@ const readDiary = (): Diary => {
 };
 
 const BoraScreen = ({ onBack }: Props) => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { isPremium } = useEntitlement();
+  const { criancas, loading: loadingCriancas } = useCriancas();
 
-  const childName = (profile?.child_name || "").trim();
-  const ageRange = (profile?.age_range || "").trim();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    if (loadingCriancas) return;
+    if (criancas.length === 0) setShowOnboarding(true);
+  }, [user, loadingCriancas, criancas.length]);
+
+  const firstCrianca = criancas[0];
+  const childName = (firstCrianca?.nome || profile?.child_name || "").trim();
+  const childAge = firstCrianca?.idade ?? null;
+  const ageRange = childAge != null ? `${childAge} anos` : (profile?.age_range || "").trim();
   const firstName = childName ? childName.split(" ")[0] : "";
   const personalTag = firstName
     ? ageRange
@@ -402,6 +414,7 @@ const BoraScreen = ({ onBack }: Props) => {
       className="bora-screen flex-1 overflow-y-auto"
       style={{ paddingBottom: 180 }}
     >
+      <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       {/* Hero */}
       <header className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2">
