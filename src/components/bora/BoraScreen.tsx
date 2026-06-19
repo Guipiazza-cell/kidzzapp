@@ -28,7 +28,7 @@ const CATS: Cat[] = [
   { key: "cozinha",   icon: CookingPot,   label: "Cozinha",   from: "#FCEBE0", to: "#F0A878", ring: "#D88052", ink: "#6E3A18" },
 ];
 
-/** 3D Glass orb — metallic bezel + glass face + embossed icon. */
+/** 3D Glass orb — thin metallic bezel + glass face + embossed icon. */
 const GlassOrb = ({
   Icon,
   size = 52,
@@ -42,7 +42,7 @@ const GlassOrb = ({
   colorTo: string;
   iconSize?: number;
 }) => {
-  const pad = Math.round(size * 0.12);
+  const pad = Math.max(2, Math.round(size * 0.065));
   const inner = size - pad * 2;
   return (
     <span
@@ -53,12 +53,12 @@ const GlassOrb = ({
         justifyContent: "center",
         width: size,
         height: size,
-        borderRadius: Math.round(size * 0.28),
+        borderRadius: Math.round(size * 0.26),
         padding: pad,
         background:
-          "linear-gradient(165deg, #f5f7fa 0%, #d1d5db 18%, #9ca3af 38%, #6b7280 52%, #9ca3af 68%, #d1d5db 86%, #f3f4f6 100%)",
+          "linear-gradient(165deg, #ffffff 0%, #e5e7eb 22%, #c4c8d0 42%, #9ca3af 54%, #c4c8d0 68%, #e5e7eb 86%, #ffffff 100%)",
         boxShadow:
-          "0 18px 40px -8px rgba(0,0,0,.35), 0 6px 14px rgba(0,0,0,.22), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -2px 4px rgba(0,0,0,.12)",
+          "0 14px 34px -8px rgba(0,0,0,.28), 0 4px 10px rgba(0,0,0,.14), inset 0 1px 1px rgba(255,255,255,.95), inset 0 -1px 2px rgba(0,0,0,.08)",
         flexShrink: 0,
       }}
     >
@@ -70,10 +70,10 @@ const GlassOrb = ({
           justifyContent: "center",
           width: inner,
           height: inner,
-          borderRadius: Math.round(inner * 0.26),
+          borderRadius: Math.round(inner * 0.24),
           background: `linear-gradient(160deg, ${colorFrom} 0%, ${colorTo} 55%, ${colorFrom} 100%)`,
           boxShadow:
-            "inset 0 2px 3px rgba(255,255,255,.55), inset 0 -6px 12px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.35)",
+            "inset 0 1.5px 2px rgba(255,255,255,.6), inset 0 -5px 10px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.35)",
           overflow: "hidden",
         }}
       >
@@ -85,9 +85,9 @@ const GlassOrb = ({
             top: 0,
             left: 0,
             right: 0,
-            height: "52%",
+            height: "50%",
             background:
-              "linear-gradient(180deg, rgba(255,255,255,.48) 0%, rgba(255,255,255,.12) 60%, rgba(255,255,255,0) 100%)",
+              "linear-gradient(180deg, rgba(255,255,255,.50) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,0) 100%)",
             pointerEvents: "none",
           }}
         />
@@ -99,9 +99,9 @@ const GlassOrb = ({
             bottom: 0,
             left: 0,
             right: 0,
-            height: "35%",
+            height: "32%",
             background:
-              "linear-gradient(0deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,0) 100%)",
+              "linear-gradient(0deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 100%)",
             pointerEvents: "none",
           }}
         />
@@ -121,29 +121,29 @@ const GlassOrb = ({
   );
 };
 
-/** 3D Glass card — thick metallic bezel + glass face + embossed icon. */
+/** 3D Glass card — thin metallic bezel + glass face + embossed icon. */
 const GlassCard = ({ c }: { c: Cat }) => {
   const Icon = c.icon;
   return (
     <div
       style={{
-        borderRadius: 26,
-        padding: 3,
+        borderRadius: 24,
+        padding: 2,
         background:
-          "linear-gradient(165deg, #f5f7fa 0%, #d1d5db 18%, #9ca3af 38%, #6b7280 52%, #9ca3af 68%, #d1d5db 86%, #f3f4f6 100%)",
+          "linear-gradient(165deg, #ffffff 0%, #e5e7eb 22%, #c4c8d0 42%, #9ca3af 54%, #c4c8d0 68%, #e5e7eb 86%, #ffffff 100%)",
         boxShadow:
-          "0 22px 50px -12px rgba(0,0,0,.32), 0 8px 18px rgba(0,0,0,.18), inset 0 1px 1px rgba(255,255,255,.9)",
+          "0 18px 42px -10px rgba(0,0,0,.26), 0 6px 14px rgba(0,0,0,.14), inset 0 1px 1px rgba(255,255,255,.95)",
       }}
     >
       <div
         style={{
           position: "relative",
-          borderRadius: 22,
+          borderRadius: 21,
           overflow: "hidden",
           background: `linear-gradient(160deg, ${c.from} 0%, ${c.to} 55%, ${c.from} 100%)`,
           padding: "18px 16px 16px",
           boxShadow:
-            "inset 0 2px 3px rgba(255,255,255,.55), inset 0 -8px 18px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.35)",
+            "inset 0 1.5px 2px rgba(255,255,255,.55), inset 0 -6px 14px rgba(0,0,0,.16), 0 1px 0 rgba(255,255,255,.35)",
           minHeight: 120,
         }}
       >
@@ -155,9 +155,9 @@ const GlassCard = ({ c }: { c: Cat }) => {
             top: 0,
             left: 0,
             right: 0,
-            height: "50%",
+            height: "48%",
             background:
-              "linear-gradient(180deg, rgba(255,255,255,.50) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,0) 100%)",
+              "linear-gradient(180deg, rgba(255,255,255,.52) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,0) 100%)",
             pointerEvents: "none",
           }}
         />
@@ -169,9 +169,9 @@ const GlassCard = ({ c }: { c: Cat }) => {
             bottom: 0,
             left: 0,
             right: 0,
-            height: "30%",
+            height: "28%",
             background:
-              "linear-gradient(0deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 100%)",
+              "linear-gradient(0deg, rgba(0,0,0,.14) 0%, rgba(0,0,0,0) 100%)",
             pointerEvents: "none",
           }}
         />
@@ -193,22 +193,22 @@ const GlassCard = ({ c }: { c: Cat }) => {
   );
 };
 
-/** Bezel premium wrapper (igual ao dock). */
+/** Bezel premium wrapper — thinner metallic frame. */
 const Bezel = ({ children, tint = "#E8821A" }: { children: React.ReactNode; tint?: string }) => (
   <div
     style={{
-      borderRadius: 30,
+      borderRadius: 28,
       padding: 2,
       background:
-        "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 14%, rgba(190,197,206,.82) 32%, rgba(150,158,168,.75) 48%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
+        "linear-gradient(165deg, #ffffff 0%, #e5e7eb 22%, #c4c8d0 42%, #9ca3af 54%, #c4c8d0 68%, #e5e7eb 86%, #ffffff 100%)",
       boxShadow:
-        "0 22px 50px -14px rgba(60,40,15,.40), 0 8px 18px rgba(60,40,15,.20), 0 1px 0 rgba(255,255,255,.6), inset 0 1px 1px rgba(255,255,255,.9)",
+        "0 18px 42px -10px rgba(60,40,15,.32), 0 6px 14px rgba(60,40,15,.16), inset 0 1px 1px rgba(255,255,255,.95)",
     }}
   >
     <div
       style={{
         position: "relative",
-        borderRadius: 28,
+        borderRadius: 25,
         overflow: "hidden",
         background:
           "linear-gradient(150deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.82) 48%, rgba(255,255,255,.92) 100%)",
