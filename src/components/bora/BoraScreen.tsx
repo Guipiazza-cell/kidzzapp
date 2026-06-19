@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
+import { usePaywall } from "@/components/paywall/PaywallProvider";
 import { CriancaOnboarding } from "./CriancaOnboarding";
 import { SurpresaModal } from "./SurpresaModal";
 
