@@ -7,7 +7,9 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
+import { useSurpresaIA } from "@/hooks/useSurpresaIA";
 import { CriancaOnboarding } from "./CriancaOnboarding";
+import { SurpresaModal } from "./SurpresaModal";
 
 interface Props {
   onBack?: () => void;
@@ -408,6 +410,14 @@ const BoraScreen = ({ onBack }: Props) => {
     [mood],
   );
 
+  const { surprise, loading: surprising, error: surpriseError, activity: surpriseActivity, reset: resetSurprise } = useSurpresaIA();
+  const [surpriseOpen, setSurpriseOpen] = useState(false);
+  const handleSurprise = async () => {
+    setSurpriseOpen(true);
+    try { await surprise(mood ? { energia: mood } : undefined); } catch (_) {}
+  };
+  const closeSurprise = () => { setSurpriseOpen(false); resetSurprise(); };
+
   return (
     <div
       data-tab="bora"
@@ -415,6 +425,15 @@ const BoraScreen = ({ onBack }: Props) => {
       style={{ paddingBottom: 180 }}
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <SurpresaModal
+        open={surpriseOpen}
+        loading={surprising}
+        activity={surpriseActivity}
+        error={surpriseError}
+        childName={firstName}
+        onClose={closeSurprise}
+        onRetry={() => surprise(mood ? { energia: mood } : undefined).catch(() => {})}
+      />
       {/* Hero */}
       <header className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2">
@@ -438,6 +457,19 @@ const BoraScreen = ({ onBack }: Props) => {
         >
           Aqui dentro só tem ideia. A brincadeira de verdade acontece longe da tela.
         </p>
+        <button
+          type="button"
+          onClick={handleSurprise}
+          className="mt-5 w-full rounded-full py-3.5 font-bold text-white text-base flex items-center justify-center gap-2"
+          style={{
+            background: "linear-gradient(180deg, #FF9A4D 0%, #E8772A 100%)",
+            border: "1.5px solid rgba(255,255,255,0.6)",
+            boxShadow: "0 14px 32px -10px rgba(232,119,42,0.65), inset 0 1px 0 rgba(255,255,255,0.6)",
+          }}
+        >
+          <Sparkles size={18} />
+          Surpresa da IA{firstName ? ` pra ${firstName}` : ""}
+        </button>
       </header>
 
       {/* Diário Sem Tela — hero metric */}
