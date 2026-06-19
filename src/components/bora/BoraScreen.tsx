@@ -28,46 +28,170 @@ const CATS: Cat[] = [
   { key: "cozinha",   icon: CookingPot,   label: "Cozinha",   from: "#FCEBE0", to: "#F0A878", ring: "#D88052", ink: "#6E3A18" },
 ];
 
-/** Premium icon orb — identical to the dock's featured button. */
-const IconOrb = ({
+/** 3D Glass orb — metallic bezel + glass face + embossed icon. */
+const GlassOrb = ({
   Icon,
-  size = 24,
+  size = 52,
   colorFrom,
   colorTo,
-  shadowColor,
   iconSize = 22,
 }: {
   Icon: typeof FlaskConical;
   size?: number;
   colorFrom: string;
   colorTo: string;
-  shadowColor: string;
   iconSize?: number;
-}) => (
-  <span
-    style={{
-      position: "relative",
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: size,
-      height: size,
-      borderRadius: 999,
-      background: `linear-gradient(155deg, ${colorFrom}, ${colorTo})`,
-      boxShadow: `0 10px 22px -4px ${shadowColor}99, inset 0 1.5px 2px rgba(255,255,255,.7), inset 0 -4px 9px rgba(0,0,0,.14), 0 0 0 3px #ffffff`,
-      flexShrink: 0,
-    }}
-  >
-    <Icon
-      size={iconSize}
-      strokeWidth={2.2}
+}) => {
+  const pad = Math.round(size * 0.12);
+  const inner = size - pad * 2;
+  return (
+    <span
       style={{
-        color: "#ffffff",
-        filter: "drop-shadow(0 1px 1px rgba(0,0,0,.25))",
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: size,
+        height: size,
+        borderRadius: Math.round(size * 0.28),
+        padding: pad,
+        background:
+          "linear-gradient(165deg, #f5f7fa 0%, #d1d5db 18%, #9ca3af 38%, #6b7280 52%, #9ca3af 68%, #d1d5db 86%, #f3f4f6 100%)",
+        boxShadow:
+          "0 18px 40px -8px rgba(0,0,0,.35), 0 6px 14px rgba(0,0,0,.22), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -2px 4px rgba(0,0,0,.12)",
+        flexShrink: 0,
       }}
-    />
-  </span>
-);
+    >
+      <span
+        style={{
+          position: "relative",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: inner,
+          height: inner,
+          borderRadius: Math.round(inner * 0.26),
+          background: `linear-gradient(160deg, ${colorFrom} 0%, ${colorTo} 55%, ${colorFrom} 100%)`,
+          boxShadow:
+            "inset 0 2px 3px rgba(255,255,255,.55), inset 0 -6px 12px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.35)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Glass specular highlight */}
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "52%",
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,.48) 0%, rgba(255,255,255,.12) 60%, rgba(255,255,255,0) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Bottom refraction */}
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "35%",
+            background:
+              "linear-gradient(0deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,0) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+        <Icon
+          size={iconSize}
+          strokeWidth={2.4}
+          style={{
+            position: "relative",
+            zIndex: 1,
+            color: "#ffffff",
+            filter:
+              "drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 -1px 0 rgba(255,255,255,.25))",
+          }}
+        />
+      </span>
+    </span>
+  );
+};
+
+/** 3D Glass card — thick metallic bezel + glass face + embossed icon. */
+const GlassCard = ({ c }: { c: Cat }) => {
+  const Icon = c.icon;
+  return (
+    <div
+      style={{
+        borderRadius: 26,
+        padding: 3,
+        background:
+          "linear-gradient(165deg, #f5f7fa 0%, #d1d5db 18%, #9ca3af 38%, #6b7280 52%, #9ca3af 68%, #d1d5db 86%, #f3f4f6 100%)",
+        boxShadow:
+          "0 22px 50px -12px rgba(0,0,0,.32), 0 8px 18px rgba(0,0,0,.18), inset 0 1px 1px rgba(255,255,255,.9)",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          borderRadius: 22,
+          overflow: "hidden",
+          background: `linear-gradient(160deg, ${c.from} 0%, ${c.to} 55%, ${c.from} 100%)`,
+          padding: "18px 16px 16px",
+          boxShadow:
+            "inset 0 2px 3px rgba(255,255,255,.55), inset 0 -8px 18px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.35)",
+          minHeight: 120,
+        }}
+      >
+        {/* Top specular highlight */}
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "50%",
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,.50) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,0) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Bottom refraction shadow */}
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "30%",
+            background:
+              "linear-gradient(0deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+        <GlassOrb
+          Icon={Icon}
+          size={48}
+          iconSize={20}
+          colorFrom={c.ring}
+          colorTo={c.ink}
+        />
+        <div
+          className="font-bora-display"
+          style={{ fontSize: 16, color: c.ink, marginTop: 14, letterSpacing: "-0.01em", position: "relative", zIndex: 1 }}
+        >
+          {c.label}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 /** Bezel premium wrapper (igual ao dock). */
 const Bezel = ({ children, tint = "#E8821A" }: { children: React.ReactNode; tint?: string }) => (
@@ -119,58 +243,6 @@ const Bezel = ({ children, tint = "#E8821A" }: { children: React.ReactNode; tint
   </div>
 );
 
-const CategoryCard = ({ c }: { c: Cat }) => {
-  const Icon = c.icon;
-  return (
-    <div
-      style={{
-        borderRadius: 24,
-        padding: 1.5,
-        background: `linear-gradient(160deg, #ffffff 0%, ${c.ring}55 40%, ${c.ring}aa 70%, #ffffff 100%)`,
-        boxShadow: `0 14px 28px -12px ${c.ring}66, 0 4px 10px rgba(60,40,15,.10)`,
-      }}
-    >
-      <div
-        style={{
-          position: "relative",
-          borderRadius: 22,
-          overflow: "hidden",
-          background: `linear-gradient(155deg, ${c.from} 0%, ${c.to} 100%)`,
-          padding: "16px 14px 14px",
-          boxShadow:
-            "inset 0 1.5px 1px rgba(255,255,255,.85), inset 0 -10px 20px rgba(0,0,0,.06)",
-          minHeight: 116,
-        }}
-      >
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: 0, left: 0, right: 0, height: "55%",
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.10) 60%, rgba(255,255,255,0) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-        <IconOrb
-          Icon={Icon}
-          size={44}
-          iconSize={22}
-          colorFrom={c.ring}
-          colorTo={c.ink}
-          shadowColor={c.ring}
-        />
-        <div
-          className="font-bora-display"
-          style={{ fontSize: 16, color: c.ink, marginTop: 14, letterSpacing: "-0.01em" }}
-        >
-          {c.label}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const BoraScreen = ({ onBack }: Props) => {
   return (
     <div
@@ -181,13 +253,12 @@ const BoraScreen = ({ onBack }: Props) => {
       {/* Hero */}
       <header className="px-5 pt-8 pb-6">
         <div className="flex items-center gap-2">
-          <IconOrb
+          <GlassOrb
             Icon={Leaf}
-            size={28}
-            iconSize={14}
+            size={30}
+            iconSize={13}
             colorFrom="#6FB04A"
             colorTo="#2F5E1F"
-            shadowColor="#6FB04A"
           />
           <span className="bora-screenfree-badge">Sem tela</span>
         </div>
@@ -215,13 +286,12 @@ const BoraScreen = ({ onBack }: Props) => {
         <Bezel tint="#E8821A">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <IconOrb
+              <GlassOrb
                 Icon={Wand2}
-                size={26}
+                size={28}
                 iconSize={13}
                 colorFrom="#F4A659"
                 colorTo="#E8821A"
-                shadowColor="#E8821A"
               />
               <span
                 className="font-bora-body"
@@ -237,13 +307,12 @@ const BoraScreen = ({ onBack }: Props) => {
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <IconOrb
+              <GlassOrb
                 Icon={Leaf}
-                size={22}
+                size={24}
                 iconSize={11}
                 colorFrom="#6FB04A"
                 colorTo="#2F5E1F"
-                shadowColor="#6FB04A"
               />
               <span className="bora-screenfree-badge">15 min</span>
             </div>
@@ -310,13 +379,12 @@ const BoraScreen = ({ onBack }: Props) => {
                 }}
               />
               <span style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 10 }}>
-                <IconOrb
+                <GlassOrb
                   Icon={Leaf}
-                  size={20}
-                  iconSize={10}
+                  size={22}
+                  iconSize={11}
                   colorFrom="#6FB04A"
                   colorTo="#2F5E1F"
-                  shadowColor="#6FB04A"
                 />
                 Bora fazer!
                 <ChevronRight size={18} strokeWidth={2.5} style={{ opacity: 0.9 }} />
@@ -336,7 +404,7 @@ const BoraScreen = ({ onBack }: Props) => {
         </h3>
         <div className="grid grid-cols-2 gap-3">
           {CATS.map((c) => (
-            <CategoryCard key={c.key} c={c} />
+            <GlassCard key={c.key} c={c} />
           ))}
         </div>
       </section>
@@ -345,13 +413,12 @@ const BoraScreen = ({ onBack }: Props) => {
       <section className="px-5 mt-8">
         <Bezel tint="#4F8B66">
           <div className="text-center">
-            <IconOrb
+            <GlassOrb
               Icon={Leaf}
-              size={56}
-              iconSize={28}
+              size={64}
+              iconSize={30}
               colorFrom="#6FB04A"
               colorTo="#2F5E1F"
-              shadowColor="#6FB04A"
             />
             <p
               className="font-bora-display mt-3"
