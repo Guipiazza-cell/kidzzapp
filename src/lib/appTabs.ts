@@ -77,9 +77,9 @@ const TAB_ALIASES: Record<string, AppTab> = {
   moments: "moments",
   cinema: "cinema",
   // Música agora vive dentro de Brincar — qualquer link antigo redireciona
-  musica: "play",
-  música: "play",
-  music: "play",
+  musica: "music",
+  música: "music",
+  music: "music",
   memorias: "memories",
   memórias: "memories",
   memories: "memories",
