@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useCriancas } from "@/hooks/useCriancas";
+import { CriancaOnboarding } from "./CriancaOnboarding";
 
 interface Props {
   onBack?: () => void;
