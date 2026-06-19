@@ -36,7 +36,7 @@ const FEATURES: Array<{ row: string; free: string; kidzz: string; premium: strin
   { row: "Cinema",            free: "Amostra",          kidzz: "🔒",                          premium: "✅" },
 ];
 
-const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
+const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScreenProps) => {
   const { handleCheckout, user } = useAuth();
   const [cycle, setCycle] = useState<Cycle>("annual");
   const [selected, setSelected] = useState<"kidzz" | "premium">("premium");
@@ -69,6 +69,62 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
   };
 
   const nome = childName?.trim() || "seu filho";
+
+  // Diário Sem Tela — emotional anchor for the headline (read-only).
+  const diary = useMemo(() => {
+    if (typeof window === "undefined") return { minutes: 0, streak: 0, completions: 0 };
+    try {
+      const raw = window.localStorage.getItem("bora_diary_v1");
+      if (raw) {
+        const d = JSON.parse(raw);
+        return { minutes: d.minutes || 0, streak: d.streak || 0, completions: d.completions || 0 };
+      }
+    } catch {}
+    return { minutes: 0, streak: 0, completions: 0 };
+  }, []);
+
+  const ctx = useMemo(() => {
+    const hasMinutes = diary.minutes > 0;
+    switch (context) {
+      case "premium_locked":
+        return {
+          tag: "Conteúdo Premium",
+          headline: `Essa coleção é feita pro ${nome.split(" ")[0]} brilhar`,
+          sub: hasMinutes
+            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado.`
+            : `Atividades feitas só pra ele, ilimitadas no Premium.`,
+        };
+      case "surprise_limit":
+        return {
+          tag: "Mais uma surpresa?",
+          headline: `A surpresa grátis do dia já saiu. Quer outra agora?`,
+          sub: `No Premium o ${nome.split(" ")[0]} recebe surpresas ilimitadas — feitas só pra ele.`,
+        };
+      case "streak_milestone":
+        return {
+          tag: `🌿 ${diary.streak} dias sem tela!`,
+          headline: `Vocês tão construindo um hábito raro`,
+          sub: `Continue o ritmo com o Premium: atividades ilimitadas e Diário completo pra não perder nenhum dia.`,
+        };
+      case "after_completion":
+        return {
+          tag: "Curtiu a brincadeira? 🌿",
+          headline: `Sentiu o valor. Agora destrava o Kidzz inteiro.`,
+          sub: hasMinutes
+            ? `${diary.minutes} min sem tela criados com a gente. No Premium, é só o começo.`
+            : `Atividades ilimitadas, personalizadas pro ${nome.split(" ")[0]}.`,
+        };
+      default:
+        return {
+          tag: "",
+          headline: `Escolha como o Kidzz vai cuidar do ${nome}`,
+          sub: hasMinutes
+            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado — e o ${nome.split(" ")[0]} ganha atividades feitas só pra ele.`
+            : `Comece grátis. Cancele quando quiser. Sem letras miúdas.`,
+        };
+    }
+  }, [context, diary, nome]);
+
 
   return (
     <div
