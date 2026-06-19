@@ -410,6 +410,14 @@ const BoraScreen = ({ onBack }: Props) => {
     [mood],
   );
 
+  const { surprise, loading: surprising, error: surpriseError, activity: surpriseActivity, reset: resetSurprise } = useSurpresaIA();
+  const [surpriseOpen, setSurpriseOpen] = useState(false);
+  const handleSurprise = async () => {
+    setSurpriseOpen(true);
+    try { await surprise(mood ? { energia: mood } : undefined); } catch (_) {}
+  };
+  const closeSurprise = () => { setSurpriseOpen(false); resetSurprise(); };
+
   return (
     <div
       data-tab="bora"
@@ -417,6 +425,15 @@ const BoraScreen = ({ onBack }: Props) => {
       style={{ paddingBottom: 180 }}
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <SurpresaModal
+        open={surpriseOpen}
+        loading={surprising}
+        activity={surpriseActivity}
+        error={surpriseError}
+        childName={firstName}
+        onClose={closeSurprise}
+        onRetry={() => surprise(mood ? { energia: mood } : undefined).catch(() => {})}
+      />
       {/* Hero */}
       <header className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2">
