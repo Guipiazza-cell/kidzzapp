@@ -272,7 +272,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                 aria-hidden
                 style={{
                   position: "absolute",
-                  top: 3,
+                  top: 14,
                   left: pill.left,
                   width: PILL_W,
                   height: 38,
