@@ -457,6 +457,19 @@ const BoraScreen = ({ onBack }: Props) => {
         >
           Aqui dentro só tem ideia. A brincadeira de verdade acontece longe da tela.
         </p>
+        <button
+          type="button"
+          onClick={handleSurprise}
+          className="mt-5 w-full rounded-full py-3.5 font-bold text-white text-base flex items-center justify-center gap-2"
+          style={{
+            background: "linear-gradient(180deg, #FF9A4D 0%, #E8772A 100%)",
+            border: "1.5px solid rgba(255,255,255,0.6)",
+            boxShadow: "0 14px 32px -10px rgba(232,119,42,0.65), inset 0 1px 0 rgba(255,255,255,0.6)",
+          }}
+        >
+          <Sparkles size={18} />
+          Surpresa da IA{firstName ? ` pra ${firstName}` : ""}
+        </button>
       </header>
 
       {/* Diário Sem Tela — hero metric */}
