@@ -373,10 +373,19 @@ const readDiary = (): Diary => {
 };
 
 const BoraScreen = ({ onBack }: Props) => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { isPremium } = useEntitlement();
+  const { criancas, loading: loadingCriancas } = useCriancas();
 
-  const childName = (profile?.child_name || "").trim();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    if (loadingCriancas) return;
+    if (criancas.length === 0) setShowOnboarding(true);
+  }, [user, loadingCriancas, criancas.length]);
+
+  const firstCrianca = criancas[0];
+  const childName = (firstCrianca?.nome || profile?.child_name || "").trim();
   const ageRange = (profile?.age_range || "").trim();
   const firstName = childName ? childName.split(" ")[0] : "";
   const personalTag = firstName
