@@ -1,10 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import PaywallScreen from "./PaywallScreen";
+import PaywallScreen, { type PaywallContextKind } from "./PaywallScreen";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface PaywallContextType {
-  open: () => void;
+  open: (context?: PaywallContextKind) => void;
   close: () => void;
 }
 
@@ -19,9 +19,13 @@ export const usePaywall = () => {
 /** Provider único do paywall — todo upgrade do app chama isso. */
 export const PaywallProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [ctx, setCtx] = useState<PaywallContextKind>("default");
   const { profile } = useAuth();
 
-  const open = useCallback(() => setIsOpen(true), []);
+  const open = useCallback((context?: PaywallContextKind) => {
+    setCtx(context ?? "default");
+    setIsOpen(true);
+  }, []);
   const close = useCallback(() => setIsOpen(false), []);
 
   // Suporte a ?paywall=1 — qualquer link/CTA legado abre o paywall canônico
@@ -29,6 +33,7 @@ export const PaywallProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("paywall") === "1") {
+      setCtx("default");
       setIsOpen(true);
       params.delete("paywall");
       const q = params.toString();
@@ -55,7 +60,7 @@ export const PaywallProvider = ({ children }: { children: ReactNode }) => {
               className="absolute inset-0 bg-gradient-to-b from-[#fef9f3] to-[#f1ead8]"
               onClick={(e) => e.stopPropagation()}
             >
-              <PaywallScreen childName={profile?.child_name} onClose={close} />
+              <PaywallScreen childName={profile?.child_name} onClose={close} context={ctx} />
             </motion.div>
           </motion.div>
         )}

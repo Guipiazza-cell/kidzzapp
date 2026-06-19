@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
+import { usePaywall } from "@/components/paywall/PaywallProvider";
 import { CriancaOnboarding } from "./CriancaOnboarding";
 import { SurpresaModal } from "./SurpresaModal";
 
@@ -159,10 +160,13 @@ const PremiumBadge = () => (
 );
 
 /** 3D Glass category card. */
-const GlassCard = ({ c, locked }: { c: Cat; locked: boolean }) => {
+const GlassCard = ({ c, locked, onClick }: { c: Cat; locked: boolean; onClick?: () => void }) => {
   const Icon = c.icon;
   return (
-    <div
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-left w-full active:scale-[0.98] transition-transform"
       style={{
         position: "relative",
         borderRadius: 24,
@@ -182,6 +186,7 @@ const GlassCard = ({ c, locked }: { c: Cat; locked: boolean }) => {
           boxShadow:
             "inset 0 1.5px 2px rgba(255,255,255,.55), inset 0 -6px 14px rgba(0,0,0,.16), 0 1px 0 rgba(255,255,255,.35)",
           minHeight: 124,
+          filter: locked ? "saturate(0.85)" : "none",
         }}
       >
         <span
@@ -239,7 +244,7 @@ const GlassCard = ({ c, locked }: { c: Cat; locked: boolean }) => {
           {c.label}
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -374,10 +379,14 @@ const readDiary = (): Diary => {
   return { minutes: 0, completions: 0, streak: 0, lastDate: "" };
 };
 
+const SURPRISE_DATE_KEY = "bora_surprise_date";
+const MILESTONE_KEY = "bora_streak_milestone_shown";
+
 const BoraScreen = ({ onBack }: Props) => {
   const { profile, user } = useAuth();
   const { isPremium } = useEntitlement();
   const { criancas, loading: loadingCriancas } = useCriancas();
+  const { open: openPaywall } = usePaywall();
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   useEffect(() => {
@@ -404,19 +413,71 @@ const BoraScreen = ({ onBack }: Props) => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Streak milestone trigger — once per (streak value) for free users.
+  useEffect(() => {
+    if (isPremium) return;
+    if (diary.streak < 3) return;
+    try {
+      const shown = window.localStorage.getItem(MILESTONE_KEY);
+      if (shown === String(diary.streak)) return;
+      const t = setTimeout(() => {
+        openPaywall("streak_milestone");
+        try { window.localStorage.setItem(MILESTONE_KEY, String(diary.streak)); } catch {}
+      }, 700);
+      return () => clearTimeout(t);
+    } catch {}
+  }, [diary.streak, isPremium, openPaywall]);
+
   const [mood, setMood] = useState<Energy | null>(null);
   const filteredCats = useMemo(
     () => (mood ? CATS.filter((c) => c.energies.includes(mood)) : CATS),
     [mood],
   );
 
+  const todayISO = () => new Date().toISOString().slice(0, 10);
+  const surpriseUsedToday = () => {
+    try { return window.localStorage.getItem(SURPRISE_DATE_KEY) === todayISO(); } catch { return false; }
+  };
+
   const { surprise, loading: surprising, error: surpriseError, activity: surpriseActivity, reset: resetSurprise } = useSurpresaIA();
   const [surpriseOpen, setSurpriseOpen] = useState(false);
   const handleSurprise = async () => {
+    // Free quota: 1 surpresa/dia. Premium: ilimitado.
+    if (!isPremium && surpriseUsedToday()) {
+      openPaywall("surprise_limit");
+      return;
+    }
     setSurpriseOpen(true);
-    try { await surprise(mood ? { energia: mood } : undefined); } catch (_) {}
+    try {
+      await surprise(mood ? { energia: mood } : undefined);
+      if (!isPremium) {
+        try { window.localStorage.setItem(SURPRISE_DATE_KEY, todayISO()); } catch {}
+      }
+    } catch (_) {}
   };
-  const closeSurprise = () => { setSurpriseOpen(false); resetSurprise(); };
+  const closeSurprise = () => {
+    setSurpriseOpen(false);
+    resetSurprise();
+    // After 1-2 completions, nudge upgrade on close (free only, no streak milestone)
+    if (!isPremium && diary.completions >= 1 && diary.completions <= 2) {
+      setTimeout(() => openPaywall("after_completion"), 400);
+    }
+  };
+
+  const handleCategoryTap = (c: Cat) => {
+    if (c.premium && !isPremium) {
+      openPaywall("premium_locked");
+      return;
+    }
+    // Future: navigate to category list. No-op for now.
+  };
+
+  const handleBoraFazer = () => {
+    // Counts as the daily "atividade de hoje". Sempre permitido (1 por dia já é o card fixo).
+    // Não abre paywall aqui — a conclusão real (em outra tela) é que vai contabilizar.
+  };
+
+
 
   return (
     <div
@@ -713,7 +774,7 @@ const BoraScreen = ({ onBack }: Props) => {
 
         <div className="grid grid-cols-2 gap-3">
           {filteredCats.map((c) => (
-            <GlassCard key={c.key} c={c} locked={!!c.premium && !isPremium} />
+            <GlassCard key={c.key} c={c} locked={!!c.premium && !isPremium} onClick={() => handleCategoryTap(c)} />
           ))}
         </div>
 

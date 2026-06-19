@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Sparkles, Lock, X } from "lucide-react";
+import { Check, Sparkles, Lock, X, Leaf, Flame, Users } from "lucide-react";
 import { useAuth, type CheckoutPlan } from "@/contexts/AuthContext";
+
+export type PaywallContextKind = "default" | "premium_locked" | "surprise_limit" | "streak_milestone" | "after_completion";
 
 interface PaywallScreenProps {
   childName?: string;
   onClose?: () => void;
+  context?: PaywallContextKind;
 }
 
 type Cycle = "monthly" | "annual";
@@ -33,7 +36,7 @@ const FEATURES: Array<{ row: string; free: string; kidzz: string; premium: strin
   { row: "Cinema",            free: "Amostra",          kidzz: "🔒",                          premium: "✅" },
 ];
 
-const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
+const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScreenProps) => {
   const { handleCheckout, user } = useAuth();
   const [cycle, setCycle] = useState<Cycle>("annual");
   const [selected, setSelected] = useState<"kidzz" | "premium">("premium");
@@ -67,6 +70,62 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
 
   const nome = childName?.trim() || "seu filho";
 
+  // Diário Sem Tela — emotional anchor for the headline (read-only).
+  const diary = useMemo(() => {
+    if (typeof window === "undefined") return { minutes: 0, streak: 0, completions: 0 };
+    try {
+      const raw = window.localStorage.getItem("bora_diary_v1");
+      if (raw) {
+        const d = JSON.parse(raw);
+        return { minutes: d.minutes || 0, streak: d.streak || 0, completions: d.completions || 0 };
+      }
+    } catch {}
+    return { minutes: 0, streak: 0, completions: 0 };
+  }, []);
+
+  const ctx = useMemo(() => {
+    const hasMinutes = diary.minutes > 0;
+    switch (context) {
+      case "premium_locked":
+        return {
+          tag: "Conteúdo Premium",
+          headline: `Essa coleção é feita pro ${nome.split(" ")[0]} brilhar`,
+          sub: hasMinutes
+            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado.`
+            : `Atividades feitas só pra ele, ilimitadas no Premium.`,
+        };
+      case "surprise_limit":
+        return {
+          tag: "Mais uma surpresa?",
+          headline: `A surpresa grátis do dia já saiu. Quer outra agora?`,
+          sub: `No Premium o ${nome.split(" ")[0]} recebe surpresas ilimitadas — feitas só pra ele.`,
+        };
+      case "streak_milestone":
+        return {
+          tag: `🌿 ${diary.streak} dias sem tela!`,
+          headline: `Vocês tão construindo um hábito raro`,
+          sub: `Continue o ritmo com o Premium: atividades ilimitadas e Diário completo pra não perder nenhum dia.`,
+        };
+      case "after_completion":
+        return {
+          tag: "Curtiu a brincadeira? 🌿",
+          headline: `Sentiu o valor. Agora destrava o Kidzz inteiro.`,
+          sub: hasMinutes
+            ? `${diary.minutes} min sem tela criados com a gente. No Premium, é só o começo.`
+            : `Atividades ilimitadas, personalizadas pro ${nome.split(" ")[0]}.`,
+        };
+      default:
+        return {
+          tag: "",
+          headline: `Escolha como o Kidzz vai cuidar do ${nome}`,
+          sub: hasMinutes
+            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado — e o ${nome.split(" ")[0]} ganha atividades feitas só pra ele.`
+            : `Comece grátis. Cancele quando quiser. Sem letras miúdas.`,
+        };
+    }
+  }, [context, diary, nome]);
+
+
   return (
     <div
       className="min-h-screen w-full overflow-y-auto overscroll-contain"
@@ -90,22 +149,66 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
           </button>
         )}
 
-        {/* Header */}
+        {/* Header — contextual + emotional */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center pt-8 pb-2"
         >
+          {ctx.tag && (
+            <span
+              className="inline-flex items-center gap-1.5 text-[11px] font-black tracking-[0.12em] uppercase px-3 py-1.5 rounded-full mb-4"
+              style={{
+                background: `linear-gradient(135deg, ${SAGE}1A 0%, ${AMBER}1A 100%)`,
+                color: AMBER_DEEP,
+                border: `1px solid ${AMBER}33`,
+              }}
+            >
+              {ctx.tag}
+            </span>
+          )}
           <h1
             className="text-[26px] leading-[1.15] font-extrabold px-1"
             style={{ color: INK, letterSpacing: "-0.01em" }}
           >
-            Escolha como o Kidzz vai cuidar do {nome}
+            {ctx.headline}
           </h1>
-          <p className="text-[14px] mt-3" style={{ color: INK_SOFT }}>
-            Comece grátis. Cancele quando quiser. Sem letras miúdas.
+          <p className="text-[14px] mt-3 px-2" style={{ color: INK_SOFT, lineHeight: 1.5 }}>
+            {ctx.sub}
           </p>
+
+          {/* Mini stats strip — only if there's something to celebrate */}
+          {(diary.minutes > 0 || diary.streak > 0) && (
+            <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+              {diary.minutes > 0 && (
+                <span
+                  className="inline-flex items-center gap-1.5 text-[12px] font-bold px-2.5 py-1 rounded-full"
+                  style={{ background: `${SAGE}1A`, color: "#3F6B30" }}
+                >
+                  <Leaf size={12} strokeWidth={2.6} /> {diary.minutes} min sem tela
+                </span>
+              )}
+              {diary.streak > 0 && (
+                <span
+                  className="inline-flex items-center gap-1.5 text-[12px] font-bold px-2.5 py-1 rounded-full"
+                  style={{ background: `${AMBER}1A`, color: AMBER_DEEP }}
+                >
+                  <Flame size={12} strokeWidth={2.6} /> {diary.streak} {diary.streak === 1 ? "dia" : "dias"} seguidos
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Prova social — Movimento Menos Tela */}
+          <div
+            className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold"
+            style={{ color: INK_SOFT }}
+          >
+            <Users size={13} />
+            <span>+12.430 famílias no movimento Menos Tela</span>
+          </div>
         </motion.div>
+
 
         {/* Cycle toggle */}
         <div
@@ -185,7 +288,11 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
           }}
         >
           <Sparkles size={18} />
-          {loading ? "Abrindo checkout..." : user ? "Assinar agora" : "Criar conta e assinar"}
+          {loading
+            ? "Abrindo checkout..."
+            : user
+              ? "Começar 7 dias grátis"
+              : "Criar conta e começar grátis"}
           <span aria-hidden>✨</span>
         </motion.button>
 
@@ -194,14 +301,15 @@ const PaywallScreen = ({ childName, onClose }: PaywallScreenProps) => {
           style={{ color: INK_SOFT }}
         >
           <Lock size={13} />
-          <span>Pagamento seguro via Stripe · Cancele quando quiser</span>
+          <span>7 dias grátis · Cancele a qualquer momento</span>
         </div>
         <p
           className="text-[12px] text-center mt-1"
           style={{ color: INK_SOFT }}
         >
-          Você não será cobrado hoje sem confirmar.
+          Sem cobrança nos primeiros 7 dias. Você decide se continua.
         </p>
+
 
         {/* Comparativo */}
         <div
