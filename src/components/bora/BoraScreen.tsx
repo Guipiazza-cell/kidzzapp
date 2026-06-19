@@ -7,7 +7,9 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
+import { useSurpresaIA } from "@/hooks/useSurpresaIA";
 import { CriancaOnboarding } from "./CriancaOnboarding";
+import { SurpresaModal } from "./SurpresaModal";
 
 interface Props {
   onBack?: () => void;
