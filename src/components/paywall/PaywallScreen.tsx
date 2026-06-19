@@ -288,7 +288,11 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           }}
         >
           <Sparkles size={18} />
-          {loading ? "Abrindo checkout..." : user ? "Assinar agora" : "Criar conta e assinar"}
+          {loading
+            ? "Abrindo checkout..."
+            : user
+              ? "Começar 7 dias grátis"
+              : "Criar conta e começar grátis"}
           <span aria-hidden>✨</span>
         </motion.button>
 
@@ -297,14 +301,15 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           style={{ color: INK_SOFT }}
         >
           <Lock size={13} />
-          <span>Pagamento seguro via Stripe · Cancele quando quiser</span>
+          <span>7 dias grátis · Cancele a qualquer momento</span>
         </div>
         <p
           className="text-[12px] text-center mt-1"
           style={{ color: INK_SOFT }}
         >
-          Você não será cobrado hoje sem confirmar.
+          Sem cobrança nos primeiros 7 dias. Você decide se continua.
         </p>
+
 
         {/* Comparativo */}
         <div
