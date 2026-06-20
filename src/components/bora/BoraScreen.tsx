@@ -8,9 +8,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
+import { useBoraStats } from "@/hooks/useBoraStats";
 import { usePaywall } from "@/components/paywall/PaywallProvider";
 import { CriancaOnboarding } from "./CriancaOnboarding";
 import { SurpresaModal } from "./SurpresaModal";
+import { ComoFoiModal } from "./ComoFoiModal";
+import { DiarioSemTela } from "./DiarioSemTela";
+import { DesafioCard } from "./DesafioCard";
+import { IndicacaoCard } from "./IndicacaoCard";
+import { scheduleDailyReminder } from "@/lib/dailyReminder";
 
 interface Props {
   onBack?: () => void;
