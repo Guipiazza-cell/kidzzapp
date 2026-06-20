@@ -425,6 +425,24 @@ const BoraScreen = ({ onBack }: Props) => {
   const heroStreak = Math.max(boraStats.streak, diary.streak);
   const heroLeaves = Math.max(boraStats.total_conclusoes, diary.completions);
 
+  // Auto-aplica código de indicação se houver na URL/sessionStorage (1x por user)
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get("ref");
+      const fromSession = sessionStorage.getItem("kidzz_ref");
+      const code = (fromUrl || fromSession || "").trim();
+      const appliedKey = `bora_indicacao_aplicada_${user.id}`;
+      if (!code || localStorage.getItem(appliedKey) === "1") return;
+      import("@/hooks/useIndicacao").then(({ aplicarIndicacao }) => {
+        aplicarIndicacao(code).then((res) => {
+          if (res?.ok) localStorage.setItem(appliedKey, "1");
+        }).catch(() => {});
+      });
+    } catch {}
+  }, [user]);
+
   // Agenda lembrete diário no mount (com nome da criança, se houver)
   useEffect(() => {
     scheduleDailyReminder((criancas[0]?.nome || "").split(" ")[0]);
