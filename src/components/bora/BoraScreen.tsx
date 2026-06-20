@@ -570,8 +570,13 @@ const BoraScreen = ({ onBack }: Props) => {
         </button>
       </header>
 
-      {/* Diário Sem Tela — hero metric */}
+      {/* Diário Sem Tela — hero metric (tap to open full diary) */}
       <section className="px-5">
+        <button
+          type="button"
+          onClick={() => setDiaryOpen(true)}
+          className="w-full text-left active:scale-[.99] transition-transform"
+        >
         <Bezel tint="#4F8B66">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
