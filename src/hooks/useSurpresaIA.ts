@@ -29,8 +29,20 @@ export function useSurpresaIA() {
       const { data, error: err } = await supabase.functions.invoke("surpresa-ia", {
         body: { mode: "single", ...(opts || {}) },
       });
-      if (err) throw err;
-      if (!data?.activity) throw new Error("sem atividade");
+      if (data?.error) throw new Error(String(data.error));
+      if (err) {
+        // Extrai o body real do FunctionsHttpError em vez do genérico "non-2xx"
+        const ctx = (err as any)?.context;
+        let msg = "";
+        try {
+          if (ctx && typeof ctx.json === "function") {
+            const j = await ctx.json();
+            if (j?.error) msg = String(j.error);
+          }
+        } catch (_) {}
+        throw new Error(msg || err.message || "Não rolou agora.");
+      }
+      if (!data?.activity) throw new Error("Sem atividade. Tenta de novo.");
       setActivity(data.activity as IaActivity);
       return data.activity as IaActivity;
     } catch (e: any) {

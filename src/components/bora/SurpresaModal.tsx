@@ -17,8 +17,13 @@ export const SurpresaModal = ({ open, loading, activity, error, childName, onClo
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[130] flex items-end sm:items-center justify-center p-4"
-          style={{ background: "rgba(20, 35, 18, 0.6)", backdropFilter: "blur(8px)" }}
+          className="fixed inset-0 z-[200] flex items-center justify-center px-4"
+          style={{
+            background: "rgba(20, 35, 18, 0.6)",
+            backdropFilter: "blur(8px)",
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 140px)",
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
