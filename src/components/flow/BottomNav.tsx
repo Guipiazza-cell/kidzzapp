@@ -317,9 +317,9 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: featured ? 46 : 38,
-                      height: featured ? 46 : 38,
-                      marginTop: featured ? -12 : 0,
+                      width: featured ? 42 : 38,
+                      height: featured ? 42 : 38,
+                      marginTop: featured ? -4 : 0,
                       borderRadius: featured ? 999 : 0,
                       background: featured
                         ? `linear-gradient(155deg, ${tab.cl}, ${tab.c})`
