@@ -724,6 +724,7 @@ const BoraScreen = ({ onBack }: Props) => {
           >
             <button
               type="button"
+              onClick={handleBoraFazer}
               className="w-full active:scale-[0.98]"
               style={{
                 position: "relative",
