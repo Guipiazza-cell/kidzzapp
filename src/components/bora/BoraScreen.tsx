@@ -834,6 +834,18 @@ const BoraScreen = ({ onBack }: Props) => {
         )}
       </section>
 
+      {/* Desafio da semana — comunidade */}
+      <section className="px-5 mt-7">
+        <DesafioCard childName={firstName} />
+      </section>
+
+      {/* Indicação de mão dupla */}
+      <section className="px-5 mt-4">
+        <IndicacaoCard />
+      </section>
+
+
+
       {/* Closing */}
       <section className="px-5 mt-8">
         <Bezel tint="#4F8B66">
