@@ -419,6 +419,21 @@ const BoraScreen = ({ onBack }: Props) => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Real stats do banco (Fase 7). Sobrepoe o `diary` local pra exibição.
+  const { stats: boraStats, refresh: refreshStats } = useBoraStats();
+  const heroMinutes = Math.max(boraStats.total_minutos, diary.minutes);
+  const heroStreak = Math.max(boraStats.streak, diary.streak);
+  const heroLeaves = Math.max(boraStats.total_conclusoes, diary.completions);
+
+  // Agenda lembrete diário no mount (com nome da criança, se houver)
+  useEffect(() => {
+    scheduleDailyReminder((criancas[0]?.nome || "").split(" ")[0]);
+  }, [criancas]);
+
+  // Diário e fluxo "Como foi?"
+  const [diaryOpen, setDiaryOpen] = useState(false);
+  const [comoFoiOpen, setComoFoiOpen] = useState(false);
+
   // Streak milestone trigger — once per (streak value) for free users.
   useEffect(() => {
     if (isPremium) return;
