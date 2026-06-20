@@ -608,7 +608,7 @@ const BoraScreen = ({ onBack }: Props) => {
                 className="font-bora-display"
                 style={{ fontSize: 34, color: "var(--bora-green-deep)", letterSpacing: "-0.02em", lineHeight: 1 }}
               >
-                {diary.minutes}
+                {heroMinutes}
                 <span style={{ fontSize: 16, marginLeft: 4, color: "var(--bora-ink-soft)" }}>min</span>
               </div>
               <div
@@ -626,13 +626,13 @@ const BoraScreen = ({ onBack }: Props) => {
                 style={{ fontSize: 22, color: "#B85F0E", letterSpacing: "-0.02em", lineHeight: 1, display: "inline-flex", alignItems: "center", gap: 4 }}
               >
                 <Flame size={18} strokeWidth={2.4} style={{ color: "#E8821A" }} />
-                {diary.streak}
+                {heroStreak}
               </div>
               <div
                 className="font-bora-body mt-1"
                 style={{ fontSize: 12, color: "var(--bora-ink-soft)" }}
               >
-                {diary.streak === 1 ? "dia seguido" : "dias seguidos"}
+                {heroStreak === 1 ? "dia seguido" : "dias seguidos"}
               </div>
             </div>
           </div>
@@ -647,18 +647,21 @@ const BoraScreen = ({ onBack }: Props) => {
               justifyContent: "space-between",
             }}
           >
-            <Tree leaves={diary.completions} />
+            <Tree leaves={heroLeaves} />
             <span
               className="font-bora-body"
-              style={{ fontSize: 12, color: "var(--bora-ink-soft)" }}
+              style={{ fontSize: 12, color: "var(--bora-ink-soft)", display: "inline-flex", alignItems: "center", gap: 4 }}
             >
-              {diary.completions === 0
+              {heroLeaves === 0
                 ? "A arvorezinha tá esperando a primeira folha 🌱"
-                : `${diary.completions} ${diary.completions === 1 ? "folha" : "folhas"} conquistadas`}
+                : `${heroLeaves} ${heroLeaves === 1 ? "folha" : "folhas"} conquistadas`}
+              <ChevronRight size={14} strokeWidth={2.4} style={{ opacity: 0.55 }} />
             </span>
           </div>
         </Bezel>
+        </button>
       </section>
+
 
       {/* Surpresa da IA — card premium com bezel */}
       <section className="px-5 mt-5">
