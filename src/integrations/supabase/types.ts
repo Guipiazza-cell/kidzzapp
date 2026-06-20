@@ -281,6 +281,39 @@ export type Database = {
         }
         Relationships: []
       }
+      desafios_semanais: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string
+          emoji: string
+          hashtag: string
+          id: string
+          semana_iso: string
+          titulo: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao: string
+          emoji?: string
+          hashtag?: string
+          id?: string
+          semana_iso: string
+          titulo: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string
+          emoji?: string
+          hashtag?: string
+          id?: string
+          semana_iso?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
       favoritos: {
         Row: {
           activity_id: string
@@ -398,6 +431,27 @@ export type Database = {
           metadata?: Json | null
           title?: string
           type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notificacao_prefs: {
+        Row: {
+          ativo: boolean
+          hora: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          hora?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          hora?: number
           updated_at?: string
           user_id?: string
         }
@@ -602,6 +656,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      aplicar_indicacao: { Args: { _codigo: string }; Returns: Json }
+      ensure_indicacao_codigo: { Args: never; Returns: string }
+      get_bora_stats: {
+        Args: never
+        Returns: {
+          categorias_exploradas: number
+          streak: number
+          total_conclusoes: number
+          total_minutos: number
+        }[]
+      }
       get_effective_plan: {
         Args: { _user_id: string }
         Returns: {
