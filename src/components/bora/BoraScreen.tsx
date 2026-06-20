@@ -8,9 +8,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
+import { useBoraStats } from "@/hooks/useBoraStats";
 import { usePaywall } from "@/components/paywall/PaywallProvider";
 import { CriancaOnboarding } from "./CriancaOnboarding";
 import { SurpresaModal } from "./SurpresaModal";
+import { ComoFoiModal } from "./ComoFoiModal";
+import { DiarioSemTela } from "./DiarioSemTela";
+import { DesafioCard } from "./DesafioCard";
+import { IndicacaoCard } from "./IndicacaoCard";
+import { scheduleDailyReminder } from "@/lib/dailyReminder";
 
 interface Props {
   onBack?: () => void;
@@ -413,6 +419,39 @@ const BoraScreen = ({ onBack }: Props) => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Real stats do banco (Fase 7). Sobrepoe o `diary` local pra exibição.
+  const { stats: boraStats, refresh: refreshStats } = useBoraStats();
+  const heroMinutes = Math.max(boraStats.total_minutos, diary.minutes);
+  const heroStreak = Math.max(boraStats.streak, diary.streak);
+  const heroLeaves = Math.max(boraStats.total_conclusoes, diary.completions);
+
+  // Auto-aplica código de indicação se houver na URL/sessionStorage (1x por user)
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get("ref");
+      const fromSession = sessionStorage.getItem("kidzz_ref");
+      const code = (fromUrl || fromSession || "").trim();
+      const appliedKey = `bora_indicacao_aplicada_${user.id}`;
+      if (!code || localStorage.getItem(appliedKey) === "1") return;
+      import("@/hooks/useIndicacao").then(({ aplicarIndicacao }) => {
+        aplicarIndicacao(code).then((res) => {
+          if (res?.ok) localStorage.setItem(appliedKey, "1");
+        }).catch(() => {});
+      });
+    } catch {}
+  }, [user]);
+
+  // Agenda lembrete diário no mount (com nome da criança, se houver)
+  useEffect(() => {
+    scheduleDailyReminder((criancas[0]?.nome || "").split(" ")[0]);
+  }, [criancas]);
+
+  // Diário e fluxo "Como foi?"
+  const [diaryOpen, setDiaryOpen] = useState(false);
+  const [comoFoiOpen, setComoFoiOpen] = useState(false);
+
   // Streak milestone trigger — once per (streak value) for free users.
   useEffect(() => {
     if (isPremium) return;
@@ -472,9 +511,15 @@ const BoraScreen = ({ onBack }: Props) => {
     // Future: navigate to category list. No-op for now.
   };
 
+  const TODAY_ACTIVITY = {
+    titulo: "Caça ao tesouro das cores",
+    emoji: "🎨",
+    tela_min: 15,
+  };
+
   const handleBoraFazer = () => {
-    // Counts as the daily "atividade de hoje". Sempre permitido (1 por dia já é o card fixo).
-    // Não abre paywall aqui — a conclusão real (em outra tela) é que vai contabilizar.
+    // Abre o fluxo: "guarda celular" -> "Como foi?"
+    setComoFoiOpen(true);
   };
 
 
@@ -486,6 +531,15 @@ const BoraScreen = ({ onBack }: Props) => {
       style={{ paddingBottom: 180 }}
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />
+      <ComoFoiModal
+        open={comoFoiOpen}
+        onClose={() => setComoFoiOpen(false)}
+        onSaved={() => refreshStats()}
+        activity={TODAY_ACTIVITY}
+        criancaId={firstCrianca?.id || null}
+        childName={firstName}
+      />
       <SurpresaModal
         open={surpriseOpen}
         loading={surprising}
@@ -495,6 +549,7 @@ const BoraScreen = ({ onBack }: Props) => {
         onClose={closeSurprise}
         onRetry={() => surprise(mood ? { energia: mood } : undefined).catch(() => {})}
       />
+
       {/* Hero */}
       <header className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2">
@@ -533,8 +588,13 @@ const BoraScreen = ({ onBack }: Props) => {
         </button>
       </header>
 
-      {/* Diário Sem Tela — hero metric */}
+      {/* Diário Sem Tela — hero metric (tap to open full diary) */}
       <section className="px-5">
+        <button
+          type="button"
+          onClick={() => setDiaryOpen(true)}
+          className="w-full text-left active:scale-[.99] transition-transform"
+        >
         <Bezel tint="#4F8B66">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -566,7 +626,7 @@ const BoraScreen = ({ onBack }: Props) => {
                 className="font-bora-display"
                 style={{ fontSize: 34, color: "var(--bora-green-deep)", letterSpacing: "-0.02em", lineHeight: 1 }}
               >
-                {diary.minutes}
+                {heroMinutes}
                 <span style={{ fontSize: 16, marginLeft: 4, color: "var(--bora-ink-soft)" }}>min</span>
               </div>
               <div
@@ -584,13 +644,13 @@ const BoraScreen = ({ onBack }: Props) => {
                 style={{ fontSize: 22, color: "#B85F0E", letterSpacing: "-0.02em", lineHeight: 1, display: "inline-flex", alignItems: "center", gap: 4 }}
               >
                 <Flame size={18} strokeWidth={2.4} style={{ color: "#E8821A" }} />
-                {diary.streak}
+                {heroStreak}
               </div>
               <div
                 className="font-bora-body mt-1"
                 style={{ fontSize: 12, color: "var(--bora-ink-soft)" }}
               >
-                {diary.streak === 1 ? "dia seguido" : "dias seguidos"}
+                {heroStreak === 1 ? "dia seguido" : "dias seguidos"}
               </div>
             </div>
           </div>
@@ -605,18 +665,21 @@ const BoraScreen = ({ onBack }: Props) => {
               justifyContent: "space-between",
             }}
           >
-            <Tree leaves={diary.completions} />
+            <Tree leaves={heroLeaves} />
             <span
               className="font-bora-body"
-              style={{ fontSize: 12, color: "var(--bora-ink-soft)" }}
+              style={{ fontSize: 12, color: "var(--bora-ink-soft)", display: "inline-flex", alignItems: "center", gap: 4 }}
             >
-              {diary.completions === 0
+              {heroLeaves === 0
                 ? "A arvorezinha tá esperando a primeira folha 🌱"
-                : `${diary.completions} ${diary.completions === 1 ? "folha" : "folhas"} conquistadas`}
+                : `${heroLeaves} ${heroLeaves === 1 ? "folha" : "folhas"} conquistadas`}
+              <ChevronRight size={14} strokeWidth={2.4} style={{ opacity: 0.55 }} />
             </span>
           </div>
         </Bezel>
+        </button>
       </section>
+
 
       {/* Surpresa da IA — card premium com bezel */}
       <section className="px-5 mt-5">
@@ -679,6 +742,7 @@ const BoraScreen = ({ onBack }: Props) => {
           >
             <button
               type="button"
+              onClick={handleBoraFazer}
               className="w-full active:scale-[0.98]"
               style={{
                 position: "relative",
@@ -787,6 +851,18 @@ const BoraScreen = ({ onBack }: Props) => {
           </p>
         )}
       </section>
+
+      {/* Desafio da semana — comunidade */}
+      <section className="px-5 mt-7">
+        <DesafioCard childName={firstName} />
+      </section>
+
+      {/* Indicação de mão dupla */}
+      <section className="px-5 mt-4">
+        <IndicacaoCard />
+      </section>
+
+
 
       {/* Closing */}
       <section className="px-5 mt-8">
