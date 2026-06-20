@@ -493,9 +493,15 @@ const BoraScreen = ({ onBack }: Props) => {
     // Future: navigate to category list. No-op for now.
   };
 
+  const TODAY_ACTIVITY = {
+    titulo: "Caça ao tesouro das cores",
+    emoji: "🎨",
+    tela_min: 15,
+  };
+
   const handleBoraFazer = () => {
-    // Counts as the daily "atividade de hoje". Sempre permitido (1 por dia já é o card fixo).
-    // Não abre paywall aqui — a conclusão real (em outra tela) é que vai contabilizar.
+    // Abre o fluxo: "guarda celular" -> "Como foi?"
+    setComoFoiOpen(true);
   };
 
 
@@ -507,6 +513,15 @@ const BoraScreen = ({ onBack }: Props) => {
       style={{ paddingBottom: 180 }}
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />
+      <ComoFoiModal
+        open={comoFoiOpen}
+        onClose={() => setComoFoiOpen(false)}
+        onSaved={() => refreshStats()}
+        activity={TODAY_ACTIVITY}
+        criancaId={firstCrianca?.id || null}
+        childName={firstName}
+      />
       <SurpresaModal
         open={surpriseOpen}
         loading={surprising}
@@ -516,6 +531,7 @@ const BoraScreen = ({ onBack }: Props) => {
         onClose={closeSurprise}
         onRetry={() => surprise(mood ? { energia: mood } : undefined).catch(() => {})}
       />
+
       {/* Hero */}
       <header className="px-5 pt-8 pb-4">
         <div className="flex items-center gap-2">
