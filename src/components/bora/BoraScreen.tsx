@@ -509,7 +509,19 @@ const BoraScreen = ({ onBack }: Props) => {
       openPaywall("premium_locked");
       return;
     }
-    // Future: navigate to category list. No-op for now.
+    // Free categories: dispara Surpresa filtrada pela categoria
+    if (!isPremium && surpriseUsedToday()) {
+      openPaywall("surprise_limit");
+      return;
+    }
+    setSurpriseOpen(true);
+    surprise({ categoria: c.key, ...(mood ? { energia: mood } : {}) })
+      .then(() => {
+        if (!isPremium) {
+          try { window.localStorage.setItem(SURPRISE_DATE_KEY, todayISO()); } catch {}
+        }
+      })
+      .catch(() => {});
   };
 
   const TODAY_ACTIVITY = {
@@ -518,9 +530,34 @@ const BoraScreen = ({ onBack }: Props) => {
     tela_min: 15,
   };
 
+  const [guardaOpen, setGuardaOpen] = useState(false);
+
   const handleBoraFazer = () => {
-    // Abre o fluxo: "guarda celular" -> "Como foi?"
-    setComoFoiOpen(true);
+    // Etapa 1: tela verde "Guarda o celular"
+    setGuardaOpen(true);
+  };
+
+  const handleGuardaDone = () => {
+    setGuardaOpen(false);
+    // Etapa 2: "Como foi?" + foto
+    setTimeout(() => setComoFoiOpen(true), 200);
+  };
+
+  // Atualização otimista do diário local quando salva uma conclusão
+  const handleConclusaoSalva = () => {
+    refreshStats();
+    setDiary((d) => {
+      const today = todayISO();
+      const nextStreak = d.lastDate === today ? d.streak : d.streak + 1;
+      const next: Diary = {
+        minutes: d.minutes + TODAY_ACTIVITY.tela_min,
+        completions: d.completions + 1,
+        streak: nextStreak,
+        lastDate: today,
+      };
+      try { window.localStorage.setItem(DIARY_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
 
