@@ -16,6 +16,7 @@ import { ComoFoiModal } from "./ComoFoiModal";
 import { DiarioSemTela } from "./DiarioSemTela";
 import { DesafioCard } from "./DesafioCard";
 import { IndicacaoCard } from "./IndicacaoCard";
+import { GuardaCelularScreen } from "./GuardaCelularScreen";
 import { scheduleDailyReminder } from "@/lib/dailyReminder";
 
 interface Props {
@@ -508,7 +509,19 @@ const BoraScreen = ({ onBack }: Props) => {
       openPaywall("premium_locked");
       return;
     }
-    // Future: navigate to category list. No-op for now.
+    // Free categories: dispara Surpresa filtrada pela categoria
+    if (!isPremium && surpriseUsedToday()) {
+      openPaywall("surprise_limit");
+      return;
+    }
+    setSurpriseOpen(true);
+    surprise({ categoria: c.key, ...(mood ? { energia: mood } : {}) })
+      .then(() => {
+        if (!isPremium) {
+          try { window.localStorage.setItem(SURPRISE_DATE_KEY, todayISO()); } catch {}
+        }
+      })
+      .catch(() => {});
   };
 
   const TODAY_ACTIVITY = {
@@ -517,9 +530,34 @@ const BoraScreen = ({ onBack }: Props) => {
     tela_min: 15,
   };
 
+  const [guardaOpen, setGuardaOpen] = useState(false);
+
   const handleBoraFazer = () => {
-    // Abre o fluxo: "guarda celular" -> "Como foi?"
-    setComoFoiOpen(true);
+    // Etapa 1: tela verde "Guarda o celular"
+    setGuardaOpen(true);
+  };
+
+  const handleGuardaDone = () => {
+    setGuardaOpen(false);
+    // Etapa 2: "Como foi?" + foto
+    setTimeout(() => setComoFoiOpen(true), 200);
+  };
+
+  // Atualização otimista do diário local quando salva uma conclusão
+  const handleConclusaoSalva = () => {
+    refreshStats();
+    setDiary((d) => {
+      const today = todayISO();
+      const nextStreak = d.lastDate === today ? d.streak : d.streak + 1;
+      const next: Diary = {
+        minutes: d.minutes + TODAY_ACTIVITY.tela_min,
+        completions: d.completions + 1,
+        streak: nextStreak,
+        lastDate: today,
+      };
+      try { window.localStorage.setItem(DIARY_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
 
@@ -532,10 +570,17 @@ const BoraScreen = ({ onBack }: Props) => {
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />
+      <GuardaCelularScreen
+        open={guardaOpen}
+        minutes={TODAY_ACTIVITY.tela_min}
+        childName={firstName}
+        onDone={handleGuardaDone}
+        onCancel={() => setGuardaOpen(false)}
+      />
       <ComoFoiModal
         open={comoFoiOpen}
         onClose={() => setComoFoiOpen(false)}
-        onSaved={() => refreshStats()}
+        onSaved={handleConclusaoSalva}
         activity={TODAY_ACTIVITY}
         criancaId={firstCrianca?.id || null}
         childName={firstName}
@@ -551,7 +596,10 @@ const BoraScreen = ({ onBack }: Props) => {
       />
 
       {/* Hero */}
-      <header className="px-5 pt-8 pb-4">
+      <header
+        className="px-5 pb-4"
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 28px)" }}
+      >
         <div className="flex items-center gap-2">
           <GlassOrb Icon={Leaf} size={30} iconSize={13} colorFrom="#6FB04A" colorTo="#2F5E1F" />
           <span className="bora-screenfree-badge">Sem tela</span>
@@ -867,7 +915,7 @@ const BoraScreen = ({ onBack }: Props) => {
       {/* Closing */}
       <section className="px-5 mt-8">
         <Bezel tint="#4F8B66">
-          <div className="text-center">
+          <div className="text-center flex flex-col items-center">
             <GlassOrb Icon={Leaf} size={64} iconSize={30} colorFrom="#6FB04A" colorTo="#2F5E1F" />
             <p
               className="font-bora-display mt-3"
