@@ -915,7 +915,7 @@ const BoraScreen = ({ onBack }: Props) => {
       {/* Closing */}
       <section className="px-5 mt-8">
         <Bezel tint="#4F8B66">
-          <div className="text-center">
+          <div className="text-center flex flex-col items-center">
             <GlassOrb Icon={Leaf} size={64} iconSize={30} colorFrom="#6FB04A" colorTo="#2F5E1F" />
             <p
               className="font-bora-display mt-3"
