@@ -189,26 +189,40 @@ Deno.serve(async (req) => {
       energia: body.energia,
     });
 
-    const raw = await callGemini(prompt);
-    const clean = sanitize(raw);
+    // Tenta IA; se falhar (créditos/rate limit/etc), cai pra atividade aleatória do banco
+    try {
+      const raw = await callGemini(prompt);
+      const clean = sanitize(raw);
 
-    // salva no banco (origem='ia') pra reaproveitar
-    const { data: saved, error: insertErr } = await supabaseAdmin
-      .from("activities")
-      .insert(clean)
-      .select()
-      .single();
+      const { data: saved, error: insertErr } = await supabaseAdmin
+        .from("activities")
+        .insert(clean)
+        .select()
+        .single();
 
-    if (insertErr) {
-      // Falha ao salvar não deve quebrar a UX — devolve a atividade gerada mesmo assim
-      return new Response(JSON.stringify({ ok: true, activity: clean, saved: false }), {
+      if (insertErr) {
+        return new Response(JSON.stringify({ ok: true, activity: clean, saved: false }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({ ok: true, activity: saved, saved: true, personalized_for: crianca?.nome ?? null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    } catch (aiErr: any) {
+      // Fallback: pega uma atividade aleatória do banco
+      const { data: pool } = await supabaseAdmin
+        .from("activities")
+        .select("*")
+        .limit(50);
+      if (pool && pool.length > 0) {
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        return new Response(JSON.stringify({ ok: true, activity: pick, saved: false, fallback: true, personalized_for: crianca?.nome ?? null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw aiErr;
     }
-
-    return new Response(JSON.stringify({ ok: true, activity: saved, saved: true, personalized_for: crianca?.nome ?? null }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   } catch (err: any) {
     const msg = String(err?.message || err);
     let status = 500;
