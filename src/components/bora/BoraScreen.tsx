@@ -16,6 +16,7 @@ import { ComoFoiModal } from "./ComoFoiModal";
 import { DiarioSemTela } from "./DiarioSemTela";
 import { DesafioCard } from "./DesafioCard";
 import { IndicacaoCard } from "./IndicacaoCard";
+import { GuardaCelularScreen } from "./GuardaCelularScreen";
 import { scheduleDailyReminder } from "@/lib/dailyReminder";
 
 interface Props {
