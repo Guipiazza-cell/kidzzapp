@@ -143,8 +143,7 @@ Deno.serve(async (req) => {
     const supabaseAdmin = createClient(supabaseUrl, serviceKey);
 
     const { data: userData } = await supabaseUser.auth.getUser();
-    const user = userData?.user;
-    if (!user) return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const user = userData?.user || null;
 
     let body: any = {};
     try { body = await req.json(); } catch (_) {}
@@ -153,6 +152,7 @@ Deno.serve(async (req) => {
 
     // ----- BATCH MODE (admin only) -----
     if (mode === "batch") {
+      if (!user) return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       const { data: isAdmin } = await supabaseAdmin.rpc("is_admin", { _user_id: user.id });
       if (!isAdmin) return new Response(JSON.stringify({ error: "forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
@@ -172,13 +172,18 @@ Deno.serve(async (req) => {
     }
 
     // ----- SINGLE MODE (default: "Surpresa") -----
-    const { data: criancas } = await supabaseUser
-      .from("criancas")
-      .select("nome,idade,interesses,materiais_em_casa")
-      .order("created_at", { ascending: true })
-      .limit(1);
+    let crianca: Crianca | null = null;
+    if (user) {
+      const { data: criancas } = await supabaseUser
+        .from("criancas")
+        .select("nome,idade,interesses,materiais_em_casa")
+        .order("created_at", { ascending: true })
+        .limit(1);
+      crianca = (criancas?.[0] as Crianca) || null;
+    }
+    // Fallback: guest body crianca
+    if (!crianca && body.crianca) crianca = body.crianca as Crianca;
 
-    const crianca = (criancas?.[0] as Crianca) || null;
     const prompt = buildPrompt(crianca, {
       categoria: body.categoria,
       energia: body.energia,
