@@ -570,10 +570,17 @@ const BoraScreen = ({ onBack }: Props) => {
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />
+      <GuardaCelularScreen
+        open={guardaOpen}
+        minutes={TODAY_ACTIVITY.tela_min}
+        childName={firstName}
+        onDone={handleGuardaDone}
+        onCancel={() => setGuardaOpen(false)}
+      />
       <ComoFoiModal
         open={comoFoiOpen}
         onClose={() => setComoFoiOpen(false)}
-        onSaved={() => refreshStats()}
+        onSaved={handleConclusaoSalva}
         activity={TODAY_ACTIVITY}
         criancaId={firstCrianca?.id || null}
         childName={firstName}
@@ -589,7 +596,10 @@ const BoraScreen = ({ onBack }: Props) => {
       />
 
       {/* Hero */}
-      <header className="px-5 pt-8 pb-4">
+      <header
+        className="px-5 pb-4"
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 28px)" }}
+      >
         <div className="flex items-center gap-2">
           <GlassOrb Icon={Leaf} size={30} iconSize={13} colorFrom="#6FB04A" colorTo="#2F5E1F" />
           <span className="bora-screenfree-badge">Sem tela</span>
