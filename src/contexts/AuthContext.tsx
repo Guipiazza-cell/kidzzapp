@@ -148,6 +148,7 @@ const createDefaultProfile = (): Profile => ({
   streak_days: 0,
   last_streak_date: null,
   level: "iniciante",
+  onboarding_done: false,
 });
 
 const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
