@@ -25,6 +25,7 @@ interface Profile {
   streak_days: number;
   last_streak_date: string | null;
   level: string;
+  onboarding_done: boolean;
 }
 
 interface AuthContextType {
