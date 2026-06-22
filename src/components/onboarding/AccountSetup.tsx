@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 
 interface AccountSetupProps {
@@ -65,18 +66,29 @@ const syncGuestProfile = async (userId: string) => {
   const guest = readGuestProfile();
   if (!guest) return;
   try {
-    await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: userId,
-          child_name: guest.child_name ?? "",
-          age_range: guest.age_range ?? null,
-          child_interests: guest.child_interests ?? [],
-          questions_used: guest.questions_used ?? 0,
-        } as any,
-        { onConflict: "id" }
-      );
+    // Single source of truth: idempotent RPC. Locks profile row, sets
+    // onboarding_done=true atomically. Safe under double-tap / re-entry.
+    const { error } = await supabase.rpc("complete_onboarding", {
+      p_child_name: guest.child_name ?? "",
+      p_age_range: guest.age_range ?? null,
+      p_child_interests: guest.child_interests ?? [],
+    });
+    if (error) {
+      console.warn("[AccountSetup] complete_onboarding failed", error);
+      // Fallback: legacy upsert keeps the user moving even if RPC fails.
+      await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: userId,
+            child_name: guest.child_name ?? "",
+            age_range: guest.age_range ?? null,
+            child_interests: guest.child_interests ?? [],
+            onboarding_done: true,
+          } as any,
+          { onConflict: "id" }
+        );
+    }
   } catch (err) {
     console.warn("[AccountSetup] guest sync failed", err);
   }
@@ -86,6 +98,7 @@ type Tab = "email" | "phone";
 type Mode = "signup" | "signin";
 
 const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
+  const { refreshProfile } = useAuth();
   const [tab, setTab] = useState<Tab>("email");
   const [mode, setMode] = useState<Mode>("signup");
 
@@ -99,6 +112,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
+  const submittingRef = useRef(false);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -119,13 +133,17 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const finishSuccess = useCallback(
     async (userId?: string) => {
       if (userId) await syncGuestProfile(userId);
+      // Refetch profile so Index sees onboarding_done=true and drops into the app.
+      try { await refreshProfile(); } catch {}
       setSuccess(true);
-      setTimeout(() => onDone(), 650);
+      setTimeout(() => onDone(), 450);
     },
-    [onDone]
+    [onDone, refreshProfile]
   );
 
   const handleEmailSubmit = useCallback(async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setError(null);
     const cleanEmail = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
@@ -185,6 +203,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       setError(translateAuthError(err?.message || ""));
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   }, [email, password, mode, finishSuccess]);
 

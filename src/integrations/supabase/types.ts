@@ -469,6 +469,7 @@ export type Database = {
           last_streak_date: string | null
           last_usage_date: string
           level: string
+          onboarding_done: boolean
           plan_end_date: string | null
           points: number
           premium_source: string | null
@@ -490,6 +491,7 @@ export type Database = {
           last_streak_date?: string | null
           last_usage_date?: string
           level?: string
+          onboarding_done?: boolean
           plan_end_date?: string | null
           points?: number
           premium_source?: string | null
@@ -511,6 +513,7 @@ export type Database = {
           last_streak_date?: string | null
           last_usage_date?: string
           level?: string
+          onboarding_done?: boolean
           plan_end_date?: string | null
           points?: number
           premium_source?: string | null
@@ -657,6 +660,14 @@ export type Database = {
     }
     Functions: {
       aplicar_indicacao: { Args: { _codigo: string }; Returns: Json }
+      complete_onboarding: {
+        Args: {
+          p_age_range: string
+          p_child_interests: string[]
+          p_child_name: string
+        }
+        Returns: undefined
+      }
       ensure_indicacao_codigo: { Args: never; Returns: string }
       get_bora_stats: {
         Args: never

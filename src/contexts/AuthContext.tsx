@@ -25,6 +25,7 @@ interface Profile {
   streak_days: number;
   last_streak_date: string | null;
   level: string;
+  onboarding_done: boolean;
 }
 
 interface AuthContextType {
@@ -39,6 +40,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
+  refreshProfile: () => Promise<void>;
   incrementQuestions: () => Promise<void>;
   incrementStories: () => Promise<void>;
   canAskQuestion: () => boolean;
@@ -147,6 +149,7 @@ const createDefaultProfile = (): Profile => ({
   streak_days: 0,
   last_streak_date: null,
   level: "iniciante",
+  onboarding_done: false,
 });
 
 const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
@@ -165,6 +168,7 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   streak_days: value?.streak_days ?? 0,
   last_streak_date: value?.last_streak_date ?? null,
   level: value?.level ?? "iniciante",
+  onboarding_done: value?.onboarding_done ?? false,
 });
 
 const getGuestProfile = (): Profile => {
@@ -310,7 +314,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, child_interests, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level")
+      .select("child_name, age_range, child_interests, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level, onboarding_done")
       .eq("id", userId)
       .single();
 
@@ -799,11 +803,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setProfile(next);
   };
 
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const prof = await fetchProfile(user.id);
+    setProfile(prof);
+  }, [user, fetchProfile]);
+
   return (
     <AuthContext.Provider value={{
       user, session, profile, tier, loading, isReady,
       signUp, signIn, signOut, resetPassword,
-      updateProfile, incrementQuestions, incrementStories,
+      updateProfile, refreshProfile, incrementQuestions, incrementStories,
       canAskQuestion, canGenerateStory, questionsRemaining, storiesRemaining,
       refreshSubscription, handleCheckout, openCustomerPortal,
     }}>
