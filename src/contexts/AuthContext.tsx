@@ -313,7 +313,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
     const { data } = await supabase
       .from("profiles")
-      .select("child_name, age_range, child_interests, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level")
+      .select("child_name, age_range, child_interests, questions_used, stories_used, last_usage_date, is_premium, voice_enabled, premium_source, plan_end_date, is_admin, points, streak_days, last_streak_date, level, onboarding_done")
       .eq("id", userId)
       .single();
 
