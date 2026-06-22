@@ -98,6 +98,7 @@ type Tab = "email" | "phone";
 type Mode = "signup" | "signin";
 
 const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
+  const { refreshProfile } = useAuth();
   const [tab, setTab] = useState<Tab>("email");
   const [mode, setMode] = useState<Mode>("signup");
 
@@ -111,6 +112,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
+  const submittingRef = useRef(false);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -131,8 +133,10 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const finishSuccess = useCallback(
     async (userId?: string) => {
       if (userId) await syncGuestProfile(userId);
+      // Refetch profile so Index sees onboarding_done=true and drops into the app.
+      try { await refreshProfile(); } catch {}
       setSuccess(true);
-      setTimeout(() => onDone(), 650);
+      setTimeout(() => onDone(), 450);
     },
     [onDone]
   );
