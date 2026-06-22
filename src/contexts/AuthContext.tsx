@@ -167,6 +167,7 @@ const normalizeProfile = (value?: Partial<Profile> | null): Profile => ({
   streak_days: value?.streak_days ?? 0,
   last_streak_date: value?.last_streak_date ?? null,
   level: value?.level ?? "iniciante",
+  onboarding_done: value?.onboarding_done ?? false,
 });
 
 const getGuestProfile = (): Profile => {
