@@ -65,18 +65,29 @@ const syncGuestProfile = async (userId: string) => {
   const guest = readGuestProfile();
   if (!guest) return;
   try {
-    await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: userId,
-          child_name: guest.child_name ?? "",
-          age_range: guest.age_range ?? null,
-          child_interests: guest.child_interests ?? [],
-          questions_used: guest.questions_used ?? 0,
-        } as any,
-        { onConflict: "id" }
-      );
+    // Single source of truth: idempotent RPC. Locks profile row, sets
+    // onboarding_done=true atomically. Safe under double-tap / re-entry.
+    const { error } = await supabase.rpc("complete_onboarding", {
+      p_child_name: guest.child_name ?? "",
+      p_age_range: guest.age_range ?? null,
+      p_child_interests: guest.child_interests ?? [],
+    });
+    if (error) {
+      console.warn("[AccountSetup] complete_onboarding failed", error);
+      // Fallback: legacy upsert keeps the user moving even if RPC fails.
+      await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: userId,
+            child_name: guest.child_name ?? "",
+            age_range: guest.age_range ?? null,
+            child_interests: guest.child_interests ?? [],
+            onboarding_done: true,
+          } as any,
+          { onConflict: "id" }
+        );
+    }
   } catch (err) {
     console.warn("[AccountSetup] guest sync failed", err);
   }
