@@ -419,28 +419,34 @@ const Index = () => {
   // ============================================================
   if (loading) return null;
 
-  if (!profile?.child_name) {
-    return <NameOnboarding key="nome-unico" />;
-  }
-  if (!profile?.age_range) {
-    return <AgeSelection key="idade-unica" />;
-  }
-  const interests = (profile as any)?.child_interests as string[] | undefined;
-  if (!interests || interests.length === 0) {
-    return <InterestsOnboarding key="interesses-unico" />;
-  }
-  const hasSession = !!user;
-  if (!hasSession && !accountStepDone) {
-    return (
-      <AccountSetup
-        key="account-unico"
-        childName={profile.child_name}
-        onDone={() => {
-          try { window.localStorage.setItem("kidzz_account_step_done", "1"); } catch {}
-          setAccountStepDone(true);
-        }}
-      />
-    );
+  // ÚNICA fonte da verdade pra usuário autenticado: profile.onboarding_done.
+  // Enquanto for false, mostramos a sequência de telas que faltam preencher.
+  const isAuthed = !!user;
+  const onboardingDone = isAuthed && profile?.onboarding_done === true;
+
+  if (!onboardingDone) {
+    if (!profile?.child_name) {
+      return <NameOnboarding key="nome-unico" />;
+    }
+    if (!profile?.age_range) {
+      return <AgeSelection key="idade-unica" />;
+    }
+    const interests = (profile as any)?.child_interests as string[] | undefined;
+    if (!interests || interests.length === 0) {
+      return <InterestsOnboarding key="interesses-unico" />;
+    }
+    if (!isAuthed && !accountStepDone) {
+      return (
+        <AccountSetup
+          key="account-unico"
+          childName={profile.child_name}
+          onDone={() => {
+            try { window.localStorage.setItem("kidzz_account_step_done", "1"); } catch {}
+            setAccountStepDone(true);
+          }}
+        />
+      );
+    }
   }
   // Onboarding completo → entra direto na home, sem telas extras.
 
