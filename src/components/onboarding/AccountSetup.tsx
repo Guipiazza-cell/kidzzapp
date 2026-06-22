@@ -203,6 +203,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       setError(translateAuthError(err?.message || ""));
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   }, [email, password, mode, finishSuccess]);
 
