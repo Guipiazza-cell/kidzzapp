@@ -40,6 +40,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
+  refreshProfile: () => Promise<void>;
   incrementQuestions: () => Promise<void>;
   incrementStories: () => Promise<void>;
   canAskQuestion: () => boolean;
