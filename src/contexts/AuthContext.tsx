@@ -803,11 +803,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setProfile(next);
   };
 
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const prof = await fetchProfile(user.id);
+    setProfile(prof);
+  }, [user, fetchProfile]);
+
   return (
     <AuthContext.Provider value={{
       user, session, profile, tier, loading, isReady,
       signUp, signIn, signOut, resetPassword,
-      updateProfile, incrementQuestions, incrementStories,
+      updateProfile, refreshProfile, incrementQuestions, incrementStories,
       canAskQuestion, canGenerateStory, questionsRemaining, storiesRemaining,
       refreshSubscription, handleCheckout, openCustomerPortal,
     }}>
