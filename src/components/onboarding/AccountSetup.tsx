@@ -138,10 +138,12 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       setSuccess(true);
       setTimeout(() => onDone(), 450);
     },
-    [onDone]
+    [onDone, refreshProfile]
   );
 
   const handleEmailSubmit = useCallback(async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setError(null);
     const cleanEmail = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
