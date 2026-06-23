@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import { toast } from "sonner";
 import { ChildAvatar } from "@/types/story";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import LenteViva from "@/components/kidzz/LenteViva";
 import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
 import { sfx } from "@/lib/sfx";
@@ -194,70 +194,59 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
           
-            <motion.div
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 16 }}
-              className="relative w-28 h-28 rounded-[2rem] bg-gradient-to-br from-amber-300 via-orange-400 to-pink-500 flex items-center justify-center shadow-2xl"
-            >
-              <motion.div
-                animate={{ rotate: [-3, 3, -3], y: [0, -4, 0] }}
-                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <span className="text-5xl drop-shadow-lg">📖</span>
-              </motion.div>
-              <motion.span
-                className="absolute -top-2 -right-2 text-2xl"
-                animate={{ scale: [1, 1.3, 1], rotate: [0, 18, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                ✨
-              </motion.span>
-              <motion.span
-                className="absolute -bottom-1 -left-2 text-lg"
-                animate={{ scale: [1, 1.25, 1], rotate: [0, -15, 0] }}
-                transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 }}
-              >
-                💫
-              </motion.span>
-            </motion.div>
+            <LenteViva accent="#E8821A" motif="book" label="Fábrica de Histórias" />
 
-            <h2 className="text-2xl font-extrabold text-gray-800 drop-shadow-sm">Uma história especial para {childName} 📖</h2>
-            <p className="text-gray-500 text-sm max-w-[280px]">
-              Crie histórias personalizadas com ilustrações exclusivas!
+            <h2 className="font-display text-[30px] leading-[1.1] font-semibold text-[#2A2520] tracking-tight">
+              Uma história, só dele.
+            </h2>
+            <p className="text-[#2A2520]/70 text-[14px] font-medium max-w-[300px] leading-snug">
+              Criada com o nome, o rosto e o mundo do seu filho.
             </p>
-            <span className="text-xs font-bold glass-card text-gray-600 px-3 py-1 rounded-full">
-              {storiesRemaining()} de {tier === "premium" ? 5 : tier === "kidzz" ? 3 : 1} {tier === "free" ? "história" : "histórias"} restante{storiesRemaining() !== 1 ? "s" : ""} hoje
+            <span className="text-[11px] font-bold text-[#2A2520]/80 px-3 py-1 rounded-full border border-[#E8821A]/25"
+              style={{ background: "rgba(232,130,26,0.10)" }}>
+              {storiesRemaining()} {storiesRemaining() === 1 ? "história gratuita" : "histórias gratuitas"} hoje
             </span>
 
-            <div className="glass-card rounded-3xl p-4 w-full max-w-xs space-y-2">
+            <div className="w-full max-w-xs rounded-3xl p-4 space-y-2"
+              style={{ background: "#FFFCF8", boxShadow: "0 4px 20px rgba(42,37,32,0.06)" }}>
               {[
-                { emoji: "🎨", text: "Crie o avatar do seu filho" },
-                { emoji: "📝", text: "Escolha temas e interesses" },
-                { emoji: "✨", text: "Vamos criar a história + ilustrações" },
-                { emoji: "🔊", text: "Narração por voz inclusa" }
-              ].map((item, i) =>
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-                className="flex items-center gap-3 p-2">
-                  <span className="text-xl">{item.emoji}</span>
-                  <span className="text-sm text-gray-600 font-bold">{item.text}</span>
+                "Monte o avatar do seu filho",
+                "Escolha temas e interesses",
+                "Geramos história + ilustrações",
+                "Narração com voz suave",
+              ].map((text, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.25 + i * 0.08 }}
+                  className="flex items-center gap-3 p-2"
+                >
+                  <span
+                    className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                    style={{ background: "rgba(232,130,26,0.12)", color: "#E8821A" }}
+                    aria-hidden
+                  >
+                    <span className="text-[15px] font-black">{i + 1}</span>
+                  </span>
+                  <span className="text-[14px] text-[#2A2520] font-semibold">{text}</span>
                 </motion.div>
-            )}
+              ))}
             </div>
 
             <motion.button
-            onClick={() => setStep("avatar")}
-            className="w-full max-w-xs py-5 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-pink text-white font-extrabold text-lg shadow-2xl flex items-center justify-center gap-2 active:scale-95"
-            whileTap={{ scale: 0.97 }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}>
-              <Zap size={22} />
-              Começar! 🚀
+              onClick={() => setStep("avatar")}
+              className="w-full max-w-xs py-4 rounded-full text-white font-bold text-[16px] flex items-center justify-center gap-2 active:scale-95"
+              style={{
+                background: "#E8821A",
+                boxShadow: "0 10px 24px -8px rgba(232,130,26,0.55), inset 0 1px 0 rgba(255,255,255,0.35)",
+                fontFamily: "'Mulish', system-ui, sans-serif",
+              }}
+              whileTap={{ scale: 0.97 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}>
+              Criar a história
             </motion.button>
           </motion.div>
         }

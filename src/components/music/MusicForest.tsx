@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Moon, Music2, Mic } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import LivingForest from "./LivingForest";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import LenteViva from "@/components/kidzz/LenteViva";
 import MorningKaraoke from "./MorningKaraoke";
 import DanceWithAne from "./DanceWithAne";
 import SungStories from "./SungStories";
@@ -155,23 +155,17 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
-          {/* KIDZZ HERO — amarelo dominante (Music Soul), interface orbita */}
-          <div className="flex flex-col items-center justify-center pt-2">
-            <motion.div
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 180, damping: 14 }}
-            >
-              <KidzzChameleon state="music" mood="happy" size="hero" interactive showParticles />
-            </motion.div>
-            <motion.p
-              className="text-center text-amber-900 text-sm font-extrabold mt-2 drop-shadow-sm bg-amber-100/80 backdrop-blur rounded-full px-4 py-1.5 border border-amber-300/60 shadow"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              {childName}, vamos cantar juntos? 🎵
-            </motion.p>
+          {/* Lente Viva — assinatura da aba Música */}
+          <div className="flex flex-col items-center justify-center pt-2 gap-3">
+            <LenteViva accent="#E2B64C" motif="wave" label="Música" />
+            <div className="text-center max-w-[300px]">
+              <h2 className="font-display text-[26px] leading-[1.1] font-semibold text-[#2A2520] tracking-tight">
+                Trilha sonora da infância.
+              </h2>
+              <p className="text-[#2A2520]/70 text-[13px] font-medium mt-1.5">
+                Playlists para cada momento do dia.
+              </p>
+            </div>
           </div>
 
           {/* CTA Principal: Cantar junto */}
