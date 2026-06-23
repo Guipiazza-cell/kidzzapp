@@ -1,4 +1,4 @@
-# 🦎 KIDZZAPP — Aprender nunca foi tão divertido
+# KIDZZ App — Aprender nunca foi tão divertido
 
 App de aprendizado mágico para crianças de 3 a 10 anos, com IA educativa, Fábrica de Histórias, Mundo dos Sonhos, jogos e gamificação.
 
