@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Search, Brain, Type, Zap, Trophy, Sparkles, Gamepad2, Plane, Target, Heart, Wand2, Compass } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
-import KidzzChameleon, { type KidzzMood } from "@/components/kidzz/KidzzChameleon";
+import type { KidzzMood } from "@/components/kidzz/KidzzChameleon";
+import LenteViva from "@/components/kidzz/LenteViva";
 import { loadMascotConfig, type LabExpression } from "@/components/lab/KidzzLab";
 import {
   BRINCAR_EXPERIENCES,
@@ -205,28 +206,12 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
       }}
     >
-      {/* KIDZZ — menor, deixa o palco para a curadoria editorial */}
-      <div className="relative flex justify-center pt-1 pb-2">
-        <motion.div
-          className="relative"
-          style={{ filter: `hue-rotate(${savedHue}deg)`, transition: "filter 350ms ease" }}
-        >
-          <KidzzChameleon
-            state="play"
-            mood={kidzzMood}
-            size="md"
-            interactive
-            showParticles={false}
-          />
-          <motion.div
-            className="absolute -top-1 left-1/2 -translate-x-1/2 bg-white/85 backdrop-blur-md rounded-2xl px-3 py-1 border border-white/60 whitespace-nowrap shadow-md"
-            key={heroSpeech}
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <p className="text-[11px] font-extrabold text-gray-800">{heroSpeech}</p>
-          </motion.div>
-        </motion.div>
+      {/* Lente Viva — assinatura visual da aba Brincar */}
+      <div className="relative flex flex-col items-center pt-1 pb-3 gap-2">
+        <LenteViva accent="#7FB069" motif="puzzle" label="Brincar" />
+        <h1 className="font-display text-[26px] leading-[1.1] font-semibold text-[#2A2520] tracking-tight mt-1">
+          O que vamos inventar hoje?
+        </h1>
       </div>
 
       {/* HERO editorial premium — rotaciona por dia */}
@@ -426,18 +411,9 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
       exit={{ opacity: 0, x: -30 }}
       className="flex-1 flex flex-col px-4"
     >
-      {/* KIDZZ menor no topo — reflete a customização salva */}
-      <div
-        className="relative flex justify-center pt-1 pb-2"
-        style={{ filter: `hue-rotate(${savedHue}deg)`, transition: "filter 350ms ease" }}
-      >
-        <KidzzChameleon
-          state="play"
-          mood={kidzzMood}
-          size="md"
-          interactive={!activeGame}
-          showParticles={!activeGame}
-        />
+      {/* Lente Viva — topo da lista de jogos */}
+      <div className="relative flex justify-center pt-1 pb-3">
+        <LenteViva accent="#7FB069" motif="puzzle" size={96} label="Jogos" />
       </div>
 
       <AnimatePresence mode="wait">

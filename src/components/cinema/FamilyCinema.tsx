@@ -12,7 +12,7 @@ import {
 } from "@/lib/featuredRotation";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import LenteViva from "@/components/kidzz/LenteViva";
 
 interface Props {
   onBack: () => void;
@@ -362,13 +362,13 @@ const FamilyCinema = ({ onBack }: Props) => {
         {/* Hero editorial */}
         <section className="px-5 mt-3 mb-6 text-center">
           <div className="flex justify-center">
-            <KidzzChameleon state="cosmic" mood="happy" size="md" interactive={false} showParticles={false} />
+            <LenteViva accent="#4C3B8F" motif="film" label="Cinema" />
           </div>
-          <h2 className="mt-3 text-gray-900 font-bold text-[26px] tracking-tight leading-tight">
-            Momentos que ficam.
+          <h2 className="mt-4 font-display text-[#2A2520] font-semibold text-[28px] tracking-tight leading-tight">
+            Cinema em família.
           </h2>
-          <p className="mt-1.5 text-gray-700 text-[13px] font-medium max-w-xs mx-auto leading-snug">
-            Filmes para viver a infância junto.
+          <p className="mt-1.5 text-[#2A2520]/70 text-[13px] font-medium max-w-xs mx-auto leading-snug">
+            Um filme por semana, escolhido a dedo.
           </p>
         </section>
 
