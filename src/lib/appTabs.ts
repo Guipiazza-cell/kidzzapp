@@ -9,7 +9,7 @@ export type AppTabConfig = {
 };
 
 export const APP_TABS_ALL: AppTabConfig[] = [
-  { id: "chat", label: "Home", dataTab: "perguntas", color: "#7FB069", light: "#A8CE8F", inDock: true },
+  { id: "chat", label: "Perguntas", dataTab: "perguntas", color: "#E8821A", light: "#F4A659", inDock: true },
   { id: "wellness", label: "KALM", dataTab: "kalm", color: "#3FA89B", light: "#6BC7BC", inDock: true },
   { id: "dreams", label: "Sonhos", dataTab: "sonhos", color: "#5E5CC2", light: "#8987DA", inDock: true },
   { id: "explore", label: "Histórias", dataTab: "historias", color: "#C173A6", light: "#D89BC2", inDock: true },
