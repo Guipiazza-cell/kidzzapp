@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 
 import {
   MessageCircle, Leaf, Moon, BookOpen, Puzzle, CalendarDays,
   Star, Clapperboard, Music2, Image as ImageIcon, Sparkles,
-  Crown, Shield, ChevronRight,
+  Crown, Shield, ChevronRight, Compass,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
@@ -27,6 +27,7 @@ type Tab = {
 
 const TAB_ICONS: Partial<Record<AppTab, typeof MessageCircle>> = {
   chat: MessageCircle,
+  discover: Compass,
   wellness: Leaf,
   dreams: Moon,
   explore: BookOpen,
