@@ -10,6 +10,7 @@ export type AppTabConfig = {
 
 export const APP_TABS_ALL: AppTabConfig[] = [
   { id: "chat", label: "Perguntas", dataTab: "perguntas", color: "#E8821A", light: "#F4A659", inDock: true },
+  { id: "discover", label: "Descobrir", dataTab: "descobrir", color: "#46703A", light: "#7FB069", inDock: true },
   { id: "wellness", label: "KALM", dataTab: "kalm", color: "#3FA89B", light: "#6BC7BC", inDock: true },
   { id: "dreams", label: "Sonhos", dataTab: "sonhos", color: "#5E5CC2", light: "#8987DA", inDock: true },
   { id: "explore", label: "Histórias", dataTab: "historias", color: "#C173A6", light: "#D89BC2", inDock: true },
@@ -27,6 +28,7 @@ export const APP_TABS = APP_TABS_ALL.filter((t) => t.inDock) as readonly AppTabC
 
 export type AppTab =
   | "chat"
+  | "discover"
   | "explore"
   | "play"
   | "bora"
@@ -46,6 +48,7 @@ export const APP_TAB_IDS: AppTab[] = [
 
 export const APP_TAB_DATA: Record<AppTab, string> = {
   chat: "perguntas",
+  discover: "descobrir",
   wellness: "kalm",
   dreams: "sonhos",
   explore: "historias",
@@ -61,6 +64,8 @@ export const APP_TAB_DATA: Record<AppTab, string> = {
 
 const TAB_ALIASES: Record<string, AppTab> = {
   perguntas: "chat",
+  descobrir: "discover",
+  discover: "discover",
   kalm: "wellness",
   wellness: "wellness",
   sonhos: "dreams",
