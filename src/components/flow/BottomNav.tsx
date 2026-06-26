@@ -118,33 +118,26 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         background: "transparent",
       }}
     >
-      {/* Paywall bar — thin glass strip, full-width, above the dock */}
+      {/* Pais / Assinar — island button, minimal & premium */}
       {(onOpenParents || (onOpenPlans && !isPremium)) && (
-        <div
-          className="w-full flex items-center justify-end gap-2 px-3 mb-2"
-          style={{
-            height: 48,
-            background: "rgba(255,252,248,0.55)",
-            backdropFilter: "blur(24px) saturate(140%)",
-            WebkitBackdropFilter: "blur(24px) saturate(140%)",
-            borderTop: "1px solid rgba(255,255,255,0.6)",
-            borderBottom: "1px solid rgba(42,37,32,0.06)",
-            boxShadow: "0 8px 32px rgba(42,37,32,0.10)",
-          }}
-        >
+        <div className="w-full flex items-center justify-end gap-1.5 mb-2 pr-1">
           {onOpenParents && (
             <button
               type="button"
               onClick={() => { haptic("light"); sfx("click"); onOpenParents(); }}
-              className="min-h-[36px] rounded-full px-3.5 text-[12px] font-bold flex items-center gap-1.5 active:scale-95"
+              aria-label="Pais"
+              className="h-8 rounded-full px-3 text-[11.5px] font-bold flex items-center gap-1 active:scale-95"
               style={{
-                background: "rgba(255,255,255,0.65)",
+                background: "rgba(255,252,248,0.78)",
+                backdropFilter: "blur(18px) saturate(140%)",
+                WebkitBackdropFilter: "blur(18px) saturate(140%)",
                 border: "1px solid rgba(42,37,32,0.10)",
                 color: "#2A2520",
                 fontFamily: "'Mulish', system-ui, sans-serif",
+                boxShadow: "0 6px 16px -4px rgba(42,37,32,0.18)",
               }}
             >
-              <Shield size={13} style={{ color: "#3FA89B" }} />
+              <Shield size={12} style={{ color: "#3FA89B" }} />
               Pais
             </button>
           )}
@@ -152,19 +145,21 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
             <button
               type="button"
               onClick={() => { haptic("medium"); sfx("click"); onOpenPlans(); }}
-              className="min-h-[36px] rounded-full px-3.5 text-[12px] font-bold text-white flex items-center gap-1.5 active:scale-95"
+              aria-label="Assinar"
+              className="h-8 rounded-full px-3 text-[11.5px] font-bold text-white flex items-center gap-1 active:scale-95"
               style={{
-                background: "#E8821A",
-                boxShadow: "0 4px 10px -2px rgba(232,130,26,.45), inset 0 1px 0 rgba(255,255,255,.30)",
+                background: "linear-gradient(135deg, #E8821A, #D26A0A)",
+                boxShadow: "0 8px 18px -4px rgba(232,130,26,.55), inset 0 1px 0 rgba(255,255,255,.30)",
                 fontFamily: "'Mulish', system-ui, sans-serif",
               }}
             >
-              <Crown size={13} />
+              <Crown size={12} />
               Assinar
             </button>
           )}
         </div>
       )}
+
 
 
       {/* Outer bezel (silver metallic frame) */}
