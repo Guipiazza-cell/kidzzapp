@@ -182,16 +182,10 @@ export function installAppUpdateGuard() {
     if (document.visibilityState === "visible") triggerCheck();
   });
 
-  const wrapHistory = (key: "pushState" | "replaceState") => {
-    const original = history[key];
-    history[key] = function (...args: any[]) {
-      const result = original.apply(this, args as any);
-      triggerCheck();
-      return result;
-    } as any;
-  };
-
-  wrapHistory("pushState");
-  wrapHistory("replaceState");
+  // IMPORTANTE: NÃO interceptar history.pushState/replaceState. A troca de
+  // abas internas usa replaceState e isso disparava checkForNewAppVersion a
+  // cada clique no dock — causando hard reload / limpeza de cache no meio da
+  // navegação. Updates já são detectados pelos gatilhos acima (intervalo,
+  // focus, online, pageshow, visibilitychange).
   window.addEventListener("popstate", triggerCheck);
 }

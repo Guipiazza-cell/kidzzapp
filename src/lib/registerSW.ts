@@ -66,17 +66,8 @@ export async function registerServiceWorker() {
         window.addEventListener("focus", checkForUpdate);
         window.addEventListener("pageshow", checkForUpdate);
 
-        // Detecta navegação SPA (pushState/replaceState/popstate) e checa update.
-        const wrap = (key: "pushState" | "replaceState") => {
-          const orig = history[key];
-          history[key] = function (...args: any[]) {
-            const r = orig.apply(this, args as any);
-            checkForUpdate();
-            return r;
-          } as any;
-        };
-        wrap("pushState");
-        wrap("replaceState");
+        // NÃO interceptar pushState/replaceState: a troca de abas internas usa
+        // replaceState e isso disparava update/reload a cada clique no dock.
         window.addEventListener("popstate", checkForUpdate);
 
         // Primeiras checagens rápidas para pegar deploys recém-publicados no mobile/PWA aberto.
