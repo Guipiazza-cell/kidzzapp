@@ -142,6 +142,11 @@ const Index = () => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [activeTab, setActiveTab] = useState<AppTab>(getInitialTab);
+  // Keep-alive: abas visitadas ficam montadas (toggle display). A 1ª visita
+  // monta (chunk pré-carregado = rápido); re-visitas são instantâneas, sem o
+  // frame branco do remount (que causava o "piscar" na troca). Só monta o que
+  // foi visitado — não as 12 de cara.
+  const [mountedTabs, setMountedTabs] = useState<AppTab[]>(() => [getInitialTab()]);
   const [showLab, setShowLab] = useState(false);
   const [showTravel, setShowTravel] = useState(false);
 
@@ -195,6 +200,7 @@ const Index = () => {
     markIntroSettled();
     persistActiveTab(nextTab);
     setActiveTab(nextTab);
+    setMountedTabs((prev) => (prev.includes(nextTab) ? prev : [...prev, nextTab]));
     setShowLab(false);
     setShowTravel(false);
     setShowChallenge(false);
@@ -458,21 +464,27 @@ const Index = () => {
       <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
-            {/* Apenas a aba ATIVA fica montada. Manter as 12 abas montadas ao
-                mesmo tempo (mesmo com display:none) deixava ~3500 nós DOM, 200+
-                SVGs e dezenas de animações framer-motion/timers rodando em
-                background — travando o app no celular. Os chunks de cada aba já
-                são pré-carregados (useEffect de preload), então a troca continua
-                rápida mesmo remontando. */}
-            <div
-              key={activeTab}
-              data-tab={APP_TAB_DATA[activeTab] ?? activeTab}
-              className="absolute inset-0 flex flex-col min-h-0"
-            >
-              <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
-                <Suspense fallback={null}>{activeRenderer()}</Suspense>
-              </TabErrorBoundary>
-            </div>
+            {/* Keep-alive: só as abas VISITADAS ficam montadas (não as 12 de
+                cara). A ativa fica visível; as outras visitadas ficam com
+                display:none (sem remontar → sem frame branco/piscar ao voltar).
+                Os chunks são pré-carregados, então a 1ª visita já é rápida. */}
+            {mountedTabs.map((tabId) => {
+              const isActive = tabId === activeTab;
+              const render = TAB_RENDERERS[tabId] ?? TAB_RENDERERS.chat;
+              return (
+                <div
+                  key={tabId}
+                  data-tab={APP_TAB_DATA[tabId] ?? tabId}
+                  aria-hidden={!isActive}
+                  className="absolute inset-0 flex flex-col min-h-0"
+                  style={{ display: isActive ? "flex" : "none" }}
+                >
+                  <TabErrorBoundary resetKey={tabId} label={tabId} onBack={backToHome}>
+                    <Suspense fallback={null}>{render()}</Suspense>
+                  </TabErrorBoundary>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
