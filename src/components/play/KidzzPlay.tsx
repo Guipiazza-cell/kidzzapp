@@ -406,9 +406,8 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
   const renderGames = () => (
     <motion.div
       key="games"
-      initial={{ opacity: 0, x: 30 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -30 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       className="flex-1 flex flex-col px-4"
     >
       {/* Lente Viva — topo da lista de jogos */}

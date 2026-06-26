@@ -244,10 +244,9 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
   return (
     <motion.div
       className="flex-1 flex flex-col relative min-h-0"
-      initial={{ opacity: 0, x: 30 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -30 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
     >
       {/* Header — dynamic island */}
       <header
@@ -274,7 +273,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       {/* Section toggle: Memórias / Conquistas — dynamic island */}
       <div
         className="absolute left-0 right-0 z-30 px-4 pb-2"
-        style={{ top: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
+        style={{ top: "calc(max(env(safe-area-inset-top, 12px), 16px) + 56px)" }}
       >
         <div className="glass-island flex gap-2 p-1 rounded-2xl max-w-sm mx-auto">
           {([
@@ -305,7 +304,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             WebkitOverflowScrolling: "touch",
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 64px)",
+            paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 108px)",
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
@@ -318,7 +317,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       {/* Filters — dynamic island */}
       <div
         className="absolute left-0 right-0 z-30 px-4 pb-2"
-        style={{ top: "calc(env(safe-area-inset-top, 0px) + 106px)" }}
+        style={{ top: "calc(max(env(safe-area-inset-top, 12px), 16px) + 106px)" }}
       >
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
           {FILTER_OPTIONS.map((opt) => {
@@ -348,7 +347,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         className="flex-1 overflow-y-auto overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 148px)",
+          paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 148px)",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >
