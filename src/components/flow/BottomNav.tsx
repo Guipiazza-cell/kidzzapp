@@ -224,7 +224,10 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               display: "flex",
               alignItems: "stretch",
               gap: 2,
-              padding: "16px 32px 6px 6px",
+              // Padding vertical simétrico (11/11) p/ centralizar os ícones na
+              // barra. Antes 16/6 (assimétrico) jogava o conteúdo pra baixo e
+              // deixava os ícones descentralizados verticalmente.
+              padding: "11px 32px 11px 6px",
               overflowX: "auto",
               overflowY: "visible",
               scrollbarWidth: "none",
@@ -237,7 +240,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                 aria-hidden
                 style={{
                   position: "absolute",
-                  top: 14,
+                  top: 11,
                   left: pill.left,
                   width: PILL_W,
                   height: 38,
@@ -260,7 +263,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                   ref={(el) => (itemRefs.current[tab.id] = el)}
                   type="button"
                   onClick={() => handle(tab.id)}
-                  className="relative flex flex-col items-center justify-start gap-0.5 py-0.5 px-1 rounded-2xl select-none active:scale-95"
+                  className="relative flex flex-col items-center justify-center gap-0.5 py-0.5 px-1 rounded-2xl select-none active:scale-95"
                   style={{
                     minWidth: featured ? ITEM_MIN_W + 8 : ITEM_MIN_W,
                     flex: "0 0 auto",
