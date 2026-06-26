@@ -162,7 +162,7 @@ const ReadingMode = ({ title, childName, story, images = [], onClose }: Props) =
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            className="absolute inset-0 overflow-y-auto px-6 pt-4 pb-28"
+            className="absolute inset-0 overflow-y-auto overflow-x-hidden px-6 pt-4 pb-28"
             style={{ touchAction: "pan-y" }}
           >
             {sceneImage && (

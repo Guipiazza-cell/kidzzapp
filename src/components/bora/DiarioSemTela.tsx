@@ -77,7 +77,7 @@ export const DiarioSemTela = ({ open, onClose, childName = "" }: Props) => {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[150] overflow-y-auto"
+          className="fixed inset-0 z-[150] overflow-y-auto overflow-x-hidden"
           style={{
             background: "linear-gradient(180deg, #FFFDF6 0%, #FFF3D9 100%)",
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 160px)",

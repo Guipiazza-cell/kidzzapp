@@ -394,7 +394,7 @@ function ThemeDetail({
 
       {/* Lista de atividades */}
       <div
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{
           padding: "16px 14px",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
@@ -1043,7 +1043,7 @@ const DiscoverScreen = ({ onBack }: Props) => {
       <GlassHeader onBack={onBack} />
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto overflow-x-hidden"
         style={{
           padding: "0 14px",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",

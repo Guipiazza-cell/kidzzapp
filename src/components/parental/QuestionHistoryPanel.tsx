@@ -346,7 +346,7 @@ const QuestionHistoryPanel = () => {
         </div>
       ) : (
         <>
-          <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-[360px] overflow-y-auto overflow-x-hidden pr-1">
             {pageRows.map((row) => {
               const expanded = expandedId === row.id;
               const isPlaying = playingId === row.id;

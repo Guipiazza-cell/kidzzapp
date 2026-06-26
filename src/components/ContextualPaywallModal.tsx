@@ -22,7 +22,7 @@ const ContextualPaywallModal = ({ open, onClose }: Props) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md overflow-y-auto"
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md overflow-y-auto overflow-x-hidden"
         >
           <PaywallScreen childName={profile?.child_name || undefined} onClose={onClose} />
         </motion.div>

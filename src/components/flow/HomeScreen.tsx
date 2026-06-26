@@ -528,7 +528,7 @@ const HomeScreen = ({
       </div>
 
       <div
-        className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overscroll-contain"
+        className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overflow-x-hidden overscroll-contain"
         style={{
           WebkitOverflowScrolling: "touch",
           paddingTop: "calc(env(safe-area-inset-top, 0px) + 108px)",

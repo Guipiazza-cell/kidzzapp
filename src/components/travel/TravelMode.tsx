@@ -264,7 +264,7 @@ const TravelMode = ({ onBack }: Props) => {
             </h1>
           </header>
 
-          <div className="relative flex-1 min-h-0 flex flex-col items-center px-6 gap-4 overflow-y-auto overscroll-contain pb-10 pt-2">
+          <div className="relative flex-1 min-h-0 flex flex-col items-center px-6 gap-4 overflow-y-auto overflow-x-hidden overscroll-contain pb-10 pt-2">
             {/* Preview de pergunta — alto-falante (PRIMEIRO: coração da experiência) */}
             <motion.button
               onClick={speakPreview}

@@ -32,7 +32,7 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
   }, []);
 
   return (
-    <div ref={ref} className="flex-1 flex flex-col items-center px-5 pt-8 pb-8 overflow-y-auto">
+    <div ref={ref} className="flex-1 flex flex-col items-center px-5 pt-8 pb-8 overflow-y-auto overflow-x-hidden">
       {/* Brand */}
       <motion.div
         className="flex items-center gap-3"

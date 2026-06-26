@@ -304,7 +304,7 @@ const ChatScreen = ({
       {/* Main content */}
       <div className="flex-1 flex flex-col relative z-10 min-h-0">
         {isFreeLimitReached ? (
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
             <ConversionScreen childName={childName} onSubscribe={onCheckout} loading={checkoutLoading} />
           </div>
         ) : messages.length === 0 ? (
@@ -419,7 +419,7 @@ const ChatScreen = ({
                 </motion.span>
               </motion.div>
             )}
-            <div ref={chatRef} className="flex-1 overflow-y-auto px-4 pb-2">
+            <div ref={chatRef} className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-2">
               <AnimatePresence>
                 {messages.map((msg) => (
                   <ChatBubble key={msg.id} message={msg.text} isUser={msg.isUser} onSpeak={!msg.isUser ? speakText : undefined} />

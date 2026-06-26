@@ -223,7 +223,7 @@ const FirstMagicMoment = ({ onComplete }: Props) => {
 
   return (
     <OnboardingShell tone="violet">
-      <div className="flex-1 flex flex-col items-center px-6 pt-[max(env(safe-area-inset-top,16px),24px)] pb-8 overflow-y-auto">
+      <div className="flex-1 flex flex-col items-center px-6 pt-[max(env(safe-area-inset-top,16px),24px)] pb-8 overflow-y-auto overflow-x-hidden">
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

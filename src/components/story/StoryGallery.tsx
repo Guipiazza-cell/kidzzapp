@@ -63,7 +63,7 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
           </motion.button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4 pb-8">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 pb-8">
           {loading ? (
             <p className="text-center text-gray-400 text-sm py-8">Carregando…</p>
           ) : stories.length === 0 ? (
@@ -139,7 +139,7 @@ const StoryGallery = ({ onClose }: StoryGalleryProps) => {
                 {selected.title}
               </h3>
             </div>
-            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 py-5 space-y-4">
               {selected.image_url && (
                 <img
                   src={selected.image_url}

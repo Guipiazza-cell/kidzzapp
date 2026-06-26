@@ -163,7 +163,7 @@ const ActivityDetailModal = ({ activity, childName, done, onComplete, onClose }:
                   </div>
 
                   {/* Conteúdo: como fazer + exemplo */}
-                  <div className="px-5 py-4 max-h-[50vh] overflow-y-auto">
+                  <div className="px-5 py-4 max-h-[50vh] overflow-y-auto overflow-x-hidden">
                     <section>
                       <h3 className="text-xs font-black text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                         <Sparkles size={12} className="text-amber-500" />

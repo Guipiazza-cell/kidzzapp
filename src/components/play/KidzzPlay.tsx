@@ -199,7 +199,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="flex-1 flex flex-col overflow-y-auto overscroll-contain px-4"
+      className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden overscroll-contain px-4"
       style={{
         WebkitOverflowScrolling: "touch",
         paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
@@ -483,7 +483,7 @@ const KidzzPlay = ({ onBack, onGameComplete, onOpenTravel, onOpenAchievements, o
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
-            className="flex-1 overflow-y-auto overscroll-contain"
+            className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
             style={{
               WebkitOverflowScrolling: "touch",
               paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",

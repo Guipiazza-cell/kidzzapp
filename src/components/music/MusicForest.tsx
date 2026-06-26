@@ -148,7 +148,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned }: Props) => {
         </div>
 
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 space-y-4"
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain px-4 space-y-4"
           style={{
             WebkitOverflowScrolling: "touch",
             paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",

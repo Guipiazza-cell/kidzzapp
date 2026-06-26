@@ -184,7 +184,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
         ))}
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-1 pb-6">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-1 pb-6">
         <AnimatePresence mode="wait">
           {step === "acolhimento" && (
             <motion.div

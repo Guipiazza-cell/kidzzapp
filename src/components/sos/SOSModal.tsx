@@ -89,7 +89,7 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
             </div>
 
             <div
-              className="flex-1 min-h-0 px-5 pt-2 overflow-y-auto overscroll-contain"
+              className="flex-1 min-h-0 px-5 pt-2 overflow-y-auto overflow-x-hidden overscroll-contain"
               style={{
                 maxHeight: "88vh",
                 WebkitOverflowScrolling: "touch",
@@ -132,7 +132,7 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
                     </button>
                   </header>
 
-                  <div className="grid grid-cols-2 gap-2.5 pb-6 overflow-y-auto" style={{ maxHeight: "60vh" }}>
+                  <div className="grid grid-cols-2 gap-2.5 pb-6 overflow-y-auto overflow-x-hidden" style={{ maxHeight: "60vh" }}>
                     {SOS_SITUATIONS.map((s, i) => (
                       <motion.button
                         key={s.id}

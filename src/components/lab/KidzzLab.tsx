@@ -409,7 +409,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
       </div>
 
       {/* Customization panel */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-32">
+      <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden px-4 pb-32">
         <AnimatePresence mode="wait">
           {activeTab === "color" && (
             <TabPanel key="color" title="Escolha a cor">

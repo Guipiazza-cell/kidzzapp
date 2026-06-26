@@ -108,7 +108,7 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
         </div>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-between px-4 py-6 overflow-y-auto">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-between px-4 py-6 overflow-y-auto overflow-x-hidden">
         {/* Kidzz Music */}
         <div className="flex flex-col items-center gap-3 mt-2">
           <div onClick={handlePlay} className="cursor-pointer">

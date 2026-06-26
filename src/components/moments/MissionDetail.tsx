@@ -27,7 +27,7 @@ const MissionDetail = ({ mission, onBack }: Props) => {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-8 relative z-10">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-8 relative z-10">
         {/* Hero card */}
         <motion.div
           className={`mt-3 rounded-2xl p-6 bg-gradient-to-br ${mission.color} text-center shadow-lg`}

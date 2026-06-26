@@ -376,7 +376,7 @@ const RoutineScreen = () => {
   }, [addMemory, childName]);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overscroll-contain px-3"
+    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain px-3"
          style={{
            paddingTop: "max(env(safe-area-inset-top, 12px), 12px)",
            WebkitOverflowScrolling: "touch",

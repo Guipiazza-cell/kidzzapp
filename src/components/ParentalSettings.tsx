@@ -59,7 +59,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
         initial={{ scale: 0.85, y: 30 }}
         animate={{ scale: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 280, damping: 24 }}
-        className="bg-card rounded-3xl p-5 w-full max-w-md shadow-2xl relative max-h-[85vh] overflow-y-auto overscroll-contain"
+        className="bg-card rounded-3xl p-5 w-full max-w-md shadow-2xl relative max-h-[85vh] overflow-y-auto overflow-x-hidden overscroll-contain"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <button

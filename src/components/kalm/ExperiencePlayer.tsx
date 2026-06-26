@@ -231,7 +231,7 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
 
             {/* Scroll com fundo seguro pra notch + bottom inset */}
             <div
-              className="flex-1 min-h-0 overflow-y-auto px-5"
+              className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-5"
               style={{
                 WebkitOverflowScrolling: "touch",
                 overscrollBehavior: "contain",

@@ -66,7 +66,7 @@ const SevenDayChallenge = ({ onClose }: Props) => {
       onClick={onClose}
     >
       <motion.div
-        className="w-full max-w-md bg-white rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto"
+        className="w-full max-w-md bg-white rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto overflow-x-hidden"
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}

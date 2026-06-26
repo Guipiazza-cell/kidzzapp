@@ -565,7 +565,7 @@ const BoraScreen = ({ onBack }: Props) => {
   return (
     <div
       data-tab="bora"
-      className="bora-screen flex-1 overflow-y-auto"
+      className="bora-screen flex-1 overflow-y-auto overflow-x-hidden"
       style={{ paddingBottom: 180 }}
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />

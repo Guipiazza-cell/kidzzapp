@@ -183,7 +183,7 @@ const WellnessCinema = ({ open, onClose }: Props) => {
 
           <motion.div
             key="wc-stage"
-            className="fixed inset-x-2 top-4 bottom-4 z-[100] overflow-y-auto overscroll-contain max-h-[90vh] flex flex-col"
+            className="fixed inset-x-2 top-4 bottom-4 z-[100] overflow-y-auto overflow-x-hidden overscroll-contain max-h-[90vh] flex flex-col"
             style={{
               borderRadius: 36,
               background: mode

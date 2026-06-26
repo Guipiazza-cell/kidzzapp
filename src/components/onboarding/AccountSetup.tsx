@@ -295,7 +295,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
 
   return (
     <div
-      className="min-h-[100dvh] flex flex-col items-center px-5 relative overflow-y-auto overscroll-contain"
+      className="min-h-[100dvh] flex flex-col items-center px-5 relative overflow-y-auto overflow-x-hidden overscroll-contain"
       style={{
         background: "linear-gradient(180deg, #FFF9F0 0%, #E8F2E8 100%)",
         paddingTop: "max(env(safe-area-inset-top, 24px), 32px)",

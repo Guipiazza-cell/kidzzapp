@@ -413,7 +413,7 @@ const GratitudeJar = () => {
         )}
 
         {items.length > 0 && (
-          <div className="mt-3 max-h-[120px] overflow-y-auto space-y-1.5">
+          <div className="mt-3 max-h-[120px] overflow-y-auto overflow-x-hidden space-y-1.5">
             {items.slice(0, 5).map((g) => (
               <div key={g.id} className="text-[12px] px-3 py-2 rounded-xl" style={{ background: "rgba(255,255,255,0.55)", color: ink }}>
                 <span style={{ color: gold }}>⭐</span> {g.text}

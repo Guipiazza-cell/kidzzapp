@@ -226,7 +226,7 @@ const MyActivities = ({ onBack }: Props) => {
         </motion.button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-6">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-6">
         {/* Progresso */}
         <div className="bg-white/60 backdrop-blur rounded-2xl p-3 border border-white/50 mb-3">
           <div className="flex items-center justify-between mb-2">

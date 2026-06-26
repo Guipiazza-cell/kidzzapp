@@ -134,7 +134,7 @@ const ReferralProgram = ({ onBack }: Props) => {
         </h1>
       </header>
 
-      <div className="relative z-10 flex-1 overflow-y-auto px-5 pb-8">
+      <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden px-5 pb-8">
         {/* Hero — KIDZZ explorer waving */}
         <div className="text-center mt-2 mb-5">
           <motion.div

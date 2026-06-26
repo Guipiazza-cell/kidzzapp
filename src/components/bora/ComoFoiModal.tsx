@@ -106,7 +106,7 @@ export const ComoFoiModal = ({ open, onClose, onSaved, activity, criancaId, chil
           <motion.div
             initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
-            className="w-full max-w-md rounded-3xl p-6 shadow-2xl relative max-h-[88vh] overflow-y-auto"
+            className="w-full max-w-md rounded-3xl p-6 shadow-2xl relative max-h-[88vh] overflow-y-auto overflow-x-hidden"
             style={{
               background: "linear-gradient(180deg, #FFFDF6 0%, #FFF3D9 100%)",
               border: "2px solid rgba(255,255,255,0.85)",

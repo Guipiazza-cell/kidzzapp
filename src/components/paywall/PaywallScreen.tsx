@@ -128,7 +128,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
 
   return (
     <div
-      className="min-h-screen w-full overflow-y-auto overscroll-contain"
+      className="min-h-screen w-full overflow-y-auto overflow-x-hidden overscroll-contain"
       style={{
         WebkitOverflowScrolling: "touch",
         background: `linear-gradient(180deg, ${CREAM} 0%, #FBF6EE 100%)`,

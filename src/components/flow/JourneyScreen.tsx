@@ -79,7 +79,7 @@ const JourneyScreen = ({ onBack, childName = "amigo" }: Props) => {
         <div className="min-w-[44px]" />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24 space-y-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-24 space-y-4">
         {/* Card de nível atual */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}

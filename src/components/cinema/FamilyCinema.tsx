@@ -191,7 +191,7 @@ const MovieSheet = ({ movie, onClose }: { movie: Movie; onClose: () => void }) =
 
       {/* Conteúdo scrollável */}
       <div
-        className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 space-y-5"
+        className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-5 py-5 space-y-5"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <p className="text-white/85 text-[14px] leading-relaxed italic">"{movie.descricao}"</p>
@@ -352,7 +352,7 @@ const FamilyCinema = ({ onBack }: Props) => {
 
       {/* Scroll */}
       <div
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain relative z-10"
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain relative z-10"
         style={{
           WebkitOverflowScrolling: "touch",
           paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",

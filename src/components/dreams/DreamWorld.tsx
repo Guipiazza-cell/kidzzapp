@@ -336,7 +336,7 @@ const DreamWorld = ({ onBack }: Props) => {
     };
     return (
       <motion.div
-        className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"
+        className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden overscroll-contain"
         style={{
           WebkitOverflowScrolling: "touch",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
@@ -485,7 +485,7 @@ const DreamWorld = ({ onBack }: Props) => {
   /* ============ MAIN ============ */
   return (
     <motion.div
-      className="fixed inset-0 z-40 overflow-y-auto overscroll-contain"
+      className="fixed inset-0 z-40 overflow-y-auto overflow-x-hidden overscroll-contain"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       style={{
         WebkitOverflowScrolling: "touch",
