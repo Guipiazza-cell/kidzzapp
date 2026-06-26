@@ -1,4 +1,4 @@
-// Dados da aba Descobrir — fácil de editar/expandir
+// Dados da aba Descobrir, fácil de editar/expandir
 // {nome} é substituído pelo nome da criança em runtime.
 
 export type Activity = {
@@ -30,7 +30,7 @@ export type Theme = {
   activities: Activity[];
 };
 
-// Slots de imagem nomeados — troque os caminhos quando subir as artes finais.
+// Slots de imagem nomeados: troque os caminhos quando subir as artes finais.
 export const DISCOVER_IMAGES = {
   hero: "/discover/hero-pai-filho.jpg",
   imgAnimais: "/discover/animais-leao.jpg",
@@ -56,7 +56,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "beija-flor",
         title: "O coração do beija-flor bate 1.200 vezes por minuto",
-        ageRange: "4–8 anos",
+        ageRange: "4 a 8 anos",
         duration: "10 min",
         material: "Só o corpo",
         discovery:
@@ -64,7 +64,7 @@ export const DISCOVER_THEMES: Theme[] = [
         steps: [
           "Coloquem a mão no peito sentadinhos e sintam o coração calmo.",
           "Corram no lugar por 20 segundos, bem forte.",
-          "Voltem a sentir o coração — agora ele dispara, está mais perto do beija-flor.",
+          "Voltem a sentir o coração: agora ele dispara, está mais perto do beija-flor.",
           "Batam palma 10 segundos imitando a velocidade das asinhas dele.",
         ],
         parentMoment: "Qual bicho você acha que tem o coração mais calminho do mundo?",
@@ -73,7 +73,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "gato-pe",
         title: "Por que o gato cai sempre de pé?",
-        ageRange: "4–10 anos",
+        ageRange: "4 a 10 anos",
         duration: "15 min",
         material: "Pelúcia + almofada",
         safetyNote: "Nunca, nunca testem com um gato de verdade. Só pelúcia, ok?",
@@ -91,7 +91,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "elefantes-pe",
         title: "Os elefantes conversam com os pés",
-        ageRange: "5–10 anos",
+        ageRange: "5 a 10 anos",
         duration: "15 min",
         material: "O chão de casa",
         discovery:
@@ -123,13 +123,13 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "peso-lua",
         title: "Quanto você pesaria na Lua?",
-        ageRange: "5–10 anos",
+        ageRange: "5 a 10 anos",
         duration: "15 min",
         material: "Fita métrica + chão",
         discovery:
           "Na Lua a gente pesa 6 vezes menos. Um pulinho normal vira um salto de gigante. Astronautas andam quase flutuando lá!",
         steps: [
-          "Peguem o peso da criança e dividam por 6 — esse é o peso lunar dela.",
+          "Peguem o peso da criança e dividam por 6. Esse é o peso lunar dela.",
           "Marquem no chão até onde ela pula normalmente.",
           "Marquem 6 vezes essa distância: seria o pulo dela na Lua.",
           "Brinquem de pular em câmera lenta, como astronauta.",
@@ -140,7 +140,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "sol-grande",
         title: "O Sol é tão grande que cabem 1 milhão de Terras dentro",
-        ageRange: "4–10 anos",
+        ageRange: "4 a 10 anos",
         duration: "10 min",
         material: "Bola + ervilha (ou grão)",
         discovery:
@@ -149,7 +149,7 @@ export const DISCOVER_THEMES: Theme[] = [
           "Peguem a bola maior que tiverem.",
           "Peguem uma ervilha ou grão pequenininho.",
           "Coloquem lado a lado e olhem em silêncio por 10 segundos.",
-          "Imaginem que cada estrelinha no céu é um sol — alguns ainda maiores.",
+          "Imaginem que cada estrelinha no céu é um sol, alguns ainda maiores.",
         ],
         parentMoment: "O que será que tem nas outras estrelas?",
         badge: "O {nome} descobriu o tamanho do Sol! ☀️",
@@ -157,11 +157,11 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "constelacao",
         title: "Construam uma constelação no teto",
-        ageRange: "5–10 anos",
+        ageRange: "5 a 10 anos",
         duration: "20 min",
         material: "Lanterna + papelão",
         discovery:
-          "As estrelas formam desenhos no céu — os antigos viam leões, ursos, caçadores. São as constelações. Vocês podem criar a sua agora.",
+          "As estrelas formam desenhos no céu. Os antigos viam leões, ursos, caçadores. São as constelações. Vocês podem criar a sua agora.",
         steps: [
           "Desenhem juntos um símbolo da família no papelão.",
           "Furem os pontos do desenho com algo pontudo (adulto faz).",
@@ -189,7 +189,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "feijao",
         title: "Plantem um feijão e vejam a vida acontecer",
-        ageRange: "4–10 anos",
+        ageRange: "4 a 10 anos",
         duration: "10 min + alguns dias",
         material: "Feijão + algodão + copo",
         discovery:
@@ -206,7 +206,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "cacada-cores",
         title: "Caçada de cores na natureza",
-        ageRange: "4–8 anos",
+        ageRange: "4 a 8 anos",
         duration: "20 min",
         material: "Caixa de ovo",
         discovery:
@@ -223,7 +223,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "chuva-copo",
         title: "Por que a chuva cai? Façam chover num copo",
-        ageRange: "5–10 anos",
+        ageRange: "5 a 10 anos",
         duration: "15 min",
         material: "Copo + água morna + pratinho + gelo",
         safetyNote: "Adulto cuida da água morna.",
@@ -256,7 +256,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "pao",
         title: "De onde vem o pão? Façam um juntos",
-        ageRange: "4–10 anos",
+        ageRange: "4 a 10 anos",
         duration: "30 min",
         material: "Farinha + água + fermento + sal",
         safetyNote: "Adulto cuida do forno.",
@@ -264,7 +264,7 @@ export const DISCOVER_THEMES: Theme[] = [
           "Uma poeirinha branca (farinha), água e um pozinho mágico (fermento) viram massa, crescem sozinhos e, no forno, viram pão quentinho.",
         steps: [
           "Misturem farinha, água morna, sal e fermento.",
-          "Amassem com as mãos por uns 5 minutos — vale rir muito.",
+          "Amassem com as mãos por uns 5 minutos. Vale rir muito.",
           "Cubram e deixem crescer 1 hora. Olhem de vez em quando.",
           "Adulto leva pro forno. Depois, comam juntos a obra de vocês.",
         ],
@@ -274,13 +274,13 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "ponte",
         title: "Como funciona uma ponte? Construam uma",
-        ageRange: "5–10 anos",
+        ageRange: "5 a 10 anos",
         duration: "20 min",
         material: "Papel + 2 livros + moedas",
         discovery:
           "Papel liso não segura nada. Mas se você dobra ele em sanfona, ele vira forte. Esse é o segredo escondido em quase toda ponte de verdade.",
         steps: [
-          "Apoiem o papel liso entre dois livros e ponham uma moeda em cima — ele afunda.",
+          "Apoiem o papel liso entre dois livros e ponham uma moeda em cima. Ele afunda.",
           "Tirem o papel e dobrem em sanfona (zig-zag).",
           "Coloquem de novo entre os livros.",
           "Vejam quantas moedas ele aguenta agora.",
@@ -291,7 +291,7 @@ export const DISCOVER_THEMES: Theme[] = [
       {
         id: "sombra",
         title: "De onde vem a sombra? Brinquem com a luz",
-        ageRange: "4–8 anos",
+        ageRange: "4 a 8 anos",
         duration: "15 min",
         material: "Lanterna + parede",
         discovery:
@@ -299,7 +299,7 @@ export const DISCOVER_THEMES: Theme[] = [
         steps: [
           "Apaguem a luz do quarto e liguem só a lanterna.",
           "Façam bichos com as mãos na parede.",
-          "Aproximem e afastem a mão da lanterna — vejam a sombra mudar de tamanho.",
+          "Aproximem e afastem a mão da lanterna e vejam a sombra mudar de tamanho.",
           "Inventem juntos uma pequena história de sombras.",
         ],
         parentMoment: "Quando a nossa sombra fica mais comprida lá fora?",

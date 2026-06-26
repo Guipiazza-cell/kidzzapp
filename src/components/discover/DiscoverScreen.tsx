@@ -6,7 +6,7 @@ import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 
 // ============================================================
-// DiscoverScreen — aba "Descobrir" (referência: arte enviada pelo usuário)
+// DiscoverScreen, aba "Descobrir" (referência: arte enviada pelo usuário)
 // LIQUID GLASS apenas no chrome (header). Cards de conteúdo: creme sólido.
 // ============================================================
 
@@ -312,7 +312,7 @@ function ThemeDetail({
       >
         <SmartImage
           src={theme.image}
-          alt={`${theme.title} — cena de capa`}
+          alt={`${theme.title}: cena de capa`}
           fallbackBg={theme.bg}
           fallbackEmoji={theme.emoji}
           className="w-full h-full"
@@ -828,7 +828,7 @@ async function shareBadge(activity: Activity, childName: string) {
   const text = activity.badge.replace(/\{nome\}/g, nome);
   const shareData: ShareData = {
     title: "Selo da Descoberta Kidzz",
-    text: `${text}\n\nDescoberto no Kidzz — menos tela, mais memórias.`,
+    text: `${text}\n\nDescoberto no Kidzz. Menos tela, mais memórias.`,
   };
   try {
     if (navigator.share) {
@@ -855,7 +855,7 @@ async function shareBadge(activity: Activity, childName: string) {
     ctx.font = "600 56px 'Fraunces', serif";
     wrapText(ctx, text, W / 2, 500, W - 200, 70);
     ctx.font = "500 24px 'Mulish', sans-serif";
-    ctx.fillText("Kidzz — menos tela, mais memórias", W / 2, H - 100);
+    ctx.fillText("Kidzz. Menos tela, mais memórias", W / 2, H - 100);
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
