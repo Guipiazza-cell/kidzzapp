@@ -504,16 +504,19 @@ function ActivityCard({
             <h3
               style={{
                 fontFamily: "'Fraunces', serif",
-                fontSize: 18,
+                fontSize: "clamp(15px, 4.4vw, 17px)",
                 fontWeight: 600,
-                lineHeight: 1.25,
+                lineHeight: 1.3,
                 color: INK,
                 margin: 0,
                 letterSpacing: "-0.01em",
+                wordBreak: "break-word",
+                hyphens: "auto",
               }}
             >
               {activity.title}
             </h3>
+
             <div className="flex flex-wrap gap-1.5 mt-2.5">
               <Chip icon={<Clock size={11} />} label={activity.duration} />
               <Chip icon={<Baby size={11} />} label={activity.ageRange} />
