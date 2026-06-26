@@ -426,14 +426,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const prof = await fetchProfile(currentSession.user.id);
           if (!mounted) return;
           setProfile(prof);
-
-          // On init, force refresh from Stripe to keep tier/locks in sync
-          const subResult = await checkSubscription(currentSession.access_token, prof, true);
-          if (!mounted) return;
-          setTier(subResult.tier);
-          if (subResult.isPremium !== prof.is_premium) {
-            setProfile(prev => prev ? { ...prev, is_premium: subResult.isPremium } : prev);
-          }
+          // Tier otimista a partir do DB — libera a UI sem esperar o Stripe.
+          setTier(prof.is_premium ? "premium" : "free");
+          // Libera a UI IMEDIATAMENTE. O gate `if (loading) return null` no Index
+          // segurava a tela inteira (~10s) ate o check-subscription do Stripe
+          // responder. Agora o refresh do Stripe roda em background e so ajusta
+          // tier/locks quando chegar.
+          setLoading(false);
+          setIsReady(true);
+          initDone.current = true;
+          checkSubscription(currentSession.access_token, prof, true)
+            .then((subResult) => {
+              if (!mounted) return;
+              setTier(subResult.tier);
+              if (subResult.isPremium !== prof.is_premium) {
+                setProfile((prev) => (prev ? { ...prev, is_premium: subResult.isPremium } : prev));
+              }
+            })
+            .catch((err) => console.warn("[Auth] init subscription check failed", err));
         } else {
           setSession(null);
           setUser(null);
