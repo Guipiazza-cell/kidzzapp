@@ -463,9 +463,13 @@
 }
 
 /* Dragonfly wing flap */
+/* Asa da libélula: anima OPACITY (composta na GPU) em vez de transform.
+   Transform em <ellipse> SVG forçava recálculo de layout a cada frame (~36
+   layouts/s globais → aquecimento/travamento com o tempo). Opacity mantém a
+   sensação de asa batendo sem disparar layout. */
 @keyframes dragonfly-wing {
-  0% { transform: scaleY(1) rotate(0deg); }
-  100% { transform: scaleY(0.6) rotate(8deg); }
+  0% { opacity: 1; }
+  100% { opacity: 0.45; }
 }
 
 /* Streak fire flicker */
