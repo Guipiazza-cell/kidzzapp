@@ -471,9 +471,11 @@ const Index = () => {
                   aria-hidden={!isActive}
                   className="absolute inset-0 flex flex-col min-h-0"
                   style={{
-                    visibility: isActive ? "visible" : "hidden",
-                    pointerEvents: isActive ? "auto" : "none",
-                    zIndex: isActive ? 2 : 1,
+                    // display:none (não visibility:hidden) — a aba inativa sai
+                    // totalmente do layout e da composição. visibility:hidden no
+                    // pai NÃO esconde filhos que o framer-motion marca como
+                    // visible, causando telas vazando por cima umas das outras.
+                    display: isActive ? "flex" : "none",
                   }}
                 >
                   <TabErrorBoundary resetKey={tabId} label={tabId} onBack={backToHome}>
