@@ -52,15 +52,15 @@ const appVersionPlugin = (): Plugin => ({
     order: "post",
     handler(html: string) {
       if (process.env.NODE_ENV !== "production") return html;
-      return html
-        .replace(
-          /((?:src|href)="\/assets\/[^\"]+\.(?:js|css|png|jpg|jpeg|svg|webp|gif|woff2|ttf))(\")/g,
-          `$1?v=${buildVersion}$2`
-        )
-        .replace(
-          /((?:href)="\/(?:manifest\.json|favicon\.png|apple-touch-icon\.png))(\")/g,
-          `$1?v=${buildVersion}$2`
-        );
+      // NÃO adicionar ?v= em /assets/*.js|css: esses arquivos já têm hash de
+      // conteúdo no nome. O ?v= no <script> de entrada deixava a URL do script
+      // diferente da URL usada nos imports internos do mesmo chunk, fazendo o
+      // módulo de entrada executar 2x (createRoot 2x) e DUPLICAR o app inteiro.
+      // ?v= fica só nos assets da raiz que não têm hash (manifest/ícones).
+      return html.replace(
+        /((?:href)="\/(?:manifest\.json|favicon\.png|apple-touch-icon\.png))(\")/g,
+        `$1?v=${buildVersion}$2`
+      );
     },
   },
   generateBundle() {
