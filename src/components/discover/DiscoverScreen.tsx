@@ -958,7 +958,7 @@ function DiscoverHero() {
         <h1
           style={{
             fontFamily: "'Fraunces', serif",
-            fontSize: 34,
+            fontSize: "clamp(26px, 8.4vw, 32px)",
             lineHeight: 1,
             fontWeight: 600,
             color: INK,
@@ -972,13 +972,14 @@ function DiscoverHero() {
           style={{
             fontFamily: "'Fraunces', serif",
             fontStyle: "italic",
-            fontSize: 19,
-            lineHeight: 1.15,
+            fontSize: "clamp(15px, 4.6vw, 18px)",
+            lineHeight: 1.2,
             color: AMBER,
             marginTop: 10,
             marginBottom: 0,
             position: "relative",
             display: "inline-block",
+            maxWidth: "100%",
           }}
         >
           Vamos explorar o mundo juntos?
@@ -998,7 +999,7 @@ function DiscoverHero() {
         <p
           style={{
             fontFamily: "'Mulish', sans-serif",
-            fontSize: 13.5,
+            fontSize: 13,
             lineHeight: 1.4,
             color: "#5a4d3d",
             marginTop: 12,
@@ -1007,6 +1008,7 @@ function DiscoverHero() {
         >
           Escolha um tema e mergulhem em descobertas que despertam a curiosidade e viram memórias.
         </p>
+
       </div>
     </section>
   );
