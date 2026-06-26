@@ -169,12 +169,12 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
       }}
       aria-label={`Abrir tema ${theme.title}`}
     >
-      {/* Imagem ocupa ~54% à direita */}
+      {/* Imagem ocupa ~50% à direita */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          left: "46%",
+          left: "52%",
         }}
       >
         <SmartImage
@@ -199,60 +199,65 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
       <div
         style={{
           position: "relative",
-          padding: "20px 18px 18px 18px",
-          width: "60%",
+          padding: "16px 14px 14px 16px",
+          width: "56%",
           minHeight: 168,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          gap: 10,
+          gap: 8,
         }}
       >
-        <div>
+        <div style={{ minWidth: 0 }}>
           <h3
             style={{
               fontFamily: "'Fraunces', serif",
-              fontSize: 26,
+              fontSize: "clamp(18px, 5.2vw, 22px)",
               lineHeight: 1.1,
               fontWeight: 600,
               color: theme.ink,
               letterSpacing: "-0.01em",
               margin: 0,
-              display: "inline",
+              wordBreak: "break-word",
+              hyphens: "auto",
             }}
           >
             {theme.title}{" "}
-            <span aria-hidden style={{ fontSize: 18 }}>{theme.emoji}</span>
+            <span aria-hidden style={{ fontSize: "0.75em" }}>{theme.emoji}</span>
           </h3>
           <p
             style={{
               fontFamily: "'Mulish', system-ui, sans-serif",
-              fontSize: 13.5,
+              fontSize: 12.5,
               lineHeight: 1.35,
               color: theme.body,
-              marginTop: 8,
+              marginTop: 6,
               marginBottom: 0,
-              maxWidth: "95%",
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
             }}
           >
             {theme.description}
           </p>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <span
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: 4,
               fontFamily: "'Mulish', sans-serif",
-              fontSize: 11.5,
+              fontSize: 11,
               fontWeight: 700,
               color: theme.ink,
               opacity: 0.85,
               background: "rgba(255,255,255,0.45)",
-              padding: "4px 10px",
+              padding: "4px 9px",
               borderRadius: 999,
               border: "1px solid rgba(255,255,255,0.6)",
+              whiteSpace: "nowrap",
             }}
           >
             ✦ {count} descobertas
@@ -260,19 +265,21 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
           <span
             aria-hidden
             style={{
-              width: 44, height: 44, borderRadius: 999,
+              flexShrink: 0,
+              width: 40, height: 40, borderRadius: 999,
               background: theme.cta,
               display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: "0 4px 10px rgba(0,0,0,0.18)",
             }}
           >
-            <ArrowRight size={20} color={theme.ctaInk} strokeWidth={2.4} />
+            <ArrowRight size={18} color={theme.ctaInk} strokeWidth={2.4} />
           </span>
         </div>
       </div>
     </button>
   );
 }
+
 
 // ------------------------------------------------------------
 // Tela de detalhe do tema
@@ -357,12 +364,14 @@ function ThemeDetail({
           <h1
             style={{
               fontFamily: "'Fraunces', serif",
-              fontSize: 36,
-              lineHeight: 1,
+              fontSize: "clamp(26px, 8vw, 34px)",
+              lineHeight: 1.05,
               fontWeight: 600,
               margin: 0,
               letterSpacing: "-0.01em",
               textShadow: "0 2px 14px rgba(0,0,0,0.4)",
+              wordBreak: "break-word",
+              hyphens: "auto",
             }}
           >
             {theme.title} <span aria-hidden>{theme.emoji}</span>
@@ -370,7 +379,8 @@ function ThemeDetail({
           <p
             style={{
               fontFamily: "'Mulish', sans-serif",
-              fontSize: 14,
+              fontSize: 13.5,
+              lineHeight: 1.4,
               marginTop: 6,
               opacity: 0.95,
               textShadow: "0 1px 6px rgba(0,0,0,0.45)",
@@ -378,6 +388,7 @@ function ThemeDetail({
           >
             {theme.description}
           </p>
+
         </div>
       </div>
 
@@ -493,16 +504,19 @@ function ActivityCard({
             <h3
               style={{
                 fontFamily: "'Fraunces', serif",
-                fontSize: 18,
+                fontSize: "clamp(15px, 4.4vw, 17px)",
                 fontWeight: 600,
-                lineHeight: 1.25,
+                lineHeight: 1.3,
                 color: INK,
                 margin: 0,
                 letterSpacing: "-0.01em",
+                wordBreak: "break-word",
+                hyphens: "auto",
               }}
             >
               {activity.title}
             </h3>
+
             <div className="flex flex-wrap gap-1.5 mt-2.5">
               <Chip icon={<Clock size={11} />} label={activity.duration} />
               <Chip icon={<Baby size={11} />} label={activity.ageRange} />
@@ -947,7 +961,7 @@ function DiscoverHero() {
         <h1
           style={{
             fontFamily: "'Fraunces', serif",
-            fontSize: 34,
+            fontSize: "clamp(26px, 8.4vw, 32px)",
             lineHeight: 1,
             fontWeight: 600,
             color: INK,
@@ -961,13 +975,14 @@ function DiscoverHero() {
           style={{
             fontFamily: "'Fraunces', serif",
             fontStyle: "italic",
-            fontSize: 19,
-            lineHeight: 1.15,
+            fontSize: "clamp(15px, 4.6vw, 18px)",
+            lineHeight: 1.2,
             color: AMBER,
             marginTop: 10,
             marginBottom: 0,
             position: "relative",
             display: "inline-block",
+            maxWidth: "100%",
           }}
         >
           Vamos explorar o mundo juntos?
@@ -987,7 +1002,7 @@ function DiscoverHero() {
         <p
           style={{
             fontFamily: "'Mulish', sans-serif",
-            fontSize: 13.5,
+            fontSize: 13,
             lineHeight: 1.4,
             color: "#5a4d3d",
             marginTop: 12,
@@ -996,6 +1011,7 @@ function DiscoverHero() {
         >
           Escolha um tema e mergulhem em descobertas que despertam a curiosidade e viram memórias.
         </p>
+
       </div>
     </section>
   );
