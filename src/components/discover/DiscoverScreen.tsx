@@ -364,12 +364,14 @@ function ThemeDetail({
           <h1
             style={{
               fontFamily: "'Fraunces', serif",
-              fontSize: 36,
-              lineHeight: 1,
+              fontSize: "clamp(26px, 8vw, 34px)",
+              lineHeight: 1.05,
               fontWeight: 600,
               margin: 0,
               letterSpacing: "-0.01em",
               textShadow: "0 2px 14px rgba(0,0,0,0.4)",
+              wordBreak: "break-word",
+              hyphens: "auto",
             }}
           >
             {theme.title} <span aria-hidden>{theme.emoji}</span>
@@ -377,7 +379,8 @@ function ThemeDetail({
           <p
             style={{
               fontFamily: "'Mulish', sans-serif",
-              fontSize: 14,
+              fontSize: 13.5,
+              lineHeight: 1.4,
               marginTop: 6,
               opacity: 0.95,
               textShadow: "0 1px 6px rgba(0,0,0,0.45)",
@@ -385,6 +388,7 @@ function ThemeDetail({
           >
             {theme.description}
           </p>
+
         </div>
       </div>
 
