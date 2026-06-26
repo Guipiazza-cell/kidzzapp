@@ -458,32 +458,21 @@ const Index = () => {
       <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
-            {/* Todas as abas ficam MONTADAS ao mesmo tempo. Trocamos apenas
-                visibilidade — assim não há remount, Suspense fallback nem flash
-                ao alternar pelo dock. */}
-            {(Object.keys(TAB_RENDERERS) as AppTab[]).map((tabId) => {
-              const isActive = tabId === activeTab;
-              const render = TAB_RENDERERS[tabId];
-              return (
-                <div
-                  key={tabId}
-                  data-tab={APP_TAB_DATA[tabId] ?? tabId}
-                  aria-hidden={!isActive}
-                  className="absolute inset-0 flex flex-col min-h-0"
-                  style={{
-                    // display:none (não visibility:hidden) — a aba inativa sai
-                    // totalmente do layout e da composição. visibility:hidden no
-                    // pai NÃO esconde filhos que o framer-motion marca como
-                    // visible, causando telas vazando por cima umas das outras.
-                    display: isActive ? "flex" : "none",
-                  }}
-                >
-                  <TabErrorBoundary resetKey={tabId} label={tabId} onBack={backToHome}>
-                    <Suspense fallback={null}>{render()}</Suspense>
-                  </TabErrorBoundary>
-                </div>
-              );
-            })}
+            {/* Apenas a aba ATIVA fica montada. Manter as 12 abas montadas ao
+                mesmo tempo (mesmo com display:none) deixava ~3500 nós DOM, 200+
+                SVGs e dezenas de animações framer-motion/timers rodando em
+                background — travando o app no celular. Os chunks de cada aba já
+                são pré-carregados (useEffect de preload), então a troca continua
+                rápida mesmo remontando. */}
+            <div
+              key={activeTab}
+              data-tab={APP_TAB_DATA[activeTab] ?? activeTab}
+              className="absolute inset-0 flex flex-col min-h-0"
+            >
+              <TabErrorBoundary resetKey={activeTab} label={activeTab} onBack={backToHome}>
+                <Suspense fallback={null}>{activeRenderer()}</Suspense>
+              </TabErrorBoundary>
+            </div>
           </div>
         </div>
       </div>
