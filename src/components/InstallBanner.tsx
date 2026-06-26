@@ -93,7 +93,12 @@ const InstallBanner = () => {
   if (!show || isStandalone) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 animate-in slide-in-from-bottom-4 duration-500">
+    <div
+      className="fixed left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-500"
+      // Acima do dock (z-[90], ~136px de altura). Antes ficava em bottom-4 com
+      // z-50, escondido atras da nav bar e das tags.
+      style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 144px)" }}
+    >
       <div className="relative bg-card border border-border rounded-2xl p-4 shadow-2xl max-w-md mx-auto">
         <button
           onClick={handleDismiss}
