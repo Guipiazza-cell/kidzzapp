@@ -26,6 +26,7 @@ export function useCriancas() {
     const { data, error } = await supabase
       .from("criancas")
       .select("*")
+      .eq("user_id", user.id) // defense-in-depth (RLS já restringe por user_id)
       .order("created_at", { ascending: true });
     if (!error && data) setCriancas(data as Crianca[]);
     setLoading(false);

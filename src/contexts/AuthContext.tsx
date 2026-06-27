@@ -131,7 +131,21 @@ const submitCheckoutRedirectForm = (plan: CheckoutPlan, accessToken: string, ref
   window.setTimeout(() => form.remove(), 5000);
 };
 
-const todayStr = () => new Date().toISOString().slice(0, 10);
+// Data no fuso de Brasília — o servidor reseta o uso em America/Sao_Paulo
+// (meia-noite de Brasília). Antes o cliente usava UTC, desalinhando o "dia"
+// do cliente vs servidor (reset em horário errado / contagem divergente).
+const todayStr = () => {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+};
 
 const createDefaultProfile = (): Profile => ({
   child_name: "",

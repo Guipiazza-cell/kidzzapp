@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Sparkles, Lock, X, Leaf, Flame, Users } from "lucide-react";
 import { useAuth, type CheckoutPlan } from "@/contexts/AuthContext";
+import ParentalGate from "@/components/ParentalGate";
 
 export type PaywallContextKind = "default" | "premium_locked" | "surprise_limit" | "streak_milestone" | "after_completion";
 
@@ -41,6 +42,9 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
   const [cycle, setCycle] = useState<Cycle>("annual");
   const [selected, setSelected] = useState<"kidzz" | "premium">("premium");
   const [loading, setLoading] = useState(false);
+  // Compra é uma ação de ADULTO: nunca leva a criança direto ao checkout.
+  // Ao tocar em assinar, exige o gate parental antes de abrir o Stripe.
+  const [showParentalGate, setShowParentalGate] = useState(false);
 
   const planKey: CheckoutPlan =
     selected === "kidzz"
@@ -58,7 +62,12 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
       : { big: "R$ 24,90", small: "/mês", hint: "" };
   };
 
-  const onSubscribe = async () => {
+  // Tocar em assinar → abre o gate parental (não vai direto pro checkout).
+  const onSubscribe = () => setShowParentalGate(true);
+
+  // Só roda após o adulto passar no gate parental.
+  const runCheckout = async () => {
+    setShowParentalGate(false);
     setLoading(true);
     try {
       if (!user) onClose?.();
@@ -366,6 +375,10 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           Renovação automática · Cancele a qualquer momento nas configurações.
         </p>
       </div>
+
+      {showParentalGate && (
+        <ParentalGate onSuccess={runCheckout} onCancel={() => setShowParentalGate(false)} />
+      )}
     </div>
   );
 };

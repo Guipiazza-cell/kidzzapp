@@ -46,8 +46,12 @@ serve(async (req) => {
       });
     }
 
-    // Use "Alice" voice - warm, clear, great for kids
-    const voiceId = "TX3LPaxmHKxFdv7VOQHJ";
+    // Voz: aceita override via body.voiceId (ex: voz feminina pt-BR criada no
+    // ElevenLabs Voice Design). Default mantém "Alice".
+    const voiceId =
+      typeof body?.voiceId === "string" && body.voiceId.trim()
+        ? body.voiceId.trim()
+        : "TX3LPaxmHKxFdv7VOQHJ";
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_22050_32`,
@@ -60,6 +64,9 @@ serve(async (req) => {
         body: JSON.stringify({
           text,
           model_id: "eleven_turbo_v2_5",
+          // Força a pronúncia em português do Brasil. Sem isso o modelo
+          // multilíngue podia narrar com sotaque/idioma errado (inglês).
+          language_code: "pt",
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.75,

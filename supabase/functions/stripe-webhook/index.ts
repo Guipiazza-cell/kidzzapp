@@ -150,6 +150,25 @@ serve(async (req) => {
   try {
     log("event", { type: event.type, id: event.id });
 
+    // Idempotência: o Stripe reenvia eventos (retries). Grava event.id numa
+    // tabela com PK única ANTES de processar. Se já existir (23505), o evento
+    // já foi processado → responde 200 e não processa de novo.
+    const { error: dupErr } = await admin
+      .from("stripe_processed_events")
+      .insert({ event_id: event.id, type: event.type });
+    if (dupErr) {
+      if ((dupErr as { code?: string }).code === "23505") {
+        log("duplicate event ignored", { id: event.id });
+        return new Response(JSON.stringify({ received: true, duplicate: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // Erro não-duplicado (ex: tabela ausente): loga e segue processando para
+      // não perder o evento.
+      log("idempotency insert error (continuing)", { id: event.id, err: String(dupErr) });
+    }
+
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
