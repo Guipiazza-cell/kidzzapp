@@ -86,25 +86,21 @@ const ACTIVE_TAB_STORAGE_KEY = "kidzz_active_tab";
 const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStorage.getItem(AGE_STORAGE_KEY) : null;
 const persistActiveTab = (tab: AppTab) => {
   if (typeof window === "undefined") return;
+  // Só sessionStorage: resume a aba ao recarregar DENTRO da mesma sessão.
+  // Não grava em localStorage nem na URL — antes isso fazia o app REABRIR na
+  // última aba (ex: KALM, a mais pesada) em vez da home a cada novo acesso.
   try { window.sessionStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
-  try { window.localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
-  try {
-    const url = new URL(window.location.href);
-    // Sempre grava o tab atual na URL — fonte da verdade ao recarregar.
-    url.searchParams.set("tab", tab);
-    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-  } catch { /* noop */ }
 };
 const getInitialTab = (): AppTab => {
   if (typeof window === "undefined") return "chat";
   try {
+    // Deep-link explícito via ?tab= continua respeitado (ex: notificações).
     const url = new URL(window.location.href);
-    const fromUrl = normalizeAppTab(url.searchParams.get("tab") || url.hash.replace(/^#\/?/, ""));
+    const fromUrl = normalizeAppTab(url.searchParams.get("tab"));
     if (fromUrl) return fromUrl;
+    // Resume só na mesma sessão. Cold start sempre cai na home (chat).
     const fromSession = normalizeAppTab(window.sessionStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
     if (fromSession) return fromSession;
-    const fromLocal = normalizeAppTab(window.localStorage.getItem(ACTIVE_TAB_STORAGE_KEY));
-    if (fromLocal) return fromLocal;
   } catch { /* noop */ }
   return "chat";
 };
@@ -184,6 +180,15 @@ const Index = () => {
   // pra que qualquer refresh volte exatamente pra mesma aba.
   useEffect(() => {
     persistActiveTab(activeTab);
+    // Limpa ?tab obsoleto da URL (versões antigas gravavam a aba na URL, o que
+    // fazia o app reabrir na última aba — ex: KALM — em vez da home).
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("tab")) {
+        url.searchParams.delete("tab");
+        window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+    } catch { /* noop */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -216,12 +221,24 @@ const Index = () => {
     setStep("home");
   }, [switchTab]);
 
-  // Pré-carrega TODAS as abas imediatamente, em paralelo, para que o clique
-  // no dock troque a tela instantaneamente.
+  // Pré-carrega as abas para troca instantânea — mas DEPOIS da home ficar
+  // pronta (requestIdleCallback / fallback). Antes disparava no mount e
+  // competia banda com a carga inicial, deixando a home lenta em conexão fraca.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
-    loaders.forEach((l) => { void l().catch(() => undefined); });
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
+      loaders.forEach((l) => { void l().catch(() => undefined); });
+    };
+    const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, opts?: any) => number);
+    const id = ric ? ric(run, { timeout: 4000 }) : window.setTimeout(run, 1500);
+    return () => {
+      cancelled = true;
+      const cic = (window as any).cancelIdleCallback as undefined | ((h: number) => void);
+      if (ric && cic) cic(id as number); else window.clearTimeout(id as number);
+    };
   }, []);
 
   // Auto monthly retrospective: day 1 + activity + not seen this month

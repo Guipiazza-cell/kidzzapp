@@ -15,7 +15,7 @@ import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { getTotalXp } from "@/lib/dailyMission";
 import explorerImg from "@/assets/kidzz/explorer.webp";
 import moonImg from "@/assets/kidzz/moon.webp";
-import wellnessImg from "@/assets/kidzz/wellness.png";
+import wellnessImg from "@/assets/kidzz/wellness.webp";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 import SOSCard from "@/components/sos/SOSCard";
