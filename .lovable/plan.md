@@ -1,54 +1,76 @@
-# Plano: Aba "Bora!" do Kidzz
+# KALM Premium Master v2 — Plano de implementação
 
-Vou implementar em 6 fases. Confirme antes de eu começar — ou peça pra eu rodar **fase por fase** (recomendado, porque é grande).
+Reescrever a aba KALM como hub enxuto que abre sub-telas dedicadas. Nenhuma outra aba será tocada.
 
-## Fase 1 — Navegação (dock)
-- Remover **Música** do dock (`src/lib/appTabs.ts` + `BottomNav.tsx`).
-- Adicionar **Bora!** na posição central (5ª de 6), com tratamento visual de FAB elevado em laranja `#E8821A`, ícone sparkles.
-- **Brincar** continua; Música vira uma seção/botão dentro de `KidzzPlay.tsx`.
-- Redirecionar `?tab=musica` → `?tab=play` em `normalizeAppTab`.
+## Arquitetura de arquivos (novo)
 
-Dock final: **Perguntas · Histórias · Brincar · Bora! · Cinema · Momentos** (mantendo padrão de 6, com Bora! central destacado).
+```
+src/components/kalm/v2/
+  KalmHome.tsx              ← home enxuta (substitui KalmSections como conteúdo da aba)
+  KalmHeader.tsx            ← header vidro + chip dias de calma
+  KalmHero.tsx              ← saudação por horário + título Fraunces + slot camaleão
+  PathsGrid.tsx             ← 4 caminhos + card extra "Vínculo em família"
+  MoodThermometer.tsx       ← 5 camaleões coloridos, salva humor por perfil
+  GratitudeJar.tsx          ← jarro + estrelinhas acumulando
+  SmallWins.tsx             ← 6 toggles do dia
+  KidzzWhisper.tsx          ← sugestão contextual + play som floresta
+  WeekSummary.tsx           ← card sálvia compartilhável (Web Share)
+  ParentSubscribeBar.tsx    ← faixa vidro acima do dock (corrige bug)
+  
+  subscreens/
+    RelaxarAgora.tsx        ← "Alívio em minutos": 15 atividades crianças + 9 adultos
+    RitualRapido.tsx        ← respirar com camaleão + pequenos rituais
+    SosEmocional.tsx        ← 4 passos seguros + bloco "falar com responsável"
+    VinculoFamilia.tsx      ← 9 experiências + jornadas + "como estamos hoje"
+  
+  player/
+    GuidedPlayer.tsx        ← tela cheia de execução (respiração, zumbido, glitter, batimento)
+    BreathingCircle.tsx     ← círculo expande/contrai sincronizado
+    GlitterJar.tsx          ← animação glitter assentando
+    PlayerEnd.tsx           ← "como você está agora" + guardar momento
+  
+  data/
+    activities.ts           ← catálogo das 24 atividades (textos reais)
+    motors.ts               ← 6 motores (cores/tints por motor)
+    journeys.ts             ← 3 jornadas
+  
+  state/
+    useKalmState.ts         ← humor, jarro, vitórias, selos, streak (localStorage por perfil)
+    useGuidedSession.ts     ← controla passos/timer/reduced-motion
+```
 
-## Fase 2 — Design system
-- Adicionar Google Fonts `Fredoka` + `Nunito` no `index.html`.
-- Tokens novos em `src/index.css` (cream `#FBF7EF`, dark green `#2F5E45`, 7 gradientes de categoria, selo verde sem-tela).
-- Classes utilitárias `.bora-card`, `.bora-cat-{ciencia|sensorial|...}`, `.bora-screenfree-badge`.
+## Pontos críticos
 
-## Fase 3 — Supabase
-- Migração: tabela `activities` (com RLS leitura pública) + tabela `completions` (RLS por user_id) com GRANTs.
-- Seed com as 32 atividades do `kidzz_bora_v4.html` via insert tool.
+1. **Barra Pais/Assinar**: componente `ParentSubscribeBar` renderizado pelo `Index.tsx` quando aba ativa = kalm, posicionado `fixed` acima do `BottomNav` com `backdrop-blur` e `z-index` entre dock e conteúdo. "Assinar" dispara `kidzz:open-plans`; "Pais" abre `ParentalGate`. Remover qualquer CTA flutuante atual da aba.
 
-**Preciso do arquivo `kidzz_bora_v4.html`** para extrair o objeto `ACTS`. Pode subir ele? Sem isso, faço seed com ~10 atividades placeholder e você sobe o HTML depois.
+2. **Selos coloridos**: `SmallWins`/coleção usa estados `earned` (gradiente vivo + glow) vs `pending` (silhueta âmbar suave 30% opacidade, nunca cinza).
 
-## Fase 4 — Edge function `surpresa-ia`
-- Criar `supabase/functions/surpresa-ia/index.ts` chamando Groq (`llama-3.3-70b-versatile`, JSON mode).
-- **Preciso da `GROQ_API_KEY`** — vou pedir via `add_secret` quando começar a fase.
-- Fallback: sorteia de `activities` se a API falhar.
+3. **Execução guiada**: TODA atividade abre `GuidedPlayer` em tela cheia. Inspira 4s / segura 2s / solta 6s (exalação maior). `prefers-reduced-motion` → fallback texto+timer.
 
-## Fase 5 — Página `/bora` (`src/components/bora/BoraScreen.tsx`)
-Seções na ordem:
-1. Topo com saudação por hora do dia
-2. Faixa de tese "sem-tela"
-3. Hero "Pra fazer hoje" (categoria por hora + selo 🧠 + botão "🎲 Outra")
-4. Card "✨ Surpresa da IA" (gradiente animado + loading + selo "Criada pela IA agora")
-5. Finder: humor (3 cards) + tempo (3 pílulas)
-6. Carrossel de 7 coleções
-7. Destaque "💬 Pra conversar"
-8. Grade "🧺 Tudo pra fazer" com chips de categoria → bottom sheet de detalhe
-9. Contador 🌿 "sem tela" (soma `tela_min` de `completions` últimos 7 dias)
-10. Fechamento
+4. **SOS**: 4 passos exatos do brief, sem técnicas de dor, bloco de segurança sempre visível com botão "Falar com um responsável" → abre ParentalGate.
 
-## Fase 6 — Overlay "sem tela"
-- `ScreenFreeOverlay.tsx`: fullscreen verde gradiente + 🌿 + confete + botão "Tô indo! 🚀".
-- Dispara ao clicar "Bora fazer! 🌿" e registra `completions`.
-- Respeita `prefers-reduced-motion`.
+5. **Slots nomeados**: criar `src/components/kalm/v2/slots.ts` exportando paths placeholder vazios (`imgChamMeditando`, `imgAtiv_<id>`, áudios). Fallback elegante (gradiente do motor + emoji) se arquivo não existir.
 
----
+6. **Persistência por perfil**: chaves `kidzz_kalm_v2_<criancaId>_<bucket>` para humor, jarro, vitórias, selos. Multi-filhos isolados.
 
-## Perguntas antes de começar
-1. **Tem o arquivo `kidzz_bora_v4.html`?** Suba ele para eu extrair as 32 atividades exatas. Sem ele, sigo com placeholders.
-2. **Já tem a `GROQ_API_KEY`?** Crie em https://console.groq.com/keys (grátis). Vou pedir via `add_secret` na Fase 4.
-3. Quer que eu **rode tudo de uma vez** ou **fase por fase** (recomendo fase por fase pra você validar o visual)?
+7. **"Em breve"**: faixa única "Lugares para viver — Em breve" sem links.
 
-Quando responder, começo pela Fase 1.
+8. **Reuso**: paywall via `kidzz:open-plans`, `useEntitlement`, `useAuth`, `useCriancas` já existentes. KALM antigo (`KalmSections`) substituído pelo novo `KalmHome` no Index.
+
+## Integração
+
+- `src/pages/Index.tsx`: trocar render do KALM tab para `<KalmHome />`. Acrescentar `<ParentSubscribeBar />` quando tab = kalm.
+- Reaproveitar `ExperiencePlayer` antigo? **Não** — substituir por `GuidedPlayer` novo (animações específicas por motor).
+- Manter `sosMap.ts` apontando ids para novas atividades da v2.
+
+## Conteúdo
+
+Todos os textos exatos do brief vão em `data/activities.ts` (24 atividades + passos guiados). Sem parafrasear.
+
+## Escopo NÃO incluído
+
+- Reservas/checkout de "Experiências que marcam" (só teaser).
+- Áudios reais (apenas slots).
+- Mudanças em outras abas, auth, schemas, edge functions.
+
+Após aprovação, implemento em parallel batches: data + state primeiro, depois componentes home, depois sub-telas, por último player e integração no Index.
