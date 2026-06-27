@@ -63,7 +63,7 @@ const KidzzLab = lazyRetry(() => import("@/components/lab/KidzzLab"));
 const TravelMode = lazyRetry(() => import("@/components/travel/TravelMode"));
 const MusicForest = lazyRetry(loadMusicForest);
 const WellnessHub = lazyRetry(loadWellnessHub);
-const KalmV2 = lazyRetry(() => import("@/components/kalm/v2/KalmV2"));
+// KalmV2 (redesign) revertido a pedido — aba KALM volta ao WellnessHub antigo.
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
@@ -423,7 +423,7 @@ const Index = () => {
     memories: () => <AreaGate area="memorias"><MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} /></AreaGate>,
     moments: () => <AreaGate area="momentos"><MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} /></AreaGate>,
     cinema: () => <AreaGate area="cinema"><FamilyCinema onBack={backToHome} /></AreaGate>,
-    wellness: () => <AreaGate area="kalm"><KalmV2 onBack={backToHome} onGoDreams={() => switchTab("dreams")} onOpenParents={() => setShowParentalGateForDashboard(true)} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} /></AreaGate>,
+    wellness: () => <AreaGate area="kalm"><WellnessHub onBack={backToHome} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} /></AreaGate>,
     achievements: () => <Suspense fallback={null}><SevenDayChallenge onClose={backToHome} /></Suspense>,
     dreams: () => <AreaGate area="sonhos"><DreamWorld onBack={() => { backToHome(); evolution.evolve("story"); }} /></AreaGate>,
     music: () => (
