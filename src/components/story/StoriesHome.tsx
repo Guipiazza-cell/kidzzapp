@@ -45,6 +45,7 @@ const StoriesHome = ({ onBack }: Props) => {
   const [mode, setMode] = useState<"home" | "factory">("home");
   const [chip, setChip] = useState<ChipKey | null>(null);
   const [chipOpen, setChipOpen] = useState(false);
+  const [collection, setCollection] = useState<typeof COLLECTIONS[number] | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
   const [reading, setReading] = useState(false);
 
