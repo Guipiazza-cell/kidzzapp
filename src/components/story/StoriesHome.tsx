@@ -275,7 +275,7 @@ const StoriesHome = ({ onBack }: Props) => {
                 <motion.button
                   key={col.key}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => { haptic("light"); setMode("factory"); }}
+                  onClick={() => { haptic("light"); setCollection(col); }}
                   className="flex gap-3 items-center text-left rounded-2xl p-3"
                   style={{
                     background: "#FFFFFF",
