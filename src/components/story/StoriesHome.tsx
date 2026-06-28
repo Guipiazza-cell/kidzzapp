@@ -74,6 +74,15 @@ const StoriesHome = ({ onBack }: Props) => {
     });
   }, [chip, stories]);
 
+  const collectionStories = useMemo(() => {
+    if (!collection) return [] as typeof stories;
+    const rx = new RegExp(collection.tag, "i");
+    return stories.filter((s) => {
+      const meta = (s.metadata as any)?.interests || "";
+      return rx.test(String(meta)) || rx.test(s.title);
+    });
+  }, [collection, stories]);
+
   if (mode === "factory") {
     return <StoryFactory onBack={() => setMode("home")} />;
   }
