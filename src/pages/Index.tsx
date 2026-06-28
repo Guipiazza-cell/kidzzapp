@@ -45,7 +45,7 @@ const lazyRetry = (importFn: () => Promise<any>) =>
       })
   );
 const loadDreamWorld = () => import("@/components/dreams/DreamWorld");
-const loadStoryFactory = () => import("@/components/story/StoryFactory");
+const loadStoryFactory = () => import("@/components/story/StoriesHome");
 const loadKidzzPlay = () => import("@/components/play/KidzzPlay");
 const loadRoutineScreen = () => import("@/components/routine/RoutineScreen");
 const loadMomentsPlaylists = () => import("@/components/moments/MomentsPlaylists");

@@ -19,6 +19,7 @@ import {
 import { useTTS } from "@/hooks/useTTS";
 import { exportStoryPDF } from "@/lib/exportStoryPDF";
 import { haptic } from "@/lib/haptics";
+import { saveProgress } from "@/lib/storyProgress";
 import { toast } from "sonner";
 
 interface Props {
@@ -27,9 +28,10 @@ interface Props {
   story: string;
   images?: string[];
   onClose: () => void;
+  storyId?: string;
 }
 
-const ReadingMode = ({ title, childName, story, images = [], onClose }: Props) => {
+const ReadingMode = ({ title, childName, story, images = [], onClose, storyId }: Props) => {
   const scenes = useMemo(
     () => story.split(/\[CENA \d+\]/).map((s) => s.trim()).filter(Boolean),
     [story]
@@ -50,7 +52,8 @@ const ReadingMode = ({ title, childName, story, images = [], onClose }: Props) =
   useEffect(() => {
     stop();
     setPlaying(false);
-  }, [page, stop]);
+    if (storyId && total > 0) saveProgress(storyId, page, total);
+  }, [page, stop, storyId, total]);
 
   const goTo = (next: number) => {
     if (next < 0 || next > total - 1 || next === page) return;
