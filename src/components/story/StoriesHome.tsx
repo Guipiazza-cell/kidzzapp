@@ -363,6 +363,77 @@ const StoriesHome = ({ onBack }: Props) => {
         )}
       </AnimatePresence>
 
+      {/* Collection drawer */}
+      <AnimatePresence>
+        {collection && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex flex-col"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => setCollection(null)} />
+            <motion.div
+              className="relative mt-auto bg-[#FDF8EE] rounded-t-3xl max-h-[85vh] flex flex-col"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 240, damping: 26 }}
+            >
+              <div className="flex items-center gap-3 px-5 pt-5 pb-3">
+                <img src={collection.img} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-display text-[19px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+                    {collection.label}
+                  </h3>
+                  <p className="text-[11.5px] leading-snug line-clamp-1" style={{ color: "rgba(42,37,32,0.6)" }}>
+                    {collection.desc}
+                  </p>
+                </div>
+                <button onClick={() => setCollection(null)} className="w-9 h-9 flex items-center justify-center rounded-full bg-white/80 shrink-0" aria-label="Fechar">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto px-5 pb-8">
+                {collectionStories.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-[14px] font-bold" style={{ color: "#2A2520" }}>Ainda não há histórias nesta coleção</p>
+                    <p className="text-[12px] mt-1" style={{ color: "rgba(42,37,32,0.6)" }}>
+                      Crie uma nova com {childName} como protagonista.
+                    </p>
+                    <motion.button
+                      onClick={() => { setCollection(null); setMode("factory"); }}
+                      whileTap={{ scale: 0.97 }}
+                      className="mt-4 px-5 py-2.5 rounded-full text-white text-[13px] font-extrabold"
+                      style={{ background: "#E8821A" }}
+                    >
+                      Criar agora
+                    </motion.button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    {collectionStories.map((s) => (
+                      <motion.button
+                        key={s.id}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => { setCollection(null); setSelected(s); }}
+                        className="text-left rounded-2xl bg-white p-2.5"
+                        style={{ border: "1px solid rgba(42,37,32,0.06)" }}
+                      >
+                        {s.image_url ? (
+                          <img src={s.image_url} alt="" className="w-full aspect-square object-cover rounded-xl mb-2" loading="lazy" />
+                        ) : (
+                          <div className="w-full aspect-square rounded-xl mb-2 bg-amber-100 flex items-center justify-center text-3xl">📖</div>
+                        )}
+                        <p className="text-[12px] font-extrabold line-clamp-2" style={{ color: "#2A2520" }}>{s.title}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+
       {/* Detail / reading */}
       <AnimatePresence>
         {selected && !reading && (
