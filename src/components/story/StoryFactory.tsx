@@ -1,11 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, BookOpen, Zap, Library } from "lucide-react";
+import { ArrowLeft, BookOpen, Library } from "lucide-react";
 import AvatarCustomization from "./AvatarCustomization";
-import StoryForm from "./StoryForm";
+import PersonalizationPanel, { StoryIntent, EnsinarSub, VoiceRate } from "./PersonalizationPanel";
 import StoryDisplay from "./StoryDisplay";
 import GeneratingOverlay from "./GeneratingOverlay";
 import StoryGallery from "./StoryGallery";
+import ParentalGate from "@/components/ParentalGate";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
@@ -21,11 +22,19 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 
 type Step = "intro" | "avatar" | "form" | "display";
 
+// Marca por sessão — pai não precisa digitar PIN toda vez que voltar pra Fábrica.
+const SESSION_GATE_KEY = "kidzz_story_factory_gate_ok";
+
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
-  const { user, session, profile, tier, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
+  const { session, profile, tier, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
+  const childAge = (() => {
+    const r = profile?.age_range || "3-7";
+    const first = parseInt(String(r).split("-")[0]) || 5;
+    return Math.min(10, Math.max(3, first));
+  })();
 
   const [step, setStep] = useState<Step>("intro");
   const [avatar, setAvatar] = useState<ChildAvatar | null>(null);
@@ -34,22 +43,40 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
+  const [gatePassed, setGatePassed] = useState<boolean>(() => {
+    try { return sessionStorage.getItem(SESSION_GATE_KEY) === "1"; } catch { return false; }
+  });
+  // Guarda o rate de voz escolhido no painel pra reutilizar na narração
+  const voiceRateRef = useRef<number>(0.88);
+
+  const requireGate = useCallback((cb: () => void) => {
+    if (gatePassed) { cb(); return; }
+    setGateOpen(true);
+    // armazena callback via micro-state — usamos efeito simples: depois do gate, abre próximo step
+    pendingAfterGate.current = cb;
+  }, [gatePassed]);
+
+  const pendingAfterGate = useRef<(() => void) | null>(null);
 
   const handleAvatarComplete = useCallback((a: ChildAvatar) => {
     setAvatar(a);
     setStep("form");
   }, []);
 
-  const handleGenerate = useCallback(async (age: number, interests: string) => {
+  const handleGenerate = useCallback(async (params: {
+    age: number; interests: string; keywords: string[]; intent: StoryIntent; ensinarSub?: EnsinarSub; voiceRate: VoiceRate;
+  }) => {
     if (!avatar) return;
+    // Voz: aplica rate
+    voiceRateRef.current = params.voiceRate === "lenta" ? 0.72 : 0.88;
+
     if (!canGenerateStory()) {
-      if (tier === "premium") {
-        toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
-      } else if (tier === "kidzz") {
-        toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
-      } else {
-        toast.info("Sua história de hoje já foi criada! Desbloqueie o Kidzz e crie histórias à vontade ✨");
+      if (tier === "free") {
+        toast.info(`A primeira foi por nossa conta. 💛 Assine e crie histórias ilimitadas só do(a) ${childName}.`);
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
+      } else {
+        toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
       }
       return;
     }
@@ -79,15 +106,22 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         body: JSON.stringify({
           childName,
           childAvatar: avatar,
-          age,
-          interests,
+          age: params.age,
+          interests: params.interests,
+          keywords: params.keywords,
+          intent: params.intent,
+          ensinarSub: params.ensinarSub,
           ageRange: profile?.age_range || "3-7",
         })
       });
 
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({ error: "Erro" }));
-        throw new Error(err.error || "Erro ao gerar história");
+        if (resp.status === 403 && err.error === "LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
+          throw new Error(err.message || "Você já usou sua história gratuita.");
+        }
+        throw new Error(err.error || "A história fugiu, vamos tentar de novo?");
       }
 
       const data = await resp.json();
@@ -96,7 +130,6 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setImages(data.images || []);
       await incrementStories();
 
-      // Auto-save story to memories (galeria)
       try {
         const firstScene = (data.story || "").split(/\[CENA \d+\]/).filter((s: string) => s.trim())[0] || "";
         const firstSentence = firstScene.split(/[.!?\n]/)[0]?.trim() || "Aventura Mágica";
@@ -107,14 +140,19 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           content: data.story,
           is_special: false,
           image_url: data.images?.[0] || null,
-          metadata: { age, interests, scenes: data.images?.length ?? 0 },
+          metadata: {
+            age: params.age,
+            interests: params.interests,
+            keywords: params.keywords,
+            intent: params.intent,
+            scenes: data.images?.length ?? 0,
+          },
         });
       } catch (e) {
         console.warn("Could not save story to memories", e);
       }
 
       setStep("display");
-      // Daily mission + XP
       const { newlyMarked } = completeMissionStep("story");
       if (newlyMarked) {
         const { gained } = addXp("story");
@@ -123,18 +161,18 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       bumpSessionActions();
       sfx("complete");
       haptic("success");
-      toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
+      toast.success("História pronta! ✨");
     } catch (e: any) {
       console.error("Story generation error:", e);
       sfx("error");
       haptic("error");
-      toast.error(e.message || "Erro ao gerar história");
+      toast.error(e.message || "A história fugiu, vamos tentar de novo?");
     } finally {
       clearInterval(timer);
       setProgress(100);
       setTimeout(() => setIsGenerating(false), 500);
     }
-  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining, addMemory]);
+  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, addMemory, session, tier]);
 
   const handleReset = useCallback(() => {
     setStep("intro");
@@ -145,16 +183,14 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
   const handleSpeak = useCallback(async (text: string) => {
     try {
-      await speak(text);
+      await speak(text, { rate: voiceRateRef.current });
     } catch {
       toast.error("Erro na narração");
     }
   }, [speak]);
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden relative min-h-0">
-
-      {/* Header — dynamic island */}
+    <div className="flex-1 flex flex-col overflow-hidden relative min-h-0" style={{ background: "linear-gradient(180deg,#FDF8EE 0%, #F2EFE6 100%)" }}>
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
         <motion.button
           onClick={onBack}
@@ -179,7 +215,6 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         </motion.button>
       </header>
 
-      {/* Content */}
       <div
         className="flex-1 relative z-10 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
         style={{
@@ -193,7 +228,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-          
+
             <LenteViva accent="#E8821A" motif="book" label="Fábrica de Histórias" />
 
             <h2 className="font-display text-[30px] leading-[1.1] font-semibold text-[#2A2520] tracking-tight">
@@ -204,16 +239,18 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
             </p>
             <span className="text-[11px] font-bold text-[#2A2520]/80 px-3 py-1 rounded-full border border-[#E8821A]/25"
               style={{ background: "rgba(232,130,26,0.10)" }}>
-              {storiesRemaining()} {storiesRemaining() === 1 ? "história gratuita" : "histórias gratuitas"} hoje
+              {tier === "free"
+                ? (storiesRemaining() > 0 ? "Primeira história por nossa conta ✨" : "Assine para criar mais histórias")
+                : `${storiesRemaining()} ${storiesRemaining() === 1 ? "história" : "histórias"} hoje`}
             </span>
 
             <div className="w-full max-w-xs rounded-3xl p-4 space-y-2"
               style={{ background: "#FFFCF8", boxShadow: "0 4px 20px rgba(42,37,32,0.06)" }}>
               {[
                 "Monte o avatar do seu filho",
-                "Escolha temas e interesses",
-                "Geramos história + ilustrações",
-                "Narração com voz suave",
+                "Escolha palavras-chave do mundo dele",
+                "Diga o que essa história precisa entregar",
+                "Narração em voz feminina suave",
               ].map((text, i) => (
                 <motion.div
                   key={i}
@@ -229,13 +266,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
                   >
                     <span className="text-[15px] font-black">{i + 1}</span>
                   </span>
-                  <span className="text-[14px] text-[#2A2520] font-semibold">{text}</span>
+                  <span className="text-[14px] text-[#2A2520] font-semibold text-left">{text}</span>
                 </motion.div>
               ))}
             </div>
 
             <motion.button
-              onClick={() => setStep("avatar")}
+              onClick={() => requireGate(() => setStep("avatar"))}
               className="w-full max-w-xs py-4 rounded-full text-white font-bold text-[16px] flex items-center justify-center gap-2 active:scale-95"
               style={{
                 background: "#E8821A",
@@ -246,15 +283,19 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}>
-              Criar a história
+              ✨ Criar minha história
             </motion.button>
+            <p className="text-[10.5px] text-[#2A2520]/55 max-w-[260px]">
+              🔒 A personalização é feita pelos pais. A criança recebe só a história pronta.
+            </p>
           </motion.div>
         }
 
         {step === "avatar" && <AvatarCustomization childName={childName} onComplete={handleAvatarComplete} />}
         {step === "form" && (
-          <StoryForm
+          <PersonalizationPanel
             childName={childName}
+            childAge={childAge}
             onGenerate={handleGenerate}
             isLoading={isGenerating}
             storiesRemaining={storiesRemaining()}
@@ -269,6 +310,26 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
       <AnimatePresence>
         {galleryOpen && <StoryGallery onClose={() => setGalleryOpen(false)} />}
+      </AnimatePresence>
+
+      {/* Portão dos Pais — protege a personalização */}
+      <AnimatePresence>
+        {gateOpen && (
+          <ParentalGate
+            onSuccess={() => {
+              setGatePassed(true);
+              try { sessionStorage.setItem(SESSION_GATE_KEY, "1"); } catch {}
+              setGateOpen(false);
+              const cb = pendingAfterGate.current;
+              pendingAfterGate.current = null;
+              if (cb) cb();
+            }}
+            onCancel={() => {
+              pendingAfterGate.current = null;
+              setGateOpen(false);
+            }}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
