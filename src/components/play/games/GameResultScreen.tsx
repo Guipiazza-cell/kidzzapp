@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useActiveChildId } from "@/contexts/ActiveChildContext";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
@@ -183,6 +184,7 @@ const GameResultScreen = ({
   onHome,
 }: Props) => {
   const { user } = useAuth();
+  const activeChildId = useActiveChildId();
   const persisted = useRef(false);
 
   const computedPercent =
@@ -213,7 +215,7 @@ const GameResultScreen = ({
       playEncouragementTone();
       haptic(tone === "mid" ? "medium" : "light");
     }
-    if (persisted.current || !user) return;
+    if (persisted.current || !user || !activeChildId) return;
     persisted.current = true;
     const detail =
       subtitle ?? (total > 0 ? `${childName} acertou ${correct} de ${total} (${computedPercent}%)` : `${childName} fez ${correct} pontos`);
@@ -221,6 +223,7 @@ const GameResultScreen = ({
       .from("memories")
       .insert({
         user_id: user.id,
+        crianca_id: activeChildId,
         type: "achievement",
         title: `${activityLabel} concluído`,
         content: detail,

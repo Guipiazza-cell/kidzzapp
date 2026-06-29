@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useActiveChildId } from "@/contexts/ActiveChildContext";
 
 export interface Memory {
   id: string;
   user_id: string;
-  type: "question" | "story" | "mission" | "achievement";
+  crianca_id: string;
+  type: "question" | "story" | "mission" | "achievement" | "sos";
   title: string;
   content: string | null;
   is_special: boolean;
@@ -15,10 +17,11 @@ export interface Memory {
   created_at: string;
 }
 
-type MemoryFilter = "all" | "question" | "story" | "mission" | "achievement";
+type MemoryFilter = "all" | "question" | "story" | "mission" | "achievement" | "sos";
 
 export function useMemories() {
   const { user } = useAuth();
+  const activeChildId = useActiveChildId();
   const { canUse } = useEntitlement();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,12 +30,13 @@ export function useMemories() {
   const isPremium = canUse("memorias");
 
   const fetchMemories = useCallback(async () => {
-    if (!user) { setMemories([]); setLoading(false); return; }
+    if (!user || !activeChildId) { setMemories([]); setLoading(false); return; }
     setLoading(true);
     let query = supabase
       .from("memories" as any)
       .select("*")
       .eq("user_id", user.id)
+      .eq("crianca_id", activeChildId)
       .order("created_at", { ascending: false });
 
     if (filter !== "all") {
@@ -44,15 +48,15 @@ export function useMemories() {
       setMemories(data as unknown as Memory[]);
     }
     setLoading(false);
-  }, [user, filter]);
+  }, [user, activeChildId, filter]);
 
   useEffect(() => { fetchMemories(); }, [fetchMemories]);
 
-  const addMemory = useCallback(async (memory: Omit<Memory, "id" | "user_id" | "created_at">) => {
-    if (!user) return null;
+  const addMemory = useCallback(async (memory: Omit<Memory, "id" | "user_id" | "crianca_id" | "created_at">) => {
+    if (!user || !activeChildId) return null;
     const { data, error } = await supabase
       .from("memories" as any)
-      .insert({ ...memory, user_id: user.id } as any)
+      .insert({ ...memory, user_id: user.id, crianca_id: activeChildId } as any)
       .select()
       .single();
     if (!error && data) {
@@ -60,15 +64,18 @@ export function useMemories() {
       return data as unknown as Memory;
     }
     return null;
-  }, [user]);
+  }, [user, activeChildId]);
 
   const toggleSpecial = useCallback(async (id: string, isSpecial: boolean) => {
+    if (!user || !activeChildId) return;
     await supabase
       .from("memories" as any)
       .update({ is_special: !isSpecial } as any)
-      .eq("id", id);
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .eq("crianca_id", activeChildId);
     setMemories(prev => prev.map(m => m.id === id ? { ...m, is_special: !isSpecial } : m));
-  }, []);
+  }, [user, activeChildId]);
 
   const totalCount = memories.length;
 

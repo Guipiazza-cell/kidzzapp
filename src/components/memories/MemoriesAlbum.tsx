@@ -470,7 +470,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
                 {lockedCount > 0 && [...Array(Math.min(lockedCount, 4))].map((_, i) => (
                   <MemoryCard
                     key={`locked-${i}`}
-                    memory={{ id: `l${i}`, type: "question", title: "", content: null, is_special: false, image_url: null, metadata: {}, created_at: "", user_id: "" }}
+                    memory={{ id: `l${i}`, type: "question", title: "", content: null, is_special: false, image_url: null, metadata: {}, created_at: "", user_id: "", crianca_id: "" }}
                     index={regularMemories.length + i}
                     onToggleSpecial={() => {}}
                     onShare={() => {}}

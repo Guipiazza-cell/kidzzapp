@@ -3,14 +3,12 @@
  * Tudo em localStorage, escopado por activeChildId quando existir.
  */
 import { useCallback, useEffect, useState } from "react";
-import { useCriancas } from "@/hooks/useCriancas";
+import { useActiveChildId as useSelectedActiveChildId } from "@/contexts/ActiveChildContext";
 
 const todayKey = () => new Date().toISOString().slice(0, 10);
 
 const useActiveChildId = (): string => {
-  const { criancas } = useCriancas();
-  // primeiro filho ativo; multi-perfil = chave separada
-  return criancas[0]?.id ?? "default";
+  return useSelectedActiveChildId() ?? "default";
 };
 
 const k = (child: string, bucket: string) => `kidzz_kalm_v2_${child}_${bucket}`;

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useActiveChildId } from "@/contexts/ActiveChildContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import pixelImg from "@/assets/pixel-chameleon.webp";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
@@ -24,7 +26,9 @@ interface Props {
 }
 
 const GeneratingScreen = ({ question, ageRange, childName, onComplete, onError, onLimitReached }: Props) => {
-  const { user, session, incrementQuestions } = useAuth();
+  const { session } = useAuth();
+  const activeChildId = useActiveChildId();
+  const { refresh: refreshEntitlement } = useEntitlement();
   const calledRef = useRef(false);
   const [phraseIdx, setPhraseIdx] = useState(0);
 
@@ -46,13 +50,11 @@ const GeneratingScreen = ({ question, ageRange, childName, onComplete, onError, 
 
     const generate = async () => {
       try {
-        if (!session?.access_token) {
+        if (!session?.access_token || !activeChildId) {
           toast.error("Faça login para continuar.");
           onError();
           return;
         }
-        await incrementQuestions();
-
         const resp = await fetch(CHAT_URL, {
           method: "POST",
           headers: {
@@ -63,6 +65,7 @@ const GeneratingScreen = ({ question, ageRange, childName, onComplete, onError, 
             messages: [{ role: "user", content: question }],
             ageRange,
             childName,
+            criancaId: activeChildId,
           }),
           signal: controller.signal,
         });
@@ -111,6 +114,7 @@ const GeneratingScreen = ({ question, ageRange, childName, onComplete, onError, 
         clearTimeout(timeout);
 
         if (fullText.trim()) {
+          await refreshEntitlement();
           onComplete(fullText);
         } else {
           throw new Error("Resposta vazia");
@@ -129,7 +133,7 @@ const GeneratingScreen = ({ question, ageRange, childName, onComplete, onError, 
       clearTimeout(timeout);
       controller.abort();
     };
-  }, []);
+  }, [activeChildId, ageRange, childName, onComplete, onError, onLimitReached, question, refreshEntitlement, session?.access_token]);
 
   return (
     <motion.div

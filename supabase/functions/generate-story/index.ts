@@ -61,6 +61,7 @@ serve(async (req) => {
     };
 
     const childName = sanitize(body.childName, 50);
+    const criancaId = typeof body.criancaId === "string" ? body.criancaId : "";
     const interests = sanitize(body.interests, 200);
     const ageRange = sanitize(body.ageRange, 10);
     const ageNum = Math.max(0, Math.min(18, Number(body.age) || 0));
@@ -77,7 +78,7 @@ serve(async (req) => {
       : null;
     const avatarValid = childAvatar && childAvatar.skinTone && childAvatar.hairColor && childAvatar.eyeColor && childAvatar.clothingStyle;
 
-    if (!childName || !age || !interests) {
+    if (!childName || !age || !interests || !criancaId) {
       return new Response(
         JSON.stringify({ error: "Dados incompletos." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -88,7 +89,7 @@ serve(async (req) => {
     {
       const { data: quotaData, error: quotaErr } = await (supabaseUser as any).rpc(
         "increment_usage",
-        { _tipo: "historias" }
+        { _tipo: "historias", _crianca_id: criancaId }
       );
       if (quotaErr) {
         console.error("[GENERATE-STORY] increment_usage error:", quotaErr.message);

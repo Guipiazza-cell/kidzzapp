@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
 import { useMemories } from "@/hooks/useMemories";
 import { usePWAUpdate } from "@/hooks/usePWAUpdate";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";
@@ -72,6 +73,7 @@ const SevenDayChallenge = lazyRetry(() => import("@/components/viral/SevenDayCha
 const ReferralProgram = lazyRetry(() => import("@/components/viral/ReferralProgram"));
 const MonthlyRetrospective = lazyRetry(() => import("@/components/viral/MonthlyRetrospective"));
 import { kidzzMemory } from "@/components/kidzz/kidzzMemory";
+import { DAILY_LIMITS } from "@/lib/plans";
 
 import BottomNav from "@/components/flow/BottomNav";
 import XpToast from "@/components/flow/XpToast";
@@ -80,6 +82,8 @@ import ConversionNudgeCard from "@/components/viral/ConversionNudgeCard";
 import { completeMissionStep, addXp, bumpSessionActions, shouldShowConversionCard, markConversionCardShown } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
 import { APP_TAB_DATA, APP_TAB_IDS, normalizeAppTab, type AppTab } from "@/lib/appTabs";
+import ActiveChildSwitcher from "@/components/ActiveChildSwitcher";
+import { useActiveChild } from "@/contexts/ActiveChildContext";
 
 type FlowStep = "home" | "age" | "generating" | "answer" | "celebrating" | "paywall";
 const AGE_STORAGE_KEY = "kidzz_last_age_range";
@@ -128,7 +132,9 @@ const Index = () => {
   // onboarding ("Ops! Algo deu errado"). Esse era o bug raiz.
   // ============================================================
   const navigate = useNavigate();
-  const { profile, loading, updateProfile, canAskQuestion, user } = useAuth();
+  const { profile, loading, user } = useAuth();
+  const { activeChild } = useActiveChild();
+  const entitlement = useEntitlement();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
   usePWAUpdate();
@@ -317,9 +323,9 @@ const Index = () => {
 
   // Soft reminder: na 2ª pergunta (última grátis), mostra paywall contextual leve
   useEffect(() => {
-    if (profile?.is_premium) return;
-    const used = profile?.questions_used ?? 0;
-    if (used > 0 && used === 2) {
+    if (entitlement.plan !== "free") return;
+    const used = entitlement.usage.perguntas;
+    if (used > 0 && used === DAILY_LIMITS.free.perguntas - 1) {
       const key = "kidzz_warned_last_free";
       if (!localStorage.getItem(key)) {
         localStorage.setItem(key, "1");
@@ -328,19 +334,19 @@ const Index = () => {
         }, 1500);
       }
     }
-  }, [profile?.questions_used, profile?.is_premium]);
+  }, [entitlement.plan, entitlement.usage.perguntas]);
 
   // Derivação segura: funciona mesmo durante o onboarding (profile parcial)
-  const childName = profile?.child_name ?? "";
+  const childName = activeChild?.nome ?? profile?.child_name ?? "";
 
   const handleQuestionSubmit = useCallback((q: string) => {
-    if (!canAskQuestion()) {
-      setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile?.questions_used ?? 0 } });
+    if (entitlement.limiteAtingido("perguntas")) {
+      setContextualPaywall({ open: true, context: "question_limit", meta: { count: entitlement.usage.perguntas } });
       return;
     }
     setQuestion(q);
     setStep("generating");
-  }, [canAskQuestion, profile?.questions_used]);
+  }, [entitlement]);
 
   const handleAnswerReady = useCallback((text: string) => {
     setAnswer(text);
@@ -514,6 +520,7 @@ const Index = () => {
         onOpenParents={() => setShowParentalGateForDashboard(true)}
         onOpenPlans={() => window.dispatchEvent(new CustomEvent("kidzz:open-plans"))}
       />
+      <ActiveChildSwitcher />
       <Suspense fallback={null}><AnimatePresence>
         {showTravel && <TravelMode onBack={() => setShowTravel(false)} />}
         {showLab && <KidzzLab onBack={() => setShowLab(false)} evolution={evolution} />}

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Check, Sparkles, Lock, X, Leaf, Flame, Users } from "lucide-react";
 import { useAuth, type CheckoutPlan } from "@/contexts/AuthContext";
 import ParentalGate from "@/components/ParentalGate";
+import { isNativePlatform } from "@/utils/platform";
 
 export type PaywallContextKind = "default" | "premium_locked" | "surprise_limit" | "streak_milestone" | "after_completion";
 
@@ -42,6 +43,8 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
   const [cycle, setCycle] = useState<Cycle>("annual");
   const [selected, setSelected] = useState<"kidzz" | "premium">("premium");
   const [loading, setLoading] = useState(false);
+  // Ao empacotar com Capacitor, ligue isNativePlatform() ao detector real.
+  const nativePlatform = isNativePlatform();
   // Compra é uma ação de ADULTO: nunca leva a criança direto ao checkout.
   // Ao tocar em assinar, exige o gate parental antes de abrir o Stripe.
   const [showParentalGate, setShowParentalGate] = useState(false);
@@ -300,7 +303,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           {loading
             ? "Abrindo checkout..."
             : user
-              ? "Começar 7 dias grátis"
+              ? nativePlatform ? "Assinar com 7 dias grátis" : "Começar 7 dias grátis"
               : "Criar conta e começar grátis"}
           <span aria-hidden>✨</span>
         </motion.button>

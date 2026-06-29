@@ -7,6 +7,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useActiveChild } from "@/contexts/ActiveChildContext";
 import { getToday as getRoutineToday } from "@/lib/routine";
 import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
@@ -86,9 +87,10 @@ function dayName(d: Date) {
 const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
+  const { activeChildId, activeChild } = useActiveChild();
   const ent = useEntitlement();
   const isPremium = ent.plan !== "free";
-  const childName = profile?.child_name || "criança";
+  const childName = activeChild?.nome || profile?.child_name || "criança";
   const streak = profile?.streak_days ?? 0;
   const shareRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
@@ -135,6 +137,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
         supabase.from("memories" as any)
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id)
+          .eq("crianca_id", activeChildId)
           .eq("type", "story")
           .gte("created_at", weekStart.toISOString()),
       ]);
@@ -145,7 +148,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
     };
     load();
     return () => { cancelled = true; };
-  }, [user, weekStart]);
+  }, [user, activeChildId, weekStart]);
 
   // Themes
   const themes = useMemo(() => {

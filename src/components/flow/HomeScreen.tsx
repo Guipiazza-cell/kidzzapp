@@ -10,6 +10,8 @@ import SubscribeBanner from "../SubscribeBanner";
 import SoundToggle from "../SoundToggle";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { DAILY_LIMITS } from "@/lib/plans";
 import { useNavigate } from "react-router-dom";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { getTotalXp } from "@/lib/dailyMission";
@@ -143,7 +145,8 @@ const HomeScreen = ({
   onOpenReferral,
   onTabChange,
 }: Props) => {
-  const { user, profile, canAskQuestion, questionsRemaining } = useAuth();
+  const { user, profile } = useAuth();
+  const { plan, usage, limiteAtingido } = useEntitlement();
   const navigate = useNavigate();
   const { particles } = useCharacterParticles();
   const [input, setInput] = useState("");
@@ -229,7 +232,8 @@ const HomeScreen = ({
     return [...matched, ...rest];
   }, [ageQuestions, interests]);
 
-  const isFreeLimitReached = !canAskQuestion();
+  const isFreeLimitReached = limiteAtingido("perguntas");
+  const questionsRemaining = Math.max(0, DAILY_LIMITS[plan].perguntas - usage.perguntas);
   const [suggestionPage, setSuggestionPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(filteredQuestions.length / SUGGESTION_COUNT));
   const visibleSuggestions = filteredQuestions.slice(
@@ -522,7 +526,7 @@ const HomeScreen = ({
       >
         <SubscribeBanner
           onOpenParentalGate={() => setShowParentalGateForSettings(true)}
-          questionsRemaining={questionsRemaining()}
+          questionsRemaining={questionsRemaining}
           isPremium={profile?.is_premium ?? false}
         />
       </div>

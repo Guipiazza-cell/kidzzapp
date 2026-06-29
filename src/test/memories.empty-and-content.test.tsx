@@ -64,6 +64,7 @@ import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
 const makeMemory = (id: string, type: Memory["type"], title: string): Memory => ({
   id,
   user_id: "u1",
+  crianca_id: "c1",
   type,
   title,
   content: `Conteúdo de ${title}`,

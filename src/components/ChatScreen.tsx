@@ -11,7 +11,10 @@ import SubscribeBanner from "./SubscribeBanner";
 import MagicalBackground from "./MagicalBackground";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
+import { useActiveChild } from "@/contexts/ActiveChildContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { supabase } from "@/integrations/supabase/client";
+import { DAILY_LIMITS } from "@/lib/plans";
 import { toast } from "sonner";
 
 interface Message {
@@ -38,9 +41,11 @@ const ChatScreen = ({
   onInitialQuestionConsumed?: () => void;
 }) => {
   const {
-    profile, user, session, tier, updateProfile, incrementQuestions,
-    handleCheckout, canAskQuestion, questionsRemaining,
+    profile, user, session, tier,
+    handleCheckout,
   } = useAuth();
+  const { activeChild, activeChildId } = useActiveChild();
+  const { plan, usage, limiteAtingido, refresh: refreshEntitlement } = useEntitlement();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -58,11 +63,12 @@ const ChatScreen = ({
   const lastLogIdRef = useRef<string | null>(null);
   const lastUserQuestionRef = useRef<string>("");
 
-  const childName = profile?.child_name || "amigo";
+  const childName = activeChild?.nome || profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
   const isPremium = profile?.is_premium ?? false;
   const isSuperPremium = tier === "premium";
-  const isFreeLimitReached = !canAskQuestion();
+  const isFreeLimitReached = limiteAtingido("perguntas");
+  const questionsRemaining = Math.max(0, DAILY_LIMITS[plan].perguntas - usage.perguntas);
 
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
@@ -137,7 +143,7 @@ const ChatScreen = ({
   }, [speak, user]);
 
   const streamChat = useCallback(async (userMessages: { role: string; content: string }[]) => {
-    if (!session?.access_token) {
+    if (!session?.access_token || !activeChildId) {
       throw new Error("Você precisa estar logado para conversar com o KIDZZ.");
     }
     const resp = await fetch(CHAT_URL, {
@@ -146,7 +152,7 @@ const ChatScreen = ({
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ messages: userMessages, ageRange }),
+      body: JSON.stringify({ messages: userMessages, ageRange, childName, criancaId: activeChildId }),
     });
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({ error: "Erro desconhecido" }));
@@ -193,10 +199,10 @@ const ChatScreen = ({
       }
     }
     lastAssistantTextRef.current = assistantText;
-  }, [ageRange, session?.access_token]);
+  }, [activeChildId, ageRange, childName, session?.access_token]);
 
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isTyping || !canAskQuestion()) return;
+    if (!text.trim() || isTyping || limiteAtingido("perguntas")) return;
     const trimmed = text.trim();
     const userMsg: Message = { id: Date.now(), text: trimmed, isUser: true };
     setMessages((prev) => [...prev, userMsg]);
@@ -204,13 +210,13 @@ const ChatScreen = ({
     setIsTyping(true);
     lastUserQuestionRef.current = trimmed;
     lastLogIdRef.current = null;
-    await incrementQuestions();
     const allMessages = [...messages, userMsg].map((m) => ({
       role: m.isUser ? ("user" as const) : ("assistant" as const),
       content: m.text,
     }));
     try {
       await streamChat(allMessages);
+      await refreshEntitlement();
       setConnectionCount((c) => c + 1);
 
       // Persist Q&A in the parent log (RLS protected, only the parent sees it).
@@ -239,7 +245,7 @@ const ChatScreen = ({
     } finally {
       setIsTyping(false);
     }
-  }, [isTyping, canAskQuestion, messages, streamChat, incrementQuestions, user, ageRange]);
+  }, [isTyping, limiteAtingido, messages, refreshEntitlement, streamChat, user, ageRange]);
 
   const handleVoiceResult = useCallback((text: string) => {
     setInput(text);
@@ -276,7 +282,7 @@ const ChatScreen = ({
             className="text-xs text-primary-foreground font-extrabold glass-card px-3 py-1.5 rounded-full"
             whileTap={{ scale: 0.9 }}
           >
-            {questionsRemaining()} 💬
+            {questionsRemaining} 💬
           </motion.span>
           {isSuperPremium && onOpenStoryFactory && (
             <motion.button
@@ -299,7 +305,7 @@ const ChatScreen = ({
         </div>
       </header>
 
-      <SubscribeBanner onOpenParentalGate={() => setShowParentalGate(true)} questionsRemaining={questionsRemaining()} isPremium={isPremium} />
+      <SubscribeBanner onOpenParentalGate={() => setShowParentalGate(true)} questionsRemaining={questionsRemaining} isPremium={isPremium} />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col relative z-10 min-h-0">

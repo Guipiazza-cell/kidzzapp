@@ -8,9 +8,12 @@ import GeneratingOverlay from "./GeneratingOverlay";
 import StoryGallery from "./StoryGallery";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
+import { useActiveChild } from "@/contexts/ActiveChildContext";
 import { useMemories } from "@/hooks/useMemories";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import { toast } from "sonner";
 import { ChildAvatar } from "@/types/story";
+import { DAILY_LIMITS } from "@/lib/plans";
 import LenteViva from "@/components/kidzz/LenteViva";
 import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
@@ -22,10 +25,13 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 type Step = "intro" | "avatar" | "form" | "display";
 
 const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
-  const { user, session, profile, tier, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
+  const { session, profile } = useAuth();
+  const { activeChild } = useActiveChild();
+  const { plan, usage, limiteAtingido, refresh: refreshEntitlement } = useEntitlement();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
-  const childName = profile?.child_name || "amigo";
+  const childName = activeChild?.nome || profile?.child_name || "amigo";
+  const storiesRemaining = Math.max(0, DAILY_LIMITS[plan].historias - usage.historias);
 
   const [step, setStep] = useState<Step>("intro");
   const [avatar, setAvatar] = useState<ChildAvatar | null>(null);
@@ -42,10 +48,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
   const handleGenerate = useCallback(async (age: number, interests: string) => {
     if (!avatar) return;
-    if (!canGenerateStory()) {
-      if (tier === "premium") {
+    if (limiteAtingido("historias")) {
+      if (plan === "premium") {
         toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
-      } else if (tier === "kidzz") {
+      } else if (plan === "kidzz") {
         toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
       } else {
         toast.info("Sua história de hoje já foi criada! Desbloqueie o Kidzz e crie histórias à vontade ✨");
@@ -64,7 +70,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
     }, 300);
 
     try {
-      if (!session?.access_token) {
+      if (!session?.access_token || !activeChild?.id) {
         toast.error("Faça login para criar histórias.");
         setIsGenerating(false);
         clearInterval(timer);
@@ -78,6 +84,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         },
         body: JSON.stringify({
           childName,
+          criancaId: activeChild.id,
           childAvatar: avatar,
           age,
           interests,
@@ -94,7 +101,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(95);
       setStory(data.story);
       setImages(data.images || []);
-      await incrementStories();
+      await refreshEntitlement();
 
       // Auto-save story to memories (galeria)
       try {
@@ -123,7 +130,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       bumpSessionActions();
       sfx("complete");
       haptic("success");
-      toast.success(`História criada! ✨ (${storiesRemaining() - 1} restante${storiesRemaining() - 1 !== 1 ? 's' : ''} hoje)`);
+      const remainingAfter = Math.max(0, storiesRemaining - 1);
+      toast.success(`História criada! ✨ (${remainingAfter} restante${remainingAfter !== 1 ? 's' : ''} hoje)`);
     } catch (e: any) {
       console.error("Story generation error:", e);
       sfx("error");
@@ -134,7 +142,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       setProgress(100);
       setTimeout(() => setIsGenerating(false), 500);
     }
-  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, storiesRemaining, addMemory]);
+  }, [avatar, activeChild?.id, childName, profile?.age_range, limiteAtingido, plan, refreshEntitlement, storiesRemaining, addMemory, session?.access_token]);
 
   const handleReset = useCallback(() => {
     setStep("intro");
@@ -204,7 +212,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
             </p>
             <span className="text-[11px] font-bold text-[#2A2520]/80 px-3 py-1 rounded-full border border-[#E8821A]/25"
               style={{ background: "rgba(232,130,26,0.10)" }}>
-              {storiesRemaining()} {storiesRemaining() === 1 ? "história gratuita" : "histórias gratuitas"} hoje
+              {storiesRemaining} {storiesRemaining === 1 ? "história gratuita" : "histórias gratuitas"} hoje
             </span>
 
             <div className="w-full max-w-xs rounded-3xl p-4 space-y-2"
@@ -257,12 +265,12 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
             childName={childName}
             onGenerate={handleGenerate}
             isLoading={isGenerating}
-            storiesRemaining={storiesRemaining()}
-            isPremium={tier !== "free"}
+            storiesRemaining={storiesRemaining}
+            isPremium={plan !== "free"}
             onUpgrade={() => window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }))}
           />
         )}
-        {step === "display" && <StoryDisplay story={story} images={images} onReset={handleReset} onSpeak={handleSpeak} isPremium={tier !== "free"} />}
+        {step === "display" && <StoryDisplay story={story} images={images} onReset={handleReset} onSpeak={handleSpeak} isPremium={plan !== "free"} />}
       </div>
 
       <GeneratingOverlay open={isGenerating} progress={progress} />

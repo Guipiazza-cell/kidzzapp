@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useActiveChildId } from "@/contexts/ActiveChildContext";
 import {
   PLAN_ACCESS,
   DAILY_LIMITS,
@@ -44,16 +45,18 @@ const todayBR = () => {
  */
 export function useEntitlement() {
   const { user, session } = useAuth();
+  const activeChildId = useActiveChildId();
   const [state, setState] = useState<EntitlementState>(DEFAULT_STATE);
-  const inFlight = useRef(false);
+  const latestFetchKey = useRef<string | null>(null);
 
   const fetchAll = useCallback(async () => {
-    if (!user || !session) {
+    if (!user || !session || !activeChildId) {
+      latestFetchKey.current = null;
       setState({ ...DEFAULT_STATE, loading: false });
       return;
     }
-    if (inFlight.current) return;
-    inFlight.current = true;
+    const fetchKey = `${user.id}:${activeChildId}`;
+    latestFetchKey.current = fetchKey;
     try {
       // Plano efetivo (RPC com regra de ciclo + período de graça)
       const [{ data: planData }, { data: usageData }] = await Promise.all([
@@ -62,6 +65,7 @@ export function useEntitlement() {
           .from("usage")
           .select("perguntas_count, historias_count")
           .eq("user_id", user.id)
+          .eq("crianca_id", activeChildId)
           .eq("date", todayBR())
           .maybeSingle(),
       ]);
@@ -72,6 +76,7 @@ export function useEntitlement() {
       const inGrace: boolean = !!row?.in_grace;
       const periodEnd = row?.current_period_end ? new Date(row.current_period_end) : null;
 
+      if (latestFetchKey.current !== fetchKey) return;
       setState({
         plan,
         status,
@@ -84,12 +89,11 @@ export function useEntitlement() {
         loading: false,
       });
     } catch (err) {
+      if (latestFetchKey.current !== fetchKey) return;
       console.warn("[useEntitlement] error, falling back to free", err);
       setState({ ...DEFAULT_STATE, loading: false });
-    } finally {
-      inFlight.current = false;
     }
-  }, [user, session]);
+  }, [user, session, activeChildId]);
 
   useEffect(() => {
     fetchAll();
@@ -132,10 +136,11 @@ export function useEntitlement() {
    */
   const consumeQuota = useCallback(
     async (tipo: QuotaTipo): Promise<{ allowed: boolean }> => {
-      if (!user) return { allowed: false };
+      if (!user || !activeChildId) return { allowed: false };
       try {
         const { data, error } = await (supabase as any).rpc("increment_usage", {
           _tipo: tipo,
+          _crianca_id: activeChildId,
         });
         if (error) {
           console.warn("[useEntitlement] increment_usage error", error);
@@ -150,7 +155,7 @@ export function useEntitlement() {
         return { allowed: false };
       }
     },
-    [user, fetchAll]
+    [user, activeChildId, fetchAll]
   );
 
   return {

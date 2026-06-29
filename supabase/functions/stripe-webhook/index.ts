@@ -5,6 +5,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import {
+  isDuplicateProcessedEventError,
+  isHandledStripeEvent,
+  subscriptionStatusForEvent,
+} from "./logic.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -44,7 +49,7 @@ serve(async (req) => {
     return new Response("config", { status: 500 });
   }
 
-  const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+  const stripe = new Stripe(stripeKey, { apiVersion: "2026-02-25.clover" });
 
   // 1) Validar assinatura
   const signature = req.headers.get("stripe-signature");
@@ -157,16 +162,25 @@ serve(async (req) => {
       .from("stripe_processed_events")
       .insert({ event_id: event.id, type: event.type });
     if (dupErr) {
-      if ((dupErr as { code?: string }).code === "23505") {
+      if (isDuplicateProcessedEventError(dupErr)) {
         log("duplicate event ignored", { id: event.id });
         return new Response(JSON.stringify({ received: true, duplicate: true }), {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      // Erro não-duplicado (ex: tabela ausente): loga e segue processando para
-      // não perder o evento.
-      log("idempotency insert error (continuing)", { id: event.id, err: String(dupErr) });
+      log("idempotency insert error", { id: event.id, err: String(dupErr) });
+      return new Response(JSON.stringify({ error: "IDEMPOTENCY_ERROR" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!isHandledStripeEvent(event.type)) {
+      log("unhandled", { type: event.type });
+      return new Response(JSON.stringify({ received: true, ignored: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     switch (event.type) {
@@ -183,7 +197,7 @@ serve(async (req) => {
           stripe_customer_id: customerId ?? undefined,
           stripe_subscription_id: subId,
           plan: planFromSubscription(sub),
-          status: sub.status,
+          status: subscriptionStatusForEvent(event.type, sub.status) ?? sub.status,
           current_period_end: periodEnd(sub),
         });
         break;
@@ -199,7 +213,7 @@ serve(async (req) => {
           stripe_customer_id: customerId,
           stripe_subscription_id: sub.id,
           plan: planFromSubscription(sub),
-          status: sub.status,
+          status: subscriptionStatusForEvent(event.type, sub.status) ?? sub.status,
           current_period_end: periodEnd(sub),
         });
         break;
@@ -212,7 +226,7 @@ serve(async (req) => {
         if (!userId) break;
         await upsertSub(userId, {
           plan: "free",
-          status: "canceled",
+          status: subscriptionStatusForEvent(event.type) ?? "canceled",
           current_period_end: periodEnd(sub),
         });
         break;
@@ -230,7 +244,7 @@ serve(async (req) => {
           stripe_customer_id: customerId,
           stripe_subscription_id: subId,
           plan: planFromSubscription(sub),
-          status: "active",
+          status: subscriptionStatusForEvent(event.type) ?? "active",
           current_period_end: periodEnd(sub),
         });
         break;
@@ -243,14 +257,11 @@ serve(async (req) => {
         const userId = await resolveUserId(customerId);
         if (!userId) break;
         await upsertSub(userId, {
-          status: "past_due",
+          status: subscriptionStatusForEvent(event.type) ?? "past_due",
           stripe_subscription_id: subId ?? undefined,
         });
         break;
       }
-
-      default:
-        log("unhandled", { type: event.type });
     }
 
     return new Response(JSON.stringify({ received: true }), {

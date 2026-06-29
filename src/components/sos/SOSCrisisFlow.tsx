@@ -11,6 +11,7 @@ import { sfx } from "@/lib/sfx";
 import { trackConnection } from "@/lib/connection";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useActiveChildId } from "@/contexts/ActiveChildContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { SosSituation } from "./situations";
@@ -44,6 +45,7 @@ const CONTINUITY_ICONS = {
 
 const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
   const { profile, user } = useAuth();
+  const activeChildId = useActiveChildId();
   const { toast } = useToast();
   const { canUse } = useEntitlement();
   // SOS Emocional exige Premium.
@@ -93,11 +95,12 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
     haptic("success");
     sfx("reward");
     setMemorySaved(true);
-    if (!user) return;
+    if (!user || !activeChildId) return;
     try {
       const closing = situation.closing;
       await supabase.from("memories").insert({
         user_id: user.id,
+        crianca_id: activeChildId,
         type: "sos",
         title: `SOS · ${situation.label}`,
         content: closing

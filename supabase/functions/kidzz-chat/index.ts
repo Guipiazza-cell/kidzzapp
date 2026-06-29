@@ -154,6 +154,12 @@ serve(async (req) => {
     const rawMessages = Array.isArray(body?.messages) ? body.messages : [];
     const ageRange = typeof body?.ageRange === "string" ? body.ageRange : "3-7";
     const childName = typeof body?.childName === "string" ? body.childName : "";
+    const criancaId = typeof body?.criancaId === "string" ? body.criancaId : "";
+    if (!criancaId) {
+      return new Response(JSON.stringify({ error: "MISSING_CHILD" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // SECURITY: only accept user/assistant messages from client; cap count and content length.
     const safeMessages = rawMessages
@@ -168,7 +174,7 @@ serve(async (req) => {
     {
       const { data: quotaData, error: quotaErr } = await (supabaseUser as any).rpc(
         "increment_usage",
-        { _tipo: "perguntas" }
+        { _tipo: "perguntas", _crianca_id: criancaId }
       );
       if (quotaErr) {
         console.error("[KIDZZ-CHAT] increment_usage error:", quotaErr.message);

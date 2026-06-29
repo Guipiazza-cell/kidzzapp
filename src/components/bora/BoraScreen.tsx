@@ -7,6 +7,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
+import { useActiveChild } from "@/contexts/ActiveChildContext";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
 import { useBoraStats } from "@/hooks/useBoraStats";
 import { usePaywall } from "@/components/paywall/PaywallProvider";
@@ -393,6 +394,7 @@ const BoraScreen = ({ onBack }: Props) => {
   const { profile, user } = useAuth();
   const { isPremium } = useEntitlement();
   const { criancas, loading: loadingCriancas } = useCriancas();
+  const { activeChild } = useActiveChild();
   const { open: openPaywall } = usePaywall();
 
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -402,9 +404,8 @@ const BoraScreen = ({ onBack }: Props) => {
     if (criancas.length === 0) setShowOnboarding(true);
   }, [user, loadingCriancas, criancas.length]);
 
-  const firstCrianca = criancas[0];
-  const childName = (firstCrianca?.nome || profile?.child_name || "").trim();
-  const childAge = firstCrianca?.idade ?? null;
+  const childName = (activeChild?.nome || profile?.child_name || "").trim();
+  const childAge = activeChild?.idade ?? null;
   const ageRange = childAge != null ? `${childAge} anos` : (profile?.age_range || "").trim();
   const firstName = childName ? childName.split(" ")[0] : "";
   const personalTag = firstName
@@ -446,8 +447,8 @@ const BoraScreen = ({ onBack }: Props) => {
 
   // Agenda lembrete diário no mount (com nome da criança, se houver)
   useEffect(() => {
-    scheduleDailyReminder((criancas[0]?.nome || "").split(" ")[0]);
-  }, [criancas]);
+    scheduleDailyReminder((activeChild?.nome || "").split(" ")[0]);
+  }, [activeChild?.nome]);
 
   // Diário e fluxo "Como foi?"
   const [diaryOpen, setDiaryOpen] = useState(false);
@@ -582,7 +583,7 @@ const BoraScreen = ({ onBack }: Props) => {
         onClose={() => setComoFoiOpen(false)}
         onSaved={handleConclusaoSalva}
         activity={TODAY_ACTIVITY}
-        criancaId={firstCrianca?.id || null}
+        criancaId={activeChild?.id || null}
         childName={firstName}
       />
       <SurpresaModal
