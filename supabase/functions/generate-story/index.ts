@@ -61,10 +61,29 @@ serve(async (req) => {
     };
 
     const childName = sanitize(body.childName, 50);
-    const interests = sanitize(body.interests, 200);
+    const interests = sanitize(body.interests, 240);
     const ageRange = sanitize(body.ageRange, 10);
     const ageNum = Math.max(0, Math.min(18, Number(body.age) || 0));
     const age = ageNum || "";
+
+    // CAMADA 1 — palavras-chave (tratadas como TEMA, nunca como instrução)
+    const rawKeywords = Array.isArray(body.keywords) ? body.keywords : [];
+    // Bloqueio de termos manifestamente inadequados (lista mínima, defensiva)
+    const BLOCK = /(sex|porn|drug|droga|matar|morte|morrer|sangue|estupr|nud[ae]z|suic[ií]d|arma de fogo|nazi|hitler|terror|satan|demon[ií]o)/i;
+    const keywords: string[] = rawKeywords
+      .map((k: unknown) => sanitize(k, 40))
+      .filter((k: string) => k.length > 0 && !BLOCK.test(k))
+      .slice(0, 12);
+
+    // CAMADA 2 — intenção (enum fechado)
+    const INTENT_ALLOWED = ["acalmar", "ensinar", "coragem", "divertir"] as const;
+    const intent = (INTENT_ALLOWED as readonly string[]).includes(String(body.intent))
+      ? String(body.intent) as typeof INTENT_ALLOWED[number]
+      : "divertir";
+    const ENSINAR_ALLOWED = ["dividir", "paciencia", "escovar", "raiva", "verdade", "compartilhar"] as const;
+    const ensinarSub = intent === "ensinar" && (ENSINAR_ALLOWED as readonly string[]).includes(String(body.ensinarSub))
+      ? String(body.ensinarSub)
+      : null;
 
     const rawAvatar = body.childAvatar && typeof body.childAvatar === "object" ? body.childAvatar : null;
     const childAvatar = rawAvatar
