@@ -96,7 +96,7 @@ export const useTTS = () => {
     }
   }, []);
 
-  const speak = useCallback(async (text: string): Promise<void> => {
+  const speak = useCallback(async (text: string, options?: { rate?: number; pitch?: number }): Promise<void> => {
     if (!("speechSynthesis" in window)) {
       console.warn("[useTTS] Web Speech API indisponível neste navegador");
       return;
@@ -120,8 +120,8 @@ export const useTTS = () => {
         utt.lang = "pt-BR";
         // Tom suave e amigo: ritmo levemente mais lento que o normal,
         // pitch quase neutro para parecer "tia que conta história".
-        utt.rate = 0.88;
-        utt.pitch = 1.0;
+        utt.rate = options?.rate ?? 0.88;
+        utt.pitch = options?.pitch ?? 1.0;
         utt.volume = 0.95;
         if (voiceRef.current) utt.voice = voiceRef.current;
 
