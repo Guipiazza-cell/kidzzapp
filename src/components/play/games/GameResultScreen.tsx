@@ -217,13 +217,6 @@ const GameResultScreen = ({
     persisted.current = true;
     const detail =
       subtitle ?? (total > 0 ? `${childName} acertou ${correct} de ${total} (${computedPercent}%)` : `${childName} fez ${correct} pontos`);
-    supabase
-      .from("memories")
-      .insert({
-        user_id: user.id,
-      } as any)
-      .then(() => {});
-    // legacy below kept as no-op to preserve metadata shape
     void supabase
       .from("memories")
       .insert({
@@ -241,7 +234,7 @@ const GameResultScreen = ({
           stars,
           xp,
         },
-      })
+      } as any)
       .then(() => { /* fire-and-forget */ });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
