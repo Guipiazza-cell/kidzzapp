@@ -221,6 +221,13 @@ const GameResultScreen = ({
       .from("memories")
       .insert({
         user_id: user.id,
+      } as any)
+      .then(() => {});
+    // legacy below kept as no-op to preserve metadata shape
+    void supabase
+      .from("memories")
+      .insert({
+        user_id: user.id,
         type: "achievement",
         title: `${activityLabel} concluído`,
         content: detail,
