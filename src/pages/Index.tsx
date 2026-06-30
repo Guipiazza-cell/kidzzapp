@@ -408,6 +408,7 @@ const Index = () => {
           onGameComplete={() => evolution.evolve("game")}
           onOpenAchievements={() => switchTab("achievements")}
           onOpenLab={() => setShowLab(true)}
+          onOpenParental={() => setShowParentalGateForSettings(true)}
           onOpenTravel={() => {
             if (!profile?.is_premium) {
               setContextualPaywall({ open: true, context: "travel" });
