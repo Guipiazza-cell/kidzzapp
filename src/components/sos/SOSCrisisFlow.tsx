@@ -109,7 +109,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
           recap: closing?.recap ?? [],
           shareable: closing?.shareable,
         },
-      });
+      } as any);
       toast({
         title: "Momento salvo 💚",
         description: "Está guardado em Momentos.",
