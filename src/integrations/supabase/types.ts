@@ -401,6 +401,7 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          crianca_id: string
           id: string
           image_url: string | null
           is_special: boolean
@@ -413,6 +414,7 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string
+          crianca_id: string
           id?: string
           image_url?: string | null
           is_special?: boolean
@@ -425,6 +427,7 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string
+          crianca_id?: string
           id?: string
           image_url?: string | null
           is_special?: boolean
@@ -434,7 +437,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "memories_crianca_id_fkey"
+            columns: ["crianca_id"]
+            isOneToOne: false
+            referencedRelation: "criancas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notificacao_prefs: {
         Row: {
@@ -650,6 +661,7 @@ export type Database = {
       }
       usage: {
         Row: {
+          crianca_id: string
           date: string
           historias_count: number
           perguntas_count: number
@@ -657,6 +669,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          crianca_id: string
           date: string
           historias_count?: number
           perguntas_count?: number
@@ -664,13 +677,22 @@ export type Database = {
           user_id: string
         }
         Update: {
+          crianca_id?: string
           date?: string
           historias_count?: number
           perguntas_count?: number
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "usage_crianca_id_fkey"
+            columns: ["crianca_id"]
+            isOneToOne: false
+            referencedRelation: "criancas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -706,7 +728,7 @@ export type Database = {
         }[]
       }
       increment_usage: {
-        Args: { _tipo: string }
+        Args: { _crianca_id: string; _tipo: string }
         Returns: {
           allowed: boolean
           historias_count: number
