@@ -317,7 +317,7 @@ const KidzzPlay = ({
         <CategoryCard
           onClick={() => setSub("criar")}
           emoji="🧩"
-          title="Criar & Imaginar"
+          title="Criar e Imaginar"
           subtitle="Atividades criativas sem limites"
           gradient="linear-gradient(135deg, #7FB069 0%, #46703A 100%)"
           accent="#46703A"
@@ -325,7 +325,7 @@ const KidzzPlay = ({
         <CategoryCard
           onClick={() => setSub("jogos")}
           emoji="🎮"
-          title="Jogos & Desafios"
+          title="Jogos e Desafios"
           subtitle="Diversão saudável para todos"
           gradient="linear-gradient(135deg, #8987DA 0%, #5E5CC2 100%)"
           accent="#5E5CC2"
@@ -489,7 +489,7 @@ const KidzzPlay = ({
     >
       <div className="px-5">
         <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#46703A]">
-          Brincar · Criar & Imaginar
+          Brincar · Criar e Imaginar
         </p>
         <h1 className="font-display text-[28px] font-extrabold text-[#1B1B1B] leading-tight mt-1">
           Atividades criativas
@@ -591,7 +591,7 @@ const KidzzPlay = ({
           >
             <div className="px-5">
               <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#5E5CC2]">
-                Brincar · Jogos & Desafios
+                Brincar · Jogos e Desafios
               </p>
               <h1 className="font-display text-[28px] font-extrabold text-[#1B1B1B] leading-tight mt-1">
                 Diversão saudável
