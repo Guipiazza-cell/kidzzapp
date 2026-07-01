@@ -304,7 +304,7 @@ const StoriesHome = ({ onBack }: Props) => {
       <AnimatePresence>
         {chipOpen && chip && (
           <motion.div
-            className="fixed inset-0 z-[60] flex flex-col"
+            className="fixed inset-0 z-[100] flex flex-col"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           >
             <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => setChipOpen(false)} />
@@ -367,7 +367,7 @@ const StoriesHome = ({ onBack }: Props) => {
       <AnimatePresence>
         {collection && (
           <motion.div
-            className="fixed inset-0 z-[60] flex flex-col"
+            className="fixed inset-0 z-[100] flex flex-col"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           >
             <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => setCollection(null)} />
@@ -438,7 +438,7 @@ const StoriesHome = ({ onBack }: Props) => {
       <AnimatePresence>
         {selected && !reading && (
           <motion.div
-            className="fixed inset-0 z-[65] flex flex-col bg-[#FDF8EE]"
+            className="fixed inset-0 z-[100] flex flex-col bg-[#FDF8EE]"
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }}
           >
             <div className="flex items-center gap-3 px-5 pb-3" style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}>

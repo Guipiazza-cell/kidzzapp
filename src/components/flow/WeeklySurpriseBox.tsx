@@ -142,7 +142,7 @@ const WeeklySurpriseBox = ({ childName, streakDays, onRewardClaimed }: WeeklySur
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-[85] flex items-center justify-center px-6"
+        className="fixed inset-0 z-[100] flex items-center justify-center px-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

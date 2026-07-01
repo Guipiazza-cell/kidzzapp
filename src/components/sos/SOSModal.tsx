@@ -48,7 +48,7 @@ const SOSModal = ({ open, onClose, onGoWellness }: Props) => {
         <>
           <motion.div
             key="sos-backdrop"
-            className="fixed inset-0 z-[90]"
+            className="fixed inset-0 z-[100]"
             style={{
               background: "hsl(0 0% 0% / 0.15)",
               backdropFilter: "blur(8px)",
