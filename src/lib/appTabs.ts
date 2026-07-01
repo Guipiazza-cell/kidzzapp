@@ -15,7 +15,7 @@ export const APP_TABS_ALL: AppTabConfig[] = [
   { id: "dreams", label: "Sonhos", dataTab: "sonhos", color: "#5E5CC2", light: "#8987DA", inDock: true },
   { id: "explore", label: "Histórias", dataTab: "historias", color: "#C173A6", light: "#D89BC2", inDock: true },
   { id: "play", label: "Brincar", dataTab: "brincar", color: "#DD6A36", light: "#F08E5E", inDock: true },
-  { id: "bora", label: "Bora!", dataTab: "bora", color: "#E8821A", light: "#F4A659", inDock: true, featured: true },
+  { id: "bora", label: "Bora!", dataTab: "bora", color: "#E8821A", light: "#F4A659", inDock: true },
   { id: "routine", label: "Rotina", dataTab: "rotina", color: "#4F8FC9", light: "#7DB0E0", inDock: true },
   { id: "moments", label: "Momentos", dataTab: "momentos", color: "#E5912E", light: "#F4B25E", inDock: true },
   { id: "cinema", label: "Cinema", dataTab: "cinema", color: "#D6A634", light: "#ECC766", inDock: true },
