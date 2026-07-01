@@ -433,6 +433,8 @@ const Index = () => {
           onBack={backToHome}
           onNavigateToDreams={() => switchTab("dreams")}
           onXpEarned={() => evolution.evolve("game")}
+          onOpenParental={() => setShowParentalGateForSettings(true)}
+          onOpenTravel={() => { if (!profile?.is_premium) { setContextualPaywall({ open: true, context: "travel" }); return; } setShowTravel(true); }}
         />
       </AreaGate>
     ),
