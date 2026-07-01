@@ -167,7 +167,7 @@ const ParentalGate = ({ onSuccess, onCancel }: ParentalGateProps) => {
     return (
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-center justify-center z-[100] p-4"
         role="dialog" aria-modal="true" aria-label="Definir novo PIN"
       >
         <motion.div
@@ -214,7 +214,7 @@ const ParentalGate = ({ onSuccess, onCancel }: ParentalGateProps) => {
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-foreground/60 backdrop-blur-md flex items-center justify-center z-[100] p-4"
       role="dialog" aria-modal="true" aria-label="Verificação dos pais"
     >
       <motion.div

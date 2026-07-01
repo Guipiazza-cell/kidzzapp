@@ -1072,7 +1072,7 @@ const DreamWorld = ({ onBack }: Props) => {
           const pl = SLEEP_PLAYLISTS.find(p => p.id === openPlaylist)!;
           return (
             <motion.div
-              className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6"
+              className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6"
               style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)" }}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setOpenPlaylist(null)}
@@ -1122,7 +1122,7 @@ const DreamWorld = ({ onBack }: Props) => {
           const m = FAMILY_MOMENTS.find(x => x.id === openMoment)!;
           return (
             <motion.div
-              className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+              className="fixed inset-0 z-[100] flex items-center justify-center p-6"
               style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)" }}
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setOpenMoment(null)}
@@ -1153,7 +1153,7 @@ const DreamWorld = ({ onBack }: Props) => {
       <AnimatePresence>
         {showPremiumBlock && (
           <motion.div
-            className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6"
             style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setShowPremiumBlock(false)}

@@ -551,7 +551,7 @@ const Index = () => {
       <AnimatePresence>
         {showNotifPrompt && (
           <motion.div
-            className="fixed inset-0 z-[55] flex items-end justify-center px-4 pb-4"
+            className="fixed inset-0 z-[100] flex items-end justify-center px-4 pb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

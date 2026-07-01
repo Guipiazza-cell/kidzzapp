@@ -94,7 +94,7 @@ const ActivityDetailModal = ({ activity, childName, done, onComplete, onClose }:
     <AnimatePresence>
       {activity && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

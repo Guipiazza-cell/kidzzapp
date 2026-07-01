@@ -25,7 +25,7 @@ const PlayerSheet = ({
   onClose: () => void;
 }) => (
   <motion.div
-    className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
+    className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}

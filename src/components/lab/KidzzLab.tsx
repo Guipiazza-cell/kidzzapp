@@ -530,7 +530,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
       <AnimatePresence>
         {shareModalOpen && (
           <motion.div
-            className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -607,7 +607,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
       <AnimatePresence>
         {showPremiumCTA && (
           <motion.div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

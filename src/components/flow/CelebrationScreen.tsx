@@ -98,7 +98,7 @@ const CelebrationScreen = ({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-6"
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
