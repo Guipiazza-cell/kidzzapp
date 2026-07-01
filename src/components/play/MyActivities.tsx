@@ -268,7 +268,7 @@ const MyActivities = ({ onBack }: Props) => {
             role="button"
             aria-label={`Ver detalhes: ${dailyHighlight.title}`}
           >
-            <div className="absolute -top-2 -right-2 px-2 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md">
+            <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md">
               <Sparkles size={10} /> HOJE
             </div>
             <div className="flex items-start gap-3">
