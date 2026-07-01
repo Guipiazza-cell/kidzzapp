@@ -129,7 +129,6 @@ function Kidzz({
           }}
           loading="eager"
           decoding="async"
-          fetchPriority="high"
         />
       </motion.div>
       {/* Sparkles for happy */}

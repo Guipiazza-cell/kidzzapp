@@ -1583,7 +1583,7 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
       <Atmosphere />
       <div
         className="relative max-w-[520px] mx-auto"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)" }}
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 152px)" }}
       >
         <AnimatePresence mode="wait">
           <motion.div

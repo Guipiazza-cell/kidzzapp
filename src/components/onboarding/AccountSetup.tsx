@@ -453,7 +453,10 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
                           }
                         }}
                         style={{
-                          width: 44,
+                          width: "100%",
+                          minWidth: 0,
+                          maxWidth: 44,
+                          flex: 1,
                           height: 56,
                           textAlign: "center",
                           fontSize: 22,

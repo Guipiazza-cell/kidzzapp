@@ -566,7 +566,7 @@ const BoraScreen = ({ onBack }: Props) => {
     <div
       data-tab="bora"
       className="bora-screen flex-1 overflow-y-auto overflow-x-hidden"
-      style={{ paddingBottom: 180 }}
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 180px)" }}
     >
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />

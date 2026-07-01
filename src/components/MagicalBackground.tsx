@@ -49,6 +49,7 @@ const MagicalBackground = () => (
       src={forestBg}
       alt=""
       aria-hidden="true"
+      decoding="async"
       className="absolute inset-0 w-full h-full object-cover"
       style={{ filter: "brightness(1.04) saturate(0.88)" }}
       width={1024}

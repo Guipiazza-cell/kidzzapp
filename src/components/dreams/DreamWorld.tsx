@@ -1100,7 +1100,7 @@ const DreamWorld = ({ onBack }: Props) => {
                   frameBorder={0}
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
-                  style={{ display: "block", border: 0 }}
+                  style={{ display: "block", border: 0, height: "clamp(232px, 52vh, 380px)" }}
                 />
                 <a
                   href={`https://open.spotify.com/playlist/${pl.spotifyId}`}

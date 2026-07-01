@@ -350,8 +350,8 @@ const HomeScreen = ({
 
       {/* ── HEADER PREMIUM: ilhas flutuantes (Dynamic Island style) ── */}
       <header
-        className="fixed top-0 left-0 right-0 flex items-center justify-between gap-2 px-3 z-[80] pointer-events-none"
-        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)", paddingBottom: 4 }}
+        className="fixed top-0 left-0 right-0 mx-auto flex items-center justify-between gap-2 px-3 z-[80] pointer-events-none"
+        style={{ maxWidth: 480, paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)", paddingBottom: 4 }}
       >
         {/* esquerda — sound + premium badge (island) */}
         <div className="flex items-center flex-1 pointer-events-auto">
@@ -471,7 +471,7 @@ const HomeScreen = ({
               {onOpenReferral && user && (
                 <motion.button
                   onClick={() => { haptic("light"); sfx("click"); onOpenReferral(); }}
-                  className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                  className="relative w-9 h-9 rounded-full flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                   aria-label="Convide amigos"
                 >
@@ -494,7 +494,7 @@ const HomeScreen = ({
               {!user ? (
                 <motion.button
                   onClick={() => navigate("/auth")}
-                  className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                  className="relative w-9 h-9 rounded-full flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                   aria-label="Entrar"
                 >
@@ -503,7 +503,7 @@ const HomeScreen = ({
               ) : (
                 <motion.button
                   onClick={() => setShowParentalGateForSettings(true)}
-                  className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                  className="relative w-9 h-9 rounded-full flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                   aria-label="Controle parental"
                 >
@@ -517,8 +517,8 @@ const HomeScreen = ({
 
       {/* Ilhas Pais/Assinar — flutuando logo abaixo do header */}
       <div
-        className="fixed left-0 right-0 z-[70] pointer-events-none"
-        style={{ top: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
+        className="fixed left-0 right-0 mx-auto z-[70] pointer-events-none"
+        style={{ maxWidth: 480, top: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
       >
         <SubscribeBanner
           onOpenParentalGate={() => setShowParentalGateForSettings(true)}
@@ -532,7 +532,7 @@ const HomeScreen = ({
         style={{
           WebkitOverflowScrolling: "touch",
           paddingTop: "calc(env(safe-area-inset-top, 0px) + 108px)",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 140px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 160px)",
         }}
       >
         {/* ── 1. HERO — greeting clean + camaleão invadindo ── */}

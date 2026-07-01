@@ -186,17 +186,17 @@ const Admin = () => {
       <div className="space-y-4">
         {results.map((user) => (
           <div key={user.id} className="rounded-xl border border-border bg-card p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-foreground">{user.email || "—"}</p>
-                <p className="text-sm text-muted-foreground">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-foreground truncate">{user.email || "—"}</p>
+                <p className="text-sm text-muted-foreground truncate">
                   {user.child_name || "Sem nome"} · Desde {new Date(user.created_at).toLocaleDateString("pt-BR")}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {user.questions_used ?? 0} perguntas · {user.points ?? 0} pts · 🔥 {user.streak_days ?? 0} · Nível: {user.level ?? "iniciante"}
                 </p>
               </div>
-              <div className={`px-2 py-1 rounded-full text-xs font-medium ${user.is_premium ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
+              <div className={`shrink-0 px-2 py-1 rounded-full text-xs font-medium ${user.is_premium ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
                 {user.is_premium ? `Premium (${user.premium_source || "?"})` : "Gratuito"}
               </div>
             </div>

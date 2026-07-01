@@ -76,7 +76,6 @@ const ChameleonMascot = forwardRef<HTMLDivElement, ChameleonMascotProps>(
           className="w-full h-full object-contain drop-shadow-2xl relative z-10"
           loading="eager"
           decoding="async"
-          fetchPriority="high"
           width={224}
           height={224}
           whileHover={interactive ? { scale: 1.12, rotate: [0, -5, 5, 0] } : undefined}

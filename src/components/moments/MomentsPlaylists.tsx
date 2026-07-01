@@ -68,7 +68,7 @@ const PlayerSheet = ({
             frameBorder={0}
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy"
-            style={{ border: 0, display: "block" }}
+            style={{ border: 0, display: "block", height: "clamp(232px, 52vh, 380px)" }}
           />
         </div>
 

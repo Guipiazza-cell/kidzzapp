@@ -264,7 +264,7 @@ const MyKidzz = ({ onBack }: Props) => {
       </div>
 
       {/* PANEL */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-32">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 140px)" }}>
         <AnimatePresence mode="wait">
           {activeTab === "color" && (
             <motion.div

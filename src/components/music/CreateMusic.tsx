@@ -190,7 +190,7 @@ const CreateMusic = ({ onBack, childName, onAchievement }: Props) => {
         )}
       </div>
 
-      <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden px-4 py-6">
+      <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden px-4 pt-6" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)" }}>
         <AnimatePresence mode="wait">
           {step === "seed" && (
             <motion.div key="seed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3">

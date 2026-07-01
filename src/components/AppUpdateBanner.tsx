@@ -19,7 +19,7 @@ const AppUpdateBanner = () => {
   if (!version) return null;
 
   return (
-    <div className="fixed left-3 right-3 top-[calc(max(env(safe-area-inset-top,12px),12px)+8px)] z-[80] rounded-2xl border border-border bg-card/95 p-3 shadow-2xl backdrop-blur-xl">
+    <div className="fixed left-3 right-3 top-[calc(max(env(safe-area-inset-top,12px),12px)+8px)] z-[85] mx-auto max-w-[480px] rounded-2xl border border-border bg-card/95 p-3 shadow-2xl backdrop-blur-xl">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <RefreshCw size={18} />
