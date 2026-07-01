@@ -785,7 +785,7 @@ const KidzzPlay = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {FloatingHeader}
+      {sub !== "missoes" && FloatingHeader}
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
