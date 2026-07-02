@@ -11,20 +11,32 @@ const audioCache = new Map<string, string>(); // text -> data URI
 
 export function useSosVoice() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Geração: cada speak()/stop() incrementa. Falas em voo (aguardando rede)
+  // que não pertencem à geração atual são abortadas → nunca dois áudios juntos.
+  const genRef = useRef(0);
   const [speaking, setSpeaking] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const stop = useCallback(() => {
+  const stopAudio = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+      audioRef.current = null;
     }
     setSpeaking(false);
   }, []);
 
+  const stop = useCallback(() => {
+    genRef.current++;      // invalida qualquer fala em voo
+    stopAudio();
+  }, [stopAudio]);
+
   const speak = useCallback(async (text: string): Promise<void> => {
     if (!text?.trim()) return;
-    stop();
+    // Nova fala: invalida a anterior (mesmo se ainda estiver carregando) e para o áudio atual.
+    genRef.current++;
+    const myGen = genRef.current;
+    stopAudio();
 
     let dataUri = audioCache.get(text);
     if (!dataUri) {
@@ -41,11 +53,14 @@ export function useSosVoice() {
       } catch (e) {
         // Falha silenciosa — narração é enhancement, não bloqueia o fluxo.
         console.warn("[sos-voice] falling back to silence:", e);
-        setLoading(false);
+        if (myGen === genRef.current) setLoading(false);
         return;
       }
-      setLoading(false);
+      if (myGen === genRef.current) setLoading(false);
     }
+
+    // Se outra fala começou (ou stop() foi chamado) enquanto carregava, aborta.
+    if (myGen !== genRef.current) return;
 
     return new Promise((resolve) => {
       const audio = new Audio(dataUri);
@@ -55,7 +70,7 @@ export function useSosVoice() {
       setSpeaking(true);
       audio.play().catch(() => { setSpeaking(false); resolve(); });
     });
-  }, [stop]);
+  }, [stopAudio]);
 
   useEffect(() => () => stop(), [stop]);
 

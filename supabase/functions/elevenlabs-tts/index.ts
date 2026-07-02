@@ -47,11 +47,12 @@ serve(async (req) => {
     }
 
     // Voz: aceita override via body.voiceId (ex: voz feminina pt-BR criada no
-    // ElevenLabs Voice Design). Default mantém "Alice".
+    // ElevenLabs Voice Design). Default = "Sarah" (feminina, mansa e serena).
+    // (O ID antigo TX3LPaxmHKxFdv7VOQHJ era "Liam", voz MASCULINA.)
     const voiceId =
       typeof body?.voiceId === "string" && body.voiceId.trim()
         ? body.voiceId.trim()
-        : "TX3LPaxmHKxFdv7VOQHJ";
+        : "EXAVITQu4vr4xnSDxMaL";
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_22050_32`,
