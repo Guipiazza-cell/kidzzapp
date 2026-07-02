@@ -503,40 +503,6 @@ const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: 
         })}
       </div>
 
-      {/* 3 · Mundo Real */}
-      <SectionTitle kicker="Mundo real" title="Lugares para viver" sub="Experiências físicas curadas para famílias." />
-      <div className="pl-5 pr-3 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none">
-        {REAL_WORLD.map((p) => (
-          <motion.button
-            key={p.id}
-            whileTap={{ scale: 0.98 }}
-            transition={tapSpring}
-            onClick={() => { haptic("light"); go("realworld"); }}
-            className="snap-start shrink-0 w-[78%] text-left rounded-[26px] overflow-hidden"
-            style={{ border: `1px solid ${stroke}`, background: "#fff" }}
-          >
-            <div className="aspect-[4/3] w-full overflow-hidden" style={{ background: pearl }}>
-              <img
-                src={p.img}
-                alt={p.title}
-                loading="lazy"
-                className="w-full h-full object-cover"
-                style={{ filter: "saturate(0.95) brightness(1.02)" }}
-              />
-            </div>
-            <div className="p-4">
-              <Eyebrow>{p.tag}</Eyebrow>
-              <div className="mt-1 text-[15px] font-semibold leading-tight" style={{ color: ink }}>
-                {p.title}
-              </div>
-              <div className="mt-0.5 flex items-center gap-1 text-[12px]" style={{ color: inkSoft }}>
-                <MapPin size={12} /> {p.city}
-              </div>
-            </div>
-          </motion.button>
-        ))}
-      </div>
-
       {/* 4 · Jornada */}
       <SectionTitle kicker="Jornada da criança" title="Como vocês estão" />
       <div className="px-5 pb-10">
