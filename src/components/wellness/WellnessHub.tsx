@@ -14,6 +14,7 @@ import WellnessCinema from "./WellnessCinema";
 import WellnessGrowth from "./WellnessGrowth";
 import KalmSections from "@/components/kalm/KalmSections";
 import KidzzHeader from "@/components/common/KidzzHeader";
+import { pickFemaleVoice, SOFT_RATE, SOFT_PITCH, SOFT_VOLUME } from "@/lib/ttsVoice";
 
 /* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
    Paleta sálvia + esmeralda + creme + dourado fosco.
@@ -954,9 +955,12 @@ const speakLine = (text: string, onEnd?: () => void) => {
   if (typeof window === "undefined" || !window.speechSynthesis) { onEnd?.(); return; }
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "pt-BR";
-  u.rate = 0.88;
-  u.pitch = 1.05;
-  u.volume = 0.9;
+  u.rate = SOFT_RATE;
+  u.pitch = SOFT_PITCH;
+  u.volume = SOFT_VOLUME;
+  // Voz feminina pt-BR padronizada (fonte única).
+  const v = pickFemaleVoice(window.speechSynthesis.getVoices());
+  if (v) u.voice = v;
   if (onEnd) u.onend = onEnd;
   window.speechSynthesis.speak(u);
 };

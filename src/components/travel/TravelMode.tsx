@@ -4,6 +4,7 @@ import { ArrowLeft, Car, Play, Pause, SkipForward, X, Volume2 } from "lucide-rea
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
+import { pickFemaleVoice, SOFT_RATE, SOFT_PITCH, SOFT_VOLUME } from "@/lib/ttsVoice";
 import KidzzChameleon, { type KidzzState } from "@/components/kidzz/KidzzChameleon";
 import CosmicRoad from "./CosmicRoad";
 import confetti from "canvas-confetti";
@@ -86,11 +87,9 @@ const TravelMode = ({ onBack }: Props) => {
     if (!("speechSynthesis" in window)) return;
     const pickVoice = () => {
       if (lockedVoiceRef.current) return;
-      const voices = window.speechSynthesis.getVoices();
-      const ptBR = voices.find(v => v.lang === "pt-BR" && /female|mulher|luciana|joana|fernanda|maria|ana/i.test(v.name))
-        || voices.find(v => v.lang === "pt-BR")
-        || voices.find(v => v.lang.startsWith("pt"));
-      if (ptBR) lockedVoiceRef.current = ptBR;
+      // Voz feminina pt-BR padronizada (fonte única).
+      const v = pickFemaleVoice(window.speechSynthesis.getVoices());
+      if (v) lockedVoiceRef.current = v;
     };
     pickVoice();
     window.speechSynthesis.onvoiceschanged = pickVoice;
@@ -124,9 +123,9 @@ const TravelMode = ({ onBack }: Props) => {
 
       const utt = new SpeechSynthesisUtterance(text);
       utt.lang = "pt-BR";
-      utt.pitch = 1.05;
-      utt.rate = 0.92;
-      utt.volume = 0.95;
+      utt.pitch = SOFT_PITCH;
+      utt.rate = SOFT_RATE;
+      utt.volume = SOFT_VOLUME;
       if (lockedVoiceRef.current) utt.voice = lockedVoiceRef.current;
 
       utt.onend = () => { speakingRef.current = false; resolve(); };

@@ -147,6 +147,37 @@ serve(async (req) => {
     }
   };
 
+  // Resolve a subscription (se houver) a partir de um charge — via invoice.
+  const subIdFromCharge = async (charge: Stripe.Charge): Promise<string | null> => {
+    const direct = (charge as any).invoice as string | null;
+    if (!direct) return null;
+    try {
+      const inv = await stripe.invoices.retrieve(direct);
+      return ((inv as any).subscription as string | null) ?? null;
+    } catch (e) {
+      log("invoice retrieve fail", { e: String(e) });
+      return null;
+    }
+  };
+
+  // Revoga o premium: cancela a assinatura no Stripe (para o check-subscription
+  // não reconceder acesso ao ver a sub ainda ativa) e rebaixa o DB para free.
+  const revokeAccess = async (
+    customerId: string | null,
+    subId: string | null,
+    email: string | null,
+    statusLabel: string
+  ) => {
+    const userId = await resolveUserId(customerId, null, email);
+    if (!userId) { log("revoke: no user", { customerId }); return; }
+    if (subId) {
+      try { await stripe.subscriptions.cancel(subId); }
+      catch (e) { log("revoke: cancel sub fail (segue)", { e: String(e) }); }
+    }
+    await upsertSub(userId, { plan: "free", status: statusLabel, current_period_end: null });
+    log("access revoked", { userId, statusLabel });
+  };
+
   try {
     log("event", { type: event.type, id: event.id });
 
@@ -246,6 +277,43 @@ serve(async (req) => {
           status: "past_due",
           stripe_subscription_id: subId ?? undefined,
         });
+        break;
+      }
+
+      // ── Estorno (refund) ──────────────────────────────────────
+      // Admin estornou o pagamento na Stripe → revogar o premium.
+      // Só revoga em refund TOTAL (charge.refunded === true). Refund parcial
+      // mantém o acesso (decisão de negócio).
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        if (!charge.refunded) {
+          log("refund parcial - mantém acesso", { charge: charge.id, refunded: charge.amount_refunded, total: charge.amount });
+          break;
+        }
+        const customerId = (charge.customer as string) ?? null;
+        const subId = await subIdFromCharge(charge);
+        await revokeAccess(customerId, subId, charge.billing_details?.email ?? null, "refunded");
+        break;
+      }
+
+      // ── Chargeback / disputa ──────────────────────────────────
+      // Cliente abriu disputa ou fundos foram retirados → revogar o premium.
+      case "charge.dispute.created":
+      case "charge.dispute.funds_withdrawn": {
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId = dispute.charge as string;
+        let customerId: string | null = null;
+        let subId: string | null = null;
+        let email: string | null = null;
+        try {
+          const charge = await stripe.charges.retrieve(chargeId);
+          customerId = (charge.customer as string) ?? null;
+          email = charge.billing_details?.email ?? null;
+          subId = await subIdFromCharge(charge);
+        } catch (e) {
+          log("dispute charge retrieve fail", { e: String(e) });
+        }
+        await revokeAccess(customerId, subId, email, "disputed");
         break;
       }
 

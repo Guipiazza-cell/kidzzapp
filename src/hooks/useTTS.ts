@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import { loadVoices, pickFemaleVoice, SOFT_RATE, SOFT_PITCH, SOFT_VOLUME } from "@/lib/ttsVoice";
 
 /**
  * useTTS — Narração via Web Speech API nativa (pt-BR).
@@ -6,7 +7,7 @@ import { useCallback, useRef } from "react";
  * Por que Web Speech?
  *  - Gratuita, sem chave, sem latência de rede, sem dependência de edge function
  *  - Funciona offline e em todos os navegadores modernos
- *  - Voz feminina pt-BR priorizada quando disponível (Luciana, Francisca, Maria, Helena…)
+ *  - Voz feminina pt-BR padronizada via @/lib/ttsVoice (fonte única)
  *
  * `stop()` cancela a fala em qualquer ponto.
  */
@@ -33,54 +34,6 @@ const splitSentences = (text: string): string[] => {
   return sentences.length > 0 ? sentences : [clean];
 };
 
-/** Lista priorizada de vozes femininas pt-BR mais agradáveis. */
-const PREFERRED_VOICE_NAMES = [
-  "Luciana",        // iOS / macOS
-  "Francisca",      // Microsoft / Edge
-  "Maria",          // Google
-  "Camila",         // Microsoft
-  "Helena",         // pt-PT mas excelente
-  "Joana",
-  "Google português do Brasil",
-  "Microsoft Maria",
-  "Microsoft Francisca",
-  "Microsoft Daniel",
-];
-
-/** Carrega vozes — em alguns browsers só ficam prontas após `onvoiceschanged`. */
-const loadVoices = (): Promise<SpeechSynthesisVoice[]> =>
-  new Promise((resolve) => {
-    if (!("speechSynthesis" in window)) return resolve([]);
-    const existing = window.speechSynthesis.getVoices();
-    if (existing.length > 0) return resolve(existing);
-    const handler = () => {
-      const v = window.speechSynthesis.getVoices();
-      window.speechSynthesis.onvoiceschanged = null;
-      resolve(v);
-    };
-    window.speechSynthesis.onvoiceschanged = handler;
-    // Fallback: alguns navegadores (Safari) nunca disparam o evento
-    setTimeout(() => resolve(window.speechSynthesis.getVoices()), 800);
-  });
-
-/** Escolhe a melhor voz pt-BR disponível. */
-const pickVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
-  // 1. Por nome preferido + qualquer pt
-  for (const name of PREFERRED_VOICE_NAMES) {
-    const v = voices.find(
-      (vv) => vv.name.toLowerCase().includes(name.toLowerCase()) && vv.lang.startsWith("pt")
-    );
-    if (v) return v;
-  }
-  // 2. Qualquer pt-BR
-  const ptBR = voices.find((v) => v.lang === "pt-BR");
-  if (ptBR) return ptBR;
-  // 3. Qualquer pt
-  const ptAny = voices.find((v) => v.lang.startsWith("pt"));
-  if (ptAny) return ptAny;
-  return null;
-};
-
 export const useTTS = () => {
   const cancelledRef = useRef(false);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
@@ -105,10 +58,10 @@ export const useTTS = () => {
     cancelledRef.current = false;
     window.speechSynthesis.cancel();
 
-    // Carrega/reusa voz
+    // Carrega/reusa voz (feminina pt-BR, fonte única)
     if (!voiceRef.current) {
       const voices = await loadVoices();
-      voiceRef.current = pickVoice(voices);
+      voiceRef.current = pickFemaleVoice(voices);
     }
 
     const sentences = splitSentences(text);
@@ -120,9 +73,9 @@ export const useTTS = () => {
         utt.lang = "pt-BR";
         // Tom suave e amigo: ritmo levemente mais lento que o normal,
         // pitch quase neutro para parecer "tia que conta história".
-        utt.rate = options?.rate ?? 0.88;
-        utt.pitch = options?.pitch ?? 1.0;
-        utt.volume = 0.95;
+        utt.rate = options?.rate ?? SOFT_RATE;
+        utt.pitch = options?.pitch ?? SOFT_PITCH;
+        utt.volume = SOFT_VOLUME;
         if (voiceRef.current) utt.voice = voiceRef.current;
 
         let settled = false;

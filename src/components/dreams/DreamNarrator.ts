@@ -1,5 +1,7 @@
 /* ── Sleep story narrator with natural pauses ── */
 
+import { pickFemaleVoice } from "@/lib/ttsVoice";
+
 export class DreamNarrator {
   private utterances: SpeechSynthesisUtterance[] = [];
   private currentIndex = 0;
@@ -16,10 +18,8 @@ export class DreamNarrator {
 
   private pickVoice() {
     if (typeof window === "undefined") return;
-    const voices = window.speechSynthesis.getVoices();
-    const ptBR = voices.filter(v => v.lang === "pt-BR");
-    const female = ptBR.filter(v => /female|feminino|luciana|francisca|google/i.test(v.name));
-    this.voice = female[0] || ptBR[0] || voices.filter(v => v.lang.startsWith("pt"))[0] || null;
+    // Voz feminina pt-BR padronizada (fonte única).
+    this.voice = pickFemaleVoice(window.speechSynthesis.getVoices());
   }
 
   speak(text: string, onEnd?: () => void) {
