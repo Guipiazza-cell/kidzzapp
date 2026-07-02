@@ -74,13 +74,14 @@ const ReferralProgram = ({ onBack }: Props) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col"
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 30 }}
       style={{
         // Cream forest gradient — quente, acolhedor, anti-fundo-branco
         background: "linear-gradient(170deg, #FBF6EC 0%, #F5E9D6 35%, #E8D9BC 70%, #D9C29A 100%)",
+        touchAction: "pan-y",
       }}
     >
       {/* Decorative organic shapes — leaves & glow */}
@@ -134,7 +135,7 @@ const ReferralProgram = ({ onBack }: Props) => {
         </h1>
       </header>
 
-      <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden px-5 pb-8">
+      <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-5 pb-8">
         {/* Hero — KIDZZ explorer waving */}
         <div className="text-center mt-2 mb-5">
           <motion.div
