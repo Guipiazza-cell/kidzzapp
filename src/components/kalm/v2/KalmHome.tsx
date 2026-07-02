@@ -189,43 +189,6 @@ const KalmHome = ({ onBack, onGoPath, onOpenActivity }: Props) => {
         </button>
       </section>
 
-      {/* Termômetro emocional */}
-      <section className="px-5 pt-6">
-        <p className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{ color: "#46703A" }}>
-          Como você está sentindo hoje?
-        </p>
-        <div className="mt-3 rounded-[20px] p-3"
-          style={{ background: cream, border: "1px solid rgba(42,37,32,0.06)" }}>
-          <div className="flex items-stretch justify-between gap-1.5">
-            {moods.map((m) => {
-              const on = moodToday === m.v;
-              return (
-                <button key={m.v} onClick={() => handleMood(m.v)}
-                  className="flex-1 flex flex-col items-center justify-center py-2 rounded-2xl active:scale-95"
-                  style={{
-                    background: on ? `${m.color}22` : "transparent",
-                    border: `1.5px solid ${on ? m.color : "transparent"}`,
-                  }}
-                  aria-label={m.label} aria-pressed={on}>
-                  <span className="text-[26px] leading-none" aria-hidden>{m.emoji}</span>
-                  <span className="mt-1 text-[10px] font-bold leading-tight text-center"
-                    style={{ color: on ? m.color : inkSoft }}>
-                    {m.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          {moodSuggestion && (
-            <button onClick={() => { haptic("light"); onOpenActivity(moodSuggestion); }}
-              className="mt-3 w-full h-11 rounded-full font-bold text-[13px] flex items-center justify-center gap-2 text-white active:scale-95"
-              style={{ background: "linear-gradient(135deg,#46703A,#7FB069)" }}>
-              <Sparkles size={14} /> Tente: {moodSuggestion.title}
-            </button>
-          )}
-        </div>
-      </section>
-
       {/* Jarro da gratidão */}
       <section className="px-5 pt-6">
         <p className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{ color: "#C9A227" }}>
@@ -304,6 +267,43 @@ const KalmHome = ({ onBack, onGoPath, onOpenActivity }: Props) => {
               </button>
             );
           })}
+        </div>
+      </section>
+
+      {/* Termômetro emocional */}
+      <section className="px-5 pt-6">
+        <p className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{ color: "#46703A" }}>
+          Como você está sentindo hoje?
+        </p>
+        <div className="mt-3 rounded-[20px] p-3"
+          style={{ background: cream, border: "1px solid rgba(42,37,32,0.06)" }}>
+          <div className="flex items-stretch justify-between gap-1.5">
+            {moods.map((m) => {
+              const on = moodToday === m.v;
+              return (
+                <button key={m.v} onClick={() => handleMood(m.v)}
+                  className="flex-1 flex flex-col items-center justify-center py-2 rounded-2xl active:scale-95"
+                  style={{
+                    background: on ? `${m.color}22` : "transparent",
+                    border: `1.5px solid ${on ? m.color : "transparent"}`,
+                  }}
+                  aria-label={m.label} aria-pressed={on}>
+                  <span className="text-[26px] leading-none" aria-hidden>{m.emoji}</span>
+                  <span className="mt-1 text-[10px] font-bold leading-tight text-center"
+                    style={{ color: on ? m.color : inkSoft }}>
+                    {m.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {moodSuggestion && (
+            <button onClick={() => { haptic("light"); onOpenActivity(moodSuggestion); }}
+              className="mt-3 w-full h-11 rounded-full font-bold text-[13px] flex items-center justify-center gap-2 text-white active:scale-95"
+              style={{ background: "linear-gradient(135deg,#46703A,#7FB069)" }}>
+              <Sparkles size={14} /> Tente: {moodSuggestion.title}
+            </button>
+          )}
         </div>
       </section>
 
