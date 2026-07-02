@@ -5,7 +5,7 @@ import { addXP } from "@/lib/habitLoop";
 import { useAuth } from "@/contexts/AuthContext";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
-import pixelImg from "@/assets/pixel-chameleon.webp";
+import pixelImg from "@/assets/chameleon-main.webp";
 import GameResultScreen from "./GameResultScreen";
 
 interface Obstacle {

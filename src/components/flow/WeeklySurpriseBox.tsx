@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gift, X, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
-import pixelImg from "@/assets/pixel-chameleon.webp";
+import pixelImg from "@/assets/chameleon-main.webp";
 import aneImg from "@/assets/ane-chameleon.webp";
 
 const SURPRISE_STORAGE_KEY = "kidzz_weekly_surprise";

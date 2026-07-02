@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { Sparkles, Check, Crown, Loader2 } from "lucide-react";
 import MagicalBackground from "@/components/MagicalBackground";
-import pixelImg from "@/assets/pixel-chameleon.webp";
+import pixelImg from "@/assets/chameleon-main.webp";
 import aneImg from "@/assets/ane-chameleon.webp";
 
 type PlanInfo = {

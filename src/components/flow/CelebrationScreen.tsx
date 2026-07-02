@@ -4,7 +4,7 @@ import { Sparkles, ArrowRight, Bookmark } from "lucide-react";
 import confetti from "canvas-confetti";
 // getMascotDialogue intentionally unused — phrases come from the local pool for variety
 import { addXP, incrementDailyStreak } from "@/lib/habitLoop";
-import pixelImg from "@/assets/pixel-chameleon.webp";
+import pixelImg from "@/assets/chameleon-main.webp";
 import aneImg from "@/assets/ane-chameleon.webp";
 
 // Emotional, varied phrases — never repeat the same one twice in a row.

@@ -12,7 +12,7 @@
 import { forwardRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import aneImg from "@/assets/ane-chameleon.webp";
-import pixelImg from "@/assets/pixel-chameleon.webp";
+import pixelImg from "@/assets/chameleon-main.webp";
 
 export type AvatarBase = "ane" | "pixel";
 export type AvatarExpression =

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Lock, Sparkles, Crown } from "lucide-react";
 import chameleonBlue from "@/assets/chameleon-blue.webp";
 import chameleonRed from "@/assets/chameleon-red.webp";
-import chameleonDark from "@/assets/chameleon-dark.webp";
+import chameleonDark from "@/assets/chameleon-main.webp";
 import chameleonMain from "@/assets/chameleon-main.webp";
 import type { SubscriptionTier } from "@/contexts/AuthContext";
 
