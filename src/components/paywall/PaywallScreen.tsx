@@ -214,7 +214,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
             style={{ color: INK_SOFT }}
           >
             <Users size={13} />
-            <span>+12.430 famílias no movimento Menos Tela</span>
+            <span>Famílias no movimento Menos Tela</span>
           </div>
         </motion.div>
 
