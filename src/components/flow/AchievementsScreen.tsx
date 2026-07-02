@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown, Share2 } from "lucide-react";
+import { Trophy, Star, Zap, BookOpen, MessageCircle, Sparkles, Flame, Crown, Share2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import KidzzHeader from "@/components/common/KidzzHeader";
 import { Progress } from "@/components/ui/progress";
 import confetti from "canvas-confetti";
 import { useEffect, useRef } from "react";
@@ -91,39 +92,12 @@ const AchievementsScreen = ({ onBack }: Props) => {
       exit={{ opacity: 0, x: 30 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Header — dynamic island */}
-      <header
-        className="absolute top-0 left-0 right-0 z-30 flex items-center gap-3 px-5 pb-3"
-        style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
-      >
-        <motion.button
-          onClick={onBack}
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
-          whileTap={{ scale: 0.9 }}
-        >
-          <ArrowLeft size={20} />
-        </motion.button>
-        <div className="glass-island flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl font-ui">
-          <h1 className="font-display text-[17px] font-semibold leading-tight truncate">
-            Conquistas de {profile?.child_name || "amigo"}
-          </h1>
-          <p className="text-[10.5px] font-semibold leading-tight truncate opacity-80">
-            {unlockedCount}/{BADGES.length} desbloqueadas
-          </p>
-        </div>
-        <motion.div
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
-          animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-        >
-          <span className="text-xl">🏆</span>
-        </motion.div>
-      </header>
+      <KidzzHeader onBack={onBack} />
 
       {/* Level progress card */}
       <div
         className="px-5 mb-3 relative z-10"
-        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 64px)" }}
+        style={{ paddingTop: 12 }}
       >
         <div className="glass-card rounded-2xl p-4">
           <div className="flex items-center gap-3 mb-3">

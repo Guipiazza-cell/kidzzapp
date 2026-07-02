@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ExternalLink, Clock, ListMusic, Play, X } from "lucide-react";
+import { ExternalLink, Clock, ListMusic, Play, X } from "lucide-react";
 import {
   PLAYLISTS,
   getWeeklyPlaylist,
@@ -11,6 +11,7 @@ import {
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import KidzzHeader from "@/components/common/KidzzHeader";
 
 interface Props {
   onBack: () => void;
@@ -246,31 +247,14 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         }}
       />
 
-      {/* Header — dynamic island */}
-      <header
-        className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2"
-        style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}
-      >
-        <motion.button
-          onClick={onBack}
-          whileTap={{ scale: 0.9 }}
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
-          aria-label="Voltar"
-        >
-          <ArrowLeft size={20} />
-        </motion.button>
-        <div className="glass-island flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl font-ui">
-          <h1 className="font-display text-[18px] font-semibold leading-tight truncate">Momentos</h1>
-          <p className="text-[10.5px] font-semibold leading-tight truncate opacity-80">Curadoria musical em família</p>
-        </div>
-      </header>
+      <KidzzHeader onBack={onBack} />
 
       {/* Scroll */}
       <div
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain relative z-10"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
+          paddingTop: 12,
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >

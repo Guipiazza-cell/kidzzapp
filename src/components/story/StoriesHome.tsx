@@ -5,11 +5,12 @@
  */
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X } from "lucide-react";
+import { ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X } from "lucide-react";
 import { useMemories } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAllProgress } from "@/lib/storyProgress";
 import { haptic } from "@/lib/haptics";
+import KidzzHeader from "@/components/common/KidzzHeader";
 import StoryFactory from "./StoryFactory";
 import ReadingMode from "./ReadingMode";
 import { LIBRARY_STORIES } from "./storyLibrary";
@@ -94,30 +95,13 @@ const StoriesHome = ({ onBack }: Props) => {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative min-h-0" style={{ background: "linear-gradient(180deg,#FDF8EE 0%, #F2EFE6 100%)" }}>
-      {/* Header island */}
-      <header
-        className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2"
-        style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}
-      >
-        <motion.button
-          onClick={onBack}
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
-          whileTap={{ scale: 0.9 }}
-          aria-label="Voltar"
-        >
-          <ArrowLeft size={20} />
-        </motion.button>
-        <div className="glass-island flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full font-ui">
-          <BookOpen size={16} className="text-[#2F4A2E] shrink-0" />
-          <h1 className="font-display text-[17px] font-semibold truncate" style={{ color: "#2A2520" }}>Histórias</h1>
-        </div>
-      </header>
+      <KidzzHeader onBack={onBack} />
 
       <div
         className="flex-1 relative z-10 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 78px)",
+          paddingTop: 12,
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >

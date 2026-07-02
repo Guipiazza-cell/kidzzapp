@@ -5,6 +5,7 @@ import {
   Mic, Sparkles, BookOpen, Sliders, Play, Lock, Star, X, Volume2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import KidzzHeader from "@/components/common/KidzzHeader";
 import LivingForest from "./LivingForest";
 import MorningKaraoke from "./MorningKaraoke";
 import DanceWithAne from "./DanceWithAne";
@@ -465,35 +466,30 @@ const MusicShell = ({
     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
   >
     <LivingForest variant="light">
-      {/* Header — dynamic island */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2"
-        style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 12px)" }}>
-        <button
-          onClick={onBack}
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
-          aria-label="Voltar"
-        >
-          <ArrowLeft size={20} className="text-gray-700" />
-        </button>
-        <div className="flex-1" />
-        <button
-          onClick={onOpenParental}
-          className="glass-island min-h-[36px] px-3 rounded-full flex items-center gap-1.5 text-[12px] font-extrabold text-gray-700"
-          aria-label="Painel dos pais"
-        >
-          👨‍👩‍👧 Pais
-        </button>
-        <div className="glass-island min-h-[36px] px-2.5 rounded-full flex items-center gap-1 text-[12px] font-extrabold text-amber-800">
-          <Star size={14} className="text-amber-500" />
-          {xp}
-        </div>
-      </div>
+      <KidzzHeader
+        onBack={onBack}
+        right={
+          <>
+            <button
+              onClick={onOpenParental}
+              className="glass-island min-h-[36px] px-3 rounded-full flex items-center gap-1.5 text-[12px] font-extrabold text-gray-700"
+              aria-label="Painel dos pais"
+            >
+              👨‍👩‍👧 Pais
+            </button>
+            <div className="glass-island min-h-[36px] px-2.5 rounded-full flex items-center gap-1 text-[12px] font-extrabold text-amber-800">
+              <Star size={14} className="text-amber-500" />
+              {xp}
+            </div>
+          </>
+        }
+      />
 
       <div
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 68px)",
+          paddingTop: 12,
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >

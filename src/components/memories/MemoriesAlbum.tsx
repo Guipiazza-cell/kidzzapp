@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, MessageCircle } from "lucide-react";
+import { Star, Share2, Lock, Heart, BookOpen, HelpCircle, Target, Trophy, MessageCircle } from "lucide-react";
 import { useMemories, type Memory } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import KidzzHeader from "@/components/common/KidzzHeader";
 import AchievementsScreen from "@/components/flow/AchievementsScreen";
 
 interface MemoriesAlbumProps {
@@ -248,33 +249,11 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
-      {/* Header — dynamic island */}
-      <header
-        className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2"
-        style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 16px)" }}
-      >
-        <motion.button
-          onClick={onBack}
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full"
-          whileTap={{ scale: 0.9 }}
-        >
-          <ArrowLeft size={20} />
-        </motion.button>
-        <div className="glass-island flex-1 min-w-0 px-3.5 py-1.5 rounded-2xl font-ui">
-          <h1 className="font-display text-[17px] font-semibold leading-tight truncate">
-            Memórias de {childName} 💛
-          </h1>
-          <p className="text-[10.5px] font-semibold leading-tight truncate opacity-80">
-            {totalCount} memórias criadas
-          </p>
-        </div>
-      </header>
+      {/* Header padrão do app */}
+      <KidzzHeader onBack={onBack} />
 
-      {/* Section toggle: Memórias / Conquistas — dynamic island */}
-      <div
-        className="absolute left-0 right-0 z-30 px-4 pb-2"
-        style={{ top: "calc(max(env(safe-area-inset-top, 12px), 16px) + 56px)" }}
-      >
+      {/* Section toggle: Memórias / Conquistas — em fluxo, logo abaixo do header */}
+      <div className="px-4 pt-2 pb-2">
         <div className="glass-island flex gap-2 p-1 rounded-2xl max-w-sm mx-auto">
           {([
             { id: "memories", label: "💛 Conteúdos" },
@@ -304,7 +283,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
           className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
           style={{
             WebkitOverflowScrolling: "touch",
-            paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 108px)",
+            paddingTop: 12,
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
@@ -314,11 +293,8 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
       <>
 
 
-      {/* Filters — dynamic island */}
-      <div
-        className="absolute left-0 right-0 z-30 px-4 pb-2"
-        style={{ top: "calc(max(env(safe-area-inset-top, 12px), 16px) + 106px)" }}
-      >
+      {/* Filters — em fluxo */}
+      <div className="px-4 pb-2">
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
           {FILTER_OPTIONS.map((opt) => {
             const isActive = filter === opt.id;
@@ -347,7 +323,7 @@ const MemoriesAlbum = ({ onBack, onNavigateToChat, onNavigateToStories }: Memori
         className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 148px)",
+          paddingTop: 12,
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >

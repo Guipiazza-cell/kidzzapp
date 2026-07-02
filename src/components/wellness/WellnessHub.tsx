@@ -13,6 +13,7 @@ import wellnessMascot from "@/assets/kidzz/wellness.webp";
 import WellnessCinema from "./WellnessCinema";
 import WellnessGrowth from "./WellnessGrowth";
 import KalmSections from "@/components/kalm/KalmSections";
+import KidzzHeader from "@/components/common/KidzzHeader";
 
 /* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
    Paleta sálvia + esmeralda + creme + dourado fosco.
@@ -382,7 +383,7 @@ const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: 
 
   return (
     <>
-      <TopBar title="Wellness" onBack={onBack} />
+      <KidzzHeader onBack={onBack} />
 
       {/* Greeting + streak */}
       <header className="px-5 pt-3 pb-1 flex items-center justify-between">

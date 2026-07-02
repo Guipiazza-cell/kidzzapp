@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, BookOpen, Library } from "lucide-react";
+import { Library } from "lucide-react";
+import KidzzHeader from "@/components/common/KidzzHeader";
 import AvatarCustomization from "./AvatarCustomization";
 import PersonalizationPanel, { StoryIntent, EnsinarSub, VoiceRate } from "./PersonalizationPanel";
 import StoryDisplay from "./StoryDisplay";
@@ -191,35 +192,25 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative min-h-0" style={{ background: "linear-gradient(180deg,#FDF8EE 0%, #F2EFE6 100%)" }}>
-      <header className="absolute top-0 left-0 right-0 z-30 flex items-center gap-2 px-3 pb-2" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 12px), 16px) + 8px)" }}>
-        <motion.button
-          onClick={onBack}
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-700"
-          whileTap={{ scale: 0.9 }}>
-          <ArrowLeft size={20} />
-        </motion.button>
-        <div className="glass-island flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2 rounded-full font-ui">
-          <BookOpen size={16} className="text-kid-orange shrink-0" />
-          <h1 className="font-display text-[17px] font-semibold truncate">Fábrica de Histórias</h1>
-          <span className="ml-auto text-[9.5px] font-extrabold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2 py-0.5 rounded-full shrink-0">
-            EXCLUSIVO
-          </span>
-        </div>
-        <motion.button
-          onClick={() => setGalleryOpen(true)}
-          className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-amber-600"
-          whileTap={{ scale: 0.9 }}
-          aria-label="Galeria de histórias"
-        >
-          <Library size={18} />
-        </motion.button>
-      </header>
+      <KidzzHeader
+        onBack={onBack}
+        right={
+          <motion.button
+            onClick={() => setGalleryOpen(true)}
+            className="glass-island min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-amber-600"
+            whileTap={{ scale: 0.9 }}
+            aria-label="Galeria de histórias"
+          >
+            <Library size={18} />
+          </motion.button>
+        }
+      />
 
       <div
         className="flex-1 relative z-10 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 80px)",
+          paddingTop: 12,
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
         }}
       >

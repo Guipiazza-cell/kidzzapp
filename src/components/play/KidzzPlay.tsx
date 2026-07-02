@@ -19,6 +19,7 @@ import {
   type BrincarExperience,
 } from "@/data/brincarExperiences";
 import LockedFeature from "@/components/LockedFeature";
+import KidzzHeader from "@/components/common/KidzzHeader";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
@@ -135,6 +136,7 @@ interface Props {
 }
 
 const KidzzPlay = ({
+  onBack,
   onGameComplete,
   onOpenTravel,
   onOpenAchievements,
@@ -214,50 +216,42 @@ const KidzzPlay = ({
     setActiveGame(id);
   };
 
-  /* ───────── HEADER FLOATING (Pais + Trophy) ───────── */
-  const FloatingHeader = (
-    <div
-      className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4"
-      style={{ paddingTop: "max(env(safe-area-inset-top, 12px), 14px)" }}
-    >
-      {sub !== "home" ? (
-        <motion.button
-          onClick={() => {
-            setSub("home");
-            setActiveGame(null);
-          }}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/70 backdrop-blur-md border border-white/60 shadow"
-          whileTap={{ scale: 0.92 }}
-          aria-label="Voltar"
-        >
-          <ArrowLeft size={20} className="text-[#2A2520]" />
-        </motion.button>
-      ) : (
-        <div />
-      )}
-      <div className="flex items-center gap-2">
-        <motion.button
-          type="button"
-          onClick={onOpenParental}
-          whileTap={{ scale: 0.94 }}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
-        >
-          <Shield size={14} className="text-[#46703A]" strokeWidth={2.4} />
-          <span className="text-[13px] font-bold text-[#2A2520]">Pais</span>
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={onOpenAchievements}
-          whileTap={{ scale: 0.94 }}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
-        >
-          <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
-          <span className="text-[13px] font-extrabold text-[#2A2520]">
-            {sessionScore}
-          </span>
-        </motion.button>
-      </div>
-    </div>
+  /* ───────── HEADER PADRÃO (KidzzHeader — Pais + Trophy) ───────── */
+  const headerBack =
+    sub === "home"
+      ? onBack
+      : () => {
+          setSub("home");
+          setActiveGame(null);
+        };
+  const PlayHeader = (
+    <KidzzHeader
+      onBack={headerBack}
+      right={
+        <>
+          <motion.button
+            type="button"
+            onClick={onOpenParental}
+            whileTap={{ scale: 0.94 }}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
+          >
+            <Shield size={14} className="text-[#46703A]" strokeWidth={2.4} />
+            <span className="text-[13px] font-bold text-[#2A2520]">Pais</span>
+          </motion.button>
+          <motion.button
+            type="button"
+            onClick={onOpenAchievements}
+            whileTap={{ scale: 0.94 }}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
+          >
+            <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
+            <span className="text-[13px] font-extrabold text-[#2A2520]">
+              {sessionScore}
+            </span>
+          </motion.button>
+        </>
+      }
+    />
   );
 
   /* ───────── HOME (matching reference) ───────── */
@@ -271,7 +265,7 @@ const KidzzPlay = ({
       className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
       style={{
         WebkitOverflowScrolling: "touch",
-        paddingTop: "calc(env(safe-area-inset-top, 0px) + 60px)",
+        paddingTop: 12,
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)",
       }}
     >
@@ -475,7 +469,7 @@ const KidzzPlay = ({
       className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
       style={{
         WebkitOverflowScrolling: "touch",
-        paddingTop: "calc(env(safe-area-inset-top, 0px) + 72px)",
+        paddingTop: 12,
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)",
       }}
     >
@@ -569,7 +563,7 @@ const KidzzPlay = ({
       className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
       style={{
         WebkitOverflowScrolling: "touch",
-        paddingTop: "calc(env(safe-area-inset-top, 0px) + 72px)",
+        paddingTop: 12,
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)",
       }}
     >
@@ -777,7 +771,7 @@ const KidzzPlay = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {sub !== "missoes" && FloatingHeader}
+      {sub !== "missoes" && PlayHeader}
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
