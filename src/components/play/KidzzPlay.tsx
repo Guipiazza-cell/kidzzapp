@@ -276,32 +276,24 @@ const KidzzPlay = ({
       }}
     >
       {/* HERO with chameleon */}
-      <section className="relative px-5 pt-2 pb-3">
-        <div className="relative">
-          <img
-            src={heroChameleon}
-            alt="Camaleão Kidzz na floresta"
-            className="absolute right-[-12px] top-[-6px] w-[58%] max-w-[260px] h-auto object-contain pointer-events-none select-none"
-            style={{ filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.22))" }}
-          />
-          <div className="relative z-10 pr-[44%]">
-            <p className="text-[13px] font-semibold text-[#2A2520]/85 flex items-center gap-1.5">
-              {greeting}, família!
-              <span className="text-base">💚</span>
-            </p>
-            <h1 className="font-display mt-2 text-[34px] leading-[1.02] font-extrabold text-[#1B1B1B] tracking-tight">
-              Brincar
-              <br />
-              faz parte da{" "}
-              <span className="text-[#46703A]">magia</span>
-              <br />
-              de crescer.
-            </h1>
-            <p className="mt-3 text-[13px] leading-snug text-[#2A2520]/75 font-medium max-w-[230px]">
-              Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
-            </p>
-          </div>
-        </div>
+      <section className="px-5 pt-2 pb-3">
+        <img
+          src={heroChameleon}
+          alt="Camaleão Kidzz na floresta"
+          className="w-full h-36 object-cover rounded-3xl select-none mb-4"
+          style={{ objectPosition: "center 30%", boxShadow: "0 12px 24px rgba(0,0,0,0.12)" }}
+        />
+        <p className="text-[13px] font-semibold text-[#2A2520]/85 flex items-center gap-1.5">
+          {greeting}, família!
+          <span className="text-base">💚</span>
+        </p>
+        <h1 className="font-display mt-2 text-[34px] leading-[1.02] font-extrabold text-[#1B1B1B] tracking-tight">
+          Brincar faz parte da{" "}
+          <span className="text-[#46703A]">magia</span> de crescer.
+        </h1>
+        <p className="mt-3 text-[13px] leading-snug text-[#2A2520]/75 font-medium">
+          Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
+        </p>
       </section>
 
       {/* 4 CATEGORY CARDS — 2x2 */}
