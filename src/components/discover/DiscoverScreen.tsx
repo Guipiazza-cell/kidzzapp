@@ -127,21 +127,8 @@ function GlassHeader({ onBack, onSearch }: { onBack?: () => void; onSearch?: () 
             Menos tela. Mais memórias.
           </span>
         </div>
-        <button
-          type="button"
-          onClick={() => { haptic("light"); onSearch?.(); }}
-          aria-label="Buscar"
-          className="active:scale-95"
-          style={{
-            width: 44, height: 44, borderRadius: 999,
-            background: "rgba(255,255,255,0.85)",
-            border: "1px solid rgba(42,37,32,0.08)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(42,37,32,0.08)",
-          }}
-        >
-          <Search size={20} color={INK} strokeWidth={2.2} />
-        </button>
+        {/* Spacer p/ manter o título centralizado (lupa removida) */}
+        <div aria-hidden style={{ width: 44, height: 44 }} />
       </div>
     </div>
   );
@@ -266,6 +253,7 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
             aria-hidden
             style={{
               flexShrink: 0,
+              marginRight: 14,
               width: 40, height: 40, borderRadius: 999,
               background: theme.cta,
               display: "flex", alignItems: "center", justifyContent: "center",
