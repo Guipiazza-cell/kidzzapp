@@ -742,7 +742,7 @@ function ActivityCard({
                       padding: "14px 18px",
                       borderRadius: 16,
                       background: accent,
-                      color: accentInk === INK ? CREAM : accentInk,
+                      color: CREAM,
                       fontFamily: "'Nunito', system-ui, sans-serif",
                       fontWeight: 800,
                       fontSize: 14.5,
