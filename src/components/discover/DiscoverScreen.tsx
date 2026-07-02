@@ -306,7 +306,7 @@ function ThemeDetail({
       exit={{ opacity: 0, y: 12 }}
       transition={{ duration: 0.25 }}
       className="absolute inset-0 flex flex-col"
-      style={{ background: CREAM_DEEP, zIndex: 10 }}
+      style={{ background: CREAM_DEEP, zIndex: 40 }}
     >
       {/* Cabeçalho imersivo */}
       <div
