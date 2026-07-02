@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { ELEVEN_FEMALE_VOICE_ID } from "@/lib/ttsVoice";
 import OnboardingShell from "./OnboardingShell";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { sfx } from "@/lib/sfx";
@@ -98,7 +99,7 @@ const FirstMagicMoment = ({ onComplete }: Props) => {
     try {
       setAudioLoading(true);
       const { data, error } = await supabase.functions.invoke("elevenlabs-tts", {
-        body: { text },
+        body: { text, voiceId: ELEVEN_FEMALE_VOICE_ID },
       });
       if (error) throw error;
       const audioContent = (data as any)?.audioContent;

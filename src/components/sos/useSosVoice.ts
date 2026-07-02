@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ELEVEN_FEMALE_VOICE_ID } from "@/lib/ttsVoice";
 
 /**
  * Hook para narração emocional do SOS via ElevenLabs (voz Alice, calma).
@@ -43,7 +44,7 @@ export function useSosVoice() {
       setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke("elevenlabs-tts", {
-          body: { text },
+          body: { text, voiceId: ELEVEN_FEMALE_VOICE_ID },
         });
         if (error) throw error;
         const audioContent = (data as any)?.audioContent;

@@ -4,6 +4,7 @@ import { X, Wind, Sunset, HeartHandshake, Sparkles, Loader2, Volume2, VolumeX, C
 import { supabase } from "@/integrations/supabase/client";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
+import { ELEVEN_FEMALE_VOICE_ID } from "@/lib/ttsVoice";
 
 /**
  * Wellness Cinemático — Quick Modes emocionais.
@@ -95,7 +96,7 @@ async function speak(text: string, audioRef: React.MutableRefObject<HTMLAudioEle
   let dataUri = voiceCache.get(text);
   if (!dataUri) {
     try {
-      const { data, error } = await supabase.functions.invoke("elevenlabs-tts", { body: { text } });
+      const { data, error } = await supabase.functions.invoke("elevenlabs-tts", { body: { text, voiceId: ELEVEN_FEMALE_VOICE_ID } });
       if (error || !(data as any)?.audioContent) return;
       dataUri = `data:audio/mpeg;base64,${(data as any).audioContent}`;
       voiceCache.set(text, dataUri);

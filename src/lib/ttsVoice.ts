@@ -13,6 +13,13 @@ export const SOFT_RATE = 0.88;
 export const SOFT_PITCH = 1.02;
 export const SOFT_VOLUME = 0.95;
 
+/**
+ * Voz feminina do ElevenLabs (usada nas narrações via edge `elevenlabs-tts`).
+ * "Sarah" — feminina, mansa e serena. Forçada pelo cliente para não depender
+ * do redeploy do edge function. (O antigo TX3LPaxmHKxFdv7VOQHJ era "Liam", masculina.)
+ */
+export const ELEVEN_FEMALE_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+
 /** Vozes femininas pt-BR/pt mais agradáveis, em ordem de preferência. */
 export const FEMALE_PT_VOICE_NAMES = [
   "Luciana",        // iOS / macOS
