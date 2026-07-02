@@ -595,27 +595,29 @@ const DreamWorld = ({ onBack }: Props) => {
             const soundFree = canAccess(sound.free);
             const playlistAllowed = canAccess(false) || playlist.id === "babies";
             const storyAllowed = canAccess(story.free);
-            // 1. ambient sound (se permitido)
-            if (soundFree && sound.url) {
-              const engine = engineRef.current;
-              if (engine && activeSounds[sound.id] === undefined) {
-                const ok = await engine.start(sound.id, sound.url, 0.4);
-                if (ok) setActiveSounds({ [sound.id]: 0.4 });
-              }
-            }
-            // 2. narrate story
+            // 1. narrar história PRIMEIRO — síncrono, dentro do gesto do usuário.
+            // (iOS bloqueia speechSynthesis.speak() chamado depois de um await → sem voz.)
             if (storyAllowed) {
               setSelectedStory(story.id);
               setIsNarrating(true);
               narratorRef.current?.speak(story.text, () => {
                 setIsNarrating(false);
-                // 3. abrir playlist quando a história terminar
+                // abrir playlist quando a história terminar
                 if (playlistAllowed) setOpenPlaylist(playlist.id);
               });
             } else if (playlistAllowed) {
               setOpenPlaylist(playlist.id);
             } else {
               triggerPaywall("Sequência mágica completa no plano Premium.");
+              return;
+            }
+            // 2. som ambiente depois (await ok — a voz já começou)
+            if (soundFree && sound.url) {
+              const engine = engineRef.current;
+              if (engine && activeSounds[sound.id] === undefined) {
+                const ok = await engine.start(sound.id, sound.url, 0.4);
+                if (ok) setActiveSounds({ [sound.id]: 0.4 });
+              }
             }
           };
           return (
