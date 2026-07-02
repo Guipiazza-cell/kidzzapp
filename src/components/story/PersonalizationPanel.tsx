@@ -139,7 +139,7 @@ const PersonalizationPanel = ({
         <span className="inline-block text-[10.5px] font-extrabold tracking-[0.18em] uppercase mb-2" style={{ color: "#E8821A" }}>
           Painel dos Pais
         </span>
-        <h2 className="font-display text-[24px] leading-[1.05] font-semibold tracking-tight" style={{ color: "#2A2520", fontFamily: "'Fraunces', Georgia, serif" }}>
+        <h2 className="font-display text-[24px] leading-[1.05] font-semibold tracking-tight" style={{ color: "#2A2520", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Vamos criar uma história só do(a) {childName}
         </h2>
         <p className="text-[13px] mt-1.5 leading-snug" style={{ color: "rgba(42,37,32,0.66)" }}>
@@ -172,7 +172,7 @@ const PersonalizationPanel = ({
 
       {/* CAMADA 1 — palavras-chave */}
       <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
-        <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+        <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           O que faz os olhos do(a) {childName} brilharem?
         </h3>
         <p className="text-[12.5px] mt-1 leading-snug" style={{ color: "rgba(42,37,32,0.6)" }}>
@@ -245,7 +245,7 @@ const PersonalizationPanel = ({
 
       {/* CAMADA 2 — intenção */}
       <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
-        <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+        <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Qual o presente de hoje?
         </h3>
         <div className="grid grid-cols-2 gap-2 mt-3">
@@ -307,7 +307,7 @@ const PersonalizationPanel = ({
 
       {/* CAMADA 3 — voz */}
       <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
-        <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+        <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Voz da narração
         </h3>
         <p className="text-[12px] mt-0.5 leading-snug" style={{ color: "rgba(42,37,32,0.6)" }}>
@@ -375,7 +375,7 @@ const PersonalizationPanel = ({
           style={{
             background: "linear-gradient(180deg,#F19A3E,#E8821A)",
             boxShadow: "0 12px 24px -10px rgba(232,130,26,0.55), inset 0 1px 0 rgba(255,255,255,0.35)",
-            fontFamily: "'Mulish', system-ui, sans-serif",
+            fontFamily: "'Nunito', system-ui, sans-serif",
             letterSpacing: "0.03em",
           }}
         >

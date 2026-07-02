@@ -24,7 +24,7 @@ export const ShareMomentCard = forwardRef<HTMLDivElement, Props>(function ShareM
         height: 1080,
         position: "relative",
         background: "linear-gradient(165deg, #FFFDF6 0%, #FFE9C2 55%, #F4C58A 100%)",
-        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+        fontFamily: "'Nunito', system-ui, sans-serif",
         color: "#3a2f23",
         padding: 60,
         boxSizing: "border-box",
@@ -104,7 +104,7 @@ export const ShareMomentCard = forwardRef<HTMLDivElement, Props>(function ShareM
         <div style={{ fontSize: 30, fontWeight: 600, color: "#5a4d3d" }}>{friendly}</div>
         <div
           style={{
-            fontFamily: "'Fredoka', 'Plus Jakarta Sans', system-ui, sans-serif",
+            fontFamily: "'Nunito', system-ui, sans-serif",
             fontSize: 56, fontWeight: 600, lineHeight: 1.05, color: "#2F5E1F",
             marginTop: 8, letterSpacing: "-0.02em",
           }}

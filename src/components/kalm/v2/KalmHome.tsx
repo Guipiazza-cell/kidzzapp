@@ -103,7 +103,7 @@ const KalmHome = ({ onBack, onGoPath, onOpenActivity }: Props) => {
   return (
     <div className="min-h-full pb-32 relative" style={{
       background: `linear-gradient(180deg, #FBF7EF 0%, #FFFCF8 60%)`,
-      fontFamily: "'Mulish', system-ui, sans-serif",
+      fontFamily: "'Nunito', system-ui, sans-serif",
     }}>
       {/* Header vidro */}
       <div className="px-4 pt-[max(14px,env(safe-area-inset-top))] pb-3 flex items-center gap-2">
@@ -127,7 +127,7 @@ const KalmHome = ({ onBack, onGoPath, onOpenActivity }: Props) => {
           {greetByHour()}
         </p>
         <h1 className="mt-2 leading-[1.05]" style={{
-          color: ink, fontFamily: "'Fraunces', serif",
+          color: ink, fontFamily: "'Nunito', system-ui, sans-serif",
           fontSize: "clamp(28px, 8.6vw, 36px)",
         }}>
           Cuidar das emoções hoje,
@@ -158,7 +158,7 @@ const KalmHome = ({ onBack, onGoPath, onOpenActivity }: Props) => {
                 style={{ background: `${p.tint}22` }}>
                 <Icon size={20} style={{ color: p.tint }} strokeWidth={2} />
               </div>
-              <p className="mt-2.5 text-[14px] font-bold leading-tight" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+              <p className="mt-2.5 text-[14px] font-bold leading-tight" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
                 {p.title}
               </p>
               <p className="mt-0.5 text-[11.5px] leading-snug" style={{ color: inkSoft }}>
@@ -179,7 +179,7 @@ const KalmHome = ({ onBack, onGoPath, onOpenActivity }: Props) => {
             <Heart size={20} color="#fff" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[14.5px] font-bold leading-tight" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+            <p className="text-[14.5px] font-bold leading-tight" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
               Vínculo em família
             </p>
             <p className="text-[11.5px]" style={{ color: inkSoft }}>
@@ -236,7 +236,7 @@ const KalmHome = ({ onBack, onGoPath, onOpenActivity }: Props) => {
             background: "linear-gradient(135deg,#1F3A2B,#0E1F18)",
             color: "#FFFCF8",
           }}>
-          <h3 className="text-[20px] font-semibold leading-tight" style={{ fontFamily: "'Fraunces', serif" }}>
+          <h3 className="text-[20px] font-semibold leading-tight" style={{ fontFamily: "'Nunito', system-ui, sans-serif" }}>
             O que foi bom hoje?
           </h3>
           <p className="text-[12.5px] opacity-80 mt-1">

@@ -148,7 +148,7 @@ const StoriesHome = ({ onBack }: Props) => {
               style={{
                 color: "#1F3A2A",
                 fontSize: "clamp(28px, 8.6vw, 38px)",
-                fontFamily: "'Fraunces', Georgia, serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
               }}
             >
               Uma história só sua
@@ -164,7 +164,7 @@ const StoriesHome = ({ onBack }: Props) => {
               style={{
                 background: "linear-gradient(180deg,#F19A3E,#E8821A)",
                 boxShadow: "0 10px 22px -8px rgba(232,130,26,0.55), inset 0 1px 0 rgba(255,255,255,0.35)",
-                fontFamily: "'Mulish', system-ui, sans-serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
                 letterSpacing: "0.04em",
               }}
             >
@@ -215,7 +215,7 @@ const StoriesHome = ({ onBack }: Props) => {
         {continueReading.length > 0 && (
           <section className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display text-[20px] font-semibold" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+              <h3 className="font-display text-[20px] font-semibold" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
                 Continue lendo
               </h3>
             </div>
@@ -262,7 +262,7 @@ const StoriesHome = ({ onBack }: Props) => {
 
         {/* COLEÇÕES */}
         <section className="mb-4">
-          <h3 className="font-display text-[20px] font-semibold mb-3" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+          <h3 className="font-display text-[20px] font-semibold mb-3" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
             Coleções especiais
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -314,7 +314,7 @@ const StoriesHome = ({ onBack }: Props) => {
               transition={{ type: "spring", stiffness: 240, damping: 26 }}
             >
               <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <h3 className="font-display text-[20px] font-semibold" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+                <h3 className="font-display text-[20px] font-semibold" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
                   {CHIPS.find((c) => c.key === chip)?.label}
                 </h3>
                 <button onClick={() => setChipOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-full bg-white/80" aria-label="Fechar">
@@ -379,7 +379,7 @@ const StoriesHome = ({ onBack }: Props) => {
               <div className="flex items-center gap-3 px-5 pt-5 pb-3">
                 <img src={collection.img} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-display text-[19px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Fraunces', Georgia, serif" }}>
+                  <h3 className="font-display text-[19px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
                     {collection.label}
                   </h3>
                   <p className="text-[11.5px] leading-snug line-clamp-1" style={{ color: "rgba(42,37,32,0.6)" }}>

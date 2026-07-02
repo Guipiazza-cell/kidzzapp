@@ -14,9 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
+        // Projeto inteiro usa Nunito (fonte do KALM) — família única
         kids: ['"Nunito"', 'system-ui', 'sans-serif'],
-        display: ['"Fraunces"', '"Nunito"', 'Georgia', 'serif'],
-        ui: ['"Mulish"', '"Nunito"', 'system-ui', 'sans-serif'],
+        display: ['"Nunito"', 'system-ui', 'sans-serif'],
+        ui: ['"Nunito"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -20,8 +20,8 @@ const C = {
   inkMuted: "rgba(26,20,16,0.55)",
 };
 
-const display = '"Sora", "Fredoka", -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-const body = '"Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+const display = "'Nunito', system-ui, sans-serif";
+const body = "'Nunito', system-ui, sans-serif";
 
 const lpVars = {
   "--c-sage": C.sage,

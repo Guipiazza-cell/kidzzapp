@@ -63,7 +63,7 @@ const ActivityCard = ({ a, onOpen, locked }: { a: Activity; onOpen: () => void; 
         )}
       </div>
       <p className="font-semibold leading-tight" style={{
-        color: ink, fontFamily: "'Fraunces', serif",
+        color: ink, fontFamily: "'Nunito', system-ui, sans-serif",
         fontSize: "clamp(13px, 4vw, 15px)",
       }}>{a.title}</p>
       <p className="text-[11.5px] leading-snug" style={{ color: inkSoft }}>
@@ -86,7 +86,7 @@ export const RelaxarAgora = ({ onBack, onOpen, isPremium }:
         Quick Relief
       </p>
       <h1 className="mt-1 leading-tight" style={{
-        color: ink, fontFamily: "'Fraunces', serif",
+        color: ink, fontFamily: "'Nunito', system-ui, sans-serif",
         fontSize: "clamp(26px, 8vw, 34px)",
       }}>Alívio em minutos</h1>
       <p className="mt-1 text-[14px]" style={{ color: inkSoft }}>
@@ -103,7 +103,7 @@ export const RelaxarAgora = ({ onBack, onOpen, isPremium }:
 
     {/* Trilha crianças */}
     <section className="px-5 pt-6">
-      <h2 className="text-[18px] font-semibold" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+      <h2 className="text-[18px] font-semibold" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
         Para as crianças ✦
       </h2>
       <p className="text-[12.5px]" style={{ color: inkSoft }}>
@@ -119,7 +119,7 @@ export const RelaxarAgora = ({ onBack, onOpen, isPremium }:
 
     {/* Trilha adultos */}
     <section className="px-5 pt-8">
-      <h2 className="text-[18px] font-semibold" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+      <h2 className="text-[18px] font-semibold" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
         Para você, mãe e pai 💚
       </h2>
       <p className="text-[12.5px]" style={{ color: inkSoft }}>
@@ -212,7 +212,7 @@ export const RitualRapido = ({ onBack, onOpen }:
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#E8821A" }}>
           Respirar com o camaleão
         </p>
-        <h1 className="mt-1 leading-tight" style={{ color: ink, fontFamily: "'Fraunces', serif", fontSize: "clamp(26px, 8vw, 34px)" }}>
+        <h1 className="mt-1 leading-tight" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif", fontSize: "clamp(26px, 8vw, 34px)" }}>
           Um respiro pequeno
         </h1>
         <p className="mt-1 text-[14px]" style={{ color: inkSoft }}>
@@ -235,7 +235,7 @@ export const RitualRapido = ({ onBack, onOpen }:
       </div>
 
       <section className="px-5 pt-6">
-        <h2 className="text-[18px] font-semibold" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+        <h2 className="text-[18px] font-semibold" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Pequenos rituais
         </h2>
         <p className="text-[12.5px]" style={{ color: inkSoft }}>
@@ -273,7 +273,7 @@ export const SosEmocional = ({ onBack, onOpen, onOpenParents }:
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
           Apoio imediato
         </p>
-        <h1 className="mt-1 leading-tight" style={{ color: ink, fontFamily: "'Fraunces', serif", fontSize: "clamp(26px, 8vw, 34px)" }}>
+        <h1 className="mt-1 leading-tight" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif", fontSize: "clamp(26px, 8vw, 34px)" }}>
           Tá tudo bem não estar bem.
         </h1>
         <p className="mt-2 text-[14px] leading-snug" style={{ color: inkSoft }}>
@@ -393,7 +393,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#C9A227" }}>
           Connection
         </p>
-        <h1 className="mt-1 leading-tight" style={{ color: ink, fontFamily: "'Fraunces', serif", fontSize: "clamp(26px, 8vw, 34px)" }}>
+        <h1 className="mt-1 leading-tight" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif", fontSize: "clamp(26px, 8vw, 34px)" }}>
           Vínculo em família
         </h1>
         <p className="mt-1 text-[14px]" style={{ color: inkSoft }}>
@@ -407,7 +407,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
 
       <div className="px-5 pt-5">
         <div className="rounded-[20px] p-4" style={{ background: "rgba(127,176,105,0.10)", border: "1px solid rgba(127,176,105,0.25)" }}>
-          <p className="text-[13px] leading-snug" style={{ color: ink, fontFamily: "'Fraunces', serif", fontStyle: "italic" }}>
+          <p className="text-[13px] leading-snug" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif", fontStyle: "italic" }}>
             "Pequenos momentos hoje, memórias que ficam para sempre."
           </p>
         </div>
@@ -418,7 +418,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#5A6660" }}>
           Journeys
         </p>
-        <h2 className="text-[20px] font-semibold leading-tight" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+        <h2 className="text-[20px] font-semibold leading-tight" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Jornadas completas
         </h2>
         <p className="text-[12.5px]" style={{ color: inkSoft }}>
@@ -449,7 +449,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
                     )}
                     <span className="text-[11px]" style={{ color: inkSoft }}>{j.days} dias</span>
                   </div>
-                  <p className="mt-0.5 font-semibold text-[15px] leading-tight" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+                  <p className="mt-0.5 font-semibold text-[15px] leading-tight" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
                     {j.title}
                   </p>
                   <p className="text-[12px]" style={{ color: inkSoft }}>{j.desc}</p>
@@ -470,7 +470,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
           <p className="text-[10.5px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
             Em breve
           </p>
-          <p className="mt-1 text-[16px] font-semibold" style={{ color: ink, fontFamily: "'Fraunces', serif" }}>
+          <p className="mt-1 text-[16px] font-semibold" style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}>
             Lugares para viver
           </p>
           <p className="mt-0.5 text-[12.5px]" style={{ color: inkSoft }}>

@@ -338,7 +338,7 @@ const MoodPill = ({
           ? `linear-gradient(155deg, ${tint} 0%, ${tint}dd 100%)`
           : "linear-gradient(155deg, #ffffff 0%, #f3f4f6 100%)",
         color: active ? "#fff" : "var(--bora-ink-soft, #3a3a3a)",
-        fontFamily: "'Fredoka','Nunito',sans-serif",
+        fontFamily: "'Nunito', system-ui, sans-serif",
         fontWeight: 600,
         fontSize: 14,
         letterSpacing: "-0.005em",
@@ -799,7 +799,7 @@ const BoraScreen = ({ onBack }: Props) => {
                 background:
                   "linear-gradient(155deg, #FFB877 0%, #F4A659 35%, #E8821A 70%, #C56C12 100%)",
                 color: "#fff",
-                fontFamily: "'Fredoka', 'Nunito', sans-serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
                 fontWeight: 600,
                 fontSize: 17,
                 letterSpacing: "0.01em",

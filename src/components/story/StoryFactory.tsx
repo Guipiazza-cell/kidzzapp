@@ -277,7 +277,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               style={{
                 background: "#E8821A",
                 boxShadow: "0 10px 24px -8px rgba(232,130,26,0.55), inset 0 1px 0 rgba(255,255,255,0.35)",
-                fontFamily: "'Mulish', system-ui, sans-serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
               }}
               whileTap={{ scale: 0.97 }}
               initial={{ opacity: 0, y: 20 }}

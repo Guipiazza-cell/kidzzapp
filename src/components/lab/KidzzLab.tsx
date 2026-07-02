@@ -372,7 +372,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
             justifyContent: "center",
             padding: 32,
             color: "white",
-            fontFamily: "system-ui, sans-serif",
+            fontFamily: "'Nunito', system-ui, sans-serif",
           }}
         >
           <p style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, opacity: 0.85 }}>

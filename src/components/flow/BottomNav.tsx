@@ -108,7 +108,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       data-kidzz-dock
       className="fixed left-0 right-0 z-[90]"
       style={{
-        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+        fontFamily: "'Nunito', system-ui, sans-serif",
         bottom: 0,
         paddingLeft: 14,
         paddingRight: 14,
@@ -133,7 +133,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                 WebkitBackdropFilter: "blur(18px) saturate(140%)",
                 border: "1px solid rgba(42,37,32,0.10)",
                 color: "#2A2520",
-                fontFamily: "'Mulish', system-ui, sans-serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
                 boxShadow: "0 6px 16px -4px rgba(42,37,32,0.18)",
               }}
             >
@@ -150,7 +150,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               style={{
                 background: "linear-gradient(135deg, #E8821A, #D26A0A)",
                 boxShadow: "0 8px 18px -4px rgba(232,130,26,.55), inset 0 1px 0 rgba(255,255,255,.30)",
-                fontFamily: "'Mulish', system-ui, sans-serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
               }}
             >
               <Crown size={12} />
@@ -272,7 +272,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                     cursor: "pointer",
                     WebkitTapHighlightColor: "transparent",
                     touchAction: "manipulation",
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Nunito', system-ui, sans-serif",
                     transition: "transform .2s ease",
                   }}
                   aria-label={tab.label}
@@ -326,7 +326,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                       color: isActive ? "#ffffff" : "#5a4d3d",
                       textShadow: isActive ? "0 1px 1px rgba(0,0,0,.18)" : "none",
                       whiteSpace: "nowrap",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontFamily: "'Nunito', system-ui, sans-serif",
                       transition: "color .25s ease",
                     }}
                   >

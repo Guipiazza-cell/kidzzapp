@@ -202,7 +202,7 @@ const GuidedPlayer = ({ activity, onClose, onSaveMoment }: Props) => {
       className="fixed inset-0 z-[200] flex flex-col"
       style={{
         background: `linear-gradient(180deg, ${tint}22, #FFFCF8 60%)`,
-        fontFamily: "'Mulish', system-ui, sans-serif",
+        fontFamily: "'Nunito', system-ui, sans-serif",
       }}>
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 pt-[max(16px,env(safe-area-inset-top))] pb-3">
@@ -221,7 +221,7 @@ const GuidedPlayer = ({ activity, onClose, onSaveMoment }: Props) => {
           <div className="flex-1 flex flex-col items-center justify-center px-6 gap-8">
             {renderAnimation()}
             <p className="text-center font-semibold text-[20px] leading-snug max-w-[320px]"
-              style={{ color: "#2A2520", fontFamily: "'Fraunces', serif" }}>
+              style={{ color: "#2A2520", fontFamily: "'Nunito', system-ui, sans-serif" }}>
               {currentStep}
             </p>
             <div className="flex items-center gap-1.5">
@@ -250,7 +250,7 @@ const GuidedPlayer = ({ activity, onClose, onSaveMoment }: Props) => {
       {done && (
         <div className="flex-1 flex flex-col items-center justify-center px-6 gap-6">
           <h2 className="text-center text-[26px] font-semibold leading-tight"
-            style={{ color: "#2A2520", fontFamily: "'Fraunces', serif" }}>
+            style={{ color: "#2A2520", fontFamily: "'Nunito', system-ui, sans-serif" }}>
             Como você está agora?
           </h2>
           <div className="flex gap-3">

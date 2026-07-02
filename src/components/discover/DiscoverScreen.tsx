@@ -105,7 +105,7 @@ function GlassHeader({ onBack, onSearch }: { onBack?: () => void; onSearch?: () 
         <div className="flex flex-col items-center leading-tight">
           <span
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: "'Nunito', system-ui, sans-serif",
               fontWeight: 700,
               fontSize: 24,
               letterSpacing: "0.04em",
@@ -116,7 +116,7 @@ function GlassHeader({ onBack, onSearch }: { onBack?: () => void; onSearch?: () 
           </span>
           <span
             style={{
-              fontFamily: "'Mulish', system-ui, sans-serif",
+              fontFamily: "'Nunito', system-ui, sans-serif",
               fontSize: 9.5,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
@@ -211,7 +211,7 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
         <div style={{ minWidth: 0 }}>
           <h3
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: "'Nunito', system-ui, sans-serif",
               fontSize: "clamp(18px, 5.2vw, 22px)",
               lineHeight: 1.1,
               fontWeight: 600,
@@ -227,7 +227,7 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
           </h3>
           <p
             style={{
-              fontFamily: "'Mulish', system-ui, sans-serif",
+              fontFamily: "'Nunito', system-ui, sans-serif",
               fontSize: 12.5,
               lineHeight: 1.35,
               color: theme.body,
@@ -248,7 +248,7 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
               display: "inline-flex",
               alignItems: "center",
               gap: 4,
-              fontFamily: "'Mulish', sans-serif",
+              fontFamily: "'Nunito', system-ui, sans-serif",
               fontSize: 11,
               fontWeight: 700,
               color: theme.ink,
@@ -363,7 +363,7 @@ function ThemeDetail({
         >
           <h1
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: "'Nunito', system-ui, sans-serif",
               fontSize: "clamp(26px, 8vw, 34px)",
               lineHeight: 1.05,
               fontWeight: 600,
@@ -378,7 +378,7 @@ function ThemeDetail({
           </h1>
           <p
             style={{
-              fontFamily: "'Mulish', sans-serif",
+              fontFamily: "'Nunito', system-ui, sans-serif",
               fontSize: 13.5,
               lineHeight: 1.4,
               marginTop: 6,
@@ -436,7 +436,7 @@ function ThemeDetail({
                 borderRadius: 22,
                 background: `linear-gradient(135deg, ${AMBER}, #D26A0A)`,
                 color: CREAM,
-                fontFamily: "'Mulish', sans-serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
                 fontWeight: 800,
                 fontSize: 15,
                 boxShadow: "0 10px 24px -6px rgba(232,130,26,0.55)",
@@ -503,7 +503,7 @@ function ActivityCard({
           <div style={{ flex: 1 }}>
             <h3
               style={{
-                fontFamily: "'Fraunces', serif",
+                fontFamily: "'Nunito', system-ui, sans-serif",
                 fontSize: "clamp(15px, 4.4vw, 17px)",
                 fontWeight: 600,
                 lineHeight: 1.3,
@@ -590,7 +590,7 @@ function ActivityCard({
                       borderRadius: 16,
                       background: `linear-gradient(135deg, ${AMBER}, #D26A0A)`,
                       color: CREAM,
-                      fontFamily: "'Mulish', sans-serif",
+                      fontFamily: "'Nunito', system-ui, sans-serif",
                       fontWeight: 800,
                       fontSize: 14.5,
                       border: "none",
@@ -649,7 +649,7 @@ function ActivityCard({
                               background: SAGE_DEEP,
                               color: CREAM,
                               display: "flex", alignItems: "center", justifyContent: "center",
-                              fontFamily: "'Mulish', sans-serif",
+                              fontFamily: "'Nunito', system-ui, sans-serif",
                               fontWeight: 800,
                               fontSize: 12,
                               marginTop: 1,
@@ -688,7 +688,7 @@ function ActivityCard({
                   >
                     <div
                       style={{
-                        fontFamily: "'Mulish', sans-serif",
+                        fontFamily: "'Nunito', system-ui, sans-serif",
                         fontSize: 10.5,
                         fontWeight: 800,
                         letterSpacing: "0.18em",
@@ -700,7 +700,7 @@ function ActivityCard({
                     </div>
                     <p
                       style={{
-                        fontFamily: "'Fraunces', serif",
+                        fontFamily: "'Nunito', system-ui, sans-serif",
                         fontSize: 18,
                         lineHeight: 1.25,
                         margin: "6px 0 12px",
@@ -719,7 +719,7 @@ function ActivityCard({
                         border: "none",
                         padding: "10px 16px",
                         borderRadius: 999,
-                        fontFamily: "'Mulish', sans-serif",
+                        fontFamily: "'Nunito', system-ui, sans-serif",
                         fontWeight: 800,
                         fontSize: 13,
                         display: "inline-flex",
@@ -743,7 +743,7 @@ function ActivityCard({
                       borderRadius: 16,
                       background: accent,
                       color: accentInk === INK ? CREAM : accentInk,
-                      fontFamily: "'Mulish', sans-serif",
+                      fontFamily: "'Nunito', system-ui, sans-serif",
                       fontWeight: 800,
                       fontSize: 14.5,
                       border: "none",
@@ -763,7 +763,7 @@ function ActivityCard({
 }
 
 const bodyStyle: React.CSSProperties = {
-  fontFamily: "'Mulish', system-ui, sans-serif",
+  fontFamily: "'Nunito', system-ui, sans-serif",
   fontSize: 14.5,
   lineHeight: 1.5,
   color: "#3a3328",
@@ -781,7 +781,7 @@ function Chip({ icon, label }: { icon: React.ReactNode; label: string }) {
         borderRadius: 999,
         background: CREAM_DEEP,
         border: "1px solid rgba(42,37,32,0.08)",
-        fontFamily: "'Mulish', sans-serif",
+        fontFamily: "'Nunito', system-ui, sans-serif",
         fontSize: 11,
         fontWeight: 700,
         color: "#5a4d3d",
@@ -814,7 +814,7 @@ function Layer({
     >
       <div
         style={{
-          fontFamily: "'Mulish', sans-serif",
+          fontFamily: "'Nunito', system-ui, sans-serif",
           fontSize: 11.5,
           fontWeight: 800,
           letterSpacing: "0.14em",
@@ -863,12 +863,12 @@ async function shareBadge(activity: Activity, childName: string) {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "#3A2C0A";
-    ctx.font = "bold 28px 'Mulish', sans-serif";
+    ctx.font = "bold 28px 'Nunito', system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("✦ SELO DA DESCOBERTA", W / 2, 200);
-    ctx.font = "600 56px 'Fraunces', serif";
+    ctx.font = "600 56px 'Nunito', system-ui, sans-serif";
     wrapText(ctx, text, W / 2, 500, W - 200, 70);
-    ctx.font = "500 24px 'Mulish', sans-serif";
+    ctx.font = "500 24px 'Nunito', system-ui, sans-serif";
     ctx.fillText("Kidzz. Menos tela, mais memórias", W / 2, H - 100);
     canvas.toBlob((blob) => {
       if (!blob) return;
@@ -948,7 +948,7 @@ function DiscoverHero() {
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
-            fontFamily: "'Mulish', sans-serif",
+            fontFamily: "'Nunito', system-ui, sans-serif",
             fontSize: 12,
             fontWeight: 800,
             letterSpacing: "0.08em",
@@ -960,7 +960,7 @@ function DiscoverHero() {
         </div>
         <h1
           style={{
-            fontFamily: "'Fraunces', serif",
+            fontFamily: "'Nunito', system-ui, sans-serif",
             fontSize: "clamp(26px, 8.4vw, 32px)",
             lineHeight: 1,
             fontWeight: 600,
@@ -973,7 +973,7 @@ function DiscoverHero() {
         </h1>
         <p
           style={{
-            fontFamily: "'Fraunces', serif",
+            fontFamily: "'Nunito', system-ui, sans-serif",
             fontStyle: "italic",
             fontSize: "clamp(15px, 4.6vw, 18px)",
             lineHeight: 1.2,
@@ -1001,7 +1001,7 @@ function DiscoverHero() {
         </p>
         <p
           style={{
-            fontFamily: "'Mulish', sans-serif",
+            fontFamily: "'Nunito', system-ui, sans-serif",
             fontSize: 13,
             lineHeight: 1.4,
             color: "#5a4d3d",

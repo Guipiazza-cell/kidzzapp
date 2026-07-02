@@ -667,7 +667,7 @@ const DailyPhrase = () => {
         <Quote size={18} style={{ color: gold, margin: "0 auto" }} />
         <p
           className="mt-2 text-[17px] leading-snug font-medium"
-          style={{ letterSpacing: "-0.01em", fontFamily: "Georgia, serif" }}
+          style={{ letterSpacing: "-0.01em", fontFamily: "'Nunito', system-ui, sans-serif" }}
         >
           "{PHRASES[idx]}"
         </p>
