@@ -5,6 +5,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* iOS Safari dá auto-zoom ao focar input com fonte < 16px e não volta.
+   Piso de 16px só em telas de toque (mantém fontes maiores intactas). */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
+
 @layer base {
   :root {
     /* ── Cinematic v2.0 — paleta exata do brief ── */

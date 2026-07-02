@@ -102,6 +102,9 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
   }, [onScroll]);
 
   const activeColor = pill?.color ?? "#E8821A";
+  // Tabs imersivos/cinematográficos: escondem as tags Pais/Assinar para não
+  // ficarem por cima do conteúdo (Sonhos e Cinema rodam em tela cheia).
+  const immersiveTab = activeTab === "dreams" || activeTab === "cinema";
 
   return (
     <nav
@@ -119,7 +122,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       }}
     >
       {/* Pais / Assinar — island button, minimal & premium */}
-      {(onOpenParents || (onOpenPlans && !isPremium)) && (
+      {!immersiveTab && (onOpenParents || (onOpenPlans && !isPremium)) && (
         <div className="w-full flex items-center justify-end gap-1.5 mb-2 pr-1">
           {onOpenParents && (
             <button

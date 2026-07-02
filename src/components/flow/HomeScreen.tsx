@@ -712,7 +712,7 @@ const HomeScreen = ({
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && submit(input)}
                 placeholder={isFreeLimitReached ? "Limite atingido" : "Digite ou pergunte…"}
-                className="flex-1 min-w-0 py-3 px-3 rounded-2xl text-[15px] font-semibold focus:outline-none transition-[opacity,transform,box-shadow] disabled:opacity-40"
+                className="flex-1 min-w-0 py-3 px-3 rounded-2xl text-[16px] font-semibold focus:outline-none transition-[opacity,transform,box-shadow] disabled:opacity-40"
                 style={{
                   background: "hsl(0 0% 100% / 0.7)",
                   border: "1px solid hsl(85 25% 88% / 0.8)",
