@@ -149,9 +149,6 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
               >
                 {KIND_EMOJI[activity.kind]}
               </motion.div>
-              <p className="text-[10px] font-black text-white/70 uppercase tracking-widest text-center">
-                Slot: {activity.slotImg}
-              </p>
             </div>
           </div>
 
@@ -159,9 +156,6 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
           <div className="rounded-3xl bg-white/85 backdrop-blur border border-white/60 p-5 text-center shadow">
             <p className="font-display text-[22px] font-semibold text-gray-800 leading-snug">
               {activity.instruction}
-            </p>
-            <p className="text-[11px] font-bold text-gray-500 mt-2 uppercase tracking-wider">
-              Áudio: {activity.slotAudio}
             </p>
           </div>
 

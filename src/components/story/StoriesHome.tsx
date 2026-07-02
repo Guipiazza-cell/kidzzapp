@@ -12,6 +12,7 @@ import { getAllProgress } from "@/lib/storyProgress";
 import { haptic } from "@/lib/haptics";
 import StoryFactory from "./StoryFactory";
 import ReadingMode from "./ReadingMode";
+import { LIBRARY_STORIES } from "./storyLibrary";
 
 import heroImg from "@/assets/stories-hero.jpg";
 import aventuraImg from "@/assets/stories-aventura.jpg";
@@ -50,7 +51,11 @@ const StoriesHome = ({ onBack }: Props) => {
   const [reading, setReading] = useState(false);
 
   const childName = profile?.child_name || "amigo";
-  const stories = useMemo(() => allMemories.filter((m) => m.type === "story"), [allMemories]);
+  const stories = useMemo(() => {
+    const userStories = allMemories.filter((m) => m.type === "story");
+    // Histórias curadas (coleções) primeiro; depois as do usuário.
+    return [...LIBRARY_STORIES, ...userStories];
+  }, [allMemories]);
   const progress = getAllProgress();
 
   const continueReading = useMemo(() => {
@@ -175,40 +180,43 @@ const StoriesHome = ({ onBack }: Props) => {
           </div>
         </motion.section>
 
-        {/* CHIPS */}
-        <section className="grid grid-cols-2 gap-3 mb-6">
-          {CHIPS.map((c) => {
-            const Icon = c.icon;
-            return (
-              <motion.button
-                key={c.key}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => { haptic("light"); setChip(c.key); setChipOpen(true); }}
-                className="text-left rounded-2xl p-3 relative"
-                style={{
-                  background: "#FFFFFF",
-                  boxShadow: "0 6px 18px -12px rgba(42,37,32,0.25), inset 0 1px 0 rgba(255,255,255,0.7)",
-                  border: "1px solid rgba(42,37,32,0.06)",
-                  minHeight: 110,
-                }}
-                aria-label={c.label}
-              >
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center mb-2"
-                  style={{ background: c.ring, color: c.tint }}
+        {/* COLEÇÕES */}
+        <section className="mb-6">
+          <h3 className="font-display text-[20px] font-semibold mb-3" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
+            Coleções especiais
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {COLLECTIONS.map((col) => {
+              const count = stories.filter((s) => {
+                const meta = (s.metadata as any)?.interests || "";
+                return new RegExp(col.tag, "i").test(String(meta)) || new RegExp(col.tag, "i").test(s.title);
+              }).length;
+              return (
+                <motion.button
+                  key={col.key}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => { haptic("light"); setCollection(col); }}
+                  className="flex gap-3 items-center text-left rounded-2xl p-3"
+                  style={{
+                    background: "#FFFFFF",
+                    boxShadow: "0 6px 18px -12px rgba(42,37,32,0.25)",
+                    border: "1px solid rgba(42,37,32,0.06)",
+                  }}
                 >
-                  <Icon size={20} />
-                </div>
-                <p className="text-[14px] font-extrabold leading-tight" style={{ color: "#2A2520" }}>
-                  {c.label}
-                </p>
-                <p className="text-[11.5px] mt-0.5 leading-snug" style={{ color: "rgba(42,37,32,0.6)" }}>
-                  {c.sub}
-                </p>
-                <ArrowRight size={14} className="absolute bottom-3 right-3 text-[#2A2520]/40" />
-              </motion.button>
-            );
-          })}
+                  <img src={col.img} alt="" loading="lazy" className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13.5px] font-extrabold leading-tight" style={{ color: "#2A2520" }}>{col.label}</p>
+                    <p className="text-[10.5px] mt-0.5 leading-snug line-clamp-2" style={{ color: "rgba(42,37,32,0.6)" }}>
+                      {col.desc}
+                    </p>
+                    <p className="text-[10.5px] font-bold mt-1" style={{ color: "#E8821A" }}>
+                      {count} {count === 1 ? "história" : "histórias"}
+                    </p>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
         </section>
 
         {/* CONTINUE LENDO */}
@@ -260,43 +268,40 @@ const StoriesHome = ({ onBack }: Props) => {
           </section>
         )}
 
-        {/* COLEÇÕES */}
-        <section className="mb-4">
-          <h3 className="font-display text-[20px] font-semibold mb-3" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
-            Coleções especiais
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            {COLLECTIONS.map((col) => {
-              const count = stories.filter((s) => {
-                const meta = (s.metadata as any)?.interests || "";
-                return new RegExp(col.tag, "i").test(String(meta)) || new RegExp(col.tag, "i").test(s.title);
-              }).length;
-              return (
-                <motion.button
-                  key={col.key}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => { haptic("light"); setCollection(col); }}
-                  className="flex gap-3 items-center text-left rounded-2xl p-3"
-                  style={{
-                    background: "#FFFFFF",
-                    boxShadow: "0 6px 18px -12px rgba(42,37,32,0.25)",
-                    border: "1px solid rgba(42,37,32,0.06)",
-                  }}
+        {/* CHIPS */}
+        <section className="grid grid-cols-2 gap-3 mb-6">
+          {CHIPS.map((c) => {
+            const Icon = c.icon;
+            return (
+              <motion.button
+                key={c.key}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => { haptic("light"); setChip(c.key); setChipOpen(true); }}
+                className="text-left rounded-2xl p-3 relative"
+                style={{
+                  background: "#FFFFFF",
+                  boxShadow: "0 6px 18px -12px rgba(42,37,32,0.25), inset 0 1px 0 rgba(255,255,255,0.7)",
+                  border: "1px solid rgba(42,37,32,0.06)",
+                  minHeight: 110,
+                }}
+                aria-label={c.label}
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center mb-2"
+                  style={{ background: c.ring, color: c.tint }}
                 >
-                  <img src={col.img} alt="" loading="lazy" className="w-14 h-14 rounded-xl object-cover shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13.5px] font-extrabold leading-tight" style={{ color: "#2A2520" }}>{col.label}</p>
-                    <p className="text-[10.5px] mt-0.5 leading-snug line-clamp-2" style={{ color: "rgba(42,37,32,0.6)" }}>
-                      {col.desc}
-                    </p>
-                    <p className="text-[10.5px] font-bold mt-1" style={{ color: "#E8821A" }}>
-                      {count} {count === 1 ? "história" : "histórias"}
-                    </p>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
+                  <Icon size={20} />
+                </div>
+                <p className="text-[14px] font-extrabold leading-tight" style={{ color: "#2A2520" }}>
+                  {c.label}
+                </p>
+                <p className="text-[11.5px] mt-0.5 leading-snug" style={{ color: "rgba(42,37,32,0.6)" }}>
+                  {c.sub}
+                </p>
+                <ArrowRight size={14} className="absolute bottom-3 right-3 text-[#2A2520]/40" />
+              </motion.button>
+            );
+          })}
         </section>
       </div>
 

@@ -38,8 +38,8 @@ const OnboardingShell = ({ children, tone = "warm" }: Props) => {
 
   return (
     <motion.div
-      className="min-h-[100dvh] flex flex-col relative overflow-hidden max-w-[100vw]"
-      style={{ background: TONES[tone], height: "auto", overflowX: "hidden" }}
+      className="h-[100dvh] flex flex-col relative overflow-y-auto overflow-x-hidden overscroll-contain max-w-[100vw]"
+      style={{ background: TONES[tone], WebkitOverflowScrolling: "touch" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

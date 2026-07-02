@@ -53,7 +53,7 @@ export const CriancaOnboarding = ({ open, onClose }: Props) => {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 overflow-y-auto"
           style={{ background: "rgba(20, 35, 18, 0.55)", backdropFilter: "blur(8px)" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -64,7 +64,7 @@ export const CriancaOnboarding = ({ open, onClose }: Props) => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
-            className="w-full max-w-md rounded-3xl p-6 shadow-2xl"
+            className="w-full max-w-md rounded-3xl p-6 shadow-2xl my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto"
             style={{
               background: "linear-gradient(180deg, #FFFDF6 0%, #FFF3D9 100%)",
               border: "2px solid rgba(255,255,255,0.85)",

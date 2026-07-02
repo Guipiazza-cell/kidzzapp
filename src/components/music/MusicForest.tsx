@@ -60,7 +60,7 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "adventure",
-    label: "Aventura & Imaginação",
+    label: "Aventura e Imaginação",
     subtitle: "Para sonhar e explorar",
     icon: <Rocket size={26} />,
     gradient: "linear-gradient(135deg, hsl(275 65% 62%) 0%, hsl(290 55% 48%) 100%)",
@@ -436,7 +436,6 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[14px] font-bold text-gray-800 truncate">{s.title}</p>
-              <p className="text-[11px] text-gray-500 font-semibold">Slot: {s.slot}</p>
             </div>
             {s.premium && !isPremium ? (
               <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white flex items-center gap-1">
@@ -534,7 +533,6 @@ const SlotHero = ({ name }: { name: string }) => (
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="text-center px-6">
         <div className="text-6xl drop-shadow-lg">🎤🦎🎧</div>
-        <p className="text-[11px] font-black text-amber-900/70 uppercase tracking-widest mt-2">Slot: {name}</p>
       </div>
     </div>
   </div>
@@ -615,11 +613,11 @@ const WideCard = ({
 );
 
 const ActivityCard = ({
-  activity, favorite, onFav, onOpen,
-}: { activity: GuidedActivity; favorite: boolean; onFav: () => void; onOpen: () => void }) => (
+  activity, favorite, onFav, onOpen, full = false,
+}: { activity: GuidedActivity; favorite: boolean; onFav: () => void; onOpen: () => void; full?: boolean }) => (
   <motion.div
     whileTap={{ scale: 0.98 }}
-    className="snap-start shrink-0 w-[220px] rounded-[22px] overflow-hidden bg-white/85 backdrop-blur border border-white/60 shadow-lg"
+    className={`snap-start rounded-[22px] overflow-hidden bg-white/85 backdrop-blur border border-white/60 shadow-lg ${full ? "w-full" : "shrink-0 w-[220px]"}`}
   >
     <button onClick={onOpen} className="block w-full text-left">
       <div
@@ -686,7 +684,7 @@ const CategoryScreen = ({
       </div>
 
       <div
-        className="flex-1 min-h-0 overflow-y-auto px-4 space-y-4"
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain px-4 space-y-4"
         style={{
           paddingTop: "calc(env(safe-area-inset-top, 0px) + 68px)",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
@@ -705,9 +703,6 @@ const CategoryScreen = ({
             </h1>
           </div>
           <div className="absolute top-3 right-3 text-4xl drop-shadow-lg">🦎🎵</div>
-          <p className="absolute bottom-2 right-3 text-[10px] font-black text-white/70 uppercase tracking-widest">
-            Slot: {category.slotName}
-          </p>
         </div>
 
         {category.id === "calm" && (
@@ -731,6 +726,7 @@ const CategoryScreen = ({
             <ActivityCard
               key={a.id}
               activity={a}
+              full
               favorite={favorites.includes(a.id)}
               onFav={() => onToggleFav(a.id)}
               onOpen={() => onOpen(a)}
