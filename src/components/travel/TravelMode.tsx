@@ -4,7 +4,7 @@ import { ArrowLeft, Car, Play, Pause, SkipForward, X, Volume2 } from "lucide-rea
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
-import { pickFemaleVoice, SOFT_RATE, SOFT_PITCH, SOFT_VOLUME } from "@/lib/ttsVoice";
+import { useTTS } from "@/hooks/useTTS";
 import KidzzChameleon, { type KidzzState } from "@/components/kidzz/KidzzChameleon";
 import CosmicRoad from "./CosmicRoad";
 import confetti from "canvas-confetti";
@@ -79,22 +79,9 @@ const TravelMode = ({ onBack }: Props) => {
   const [previewIndex, setPreviewIndex] = useState(0);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const speakingRef = useRef(false);
-  const lockedVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
-  // Lock TTS voice once for consistency across all phases (setup preview, playing, finished)
-  useEffect(() => {
-    if (!("speechSynthesis" in window)) return;
-    const pickVoice = () => {
-      if (lockedVoiceRef.current) return;
-      // Voz feminina pt-BR padronizada (fonte única).
-      const v = pickFemaleVoice(window.speechSynthesis.getVoices());
-      if (v) lockedVoiceRef.current = v;
-    };
-    pickVoice();
-    window.speechSynthesis.onvoiceschanged = pickVoice;
-    return () => { window.speechSynthesis.onvoiceschanged = null; };
-  }, []);
+  // Narração via ElevenLabs (voz Amanda) com fallback Web Speech — fonte única.
+  const { speak, stop: stopSpeak } = useTTS();
 
   // Preview de pergunta no setup — rotaciona a cada 4s
   useEffect(() => {
@@ -114,33 +101,13 @@ const TravelMode = ({ onBack }: Props) => {
     setPhase("playing");
   }, [theme, questionCount]);
 
-  // TTS speak — voz/pitch/rate IDÊNTICOS em todas as fases
-  const speak = useCallback((text: string): Promise<void> => {
-    return new Promise((resolve) => {
-      if (!("speechSynthesis" in window)) { resolve(); return; }
-      window.speechSynthesis.cancel();
-      speakingRef.current = true;
-
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = "pt-BR";
-      utt.pitch = SOFT_PITCH;
-      utt.rate = SOFT_RATE;
-      utt.volume = SOFT_VOLUME;
-      if (lockedVoiceRef.current) utt.voice = lockedVoiceRef.current;
-
-      utt.onend = () => { speakingRef.current = false; resolve(); };
-      utt.onerror = () => { speakingRef.current = false; resolve(); };
-      window.speechSynthesis.speak(utt);
-    });
-  }, []);
-
   // Cleanup TTS ao desmontar (ex: voltar à home)
   useEffect(() => {
     return () => {
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      stopSpeak();
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
+  }, [stopSpeak]);
 
   // Falar a pergunta do preview (sincroniza com o texto exibido no chip)
   const speakPreview = useCallback(() => {
@@ -185,10 +152,10 @@ const TravelMode = ({ onBack }: Props) => {
 
     return () => {
       cancelled = true;
-      window.speechSynthesis.cancel();
+      stopSpeak();
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [phase, currentIndex, isPaused, questions, childName, speak]);
+  }, [phase, currentIndex, isPaused, questions, childName, speak, stopSpeak]);
 
   // Check if finished
   useEffect(() => {
@@ -221,7 +188,7 @@ const TravelMode = ({ onBack }: Props) => {
 
   const skipQuestion = () => {
     if (timerRef.current) clearInterval(timerRef.current);
-    window.speechSynthesis.cancel();
+    stopSpeak();
     setCurrentIndex(prev => prev + 1);
   };
 
@@ -230,7 +197,7 @@ const TravelMode = ({ onBack }: Props) => {
       setIsPaused(false);
     } else {
       setIsPaused(true);
-      window.speechSynthesis.cancel();
+      stopSpeak();
       if (timerRef.current) clearInterval(timerRef.current);
     }
   };

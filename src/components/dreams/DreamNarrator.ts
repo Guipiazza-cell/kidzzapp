@@ -1,6 +1,7 @@
-/* ── Sleep story narrator with natural pauses ── */
+/* ── Sleep story narrator (ElevenLabs voz Amanda + fallback Web Speech) ── */
 
 import { pickFemaleVoice } from "@/lib/ttsVoice";
+import { cleanNarrationText, chunkText, fetchElevenChunk } from "@/lib/elevenTTS";
 
 export class DreamNarrator {
   private utterances: SpeechSynthesisUtterance[] = [];
@@ -8,6 +9,9 @@ export class DreamNarrator {
   private isSpeaking = false;
   private onEndCallback?: () => void;
   private voice: SpeechSynthesisVoice | null = null;
+  private audio: HTMLAudioElement | null = null;
+  // Cada speak()/stop() incrementa; falas em voo de gerações antigas abortam.
+  private gen = 0;
 
   constructor() {
     this.pickVoice();
@@ -18,7 +22,7 @@ export class DreamNarrator {
 
   private pickVoice() {
     if (typeof window === "undefined") return;
-    // Voz feminina pt-BR padronizada (fonte única).
+    // Voz feminina pt-BR padronizada (fonte única) — usada no fallback.
     this.voice = pickFemaleVoice(window.speechSynthesis.getVoices());
   }
 
@@ -26,16 +30,50 @@ export class DreamNarrator {
     this.stop();
     this.onEndCallback = onEnd;
 
-    // Limpa markdown e remove emojis para uma narração de sono limpa.
-    const clean = text
-      .replace(/[*_~`#>]/g, "")
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-      .replace(/\p{Extended_Pictographic}/gu, "")
-      .replace(/[\u200D\uFE0F\u20E3]/g, "")
-      .replace(/\s{2,}/g, " ")
-      .trim();
+    const clean = cleanNarrationText(text);
+    if (!clean) {
+      onEnd?.();
+      return;
+    }
 
-    // Split into sentences for natural pauses
+    this.gen++;
+    const myGen = this.gen;
+    this.isSpeaking = true;
+
+    // 1) Tenta ElevenLabs (voz Amanda), tocando os trechos em sequência.
+    void this.speakEleven(clean, myGen).catch(() => {
+      // 2) Fallback Web Speech se a ElevenLabs falhar.
+      if (myGen === this.gen) this.speakWebSpeech(clean, myGen);
+    });
+  }
+
+  private async speakEleven(clean: string, myGen: number): Promise<void> {
+    const chunks = chunkText(clean);
+    for (const chunk of chunks) {
+      if (myGen !== this.gen) return;
+      const uri = await fetchElevenChunk(chunk); // lança se indisponível
+      if (myGen !== this.gen) return;
+      await this.playUri(uri, myGen);
+    }
+    if (myGen === this.gen) {
+      this.isSpeaking = false;
+      this.onEndCallback?.();
+    }
+  }
+
+  private playUri(uri: string, myGen: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (myGen !== this.gen) return resolve();
+      const audio = new Audio(uri);
+      this.audio = audio;
+      audio.onended = () => resolve();
+      audio.onerror = () => reject(new Error("audio_error"));
+      // Pausa natural entre trechos já embutida no áudio; toca direto.
+      audio.play().catch(() => reject(new Error("play_blocked")));
+    });
+  }
+
+  private speakWebSpeech(clean: string, myGen: number) {
     const sentences = clean
       .split(/(?<=[.!?…])\s+/)
       .map((s) => s.trim())
@@ -53,14 +91,15 @@ export class DreamNarrator {
     });
 
     this.currentIndex = 0;
-    this.isSpeaking = true;
-    this.speakNext();
+    this.speakNext(myGen);
   }
 
-  private speakNext() {
-    if (!this.isSpeaking || this.currentIndex >= this.utterances.length) {
-      this.isSpeaking = false;
-      this.onEndCallback?.();
+  private speakNext(myGen: number) {
+    if (myGen !== this.gen || this.currentIndex >= this.utterances.length) {
+      if (myGen === this.gen) {
+        this.isSpeaking = false;
+        this.onEndCallback?.();
+      }
       return;
     }
 
@@ -69,19 +108,26 @@ export class DreamNarrator {
       this.currentIndex++;
       // Natural breathing pause between sentences (400-700ms)
       const pause = 400 + Math.random() * 300;
-      setTimeout(() => this.speakNext(), pause);
+      setTimeout(() => this.speakNext(myGen), pause);
     };
     utt.onerror = () => {
       this.currentIndex++;
-      setTimeout(() => this.speakNext(), 400);
+      setTimeout(() => this.speakNext(myGen), 400);
     };
 
     window.speechSynthesis.speak(utt);
   }
 
   stop() {
+    this.gen++;
     this.isSpeaking = false;
-    window.speechSynthesis.cancel();
+    if (this.audio) {
+      this.audio.pause();
+      this.audio = null;
+    }
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
     this.utterances = [];
     this.currentIndex = 0;
   }
