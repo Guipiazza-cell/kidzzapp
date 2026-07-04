@@ -14,7 +14,9 @@ export type Motor =
   | "toque"
   | "ocitocina"
   | "conexao"
-  | "exalacao";
+  | "exalacao"
+  | "nutricao"       // comer com atenção, cozinhar junto (SEM linguagem de dieta)
+  | "hidratacao";    // beber água juntos
 
 export type ActivityKind =
   | "breath"      // círculo expande/contrai
