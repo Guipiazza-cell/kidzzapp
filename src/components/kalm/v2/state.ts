@@ -40,6 +40,78 @@ export const useMood = () => {
   return { today, set };
 };
 
+// ── Parent Mood (pai/mãe também registra) ────
+export const useParentMood = () => {
+  const child = useActiveChildId();
+  const bucket = `parent_${child}`;
+  const [today, setToday] = useState<MoodValue | null>(null);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(k(bucket, "mood"));
+      const map = raw ? JSON.parse(raw) : {};
+      setToday(map[todayKey()] ?? null);
+    } catch { /* noop */ }
+  }, [bucket]);
+  const set = useCallback((v: MoodValue) => {
+    try {
+      const raw = localStorage.getItem(k(bucket, "mood"));
+      const map = raw ? JSON.parse(raw) : {};
+      map[todayKey()] = v;
+      localStorage.setItem(k(bucket, "mood"), JSON.stringify(map));
+    } catch { /* noop */ }
+    setToday(v);
+  }, [bucket]);
+  return { today, set };
+};
+
+// ── Sugestão do dia (dinâmica, sem repetir 2 dias seguidos) ────
+type DailySuggestion = {
+  emoji: string;
+  title: string;
+  desc: string;
+  pillar: "sentir" | "agradecer" | "mover" | "nutrir" | "conectar" | "cuidar";
+  activityId?: string;
+};
+
+const SUGGESTION_POOL: DailySuggestion[] = [
+  { emoji: "💧", title: "Copo d'água da família", desc: "Bebam um copo d'água juntos, agora, como um brinde.", pillar: "nutrir", activityId: "agua-familia" },
+  { emoji: "🫂", title: "Abraço de 20 segundos", desc: "Um abraço apertado com seu filho. Conte até 20.", pillar: "conectar", activityId: "abraco-20s" },
+  { emoji: "🌈", title: "3 coisas boas de hoje", desc: "Cada um da família diz uma coisa boa que aconteceu.", pillar: "agradecer", activityId: "tres-boas" },
+  { emoji: "🐻", title: "Alongamento do urso", desc: "Estiquem o corpo juntos por 1 minuto. Acorda a calma.", pillar: "mover", activityId: "alongamento-urso" },
+  { emoji: "🎈", title: "Solte o balão", desc: "Coloque o que incomodou hoje num balão e deixe ir.", pillar: "sentir", activityId: "soltar-balao" },
+  { emoji: "☕", title: "5 minutos só seus", desc: "Sem culpa. Cuidar de si é cuidar da família.", pillar: "cuidar", activityId: "cafe-sem-culpa" },
+  { emoji: "🌈", title: "Prato colorido", desc: "Contem quantas cores diferentes tem no prato hoje.", pillar: "nutrir", activityId: "prato-colorido" },
+  { emoji: "👀", title: "Olhos nos olhos", desc: "Cinco minutos de atenção total, sem tela, sem pressa.", pillar: "conectar", activityId: "olhos-nos-olhos" },
+  { emoji: "🎉", title: "Festival da risada", desc: "Um minuto de riso em família. Cócegas valem.", pillar: "mover", activityId: "festival-risada" },
+  { emoji: "🌟", title: "Elogio específico", desc: "Diga uma coisa específica que admirou no seu filho hoje.", pillar: "conectar", activityId: "elogio-especifico" },
+  { emoji: "🍋", title: "Aperta e solta o limão", desc: "Aperte forte, depois solte. Alívio na hora.", pillar: "sentir", activityId: "aperta-limao" },
+  { emoji: "🙏", title: "Diário de uma linha", desc: "Escreva UMA frase boa sobre o dia.", pillar: "agradecer", activityId: "diario-uma-linha" },
+];
+
+export const useDailySuggestion = (): DailySuggestion => {
+  const child = useActiveChildId();
+  const [pick, setPick] = useState<DailySuggestion>(SUGGESTION_POOL[0]);
+  useEffect(() => {
+    try {
+      const key = k(child, "suggestion");
+      const raw = localStorage.getItem(key);
+      const state = raw ? JSON.parse(raw) : { last: null, lastIdx: -1 };
+      const today = todayKey();
+      if (state.today === today && typeof state.idx === "number") {
+        setPick(SUGGESTION_POOL[state.idx]);
+        return;
+      }
+      // day-of-year → semente estável, mas evita o índice de ontem
+      const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+      let idx = doy % SUGGESTION_POOL.length;
+      if (state.lastIdx === idx) idx = (idx + 1) % SUGGESTION_POOL.length;
+      localStorage.setItem(key, JSON.stringify({ today, idx, lastIdx: idx }));
+      setPick(SUGGESTION_POOL[idx]);
+    } catch { /* noop */ }
+  }, [child]);
+  return pick;
+};
+
 // ── Jarro da gratidão ────────────────────────
 export type JarItem = { id: string; text: string; ts: number };
 

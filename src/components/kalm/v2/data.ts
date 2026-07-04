@@ -14,7 +14,9 @@ export type Motor =
   | "toque"
   | "ocitocina"
   | "conexao"
-  | "exalacao";
+  | "exalacao"
+  | "nutricao"       // comer com atenção, cozinhar junto (SEM linguagem de dieta)
+  | "hidratacao";    // beber água juntos
 
 export type ActivityKind =
   | "breath"      // círculo expande/contrai
@@ -350,9 +352,99 @@ const PARENTS: Activity[] = [
   },
 ];
 
-export const ACTIVITIES: Activity[] = [...KIDS, ...PARENTS];
+// ─── Nutrir (alimentação/hidratação consciente — SEM linguagem de dieta) ─────
+// Foco em variedade, cor, energia e prazer de comer junto. Nunca peso/calorias.
+const NUTRIR: Activity[] = [
+  { id: "agua-familia", audience: "kid",
+    title: "Copo d'água da família", duration: "1 min", durationSec: 60,
+    oneLine: "Bebam um copo d'água juntos, devagar, como um brinde.",
+    motor: "hidratacao", kind: "steps",
+    steps: [
+      "Cada um pega um copo d'água.",
+      "Olham um para o outro e brindam: 'saúde!'",
+      "Bebem devagar, sentindo a água fresca.",
+      "Um sorriso no final. Combinado?",
+    ],
+    imgSlot: "imgAtiv_aguaFamilia",
+  },
+  { id: "agua-com-fruta", audience: "kid",
+    title: "Água com fruta", duration: "3 min", durationSec: 180,
+    oneLine: "Escolham uma fruta juntos e deixem a água ficar colorida.",
+    motor: "hidratacao", kind: "steps",
+    steps: [
+      "Escolham uma fruta bonita: limão, laranja, morango...",
+      "Cortem em pedaços (com um adulto).",
+      "Colocam na jarra de água gelada.",
+      "Esperem uns minutos e provem juntos.",
+    ],
+    imgSlot: "imgAtiv_aguaFruta",
+  },
+  { id: "prato-colorido", audience: "kid",
+    title: "Prato colorido", duration: "5 min", durationSec: 300,
+    oneLine: "Achem quantas cores diferentes tem no prato agora.",
+    motor: "nutricao", kind: "steps",
+    steps: [
+      "Olhem o prato juntos.",
+      "Contem quantas cores diferentes vocês veem.",
+      "Provem a cor mais bonita primeiro.",
+      "Falem: 'que cor esse gosto tem?'",
+    ],
+    imgSlot: "imgAtiv_pratoColorido",
+  },
+  { id: "cores-novas", audience: "kid", premium: true,
+    title: "Provar uma cor nova", duration: "5 min", durationSec: 300,
+    oneLine: "Escolham juntos uma fruta ou legume de cor nova para experimentar.",
+    motor: "nutricao", kind: "steps",
+    steps: [
+      "No mercado ou na cozinha, escolham UMA cor nova.",
+      "Levem para casa e experimentem juntos.",
+      "Descrevam o gosto: doce, azedo, crocante?",
+      "Ganhou selo de coragem colorida 🌈.",
+    ],
+    imgSlot: "imgAtiv_coresNovas",
+  },
+  { id: "cozinhar-juntos", audience: "parent", premium: true,
+    title: "Cozinhar juntos", duration: "15 min", durationSec: 900,
+    oneLine: "Uma receita simples: pai/mãe + filho, mãos na massa.",
+    motor: "nutricao", kind: "steps",
+    steps: [
+      "Escolham uma receita fácil: sanduíche, salada, panqueca.",
+      "Dividam tarefas: mexer, cortar, decorar.",
+      "Conversem enquanto fazem, sem pressa.",
+      "Sentem-se e comam juntos, sem tela.",
+    ],
+    imgSlot: "imgAtiv_cozinhar",
+  },
+  { id: "refeicao-sem-tela", audience: "parent",
+    title: "Refeição sem tela", duration: "20 min", durationSec: 1200,
+    oneLine: "Uma refeição por dia, todos juntos, só conversando.",
+    motor: "nutricao", kind: "steps",
+    steps: [
+      "Combine: 'hoje, jantar sem celular'.",
+      "Sentem-se juntos à mesa.",
+      "Cada um conta uma coisa do dia.",
+      "Terminem com um obrigado pela comida.",
+    ],
+    imgSlot: "imgAtiv_semTela",
+  },
+  { id: "bacterias-boas", audience: "kid", premium: true,
+    title: "Alimentar os amiguinhos da barriga", duration: "3 min", durationSec: 180,
+    oneLine: "Escolham juntos uma fruta ou legume que deixa a barriga feliz.",
+    motor: "nutricao", kind: "steps",
+    steps: [
+      "Sua barriga tem amiguinhos invisíveis (bactérias boas).",
+      "Eles adoram frutas, verduras e fibras.",
+      "Escolham UM alimento colorido pra dar de comer pra eles.",
+      "Barriga feliz = você mais feliz.",
+    ],
+    imgSlot: "imgAtiv_bacterias",
+  },
+];
+
+export const ACTIVITIES: Activity[] = [...KIDS, ...PARENTS, ...NUTRIR];
 export const KID_ACTIVITIES = KIDS;
 export const PARENT_ACTIVITIES = PARENTS;
+export const NUTRIR_ACTIVITIES = NUTRIR;
 
 export const findActivity = (id: string) => ACTIVITIES.find((a) => a.id === id);
 
@@ -369,6 +461,8 @@ export const MOTOR_TINT: Record<Motor, string> = {
   ocitocina:    "#D98C7A",
   conexao:      "#46703A",
   exalacao:     "#7FB069",
+  nutricao:     "#E8821A",  // âmbar/laranja quente (comida colorida)
+  hidratacao:   "#4F8FC9",  // azul água
 };
 
 // ── Jornadas (multi-dias) ───────────────────────────────────
