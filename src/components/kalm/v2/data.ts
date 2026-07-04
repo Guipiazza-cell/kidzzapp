@@ -371,6 +371,8 @@ export const MOTOR_TINT: Record<Motor, string> = {
   ocitocina:    "#D98C7A",
   conexao:      "#46703A",
   exalacao:     "#7FB069",
+  nutricao:     "#E8821A",  // âmbar/laranja quente (comida colorida)
+  hidratacao:   "#4F8FC9",  // azul água
 };
 
 // ── Jornadas (multi-dias) ───────────────────────────────────
