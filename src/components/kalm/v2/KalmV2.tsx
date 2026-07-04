@@ -1,16 +1,19 @@
 /**
- * KALM v2 — root. Faz roteamento interno entre Home e sub-telas
- * e mantém o GuidedPlayer global da aba.
+ * KALM v2 — root. Home diurna + 6 pilares + SOS.
+ * Nada de conteúdo noturno aqui (isso vive em Sonhos).
  */
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
-import KalmHome from "./KalmHome";
-import { RelaxarAgora, RitualRapido, SosEmocional, VinculoFamilia } from "./SubScreens";
+import KalmHome, { type Pillar } from "./KalmHome";
+import { SosEmocional } from "./SubScreens";
+import {
+  PilarSentir, PilarAgradecer, PilarMover, PilarNutrir, PilarConectar, PilarCuidar,
+} from "./Pillars";
 import GuidedPlayer from "./GuidedPlayer";
 import { findActivity, type Activity } from "./data";
 
-type View = "home" | "relaxar" | "ritual" | "sos" | "vinculo";
+type View = "home" | "sos" | Pillar;
 
 interface Props {
   onBack: () => void;
@@ -38,36 +41,33 @@ const KalmV2 = ({ onBack, onGoDreams, onOpenParents, initialExperienceId, onCons
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialExperienceId]);
 
-  const goPath = useCallback((p: "relaxar" | "ritual" | "sos" | "dormir" | "vinculo") => {
-    if (p === "dormir") { onGoDreams(); return; }
-    setView(p);
-  }, [onGoDreams]);
-
-  const openActivity = useCallback((a: Activity) => {
-    setActivity(a);
-  }, []);
+  const openActivity = useCallback((a: Activity) => setActivity(a), []);
+  const backHome = useCallback(() => setView("home"), []);
 
   return (
     <>
       {view === "home" && (
-        <KalmHome onBack={onBack} onGoPath={goPath} onOpenActivity={openActivity} />
+        <KalmHome
+          onBack={onBack}
+          onGoPillar={(p) => setView(p)}
+          onGoSos={() => setView("sos")}
+          onGoDreams={onGoDreams}
+          onOpenActivity={openActivity}
+        />
       )}
-      {view === "relaxar" && (
-        <RelaxarAgora onBack={() => setView("home")} onOpen={openActivity} isPremium={isPremium} />
-      )}
-      {view === "ritual" && (
-        <RitualRapido onBack={() => setView("home")} onOpen={openActivity} />
-      )}
+      {view === "sentir"    && <PilarSentir    onBack={backHome} onOpen={openActivity} isPremium={isPremium} />}
+      {view === "agradecer" && <PilarAgradecer onBack={backHome} onOpen={openActivity} isPremium={isPremium} />}
+      {view === "mover"     && <PilarMover     onBack={backHome} onOpen={openActivity} isPremium={isPremium} />}
+      {view === "nutrir"    && <PilarNutrir    onBack={backHome} onOpen={openActivity} isPremium={isPremium} />}
+      {view === "conectar"  && <PilarConectar  onBack={backHome} onOpen={openActivity} isPremium={isPremium} />}
+      {view === "cuidar"    && <PilarCuidar    onBack={backHome} onOpen={openActivity} isPremium={isPremium} />}
       {view === "sos" && (
-        <SosEmocional onBack={() => setView("home")} onOpen={openActivity} onOpenParents={onOpenParents} />
-      )}
-      {view === "vinculo" && (
-        <VinculoFamilia onBack={() => setView("home")} onOpen={openActivity} isPremium={isPremium} />
+        <SosEmocional onBack={backHome} onOpen={openActivity} onOpenParents={onOpenParents} />
       )}
       <GuidedPlayer
         activity={activity}
         onClose={() => setActivity(null)}
-        onSaveMoment={() => { /* já é registrado por badges/streak no player */ }}
+        onSaveMoment={() => { /* já rastreado em GuidedPlayer via badges/streak */ }}
       />
     </>
   );
