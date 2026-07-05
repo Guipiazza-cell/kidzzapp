@@ -8,6 +8,7 @@ import {
   ArrowLeft, Heart, Leaf, Droplet, Users, Coffee, LifeBuoy,
   Share2, Sparkles, ChevronRight,
 } from "lucide-react";
+import kalmHeroChameleon from "@/assets/kalm-hero-chameleon.jpg";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
@@ -125,18 +126,40 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
 
       {/* Herói */}
       <section className="px-5 pt-2">
-        <p className="text-[11px] font-bold tracking-[0.18em]" style={{ color: "#46703A" }}>{greetByHour()}</p>
-        <h1 className="mt-2 leading-[1.05]" style={{
-          color: ink, fontFamily: "'Fraunces','Nunito',serif",
-          fontSize: "clamp(28px, 8.6vw, 36px)", fontWeight: 500,
-        }}>
-          Bem-estar da família,
-          <span style={{ fontStyle: "italic", color: "#46703A" }}> feito juntos.</span>
-        </h1>
-        <p className="mt-2 text-[14px]" style={{ color: inkSoft }}>
-          Emoção, corpo, gratidão, alimentação e vínculo — no dia a dia.
-        </p>
+        <div className="flex items-start gap-2">
+          <div className="flex-1 min-w-0 pt-1">
+            <p className="text-[11px] font-bold tracking-[0.18em] flex items-center gap-1" style={{ color: "#46703A" }}>
+              {greetByHour()}
+            </p>
+            <h1 className="mt-2 leading-[1.02]" style={{
+              color: ink, fontFamily: "'Fraunces','Nunito',serif",
+              fontSize: "clamp(26px, 7.8vw, 34px)", fontWeight: 600,
+            }}>
+              Cuidar das
+              <br />emoções hoje,
+              <br />
+              <span style={{
+                fontStyle: "italic", color: "#46703A",
+                borderBottom: "2px solid #E8B93A", paddingBottom: 2,
+              }}>
+                transforma o amanhã.
+              </span>
+            </h1>
+            <p className="mt-3 text-[13.5px] leading-snug" style={{ color: inkSoft }}>
+              Pequenas escolhas hoje,<br />grandes conexões sempre.
+            </p>
+          </div>
+          <img
+            src={kalmHeroChameleon}
+            alt="Camaleão meditando"
+            width={1024}
+            height={1024}
+            className="w-[42%] max-w-[180px] h-auto object-contain flex-shrink-0 -mr-1 -mt-1"
+            style={{ filter: "drop-shadow(0 8px 20px rgba(70,112,58,0.18))" }}
+          />
+        </div>
       </section>
+
 
       {/* Sugestão do dia (dinâmica) */}
       <section className="px-5 pt-5">
