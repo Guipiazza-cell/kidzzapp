@@ -51,7 +51,7 @@ const loadRoutineScreen = () => import("@/components/routine/RoutineScreen");
 const loadMomentsPlaylists = () => import("@/components/moments/MomentsPlaylists");
 const loadFamilyCinema = () => import("@/components/cinema/FamilyCinema");
 const loadMusicForest = () => import("@/components/music/MusicForest");
-const loadKalmV2 = () => import("@/components/kalm/v2/KalmV2");
+const loadWellnessHub = () => import("@/components/wellness/WellnessHub");
 const DreamWorld = lazyRetry(loadDreamWorld);
 const StoryFactory = lazyRetry(loadStoryFactory);
 const JourneyScreen = lazyRetry(() => import("@/components/flow/JourneyScreen"));
@@ -62,8 +62,8 @@ const FamilyCinema = lazyRetry(loadFamilyCinema);
 const KidzzLab = lazyRetry(() => import("@/components/lab/KidzzLab"));
 const TravelMode = lazyRetry(() => import("@/components/travel/TravelMode"));
 const MusicForest = lazyRetry(loadMusicForest);
-const KalmV2 = lazyRetry(loadKalmV2);
-// KALM = KalmV2 (bem-estar diurno, 6 pilares). Conteúdo noturno vive em Sonhos.
+const WellnessHub = lazyRetry(loadWellnessHub);
+// KalmV2 (redesign) revertido a pedido — aba KALM volta ao WellnessHub antigo.
 import Paywall from "@/components/Paywall";
 import ParentalGate from "@/components/ParentalGate";
 import ParentalSettings from "@/components/ParentalSettings";
@@ -230,7 +230,7 @@ const Index = () => {
     let cancelled = false;
     const run = () => {
       if (cancelled) return;
-      const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadKalmV2];
+      const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
       loaders.forEach((l) => { void l().catch(() => undefined); });
     };
     const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, opts?: any) => number);
@@ -424,7 +424,7 @@ const Index = () => {
     memories: () => <AreaGate area="memorias"><MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} /></AreaGate>,
     moments: () => <AreaGate area="momentos"><MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} /></AreaGate>,
     cinema: () => <AreaGate area="cinema"><FamilyCinema onBack={backToHome} /></AreaGate>,
-    wellness: () => <AreaGate area="kalm"><KalmV2 onBack={backToHome} onGoDreams={() => switchTab("dreams")} onOpenParents={() => setShowParentalGateForSettings(true)} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} /></AreaGate>,
+    wellness: () => <AreaGate area="kalm"><WellnessHub onBack={backToHome} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} /></AreaGate>,
     achievements: () => <Suspense fallback={null}><SevenDayChallenge onClose={backToHome} /></Suspense>,
     dreams: () => <AreaGate area="sonhos"><DreamWorld onBack={() => { backToHome(); evolution.evolve("story"); }} /></AreaGate>,
     music: () => (

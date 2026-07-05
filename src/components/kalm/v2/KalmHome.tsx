@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, Heart, Leaf, Droplet, Users, Coffee, LifeBuoy,
-  Share2, Sparkles, ChevronRight, Wind, Zap,
+  Share2, Sparkles, ChevronRight,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
@@ -16,7 +16,6 @@ import {
   useMood, useParentMood, useKalmStreak, useWeekStats, useDailySuggestion,
   type MoodValue,
 } from "./state";
-import kalmChameleon from "@/assets/kalm-chameleon-meditando.jpg";
 
 export type Pillar = "sentir" | "agradecer" | "mover" | "nutrir" | "conectar" | "cuidar";
 
@@ -124,64 +123,19 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         </div>
       </div>
 
-      {/* Herói — camaleão meditando */}
+      {/* Herói */}
       <section className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.18em]" style={{ color: "#46703A" }}>{greetByHour()}</p>
         <h1 className="mt-2 leading-[1.05]" style={{
           color: ink, fontFamily: "'Fraunces','Nunito',serif",
-          fontSize: "clamp(26px, 8vw, 34px)", fontWeight: 500,
+          fontSize: "clamp(28px, 8.6vw, 36px)", fontWeight: 500,
         }}>
-          Cuidar das emoções hoje,
-          <span style={{ fontStyle: "italic", color: "#46703A" }}> transforma o amanhã.</span>
+          Bem-estar da família,
+          <span style={{ fontStyle: "italic", color: "#46703A" }}> feito juntos.</span>
         </h1>
-        <p className="mt-2 text-[13.5px]" style={{ color: inkSoft }}>
-          Pequenas escolhas hoje, grandes conexões sempre.
+        <p className="mt-2 text-[14px]" style={{ color: inkSoft }}>
+          Emoção, corpo, gratidão, alimentação e vínculo — no dia a dia.
         </p>
-        <div className="relative mt-4 rounded-[28px] overflow-hidden" style={{
-          background: "linear-gradient(180deg,#FBE9C7 0%,#F5DDA8 100%)",
-          border: "1px solid rgba(232,185,58,0.25)",
-          boxShadow: "0 12px 40px -18px rgba(197,151,66,0.35)",
-        }}>
-          <img
-            src={kalmChameleon}
-            alt="Camaleão Kidzz meditando"
-            width={1024}
-            height={1024}
-            className="w-full h-auto block select-none pointer-events-none"
-            style={{ maxHeight: 260, objectFit: "cover", objectPosition: "center 30%" }}
-            draggable={false}
-          />
-        </div>
-      </section>
-
-      {/* 4 caminhos rápidos */}
-      <section className="px-5 pt-5">
-        <div className="grid grid-cols-2 gap-2.5">
-          {[
-            { key: "relaxar",   label: "Relaxar agora",  desc: "Acalmar a mente.",           icon: Wind,     tint: "#7FB069", act: () => onGoPillar("sentir") },
-            { key: "ritual",    label: "Ritual rápido",  desc: "Recarregar o dia.",          icon: Zap,      tint: "#E8B93A", act: () => { if (suggestionActivity) onOpenActivity(suggestionActivity); else onGoPillar(suggestion.pillar); } },
-            { key: "sos",       label: "SOS emocional",  desc: "Apoio imediato.",            icon: LifeBuoy, tint: "#D63F5C", act: onGoSos },
-            { key: "conectar",  label: "Conectar agora", desc: "Aproximar a família.",       icon: Users,    tint: "#46703A", act: () => onGoPillar("conectar") },
-          ].map((c) => {
-            const Icon = c.icon;
-            return (
-              <button key={c.key} onClick={() => { haptic("light"); c.act(); }}
-                className="text-left rounded-[20px] p-3.5 active:scale-[0.98]"
-                style={{ ...glassChrome, minHeight: 90 }}>
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${c.tint}22` }}>
-                    <Icon size={18} style={{ color: c.tint }} strokeWidth={2} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-bold leading-tight" style={{ color: ink }}>{c.label}</p>
-                    <p className="mt-0.5 text-[11px] leading-snug" style={{ color: inkSoft }}>{c.desc}</p>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
       </section>
 
       {/* Sugestão do dia (dinâmica) */}
