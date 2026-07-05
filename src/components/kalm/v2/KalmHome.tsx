@@ -8,6 +8,7 @@ import {
   ArrowLeft, Heart, Leaf, Droplet, Users, Coffee, LifeBuoy,
   Share2, Sparkles, ChevronRight,
 } from "lucide-react";
+import kalmHeroChameleon from "@/assets/kalm-hero-chameleon.jpg";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
