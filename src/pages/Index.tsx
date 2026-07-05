@@ -230,7 +230,7 @@ const Index = () => {
     let cancelled = false;
     const run = () => {
       if (cancelled) return;
-      const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadWellnessHub];
+      const loaders = [loadStoryFactory, loadRoutineScreen, loadMusicForest, loadFamilyCinema, loadMomentsPlaylists, loadDreamWorld, loadKidzzPlay, loadKalmV2];
       loaders.forEach((l) => { void l().catch(() => undefined); });
     };
     const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, opts?: any) => number);
