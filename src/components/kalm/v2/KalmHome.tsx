@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, Heart, Leaf, Droplet, Users, Coffee, LifeBuoy,
-  Share2, Sparkles, ChevronRight,
+  Share2, Sparkles, ChevronRight, Wind, Zap,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
@@ -16,6 +16,7 @@ import {
   useMood, useParentMood, useKalmStreak, useWeekStats, useDailySuggestion,
   type MoodValue,
 } from "./state";
+import kalmChameleon from "@/assets/kalm-chameleon-meditando.jpg";
 
 export type Pillar = "sentir" | "agradecer" | "mover" | "nutrir" | "conectar" | "cuidar";
 
