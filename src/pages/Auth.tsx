@@ -59,7 +59,7 @@ const Auth = () => {
           toast.error(error);
         } else {
           toast.success("Conta criada! Entrando... 🎉");
-          if (!isCheckoutFlow) navigate("/", { replace: true });
+          if (!isCheckoutFlow) postLogin();
         }
       } else {
         const { error } = await signIn(email, password);
