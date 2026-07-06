@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://wnowaafqtjoycjhmxsnf.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "kidzz-mcp",
+      "version": "0.1.0",
+      "title": "Kidzz MCP"
+    },
+    "tools": [
+      {
+        "name": "list_children",
+        "title": "List children profiles",
+        "description": "List the signed-in parent's registered children (name, age, interests).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_recent_questions",
+        "title": "List recent questions",
+        "description": "List the signed-in user's most recent child questions and Kidzz answers.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Max rows to return (default 10)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_memories",
+        "title": "List family memories",
+        "description": "List saved family memories for the signed-in parent.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Max rows to return (default 20)."
+            },
+            "crianca_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Optional filter by child id."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "save_memory",
+        "title": "Save family memory",
+        "description": "Save a new family memory (achievement, moment, note) for a child.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "crianca_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Target child id (from list_children)."
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Short memory title."
+            },
+            "content": {
+              "type": "string",
+              "description": "Optional longer description."
+            },
+            "type": {
+              "type": "string",
+              "description": "Memory type, e.g. achievement, moment, note."
+            },
+            "is_special": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "crianca_id",
+            "title"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
