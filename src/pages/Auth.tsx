@@ -67,7 +67,7 @@ const Auth = () => {
           console.error("Login error:", error);
           toast.error(error);
         } else {
-          if (!isCheckoutFlow) navigate("/", { replace: true });
+          if (!isCheckoutFlow) postLogin();
         }
       }
     } catch {
