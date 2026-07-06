@@ -19,6 +19,9 @@ const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isCheckoutFlow = new URLSearchParams(location.search).get("checkout") === "1";
+  const nextParam = new URLSearchParams(location.search).get("next");
+  const safeNext = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : null;
+  const postLogin = () => navigate(safeNext ?? "/", { replace: true });
   const [mode, setMode] = useState<Mode>(() => (isCheckoutFlow ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,8 +29,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user && !isCheckoutFlow) navigate("/", { replace: true });
-  }, [user, isCheckoutFlow, navigate]);
+    if (user && !isCheckoutFlow) postLogin();
+  }, [user, isCheckoutFlow]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
