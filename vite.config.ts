@@ -96,6 +96,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     appVersionPlugin(),
     mode === "development" && componentTagger(),
+    mcpPlugin(),
     VitePWA({
       registerType: "autoUpdate",
       // CRITICAL: never run SW in dev (breaks Lovable preview/HMR)
