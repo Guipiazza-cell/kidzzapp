@@ -20,6 +20,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Admin = lazy(() => import("./pages/Admin"));
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isReady } = useAuth();
@@ -89,6 +90,7 @@ const MainApp = () => {
               <Route path="/landing" element={<Landing />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

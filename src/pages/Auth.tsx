@@ -19,6 +19,9 @@ const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isCheckoutFlow = new URLSearchParams(location.search).get("checkout") === "1";
+  const nextParam = new URLSearchParams(location.search).get("next");
+  const safeNext = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : null;
+  const postLogin = () => navigate(safeNext ?? "/", { replace: true });
   const [mode, setMode] = useState<Mode>(() => (isCheckoutFlow ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,8 +29,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user && !isCheckoutFlow) navigate("/", { replace: true });
-  }, [user, isCheckoutFlow, navigate]);
+    if (user && !isCheckoutFlow) postLogin();
+  }, [user, isCheckoutFlow]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +59,7 @@ const Auth = () => {
           toast.error(error);
         } else {
           toast.success("Conta criada! Entrando... 🎉");
-          if (!isCheckoutFlow) navigate("/", { replace: true });
+          if (!isCheckoutFlow) postLogin();
         }
       } else {
         const { error } = await signIn(email, password);
@@ -64,7 +67,7 @@ const Auth = () => {
           console.error("Login error:", error);
           toast.error(error);
         } else {
-          if (!isCheckoutFlow) navigate("/", { replace: true });
+          if (!isCheckoutFlow) postLogin();
         }
       }
     } catch {
