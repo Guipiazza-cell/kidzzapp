@@ -507,7 +507,7 @@ export default function LandingQuiz() {
               transition={{ duration: 0.7, delay: 0.16 }}
               style={{ fontSize: "clamp(16px, 1.6vw, 19px)", color: C.inkSoft, maxWidth: 540, lineHeight: 1.55 }}
             >
-              Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado — com o Kidzz.
+              Responda 6 perguntas rápidas e descubra como transformar os pequenos momentos do dia em memórias que ficam pra sempre. Leva 1 minuto.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 16 }}
