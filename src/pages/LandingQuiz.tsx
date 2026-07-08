@@ -8,20 +8,24 @@ const APP_URL = "https://kidzz.app";
 
 // Brand palette
 const C = {
-  sage: "#7FB069",
-  sageDark: "#5E9550",
-  amber: "#E8821A",
-  amberDark: "#C96F12",
-  gold: "#E2B64C",
-  cream: "#FFF8F0",
-  deep: "#1B3A2F",
-  ink: "#1A1410",
-  inkSoft: "rgba(26,20,16,0.72)",
-  inkMuted: "rgba(26,20,16,0.55)",
+  sage: "#7FA173",
+  sageDark: "#46703A",
+  sageSoft: "#DCE6D2",
+  amber: "#D89B4A",
+  amberDark: "#B47A2E",
+  gold: "#C9A24B",
+  goldSoft: "#EBDCB1",
+  cream: "#FBF6EC",
+  creamWarm: "#F4EBD7",
+  deep: "#1F3A2E",
+  deepInk: "#132720",
+  ink: "#1F1A14",
+  inkSoft: "rgba(31,26,20,0.72)",
+  inkMuted: "rgba(31,26,20,0.55)",
 };
 
-const display = "'Nunito', system-ui, sans-serif";
-const body = "'Nunito', system-ui, sans-serif";
+const display = "'Fraunces', 'Cormorant Garamond', Georgia, serif";
+const body = "'Mulish', 'Inter', system-ui, sans-serif";
 
 const lpVars = {
   "--c-sage": C.sage,
