@@ -528,8 +528,8 @@ export default function LandingQuiz() {
               className="meta-row"
               style={{ display: "flex", gap: 18, marginTop: 28, color: C.inkMuted, fontSize: 13, flexWrap: "wrap" }}
             >
-              <span>⭐ 4.9 nas avaliações</span>
-              <span>👨‍👩‍👧 +12 mil famílias</span>
+              <span>🦎 Feito por um pai, pra famílias brasileiras</span>
+              <span>🔒 Sem anúncios, ambiente seguro</span>
               <span>🇧🇷 100% em português</span>
             </motion.div>
           </motion.div>
