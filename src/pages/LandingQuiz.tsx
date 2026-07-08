@@ -710,7 +710,7 @@ export default function LandingQuiz() {
           id="capture"
           style={{
             padding: "100px 24px",
-            background: `linear-gradient(180deg, #FBEDD6 0%, ${C.cream} 100%)`,
+            background: `linear-gradient(180deg, ${C.creamWarm} 0%, ${C.cream} 100%)`,
           }}
         >
           <div style={{ maxWidth: 560, margin: "0 auto", textAlign: "center" }}>
