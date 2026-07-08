@@ -577,7 +577,7 @@ export default function LandingQuiz() {
         id="quiz"
         style={{
           padding: "100px 24px",
-          background: `linear-gradient(180deg, ${C.cream} 0%, #FBEDD6 100%)`,
+          background: `linear-gradient(180deg, ${C.cream} 0%, ${C.creamWarm} 100%)`,
           position: "relative",
         }}
       >
