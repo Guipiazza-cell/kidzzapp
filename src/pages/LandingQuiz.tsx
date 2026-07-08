@@ -489,7 +489,7 @@ export default function LandingQuiz() {
               transition={{ duration: 0.7, delay: 0.08 }}
               style={{
                 fontFamily: display,
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: "clamp(36px, 5.4vw, 64px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
@@ -599,7 +599,7 @@ export default function LandingQuiz() {
                         <h2
                           style={{
                             fontFamily: display,
-                            fontWeight: 800,
+                            fontWeight: 600,
                             fontSize: "clamp(26px, 3.4vw, 38px)",
                             lineHeight: 1.15,
                             color: C.deep,
@@ -694,7 +694,7 @@ export default function LandingQuiz() {
               style={{ textAlign: "center", padding: "40px 0" }}
             >
               <Kidzz size={200} mood="happy" reactive={false} />
-              <h2 style={{ fontFamily: display, fontSize: 32, fontWeight: 800, color: C.deep, marginTop: 16 }}>
+              <h2 style={{ fontFamily: display, fontSize: 32, fontWeight: 600, color: C.deep, marginTop: 16 }}>
                 Quase lá... ✨
               </h2>
               <p style={{ color: C.inkSoft, marginTop: 8 }}>Role para ver seu resultado.</p>
@@ -719,7 +719,7 @@ export default function LandingQuiz() {
                   initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  style={{ fontFamily: display, fontWeight: 800, fontSize: "clamp(28px, 4vw, 42px)", color: C.deep, letterSpacing: "-0.015em" }}
+                  style={{ fontFamily: display, fontWeight: 600, fontSize: "clamp(28px, 4vw, 42px)", color: C.deep, letterSpacing: "-0.015em" }}
                 >
                   Seu resultado está pronto! 🎉
                 </motion.h2>
@@ -788,7 +788,7 @@ export default function LandingQuiz() {
               transition={{ duration: 0.7 }}
               style={{
                 fontFamily: display,
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: "clamp(32px, 5vw, 52px)",
                 marginTop: 18,
                 lineHeight: 1.1,
@@ -866,7 +866,7 @@ export default function LandingQuiz() {
             style={{
               fontFamily: display,
               fontSize: "clamp(30px, 4vw, 46px)",
-              fontWeight: 800,
+              fontWeight: 600,
               color: C.deep,
               letterSpacing: "-0.02em",
               lineHeight: 1.1,
@@ -913,7 +913,7 @@ export default function LandingQuiz() {
           <h2
             style={{
               fontFamily: display,
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: "clamp(32px, 5vw, 52px)",
               marginTop: 20,
               letterSpacing: "-0.02em",
@@ -981,7 +981,7 @@ function Nav({ onCta }: { onCta: () => void }) {
           >
             K
           </div>
-          <span style={{ fontFamily: display, fontWeight: 800, fontSize: 20, color: C.deep, letterSpacing: "-0.01em" }}>
+          <span style={{ fontFamily: display, fontWeight: 600, fontSize: 20, color: C.deep, letterSpacing: "-0.01em" }}>
             Kidzz
           </span>
         </div>
@@ -1151,7 +1151,7 @@ function SectionHeader({ eyebrow, title, subtitle }: { eyebrow?: string; title: 
         style={{
           fontFamily: display,
           fontSize: "clamp(28px, 4vw, 44px)",
-          fontWeight: 800,
+          fontWeight: 600,
           color: C.deep,
           letterSpacing: "-0.02em",
           lineHeight: 1.1,
@@ -1202,7 +1202,7 @@ function FeatureCard({ emoji, color, title, text }: { emoji: string; color: stri
         >
           {emoji}
         </div>
-        <h3 style={{ fontFamily: display, fontWeight: 800, fontSize: 22, color: C.deep, margin: "0 0 10px" }}>{title}</h3>
+        <h3 style={{ fontFamily: display, fontWeight: 600, fontSize: 22, color: C.deep, margin: "0 0 10px" }}>{title}</h3>
         <p style={{ color: C.inkSoft, lineHeight: 1.55, margin: 0, fontSize: 15 }}>{text}</p>
       </motion.div>
     </TiltCard>
@@ -1398,7 +1398,7 @@ function TestimonialsSection() {
             { n: "98%", t: "recomendam" },
           ].map((s) => (
             <div key={s.t}>
-              <div style={{ fontFamily: display, fontWeight: 800, fontSize: 32, color: C.amber, letterSpacing: "-0.02em" }}>{s.n}</div>
+              <div style={{ fontFamily: display, fontWeight: 600, fontSize: 32, color: C.amber, letterSpacing: "-0.02em" }}>{s.n}</div>
               <div style={{ color: C.inkMuted, fontSize: 13, fontWeight: 600, marginTop: 4 }}>{s.t}</div>
             </div>
           ))}
@@ -1464,7 +1464,7 @@ function PriceCard({
         )}
         <div style={{ fontWeight: 700, color: C.inkSoft, fontSize: 14, letterSpacing: 1, textTransform: "uppercase" }}>{name}</div>
         <div style={{ marginTop: 12, display: "flex", alignItems: "baseline", gap: 4 }}>
-          <span style={{ fontFamily: display, fontSize: 44, fontWeight: 800, color: C.deep, letterSpacing: "-0.02em" }}>{price}</span>
+          <span style={{ fontFamily: display, fontSize: 44, fontWeight: 600, color: C.deep, letterSpacing: "-0.02em" }}>{price}</span>
           <span style={{ color: C.inkMuted, fontWeight: 600 }}>{suffix}</span>
         </div>
         <ul style={{ marginTop: 20, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
