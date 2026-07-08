@@ -516,7 +516,7 @@ export default function LandingQuiz() {
               className="cta-row"
               style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}
             >
-              <PrimaryButton onClick={startQuiz}>Fazer o teste grátis ✨</PrimaryButton>
+              <PrimaryButton onClick={startQuiz}>Começar o teste ✨</PrimaryButton>
               <SecondaryButton onClick={() => document.getElementById("solucao")?.scrollIntoView({ behavior: "smooth" })}>
                 Como funciona
               </SecondaryButton>
