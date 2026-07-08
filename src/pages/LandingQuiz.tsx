@@ -498,8 +498,8 @@ export default function LandingQuiz() {
                 margin: "22px 0 18px",
               }}
             >
-              Seu filho faz mil perguntas. Mas e se o que ele mais precisa for{" "}
-              <span style={{ color: C.amber }}>você?</span>
+              Que tipo de conexão você está criando com{" "}
+              <em style={{ color: C.sageDark, fontStyle: "italic", fontWeight: 500 }}>seu filho?</em>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
