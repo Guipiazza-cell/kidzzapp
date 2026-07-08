@@ -970,7 +970,7 @@ function Nav({ onCta }: { onCta: () => void }) {
               width: 34,
               height: 34,
               borderRadius: 10,
-              background: `linear-gradient(135deg, ${C.amber}, ${C.gold})`,
+              background: `linear-gradient(135deg, ${C.gold}, ${C.sageDark})`,
               display: "grid",
               placeItems: "center",
               color: "#fff",
