@@ -8,20 +8,24 @@ const APP_URL = "https://kidzz.app";
 
 // Brand palette
 const C = {
-  sage: "#7FB069",
-  sageDark: "#5E9550",
-  amber: "#E8821A",
-  amberDark: "#C96F12",
-  gold: "#E2B64C",
-  cream: "#FFF8F0",
-  deep: "#1B3A2F",
-  ink: "#1A1410",
-  inkSoft: "rgba(26,20,16,0.72)",
-  inkMuted: "rgba(26,20,16,0.55)",
+  sage: "#7FA173",
+  sageDark: "#46703A",
+  sageSoft: "#DCE6D2",
+  amber: "#D89B4A",
+  amberDark: "#B47A2E",
+  gold: "#C9A24B",
+  goldSoft: "#EBDCB1",
+  cream: "#FBF6EC",
+  creamWarm: "#F4EBD7",
+  deep: "#1F3A2E",
+  deepInk: "#132720",
+  ink: "#1F1A14",
+  inkSoft: "rgba(31,26,20,0.72)",
+  inkMuted: "rgba(31,26,20,0.55)",
 };
 
-const display = "'Nunito', system-ui, sans-serif";
-const body = "'Nunito', system-ui, sans-serif";
+const display = "'Fraunces', 'Cormorant Garamond', Georgia, serif";
+const body = "'Mulish', 'Inter', system-ui, sans-serif";
 
 const lpVars = {
   "--c-sage": C.sage,
@@ -425,7 +429,7 @@ export default function LandingQuiz() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Mulish:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
       />
 
@@ -439,9 +443,9 @@ export default function LandingQuiz() {
           position: "relative",
           minHeight: "100vh",
           paddingTop: 96,
-          background: `radial-gradient(ellipse at 70% 20%, ${C.amber}1f, transparent 60%),
-                       radial-gradient(ellipse at 10% 80%, ${C.sage}26, transparent 55%),
-                       linear-gradient(180deg, #FFF4E2 0%, ${C.cream} 100%)`,
+          background: `radial-gradient(ellipse at 80% 10%, ${C.goldSoft}88, transparent 55%),
+                       radial-gradient(ellipse at 8% 85%, ${C.sageSoft}CC, transparent 60%),
+                       linear-gradient(180deg, ${C.creamWarm} 0%, ${C.cream} 100%)`,
           overflow: "hidden",
         }}
       >
@@ -469,15 +473,16 @@ export default function LandingQuiz() {
                 gap: 8,
                 padding: "8px 14px",
                 borderRadius: 999,
-                background: "rgba(232,130,26,0.12)",
-                color: C.amberDark,
+                background: "rgba(127,161,115,0.14)",
+                color: C.sageDark,
                 fontWeight: 700,
-                fontSize: 13,
-                letterSpacing: 0.2,
+                fontSize: 12,
+                letterSpacing: 1.4,
+                textTransform: "uppercase",
               }}
             >
-              <span style={{ width: 8, height: 8, borderRadius: 999, background: C.amber }} />
-              Feito para a família brasileira
+              <span style={{ width: 6, height: 6, borderRadius: 999, background: C.gold }} />
+              Menos telas, mais memórias
             </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 18 }}
@@ -485,7 +490,7 @@ export default function LandingQuiz() {
               transition={{ duration: 0.7, delay: 0.08 }}
               style={{
                 fontFamily: display,
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: "clamp(36px, 5.4vw, 64px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
@@ -493,8 +498,8 @@ export default function LandingQuiz() {
                 margin: "22px 0 18px",
               }}
             >
-              Seu filho faz mil perguntas. Mas e se o que ele mais precisa for{" "}
-              <span style={{ color: C.amber }}>você?</span>
+              Que tipo de conexão você está criando com{" "}
+              <em style={{ color: C.sageDark, fontStyle: "italic", fontWeight: 500 }}>seu filho?</em>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
@@ -502,7 +507,7 @@ export default function LandingQuiz() {
               transition={{ duration: 0.7, delay: 0.16 }}
               style={{ fontSize: "clamp(16px, 1.6vw, 19px)", color: C.inkSoft, maxWidth: 540, lineHeight: 1.55 }}
             >
-              Descubra em 60 segundos como transformar telas em momentos de calma, vínculo e aprendizado — com o Kidzz.
+              Responda 6 perguntas rápidas e descubra como transformar os pequenos momentos do dia em memórias que ficam pra sempre. Leva 1 minuto.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -511,7 +516,7 @@ export default function LandingQuiz() {
               className="cta-row"
               style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}
             >
-              <PrimaryButton onClick={startQuiz}>Fazer o teste grátis ✨</PrimaryButton>
+              <PrimaryButton onClick={startQuiz}>Começar o teste ✨</PrimaryButton>
               <SecondaryButton onClick={() => document.getElementById("solucao")?.scrollIntoView({ behavior: "smooth" })}>
                 Como funciona
               </SecondaryButton>
@@ -523,8 +528,8 @@ export default function LandingQuiz() {
               className="meta-row"
               style={{ display: "flex", gap: 18, marginTop: 28, color: C.inkMuted, fontSize: 13, flexWrap: "wrap" }}
             >
-              <span>⭐ 4.9 nas avaliações</span>
-              <span>👨‍👩‍👧 +12 mil famílias</span>
+              <span>🦎 Feito por um pai, pra famílias brasileiras</span>
+              <span>🔒 Sem anúncios, ambiente seguro</span>
               <span>🇧🇷 100% em português</span>
             </motion.div>
           </motion.div>
@@ -572,7 +577,7 @@ export default function LandingQuiz() {
         id="quiz"
         style={{
           padding: "100px 24px",
-          background: `linear-gradient(180deg, ${C.cream} 0%, #FBEDD6 100%)`,
+          background: `linear-gradient(180deg, ${C.cream} 0%, ${C.creamWarm} 100%)`,
           position: "relative",
         }}
       >
@@ -595,7 +600,7 @@ export default function LandingQuiz() {
                         <h2
                           style={{
                             fontFamily: display,
-                            fontWeight: 800,
+                            fontWeight: 600,
                             fontSize: "clamp(26px, 3.4vw, 38px)",
                             lineHeight: 1.15,
                             color: C.deep,
@@ -690,7 +695,7 @@ export default function LandingQuiz() {
               style={{ textAlign: "center", padding: "40px 0" }}
             >
               <Kidzz size={200} mood="happy" reactive={false} />
-              <h2 style={{ fontFamily: display, fontSize: 32, fontWeight: 800, color: C.deep, marginTop: 16 }}>
+              <h2 style={{ fontFamily: display, fontSize: 32, fontWeight: 600, color: C.deep, marginTop: 16 }}>
                 Quase lá... ✨
               </h2>
               <p style={{ color: C.inkSoft, marginTop: 8 }}>Role para ver seu resultado.</p>
@@ -705,7 +710,7 @@ export default function LandingQuiz() {
           id="capture"
           style={{
             padding: "100px 24px",
-            background: `linear-gradient(180deg, #FBEDD6 0%, ${C.cream} 100%)`,
+            background: `linear-gradient(180deg, ${C.creamWarm} 0%, ${C.cream} 100%)`,
           }}
         >
           <div style={{ maxWidth: 560, margin: "0 auto", textAlign: "center" }}>
@@ -715,7 +720,7 @@ export default function LandingQuiz() {
                   initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  style={{ fontFamily: display, fontWeight: 800, fontSize: "clamp(28px, 4vw, 42px)", color: C.deep, letterSpacing: "-0.015em" }}
+                  style={{ fontFamily: display, fontWeight: 600, fontSize: "clamp(28px, 4vw, 42px)", color: C.deep, letterSpacing: "-0.015em" }}
                 >
                   Seu resultado está pronto! 🎉
                 </motion.h2>
@@ -784,7 +789,7 @@ export default function LandingQuiz() {
               transition={{ duration: 0.7 }}
               style={{
                 fontFamily: display,
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: "clamp(32px, 5vw, 52px)",
                 marginTop: 18,
                 lineHeight: 1.1,
@@ -862,7 +867,7 @@ export default function LandingQuiz() {
             style={{
               fontFamily: display,
               fontSize: "clamp(30px, 4vw, 46px)",
-              fontWeight: 800,
+              fontWeight: 600,
               color: C.deep,
               letterSpacing: "-0.02em",
               lineHeight: 1.1,
@@ -909,7 +914,7 @@ export default function LandingQuiz() {
           <h2
             style={{
               fontFamily: display,
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: "clamp(32px, 5vw, 52px)",
               marginTop: 20,
               letterSpacing: "-0.02em",
@@ -965,7 +970,7 @@ function Nav({ onCta }: { onCta: () => void }) {
               width: 34,
               height: 34,
               borderRadius: 10,
-              background: `linear-gradient(135deg, ${C.amber}, ${C.gold})`,
+              background: `linear-gradient(135deg, ${C.gold}, ${C.sageDark})`,
               display: "grid",
               placeItems: "center",
               color: "#fff",
@@ -977,7 +982,7 @@ function Nav({ onCta }: { onCta: () => void }) {
           >
             K
           </div>
-          <span style={{ fontFamily: display, fontWeight: 800, fontSize: 20, color: C.deep, letterSpacing: "-0.01em" }}>
+          <span style={{ fontFamily: display, fontWeight: 600, fontSize: 20, color: C.deep, letterSpacing: "-0.01em" }}>
             Kidzz
           </span>
         </div>
@@ -1147,7 +1152,7 @@ function SectionHeader({ eyebrow, title, subtitle }: { eyebrow?: string; title: 
         style={{
           fontFamily: display,
           fontSize: "clamp(28px, 4vw, 44px)",
-          fontWeight: 800,
+          fontWeight: 600,
           color: C.deep,
           letterSpacing: "-0.02em",
           lineHeight: 1.1,
@@ -1198,7 +1203,7 @@ function FeatureCard({ emoji, color, title, text }: { emoji: string; color: stri
         >
           {emoji}
         </div>
-        <h3 style={{ fontFamily: display, fontWeight: 800, fontSize: 22, color: C.deep, margin: "0 0 10px" }}>{title}</h3>
+        <h3 style={{ fontFamily: display, fontWeight: 600, fontSize: 22, color: C.deep, margin: "0 0 10px" }}>{title}</h3>
         <p style={{ color: C.inkSoft, lineHeight: 1.55, margin: 0, fontSize: 15 }}>{text}</p>
       </motion.div>
     </TiltCard>
@@ -1394,7 +1399,7 @@ function TestimonialsSection() {
             { n: "98%", t: "recomendam" },
           ].map((s) => (
             <div key={s.t}>
-              <div style={{ fontFamily: display, fontWeight: 800, fontSize: 32, color: C.amber, letterSpacing: "-0.02em" }}>{s.n}</div>
+              <div style={{ fontFamily: display, fontWeight: 600, fontSize: 32, color: C.amber, letterSpacing: "-0.02em" }}>{s.n}</div>
               <div style={{ color: C.inkMuted, fontSize: 13, fontWeight: 600, marginTop: 4 }}>{s.t}</div>
             </div>
           ))}
@@ -1460,7 +1465,7 @@ function PriceCard({
         )}
         <div style={{ fontWeight: 700, color: C.inkSoft, fontSize: 14, letterSpacing: 1, textTransform: "uppercase" }}>{name}</div>
         <div style={{ marginTop: 12, display: "flex", alignItems: "baseline", gap: 4 }}>
-          <span style={{ fontFamily: display, fontSize: 44, fontWeight: 800, color: C.deep, letterSpacing: "-0.02em" }}>{price}</span>
+          <span style={{ fontFamily: display, fontSize: 44, fontWeight: 600, color: C.deep, letterSpacing: "-0.02em" }}>{price}</span>
           <span style={{ color: C.inkMuted, fontWeight: 600 }}>{suffix}</span>
         </div>
         <ul style={{ marginTop: 20, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
