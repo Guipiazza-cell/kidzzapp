@@ -443,9 +443,9 @@ export default function LandingQuiz() {
           position: "relative",
           minHeight: "100vh",
           paddingTop: 96,
-          background: `radial-gradient(ellipse at 70% 20%, ${C.amber}1f, transparent 60%),
-                       radial-gradient(ellipse at 10% 80%, ${C.sage}26, transparent 55%),
-                       linear-gradient(180deg, #FFF4E2 0%, ${C.cream} 100%)`,
+          background: `radial-gradient(ellipse at 80% 10%, ${C.goldSoft}88, transparent 55%),
+                       radial-gradient(ellipse at 8% 85%, ${C.sageSoft}CC, transparent 60%),
+                       linear-gradient(180deg, ${C.creamWarm} 0%, ${C.cream} 100%)`,
           overflow: "hidden",
         }}
       >
