@@ -473,15 +473,16 @@ export default function LandingQuiz() {
                 gap: 8,
                 padding: "8px 14px",
                 borderRadius: 999,
-                background: "rgba(232,130,26,0.12)",
-                color: C.amberDark,
+                background: "rgba(127,161,115,0.14)",
+                color: C.sageDark,
                 fontWeight: 700,
-                fontSize: 13,
-                letterSpacing: 0.2,
+                fontSize: 12,
+                letterSpacing: 1.4,
+                textTransform: "uppercase",
               }}
             >
-              <span style={{ width: 8, height: 8, borderRadius: 999, background: C.amber }} />
-              Feito para a família brasileira
+              <span style={{ width: 6, height: 6, borderRadius: 999, background: C.gold }} />
+              Menos telas, mais memórias
             </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 18 }}
