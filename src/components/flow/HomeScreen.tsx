@@ -1,44 +1,29 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect, useRef, useMemo, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogIn, Shield, Crown, Gift, Bell, Mic, Sparkles, Leaf, Heart, ChevronRight } from "lucide-react";
 import StreakCelebration from "./StreakCelebration";
 import ParentalGate from "../ParentalGate";
 import ParentalSettings from "../ParentalSettings";
 import ParentDashboard from "../parental/ParentDashboard";
-import SubscribeBanner from "../SubscribeBanner";
-import SoundToggle from "../SoundToggle";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
-import { getTotalXp } from "@/lib/dailyMission";
-import explorerImg from "@/assets/kidzz/explorer.webp";
-import moonImg from "@/assets/kidzz/moon.webp";
-import wellnessImg from "@/assets/kidzz/wellness.webp";
-import { sfx } from "@/lib/sfx";
+import { sfx, isSfxMuted, setSfxMuted } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
-import SOSCard from "@/components/sos/SOSCard";
 import SOSModal from "@/components/sos/SOSModal";
-import RitualCard from "@/components/rituals/RitualCard";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
-import DecompressionCard from "@/components/decompress/DecompressionCard";
-import SleepCard from "@/components/sleep/SleepCard";
-import SleepMode from "@/components/sleep/SleepMode";
-import DecompressionMode from "@/components/decompress/DecompressionMode";
-import ConnectionMeter from "@/components/connection/ConnectionMeter";
-import ContextualNudge from "@/components/nudges/ContextualNudge";
 
-/* ───────────── KIDZZ HOME • PREMIUM v4 — WHITER / CLEANER / CALMER ─────────────
-   Foco: respirável, sofisticado, Apple + Calm + Pixar.
-   - Logo KIDZZ centralizado, sem coração, com glow branco suave.
-   - Topo: greeting clean (sem foto), notificação + presente discretos.
-   - HUD reduzido a 2 mini pills (Energia / Conexão).
-   - Card pergunta editorial com mic verde metalizado + CTA "Perguntar".
-   - Banner rotativo (Histórias / Wellness / Brincar / Música / Rotina / Sonhos).
-   - Cards "Hoje para você" mais brancos, suaves.
-   - Dock 2 linhas vem do BottomNav.
+/* ───────────── KIDZZ HOME • REDESIGN "PERGUNTAS" (forest / cinematic) ─────────────
+   Porta fiel do mockup public/exemplos/Perguntas.dc.html (estilos inline 1:1)
+   ligado aos dados reais do app:
+     - Saudação contextual        → getGreeting(childName)
+     - Perguntar (mic/texto)      → onSubmit + Web Speech API
+     - Sugestões "Hoje para você" → CATEGORIZED_QUESTIONS por faixa etária/interesses
+     - Última grátis / Liberar    → questionsRemaining()/isPremium + kidzz:open-plans
+     - SOS KIDZZ                  → SOSModal
+     - Hora do reencontro         → RitualFlow (ritual da família)
+     - Sound / Presente / Sino / Pais → toggles e portões parentais reais
+   A barra inferior é a BottomNav global (não duplicada aqui).
    ──────────────────────────────────────────────────────────────────────────── */
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
@@ -87,59 +72,93 @@ interface Props {
 }
 
 /* ── Greeting contextual ── */
-function getGreeting(name: string): { title: string; subtitle: string; mascot: "cosmic" | "explorer" | "moon" } {
+function getGreeting(name: string): { saudacao: string; sub: string } {
   const h = new Date().getHours();
-  if (h >= 5 && h < 12)
-    return { title: `Bom dia, ${name} ☀️`, subtitle: "Que bom ter você aqui.", mascot: "explorer" };
-  if (h >= 12 && h < 18)
-    return { title: `Olá, ${name} ✨`, subtitle: "Pequenos momentos criam grandes memórias.", mascot: "cosmic" };
-  if (h >= 18 && h < 22)
-    return { title: `Boa noite, ${name} 🌙`, subtitle: "Vamos descobrir algo juntos antes de dormir?", mascot: "moon" };
-  return { title: `Hora de sonhar, ${name} ✨`, subtitle: "A imaginação trabalha melhor agora.", mascot: "moon" };
+  const saudacao = h < 5 ? "Boa noite" : h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
+  const noite = h >= 18 || h < 5;
+  const sub = noite ? "Vamos descobrir algo juntos antes de dormir?" : "Vamos descobrir algo incrível juntos?";
+  return { saudacao, sub };
 }
 
-/* ── Banners rotativos ── */
-const BANNERS = [
-  {
-    id: "story",
-    eyebrow: "Continue sua jornada",
-    title: "Hora da história",
-    sub: "Vocês estavam em \u201cA floresta dos sonhos\u201d.",
-    cta: "Continuar",
-    target: "explore",
-    img: moonImg,
-    tint: "hsl(85 30% 60%)",
-    bg: "linear-gradient(135deg, hsl(0 0% 100% / 0.85) 0%, hsl(85 40% 94% / 0.85) 100%)",
-  },
-  {
-    id: "wellness",
-    eyebrow: "Momento calmo",
-    title: "Respire juntos",
-    sub: "3 minutos de respiração guiada.",
-    cta: "Iniciar",
-    target: "wellness",
-    img: wellnessImg,
-    tint: "hsl(150 45% 55%)",
-    bg: "linear-gradient(135deg, hsl(0 0% 100% / 0.85) 0%, hsl(140 35% 94% / 0.85) 100%)",
-  },
-  {
-    id: "play",
-    eyebrow: "Aventura do dia",
-    title: "Vamos brincar?",
-    sub: "Uma atividade nova esperando vocês.",
-    cta: "Descobrir",
-    target: "play",
-    img: explorerImg,
-    tint: "hsl(28 80% 60%)",
-    bg: "linear-gradient(135deg, hsl(0 0% 100% / 0.85) 0%, hsl(35 40% 94% / 0.85) 100%)",
-  },
-] as const;
+/* ── Paleta do design (cores exatas do mockup) ── */
+const CREAM = "#FBF4E4";
+const CREAM_SOFT = "rgba(240,234,220,.82)";
+const GREEN_LIGHT = "#8FE3AD";
+
+/* ── Variantes de cor dos cards de descoberta (do DSC do mockup) ── */
+const DISC_VARIANTS: { grad: string; accent: string; arrow: [string, string, string]; badgeColor: string }[] = [
+  { grad: "linear-gradient(160deg,#7FC96A,#2E7A3E)", accent: "#5EAE4E", arrow: ["#8FD07A", "#4E9A3A", "#2E7A26"], badgeColor: "#2E7A3E" },
+  { grad: "linear-gradient(160deg,#A8CCF0,#5E86C0)", accent: "#4E8AD8", arrow: ["#8FB8F0", "#4E86D8", "#2E5AA8"], badgeColor: "#2E5A9A" },
+  { grad: "linear-gradient(160deg,#FFD48A,#E0952E)", accent: "#E0952E", arrow: ["#FFD48A", "#F0A53E", "#D9822A"], badgeColor: "#B0701A" },
+];
+
+/* ── Helper: botão gloss circular (verde metálico do mockup) ── */
+const glossGreen = (size: number, radius = 999): CSSProperties => ({
+  flex: "none",
+  width: size,
+  height: size,
+  borderRadius: radius,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "radial-gradient(130% 130% at 30% 22%,#8FE0A0,#4EA35E 55%,#2E7A42)",
+  border: "1px solid rgba(255,255,255,.55)",
+  boxShadow: "0 8px 18px rgba(40,110,60,.45),inset 0 1.5px 2px rgba(255,255,255,.6)",
+});
+
+/* ── Estilo do card de descoberta (cream glass do mockup) ── */
+const discCardStyle: CSSProperties = {
+  position: "relative",
+  overflow: "hidden",
+  display: "flex",
+  alignItems: "center",
+  gap: 13,
+  padding: "13px 14px",
+  borderRadius: 22,
+  cursor: "pointer",
+  textAlign: "left",
+  width: "100%",
+  border: "1px solid rgba(255,248,228,.6)",
+  background: "linear-gradient(150deg,rgba(246,238,214,.9),rgba(228,214,180,.8))",
+  backdropFilter: "blur(14px) saturate(150%)",
+  WebkitBackdropFilter: "blur(14px) saturate(150%)",
+  boxShadow: "0 14px 30px rgba(40,50,20,.24), inset 0 1.5px 0 rgba(255,255,255,.8)",
+  fontFamily: "'Nunito',sans-serif",
+  transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
+};
+
+/* ── Estilo island do header (glass âmbar escuro) ── */
+const islandStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 1,
+  padding: "7px 5px",
+  borderRadius: 999,
+  background: "linear-gradient(160deg,rgba(70,58,38,.66),rgba(40,34,22,.5))",
+  backdropFilter: "blur(16px) saturate(150%)",
+  WebkitBackdropFilter: "blur(16px) saturate(150%)",
+  border: "1px solid rgba(230,205,150,.4)",
+  boxShadow: "0 8px 20px rgba(0,0,0,.36),inset 0 1.5px 1px rgba(255,240,200,.4)",
+};
+
+const KEYFRAMES = `
+@keyframes perg-floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes perg-shine{0%{transform:translateX(-130%) skewX(-18deg)}60%,100%{transform:translateX(240%) skewX(-18deg)}}
+@keyframes perg-cascade{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes perg-heroIn{from{opacity:0;transform:translateY(-14px) scale(1.04)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes perg-micpulse{0%{box-shadow:0 0 0 0 rgba(120,210,130,.6)}100%{box-shadow:0 0 0 14px rgba(120,210,130,0)}}
+@keyframes perg-raysweep{0%,100%{opacity:.42;transform:translateX(-4%) rotate(-2deg)}50%{opacity:.78;transform:translateX(4%) rotate(2deg)}}
+@keyframes perg-bob1{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-13px) rotate(3deg)}}
+@keyframes perg-bob2{0%,100%{transform:translateY(0) rotate(4deg)}50%{transform:translateY(-17px) rotate(-3deg)}}
+@keyframes perg-bob3{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes perg-sosring{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+@keyframes perg-dust{0%{transform:translateY(0);opacity:0}20%{opacity:.7}100%{transform:translateY(-120px);opacity:0}}
+@keyframes perg-playpulse{0%{box-shadow:0 0 0 0 rgba(200,170,240,.55)}100%{box-shadow:0 0 0 15px rgba(200,170,240,0)}}
+`;
 
 const HomeScreen = ({
   onSubmit,
   onOpenAchievements,
-  onOpenPlay,
-  onOpenTravel,
   onOpenReferral,
   onTabChange,
 }: Props) => {
@@ -152,64 +171,17 @@ const HomeScreen = ({
   const [showSettings, setShowSettings] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [bannerIdx, setBannerIdx] = useState(0);
   const [sosOpen, setSosOpen] = useState(false);
   const [ritualOpen, setRitualOpen] = useState(false);
-  const [decompressOpen, setDecompressOpen] = useState(false);
-  const [sleepOpen, setSleepOpen] = useState(false);
+  const [muted, setMuted] = useState(false);
   const currentRitual = useMemo(() => getCurrentRitual(), []);
-  const showDecompress = useMemo(() => {
-    const h = new Date().getHours();
-    return h >= 16 && h < 21; // janela do reencontro
-  }, []);
-  const showSleep = useMemo(() => {
-    const h = new Date().getHours();
-    return h >= 20 || h < 5; // janela noturna
-  }, []);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [lastTopic, setLastTopic] = useState<{ question: string; when: string } | null>(null);
   const isPremium = profile?.is_premium ?? false;
 
-  // Memória contextual premium — busca última pergunta dos últimos 7 dias (exceto hoje)
-  // Falha silenciosa: se a query quebrar, o chip simplesmente não aparece — Home nunca quebra.
-  useEffect(() => {
-    if (!isPremium || !user) return;
-    let cancelled = false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    (async () => {
-      try {
-        const { data, error } = await supabase
-          .from("kidzz_questions_log")
-          .select("question, created_at")
-          .eq("user_id", user.id)
-          .gte("created_at", sevenDaysAgo.toISOString())
-          .lt("created_at", today.toISOString())
-          .order("created_at", { ascending: false })
-          .limit(1);
-        if (cancelled) return;
-        if (error) {
-          console.warn("[Kidzz] memória premium indisponível:", error.message);
-          return;
-        }
-        if (data && data[0]) {
-          const d = new Date(data[0].created_at);
-          const diff = Math.floor((today.getTime() - new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86400000);
-          const when = diff === 1 ? "Ontem" : `Há ${diff} dias`;
-          setLastTopic({ question: data[0].question, when });
-        }
-      } catch (e: any) {
-        console.warn("[Kidzz] memória premium falhou (fallback silencioso):", e?.message ?? e);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [isPremium, user]);
+  useEffect(() => { setMuted(isSfxMuted()); }, []);
 
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
-  const points = profile?.points ?? 0;
   const interests = (profile as any)?.child_interests as string[] | undefined;
   const ageQuestions = CATEGORIZED_QUESTIONS[ageRange] || CATEGORIZED_QUESTIONS["3-7"];
 
@@ -230,6 +202,10 @@ const HomeScreen = ({
   }, [ageQuestions, interests]);
 
   const isFreeLimitReached = !canAskQuestion();
+  const remaining = questionsRemaining();
+  const isOver = remaining <= 0;
+  const isLastFree = remaining === 1;
+
   const [suggestionPage, setSuggestionPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(filteredQuestions.length / SUGGESTION_COUNT));
   const visibleSuggestions = filteredQuestions.slice(
@@ -243,15 +219,9 @@ const HomeScreen = ({
     return () => clearInterval(iv);
   }, [totalPages]);
 
-  // Banner auto-rotate
-  useEffect(() => {
-    const iv = setInterval(() => setBannerIdx((i) => (i + 1) % BANNERS.length), 6000);
-    return () => clearInterval(iv);
-  }, []);
-
   const greeting = useMemo(() => getGreeting(childName), [childName]);
-  const xp = getTotalXp();
   const streakDays = profile?.streak_days ?? 0;
+  const introHoje = `${childName}, escolhemos algumas descobertas que combinam com a curiosidade da sua família.`;
 
   const submit = (text: string) => {
     if (!text.trim() || submitting) return;
@@ -259,6 +229,14 @@ const HomeScreen = ({
     haptic("light");
     sfx("click");
     onSubmit(text.trim());
+  };
+
+  const toggleSound = () => {
+    const next = !muted;
+    setSfxMuted(next);
+    setMuted(next);
+    haptic("light");
+    if (!next) sfx("click");
   };
 
   /* ── Voice input (Web Speech API) ── */
@@ -319,7 +297,6 @@ const HomeScreen = ({
     };
 
     recognitionRef.current = recognition;
-    // IMPORTANT: start synchronously inside the tap handler (iOS requirement)
     try {
       recognition.start();
       setIsListening(true);
@@ -335,374 +312,307 @@ const HomeScreen = ({
     window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
   };
 
-  const goBannerTarget = (target: string) => {
-    haptic("medium");
+  const focusInput = () => {
+    haptic("light");
     sfx("click");
-    if (target === "play" && onOpenPlay) onOpenPlay();
-    else onTabChange?.(target);
+    inputRef.current?.focus();
+    inputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
+
+  const hasQ = !!input.trim();
 
   return (
     <motion.div
       className="flex-1 flex flex-col relative min-h-0"
+      style={{
+        fontFamily: "'Nunito',system-ui,sans-serif",
+        background: "linear-gradient(180deg,#3E5E2A 0%,#345224 46%,#284219 100%)",
+        overflow: "hidden",
+      }}
     >
+      <style>{KEYFRAMES}</style>
       <CharacterParticles particles={particles} />
 
-      {/* ── HEADER PREMIUM: ilhas flutuantes (Dynamic Island style) ── */}
-      <header
-        className="fixed top-0 left-0 right-0 mx-auto flex items-center justify-between gap-2 px-3 z-[80] pointer-events-none"
-        style={{ maxWidth: 480, paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)", paddingBottom: 4 }}
-      >
-        {/* esquerda — sound + premium badge (island) */}
-        <div className="flex items-center flex-1 pointer-events-auto">
-          {(user || profile?.is_premium) && (
-            <div
-              style={{
-                borderRadius: 999,
-                padding: 2,
-                background:
-                  "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 12%, rgba(190,197,206,.82) 30%, rgba(150,158,168,.75) 46%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
-                boxShadow:
-                  "0 10px 24px -8px rgba(60,40,15,.35), 0 3px 8px rgba(60,40,15,.18), inset 0 1px 1px rgba(255,255,255,.9)",
-              }}
-            >
-              <div
-                style={{
-                  position: "relative",
-                  borderRadius: 999,
-                  overflow: "hidden",
-                  background:
-                    "linear-gradient(150deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.14) 48%, rgba(255,255,255,.30) 100%)",
-                  backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                  WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                  boxShadow:
-                    "inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.18)",
-                  padding: "4px 8px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                {user && <SoundToggle size={14} />}
-                {profile?.is_premium && (
-                  <span
-                    className="text-[9px] text-white font-extrabold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm"
-                    style={{ background: "linear-gradient(135deg, hsl(var(--kid-purple)), hsl(var(--kid-pink)))" }}
-                  >
-                    <Crown size={9} /> Premium
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+      {/* ── FUNDO CINEMÁTICO — cena + raios + poeira de luz ── */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "-6%",
+          left: "-6%",
+          width: "112%",
+          height: "118%",
+          backgroundImage: "url('/exemplos/assets/cena-perguntas.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center 32%",
+          filter: "blur(2px) saturate(1.4) brightness(1.08)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background:
+            "linear-gradient(180deg,rgba(255,244,200,.14) 0%,rgba(90,130,50,.04) 26%,rgba(50,80,30,.14) 66%,rgba(30,55,22,.5) 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "-14%",
+          left: "-10%",
+          width: "82%",
+          height: "82%",
+          pointerEvents: "none",
+          background:
+            "conic-gradient(from 200deg at 30% 0%,rgba(255,238,170,.26),transparent 22%,rgba(255,232,150,.16) 40%,transparent 60%)",
+          filter: "blur(12px)",
+          mixBlendMode: "screen",
+          animation: "perg-raysweep 11s ease-in-out infinite",
+        }}
+      />
+      <div aria-hidden style={{ position: "absolute", bottom: "22%", left: "14%", width: 4, height: 4, borderRadius: 99, background: "#FFF3CC", boxShadow: "0 0 8px 2px rgba(255,225,150,.8)", animation: "perg-dust 7s linear infinite", pointerEvents: "none" }} />
+      <div aria-hidden style={{ position: "absolute", bottom: "36%", right: "20%", width: 5, height: 5, borderRadius: 99, background: "#EAFBD0", boxShadow: "0 0 9px 2px rgba(200,240,150,.75)", animation: "perg-dust 9s linear 2s infinite", pointerEvents: "none" }} />
 
-        {/* centro — KIDZZ wordmark (island glass) */}
+      {/* ── SCROLL ── */}
+      <div
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+          position: "relative",
+          zIndex: 2,
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
+        }}
+      >
+        {/* ── HEADER: som · KIDZZ · presente/sino/pais ── */}
         <div
-          className="relative flex-shrink-0 select-none pointer-events-none"
+          className="flex items-center justify-between"
           style={{
-            borderRadius: 999,
-            padding: "6px 14px",
-            background:
-              "linear-gradient(150deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.40) 100%)",
-            backdropFilter: "blur(24px) saturate(180%)",
-            WebkitBackdropFilter: "blur(24px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.55)",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.10), inset 0 1px 1px rgba(255,255,255,.9)",
+            padding: "4px 15px 4px",
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 20px)",
+            position: "relative",
+            zIndex: 6,
           }}
         >
-          <span
-            className="relative text-[18px] tracking-[0.18em] leading-none"
+          {/* som */}
+          <button
+            onClick={toggleSound}
+            className="active:scale-90"
+            aria-label={muted ? "Ativar sons" : "Silenciar sons"}
             style={{
-              fontWeight: 900,
-              color: "hsl(0 0% 100% / 0.25)",
-              WebkitTextStroke: "1.1px hsl(0 0% 100% / 0.95)",
-              textShadow:
-                "0 1px 0 hsl(0 0% 100% / 0.9), 0 2px 6px hsl(0 0% 0% / 0.15), 0 0 14px hsl(0 0% 100% / 0.5)",
+              flex: "none",
+              width: 47,
+              height: 47,
+              borderRadius: 999,
+              cursor: "pointer",
+              background: "linear-gradient(160deg,rgba(70,58,38,.66),rgba(40,34,22,.5))",
+              backdropFilter: "blur(16px) saturate(150%)",
+              WebkitBackdropFilter: "blur(16px) saturate(150%)",
+              border: "1px solid rgba(230,205,150,.4)",
+              boxShadow: "0 8px 20px rgba(0,0,0,.36),inset 0 1.5px 1px rgba(255,240,200,.45)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform .2s",
+            }}
+          >
+            {muted ? (
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 4 6m0-6-4 6" stroke="#F2E6C8" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            ) : (
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Zm4.5 3.5a5 5 0 0 1 0 7m2.8-10a9 9 0 0 1 0 13" stroke="#F2E6C8" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            )}
+          </button>
+
+          {/* KIDZZ wordmark */}
+          <div
+            className="select-none"
+            style={{
+              position: "relative",
+              fontFamily: "'Lora',serif",
+              fontWeight: 700,
+              fontSize: 33,
+              letterSpacing: 5,
+              background: "linear-gradient(180deg,#CFF29A 0%,#82CF58 44%,#3E8A2E 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              filter: "drop-shadow(0 2px 8px rgba(90,180,80,.45)) drop-shadow(0 1px 0 rgba(255,255,255,.2))",
             }}
           >
             KIDZZ
-          </span>
-        </div>
+          </div>
 
-
-        {/* direita — gift + bell + parental (island glass) */}
-        <div className="flex items-center gap-1.5 flex-1 justify-end pointer-events-auto">
-          <div
-            style={{
-              borderRadius: 999,
-              padding: 2,
-              background:
-                "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 12%, rgba(190,197,206,.82) 30%, rgba(150,158,168,.75) 46%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
-              boxShadow:
-                "0 10px 24px -8px rgba(60,40,15,.35), 0 3px 8px rgba(60,40,15,.18), inset 0 1px 1px rgba(255,255,255,.9)",
-            }}
-          >
-            <div
-              style={{
-                position: "relative",
-                borderRadius: 999,
-                overflow: "hidden",
-                background:
-                  "linear-gradient(150deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.14) 48%, rgba(255,255,255,.30) 100%)",
-                backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                boxShadow:
-                  "inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.18)",
-                padding: "3px 5px",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <span
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  top: 0, left: 0, right: 0,
-                  height: "55%",
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.15) 60%, rgba(255,255,255,0) 100%)",
-                  pointerEvents: "none",
-                  borderTopLeftRadius: 999,
-                  borderTopRightRadius: 999,
-                }}
-              />
-              {onOpenReferral && user && (
-                <motion.button
+          {/* presente · sino · pais */}
+          <div style={islandStyle}>
+            {onOpenReferral && user && (
+              <>
+                <button
                   onClick={() => { haptic("light"); sfx("click"); onOpenReferral(); }}
-                  className="relative w-9 h-9 rounded-full flex items-center justify-center"
-                  whileTap={{ scale: 0.9 }}
+                  className="active:scale-90"
                   aria-label="Convide amigos"
+                  style={{ position: "relative", width: 31, height: 31, borderRadius: 999, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
-                  <Gift size={14} style={{ color: "hsl(var(--wellness-deep))" }} />
-                  <span
-                    aria-hidden
-                    className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full"
-                    style={{ background: "hsl(var(--kidzz-green))", boxShadow: "0 0 6px hsl(var(--kidzz-green))" }}
-                  />
-                </motion.button>
-              )}
-              <motion.button
-                onClick={() => setShowParentalGateForDashboard(true)}
-                className="relative w-8 h-8 rounded-full flex items-center justify-center"
-                whileTap={{ scale: 0.9 }}
-                aria-label="Notificações"
-              >
-                <Bell size={14} style={{ color: "hsl(var(--premium-ink-soft))" }} />
-              </motion.button>
-              {!user ? (
-                <motion.button
-                  onClick={() => navigate("/auth")}
-                  className="relative w-9 h-9 rounded-full flex items-center justify-center"
-                  whileTap={{ scale: 0.9 }}
-                  aria-label="Entrar"
-                >
-                  <LogIn size={14} style={{ color: "hsl(var(--wellness-deep))" }} />
-                </motion.button>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8M2 7.5h20V12H2zM12 21V7.5M12 7.5H7.8A2.4 2.4 0 1 1 10.2 3C11.6 3 12 7.5 12 7.5Zm0 0h4.2A2.4 2.4 0 1 0 13.8 3C12.4 3 12 7.5 12 7.5Z" stroke="#F2E6C8" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </button>
+                <div style={{ width: 1, height: 18, background: "rgba(230,205,150,.3)" }} />
+              </>
+            )}
+            <button
+              onClick={() => setShowParentalGateForDashboard(true)}
+              className="active:scale-90"
+              aria-label="Notificações"
+              style={{ position: "relative", width: 31, height: 31, borderRadius: 999, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Zm3.5 9a2.5 2.5 0 0 0 5 0" stroke="#F2E6C8" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              <span style={{ position: "absolute", top: 4, right: 6, width: 6, height: 6, borderRadius: 99, background: "#F0645A", boxShadow: "0 0 0 2px rgba(40,34,22,.95)" }} />
+            </button>
+            <div style={{ width: 1, height: 18, background: "rgba(230,205,150,.3)" }} />
+            <button
+              onClick={() => (user ? setShowParentalGateForSettings(true) : navigate("/auth"))}
+              className="active:scale-90"
+              aria-label={user ? "Área dos pais" : "Entrar"}
+              style={{ width: 31, height: 31, borderRadius: 999, border: "none", background: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              {user ? (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z" stroke="#F2E6C8" strokeWidth="1.7" strokeLinejoin="round" /></svg>
               ) : (
-                <motion.button
-                  onClick={() => setShowParentalGateForSettings(true)}
-                  className="relative w-9 h-9 rounded-full flex items-center justify-center"
-                  whileTap={{ scale: 0.9 }}
-                  aria-label="Controle parental"
-                >
-                  <Shield size={14} style={{ color: "hsl(var(--premium-ink-soft))" }} />
-                </motion.button>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3" stroke="#F2E6C8" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>
               )}
-            </div>
+            </button>
           </div>
         </div>
-      </header>
 
-      {/* Ilhas Pais/Assinar — flutuando logo abaixo do header */}
-      <div
-        className="fixed left-0 right-0 mx-auto z-[70] pointer-events-none"
-        style={{ maxWidth: 480, top: "calc(env(safe-area-inset-top, 0px) + 56px)" }}
-      >
-        <SubscribeBanner
-          onOpenParentalGate={() => setShowParentalGateForSettings(true)}
-          questionsRemaining={questionsRemaining()}
-          isPremium={profile?.is_premium ?? false}
-        />
-      </div>
-
-      <div
-        className="flex-1 min-h-0 flex flex-col items-center px-5 overflow-y-auto overflow-x-hidden overscroll-contain"
-        style={{
-          WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 108px)",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 160px)",
-        }}
-      >
-        {/* ── 1. HERO — greeting clean + camaleão invadindo ── */}
-        <section className="w-full max-w-sm relative pt-3 pb-2">
-          <div className="relative flex items-start gap-2">
-            <motion.div
-              className="flex-1 min-w-0 pt-1"
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1, duration: 0.4 }}
+        {/* ── ÚLTIMA GRÁTIS · LIBERAR TUDO (só free) ── */}
+        {!isPremium && (
+          <div
+            style={{ display: "flex", gap: 10, padding: "12px 15px 4px", position: "relative", zIndex: 5, animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) .04s both" }}
+          >
+            <button
+              onClick={focusInput}
+              className="active:scale-[.985]"
+              style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 11, padding: "11px 13px", borderRadius: 19, cursor: "pointer", textAlign: "left", background: "linear-gradient(155deg,rgba(74,60,38,.72),rgba(44,36,22,.6))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(255,225,140,.36)", boxShadow: "0 12px 26px rgba(0,0,0,.34),inset 0 1.5px 0 rgba(255,240,200,.18)" }}
             >
-              <h1
-                className="text-[26px] font-black leading-[1.1] tracking-tight"
-                style={{ color: "hsl(var(--premium-ink))" }}
-              >
-                {greeting.title.split(",")[0]},{" "}
-                <span style={{ color: "hsl(var(--kidzz-green-deep))" }}>
-                  {greeting.title.split(",")[1]?.trim() || childName}
+              <span style={{ flex: "none", display: "flex", alignItems: "center", gap: 1 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 18h16l-1.4-8.6-4 3.2L12 5l-2.6 7.6-4-3.2L4 18Z" fill="#F5C24E" stroke="#E0A52E" strokeWidth="1" strokeLinejoin="round" /></svg>
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: "block", fontWeight: 900, fontSize: 13.5, color: "#FBF4E4", lineHeight: 1.14 }}>
+                  {isOver ? "Limite de hoje atingido" : isLastFree ? "Última pergunta grátis!" : `${remaining} perguntas grátis hoje`}
                 </span>
-              </h1>
-              <p
-                className="text-[13px] font-medium leading-snug mt-1.5"
-                style={{ color: "hsl(var(--premium-ink-soft))" }}
-              >
-                {greeting.subtitle}
-              </p>
-            </motion.div>
-
-            {/* Camaleão invadindo o lado direito do hero — efeito 3D volumétrico */}
-            <motion.div
-              className="flex-shrink-0 -mr-3 -mt-2 relative"
-              initial={{ scale: 0.7, opacity: 0, rotate: -8 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.05 }}
-              style={{
-                filter:
-                  "drop-shadow(0 18px 22px hsl(140 40% 25% / 0.32)) drop-shadow(0 6px 10px hsl(140 40% 25% / 0.22)) drop-shadow(0 0 22px hsl(140 70% 55% / 0.35))",
-                transform: "perspective(800px) rotateX(6deg) rotateY(-8deg)",
-                transformStyle: "preserve-3d",
-              }}
+                <span style={{ display: "block", fontSize: 10.5, fontWeight: 700, color: "rgba(232,224,198,.72)", marginTop: 1 }}>
+                  {isOver ? "Libere tudo e continue a jornada." : "Responda agora e mantenha sua sequência."}
+                </span>
+              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="#E8D9A8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+            <button
+              onClick={openPlans}
+              className="active:scale-95"
+              style={{ flex: "none", display: "flex", alignItems: "center", gap: 7, padding: "11px 16px", borderRadius: 19, cursor: "pointer", background: "linear-gradient(160deg,rgba(120,200,90,.32),rgba(60,140,50,.26))", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(200,240,170,.5)", boxShadow: "0 12px 26px rgba(40,110,40,.32),inset 0 1.5px 0 rgba(255,255,255,.28)" }}
             >
-              {/* contact shadow elíptica abaixo */}
-              <div
-                aria-hidden
-                className="absolute left-1/2 -translate-x-1/2 bottom-1 w-[78%] h-3 rounded-[50%] pointer-events-none"
-                style={{
-                  background: "radial-gradient(ellipse, hsl(140 40% 20% / 0.35), transparent 70%)",
-                  filter: "blur(6px)",
-                }}
-              />
-              <KidzzChameleon
-                state={greeting.mascot}
-                mood="curious"
-                size="lg"
-                showParticles={false}
-                interactive={false}
-              />
-            </motion.div>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 4l1.6 4.8L18 10l-4.4 1.2L12 16l-1.6-4.8L6 10l4.4-1.2L12 4Z" fill="#EAFBD0" stroke="#EAFBD0" strokeWidth=".8" strokeLinejoin="round" /></svg>
+              <span style={{ fontWeight: 900, fontSize: 13, color: "#F2FBE8", whiteSpace: "nowrap" }}>Liberar tudo</span>
+            </button>
           </div>
-        </section>
+        )}
 
-        {/* ── 1.5 TERMÔMETRO DE CONEXÃO — coração emocional da família ── */}
-        <div className="mb-3">
-          <ConnectionMeter />
-        </div>
-
-        {/* ── 1.6 NUDGE CONTEXTUAL — sussurro inteligente ── */}
-        <div className="w-full max-w-sm mb-3">
-          <ContextualNudge
-            onAction={(a) => {
-              if (a === "ritual") setRitualOpen(true);
-              else if (a === "decompress") setDecompressOpen(true);
-              else if (a === "moment-add") {
-                onTabChange?.("moments");
-                setTimeout(() => window.dispatchEvent(new CustomEvent("kidzz:open-moment-add")), 200);
-              }
-            }}
-          />
-        </div>
-
-
-
-
-
-        {/* ── 2. HUD MINI — apenas Energia + Conexão ── */}
-        <motion.div
-          className="w-full max-w-sm flex items-center justify-end gap-2 mb-3 -mt-2"
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <MiniPill
-            icon={<Leaf size={11} style={{ color: "hsl(var(--kidzz-green-deep))" }} />}
-            label="Energia"
-            value={xp}
-          />
-          <MiniPill
-            icon={<Heart size={11} className="text-rose-400 fill-rose-300" />}
-            label="Conexão"
-            value={Math.max(1, Math.floor(points / 10))}
-          />
-        </motion.div>
-
-        {/* ── 3. CARD PRINCIPAL — PERGUNTAS (coração do app) ── */}
-        <motion.section
-          className="w-full max-w-sm relative mb-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.36, type: "spring", stiffness: 200, damping: 24 }}
-        >
-          {/* halo branco premium */}
+        {/* ── HERO: saudação + Gui + bolhas ── */}
+        <div style={{ position: "relative", padding: "12px 15px 2px", zIndex: 4 }}>
           <div
-            aria-hidden
-            className="absolute -inset-3 rounded-[32px] pointer-events-none"
             style={{
-              background:
-                "radial-gradient(70% 90% at 50% 30%, hsl(0 0% 100% / 0.5), transparent 75%)",
-              filter: "blur(20px)",
-            }}
-          />
-          <div
-            className="relative surface-premium px-5 py-5"
-            style={{
+              position: "relative",
+              overflow: "hidden",
               borderRadius: 28,
-              background:
-                "linear-gradient(180deg, hsl(0 0% 100% / 0.96) 0%, hsl(85 30% 97% / 0.92) 100%)",
-              border: "1px solid hsl(0 0% 100% / 0.9)",
-              boxShadow:
-                "0 24px 48px -22px hsl(140 40% 20% / 0.32), 0 8px 18px -12px hsl(140 40% 20% / 0.22), inset 0 1px 0 hsl(0 0% 100% / 0.95), inset 0 -1px 0 hsl(140 25% 80% / 0.35)",
+              minHeight: 250,
+              padding: "22px 20px 20px",
+              background: "linear-gradient(150deg,rgba(96,78,50,.6),rgba(52,42,26,.48))",
+              backdropFilter: "blur(20px) saturate(150%)",
+              WebkitBackdropFilter: "blur(20px) saturate(150%)",
+              border: "1px solid rgba(255,228,160,.34)",
+              boxShadow: "0 20px 46px rgba(0,0,0,.4),inset 0 2px 0 rgba(255,240,200,.28)",
+              animation: "perg-heroIn .7s cubic-bezier(.22,1,.36,1) .08s both",
             }}
           >
-            <div className="flex items-start gap-2 mb-3">
-              <Sparkles size={16} className="mt-1 flex-shrink-0" style={{ color: "hsl(var(--kidzz-green-deep))" }} />
-              <div className="min-w-0">
-                <h2
-                  className="text-[22px] font-black leading-[1.1] tracking-tight"
-                  style={{ color: "hsl(var(--premium-ink))", fontFamily: "Nunito, system-ui" }}
-                >
-                  Me pergunte qualquer coisa!
-                </h2>
-                <p
-                  className="text-[12px] font-medium leading-snug mt-1.5"
-                  style={{ color: "hsl(var(--premium-ink-soft))" }}
-                >
-                  Descubra respostas e crie conversas incríveis juntos.
-                </p>
+            {/* shine sweep */}
+            <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent,rgba(255,244,210,.14) 50%,transparent)", animation: "perg-shine 7s ease-in-out infinite" }} />
+
+            {/* Gui, o camaleão */}
+            <img
+              src="/exemplos/assets/gui-arms.jpeg"
+              alt="Gui, o camaleão, com o coração brilhando"
+              draggable={false}
+              style={{
+                position: "absolute",
+                right: -30,
+                bottom: -14,
+                height: 270,
+                width: "auto",
+                objectFit: "contain",
+                WebkitMaskImage: "radial-gradient(76% 80% at 50% 46%,#000 56%,rgba(0,0,0,.5) 76%,transparent 100%)",
+                maskImage: "radial-gradient(76% 80% at 50% 46%,#000 56%,rgba(0,0,0,.5) 76%,transparent 100%)",
+                filter: "drop-shadow(0 16px 26px rgba(0,0,0,.45))",
+                animation: "perg-floaty 6s ease-in-out infinite",
+                zIndex: 2,
+              }}
+            />
+
+            {/* bolhas de pergunta */}
+            <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 3 }}>
+              <div style={{ position: "absolute", top: 22, right: 120, width: 38, height: 38, borderRadius: "50% 50% 50% 8px", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(150deg,rgba(210,240,180,.5),rgba(140,200,120,.3))", backdropFilter: "blur(6px)", border: "1px solid rgba(230,250,210,.65)", boxShadow: "0 6px 14px rgba(0,0,0,.25)", animation: "perg-bob1 5.5s ease-in-out infinite" }}><span style={{ fontFamily: "'Lora',serif", fontWeight: 700, fontSize: 19, color: "#2E5A2E" }}>?</span></div>
+              <div style={{ position: "absolute", top: 6, right: 20, width: 33, height: 33, borderRadius: "50% 50% 8px 50%", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(150deg,rgba(255,236,170,.55),rgba(240,190,90,.34))", backdropFilter: "blur(6px)", border: "1px solid rgba(255,240,190,.7)", boxShadow: "0 6px 14px rgba(0,0,0,.25)", animation: "perg-bob2 6.5s ease-in-out .6s infinite" }}><span style={{ fontFamily: "'Lora',serif", fontWeight: 700, fontSize: 17, color: "#7A5A10" }}>?</span></div>
+              <div style={{ position: "absolute", top: 104, right: 138, width: 28, height: 28, borderRadius: "50% 50% 50% 8px", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(150deg,rgba(200,240,180,.5),rgba(120,190,110,.3))", backdropFilter: "blur(6px)", border: "1px solid rgba(230,250,210,.65)", boxShadow: "0 5px 12px rgba(0,0,0,.22)", animation: "perg-bob3 4.8s ease-in-out .3s infinite" }}><span style={{ fontFamily: "'Lora',serif", fontWeight: 700, fontSize: 14, color: "#2E5A2E" }}>?</span></div>
+              <div style={{ position: "absolute", top: 150, right: 12, width: 42, height: 33, borderRadius: "50% 50% 50% 10px", display: "flex", alignItems: "center", justifyContent: "center", gap: 3, background: "linear-gradient(150deg,rgba(230,240,220,.5),rgba(180,210,160,.3))", backdropFilter: "blur(6px)", border: "1px solid rgba(240,250,230,.65)", boxShadow: "0 6px 14px rgba(0,0,0,.22)", animation: "perg-bob2 5.9s ease-in-out .9s infinite" }}>
+                <span style={{ width: 4, height: 4, borderRadius: 99, background: "#3E5A3A" }} />
+                <span style={{ width: 4, height: 4, borderRadius: 99, background: "#3E5A3A" }} />
+                <span style={{ width: 4, height: 4, borderRadius: 99, background: "#3E5A3A" }} />
               </div>
             </div>
 
-            {/* Input + mic + ask */}
-            <div className="flex items-center gap-2">
-              {/* MIC verde metalizado premium */}
+            <div style={{ position: "relative", zIndex: 4, maxWidth: 192 }}>
+              <h1 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 34, lineHeight: 1.02, color: CREAM, letterSpacing: "-.6px", textShadow: "0 2px 12px rgba(0,0,0,.4)" }}>{greeting.saudacao},</h1>
+              <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 1, minHeight: 44 }}>
+                <span style={{ fontFamily: "'Lora',serif", fontWeight: 700, fontSize: 34, lineHeight: 1.02, color: GREEN_LIGHT, letterSpacing: "-.6px", textShadow: "0 2px 12px rgba(0,0,0,.35)" }}>{childName}</span>
+                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" style={{ flex: "none" }}><path d="M20 13.5A8 8 0 0 1 10.5 4 8 8 0 1 0 20 13.5Z" fill="#F5C24E" stroke="#E0A52E" strokeWidth="1.1" strokeLinejoin="round" /></svg>
+              </div>
+              <p style={{ margin: "11px 0 0", fontSize: 14, fontWeight: 700, lineHeight: 1.34, color: CREAM_SOFT, maxWidth: 170, textShadow: "0 1px 8px rgba(0,0,0,.35)" }}>{greeting.sub}</p>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 9, marginTop: 16, padding: "9px 14px 9px 9px", borderRadius: 16, background: "rgba(255,248,228,.16)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,240,200,.34)", boxShadow: "inset 0 1px 0 rgba(255,255,255,.3),0 6px 14px rgba(0,0,0,.2)" }}>
+                <div style={{ flex: "none", width: 34, height: 34, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(130% 130% at 30% 22%,#B6F0C0,#4EA35E 60%,#2E7A42)", boxShadow: "0 4px 10px rgba(40,110,60,.4),inset 0 1px 1px rgba(255,255,255,.5)" }}><svg width="17" height="17" viewBox="0 0 24 24" fill="#EAFBEF"><path d="M12 20.3l-7.1-6.9a4.6 4.6 0 0 1 6.4-6.5l.7.7.7-.7a4.6 4.6 0 0 1 6.4 6.5Z" /></svg></div>
+                <span style={{ fontSize: 11.5, fontWeight: 800, lineHeight: 1.3, color: "#F2EAD8", maxWidth: 118 }}>Cada resposta aproxima vocês ainda mais.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── CARD "ME PERGUNTE QUALQUER COISA" ── */}
+        <div style={{ padding: "14px 15px 0", position: "relative", zIndex: 4, animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) .16s both" }}>
+          <div style={{ borderRadius: 26, padding: 17, background: "linear-gradient(150deg,rgba(90,74,48,.56),rgba(50,40,26,.46))", backdropFilter: "blur(20px) saturate(150%)", WebkitBackdropFilter: "blur(20px) saturate(150%)", border: "1px solid rgba(255,228,160,.32)", boxShadow: "0 16px 34px rgba(0,0,0,.34),inset 0 1.5px 0 rgba(255,240,200,.24)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4l1.6 4.8L18 10l-4.4 1.2L12 16l-1.6-4.8L6 10l4.4-1.2L12 4Z" fill="#8FE0A0" stroke="#4EA35E" strokeWidth="1" strokeLinejoin="round" /></svg>
+              <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 20, color: CREAM, textShadow: "0 1px 6px rgba(0,0,0,.3)" }}>Me pergunte qualquer coisa!</h2>
+            </div>
+            <p style={{ margin: "0 0 14px", fontSize: 12, fontWeight: 700, color: "rgba(236,228,204,.72)" }}>Descubra respostas e crie conversas incríveis juntos.</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {/* MIC */}
               <motion.button
                 type="button"
-                aria-label={isListening ? "Parar de ouvir" : "Falar com Kidzz"}
                 onClick={toggleMic}
-                className="mic-metallic relative w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-white"
-                whileTap={{ scale: 0.92 }}
-                animate={isListening ? { scale: [1, 1.12, 1] } : { scale: [1, 1.04, 1] }}
-                transition={{ duration: isListening ? 1 : 3.6, repeat: Infinity, ease: "easeInOut" }}
-                style={isListening ? { boxShadow: "0 0 0 4px hsl(0 80% 60% / 0.35), 0 0 20px hsl(0 80% 60% / 0.5)" } : undefined}
+                aria-label={isListening ? "Parar de ouvir" : "Falar com Kidzz"}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  ...glossGreen(50),
+                  cursor: "pointer",
+                  animation: isListening ? undefined : "perg-micpulse 2.1s ease-out infinite",
+                  boxShadow: isListening
+                    ? "0 0 0 4px rgba(240,90,80,.35),0 0 20px rgba(240,90,80,.5),inset 0 1.5px 2px rgba(255,255,255,.6)"
+                    : "0 8px 18px rgba(40,110,60,.45),inset 0 1.5px 2px rgba(255,255,255,.6)",
+                }}
               >
-                {isListening && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-0 rounded-full pointer-events-none animate-ping"
-                    style={{ background: "hsl(0 80% 60% / 0.25)" }}
-                  />
-                )}
-                <Mic size={18} strokeWidth={2.4} className={isListening ? "animate-pulse" : undefined} />
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-5a3.5 3.5 0 1 0-7 0v5A3.5 3.5 0 0 0 12 15Zm6-4a6 6 0 0 1-12 0m6 6v3.5m-3 0h6" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </motion.button>
 
               <input
@@ -712,297 +622,193 @@ const HomeScreen = ({
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && submit(input)}
                 placeholder={isFreeLimitReached ? "Limite atingido" : "Digite ou pergunte…"}
-                className="flex-1 min-w-0 py-3 px-3 rounded-2xl text-[16px] font-semibold focus:outline-none transition-[opacity,transform,box-shadow] disabled:opacity-40"
-                style={{
-                  background: "hsl(0 0% 100% / 0.7)",
-                  border: "1px solid hsl(85 25% 88% / 0.8)",
-                  color: "hsl(var(--premium-ink))",
-                }}
                 disabled={submitting || isFreeLimitReached}
+                style={{ flex: 1, minWidth: 0, padding: "15px 16px", borderRadius: 16, border: "1px solid rgba(255,240,200,.3)", background: "rgba(255,248,228,.14)", backdropFilter: "blur(6px)", fontFamily: "'Nunito',sans-serif", fontSize: 16, fontWeight: 700, color: "#F6EFDD", outline: "none", boxShadow: "inset 0 2px 6px rgba(0,0,0,.16)", opacity: isFreeLimitReached ? 0.5 : 1 }}
               />
-            </div>
 
-            {/* CTA Perguntar — premium green/white gradient */}
-            <motion.button
-              type="button"
-              onClick={() => submit(input)}
-              disabled={!input.trim() || submitting || isFreeLimitReached}
-              className="btn-ask-premium relative mt-3 w-full py-3 rounded-2xl text-[14px] font-black tracking-tight flex items-center justify-center gap-1.5 disabled:opacity-40 overflow-hidden"
-              whileTap={{ scale: 0.97 }}
-              whileHover={{ y: -1 }}
-            >
-              <span className="shine-overlay" aria-hidden />
-              <span className="relative">Perguntar</span>
-              <Sparkles size={14} className="relative" />
-            </motion.button>
+              {/* SEND */}
+              <motion.button
+                type="button"
+                onClick={() => submit(input)}
+                disabled={!hasQ || submitting || isFreeLimitReached}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Perguntar"
+                style={{
+                  flex: "none",
+                  width: 50,
+                  height: 50,
+                  borderRadius: 16,
+                  cursor: hasQ ? "pointer" : "default",
+                  border: "1px solid rgba(255,255,255,.5)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "transform .2s",
+                  color: hasQ ? "#153A16" : "rgba(240,250,230,.7)",
+                  background: hasQ ? "radial-gradient(130% 130% at 30% 22%,#C7E8A8,#5EA83E 55%,#3A7A26)" : "rgba(255,255,255,.16)",
+                  boxShadow: hasQ ? "0 8px 18px rgba(40,110,40,.45), inset 0 1.5px 1px rgba(255,255,255,.5)" : "inset 0 1px 0 rgba(255,255,255,.3)",
+                  opacity: submitting || isFreeLimitReached ? 0.5 : 1,
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12 20 4l-4 16-4.5-6.5L4 12Zm7.5 1.5L20 4" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </motion.button>
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 9, marginTop: 12 }}>
+              <button
+                onClick={() => (user ? setShowParentalGateForSettings(true) : navigate("/auth"))}
+                className="active:scale-95"
+                style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 16px", borderRadius: 999, cursor: "pointer", background: "rgba(255,248,235,.9)", border: "1px solid rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 12.5, color: "#2E6B3E", boxShadow: "0 6px 14px rgba(0,0,0,.2)" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z" stroke="#2E6B3E" strokeWidth="1.9" strokeLinejoin="round" /></svg>
+                Pais
+              </button>
+              <button
+                onClick={openPlans}
+                className="active:scale-95"
+                style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 999, cursor: "pointer", border: "1px solid rgba(255,235,150,.6)", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 12.5, color: "#5A3A00", background: "radial-gradient(130% 130% at 30% 22%,#FFE9A8,#F5C24E 55%,#E0A52E)", boxShadow: "0 8px 18px rgba(200,150,30,.4),inset 0 1.5px 1px rgba(255,255,255,.6)" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#5A3A00"><path d="M4 18h16l-1.4-8.6-4 3.2L12 5l-2.6 7.6-4-3.2L4 18Z" /></svg>
+                {isPremium ? "Premium" : "Assinar"}
+              </button>
+            </div>
           </div>
-        </motion.section>
-        {/* ── MEMÓRIA CONTEXTUAL PREMIUM — continua a conversa de ontem ── */}
-        {isPremium && lastTopic && (
-          <motion.button
-            type="button"
-            onClick={() => submit(lastTopic.question)}
-            className="w-full max-w-sm mb-3 text-left px-4 py-3 rounded-2xl flex items-center gap-3"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            whileTap={{ scale: 0.98 }}
-            style={{
-              background: "linear-gradient(135deg, hsl(0 0% 100% / 0.85) 0%, hsl(280 40% 96% / 0.82) 100%)",
-              border: "1px solid hsl(280 30% 88% / 0.7)",
-              backdropFilter: "blur(18px)",
-              boxShadow: "0 10px 24px -14px hsl(280 30% 30% / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.9)",
-            }}
-          >
-            <span className="text-xl flex-shrink-0">💭</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "hsl(280 45% 50%)" }}>
-                {lastTopic.when} {childName} perguntou
-              </p>
-              <p className="text-[13px] font-semibold leading-snug truncate" style={{ color: "hsl(var(--premium-ink))" }}>
-                {lastTopic.question}
-              </p>
-            </div>
-            <ChevronRight size={16} style={{ color: "hsl(280 30% 55%)" }} />
-          </motion.button>
-        )}
-
-
-        {/* ── 3.5 SOS KIDZZ — acolhimento emocional ── */}
-        <SOSCard onOpen={() => setSosOpen(true)} />
-
-        {/* ── 3.6 RITUAL DA FAMÍLIA — contextual por hora do dia ── */}
-        <div className="w-full max-w-sm mt-3">
-          <RitualCard onOpen={() => setRitualOpen(true)} />
         </div>
 
-        {/* ── 3.7 DECOMPRESSÃO — janela do reencontro (16h–21h) ── */}
-        {showDecompress && (
-          <div className="w-full max-w-sm mt-3">
-            <DecompressionCard onOpen={() => setDecompressOpen(true)} />
-          </div>
-        )}
+        {/* ── HOJE PARA VOCÊ ── */}
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", padding: "20px 18px 2px", position: "relative", zIndex: 4 }}>
+          <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 21, color: CREAM, letterSpacing: ".3px", textShadow: "0 1px 8px rgba(0,0,0,.4)" }}>
+            Hoje para você <span style={{ fontSize: 16 }}>✦</span>
+          </h2>
+          {onOpenAchievements && (
+            <button
+              onClick={() => { haptic("light"); sfx("click"); onOpenAchievements(); }}
+              className="active:scale-95"
+              style={{ flex: "none", display: "flex", alignItems: "center", gap: 5, padding: "8px 13px", borderRadius: 999, cursor: "pointer", background: "rgba(255,248,228,.14)", border: "1px solid rgba(255,240,200,.3)", backdropFilter: "blur(8px)", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 11.5, color: "#F2EAD8" }}
+            >
+              Ver todas <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="#F2EAD8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+          )}
+        </div>
+        <p style={{ margin: 0, padding: "4px 18px 8px", fontSize: 12, fontWeight: 700, lineHeight: 1.4, color: "rgba(224,232,210,.68)", position: "relative", zIndex: 4 }}>{introHoje}</p>
 
-        {/* ── 3.8 MODO DORMIR — janela noturna (20h+) ── */}
-        {showSleep && (
-          <div className="w-full max-w-sm mt-3">
-            <SleepCard onOpen={() => setSleepOpen(true)} />
-          </div>
-        )}
-
-
-
-
-
-
-        {/* ── 4. BANNER ROTATIVO PREMIUM ── */}
-        <motion.section
-          className="w-full max-w-sm mb-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.46 }}
-        >
-          <div className="relative h-[150px] rounded-[24px] overflow-hidden">
-            <AnimatePresence mode="wait">
-              {BANNERS.map((b, i) =>
-                i === bannerIdx ? (
-                  <motion.button
-                    key={b.id}
-                    type="button"
-                    onClick={() => goBannerTarget(b.target)}
-                    className="absolute inset-0 text-left p-4 flex items-center gap-3 overflow-hidden"
-                    style={{
-                      background: b.bg,
-                      border: "1px solid hsl(0 0% 100% / 0.7)",
-                      backdropFilter: "blur(22px)",
-                      boxShadow: `0 22px 40px -20px ${b.tint.replace(")", " / 0.55)")}, 0 6px 14px -8px hsl(140 30% 20% / 0.22), inset 0 1px 0 hsl(0 0% 100% / 0.9), inset 0 -1px 0 hsl(140 20% 80% / 0.3)`,
-                      borderRadius: 24,
-                    }}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1 mb-1"
-                        style={{ color: b.tint }}
-                      >
-                        <Sparkles size={10} />
-                        {b.eyebrow}
-                      </p>
-                      <h3
-                        className="text-[18px] font-black leading-tight tracking-tight"
-                        style={{ color: "hsl(var(--premium-ink))" }}
-                      >
-                        {b.title}
-                      </h3>
-                      <p
-                        className="text-[11px] font-medium leading-snug mt-1"
-                        style={{ color: "hsl(var(--premium-ink-soft))" }}
-                      >
-                        {b.sub}
-                      </p>
-                      <span
-                        className="inline-flex items-center gap-1 mt-2 px-3 py-1 rounded-full text-[11px] font-black text-white"
-                        style={{ background: b.tint, boxShadow: `0 4px 12px -4px ${b.tint.replace(")", " / 0.5)")}` }}
-                      >
-                        {b.cta} <ChevronRight size={12} />
-                      </span>
-                    </div>
-                    <img
-                      src={b.img}
-                      alt=""
-                      aria-hidden
-                      className="w-20 h-20 object-contain drop-shadow-lg flex-shrink-0"
-                      draggable={false}
-                    />
-                  </motion.button>
-                ) : null
-              )}
-            </AnimatePresence>
-
-            {/* Dots */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
-              {BANNERS.map((_, i) => (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={suggestionPage}
+            style={{ display: "flex", flexDirection: "column", gap: 12, padding: "4px 15px 6px" }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.4 }}
+          >
+            {visibleSuggestions.map((q, i) => {
+              const v = DISC_VARIANTS[i % DISC_VARIANTS.length];
+              return (
                 <button
-                  key={i}
-                  type="button"
-                  onClick={() => setBannerIdx(i)}
-                  className="rounded-full transition-[opacity,transform]"
-                  style={{
-                    width: i === bannerIdx ? 16 : 5,
-                    height: 5,
-                    background: i === bannerIdx ? "hsl(var(--kidzz-green-deep))" : "hsl(100 10% 60% / 0.4)",
-                  }}
-                  aria-label={`Banner ${i + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </motion.section>
-
-        {/* ── 5. HOJE PARA VOCÊ — sugestões clean ── */}
-        <motion.section
-          className="w-full max-w-sm mb-3"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.56 }}
-        >
-          <div className="flex items-center justify-between mb-2 px-1">
-            <p
-              className="text-[11px] font-black uppercase tracking-[0.16em]"
-              style={{ color: "hsl(var(--premium-ink-soft))" }}
-            >
-              Hoje para você ✨
-            </p>
-            {onOpenAchievements && (
-              <button
-                type="button"
-                onClick={() => { haptic("light"); sfx("click"); onOpenAchievements(); }}
-                className="text-[10px] font-black flex items-center gap-0.5"
-                style={{ color: "hsl(var(--kidzz-green-deep))" }}
-              >
-                Ver todas <ChevronRight size={10} />
-              </button>
-            )}
-          </div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={suggestionPage}
-              className="flex flex-col gap-2"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.4 }}
-            >
-              {visibleSuggestions.map((q) => (
-                <motion.button
                   key={q.text}
                   onClick={() => submit(q.text)}
                   disabled={submitting || isFreeLimitReached}
-                  className="flex items-center gap-3 px-4 py-3 text-left active:scale-[0.98] transition-transform disabled:opacity-40 rounded-2xl"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, hsl(0 0% 100% / 0.95) 0%, hsl(85 25% 96% / 0.88) 100%)",
-                    border: "1px solid hsl(0 0% 100% / 0.85)",
-                    backdropFilter: "blur(20px)",
-                    boxShadow:
-                      "0 14px 28px -16px hsl(140 30% 20% / 0.28), 0 4px 10px -6px hsl(140 30% 20% / 0.18), inset 0 1px 0 hsl(0 0% 100% / 0.9), inset 0 -1px 0 hsl(140 20% 80% / 0.3)",
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  whileHover={{ y: -2 }}
+                  className="active:scale-[.98]"
+                  style={{ ...discCardStyle, opacity: submitting || isFreeLimitReached ? 0.5 : 1 }}
                 >
-                  <span className="text-xl flex-shrink-0">{q.emoji}</span>
-                  <div className="min-w-0 flex-1">
-                    <span
-                      className="text-[13px] font-bold leading-snug block"
-                      style={{ color: "hsl(var(--premium-ink))" }}
-                    >
-                      {q.text}
-                    </span>
-                    <span
-                      className="text-[9px] font-semibold uppercase tracking-wider"
-                      style={{ color: "hsl(var(--kidzz-green-deep) / 0.7)" }}
-                    >
-                      {q.category}
-                    </span>
+                  <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "46%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent,rgba(255,255,255,.14) 50%,transparent)", animation: "perg-shine 7s ease-in-out infinite", zIndex: 3 }} />
+                  {/* cena / emoji — tile glossy com specular + vinheta pra dar profundidade */}
+                  <div style={{ flex: "none", width: 78, height: 78, borderRadius: 18, overflow: "hidden", border: "1px solid rgba(255,255,255,.5)", boxShadow: "0 6px 14px rgba(0,0,0,.24), inset 0 1.5px 1px rgba(255,255,255,.55), inset 0 -10px 16px rgba(0,0,0,.2)", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", background: v.grad }}>
+                    <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(82% 62% at 28% 16%,rgba(255,255,255,.5),rgba(255,255,255,.12) 46%,transparent 70%)" }} />
+                    <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 90% at 50% 118%,rgba(0,0,0,.22),transparent 60%)" }} />
+                    <span style={{ position: "relative", fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 5px rgba(0,0,0,.32))" }}>{q.emoji}</span>
                   </div>
-                  <ChevronRight size={14} style={{ color: "hsl(var(--premium-ink-soft) / 0.5)" }} />
-                </motion.button>
-              ))}
-            </motion.div>
-          </AnimatePresence>
-        </motion.section>
+                  <div style={{ flex: 1, minWidth: 0, position: "relative", zIndex: 2 }}>
+                    <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 16.5, lineHeight: 1.1, color: "#26401E" }}>{q.text}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, fontSize: 10.5, fontWeight: 800, color: "#5E7A50" }}>
+                      <span style={{ width: 5, height: 5, borderRadius: 99, background: v.accent, boxShadow: "0 0 5px " + v.accent }} />
+                      Toque para descobrir
+                    </div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, padding: "4px 10px", borderRadius: 999, background: "rgba(255,255,255,.5)", border: "1px solid rgba(255,255,255,.85)" }}>
+                      <span style={{ width: 6, height: 6, borderRadius: 99, background: v.accent, boxShadow: "0 0 6px " + v.accent }} />
+                      <span style={{ fontSize: 9.5, fontWeight: 900, color: v.badgeColor }}>{q.category}</span>
+                    </div>
+                  </div>
+                  <div style={{ flex: "none", width: 46, height: 46, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 2, background: "radial-gradient(130% 130% at 30% 22%," + v.arrow[0] + "," + v.arrow[1] + " 55%," + v.arrow[2] + ")", border: "1px solid rgba(255,255,255,.65)", boxShadow: "0 8px 16px " + v.arrow[2] + "66, 0 0 14px " + v.arrow[1] + "55, inset 0 1.5px 2px rgba(255,255,255,.6)" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </div>
+                </button>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
 
-        {/* ── 6. JORNADA DA FAMÍLIA (discreto) ── */}
-        <motion.div
-          className="w-full max-w-sm mb-2"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.66 }}
-        >
-          <div
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-            style={{
-              background: "hsl(0 0% 100% / 0.7)",
-              border: "1px solid hsl(0 0% 100% / 0.65)",
-              backdropFilter: "blur(20px)",
-            }}
+        {/* ── SOS KIDZZ ── */}
+        <div style={{ padding: "10px 15px 0" }}>
+          <button
+            onClick={() => { haptic("medium"); sfx("click"); setSosOpen(true); }}
+            className="active:scale-[.985]"
+            style={{ position: "relative", overflow: "hidden", width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 14, padding: "16px 15px", borderRadius: 26, cursor: "pointer", background: "linear-gradient(150deg,rgba(240,180,150,.28),rgba(200,110,90,.2))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(255,210,190,.45)", boxShadow: "0 16px 34px rgba(120,40,30,.28),inset 0 1.5px 0 rgba(255,235,225,.4)" }}
           >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: "hsl(var(--kidzz-green-soft))" }}
-            >
-              <Heart size={16} style={{ color: "hsl(var(--wellness-deep))" }} fill="currentColor" />
+            <div style={{ position: "relative", flex: "none", width: 80, height: 80, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span aria-hidden style={{ position: "absolute", inset: 14, borderRadius: 999, border: "2px solid rgba(240,110,90,.5)", animation: "perg-sosring 2.4s ease-out infinite" }} />
+              <span aria-hidden style={{ position: "absolute", inset: 14, borderRadius: 999, border: "2px solid rgba(240,110,90,.5)", animation: "perg-sosring 2.4s ease-out 1.2s infinite" }} />
+              <div style={{ position: "relative", width: 56, height: 56, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(130% 130% at 30% 22%,#FF9E8E,#F0645A 55%,#D23B32)", boxShadow: "0 8px 18px rgba(200,50,40,.5),inset 0 1.5px 2px rgba(255,255,255,.5)" }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 20.5l-1.4-1.3C6 15.1 3 12.4 3 9a4.5 4.5 0 0 1 8.2-2.6L12 7l.8-.6A4.5 4.5 0 0 1 21 9c0 3.4-3 6.1-7.6 10.2L12 20.5Z" fill="rgba(255,255,255,.28)" stroke="#fff" strokeWidth="1.5" /><path d="M9 12a2 2 0 1 1 4 0m2.5 0a2 2 0 1 1 0-.1M12 13.5a2 2 0 0 0-2 2m4 0a2 2 0 0 0-2-2" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" /></svg>
+              </div>
+              <span style={{ position: "absolute", top: 2, left: 2, padding: "3px 8px", borderRadius: 999, background: "linear-gradient(150deg,#FF9E8E,#E24B40)", color: "#fff", fontSize: 9, fontWeight: 900, letterSpacing: ".8px", boxShadow: "0 3px 8px rgba(200,50,40,.5)" }}>SOS</span>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[12px] font-black" style={{ color: "hsl(var(--premium-ink))" }}>
-                Jornada da família
-              </p>
-              <p className="text-[10px] font-medium" style={{ color: "hsl(var(--premium-ink-soft))" }}>
-                {streakDays} dias juntos · {points} momentos
-              </p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.4, color: "#D24B3E", marginBottom: 2 }}>SOS KIDZZ</div>
+              <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, lineHeight: 1.08, color: "#5A2A1E", marginBottom: 4 }}>Precisa de <span style={{ color: "#E24B3E" }}>apoio</span> agora?</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.35, color: "#7A4A3A", maxWidth: 170 }}>Acolhimento imediato para sua família, sempre que precisar.</div>
             </div>
-            {onOpenTravel && (
-              <button
-                type="button"
-                onClick={onOpenTravel}
-                className="text-[10px] font-black px-2.5 py-1 rounded-full"
-                style={{
-                  background: "hsl(var(--kidzz-green-soft))",
-                  color: "hsl(var(--wellness-deep))",
-                }}
-              >
-                Viagem
-              </button>
-            )}
+            <div style={{ flex: "none", width: 44, height: 44, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(130% 130% at 30% 22%,#FF9E8E,#F0645A 55%,#D23B32)", boxShadow: "0 8px 16px rgba(200,50,40,.45),inset 0 1.5px 2px rgba(255,255,255,.5)" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </div>
+          </button>
+          <div style={{ display: "flex", justifyContent: "center", gap: 9, marginTop: 10 }}>
+            {[
+              { label: "Sigiloso", d: "M7 11V8a5 5 0 0 1 10 0v3M6 11h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z" },
+              { label: "Acolhedor", d: "M12 20.3l-7.1-6.9a4.6 4.6 0 0 1 6.4-6.5l.7.7.7-.7a4.6 4.6 0 0 1 6.4 6.5Z" },
+              { label: "Imediato", d: "M13 2 4.5 13.5H11l-1 8L19.5 10H13l0-8Z" },
+            ].map((c) => (
+              <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 999, background: "rgba(255,240,235,.14)", border: "1px solid rgba(255,210,190,.3)", backdropFilter: "blur(6px)", fontSize: 10.5, fontWeight: 900, color: "#F2D0C4" }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d={c.d} stroke="#F0908A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                {c.label}
+              </div>
+            ))}
           </div>
-        </motion.div>
+        </div>
 
-        <div className="mt-2" />
+        {/* ── HORA DO REENCONTRO → Ritual da família ── */}
+        <div style={{ padding: "14px 15px 4px" }}>
+          <button
+            onClick={() => { haptic("medium"); sfx("click"); setRitualOpen(true); }}
+            className="active:scale-[.99]"
+            style={{ position: "relative", overflow: "hidden", width: "100%", textAlign: "left", display: "flex", alignItems: "stretch", gap: 0, borderRadius: 26, cursor: "pointer", background: "linear-gradient(150deg,rgba(210,180,230,.26),rgba(150,120,200,.2))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(225,205,245,.42)", boxShadow: "0 16px 34px rgba(60,40,110,.3),inset 0 1.5px 0 rgba(255,255,255,.32)" }}
+          >
+            <div style={{ flex: "none", width: 118, position: "relative", overflow: "hidden" }}>
+              <img src="/exemplos/assets/hi-familia.png" alt="Família se abraçando" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 22%" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(100deg,transparent 55%,rgba(180,150,220,.55) 100%)" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0, padding: "15px 14px 15px 13px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: 1.2, color: "#8A6AC0", lineHeight: 1.3, marginBottom: 4 }}>TRANSIÇÃO SUAVE<br />PARA A NOITE</div>
+              <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 21, lineHeight: 1.04, color: "#3A2A56", marginBottom: 6 }}>Hora do reencontro</div>
+              <div style={{ fontSize: 11, fontWeight: 700, lineHeight: 1.34, color: "#5E4A7A", maxWidth: 150, marginBottom: 10 }}>Momentos que acolhem, aproximam e transformam o fim do dia em conexão.</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 10.5, fontWeight: 900, color: "#6A5490" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#8A6AC0" strokeWidth="1.9" /><path d="M12 8v4l2.5 1.5" stroke="#8A6AC0" strokeWidth="1.9" strokeLinecap="round" /></svg>3 min</span>
+                <span style={{ width: 1, height: 12, background: "rgba(130,100,180,.35)" }} />
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 7h4l2-2h4l2 2h4v12H4V7Zm8 3a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" stroke="#8A6AC0" strokeWidth="1.7" strokeLinejoin="round" /></svg>3 passos</span>
+              </div>
+            </div>
+            <div style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", width: 52, height: 52, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(130% 130% at 30% 22%,#F4EAFB,#C9A8E8 55%,#9A6ACE)", boxShadow: "0 8px 18px rgba(120,70,180,.45),inset 0 1.5px 2px rgba(255,255,255,.6)", animation: "perg-playpulse 2.4s ease-out infinite", zIndex: 3 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" style={{ marginLeft: 2 }}><path d="M8 5v14l11-7z" /></svg>
+            </div>
+          </button>
+        </div>
+
+        {/* ── RODAPÉ ── */}
+        <div style={{ padding: "16px 20px 18px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "rgba(180,204,170,.6)", position: "relative", zIndex: 3 }}>
+          {streakDays > 0 ? `${streakDays} dias juntos · uma pergunta por dia aproxima a família` : "Uma pergunta por dia aproxima a família"}
+        </div>
       </div>
 
+      {/* ── MODAIS ── */}
       <StreakCelebration streakDays={streakDays} childName={childName} previousRecord={streakDays} />
 
       <AnimatePresence>
@@ -1031,48 +837,17 @@ const HomeScreen = ({
         {showSettings && <ParentalSettings onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
 
-      {/* ── SOS Kidzz Modal — bottom sheet cinemático ── */}
+      {/* ── SOS Kidzz Modal ── */}
       <SOSModal
         open={sosOpen}
         onClose={() => setSosOpen(false)}
         onGoWellness={() => onTabChange?.("wellness")}
       />
 
-      {/* ── Ritual da Família — flow cinemático full-screen ── */}
+      {/* ── Ritual da Família ── */}
       <RitualFlow ritual={currentRitual} open={ritualOpen} onClose={() => setRitualOpen(false)} />
-
-      {/* ── Modo Decompressão — 60s só para o adulto ── */}
-      <DecompressionMode open={decompressOpen} onClose={() => setDecompressOpen(false)} />
-
-      {/* ── Modo Dormir — boa noite cinemática ── */}
-      <SleepMode open={sleepOpen} onClose={() => setSleepOpen(false)} childName={childName} />
     </motion.div>
   );
 };
-
-/* ───── subcomponentes ───── */
-const MiniPill = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: number | string }) => (
-  <div
-    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
-    style={{
-      background: "hsl(0 0% 100% / 0.78)",
-      border: "1px solid hsl(0 0% 100% / 0.7)",
-      backdropFilter: "blur(14px)",
-      boxShadow: "0 2px 8px -4px hsl(100 15% 18% / 0.12)",
-      minHeight: 28,
-    }}
-  >
-    {icon}
-    <span className="text-[11px] font-black leading-none" style={{ color: "hsl(var(--premium-ink))" }}>
-      {value}
-    </span>
-    <span
-      className="text-[9px] font-semibold uppercase tracking-wider leading-none"
-      style={{ color: "hsl(var(--premium-ink-soft))" }}
-    >
-      {label}
-    </span>
-  </div>
-);
 
 export default HomeScreen;

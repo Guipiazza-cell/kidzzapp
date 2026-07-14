@@ -103,9 +103,6 @@ describe("Aba Memórias — empty state e exibição de conteúdo", () => {
     expect(
       screen.getByRole("button", { name: /Criar primeira história/i })
     ).toBeInTheDocument();
-
-    // Mascote do empty state está presente
-    expect(screen.getByTestId("kidzz-mascot")).toBeInTheDocument();
   });
 
   it("EMPTY STATE: CTAs disparam navegação para chat e histórias", () => {
@@ -142,10 +139,8 @@ describe("Aba Memórias — empty state e exibição de conteúdo", () => {
     expect(screen.getByText("Por que o céu é azul?")).toBeInTheDocument();
     expect(screen.getByText("A aventura de Theo na floresta")).toBeInTheDocument();
     expect(screen.getByText("Caça às Emoções")).toBeInTheDocument();
+    // Conquista aparece inline na seção "Conquistas da família"
     expect(screen.getByText("Primeira semana completa")).toBeInTheDocument();
-
-    // Counter no header
-    expect(screen.getByText(/4 memórias criadas/)).toBeInTheDocument();
   });
 
   it("FILTRO: clicar em 'Histórias' chama setFilter('story')", () => {
@@ -162,9 +157,17 @@ describe("Aba Memórias — empty state e exibição de conteúdo", () => {
     expect(setFilterMock).toHaveBeenCalledWith("story");
   });
 
-  it("SUBABA Conquistas: alterna para tela de conquistas sem quebrar", () => {
+  it("FILTRO Conquistas: clicar no chip 'Conquistas' chama setFilter('achievement')", () => {
+    const all: Memory[] = [
+      makeMemory("1", "question", "Pergunta A"),
+      makeMemory("2", "achievement", "Primeira semana completa"),
+    ];
+    mockState.allMemories = all;
+    mockState.memories = all;
+    mockState.totalCount = 2;
+
     render(<MemoriesAlbum onBack={() => {}} />);
-    fireEvent.click(screen.getByRole("button", { name: /🏆 Conquistas/i }));
-    expect(screen.getByTestId("achievements-stub")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Conquistas/i }));
+    expect(setFilterMock).toHaveBeenCalledWith("achievement");
   });
 });

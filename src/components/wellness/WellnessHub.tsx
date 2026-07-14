@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Wind, Heart, Sparkles, Play, Pause, Timer, X,
@@ -376,172 +376,330 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
 };
 
 /* ────────────── HOME ────────────── */
+/* ═════════ KALM redesign — helpers de estilo do design (KALM.dc.html) ═════════ */
+type KTint = [number, number, number];
+type KGloss = [string, string, string];
+
+const KALM_KEYFRAMES = `
+@keyframes kalm-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes kalm-toastin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes kalm-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.055)}}
+@keyframes kalm-floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes kalm-drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,24px) scale(1.16)}}
+@keyframes kalm-drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-36px,-20px) scale(1.1)}}
+@keyframes kalm-sparklefloat{0%,100%{opacity:.1;transform:translateY(0) scale(.7)}50%{opacity:.9;transform:translateY(-14px) scale(1.12)}}
+@keyframes kalm-shine{0%{transform:translateX(-130%) skewX(-18deg)}60%,100%{transform:translateX(240%) skewX(-18deg)}}
+@keyframes kalm-cascade{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+@keyframes kalm-heroIn{from{opacity:0;transform:translateY(-14px) scale(1.04)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes kalm-eq{0%,100%{height:28%}50%{height:100%}}
+@media (prefers-reduced-motion: reduce){.kalm-root *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+`;
+
+/* SVG paths (idênticos ao design) */
+const KD = {
+  wind: "M3 8h10a2.5 2.5 0 1 0-2.5-2.5M3 12h14a2.5 2.5 0 1 1-2.5 2.5M3 16h8a2 2 0 1 1-2 2",
+  sparkle: "M12 4l1.8 5.2L19 11l-5.2 1.8L12 18l-1.8-5.2L5 11l5.2-1.8L12 4Zm7-1 .7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z",
+  sos: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13v5m0 3h.01",
+  moon: "M20 13.5A8 8 0 0 1 10.5 4 8 8 0 1 0 20 13.5Z",
+  bubbles: "M8 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8-3a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm1.5 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",
+  leaf: "M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11",
+  heart: "M12 20.3l-7.1-6.9a4.6 4.6 0 0 1 6.4-6.5l.7.7.7-.7a4.6 4.6 0 0 1 6.4 6.5Z",
+  rain: "M7 16a5 5 0 0 1 .3-9.9 6 6 0 0 1 11.6 1.4A4 4 0 0 1 18 16M8 19l-1 2m5-2-1 2m5-2-1 2",
+  waves: "M3 13c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2M3 17.5c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2",
+  fire: "M12 3c1 3-1 4-1 6a3 3 0 0 0 6 0c0-1 .5-2 .5-2 1 2 1.5 3.5 1.5 5a6 6 0 1 1-12 0c0-3 2-5 3-7 .8-1.5 2-3 2-5Z",
+  shield: "M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z",
+};
+
+const kalmGlass = (r: number, g: number, b: number, aT = 0.4, aB = 0.14): CSSProperties => ({
+  background: `linear-gradient(155deg, rgba(255,255,255,.9) 0%, rgba(${r},${g},${b},${aT}) 30%, rgba(${r},${g},${b},${aB}) 85%, rgba(255,255,255,.6) 100%)`,
+  backdropFilter: "blur(18px) saturate(160%)", WebkitBackdropFilter: "blur(18px) saturate(160%)",
+  border: "1px solid rgba(255,255,255,1)",
+  boxShadow: `0 12px 26px rgba(50,90,50,.14), inset 0 1.5px 0 rgba(255,255,255,1), inset 0 -8px 16px rgba(${r},${g},${b},.1)`,
+});
+const kalmGloss = (l: string, m: string, d: string, size = 42, radius = 14): CSSProperties => ({
+  flex: "none", width: size, height: size, borderRadius: radius, display: "flex", alignItems: "center", justifyContent: "center",
+  background: `radial-gradient(130% 130% at 30% 22%, #FFFFFF 0%, ${l} 16%, ${m} 55%, ${d} 100%)`,
+  boxShadow: "0 7px 15px rgba(50,90,50,.3), inset 0 2px 3px rgba(255,255,255,.7), inset 0 -5px 10px rgba(0,0,0,.2)",
+});
+const KalmIcon = ({ d, stroke = "#fff", size = 21, sw = 1.8 }: { d: string; stroke?: string; size?: number; sw?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <path d={d} stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/* Ações rápidas → views reais */
+const KALM_ACTIONS: { key: string; title: string; sub: string; d: string; t: KTint; g: KGloss; view: View }[] = [
+  { key: "a1", title: "Relaxar agora", sub: "Respiração guiada",  d: KD.wind,    t: [95, 180, 120],  g: ["#B8E8C0", "#5CB57A", "#2F7A4E"], view: "breath" },
+  { key: "a2", title: "Ritual rápido", sub: "2 minutos de calma",  d: KD.sparkle, t: [200, 180, 120], g: ["#FFE9B8", "#E0B85C", "#B08A2E"], view: "mindful" },
+  { key: "a3", title: "SOS emocional", sub: "Acolhimento agora",   d: KD.sos,     t: [210, 150, 150], g: ["#F0C8C8", "#D87A7A", "#A84E4E"], view: "sos" },
+  { key: "a4", title: "Dormir melhor", sub: "Prepare a noite",     d: KD.moon,    t: [160, 160, 220], g: ["#D2CCF0", "#8A7AD8", "#5E4EA8"], view: "sleep" },
+];
+
+/* Quick Relief → views reais */
+const KALM_PAUSAS: { key: string; title: string; sub: string; min: string; d: string; t: KTint; g: KGloss; view: View }[] = [
+  { key: "p1", title: "Pausa de 1 minuto",   sub: "Um respiro guiado, simples e curto.",     min: "1 min", d: KD.bubbles, t: [95, 180, 120],  g: ["#B8E8C0", "#5CB57A", "#2F7A4E"], view: "pause" },
+  { key: "p2", title: "Respirar com o vento", sub: "Inspira 4 · solta 6. Cinco ciclos lentos.", min: "3 min", d: KD.leaf,   t: [120, 200, 150], g: ["#C0EDC8", "#6FBE7A", "#3F8A4E"], view: "breath" },
+  { key: "p3", title: "Aterrissar no corpo",  sub: "Cinco sentidos, um de cada vez.",         min: "4 min", d: KD.heart,   t: [200, 180, 120], g: ["#FFE9B8", "#E0B85C", "#B08A2E"], view: "mindful" },
+];
+
+/* Humor: faces do design → valor 1..5 (useMoodWeek) */
+const KALM_MOOD: { value: number; mouth: string; fill: string }[] = [
+  { value: 1, mouth: "M14 26c1.5-2 4-2 6-2s4.5 0 6 2", fill: "#F2C94C" },
+  { value: 2, mouth: "M14 25h12", fill: "#F2C94C" },
+  { value: 3, mouth: "M14.5 24c1.5 1.5 4 2.2 5.5 2.2s4-.7 5.5-2.2", fill: "#F2C94C" },
+  { value: 4, mouth: "M14 23.5c1.5 2.5 4.2 3.5 6 3.5s4.5-1 6-3.5", fill: "#F0B93E" },
+  { value: 5, mouth: "M13.5 23c1.8 3.2 4.7 4.4 6.5 4.4s4.7-1.2 6.5-4.4", fill: "#F0A62E" },
+];
+
+/* Soundscapes → engine de som real (mesmos endpoints do SOUND_LIST) */
+type KalmSoundscape = { key: string; title: string; sub: string; grad: [string, string]; d: string; url: string; premium?: boolean };
+const KALM_SOUNDSCAPES: KalmSoundscape[] = [
+  { key: "forest", title: "Floresta ao amanhecer", sub: "Pássaros e folhas", grad: ["#4C8A5A", "#274E32"], d: KD.leaf,  url: "https://cdn.pixabay.com/audio/2022/03/10/audio_270f49c32b.mp3" },
+  { key: "rain",   title: "Chuva leve",            sub: "Telhado e vidro",   grad: ["#5A7FA8", "#2E4A66"], d: KD.rain,  url: "https://cdn.pixabay.com/audio/2022/03/10/audio_1648d7e3cd.mp3" },
+  { key: "ocean",  title: "Ondas do mar",          sub: "Maré calma",        grad: ["#3E8FA0", "#1C5464"], d: KD.waves, url: "https://cdn.pixabay.com/audio/2021/09/06/audio_e1b0956a16.mp3" },
+  { key: "white",  title: "Noite estrelada",       sub: "Grilos e brisa",    grad: ["#5E5AA8", "#2E2A64"], d: KD.moon,  url: "https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bfefcb.mp3" },
+  { key: "fire",   title: "Lareira",               sub: "Crepitar quente",   grad: ["#C0894C", "#84532A"], d: KD.fire,  url: "/audio/rain-soft.mp3", premium: true },
+];
+
 const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: View) => void; onBack: () => void; initialExperienceId?: string | null; onConsumedInitial?: () => void }) => {
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  const h = new Date().getHours();
+  const saudacaoCaps = h < 12 ? "BOM DIA" : h < 18 ? "BOA TARDE" : "BOA NOITE";
   const { streak } = useWellnessStreak();
-  const { week, setToday, todayValue } = useMoodWeek();
+  const { setToday, todayValue } = useMoodWeek();
+
+  // Parallax cinematográfico do hero (fiel ao onScrollFrame do design):
+  // ao rolar, o hero recua, escala levemente e desaparece. Auto-detecta o
+  // container de scroll; degrada sem quebrar se não encontrar.
+  const heroWrapRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = heroWrapRef.current;
+    if (!el) return;
+    let scroller: HTMLElement | Window = window;
+    let p = el.parentElement;
+    while (p) {
+      const oy = getComputedStyle(p).overflowY;
+      if ((oy === "auto" || oy === "scroll") && p.scrollHeight > p.clientHeight + 4) { scroller = p; break; }
+      p = p.parentElement;
+    }
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const y = scroller === window ? window.scrollY : (scroller as HTMLElement).scrollTop;
+      el.style.transform = `translateY(${y * 0.4}px) scale(${1 + y * 0.0004})`;
+      el.style.opacity = String(Math.max(0, 1 - y / 250));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    (scroller as any).addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      (scroller as any).removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Soundscapes inline (engine real) + toast local (feedback do design)
+  const engineRef = useRef<AmbientSoundEngine | null>(null);
+  const [soundOn, setSoundOn] = useState<string | null>(null);
+  const [toast, setToast] = useState("");
+  const toastT = useRef<number | null>(null);
+  const showToast = useCallback((msg: string) => {
+    if (toastT.current) window.clearTimeout(toastT.current);
+    setToast(msg);
+    toastT.current = window.setTimeout(() => setToast(""), 1900);
+  }, []);
+  useEffect(() => {
+    engineRef.current = new AmbientSoundEngine();
+    return () => {
+      engineRef.current?.stopAll?.();
+      if (toastT.current) window.clearTimeout(toastT.current);
+    };
+  }, []);
+
+  const toggleSound = (sc: KalmSoundscape) => {
+    if (sc.premium) {
+      haptic("medium");
+      window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "wellness_sound" } }));
+      return;
+    }
+    haptic("light");
+    const engine = engineRef.current as any;
+    if (soundOn === sc.key) {
+      engine?.stop?.(sc.key);
+      setSoundOn(null);
+      showToast("Som pausado");
+    } else {
+      engine?.stopAll?.();
+      engine?.start?.(sc.key, sc.url, 0.5);
+      setSoundOn(sc.key);
+      showToast(`Tocando “${sc.title}” · modo calmo`);
+    }
+  };
+
+  const whisper = todayValue <= 2 && todayValue > 0
+    ? "Hoje parece pesado. Que tal 1 minuto de pausa?"
+    : "Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?";
 
   return (
-    <>
-      <KidzzHeader onBack={onBack} />
+    <div className="kalm-root" style={{ position: "relative", overflow: "hidden", fontFamily: "'Nunito',system-ui,sans-serif", background: "linear-gradient(180deg,#EEF4E9 0%,#E4EEDD 42%,#D8E6CF 75%,#CBDCC0 100%)" }}>
+      <style>{KALM_KEYFRAMES}</style>
 
-      {/* Greeting + streak */}
-      <header className="px-5 pt-3 pb-1 flex items-center justify-between">
-        <Eyebrow>{greet}, família</Eyebrow>
-        {streak.count > 0 && (
-          <div
-            className="flex items-center gap-1.5 px-3 h-7 rounded-full text-[11px] font-semibold"
-            style={{ background: `${emerald}18`, color: emerald, border: `1px solid ${emerald}33` }}
-          >
-            <Zap size={12} fill="currentColor" strokeWidth={0} />
-            {streak.count} {streak.count === 1 ? "dia" : "dias"} de calma
+      {/* Atmosfera verde do design */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(45% 30% at 50% 20%,rgba(120,190,130,.16),transparent 70%),radial-gradient(42% 28% at 12% 60%,rgba(150,210,150,.14),transparent 70%),radial-gradient(50% 30% at 80% 88%,rgba(90,160,110,.12),transparent 70%)" }} />
+      <div style={{ position: "absolute", top: -50, left: -70, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle,rgba(140,205,140,.26),transparent 65%)", filter: "blur(30px)", animation: "kalm-drift1 15s ease-in-out infinite", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: 110, right: -90, width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle,rgba(110,180,120,.22),transparent 65%)", filter: "blur(32px)", animation: "kalm-drift2 18s ease-in-out 3s infinite", pointerEvents: "none" }} />
+
+      <div style={{ position: "relative" }}>
+        {/* ── HERO cinematográfico (cena-kalm) ── */}
+        <div style={{ position: "relative" }} data-screen-label="Hero KALM">
+          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 414, backgroundImage: "url('/exemplos/assets/cena-kalm.png')", backgroundSize: "cover", backgroundPosition: "center", filter: "blur(46px) saturate(1.45)", opacity: 0.5, transform: "scale(1.22)", pointerEvents: "none" }} />
+          <div ref={heroWrapRef} style={{ position: "relative", width: "100%", height: 414, willChange: "transform, opacity", WebkitMaskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)", maskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)", animation: "kalm-heroIn .7s cubic-bezier(.22,1,.36,1) both" }}>
+            <img src="/exemplos/assets/cena-kalm.png" alt="Gui, o camaleão, na floresta" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 34%", animation: "kalm-floaty 7s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)" }} />
+            <div style={{ position: "absolute", top: 44, left: 0, right: 0, display: "flex", justifyContent: "center", pointerEvents: "none" }}>
+              <div style={{ width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,240,180,.35),transparent 66%)", animation: "kalm-breathe 5s ease-in-out infinite" }} />
+            </div>
+            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(180deg,rgba(238,244,233,.14) 0%,rgba(238,244,233,0) 30%,rgba(40,60,40,.05) 62%,rgba(238,244,233,.86) 90%,#EEF4E9 100%)" }} />
           </div>
-        )}
-      </header>
+          <div style={{ position: "absolute", top: 56, left: "52%", width: 5, height: 5, borderRadius: 99, background: "#D6F0B8", boxShadow: "0 0 9px 3px rgba(150,210,120,.7)", animation: "kalm-sparklefloat 4.4s ease-in-out 1s infinite" }} />
 
-      {/* Hero cinematográfico */}
-      <HeroBlock go={go} />
+          <button onClick={() => { haptic("light"); onBack(); }} className="active:scale-90" aria-label="Voltar" style={{ position: "absolute", top: "calc(env(safe-area-inset-top, 0px) + 16px)", left: 16, width: 42, height: 42, borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.62)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(50,90,50,.16),inset 0 1px 0 rgba(255,255,255,1)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", zIndex: 6 }}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m6-6-6 6 6 6" stroke="#1F3A25" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
 
-      {/* Check-in de humor diário */}
-      <div className="px-5">
-        <Surface className="p-4">
-          <Eyebrow>{todayValue > 0 ? "Hoje você está" : "Como você está hoje?"}</Eyebrow>
-          <div className="mt-2.5 flex items-center justify-between gap-1.5">
-            {[
-              { v: 1, emoji: "😔", label: "Triste" },
-              { v: 2, emoji: "😐", label: "Mais ou menos" },
-              { v: 3, emoji: "🙂", label: "Bem" },
-              { v: 4, emoji: "😊", label: "Feliz" },
-              { v: 5, emoji: "🤩", label: "Ótimo" },
-            ].map((m) => {
-              const isOn = todayValue === m.v;
+          {streak.count > 0 && (
+            <div style={{ position: "absolute", top: "calc(env(safe-area-inset-top, 0px) + 16px)", right: 16, display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 999, background: "rgba(255,255,255,.62)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(50,90,50,.16),inset 0 1px 0 rgba(255,255,255,1)", fontWeight: 800, fontSize: 13, color: "#1F3A25", zIndex: 6 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d={KD.shield} stroke="#3E9A5E" strokeWidth="2" strokeLinejoin="round" /></svg>
+              {streak.count} {streak.count === 1 ? "dia" : "dias"}
+            </div>
+          )}
+
+          <div style={{ padding: "2px 20px", textAlign: "center", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", position: "relative" }}>
+            <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.8px", color: "#5E8A5E", marginBottom: 8 }}>{saudacaoCaps}, FAMÍLIA</div>
+            <h1 style={{ margin: "0 auto", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 24, lineHeight: 1.2, color: "#1B301F", letterSpacing: "-.2px", maxWidth: 280 }}>Hoje é um bom dia para <span style={{ color: "#3E9A5E" }}>respirar</span>.</h1>
+          </div>
+        </div>
+
+        {/* ── Ações rápidas ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, padding: "18px 16px 0", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .14s both" }} data-screen-label="Ações rápidas">
+          {KALM_ACTIONS.map((a) => (
+            <button key={a.key} onClick={() => { haptic("light"); go(a.view); }} className="active:scale-95" style={{ position: "relative", overflow: "hidden", borderRadius: 22, padding: "13px 13px 12px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, transition: "transform .3s cubic-bezier(.34,1.4,.64,1)", fontFamily: "'Nunito',sans-serif", ...kalmGlass(a.t[0], a.t[1], a.t[2], 0.4, 0.14) }}>
+              <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.3) 50%,transparent 100%)", animation: "kalm-shine 6s ease-in-out infinite" }} />
+              <div style={kalmGloss(a.g[0], a.g[1], a.g[2])}><KalmIcon d={a.d} /></div>
+              <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#1B301F", lineHeight: 1.15 }}>{a.title}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: "#5E7A5E" }}>{a.sub}</div>
+            </button>
+          ))}
+        </div>
+
+        {/* ── Humor (useMoodWeek) ── */}
+        <div style={{ padding: "20px 16px 0", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .2s both" }} data-screen-label="Humor">
+          <div style={{ borderRadius: 24, padding: "15px 15px 16px", background: "linear-gradient(155deg,rgba(255,255,255,.85),rgba(232,240,225,.6))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 12px 26px rgba(50,90,50,.12),inset 0 1.5px 0 rgba(255,255,255,1)" }}>
+            <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.4px", color: "#5E7A5E", marginBottom: 13 }}>{todayValue > 0 ? "HOJE VOCÊ ESTÁ" : "COMO VOCÊ ESTÁ HOJE?"}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+              {KALM_MOOD.map((m) => {
+                const on = todayValue === m.value;
+                return (
+                  <button key={m.value} onClick={() => { haptic("light"); setToday(m.value); showToast("Humor registrado"); }} className="active:scale-90" aria-label={`Humor ${m.value}`} style={{ flex: 1, aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 15, cursor: "pointer", transition: "transform .2s, box-shadow .2s", background: on ? "rgba(62,154,94,.14)" : "rgba(255,255,255,.55)", border: on ? "1.5px solid #3E9A5E" : "1px solid rgba(0,0,0,.06)", boxShadow: on ? "0 6px 14px rgba(62,154,94,.28)" : "inset 0 1px 0 rgba(255,255,255,.7)" }}>
+                    <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+                      <circle cx="20" cy="20" r="16" fill={m.fill} stroke={on ? "#3E9A5E" : "rgba(0,0,0,.06)"} strokeWidth="1.5" />
+                      <circle cx="14.5" cy="17" r="1.8" fill="#3A2E12" />
+                      <circle cx="25.5" cy="17" r="1.8" fill="#3A2E12" />
+                      <path d={m.mouth} stroke="#3A2E12" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+                    </svg>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Sussurro do KIDZZ (texto dinâmico real) ── */}
+        <div style={{ padding: "14px 16px 0", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .26s both" }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", borderRadius: 22, padding: "14px 15px", background: "linear-gradient(155deg,rgba(206,232,196,.72),rgba(180,215,175,.5))", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 10px 22px rgba(50,90,50,.12),inset 0 1.5px 0 rgba(255,255,255,.9)" }}>
+            <div style={{ flex: "none", width: 40, height: 40, borderRadius: 13, background: "radial-gradient(130% 130% at 30% 22%,#D8F0C8,#6FBE6A 55%,#3E8A4E)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 14px rgba(40,110,50,.35),inset 0 1px 1px rgba(255,255,255,.5)" }}>
+              <KalmIcon d={KD.leaf} size={20} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: "1.2px", color: "#3E7A4A", marginBottom: 4 }}>SUSSURRO DO KIDZZ</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.5, color: "#274A30" }}>{whisper}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Quick Relief → views reais (pause/breath/mindful) ── */}
+        <div data-screen-label="Alívio em minutos" style={{ animation: "kalm-cascade .5s both" }}>
+          <div style={{ padding: "20px 20px 10px" }}>
+            <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.4px", color: "#3E7A4A", marginBottom: 3 }}>QUICK RELIEF</div>
+            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#1B301F" }}>Alívio em minutos</h2>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#5E7A5E", marginTop: 2 }}>Pequenas pausas que restauram já.</div>
+          </div>
+          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 14px", scrollbarWidth: "none" }}>
+            {KALM_PAUSAS.map((p) => (
+              <button key={p.key} onClick={() => { haptic("light"); go(p.view); }} className="active:scale-95" style={{ position: "relative", overflow: "hidden", flex: "none", width: 190, minHeight: 150, borderRadius: 22, padding: "13px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 6, transition: "transform .3s cubic-bezier(.34,1.4,.64,1)", fontFamily: "'Nunito',sans-serif", ...kalmGlass(p.t[0], p.t[1], p.t[2], 0.38, 0.12) }}>
+                <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.25) 50%,transparent 100%)", animation: "kalm-shine 6.5s ease-in-out infinite" }} />
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                  <div style={kalmGloss(p.g[0], p.g[1], p.g[2])}><KalmIcon d={p.d} size={20} /></div>
+                  <div style={{ padding: "4px 10px", borderRadius: 999, background: "rgba(62,138,78,.14)", color: "#2E6A3E", fontSize: 10, fontWeight: 900, border: "1px solid rgba(62,138,78,.2)" }}>{p.min}</div>
+                </div>
+                <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#1B301F", lineHeight: 1.18, marginTop: "auto" }}>{p.title}</div>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: "#5E7A5E", lineHeight: 1.35 }}>{p.sub}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 900, color: "#3E9A5E", marginTop: 2 }}>Começar <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="#3E9A5E" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Soundscapes → AmbientSoundEngine real (premium → paywall) ── */}
+        <div data-screen-label="Soundscapes">
+          <div style={{ padding: "20px 20px 10px" }}>
+            <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.4px", color: "#3E7A4A", marginBottom: 3 }}>SONS DA CALMA</div>
+            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#1B301F" }}>Paisagens sonoras</h2>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#5E7A5E", marginTop: 2 }}>Toque para tocar e acalmar o ambiente.</div>
+          </div>
+          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 16px", scrollbarWidth: "none" }}>
+            {KALM_SOUNDSCAPES.map((s) => {
+              const playing = soundOn === s.key;
               return (
-                <motion.button
-                  key={m.v}
-                  whileTap={{ scale: 0.9 }}
-                  transition={tapSpring}
-                  onClick={() => { haptic("light"); setToday(m.v); }}
-                  className="flex-1 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-0.5"
-                  style={{
-                    background: isOn ? `${emerald}22` : "transparent",
-                    border: `1px solid ${isOn ? `${emerald}66` : stroke}`,
-                  }}
-                  aria-label={m.label}
-                >
-                  <span className="text-[22px] leading-none">{m.emoji}</span>
-                </motion.button>
+                <button key={s.key} onClick={() => toggleSound(s)} className="active:scale-95" style={{ position: "relative", overflow: "hidden", flex: "none", width: 158, height: 122, borderRadius: 20, cursor: "pointer", border: "1px solid rgba(255,255,255,.5)", boxShadow: playing ? "0 12px 26px rgba(46,122,74,.4)" : "0 10px 22px rgba(50,90,50,.22)", background: `linear-gradient(158deg,${s.grad[0]},${s.grad[1]})`, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 12, transition: "transform .3s cubic-bezier(.34,1.4,.64,1), box-shadow .3s", fontFamily: "'Nunito',sans-serif" }}>
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.46))", pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", top: 11, left: 11, width: 32, height: 32, borderRadius: 11, background: "rgba(255,255,255,.22)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <KalmIcon d={s.d} size={17} />
+                  </div>
+                  <div style={{ position: "absolute", top: 11, right: 11, width: 34, height: 34, borderRadius: 999, background: "rgba(255,255,255,.92)", boxShadow: "0 4px 12px rgba(0,0,0,.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {playing ? (
+                      <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 14 }}>
+                        <span style={{ width: 3, height: "100%", borderRadius: 2, background: "#2E7A4A", animation: "kalm-eq .8s ease-in-out infinite" }} />
+                        <span style={{ width: 3, height: "100%", borderRadius: 2, background: "#2E7A4A", animation: "kalm-eq .8s ease-in-out .22s infinite" }} />
+                        <span style={{ width: 3, height: "100%", borderRadius: 2, background: "#2E7A4A", animation: "kalm-eq .8s ease-in-out .44s infinite" }} />
+                      </div>
+                    ) : s.premium ? (
+                      <Lock size={15} color="#2E7A4A" />
+                    ) : (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="#2E7A4A"><path d="M8 5v14l11-7z" /></svg>
+                    )}
+                  </div>
+                  <div style={{ position: "relative", zIndex: 2 }}>
+                    <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#fff", lineHeight: 1.15 }}>{s.title}</div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.82)", marginTop: 1 }}>{s.sub}</div>
+                  </div>
+                </button>
               );
             })}
           </div>
-        </Surface>
-      </div>
-
-      {/* Sugestão da IA do camaleão */}
-      <div className="px-5 pt-3">
-        <div
-          className="rounded-[22px] p-4 flex items-start gap-3"
-          style={{
-            background: `linear-gradient(135deg, ${emerald}14, ${sage}10)`,
-            border: `1px solid ${emerald}26`,
-          }}
-        >
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: `${emerald}22` }}
-          >
-            <HandHeart size={17} style={{ color: emerald }} strokeWidth={1.8} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <Eyebrow>Sussurro do KIDZZ</Eyebrow>
-            <p className="mt-0.5 text-[14px] leading-snug" style={{ color: ink }}>
-              {todayValue <= 2 && todayValue > 0
-                ? "Hoje parece pesado. Que tal 1 minuto de pausa?"
-                : "Hoje vocês parecem precisar desacelerar. Que tal um som da floresta?"}
-            </p>
-          </div>
         </div>
+
+        {/* ── Features profundas reais preservadas (player, journeys, growth) ── */}
+        <KalmSections initialExperienceId={initialExperienceId} onConsumedInitial={onConsumedInitial} />
+        <WellnessGrowth />
+
+        <div style={{ padding: "2px 20px 16px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#8AA085" }}>KALM by KIDZZ · Seu espaço de calma em família</div>
       </div>
 
-      {/* KALM — seções premium (Quick Relief, Parent Reset, Connection, Soundscapes, Journeys) */}
-      <KalmSections initialExperienceId={initialExperienceId} onConsumedInitial={onConsumedInitial} />
-
-      {/* Crescimento da família — 10 camadas premium de engajamento */}
-      <WellnessGrowth />
-
-      {/* 2 · Bem-estar diário */}
-      <SectionTitle kicker="Bem-estar diário" title="Pequenos rituais" sub="Cada toque conta como um dia de calma." />
-      <div className="px-5 grid grid-cols-2 gap-3">
-        {DAILY.map((c) => {
-          const Icon = c.icon;
-          return (
-            <motion.button
-              key={c.id}
-              whileTap={{ scale: 0.97 }}
-              transition={tapSpring}
-              onClick={() => { haptic("light"); go(c.view); }}
-              className="text-left p-4 rounded-3xl flex flex-col gap-3 min-h-[124px]"
-              style={{
-                background: surface,
-                border: `1px solid ${stroke}`,
-                backdropFilter: "blur(18px)",
-                WebkitBackdropFilter: "blur(18px)",
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{ background: `${c.tint}33` }}
-              >
-                <Icon size={20} style={{ color: ink }} strokeWidth={1.7} />
-              </div>
-              <div>
-                <div className="text-[15px] font-semibold leading-tight" style={{ color: ink }}>
-                  {c.label}
-                </div>
-                <div className="text-[12px] mt-0.5" style={{ color: inkSoft }}>{c.time}</div>
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* 4 · Jornada */}
-      <SectionTitle kicker="Jornada da criança" title="Como vocês estão" />
-      <div className="px-5 pb-10">
-        <motion.button
-          whileTap={{ scale: 0.985 }}
-          transition={tapSpring}
-          onClick={() => { haptic("light"); go("journey"); }}
-          className="w-full text-left p-5 rounded-[28px]"
-          style={{ background: surface, border: `1px solid ${stroke}` }}
-        >
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <div className="text-[15px] font-semibold" style={{ color: ink }}>Humor desta semana</div>
-              <div className="text-[12px]" style={{ color: inkSoft }}>Toque para ver a jornada completa</div>
-            </div>
-            <Smile size={22} style={{ color: emerald }} />
-          </div>
-          <div className="mt-4 flex items-end justify-between gap-2 h-20">
-            {week.map((m, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                <motion.div
-                  initial={{ height: 4 }}
-                  animate={{ height: 8 + Math.max(m.v, 0.4) * 10 }}
-                  transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
-                  className="w-full rounded-full"
-                  style={{
-                    background: m.v > 0 ? `linear-gradient(180deg, ${sage}, ${emerald})` : `${ink}22`,
-                    maxWidth: 18,
-                  }}
-                />
-                <span className="text-[10px]" style={{ color: inkSoft }}>{m.d}</span>
-              </div>
-            ))}
-          </div>
-        </motion.button>
-      </div>
-    </>
+      {/* Toast local (feedback humor/som) */}
+      {toast && (
+        <div style={{ position: "fixed", left: 0, right: 0, bottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)", display: "flex", justifyContent: "center", pointerEvents: "none", zIndex: 50 }}>
+          <div style={{ padding: "10px 18px", borderRadius: 999, background: "rgba(27,48,31,.93)", color: "#EEF4E9", fontFamily: "'Nunito',sans-serif", fontSize: 12.5, fontWeight: 800, backdropFilter: "blur(10px)", boxShadow: "0 10px 24px rgba(27,48,31,.4)", animation: "kalm-toastin .3s both" }}>{toast}</div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -1553,7 +1711,7 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
     >
       <Atmosphere />
       <div
-        className="relative max-w-[520px] mx-auto"
+        className="relative"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 152px)" }}
       >
         <AnimatePresence mode="wait">

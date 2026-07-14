@@ -1,8 +1,8 @@
-import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   MessageCircle, Leaf, Moon, BookOpen, Puzzle, CalendarDays,
   Star, Clapperboard, Music2, Image as ImageIcon, Sparkles,
-  Crown, Shield, ChevronRight, Compass,
+  Crown, Shield, ChevronLeft, ChevronRight, Compass,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
@@ -49,13 +49,20 @@ const TABS: Tab[] = APP_TABS_ALL.filter((t) => t.inDock).map((tab) => ({
   featured: tab.featured,
 }));
 
-const PILL_W = 50;
-const ITEM_MIN_W = 58;
+// Telas de fundo ESCURO — o dock usa vidro escuro; nas demais, vidro claro.
+// Assim a nav "combina" com cada tela em vez de destoar.
+const DARK_SCREENS = new Set<string>(["dreams", "moments", "memories"]);
 
+/**
+ * BottomNav — dock de vidro premium que HARMONIZA com cada tela.
+ *
+ * - Fundo do dock adapta claro/escuro conforme a tela ativa (DARK_SCREENS).
+ * - Ícone ativo em cápsula glossy tingida na cor da aba (tab.c/tab.cl) + glow.
+ * - Setas prev/next, rolagem horizontal. Fiel aos mockups (design-src/*.dc.html).
+ */
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const [pill, setPill] = useState<{ left: number; color: string; light: string } | null>(null);
   const [showFade, setShowFade] = useState(true);
 
   const handle = useCallback((id: string) => {
@@ -65,26 +72,6 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     onTabChange(id);
   }, [activeTab, onTabChange]);
 
-  const updatePill = useCallback(() => {
-    const tab = TABS.find((t) => t.id === activeTab);
-    const el = itemRefs.current[activeTab];
-    const scroller = scrollerRef.current;
-    if (!tab || !el || !scroller) return;
-    const left = el.offsetLeft + (el.offsetWidth - PILL_W) / 2;
-    setPill({ left, color: tab.c, light: tab.cl });
-  }, [activeTab]);
-
-  useLayoutEffect(() => {
-    updatePill();
-  }, [updatePill]);
-
-  useEffect(() => {
-    const onResize = () => updatePill();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [updatePill]);
-
-  // Scroll active into view + fade indicator
   useEffect(() => {
     const el = itemRefs.current[activeTab];
     el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
@@ -93,18 +80,42 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
   const onScroll = useCallback(() => {
     const s = scrollerRef.current;
     if (!s) return;
-    const atEnd = s.scrollLeft + s.clientWidth >= s.scrollWidth - 4;
-    setShowFade(!atEnd);
+    setShowFade(s.scrollLeft + s.clientWidth < s.scrollWidth - 4);
+  }, []);
+  useEffect(() => { onScroll(); }, [onScroll]);
+
+  const dockBy = useCallback((dx: number) => {
+    scrollerRef.current?.scrollBy({ left: dx, behavior: "smooth" });
   }, []);
 
-  useEffect(() => {
-    onScroll();
-  }, [onScroll]);
-
-  const activeColor = pill?.color ?? "#E8821A";
-  // Tabs imersivos/cinematográficos: escondem as tags Pais/Assinar para não
-  // ficarem por cima do conteúdo (Sonhos e Cinema rodam em tela cheia).
   const immersiveTab = activeTab === "dreams" || activeTab === "cinema";
+  const dark = DARK_SCREENS.has(activeTab);
+
+  // Tema do dock por claridade da tela ativa.
+  const dockStyle: CSSProperties = dark
+    ? {
+        background: "linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.06))",
+        border: "1px solid rgba(255,255,255,.3)",
+        boxShadow: "0 18px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -8px 18px rgba(0,0,0,.15)",
+      }
+    : {
+        background: "linear-gradient(160deg, rgba(255,255,255,.82), rgba(255,255,255,.5))",
+        border: "1px solid rgba(255,255,255,.95)",
+        boxShadow: "0 18px 40px -8px rgba(60,50,30,.30), 0 4px 12px rgba(60,50,30,.14), inset 0 1.5px 1px rgba(255,255,255,1), inset 0 -8px 18px rgba(120,110,90,.06)",
+      };
+  const idleIcon = dark ? "rgba(240,235,225,.66)" : "rgba(70,60,45,.6)";
+  const idleLabel = dark ? "rgba(240,235,225,.6)" : "rgba(70,60,45,.62)";
+  const arrowBg = dark ? "rgba(255,255,255,.16)" : "rgba(255,255,255,.7)";
+  const arrowBorder = dark ? "rgba(255,255,255,.3)" : "rgba(255,255,255,1)";
+  const arrowIcon = dark ? "#FBEFE6" : "#6E5E48";
+
+  const arrowBtn: CSSProperties = {
+    position: "absolute", top: "50%", width: 26, height: 26, borderRadius: 999, cursor: "pointer",
+    transform: "translateY(-50%)", background: arrowBg, border: `1px solid ${arrowBorder}`,
+    backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+    boxShadow: "0 4px 10px rgba(0,0,0,.28), inset 0 1px 1px rgba(255,255,255,.5)",
+    display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2,
+  };
 
   return (
     <nav
@@ -121,7 +132,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         background: "transparent",
       }}
     >
-      {/* Pais / Assinar — island button, minimal & premium */}
+      {/* Pais / Assinar — chips de vidro (adaptam claro/escuro) */}
       {!immersiveTab && (onOpenParents || (onOpenPlans && !isPremium)) && (
         <div className="w-full flex items-center justify-end gap-1.5 mb-2 pr-1">
           {onOpenParents && (
@@ -131,13 +142,13 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               aria-label="Pais"
               className="h-8 rounded-full px-3 text-[11.5px] font-bold flex items-center gap-1 active:scale-95"
               style={{
-                background: "rgba(255,252,248,0.78)",
-                backdropFilter: "blur(18px) saturate(140%)",
-                WebkitBackdropFilter: "blur(18px) saturate(140%)",
-                border: "1px solid rgba(42,37,32,0.10)",
-                color: "#2A2520",
+                color: dark ? "#F4EFE2" : "#3A2E1E",
+                background: dark ? "rgba(255,255,255,.14)" : "rgba(255,255,255,.78)",
+                border: `1px solid ${dark ? "rgba(255,255,255,.3)" : "rgba(255,255,255,1)"}`,
+                backdropFilter: "blur(16px) saturate(150%)",
+                WebkitBackdropFilter: "blur(16px) saturate(150%)",
+                boxShadow: "0 6px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.6)",
                 fontFamily: "'Nunito', system-ui, sans-serif",
-                boxShadow: "0 6px 16px -4px rgba(42,37,32,0.18)",
               }}
             >
               <Shield size={12} style={{ color: "#3FA89B" }} />
@@ -151,8 +162,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
               aria-label="Assinar"
               className="h-8 rounded-full px-3 text-[11.5px] font-bold text-white flex items-center gap-1 active:scale-95"
               style={{
-                background: "linear-gradient(135deg, #E8821A, #D26A0A)",
-                boxShadow: "0 8px 18px -4px rgba(232,130,26,.55), inset 0 1px 0 rgba(255,255,255,.30)",
+                background: "linear-gradient(135deg, #F79A3E, #E4722A)",
+                boxShadow: "0 10px 24px -4px rgba(210,110,40,.5), inset 0 1px 0 rgba(255,255,255,.4)",
                 fontFamily: "'Nunito', system-ui, sans-serif",
               }}
             >
@@ -163,223 +174,117 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         </div>
       )}
 
-
-
-      {/* Outer bezel (silver metallic frame) */}
+      {/* Dock de vidro (premium, harmoniza com a tela) */}
       <div
         style={{
-          borderRadius: 36,
-          padding: 2,
-          background:
-            "linear-gradient(160deg, rgba(255,255,255,1) 0%, rgba(232,236,240,.92) 12%, rgba(190,197,206,.82) 30%, rgba(150,158,168,.75) 46%, rgba(206,212,219,.78) 64%, rgba(124,132,142,.82) 84%, rgba(238,241,244,.95) 100%)",
-          boxShadow:
-            "0 22px 50px -10px rgba(60,40,15,.45), 0 8px 18px rgba(60,40,15,.24), 0 1px 0 rgba(255,255,255,.6), inset 0 1px 1px rgba(255,255,255,.9)",
+          position: "relative",
+          padding: "8px 4px",
+          borderRadius: 26,
+          backdropFilter: "blur(24px) saturate(170%)",
+          WebkitBackdropFilter: "blur(24px) saturate(170%)",
+          transition: "background .4s ease, box-shadow .4s ease, border-color .4s ease",
+          ...dockStyle,
         }}
       >
-        {/* Inner glass scroller wrapper */}
         <div
+          ref={scrollerRef}
+          onScroll={onScroll}
+          className="kidzz-dock-scroller"
           style={{
-            position: "relative",
-            borderRadius: 32,
-            overflow: "hidden",
-            background:
-              "linear-gradient(150deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,.12) 48%, rgba(255,255,255,.28) 100%)",
-            backdropFilter: "blur(30px) saturate(200%) brightness(1.08)",
-            WebkitBackdropFilter: "blur(30px) saturate(200%) brightness(1.08)",
-            boxShadow:
-              "inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 -10px 22px rgba(255,255,255,.20), inset 2px 0 10px rgba(255,255,255,.28), inset -2px 0 10px rgba(255,255,255,.28), inset 0 0 0 1px rgba(255,255,255,.18)",
+            display: "flex",
+            gap: 2,
+            overflowX: "auto",
+            overflowY: "visible",
+            scrollbarWidth: "none",
+            WebkitOverflowScrolling: "touch",
+            padding: "0 26px",
+            width: "100%",
           }}
         >
-          {/* Top specular highlight */}
-          <span
-            aria-hidden
-            style={{
-              position: "absolute",
-              top: 0, left: 0, right: 0,
-              height: "44%",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.18) 55%, rgba(255,255,255,0) 100%)",
-              pointerEvents: "none",
-              borderTopLeftRadius: 32,
-              borderTopRightRadius: 32,
-            }}
-          />
-          {/* Bottom refraction tinted with active color */}
-          <span
-            aria-hidden
-            style={{
-              position: "absolute",
-              bottom: 0, left: 0, right: 0,
-              height: 14,
-              background: `linear-gradient(0deg, ${activeColor}33 0%, transparent 100%)`,
-              pointerEvents: "none",
-              transition: "background .35s ease",
-            }}
-          />
-
-          {/* Scroller */}
-          <div
-            ref={scrollerRef}
-            onScroll={onScroll}
-            className="kidzz-dock-scroller"
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "stretch",
-              gap: 2,
-              // Padding vertical simétrico (11/11) p/ centralizar os ícones na
-              // barra. Antes 16/6 (assimétrico) jogava o conteúdo pra baixo e
-              // deixava os ícones descentralizados verticalmente.
-              padding: "11px 32px 11px 6px",
-              overflowX: "auto",
-              overflowY: "visible",
-              scrollbarWidth: "none",
-              WebkitOverflowScrolling: "touch",
-            }}
-          >
-            {/* Sliding pill behind active icon */}
-            {pill && (
-              <span
-                aria-hidden
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                ref={(el) => (itemRefs.current[tab.id] = el)}
+                type="button"
+                onClick={() => handle(tab.id)}
+                aria-label={tab.label}
+                aria-current={isActive ? "page" : undefined}
+                className="active:scale-90"
                 style={{
-                  position: "absolute",
-                  top: 11,
-                  left: pill.left,
-                  width: PILL_W,
-                  height: 38,
-                  borderRadius: 16,
-                  background: `linear-gradient(155deg, ${pill.light}, ${pill.color})`,
-                  boxShadow: `0 8px 20px -3px ${pill.color}99, inset 0 1.5px 2px rgba(255,255,255,.65), inset 0 -4px 9px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35)`,
-                  transition: "left .45s cubic-bezier(.34,1.4,.5,1), background .35s ease, box-shadow .35s ease",
-                  pointerEvents: "none",
+                  flex: "none",
+                  width: 60,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 3,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "2px 0",
+                  transition: "transform .2s",
+                  fontFamily: "'Nunito', system-ui, sans-serif",
                 }}
-              />
-            )}
-
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              const Icon = tab.icon;
-              const featured = !!tab.featured;
-              return (
-                <button
-                  key={tab.id}
-                  ref={(el) => (itemRefs.current[tab.id] = el)}
-                  type="button"
-                  onClick={() => handle(tab.id)}
-                  className="relative flex flex-col items-center justify-center gap-0.5 py-0.5 px-1 rounded-2xl select-none active:scale-95"
+              >
+                <span
                   style={{
-                    minWidth: featured ? ITEM_MIN_W + 8 : ITEM_MIN_W,
-                    flex: "0 0 auto",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    WebkitTapHighlightColor: "transparent",
-                    touchAction: "manipulation",
-                    fontFamily: "'Nunito', system-ui, sans-serif",
-                    transition: "transform .2s ease",
+                    width: 40,
+                    height: 30,
+                    borderRadius: 11,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "all .3s",
+                    background: isActive
+                      ? `radial-gradient(130% 130% at 30% 22%, ${tab.cl} 0%, ${tab.cl} 22%, ${tab.c} 100%)`
+                      : "transparent",
+                    border: isActive ? "1px solid rgba(255,255,255,.55)" : "1px solid transparent",
+                    boxShadow: isActive
+                      ? `0 5px 14px -2px ${tab.c}b3, 0 0 16px ${tab.c}66, inset 0 1px 0 rgba(255,255,255,.6)`
+                      : "none",
                   }}
-                  aria-label={tab.label}
-                  aria-current={isActive ? "page" : undefined}
                 >
-                  <span
-                    style={{
-                      position: "relative",
-                      zIndex: 1,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: featured ? 42 : 38,
-                      height: featured ? 42 : 38,
-                      marginTop: featured ? -4 : 0,
-                      borderRadius: featured ? 999 : 0,
-                      background: featured
-                        ? `linear-gradient(155deg, ${tab.cl}, ${tab.c})`
-                        : "transparent",
-                      boxShadow: featured
-                        ? `0 10px 22px -4px ${tab.c}99, inset 0 1.5px 2px rgba(255,255,255,.7), inset 0 -4px 9px rgba(0,0,0,.14), 0 0 0 3px #ffffff`
-                        : "none",
-                      transform: isActive
-                        ? `translateY(${featured ? -2 : -1}px) scale(${featured ? 1.08 : 1.05})`
-                        : `translateY(0) scale(${featured ? 1.02 : 1})`,
-                      transition: "transform .35s cubic-bezier(.34,1.4,.5,1)",
-                    }}
-                  >
-                    <Icon
-                      size={featured ? 24 : 20}
-                      strokeWidth={featured ? 2.2 : 1.9}
-                      style={{
-                        color: featured ? "#ffffff" : isActive ? "#ffffff" : "#7d6e5b",
-                        opacity: featured ? 1 : isActive ? 1 : 0.72,
-                        filter:
-                          featured || isActive
-                            ? "drop-shadow(0 1px 1px rgba(0,0,0,.25))"
-                            : "none",
-                        transition: "color .25s ease, opacity .25s ease",
-                      }}
-                    />
-                  </span>
-                  <span
-                    style={{
-                      position: "relative",
-                      zIndex: 1,
-                      fontSize: 9.5,
-                      lineHeight: 1.1,
-                      letterSpacing: "-0.01em",
-                      fontWeight: isActive ? 700 : 600,
-                      color: isActive ? "#ffffff" : "#5a4d3d",
-                      textShadow: isActive ? "0 1px 1px rgba(0,0,0,.18)" : "none",
-                      whiteSpace: "nowrap",
-                      fontFamily: "'Nunito', system-ui, sans-serif",
-                      transition: "color .25s ease",
-                    }}
-                  >
-                    {tab.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Right scroll-fade indicator */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-              bottom: 0,
-              width: 38,
-              pointerEvents: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              paddingRight: 6,
-              background:
-                "linear-gradient(270deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.30) 55%, rgba(255,255,255,0) 100%)",
-              opacity: showFade ? 1 : 0,
-              transition: "opacity .35s ease",
-            }}
-          >
-            <ChevronRight
-              size={16}
-              strokeWidth={2}
-              className="kidzz-dock-chev"
-              style={{ color: "#8a8f97" }}
-            />
-          </div>
+                  <Icon
+                    size={19}
+                    strokeWidth={1.9}
+                    style={{ color: isActive ? "#fff" : idleIcon }}
+                  />
+                </span>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 900,
+                    color: isActive ? (dark ? tab.cl : tab.c) : idleLabel,
+                    whiteSpace: "nowrap",
+                    transition: "color .3s",
+                  }}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
+
+        {/* Setas prev/next */}
+        <button type="button" aria-label="Anterior" onClick={() => dockBy(-200)} className="active:scale-90" style={{ ...arrowBtn, left: 5 }}>
+          <ChevronLeft size={12} strokeWidth={2.6} style={{ color: arrowIcon }} />
+        </button>
+        <button
+          type="button"
+          aria-label="Próximo"
+          onClick={() => dockBy(200)}
+          className="active:scale-90"
+          style={{ ...arrowBtn, right: 5, opacity: showFade ? 1 : 0.4 }}
+        >
+          <ChevronRight size={12} strokeWidth={2.6} style={{ color: arrowIcon }} />
+        </button>
       </div>
 
       <style>{`
         .kidzz-dock-scroller::-webkit-scrollbar { display: none; }
-        @keyframes kidzz-chev-pulse {
-          0%, 100% { opacity: .55; transform: translateX(0); }
-          50% { opacity: 1; transform: translateX(2px); }
-        }
-        .kidzz-dock-chev { animation: kidzz-chev-pulse 2.2s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) {
-          .kidzz-dock-chev { animation: none !important; }
-        }
       `}</style>
     </nav>
   );

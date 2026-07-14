@@ -1,17 +1,15 @@
-import { useState, useCallback, useMemo, lazy, Suspense } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft,
-  ArrowRight,
-  Lock,
-  Trophy,
-  Shield,
-  Bookmark,
-  Heart,
-  Plane,
-  Sparkles,
-  ChevronRight,
-} from "lucide-react";
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+  lazy,
+  Suspense,
+  type CSSProperties,
+} from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Lock, Trophy, Shield, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import {
@@ -23,7 +21,6 @@ import KidzzHeader from "@/components/common/KidzzHeader";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 
-import heroChameleon from "@/assets/brincar-hero-chameleon.jpg";
 import imgCabana from "@/assets/brincar-act-cabana.jpg";
 import imgCaca from "@/assets/brincar-act-cacatesouro.jpg";
 import imgArte from "@/assets/brincar-act-arte.jpg";
@@ -59,7 +56,8 @@ interface FeaturedActivity {
   idade: string;
   energia: "leve" | "média" | "ativa";
   premium?: boolean;
-  tint: string; // overlay tint color
+  tint: string; // overlay tint color (usado no modal de detalhe)
+  scrim: string; // gradiente colorido do card (fiel ao SCRIM do design)
 }
 
 const FEATURED: FeaturedActivity[] = [
@@ -72,6 +70,8 @@ const FEATURED: FeaturedActivity[] = [
     idade: "3–6 anos",
     energia: "leve",
     tint: "rgba(232,130,26,0.55)",
+    scrim:
+      "linear-gradient(180deg, rgba(120,60,10,0) 30%, rgba(95,45,8,.85) 100%)",
   },
   {
     id: "caca",
@@ -83,6 +83,8 @@ const FEATURED: FeaturedActivity[] = [
     energia: "média",
     premium: true,
     tint: "rgba(70,112,58,0.55)",
+    scrim:
+      "linear-gradient(180deg, rgba(15,50,25,0) 30%, rgba(12,42,22,.85) 100%)",
   },
   {
     id: "arte",
@@ -93,6 +95,8 @@ const FEATURED: FeaturedActivity[] = [
     idade: "3–10 anos",
     energia: "leve",
     tint: "rgba(193,115,166,0.55)",
+    scrim:
+      "linear-gradient(180deg, rgba(90,40,60,0) 30%, rgba(70,30,48,.85) 100%)",
   },
   {
     id: "aviao",
@@ -104,6 +108,8 @@ const FEATURED: FeaturedActivity[] = [
     energia: "leve",
     premium: true,
     tint: "rgba(79,143,201,0.55)",
+    scrim:
+      "linear-gradient(180deg, rgba(20,50,90,0) 30%, rgba(15,40,78,.85) 100%)",
   },
 ];
 
@@ -125,6 +131,179 @@ const GAMES: {
   { id: "hangman", label: "Forca", emoji: "✏️", sub: "Descubra a palavra", bgColor: "linear-gradient(135deg, hsl(35 90% 60%), hsl(25 90% 55%))", premium: true },
   { id: "daily", label: "Desafio", emoji: "🎯", sub: "Missão especial", bgColor: "linear-gradient(135deg, hsl(340 75% 65%), hsl(0 75% 60%))", premium: true },
 ];
+
+/* ───────── Design tokens (Brincar.dc.html — light glass) ───────── */
+const TINT: Record<string, [number, number, number]> = {
+  laranja: [245, 150, 60],
+  verde: [90, 190, 110],
+  roxo: [155, 120, 240],
+  azul: [95, 165, 240],
+};
+const GLOSSY: Record<string, [string, string, string]> = {
+  laranja: ["#FFD0A0", "#F0913C", "#C05E10"],
+  verde: ["#B8E8B0", "#5CB56A", "#2F7A3E"],
+  roxo: ["#D8C2FF", "#9A6CF0", "#6A3EC0"],
+  azul: ["#B4D8FF", "#5A9CE8", "#2D64B0"],
+};
+
+const D = {
+  target:
+    "M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18Zm0-4.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Zm0-3.3a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4Z",
+  brush:
+    "M14.5 4.5c1.5-1.5 3.8-1.6 5 0 1 1.4.6 3.4-.6 4.6l-7.4 7.4-4-4 7-8Zm-8.2 9.2-1.6 1.6c-1.2 1.2-1 3.3-2.2 4.7 1.9.6 4.6.4 6-1l1.8-1.8",
+  gamepad:
+    "M6 9h4m-2-2v4m8.5-1.5h.01M15 11h.01M17.3 6H6.7a4 4 0 0 0-4 3.7l-.5 5.6a2.6 2.6 0 0 0 4.6 1.9L8.5 15h7l1.7 2.2a2.6 2.6 0 0 0 4.6-1.9l-.5-5.6a4 4 0 0 0-4-3.7Z",
+  plane:
+    "M10.5 13.5 3 11l1.5-1.5 5.5.5 5-5.5c.6-.6 1.6-.6 2.2 0 .6.6.6 1.6 0 2.2l-5.5 5 .5 5.5L10.7 19l-2.5-7.5Z",
+  shield: "M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z",
+  trophy:
+    "M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5",
+  heart:
+    "M12 20.3l-7.1-6.9a4.6 4.6 0 0 1 6.4-6.5l.7.7.7-.7a4.6 4.6 0 0 1 6.4 6.5Z",
+  arrow: "M5 12h14m-6-6 6 6-6 6",
+  arrowBack: "M19 12H5m6-6-6 6 6 6",
+  people:
+    "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8 .5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.5 19a5.5 5.5 0 0 1 11 0m1-.5a4.5 4.5 0 0 1 5 0",
+  leaf: "M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11",
+};
+
+/* Liquid glass claro com tint colorido (fundo claro-esverdeado) */
+const glass = (
+  r: number,
+  g: number,
+  b: number,
+  aTop = 0.5,
+  aBot = 0.16,
+): CSSProperties => {
+  const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
+  return {
+    background: `linear-gradient(155deg, rgba(255,255,255,.9) 0%, ${rgba(aTop)} 28%, ${rgba((aTop + aBot) / 2)} 60%, ${rgba(aBot)} 85%, rgba(255,255,255,.6) 100%)`,
+    backdropFilter: "blur(20px) saturate(170%)",
+    WebkitBackdropFilter: "blur(20px) saturate(170%)",
+    border: "1px solid rgba(255,255,255,1)",
+    boxShadow: `0 14px 32px rgba(50,90,40,.18), 0 0 26px ${rgba(0.22)}, inset 0 1.5px 0 rgba(255,255,255,1), inset 0 -10px 20px ${rgba(0.16)}`,
+  };
+};
+const gloss = (
+  light: string,
+  mid: string,
+  deep: string,
+  size = 44,
+  radius = 15,
+): CSSProperties => ({
+  flex: "none",
+  width: size,
+  height: size,
+  borderRadius: radius,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: `radial-gradient(130% 130% at 30% 22%, #FFFFFF 0%, ${light} 16%, ${mid} 55%, ${deep} 100%)`,
+  boxShadow:
+    "0 8px 16px rgba(50,90,40,.3), inset 0 2px 3px rgba(255,255,255,.75), inset 0 -5px 10px rgba(0,0,0,.25)",
+});
+const glossArrow = (light: string, mid: string, deep: string): CSSProperties => ({
+  alignSelf: "flex-end",
+  width: 25,
+  height: 25,
+  borderRadius: 999,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: `radial-gradient(130% 130% at 30% 22%, #FFFFFF 0%, ${light} 20%, ${mid} 60%, ${deep} 100%)`,
+  boxShadow:
+    "0 4px 10px rgba(50,90,40,.3), inset 0 1px 2px rgba(255,255,255,.65), inset 0 -3px 6px rgba(0,0,0,.22)",
+});
+const categoryCardStyle = (k: string): CSSProperties => ({
+  position: "relative",
+  overflow: "hidden",
+  borderRadius: 24,
+  padding: "14px 13px 12px",
+  textAlign: "left",
+  cursor: "pointer",
+  display: "flex",
+  flexDirection: "column",
+  gap: 7,
+  transition: "transform .2s",
+  fontFamily: "'Nunito',sans-serif",
+  ...glass(...TINT[k], 0.5, 0.16),
+});
+
+/* Ambientes premium das sub-telas (mesma linguagem do hero da Home) */
+const AMBIENT_CRIAR =
+  "radial-gradient(58% 40% at 84% 6%,rgba(255,210,120,.16),transparent 70%),radial-gradient(52% 34% at 6% 42%,rgba(120,220,180,.14),transparent 70%),radial-gradient(50% 30% at 55% 96%,rgba(175,150,235,.08),transparent 70%),linear-gradient(180deg,#F0F8EA 0%,#E4F1DD 40%,#D8EAD1 75%,#CCE2C6 100%)";
+const AMBIENT_JOGOS =
+  "radial-gradient(56% 38% at 85% 6%,rgba(175,150,235,.20),transparent 70%),radial-gradient(50% 34% at 6% 40%,rgba(120,180,235,.14),transparent 70%),linear-gradient(180deg,#F3F1FB 0%,#EAE7F6 42%,#E1DDF0 78%,#D8D3EC 100%)";
+
+/* Cabeçalho premium das sub-telas (tipografia Lora fiel à Home) */
+const subEyebrow = (color: string): CSSProperties => ({
+  fontFamily: "'Nunito',sans-serif",
+  fontSize: 11,
+  fontWeight: 900,
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
+  color,
+});
+const subTitle: CSSProperties = {
+  fontFamily: "'Lora',serif",
+  fontWeight: 600,
+  fontSize: 28,
+  lineHeight: 1.13,
+  letterSpacing: "-0.3px",
+  color: "#17301F",
+  marginTop: 6,
+};
+const subLead = (color: string): CSSProperties => ({
+  fontFamily: "'Nunito',sans-serif",
+  fontSize: 13,
+  fontWeight: 700,
+  lineHeight: 1.45,
+  color,
+  marginTop: 8,
+  maxWidth: 300,
+});
+
+/* Icone SVG genérico */
+const Icon = ({
+  d,
+  stroke = "#fff",
+  size = 22,
+  sw = 1.8,
+  fill = "none",
+}: {
+  d: string;
+  stroke?: string;
+  size?: number;
+  sw?: number;
+  fill?: string;
+}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill}>
+    <path
+      d={d}
+      stroke={stroke}
+      strokeWidth={sw}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/* Keyframes locais (prefixo brin- para evitar colisão com index.css) */
+const BRIN_KEYFRAMES = `
+@keyframes brin-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes brin-cascade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes brin-heroIn{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+@keyframes brin-floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes brin-twinkle{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:.9;transform:scale(1.15)}}
+@keyframes brin-raysway{0%,100%{opacity:.5;transform:translateX(0)}50%{opacity:1;transform:translateX(12px)}}
+@keyframes brin-drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(34px,26px) scale(1.18)}}
+@keyframes brin-drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,-22px) scale(1.12)}}
+@keyframes brin-sparklefloat{0%,100%{opacity:.1;transform:translateY(0) scale(.7)}50%{opacity:.95;transform:translateY(-16px) scale(1.15)}}
+@keyframes brin-shine{0%{transform:translateX(-130%) skewX(-18deg)}60%,100%{transform:translateX(240%) skewX(-18deg)}}
+@keyframes brin-leafdrift{0%{transform:translate(0,-30px) rotate(0deg);opacity:0}12%{opacity:.7}88%{opacity:.6}100%{transform:translate(-46px,105vh) rotate(300deg);opacity:0}}
+@keyframes brin-heartbeat{0%,100%{transform:scale(1)}12%{transform:scale(1.12)}24%{transform:scale(1)}36%{transform:scale(1.08)}48%{transform:scale(1)}}
+@keyframes brin-wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+`;
 
 interface Props {
   onBack: () => void;
@@ -158,7 +337,8 @@ const KidzzPlay = ({
   const [sessionScore, setSessionScore] = useState(0);
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);
   const [selectedExp, setSelectedExp] = useState<BrincarExperience | null>(null);
-  const [selectedFeatured, setSelectedFeatured] = useState<FeaturedActivity | null>(null);
+  const [selectedFeatured, setSelectedFeatured] =
+    useState<FeaturedActivity | null>(null);
 
   const creativeExperiences = useMemo(
     () =>
@@ -167,6 +347,35 @@ const KidzzPlay = ({
       ),
     [],
   );
+
+  /* ── Parallax do hero (portado do design) ── */
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const heroWrapRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 300);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const onHeroScroll = useCallback(() => {
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const sc = scrollRef.current;
+      const hero = heroWrapRef.current;
+      if (!sc || !hero) return;
+      const y = sc.scrollTop;
+      hero.style.transform = `translateY(${y * 0.42}px) scale(${1 + y * 0.0004})`;
+      hero.style.opacity = String(Math.max(0, 1 - y / 240));
+    });
+  }, []);
 
   const handleScore = useCallback(
     (pts: number) => {
@@ -216,28 +425,23 @@ const KidzzPlay = ({
     setActiveGame(id);
   };
 
-  /* ───────── HEADER PADRÃO (KidzzHeader — Pais + Trophy) ───────── */
-  const headerBack =
-    sub === "home"
-      ? onBack
-      : () => {
-          setSub("home");
-          setActiveGame(null);
-        };
+  const openFeatured = (f: FeaturedActivity) => {
+    if (f.premium && !isPremium) {
+      setShowPremiumCTA(true);
+      return;
+    }
+    setSelectedFeatured(f);
+  };
+
+  /* ───────── HEADER PADRÃO (sub-telas criar/jogos) ───────── */
   const PlayHeader = (
     <KidzzHeader
-      onBack={headerBack}
+      onBack={() => {
+        setSub("home");
+        setActiveGame(null);
+      }}
       right={
         <>
-          <motion.button
-            type="button"
-            onClick={onOpenParental}
-            whileTap={{ scale: 0.94 }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
-          >
-            <Shield size={14} className="text-[#46703A]" strokeWidth={2.4} />
-            <span className="text-[13px] font-bold text-[#2A2520]">Pais</span>
-          </motion.button>
           <motion.button
             type="button"
             onClick={onOpenAchievements}
@@ -254,208 +458,290 @@ const KidzzPlay = ({
     />
   );
 
-  /* ───────── HOME (matching reference) ───────── */
+  /* ── Categorias (dados reais → navegação real) ── */
+  const categorias: {
+    key: string;
+    title: string;
+    sub: string;
+    d: string;
+    k: string;
+    novo?: boolean;
+    onClick: () => void;
+  }[] = [
+    { key: "c1", title: "Missões do dia", sub: "Desafios rápidos em família", d: D.target, k: "laranja", onClick: () => setSub("missoes") },
+    { key: "c2", title: "Criar e Imaginar", sub: "Atividades criativas sem limites", d: D.brush, k: "verde", onClick: () => setSub("criar") },
+    { key: "c3", title: "Jogos e Desafios", sub: "Diversão que une todo mundo", d: D.gamepad, k: "roxo", onClick: () => setSub("jogos") },
+    { key: "c4", title: "Modo Viagem", sub: "Brincadeiras para o caminho", d: D.plane, k: "azul", novo: true, onClick: () => onOpenTravel?.() },
+  ];
+
+  /* Anel de progresso do desafio (2/3 — igual ao design) */
+  const RING_CIRC = 207.3;
+  const ringOffset = mounted ? RING_CIRC * (1 - 2 / 3) : RING_CIRC;
+
+  const verTodasStyle: CSSProperties = {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontFamily: "'Nunito',sans-serif",
+    fontWeight: 900,
+    fontSize: 12.5,
+    color: "#2E9A63",
+    padding: 0,
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 3,
+  };
+
+  /* ───────── HOME (porte fiel de Brincar.dc.html) ───────── */
   const renderHome = () => (
     <motion.div
       key="home"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
-      className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
+      className="flex-1 relative overflow-hidden min-h-0"
       style={{
-        WebkitOverflowScrolling: "touch",
-        paddingTop: 12,
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)",
+        fontFamily: "'Nunito',system-ui,sans-serif",
+        background:
+          "linear-gradient(180deg,#F0F8EA 0%,#E4F1DD 40%,#D8EAD1 75%,#CCE2C6 100%)",
       }}
     >
-      {/* HERO with chameleon */}
-      <section className="px-5 pt-2 pb-3">
-        <img
-          src={heroChameleon}
-          alt="Camaleão Kidzz na floresta"
-          className="w-full h-36 object-cover rounded-3xl select-none mb-4"
-          style={{ objectPosition: "center 30%", boxShadow: "0 12px 24px rgba(0,0,0,0.12)" }}
-        />
-        <p className="text-[13px] font-semibold text-[#2A2520]/85 flex items-center gap-1.5">
-          {greeting}, família!
-          <span className="text-base">💚</span>
-        </p>
-        <h1 className="font-display mt-2 text-[34px] leading-[1.02] font-extrabold text-[#1B1B1B] tracking-tight">
-          Brincar faz parte da{" "}
-          <span className="text-[#46703A]">magia</span> de crescer.
-        </h1>
-        <p className="mt-3 text-[13px] leading-snug text-[#2A2520]/75 font-medium">
-          Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
-        </p>
-      </section>
+      {/* brilho radial de fundo */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background:
+            "radial-gradient(45% 30% at 78% 26%,rgba(255,210,120,.20),transparent 70%),radial-gradient(42% 28% at 10% 55%,rgba(120,220,180,.14),transparent 70%),radial-gradient(50% 30% at 55% 90%,rgba(175,150,235,.10),transparent 70%)",
+        }}
+      />
+      {/* orbes de luz que flutuam */}
+      <div style={{ position: "absolute", top: -60, left: -80, width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,220,130,.35),transparent 65%)", filter: "blur(28px)", animation: "brin-drift1 13s ease-in-out infinite", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: "38%", left: -90, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(110,215,170,.28),transparent 65%)", filter: "blur(30px)", animation: "brin-drift2 17s ease-in-out 2s infinite", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: 90, right: -100, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle,rgba(175,150,235,.22),transparent 65%)", filter: "blur(32px)", animation: "brin-drift1 19s ease-in-out 4s infinite", pointerEvents: "none" }} />
+      {/* folhas caindo */}
+      <div style={{ position: "absolute", top: 0, left: "22%", pointerEvents: "none", animation: "brin-leafdrift 16s linear 1s infinite" }}>
+        <Icon d={D.leaf} stroke="#5CB56A" size={15} sw={1.8} />
+      </div>
+      <div style={{ position: "absolute", top: 0, left: "72%", pointerEvents: "none", animation: "brin-leafdrift 21s linear 7s infinite" }}>
+        <Icon d={D.leaf} stroke="#84C45C" size={12} sw={1.8} />
+      </div>
 
-      {/* 4 CATEGORY CARDS — 2x2 */}
-      <section className="px-4 mt-3 grid grid-cols-2 gap-3">
-        <CategoryCard
-          onClick={() => setSub("missoes")}
-          emoji="🎯"
-          title="Missões do dia"
-          subtitle="Desafios rápidos em família"
-          gradient="linear-gradient(135deg, #F4A659 0%, #E8821A 100%)"
-          accent="#E8821A"
-        />
-        <CategoryCard
-          onClick={() => setSub("criar")}
-          emoji="🧩"
-          title="Criar e Imaginar"
-          subtitle="Atividades criativas sem limites"
-          gradient="linear-gradient(135deg, #7FB069 0%, #46703A 100%)"
-          accent="#46703A"
-        />
-        <CategoryCard
-          onClick={() => setSub("jogos")}
-          emoji="🎮"
-          title="Jogos e Desafios"
-          subtitle="Diversão saudável para todos"
-          gradient="linear-gradient(135deg, #8987DA 0%, #5E5CC2 100%)"
-          accent="#5E5CC2"
-        />
-        <CategoryCard
-          onClick={() => onOpenTravel?.()}
-          emoji="✈️"
-          title="Modo Viagem"
-          subtitle="Atividades para qualquer lugar"
-          gradient="linear-gradient(135deg, #7DB0E0 0%, #4F8FC9 100%)"
-          accent="#4F8FC9"
-          badge="NOVO"
-        />
-      </section>
-
-      {/* PARA BRINCAR AGORA — horizontal carousel */}
-      <section className="mt-6">
-        <div className="flex items-end justify-between px-5 mb-3">
-          <h2 className="font-display text-[19px] font-extrabold text-[#1B1B1B] tracking-tight flex items-center gap-1.5">
-            Para brincar agora
-            <Sparkles size={15} className="text-amber-500" />
-          </h2>
-          <button
-            type="button"
-            onClick={() => setSub("missoes")}
-            className="text-[12px] font-bold text-[#2A2520]/70 flex items-center gap-0.5"
-          >
-            Ver todas <ArrowRight size={13} />
-          </button>
-        </div>
-        <div className="-mx-1 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {FEATURED.map((f) => (
-            <FeaturedCard
-              key={f.id}
-              data={f}
-              onOpen={() => {
-                if (f.premium && !isPremium) {
-                  setShowPremiumCTA(true);
-                  return;
-                }
-                setSelectedFeatured(f);
-              }}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* DESAFIOS EM FAMÍLIA */}
-      <section className="mt-5 px-4">
-        <div className="flex items-end justify-between mb-3 px-1">
-          <h2 className="font-display text-[19px] font-extrabold text-[#1B1B1B] tracking-tight flex items-center gap-1.5">
-            Desafios em família
-            <Sparkles size={15} className="text-amber-500" />
-          </h2>
-          <button
-            type="button"
-            onClick={() => setSub("missoes")}
-            className="text-[12px] font-bold text-[#2A2520]/70 flex items-center gap-0.5"
-          >
-            Ver todos <ArrowRight size={13} />
-          </button>
-        </div>
-        <button
-          type="button"
-          onClick={() => setSub("missoes")}
-          className="w-full rounded-3xl p-4 text-left border border-white/40 shadow-lg overflow-hidden relative"
-          style={{
-            background:
-              "linear-gradient(135deg, #8987DA 0%, #5E5CC2 60%, #46377A 100%)",
-          }}
-        >
+      <div
+        ref={scrollRef}
+        onScroll={onHeroScroll}
+        style={{
+          height: "100%",
+          overflowY: "auto",
+          overflowX: "hidden",
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
+          scrollbarWidth: "none",
+          position: "relative",
+        }}
+      >
+        {/* ── HERO ── */}
+        <div style={{ position: "relative" }}>
+          {/* cópia borrada de fundo */}
+          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 414, backgroundImage: "url('/exemplos/assets/cena-brincar.png')", backgroundSize: "cover", backgroundPosition: "center", filter: "blur(46px) saturate(1.45)", opacity: 0.5, transform: "scale(1.22)", pointerEvents: "none" }} />
           <div
-            className="absolute -top-12 -right-12 w-44 h-44 rounded-full opacity-30 pointer-events-none"
+            ref={heroWrapRef}
             style={{
-              background:
-                "radial-gradient(closest-side, rgba(255,255,255,0.6), transparent 70%)",
+              position: "relative",
+              width: "100%",
+              height: 414,
+              willChange: "transform",
+              WebkitMaskImage:
+                "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)",
+              maskImage:
+                "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)",
+              animation: "brin-heroIn .7s cubic-bezier(.22,1,.36,1) both",
             }}
-          />
-          <div className="relative flex items-stretch gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 text-white/95 mb-1">
-                <span className="text-sm">👨‍👩‍👧</span>
-                <span className="text-[11px] font-bold tracking-wide">
-                  Desafio da Semana
-                </span>
-              </div>
-              <h3 className="font-display text-[22px] font-extrabold text-white leading-[1.05] drop-shadow-sm">
-                Diversão em Equipe
-              </h3>
-              <p className="text-[12px] font-medium text-white/90 leading-snug mt-1.5 max-w-[220px]">
-                Escolham 3 atividades, completam juntos e ganhem uma conquista especial!
-              </p>
-              <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-[12px] font-bold backdrop-blur">
-                Ver detalhes <ArrowRight size={12} />
+          >
+            <img
+              src="/exemplos/assets/cena-brincar.png"
+              alt="Gui, o camaleão, com o coração brilhando"
+              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 34%", animation: "brin-floaty 6s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)" }}
+            />
+            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(180deg,rgba(240,248,234,.2) 0%,rgba(240,248,234,0) 20%,rgba(240,248,234,.22) 48%,rgba(240,248,234,.6) 72%,rgba(240,248,234,.34) 84%,rgba(240,248,234,.12) 94%,transparent 100%)" }} />
+          </div>
+          {/* raio de luz + brilhos */}
+          <div style={{ position: "absolute", top: 0, left: 0, width: "46%", height: 236, pointerEvents: "none", background: "linear-gradient(180deg,rgba(255,240,190,.32) 0%,rgba(255,240,190,.10) 45%,transparent 75%)", filter: "blur(6px)", animation: "brin-raysway 7s ease-in-out infinite" }} />
+          <div style={{ position: "absolute", top: 46, left: "56%", width: 6, height: 6, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 10px 3px rgba(255,205,110,.85)", animation: "brin-twinkle 3.2s ease-in-out infinite" }} />
+          <div style={{ position: "absolute", top: 130, left: "47%", width: 4, height: 4, borderRadius: 99, background: "#FFF3CC", boxShadow: "0 0 8px 2px rgba(255,220,140,.75)", animation: "brin-sparklefloat 4.4s ease-in-out 1s infinite" }} />
+          <div style={{ position: "absolute", top: 196, left: "64%", width: 5, height: 5, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 9px 3px rgba(255,205,110,.7)", animation: "brin-sparklefloat 5.1s ease-in-out .4s infinite" }} />
+
+          {/* voltar */}
+          <button
+            type="button"
+            onClick={onBack}
+            className="active:scale-90"
+            style={{ position: "absolute", top: 62, left: 16, width: 42, height: 42, borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.95)", boxShadow: "0 6px 16px rgba(60,100,50,.2),inset 0 1px 0 rgba(255,255,255,1)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", zIndex: 6 }}
+          >
+            <Icon d={D.arrowBack} stroke="#1E3A28" size={19} sw={2.2} />
+          </button>
+          {/* Pais + Pontos */}
+          <div style={{ position: "absolute", top: 62, right: 16, display: "flex", gap: 8, zIndex: 6 }}>
+            <button
+              type="button"
+              onClick={onOpenParental}
+              className="active:scale-95"
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.95)", boxShadow: "0 6px 16px rgba(60,100,50,.2),inset 0 1px 0 rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: 13, color: "#1E3A28" }}
+            >
+              <Icon d={D.shield} stroke="#1E9A6E" size={15} sw={2} />
+              Pais
+            </button>
+            <button
+              type="button"
+              onClick={onOpenAchievements}
+              className="active:scale-95"
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 13px", borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.95)", boxShadow: "0 6px 16px rgba(60,100,50,.2),inset 0 1px 0 rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 13, color: "#1E3A28" }}
+            >
+              <Icon d={D.trophy} stroke="#E0A62B" size={14} sw={1.9} />
+              {sessionScore}
+            </button>
+          </div>
+
+          {/* textos do hero */}
+          <div style={{ padding: "14px 20px 2px", animation: "brin-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", zIndex: 4, position: "relative" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 999, background: "rgba(255,255,255,.72)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,1)", boxShadow: "inset 0 1px 0 rgba(255,255,255,1),0 4px 12px rgba(60,100,50,.1)", fontWeight: 800, fontSize: 12, color: "#3E5A44", marginBottom: 11 }}>
+              {greeting}, família!
+              <span style={{ display: "inline-flex", animation: "brin-heartbeat 2.4s ease-in-out infinite" }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#39B58A"><path d={D.heart} /></svg>
               </span>
             </div>
-            <div className="flex flex-col items-center justify-center gap-2 pr-1">
-              <ProgressRing value={2} total={3} />
-              <p className="text-[10px] font-bold text-white/85 text-center leading-tight">
-                atividades
-                <br />
-                concluídas
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center min-w-[70px]">
-              <p className="text-[10px] font-bold text-white/85 mb-0.5">
-                Recompensa
-              </p>
-              <span className="text-3xl drop-shadow">🏆</span>
-              <p className="text-[11px] font-extrabold text-amber-200 mt-0.5">
-                ✨ +50 pts
-              </p>
+            <h1 style={{ margin: "0 0 8px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 29, lineHeight: 1.13, color: "#17301F", letterSpacing: "-.3px" }}>
+              Brincar faz parte da <span style={{ color: "#2E9A63" }}>magia</span> de crescer.
+            </h1>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "#557A5E", maxWidth: 300 }}>
+              Escolha uma atividade e transforme qualquer momento em diversão e conexão.
+            </p>
+          </div>
+        </div>
+
+        {/* ── CATEGORIAS (2x2) ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, padding: "10px 16px 0", position: "relative", zIndex: 5, animation: "brin-rise .6s .1s both" }}>
+          {categorias.map((c) => (
+            <button key={c.key} type="button" onClick={c.onClick} className="active:scale-95" style={categoryCardStyle(c.k)}>
+              <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%)", animation: "brin-shine 5.5s ease-in-out infinite" }} />
+              {c.novo && (
+                <div style={{ position: "absolute", top: 10, right: 10, padding: "3px 9px", borderRadius: 999, background: "radial-gradient(130% 130% at 30% 22%,#FFF3C4 0%,#F2C55C 45%,#C98F1E 100%)", color: "#4A3300", fontSize: 9, fontWeight: 900, letterSpacing: ".4px", boxShadow: "0 3px 8px rgba(150,95,10,.4),inset 0 1px 0 rgba(255,255,255,.7)", animation: "brin-wiggle 2.6s ease-in-out infinite" }}>NOVO</div>
+              )}
+              <div style={gloss(...GLOSSY[c.k], 44, 15)}>
+                <Icon d={c.d} size={22} sw={1.8} />
+              </div>
+              <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#17301F", lineHeight: 1.15 }}>{c.title}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: "#557A5E", lineHeight: 1.35 }}>{c.sub}</div>
+              <div style={glossArrow(...GLOSSY[c.k])}>
+                <Icon d={D.arrow} size={13} sw={2.4} />
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* ── PARA BRINCAR AGORA ── */}
+        <div>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "20px 20px 10px" }}>
+            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#17301F" }}>Para brincar agora</h2>
+            <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todas →</button>
+          </div>
+          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 12px", scrollbarWidth: "none" }}>
+            {FEATURED.map((f) => {
+              const locked = !!f.premium && !isPremium;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => openFeatured(f)}
+                  className="active:scale-[.97]"
+                  style={{ flex: "none", width: 168, height: 220, borderRadius: 22, position: "relative", overflow: "hidden", cursor: "pointer", padding: 0, textAlign: "left", boxShadow: "0 14px 30px rgba(50,90,40,.28),inset 0 1px 0 rgba(255,255,255,.5)", border: "1px solid rgba(255,255,255,.6)", animation: "brin-rise .45s both", transition: "transform .2s" }}
+                >
+                  <img src={f.img} alt={f.titulo} loading="lazy" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: f.scrim }} />
+                  <div style={{ position: "absolute", top: 9, left: 9, padding: "4px 11px", borderRadius: 999, background: "rgba(255,253,246,.9)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 3px 8px rgba(0,0,0,.2)", color: "#33421F", fontSize: 10.5, fontWeight: 900 }}>{f.tempo}</div>
+                  {locked && (
+                    <div style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: 999, background: "rgba(255,255,255,.28)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,.6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Lock size={13} className="text-white" />
+                    </div>
+                  )}
+                  <div style={{ position: "absolute", left: 12, right: 12, bottom: 10, display: "flex", flexDirection: "column", gap: 3 }}>
+                    <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#FFFDF4", lineHeight: 1.2, textShadow: "0 1px 6px rgba(0,0,0,.35)" }}>{f.titulo}</div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,253,244,.85)", lineHeight: 1.35, textShadow: "0 1px 5px rgba(0,0,0,.3)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{f.desc}</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
+                      <div style={{ fontSize: 10, fontWeight: 900, color: "rgba(255,253,244,.8)" }}>{f.idade}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 900, color: "rgba(255,253,244,.85)" }}>
+                        <Icon d={D.heart} stroke="rgba(255,253,244,.85)" size={11} sw={1.9} />
+                        {f.energia}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── DESAFIOS EM FAMÍLIA ── */}
+        <div>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "14px 20px 10px" }}>
+            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#17301F" }}>Desafios em família</h2>
+            <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todos →</button>
+          </div>
+          <div style={{ padding: "0 16px" }}>
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 26, padding: "16px 16px 14px", background: "linear-gradient(155deg,rgba(255,255,255,.35) 0%,rgba(139,105,240,.78) 24%,rgba(120,88,220,.68) 60%,rgba(98,70,190,.75) 100%)", backdropFilter: "blur(20px) saturate(170%)", WebkitBackdropFilter: "blur(20px) saturate(170%)", border: "1px solid rgba(255,255,255,.6)", boxShadow: "0 16px 36px rgba(90,60,180,.35),0 0 28px rgba(139,105,240,.3),inset 0 1.5px 0 rgba(255,255,255,.7),inset 0 -10px 22px rgba(40,20,100,.25)", animation: "brin-rise .5s .15s both" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%)", animation: "brin-shine 6s ease-in-out infinite" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
+                <div style={{ width: 26, height: 26, borderRadius: 9, background: "rgba(255,255,255,.24)", border: "1px solid rgba(255,255,255,.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Icon d={D.people} size={14} sw={1.8} />
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: ".5px", color: "rgba(255,255,255,.9)" }}>DESAFIO DA SEMANA</div>
+              </div>
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 20, color: "#fff", lineHeight: 1.15, marginBottom: 5 }}>Diversão em Equipe</div>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.85)", lineHeight: 1.45, marginBottom: 11 }}>Escolham 3 atividades, completem juntos e ganhem uma conquista especial!</div>
+                  <button type="button" onClick={() => setSub("missoes")} className="active:scale-95" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.2)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,.55)", boxShadow: "inset 0 1px 0 rgba(255,255,255,.5),0 4px 12px rgba(40,20,100,.3)", color: "#fff", fontFamily: "'Nunito',sans-serif", fontSize: 12.5, fontWeight: 900, transition: "transform .2s" }}>
+                    Ver detalhes
+                    <Icon d={D.arrow} size={13} sw={2.4} />
+                  </button>
+                </div>
+                <div style={{ flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ position: "relative", width: 78, height: 78 }}>
+                    <svg width="78" height="78" viewBox="0 0 78 78">
+                      <circle cx="39" cy="39" r="33" fill="none" stroke="rgba(255,255,255,.22)" strokeWidth="7" />
+                      <circle cx="39" cy="39" r="33" fill="none" stroke="#FFD34D" strokeWidth="7" strokeLinecap="round" strokeDasharray={RING_CIRC} strokeDashoffset={ringOffset} transform="rotate(-90 39 39)" style={{ transition: "stroke-dashoffset 1.3s cubic-bezier(.22,1,.36,1) .4s", filter: "drop-shadow(0 0 6px rgba(255,211,77,.7))" }} />
+                    </svg>
+                    <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 17, color: "#fff" }}>
+                      2<span style={{ opacity: 0.6, fontSize: 13 }}>/3</span>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10.5, fontWeight: 900, color: "#FFD34D" }}>
+                    <span style={{ animation: "brin-heartbeat 2.4s ease-in-out infinite", display: "inline-flex" }}>
+                      <Icon d={D.trophy} stroke="#FFD34D" size={13} sw={2} />
+                    </span>
+                    +50 pts
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </button>
-      </section>
+        </div>
 
-      {/* IDEIAS RÁPIDAS + Modo Viagem chip */}
-      <section className="mt-4 px-4 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setSub("criar")}
-          className="flex-1 bg-white/65 backdrop-blur-md border border-white/60 rounded-full px-4 py-3 flex items-center justify-between min-h-[48px] shadow-sm"
-        >
-          <span className="text-[13px] font-bold text-[#2A2520]">
-            <span className="text-[#2A2520]">Ideias rápidas</span>{" "}
-            <span className="text-[#2A2520]/65 font-semibold">
-              para qualquer lugar
-            </span>
-          </span>
-          <ArrowRight size={14} className="text-[#2A2520]/70" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onOpenTravel?.()}
-          className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full text-white font-bold text-[12px] shadow-md min-h-[44px]"
-          style={{
-            background: "linear-gradient(135deg, #F4A659 0%, #E8821A 100%)",
-          }}
-        >
-          <Plane size={13} />
-          Modo Viagem
-        </button>
-      </section>
+        {/* ── IDEIAS RÁPIDAS + Modo Viagem ── */}
+        <div style={{ display: "flex", gap: 10, padding: "16px 16px 8px", alignItems: "stretch" }}>
+          <button type="button" onClick={() => setSub("criar")} className="active:scale-[.97]" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "13px 16px", borderRadius: 999, cursor: "pointer", background: "linear-gradient(155deg,rgba(255,255,255,.9),rgba(255,255,255,.55))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 10px 24px rgba(60,100,50,.16),inset 0 1.5px 0 rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", transition: "transform .2s", textAlign: "left" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 900, color: "#17301F" }}>Ideias rápidas <span style={{ fontWeight: 700, color: "#557A5E" }}>para qualquer lugar</span></span>
+            <Icon d={D.arrow} stroke="#2E9A63" size={15} sw={2.4} />
+          </button>
+          <button type="button" onClick={() => onOpenTravel?.()} className="active:scale-[.97]" style={{ flex: "none", display: "flex", alignItems: "center", gap: 7, padding: "13px 17px", borderRadius: 999, cursor: "pointer", background: "radial-gradient(130% 130% at 30% 22%,#FFE9A8 0%,#F2A62B 55%,#C77E12 100%)", border: "1px solid rgba(255,255,255,.8)", boxShadow: "0 10px 24px rgba(180,110,10,.35),inset 0 1.5px 1px rgba(255,255,255,.75),inset 0 -5px 10px rgba(140,80,0,.35)", fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 900, color: "#4A3300", transition: "transform .2s" }}>
+            <Icon d={D.plane} stroke="#4A3300" size={15} sw={1.8} />
+            Modo Viagem
+          </button>
+        </div>
+      </div>
     </motion.div>
   );
 
@@ -470,19 +756,19 @@ const KidzzPlay = ({
       style={{
         WebkitOverflowScrolling: "touch",
         paddingTop: 12,
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
+        background: AMBIENT_CRIAR,
+        backgroundAttachment: "local",
       }}
     >
-      <div className="px-5">
-        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#46703A]">
-          Brincar · Criar e Imaginar
-        </p>
-        <h1 className="font-display text-[28px] font-extrabold text-[#1B1B1B] leading-tight mt-1">
+      <div className="px-5" style={{ animation: "brin-cascade .5s cubic-bezier(.22,1,.36,1) both" }}>
+        <p style={subEyebrow("#2E9A63")}>Brincar · Criar e Imaginar</p>
+        <h1 style={subTitle}>
           Atividades criativas
           <br />
-          <span className="text-[#46703A]">sem limites</span>
+          <span style={{ color: "#2E9A63" }}>sem limites</span>
         </h1>
-        <p className="mt-2 text-[13px] text-[#2A2520]/75 max-w-[300px]">
+        <p style={subLead("#557A5E")}>
           Inventem juntos, façam arte, transformem objetos comuns em magia.
         </p>
       </div>
@@ -500,14 +786,39 @@ const KidzzPlay = ({
                 }
                 setSelectedExp(e);
               }}
-              className="relative rounded-3xl overflow-hidden text-left border border-white/40 shadow-md min-h-[170px]"
-              style={{ background: e.gradient }}
+              className="relative rounded-3xl overflow-hidden text-left min-h-[170px] active:scale-[.97]"
+              style={{
+                background: e.gradient,
+                border: "1px solid rgba(255,255,255,.55)",
+                boxShadow:
+                  "0 14px 30px rgba(50,90,40,.24), 0 2px 6px rgba(0,0,0,.12), inset 0 1.5px 0 rgba(255,255,255,.6), inset 0 -12px 22px rgba(0,0,0,.18)",
+                transition: "transform .2s",
+                animation: "brin-rise .45s both",
+              }}
             >
+              {/* specular highlight (topo glossy) */}
               <div
-                className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-50 pointer-events-none"
+                className="absolute inset-0 pointer-events-none"
                 style={{
                   background:
-                    "radial-gradient(closest-side, rgba(255,255,255,0.5), transparent 70%)",
+                    "linear-gradient(180deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,0) 42%)",
+                }}
+              />
+              {/* brilho de varredura */}
+              <div
+                className="absolute top-0 left-0 h-full pointer-events-none"
+                style={{
+                  width: "55%",
+                  background:
+                    "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.30) 50%,transparent 100%)",
+                  animation: "brin-shine 6.5s ease-in-out infinite",
+                }}
+              />
+              <div
+                className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-60 pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(closest-side, rgba(255,255,255,0.55), transparent 70%)",
                 }}
               />
               <div className="relative z-10 p-3 flex flex-col h-full">
@@ -523,7 +834,11 @@ const KidzzPlay = ({
                 </div>
                 <div
                   className="text-4xl mt-3"
-                  style={{ filter: locked ? "blur(2px)" : "none" }}
+                  style={{
+                    filter: locked
+                      ? "blur(2px)"
+                      : "drop-shadow(0 3px 5px rgba(0,0,0,.22))",
+                  }}
                 >
                   {e.emoji}
                 </div>
@@ -564,7 +879,9 @@ const KidzzPlay = ({
       style={{
         WebkitOverflowScrolling: "touch",
         paddingTop: 12,
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 130px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
+        background: activeGame ? undefined : AMBIENT_JOGOS,
+        backgroundAttachment: "local",
       }}
     >
       <AnimatePresence mode="wait">
@@ -575,16 +892,14 @@ const KidzzPlay = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="px-5">
-              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#5E5CC2]">
-                Brincar · Jogos e Desafios
-              </p>
-              <h1 className="font-display text-[28px] font-extrabold text-[#1B1B1B] leading-tight mt-1">
+            <div className="px-5" style={{ animation: "brin-cascade .5s cubic-bezier(.22,1,.36,1) both" }}>
+              <p style={subEyebrow("#6A3EC0")}>Brincar · Jogos e Desafios</p>
+              <h1 style={subTitle}>
                 Diversão saudável
                 <br />
-                <span className="text-[#5E5CC2]">para todos</span>
+                <span style={{ color: "#6A3EC0" }}>para todos</span>
               </h1>
-              <p className="mt-2 text-[13px] text-[#2A2520]/75 max-w-[300px]">
+              <p style={subLead("#5E5680")}>
                 Memória, palavras, desafios — escolha o jogo do dia.
               </p>
             </div>
@@ -595,48 +910,130 @@ const KidzzPlay = ({
                   <motion.button
                     key={game.id}
                     onClick={() => handleGameSelect(game.id)}
-                    className={`relative rounded-3xl p-4 flex flex-col items-center gap-1.5 border min-h-[130px] ${
-                      locked
-                        ? "border-white/40 opacity-80"
-                        : "border-white/40 shadow-md"
-                    }`}
+                    className="relative rounded-3xl p-4 flex flex-col items-center gap-1.5 min-h-[130px]"
                     style={{
                       background: locked
-                        ? "rgba(255,255,255,0.55)"
+                        ? "linear-gradient(155deg,rgba(255,255,255,.85) 0%,rgba(255,255,255,.5) 100%)"
                         : game.bgColor,
+                      border: "1px solid rgba(255,255,255,.6)",
+                      boxShadow: locked
+                        ? "0 8px 18px rgba(60,70,120,.12), inset 0 1.5px 0 rgba(255,255,255,.9)"
+                        : "0 12px 26px rgba(40,40,90,.24), 0 2px 6px rgba(0,0,0,.14), inset 0 1.5px 0 rgba(255,255,255,.6), inset 0 -12px 22px rgba(0,0,0,.20)",
+                      transition: "transform .2s",
                     }}
                     whileTap={locked ? undefined : { scale: 0.96 }}
                   >
+                    {/* camada de brilho recortada (não corta o selo NOVO) */}
                     <span
-                      className="text-4xl"
-                      style={{ filter: locked ? "blur(2px)" : "none" }}
+                      aria-hidden
+                      className="absolute inset-0 pointer-events-none overflow-hidden"
+                      style={{ borderRadius: 24 }}
+                    >
+                      <span
+                        className="absolute inset-0"
+                        style={{
+                          background: locked
+                            ? "none"
+                            : "linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,0) 42%)",
+                        }}
+                      />
+                      {!locked && (
+                        <span
+                          className="absolute top-0 h-full"
+                          style={{
+                            left: "-20%",
+                            width: "60%",
+                            background:
+                              "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.28) 50%,transparent 100%)",
+                            animation: "brin-shine 6.5s ease-in-out infinite",
+                          }}
+                        />
+                      )}
+                    </span>
+                    <span
+                      className="text-4xl relative"
+                      style={{
+                        filter: locked
+                          ? "blur(2px)"
+                          : "drop-shadow(0 3px 5px rgba(0,0,0,.22))",
+                      }}
                     >
                       {game.emoji}
                     </span>
                     <span
-                      className={`text-[13px] font-extrabold ${
+                      className={`relative text-[13px] font-extrabold ${
                         locked ? "text-gray-500" : "text-white"
                       }`}
+                      style={
+                        locked
+                          ? undefined
+                          : { textShadow: "0 1px 4px rgba(0,0,0,.22)" }
+                      }
                     >
                       {game.label}
                     </span>
                     <span
-                      className={`text-[10px] font-semibold leading-tight text-center ${
-                        locked ? "text-gray-400" : "text-white/85"
+                      className={`relative text-[10px] font-semibold leading-tight text-center ${
+                        locked ? "text-gray-400" : "text-white/90"
                       }`}
+                      style={
+                        locked
+                          ? undefined
+                          : { textShadow: "0 1px 3px rgba(0,0,0,.20)" }
+                      }
                     >
                       {game.sub}
                     </span>
                     {locked && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-white/30">
-                        <Lock size={18} className="text-gray-600" />
-                        <span className="text-[8px] text-gray-700 font-extrabold mt-1">
+                      <div
+                        className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl"
+                        style={{
+                          background:
+                            "linear-gradient(160deg,rgba(255,255,255,.34),rgba(255,255,255,.18))",
+                          backdropFilter: "blur(3px)",
+                          WebkitBackdropFilter: "blur(3px)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 34,
+                            height: 34,
+                            borderRadius: 999,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background:
+                              "radial-gradient(130% 130% at 30% 22%,#FFFFFF 0%,#EDE6FF 30%,#B9A6F0 100%)",
+                            boxShadow:
+                              "0 6px 14px rgba(90,70,160,.35), inset 0 1.5px 2px rgba(255,255,255,.8), inset 0 -4px 8px rgba(60,40,120,.25)",
+                          }}
+                        >
+                          <Lock size={15} className="text-[#5B3EA6]" strokeWidth={2.4} />
+                        </div>
+                        <span className="text-[8px] text-[#4A3A78] font-black tracking-wide mt-1.5">
                           KIDZZ
                         </span>
                       </div>
                     )}
                     {game.isNew && !locked && (
-                      <div className="absolute -top-1.5 -right-1.5 bg-gradient-to-br from-amber-400 to-pink-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white/60">
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: -6,
+                          right: -6,
+                          padding: "3px 9px",
+                          borderRadius: 999,
+                          background:
+                            "radial-gradient(130% 130% at 30% 22%,#FFF3C4 0%,#F2C55C 45%,#C98F1E 100%)",
+                          color: "#4A3300",
+                          fontSize: 9,
+                          fontWeight: 900,
+                          letterSpacing: ".4px",
+                          boxShadow:
+                            "0 3px 8px rgba(150,95,10,.4),inset 0 1px 0 rgba(255,255,255,.7)",
+                          animation: "brin-wiggle 2.6s ease-in-out infinite",
+                        }}
+                      >
                         NOVO
                       </div>
                     )}
@@ -771,7 +1168,8 @@ const KidzzPlay = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {sub !== "missoes" && PlayHeader}
+      <style>{BRIN_KEYFRAMES}</style>
+      {sub !== "missoes" && sub !== "home" && PlayHeader}
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
@@ -886,10 +1284,14 @@ const KidzzPlay = ({
                 </div>
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  className="w-full py-3.5 rounded-2xl font-black text-white text-sm shadow-md"
+                  className="w-full py-3.5 rounded-2xl font-black text-sm"
                   style={{
+                    color: "#4A3300",
                     background:
-                      "linear-gradient(135deg, #F4A659 0%, #E8821A 100%)",
+                      "radial-gradient(130% 160% at 30% 18%,#FFE9A8 0%,#F2A62B 55%,#C77E12 100%)",
+                    border: "1px solid rgba(255,255,255,.8)",
+                    boxShadow:
+                      "0 10px 24px rgba(180,110,10,.35), inset 0 1.5px 1px rgba(255,255,255,.75), inset 0 -5px 10px rgba(140,80,0,.35)",
                   }}
                   onClick={() => {
                     handleScore(5);
@@ -979,160 +1381,6 @@ const KidzzPlay = ({
         )}
       </AnimatePresence>
     </motion.div>
-  );
-};
-
-/* ───────────── SUB-COMPONENTS ───────────── */
-
-const CategoryCard = ({
-  onClick,
-  emoji,
-  title,
-  subtitle,
-  gradient,
-  accent,
-  badge,
-}: {
-  onClick: () => void;
-  emoji: string;
-  title: string;
-  subtitle: string;
-  gradient: string;
-  accent: string;
-  badge?: string;
-}) => (
-  <motion.button
-    type="button"
-    onClick={onClick}
-    whileTap={{ scale: 0.97 }}
-    className="relative rounded-[22px] p-3.5 text-left overflow-hidden border border-white/40 min-h-[160px] flex flex-col justify-between"
-    style={{
-      background: gradient,
-      boxShadow: `0 10px 24px -10px ${accent}66, inset 0 1px 0 rgba(255,255,255,0.3)`,
-    }}
-  >
-    <div
-      className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-40 pointer-events-none"
-      style={{
-        background:
-          "radial-gradient(closest-side, rgba(255,255,255,0.55), transparent 70%)",
-      }}
-    />
-    {badge && (
-      <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-400 text-white text-[9px] font-black shadow-md">
-        {badge}
-      </span>
-    )}
-    <div className="relative z-10 w-12 h-12 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center text-2xl border border-white/30">
-      {emoji}
-    </div>
-    <div className="relative z-10 mt-2">
-      <h3 className="font-display text-[15px] font-extrabold text-white leading-tight drop-shadow-sm">
-        {title}
-      </h3>
-      <p className="text-[10.5px] font-semibold text-white/90 leading-snug mt-0.5">
-        {subtitle}
-      </p>
-    </div>
-    <div className="relative z-10 self-end mt-1.5">
-      <div className="w-7 h-7 rounded-full bg-white/25 backdrop-blur flex items-center justify-center border border-white/30">
-        <ChevronRight size={15} className="text-white" strokeWidth={2.4} />
-      </div>
-    </div>
-  </motion.button>
-);
-
-const FeaturedCard = ({
-  data,
-  onOpen,
-}: {
-  data: FeaturedActivity;
-  onOpen: () => void;
-}) => (
-  <motion.button
-    type="button"
-    onClick={onOpen}
-    whileTap={{ scale: 0.97 }}
-    className="relative snap-start flex-shrink-0 w-[170px] rounded-3xl overflow-hidden text-left border border-white/40 shadow-md"
-    style={{ minHeight: 230 }}
-  >
-    <img
-      src={data.img}
-      alt={data.titulo}
-      loading="lazy"
-      className="absolute inset-0 w-full h-full object-cover"
-    />
-    <div
-      className="absolute inset-0"
-      style={{
-        background: `linear-gradient(180deg, ${data.tint} 0%, rgba(0,0,0,0.55) 100%)`,
-      }}
-    />
-    <div className="relative z-10 p-3 flex flex-col h-full min-h-[230px]">
-      <div className="flex items-start justify-between">
-        <span className="px-2 py-0.5 rounded-full bg-white/85 backdrop-blur text-[10px] font-extrabold text-[#2A2520]">
-          {data.tempo}
-        </span>
-        <span className="w-7 h-7 rounded-full bg-white/25 backdrop-blur flex items-center justify-center border border-white/30">
-          <Bookmark size={13} className="text-white" />
-        </span>
-      </div>
-      <div className="mt-auto">
-        <h4 className="font-display text-[15px] font-extrabold text-white leading-tight drop-shadow-sm">
-          {data.titulo}
-        </h4>
-        <p className="text-[11px] font-medium text-white/95 leading-snug mt-0.5 line-clamp-2">
-          {data.desc}
-        </p>
-        <div className="mt-2 flex items-center justify-between text-[10px] font-extrabold text-white/95">
-          <span className="flex items-center gap-1">
-            {data.premium && <Lock size={9} />}
-            {data.idade}
-          </span>
-          <span className="flex items-center gap-1">
-            <Heart size={10} className="text-rose-300" />
-            {data.energia}
-          </span>
-        </div>
-      </div>
-    </div>
-  </motion.button>
-);
-
-const ProgressRing = ({ value, total }: { value: number; total: number }) => {
-  const size = 64;
-  const stroke = 5;
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
-  const pct = Math.min(value / total, 1);
-  return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke="rgba(255,255,255,0.25)"
-          strokeWidth={stroke}
-          fill="none"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke="#FFD66E"
-          strokeWidth={stroke}
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - pct)}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center font-display font-black text-white text-[18px] leading-none">
-        {value}
-        <span className="text-white/60">/{total}</span>
-      </div>
-    </div>
   );
 };
 
