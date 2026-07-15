@@ -1,4 +1,15 @@
-import { memo, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  ArrowRight,
+  Bell,
+  Clock,
+  Crown,
+  Gift,
+  Heart,
+  Menu,
+  Sparkles,
+  Tent,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
@@ -13,131 +24,71 @@ import { ComoFoiModal } from "./ComoFoiModal";
 import { DiarioSemTela } from "./DiarioSemTela";
 import { GuardaCelularScreen } from "./GuardaCelularScreen";
 import { scheduleDailyReminder } from "@/lib/dailyReminder";
+import {
+  FONT,
+  SERIF,
+  R,
+  PAD,
+  glassDark as glass,
+  glassDarkSoft as glassSoft,
+  pillGlassDark as pillGlass,
+  goldBtn,
+  outlineGoldBtn,
+  sectionWrap,
+} from "@/lib/premiumUi";
 
 interface Props {
   onBack?: () => void;
 }
 
-type Energy = "agitada" | "cansada" | "curiosa";
+type Energy = "agitada" | "cansada" | "curiosa" | "feliz";
 
-/* ── SVG paths (fiéis ao design Bora.dc.html) ── */
-const D = {
-  back: "M19 12H5m6-6-6 6 6 6",
-  bolt: "M13 2 4.5 13.5H11l-1 8L19.5 10H13l0-8Z",
-  shield: "M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z",
-  sparkle: "M12 3l2 4.5 5 .5-3.7 3.4 1 4.9L12 14l-4.3 2.2 1-4.9L5 7.9l5-.4L12 3Z",
-  palette:
-    "M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2s-.6-1.5-.6-2.4c0-.9.7-1.6 1.6-1.6H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8Zm-4.5 9a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Zm3-4a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Zm5 0a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Z",
-  arrow: "M5 12h13m-6-6 6 6-6 6",
-  clock: "M12 8v4.5l3 1.8M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
-  leaf: "M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11",
-  users:
-    "M17 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7-6a3 3 0 0 1 0 6m4 6v-1a4 4 0 0 0-3-3.8",
-  share:
-    "M18 8a3 3 0 1 0-2.8-4M18 8a3 3 0 0 1-2.8-2M18 8v.5m0 7.5a3 3 0 1 0 2.8 4M18 16a3 3 0 0 1 2.8 2M8.7 10.7l6.6-3.4m-6.6 6l6.6 3.4M9 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z",
-  copy: "M9 9V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-4M5 9h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z",
-  check: "M5 12l4 4L19 7",
-  gift: "M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8M2 7h20v5H2V7Zm10 0v14M12 7S9 2 6.5 4 8 7 12 7Zm0 0s3-5 5.5-3S16 7 12 7Z",
-  lock: "M7 11V8a5 5 0 0 1 10 0v3M6 11h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z",
-  // category glyphs
-  ciencia: "M9 3h6M10 3v5.5L5.5 17a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 8.5V3",
-  natureza: "M12 3 5 20h14L12 3Zm0 6 3.5 11M12 9 8.5 20",
-  movimento:
-    "M6.5 6.5 4 9m0 0 2.5 2.5M4 9h5m8.5 8.5L20 15m0 0-2.5-2.5M20 15h-5M6.5 17.5 9 20m6-16 2.5 2.5M9 4 6.5 6.5",
-  conversa:
-    "M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7A2.5 2.5 0 0 1 17.5 16H9l-4 3.5V16H6.5A2.5 2.5 0 0 1 4 13.5Z",
-  pot: "M4 10h16M6 10a6 6 0 0 0 12 0M9 6c0-1 .5-1.5.5-2.5M12 6c0-1 .5-1.5.5-2.5M15 6c0-1 .5-1.5.5-2.5M5 20h14",
-};
+const ASSETS = {
+  heroBg: "/exemplos/assets/bora-v2/hero-bg.jpg",
+  heroArt: "/exemplos/assets/bora-v2/hero-art.jpg",
+  actArt: "/exemplos/assets/bora-v2/act-art.jpg",
+  premiumArt: "/exemplos/assets/bora-v2/premium-art.jpg",
+  challengeArt: "/exemplos/assets/bora-v2/challenge-art.jpg",
+  referralArt: "/exemplos/assets/bora-v2/referral-art.jpg",
+  cats: {
+    ciencia: "/exemplos/assets/bora-v2/cat-ciencia.jpg",
+    sensorial: "/exemplos/assets/bora-v2/cat-sensorial.jpg",
+    natureza: "/exemplos/assets/bora-v2/cat-natureza.jpg",
+    arte: "/exemplos/assets/bora-v2/cat-arte.jpg",
+    movimento: "/exemplos/assets/bora-v2/cat-movimento.jpg",
+    musica: "/exemplos/assets/bora-v2/cat-musica.jpg",
+    cozinha: "/exemplos/assets/bora-v2/cat-cozinha.jpg",
+    conversa: "/exemplos/assets/bora-v2/cat-conversa.jpg",
+  },
+} as const;
 
-/* ── Helpers de estilo (idênticos ao design) ── */
-const hexA = (hex: string, a: number) => {
-  const h = hex.replace("#", "");
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},${a})`;
-};
-
-/** Chip de vidro branco com brilho (categorias / mission). */
-const glossChip = (size = 46, radius = 14): CSSProperties => ({
-  position: "relative",
-  flex: "none",
-  width: size,
-  height: size,
-  borderRadius: radius,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  overflow: "hidden",
-  background: "linear-gradient(150deg,rgba(255,255,255,.92),rgba(255,255,255,.55))",
-  border: "1px solid rgba(255,255,255,.95)",
-  boxShadow: "0 6px 14px rgba(0,0,0,.16), inset 0 1px 2px rgba(255,255,255,.9)",
-});
-
-/** Botão-seta glossy (círculo com gradiente radial). */
-const arrowGloss = (l: string, m: string, d: string, size = 50): CSSProperties => ({
-  position: "relative",
-  overflow: "hidden",
-  flex: "none",
-  width: size,
-  height: size,
-  borderRadius: 999,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: `radial-gradient(130% 130% at 32% 22%, #FFFFFF 0%, ${l} 20%, ${m} 56%, ${d} 100%)`,
-  border: "1px solid rgba(255,255,255,.75)",
-  boxShadow: `0 7px 16px ${hexA(d, 0.5)}, 0 0 16px ${hexA(m, 0.45)}, inset 0 2px 3px rgba(255,255,255,.7), inset 0 -5px 9px rgba(0,0,0,.2)`,
-});
-
-/* ── Ícone SVG genérico ── */
-const Icon = ({
-  d,
-  stroke = "#fff",
-  size = 21,
-  sw = 1.9,
-  fill = "none",
-}: {
-  d: string;
-  stroke?: string;
-  size?: number;
-  sw?: number;
-  fill?: string;
-}) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill}>
-    <path d={d} stroke={fill === "none" ? stroke : "none"} fill={fill === "none" ? "none" : fill} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-/* ── Categorias reais (dados do app) + estilo visual do design ── */
 type Cat = {
-  key: string;
+  key: keyof typeof ASSETS.cats;
   label: string;
-  d: string;
-  grad: [string, string];
-  stroke: string;
-  titleColor: string;
+  grad: string;
+  glow: string;
   energies: Energy[];
   premium?: boolean;
 };
 
 const CATS: Cat[] = [
-  { key: "ciencia", label: "Ciência", d: D.ciencia, grad: ["#BCD8F2", "#7FA8D8"], stroke: "#2E5A8A", titleColor: "#2E5A8A", energies: ["curiosa"], premium: true },
-  { key: "sensorial", label: "Sensorial", d: D.sparkle, grad: ["#F2C0D8", "#D888B0"], stroke: "#9A3A6A", titleColor: "#9A3A6A", energies: ["agitada", "cansada"] },
-  { key: "natureza", label: "Natureza", d: D.natureza, grad: ["#C4E8B8", "#7AB86A"], stroke: "#2E7A3E", titleColor: "#2E7A3E", energies: ["curiosa", "agitada"] },
-  { key: "arte", label: "Arte", d: D.palette, grad: ["#F5D9A8", "#E0A85A"], stroke: "#9A6A20", titleColor: "#9A6A20", energies: ["cansada", "curiosa"] },
-  { key: "movimento", label: "Movimento", d: D.movimento, grad: ["#F5C0A8", "#DE8A66"], stroke: "#A85434", titleColor: "#A85434", energies: ["agitada"] },
-  { key: "conversa", label: "Conversa", d: D.conversa, grad: ["#D8C4F2", "#A888E0"], stroke: "#6A3A9A", titleColor: "#6A3A9A", energies: ["cansada", "curiosa"] },
-  { key: "cozinha", label: "Cozinha", d: D.pot, grad: ["#FCD9B8", "#EBA36A"], stroke: "#9A5A20", titleColor: "#9A5A20", energies: ["curiosa"], premium: true },
+  { key: "ciencia", label: "Ciência", grad: "linear-gradient(145deg,#1a3a6e 0%,#0d2448 100%)", glow: "rgba(90,160,255,.35)", energies: ["curiosa", "feliz"], premium: true },
+  { key: "sensorial", label: "Sensorial", grad: "linear-gradient(145deg,#6a2a6e 0%,#3a1848 100%)", glow: "rgba(220,120,255,.35)", energies: ["agitada", "cansada", "feliz"] },
+  { key: "natureza", label: "Natureza", grad: "linear-gradient(145deg,#2a5a28 0%,#143818 100%)", glow: "rgba(120,220,100,.3)", energies: ["curiosa", "agitada", "feliz"] },
+  { key: "arte", label: "Arte", grad: "linear-gradient(145deg,#8a4a18 0%,#4a2808 100%)", glow: "rgba(255,180,80,.35)", energies: ["cansada", "curiosa", "feliz"] },
+  { key: "movimento", label: "Movimento", grad: "linear-gradient(145deg,#8a3a18 0%,#4a1c08 100%)", glow: "rgba(255,140,70,.35)", energies: ["agitada", "feliz"] },
+  { key: "musica", label: "Música", grad: "linear-gradient(145deg,#4a2a7e 0%,#281048 100%)", glow: "rgba(180,120,255,.35)", energies: ["cansada", "feliz", "curiosa"] },
+  { key: "cozinha", label: "Cozinha", grad: "linear-gradient(145deg,#8a4a20 0%,#4a280c 100%)", glow: "rgba(255,170,90,.35)", energies: ["curiosa", "feliz"], premium: true },
+  { key: "conversa", label: "Conversa", grad: "linear-gradient(145deg,#4a2a6e 0%,#281040 100%)", glow: "rgba(190,140,255,.3)", energies: ["cansada", "curiosa", "feliz"] },
 ];
 
-const MOOD_PILLS: { key: Energy; label: string; dot: string }[] = [
-  { key: "agitada", label: "Agitada", dot: "#E4722A" },
-  { key: "cansada", label: "Cansada", dot: "#6E7FE8" },
-  { key: "curiosa", label: "Curiosa", dot: "#2E8A54" },
+const MOOD_PILLS: { key: Energy; label: string; emoji: string; iconBg: string }[] = [
+  { key: "agitada", label: "Agitada", emoji: "🌪️", iconBg: "linear-gradient(145deg,#4a6a9a,#2a3a5a)" },
+  { key: "cansada", label: "Cansada", emoji: "😴", iconBg: "linear-gradient(145deg,#5a6aaa,#2a3458)" },
+  { key: "curiosa", label: "Curiosa", emoji: "🔍", iconBg: "linear-gradient(145deg,#3a7a9a,#1a3a50)" },
+  { key: "feliz", label: "Feliz", emoji: "☀️", iconBg: "linear-gradient(145deg,#d4a030,#8a6010)" },
 ];
 
-// localStorage diary key
 const DIARY_KEY = "bora_diary_v1";
 type Diary = { minutes: number; completions: number; streak: number; lastDate: string };
 
@@ -152,6 +103,33 @@ const readDiary = (): Diary => {
 
 const SURPRISE_DATE_KEY = "bora_surprise_date";
 const MILESTONE_KEY = "bora_streak_milestone_shown";
+
+const SectionLabel = ({ children, right }: { children: ReactNode; right?: ReactNode }) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10,
+      marginBottom: 12,
+      padding: "0 2px",
+    }}
+  >
+    <h2
+      style={{
+        margin: 0,
+        fontFamily: SERIF,
+        fontWeight: 600,
+        fontSize: 18,
+        color: "#FFF4E8",
+        letterSpacing: "-0.3px",
+      }}
+    >
+      {children}
+    </h2>
+    {right}
+  </div>
+);
 
 const BoraScreen = ({ onBack }: Props) => {
   const { profile, user } = useAuth();
@@ -170,14 +148,8 @@ const BoraScreen = ({ onBack }: Props) => {
 
   const firstCrianca = criancas[0];
   const childName = (firstCrianca?.nome || profile?.child_name || "").trim();
-  const childAge = firstCrianca?.idade ?? null;
-  const ageRange = childAge != null ? `${childAge} anos` : (profile?.age_range || "").trim();
   const firstName = childName ? childName.split(" ")[0] : "";
-  const personalTag = firstName
-    ? ageRange
-      ? `Pra ${firstName}, ${ageRange}`
-      : `Pra ${firstName}`
-    : "Pra família toda";
+  const greetName = firstName || "família";
 
   const [diary, setDiary] = useState<Diary>(() => readDiary());
   useEffect(() => {
@@ -186,13 +158,9 @@ const BoraScreen = ({ onBack }: Props) => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // Real stats do banco (Fase 7). Sobrepoe o `diary` local pra exibição.
   const { stats: boraStats, refresh: refreshStats } = useBoraStats();
-  const heroMinutes = Math.max(boraStats.total_minutos, diary.minutes);
   const heroStreak = Math.max(boraStats.streak, diary.streak);
-  const heroLeaves = Math.max(boraStats.total_conclusoes, diary.completions);
 
-  // Auto-aplica código de indicação se houver na URL/sessionStorage (1x por user)
   useEffect(() => {
     if (!user) return;
     try {
@@ -212,16 +180,13 @@ const BoraScreen = ({ onBack }: Props) => {
     } catch {}
   }, [user]);
 
-  // Agenda lembrete diário no mount (com nome da criança, se houver)
   useEffect(() => {
     scheduleDailyReminder((criancas[0]?.nome || "").split(" ")[0]);
   }, [criancas]);
 
-  // Diário e fluxo "Como foi?"
   const [diaryOpen, setDiaryOpen] = useState(false);
   const [comoFoiOpen, setComoFoiOpen] = useState(false);
 
-  // Streak milestone trigger — once per (streak value) for free users.
   useEffect(() => {
     if (isPremium) return;
     if (diary.streak < 3) return;
@@ -261,15 +226,15 @@ const BoraScreen = ({ onBack }: Props) => {
     reset: resetSurprise,
   } = useSurpresaIA();
   const [surpriseOpen, setSurpriseOpen] = useState(false);
+
   const handleSurprise = async () => {
-    // Free quota: 1 surpresa/dia. Premium: ilimitado.
     if (!isPremium && surpriseUsedToday()) {
       openPaywall("surprise_limit");
       return;
     }
     setSurpriseOpen(true);
     try {
-      await surprise(mood ? { energia: mood } : undefined);
+      await surprise(mood ? { energia: mood === "feliz" ? "curiosa" : mood } : undefined);
       if (!isPremium) {
         try {
           window.localStorage.setItem(SURPRISE_DATE_KEY, todayISO());
@@ -277,10 +242,10 @@ const BoraScreen = ({ onBack }: Props) => {
       }
     } catch (_) {}
   };
+
   const closeSurprise = () => {
     setSurpriseOpen(false);
     resetSurprise();
-    // After 1-2 completions, nudge upgrade on close (free only, no streak milestone)
     if (!isPremium && diary.completions >= 1 && diary.completions <= 2) {
       setTimeout(() => openPaywall("after_completion"), 400);
     }
@@ -291,13 +256,13 @@ const BoraScreen = ({ onBack }: Props) => {
       openPaywall("premium_locked");
       return;
     }
-    // Free categories: dispara Surpresa filtrada pela categoria
     if (!isPremium && surpriseUsedToday()) {
       openPaywall("surprise_limit");
       return;
     }
     setSurpriseOpen(true);
-    surprise({ categoria: c.key, ...(mood ? { energia: mood } : {}) })
+    const energia = mood && mood !== "feliz" ? mood : undefined;
+    surprise({ categoria: c.key, ...(energia ? { energia } : {}) })
       .then(() => {
         if (!isPremium) {
           try {
@@ -315,19 +280,12 @@ const BoraScreen = ({ onBack }: Props) => {
   };
 
   const [guardaOpen, setGuardaOpen] = useState(false);
-
-  const handleBoraFazer = () => {
-    // Etapa 1: tela verde "Guarda o celular"
-    setGuardaOpen(true);
-  };
-
+  const handleBoraFazer = () => setGuardaOpen(true);
   const handleGuardaDone = () => {
     setGuardaOpen(false);
-    // Etapa 2: "Como foi?" + foto
     setTimeout(() => setComoFoiOpen(true), 200);
   };
 
-  // Atualização otimista do diário local quando salva uma conclusão
   const handleConclusaoSalva = () => {
     refreshStats();
     setDiary((d) => {
@@ -346,16 +304,6 @@ const BoraScreen = ({ onBack }: Props) => {
     });
   };
 
-  // Indicação (dados reais useIndicacao)
-  const [copied, setCopied] = useState(false);
-  const copyRef = async () => {
-    if (!indicacaoLink) return;
-    try {
-      await navigator.clipboard.writeText(indicacaoLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {}
-  };
   const shareRef = async () => {
     if (!indicacaoLink) return;
     const text =
@@ -370,10 +318,11 @@ const BoraScreen = ({ onBack }: Props) => {
         return;
       } catch {}
     }
-    copyRef();
+    try {
+      await navigator.clipboard.writeText(indicacaoLink);
+    } catch {}
   };
 
-  // Desafio da semana (dados reais useDesafioSemana)
   const shareDesafio = async () => {
     if (!desafio) return;
     const text = `Essa semana a família tá no desafio Kidzz: ${desafio.titulo}. ${desafio.descricao} ${desafio.hashtag}`;
@@ -392,9 +341,64 @@ const BoraScreen = ({ onBack }: Props) => {
     } catch {}
   };
 
-  const INK = "#3A1D0E";
-  const INK_SOFT = "#7A5240";
-  const ORANGE = "#D9622B";
+  // Parallax sutil no hero
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const heroArtRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef(0);
+  const onScroll = () => {
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const sc = scrollRef.current;
+      const hero = heroArtRef.current;
+      if (!sc || !hero) return;
+      const y = sc.scrollTop;
+      hero.style.transform = `translateY(${y * 0.22}px) scale(${1 + y * 0.00025})`;
+      hero.style.opacity = String(Math.max(0.35, 1 - y / 320));
+    });
+  };
+  useEffect(
+    () => () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    },
+    [],
+  );
+
+  // Tilt 3D nos cards
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root) return;
+    let tiltEl: HTMLElement | null = null;
+    const reset = () => {
+      if (!tiltEl) return;
+      tiltEl.style.transition = "transform .5s cubic-bezier(.22,1,.36,1)";
+      tiltEl.style.transform = "";
+      tiltEl = null;
+    };
+    const onMove = (e: PointerEvent) => {
+      const t = e.target as HTMLElement | null;
+      const el = t && t.closest ? (t.closest("[data-tilt]") as HTMLElement | null) : null;
+      if (tiltEl && tiltEl !== el) reset();
+      if (!el) return;
+      tiltEl = el;
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transition = "transform .09s ease-out";
+      el.style.transform = `perspective(720px) rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 7).toFixed(2)}deg) scale(1.015)`;
+    };
+    root.addEventListener("pointermove", onMove);
+    root.addEventListener("pointerleave", reset);
+    return () => {
+      root.removeEventListener("pointermove", onMove);
+      root.removeEventListener("pointerleave", reset);
+    };
+  }, []);
+
+  const desafioTitulo = desafio?.titulo || "Cabaninha de lençol";
+  const desafioDesc =
+    desafio?.descricao ||
+    "Transformem a sala em um acampamento e contem histórias que ficam no coração.";
 
   return (
     <div
@@ -402,26 +406,30 @@ const BoraScreen = ({ onBack }: Props) => {
       style={{
         height: "100%",
         position: "relative",
-        fontFamily: "'Nunito',system-ui,sans-serif",
-        background: "linear-gradient(180deg,#FFEEE0 0%,#FEDBC6 38%,#FBC3A4 74%,#F4A97F 100%)",
+        fontFamily: FONT,
+        background: "#120E0A",
+        color: "#F8E8D0",
+        overflow: "hidden",
+        WebkitFontSmoothing: "antialiased",
       }}
     >
-      {/* keyframes locais (prefixo bora-) */}
       <style>{`
-        @keyframes bora-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes bora-cascade{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes bora-heroIn{from{opacity:0;transform:translateY(-14px) scale(1.04)}to{opacity:1;transform:translateY(0) scale(1)}}
-        @keyframes bora-floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-        @keyframes bora-drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(34px,26px) scale(1.18)}}
-        @keyframes bora-drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,-22px) scale(1.12)}}
-        @keyframes bora-sunspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-        @keyframes bora-sparklefloat{0%,100%{opacity:.1;transform:translateY(0) scale(.7)}50%{opacity:.95;transform:translateY(-16px) scale(1.15)}}
-        @keyframes bora-twinkle{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:.9;transform:scale(1.15)}}
-        @keyframes bora-shine{0%{transform:translateX(-130%) skewX(-18deg)}60%,100%{transform:translateX(240%) skewX(-18deg)}}
-        @keyframes bora-birddrift{0%{transform:translate(0,0) rotate(0);opacity:0}12%{opacity:.55}88%{opacity:.5}100%{transform:translate(-120px,42px) rotate(-8deg);opacity:0}}
+        @keyframes bora2-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes bora2-cascade{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes bora2-heroIn{from{opacity:0;transform:translateY(-8px) scale(1.03)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes bora2-floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+        @keyframes bora2-drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(24px,14px) scale(1.1)}}
+        @keyframes bora2-shine{0%{transform:translateX(-130%) skewX(-16deg)}60%,100%{transform:translateX(240%) skewX(-16deg)}}
+        @keyframes bora2-twinkle{0%,100%{opacity:.18;transform:scale(.7)}50%{opacity:.9;transform:scale(1.15)}}
+        @keyframes bora2-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+        @keyframes bora2-glow{0%,100%{box-shadow:0 0 16px rgba(255,180,80,.12)}50%{box-shadow:0 0 26px rgba(255,180,80,.28)}}
+        .bora2-screen::-webkit-scrollbar,.bora2-hscroll::-webkit-scrollbar{display:none}
+        [data-tab="bora"] button{ -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+        @media (prefers-reduced-motion: reduce){
+          [data-tab="bora"] *,[data-tab="bora"] *::before,[data-tab="bora"] *::after{animation:none!important;transition-duration:.01ms!important}
+        }
       `}</style>
 
-      {/* Modais / fluxos (funcionalidade preservada) */}
       <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />
       <GuardaCelularScreen
@@ -446,405 +454,1136 @@ const BoraScreen = ({ onBack }: Props) => {
         error={surpriseError}
         childName={firstName}
         onClose={closeSurprise}
-        onRetry={() => surprise(mood ? { energia: mood } : undefined).catch(() => {})}
+        onRetry={() =>
+          surprise(mood && mood !== "feliz" ? { energia: mood } : undefined).catch(() => {})
+        }
       />
 
-      {/* atmosfera / orbes que flutuam (fixos atrás do scroll) */}
+      {/* Fundo florestal escuro + orbes dourados */}
       <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `url(${ASSETS.heroBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "50% 18%",
+          filter: "brightness(.42) saturate(1.15) blur(1px)",
+          transform: "scale(1.08)",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(180deg, rgba(18,12,8,.55) 0%, rgba(22,14,10,.72) 28%, rgba(18,12,8,.88) 58%, #140E0A 100%)",
+        }}
+      />
+      <div
+        aria-hidden
         style={{
           position: "absolute",
           inset: 0,
           pointerEvents: "none",
           background:
-            "radial-gradient(46% 30% at 80% 22%,rgba(255,180,120,.24),transparent 70%),radial-gradient(42% 28% at 8% 52%,rgba(255,140,110,.16),transparent 70%),radial-gradient(52% 32% at 55% 92%,rgba(240,120,90,.14),transparent 70%)",
+            "radial-gradient(50% 32% at 78% 12%, rgba(255,180,90,.22), transparent 70%), radial-gradient(40% 28% at 12% 40%, rgba(255,140,70,.1), transparent 70%), radial-gradient(48% 30% at 50% 95%, rgba(180,100,40,.12), transparent 70%)",
         }}
       />
-      <div style={{ position: "absolute", top: -60, left: -80, width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,190,130,.34),transparent 65%)", filter: "blur(28px)", animation: "bora-drift1 13s ease-in-out infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: "40%", left: -90, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,150,120,.26),transparent 65%)", filter: "blur(30px)", animation: "bora-drift2 17s ease-in-out 2s infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: 80, right: -100, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,170,110,.24),transparent 65%)", filter: "blur(32px)", animation: "bora-drift1 19s ease-in-out 4s infinite", pointerEvents: "none" }} />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: -80,
+          right: -60,
+          width: 320,
+          height: 320,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,190,100,.28), transparent 65%)",
+          filter: "blur(30px)",
+          animation: "bora2-drift 14s ease-in-out infinite",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "48%",
+          left: -100,
+          width: 280,
+          height: 280,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,140,80,.16), transparent 65%)",
+          filter: "blur(28px)",
+          animation: "bora2-drift 18s ease-in-out 2s infinite reverse",
+          pointerEvents: "none",
+        }}
+      />
+      {/* Partículas douradas */}
+      {[
+        { t: 90, l: "18%", d: "0s" },
+        { t: 160, l: "72%", d: "1.2s" },
+        { t: 240, l: "42%", d: "2.1s" },
+        { t: 320, l: "85%", d: ".6s" },
+        { t: 400, l: "12%", d: "1.8s" },
+      ].map((p, i) => (
+        <div
+          key={i}
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: p.t,
+            left: p.l,
+            width: 4,
+            height: 4,
+            borderRadius: 99,
+            background: "#FFE0A8",
+            boxShadow: "0 0 10px 3px rgba(255,190,110,.75)",
+            animation: `bora2-twinkle ${3 + i * 0.4}s ease-in-out ${p.d} infinite`,
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
+      ))}
 
       <div
-        className="bora-screen"
+        ref={scrollRef}
+        onScroll={onScroll}
+        className="bora2-screen"
         style={{
           height: "100%",
           overflowY: "auto",
           overflowX: "hidden",
           WebkitOverflowScrolling: "touch",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
+          touchAction: "pan-y",
+          overscrollBehavior: "contain",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 132px)",
           scrollbarWidth: "none",
           position: "relative",
+          zIndex: 2,
         }}
       >
-        {/* ── HERO ── */}
-        <div style={{ position: "relative", paddingTop: 2 }}>
-          {/* blur da cena atrás */}
-          <div
+        {/* ── HEADER iOS liquid glass ── */}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)",
+            paddingLeft: PAD,
+            paddingRight: PAD,
+            paddingBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: "linear-gradient(180deg, rgba(18,12,8,.78) 0%, rgba(18,12,8,.4) 65%, transparent 100%)",
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => onBack?.()}
+            aria-label="Menu"
+            className="active:scale-90"
             style={{
-              position: "absolute", top: -16, left: 0, width: "100%", height: 300,
-              backgroundImage: "url('/exemplos/assets/cena-bora.png')",
-              backgroundSize: "cover", backgroundPosition: "50% 30%",
-              filter: "blur(40px) saturate(1.4)", opacity: 0.42, transform: "scale(1.2)",
-              WebkitMaskImage: "linear-gradient(180deg,#000 42%,transparent 94%)",
-              maskImage: "linear-gradient(180deg,#000 42%,transparent 94%)", pointerEvents: "none",
+              width: 44,
+              height: 44,
+              flex: "none",
+              borderRadius: R.btn,
+              ...pillGlass,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
             }}
-          />
+          >
+            <Menu size={19} color="#FFE8C0" strokeWidth={2.1} />
+          </button>
+
           <div
             style={{
-              position: "relative", width: "100%", height: 288,
-              WebkitMaskImage: "linear-gradient(180deg,#000 66%,rgba(0,0,0,.5) 84%,transparent 100%)",
-              maskImage: "linear-gradient(180deg,#000 66%,rgba(0,0,0,.5) 84%,transparent 100%)",
-              animation: "bora-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+              flex: 1,
+              minWidth: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              height: 44,
+              padding: "0 14px",
+              borderRadius: R.btn,
+              ...pillGlass,
+            }}
+          >
+            <span
+              style={{
+                fontWeight: 800,
+                fontSize: 15,
+                color: "#FFF6E8",
+                letterSpacing: "-0.2px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Oi, {greetName}!
+            </span>
+            <Sparkles size={14} color="#F0C060" strokeWidth={2.2} style={{ flexShrink: 0 }} />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setDiaryOpen(true)}
+            aria-label="Lembretes e diário"
+            className="active:scale-90"
+            style={{
+              width: 44,
+              height: 44,
+              flex: "none",
+              borderRadius: R.btn,
+              ...pillGlass,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              position: "relative",
+            }}
+          >
+            <Bell size={17} color="#FFE8C0" strokeWidth={2.1} />
+            {heroStreak > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: 9,
+                  right: 10,
+                  width: 8,
+                  height: 8,
+                  borderRadius: 99,
+                  background: "#F0A030",
+                  boxShadow: "0 0 8px rgba(240,160,48,.9)",
+                  border: "1.5px solid rgba(20,14,10,.6)",
+                }}
+              />
+            )}
+          </button>
+        </div>
+
+        {/* ── HERO ── */}
+        <div style={{ position: "relative", padding: `4px ${PAD}px 14px`, minHeight: 248 }}>
+          <div
+            ref={heroArtRef}
+            style={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              width: "66%",
+              height: 220,
+              willChange: "transform",
+              animation: "bora2-heroIn .75s cubic-bezier(.22,1,.36,1) both",
+              pointerEvents: "none",
+              borderRadius: `0 ${R.card}px ${R.card}px 0`,
+              overflow: "hidden",
             }}
           >
             <img
-              src="/exemplos/assets/cena-bora.png"
-              alt="Gui, o camaleão, correndo com a família ao pôr do sol"
-              style={{ position: "absolute", top: 30, left: 0, width: "100%", height: "auto", objectFit: "contain", filter: "saturate(1.1) contrast(1.03)" }}
-            />
-            <div style={{ position: "absolute", right: "12%", bottom: 14, width: 66, height: 66, borderRadius: "50%", background: "radial-gradient(130% 130% at 32% 26%,rgba(255,255,255,.5),rgba(255,210,170,.25) 55%,rgba(255,160,110,.12))", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,.6)", boxShadow: "0 10px 24px rgba(200,100,50,.28),inset 0 2px 4px rgba(255,255,255,.7)", animation: "bora-floaty 7s ease-in-out .5s infinite", pointerEvents: "none" }} />
-          </div>
-
-          {/* sol */}
-          <div style={{ position: "absolute", top: 30, left: "19%", animation: "bora-floaty 5s ease-in-out infinite", zIndex: 5 }}>
-            <svg width="52" height="52" viewBox="0 0 64 64" fill="none" style={{ animation: "bora-sunspin 26s linear infinite", transformOrigin: "32px 32px" }}>
-              <circle cx="32" cy="32" r="13" fill="rgba(255,224,150,.85)" stroke="rgba(255,255,255,.85)" strokeWidth="2" />
-              <g stroke="#FFC24D" strokeWidth="2.6" strokeLinecap="round">
-                <path d="M32 6v7M32 51v7M6 32h7M51 32h7M13 13l5 5M46 46l5 5M51 13l-5 5M18 46l-5 5" />
-              </g>
-            </svg>
-          </div>
-          <div style={{ position: "absolute", top: 70, left: "56%", width: 5, height: 5, borderRadius: 99, background: "#FFE0A8", boxShadow: "0 0 10px 3px rgba(255,190,110,.85)", animation: "bora-twinkle 3.2s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", top: 150, left: "68%", width: 4, height: 4, borderRadius: 99, background: "#FFD0B8", boxShadow: "0 0 8px 2px rgba(255,150,120,.8)", animation: "bora-sparklefloat 4.4s ease-in-out 1s infinite" }} />
-          <div style={{ position: "absolute", top: 16, left: "14%", pointerEvents: "none", animation: "bora-birddrift 15s linear 1s infinite" }}>
-            <svg width="20" height="12" viewBox="0 0 24 14" fill="none"><path d="M2 8c3-5 5-5 8 0m0 0c3-5 5-5 8 0" stroke="#C9744A" strokeWidth="1.6" strokeLinecap="round" /></svg>
-          </div>
-
-          {/* voltar → onBack */}
-          <button
-            onClick={() => onBack?.()}
-            className="active:scale-90"
-            style={{ position: "absolute", top: 62, left: 16, width: 42, height: 42, borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(150,80,40,.2),inset 0 1px 0 rgba(255,255,255,1)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", zIndex: 6 }}
-          >
-            <Icon d={D.back} stroke="#7A3A1E" size={19} sw={2.2} />
-          </button>
-          <div style={{ position: "absolute", top: 62, right: 16, display: "flex", gap: 8, zIndex: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 999, background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(150,80,40,.2),inset 0 1px 0 rgba(255,255,255,1)", fontWeight: 900, fontSize: 13, color: "#7A3A1E" }}>
-              <Icon d={D.bolt} stroke="#E0742B" size={15} sw={1.9} />
-              {heroStreak}
-            </div>
-          </div>
-
-          {/* título */}
-          <div style={{ padding: "14px 20px 2px", animation: "bora-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", zIndex: 4, position: "relative" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <Icon d={D.bolt} stroke="#D9622B" size={15} sw={1.9} />
-              <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.8px", color: "#C15A2A" }}>BORA!</span>
-            </div>
-            <h1 style={{ margin: "0 0 7px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 29, lineHeight: 1.13, color: INK, letterSpacing: "-.3px" }}>
-              Bora viver de <span style={{ color: ORANGE }}>verdade</span>
-              {firstName ? `, ${firstName}` : " hoje"}?
-            </h1>
-            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.45, color: INK_SOFT, maxWidth: 290 }}>
-              Missões pra sair da tela e criar memórias juntos. Complete e mantenha a chama acesa.
-            </p>
-
-            {/* Surpresa da IA — feature principal preservada */}
-            <button
-              onClick={handleSurprise}
-              className="active:scale-[0.98]"
+              src={ASSETS.heroArt}
+              alt="Família em aventura na floresta com o camaleão Gui"
               style={{
-                position: "relative", overflow: "hidden", marginTop: 14, width: "100%",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 9,
-                padding: "13px 18px", borderRadius: 999, cursor: "pointer",
-                border: "1px solid rgba(255,255,255,.6)",
-                background: "linear-gradient(155deg,#FFB877 0%,#F4A659 35%,#E8821A 70%,#C56C12 100%)",
-                color: "#fff", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 15.5,
-                boxShadow: "0 16px 32px -10px rgba(232,130,26,.55), inset 0 1.5px 1px rgba(255,255,255,.7), inset 0 -6px 12px rgba(120,50,0,.25)",
-                transition: "transform .18s cubic-bezier(.22,1,.36,1)",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "58% 40%",
+                maskImage:
+                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                WebkitMaskComposite: "source-in",
+                maskComposite: "intersect",
+                filter: "saturate(1.1) contrast(1.03)",
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                right: "16%",
+                bottom: 32,
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(255,200,120,.32), transparent 70%)",
+                filter: "blur(8px)",
+                animation: "bora2-floaty 6s ease-in-out infinite",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              position: "relative",
+              zIndex: 3,
+              maxWidth: "56%",
+              paddingTop: 16,
+              animation: "bora2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
+            }}
+          >
+            <h1
+              style={{
+                margin: 0,
+                fontFamily: SERIF,
+                fontWeight: 600,
+                fontSize: 28,
+                lineHeight: 1.12,
+                color: "#FFF8EE",
+                letterSpacing: "-0.4px",
+                textShadow: "0 2px 16px rgba(0,0,0,.4)",
               }}
             >
-              <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 130% at 15% 6%,rgba(255,255,255,.34),transparent 55%)" }} />
-              <span aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "60%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent 0%,rgba(255,255,255,.28) 50%,transparent 100%)", animation: "bora-shine 6.5s ease-in-out infinite" }} />
-              <span style={{ position: "relative", zIndex: 2, display: "inline-flex", alignItems: "center", gap: 9 }}>
-                <Icon d={D.sparkle} stroke="#fff" size={18} sw={2} />
-                Surpresa da IA{firstName ? ` pra ${firstName}` : ""}
-              </span>
+              Bora viver
+              <br />
+              <span style={{ color: "#F0B050" }}>mais aventuras</span>
+              <br />
+              de <span style={{ color: "#F0B050" }}>verdade</span>!
+            </h1>
+            <p
+              style={{
+                margin: "10px 0 0",
+                fontSize: 13,
+                fontWeight: 600,
+                lineHeight: 1.45,
+                color: "rgba(255,232,205,.78)",
+                maxWidth: 200,
+                textShadow: "0 1px 8px rgba(0,0,0,.35)",
+              }}
+            >
+              Atividades em família que criam memórias para a vida.
+            </p>
+            <button
+              type="button"
+              onClick={handleBoraFazer}
+              className="active:scale-[0.97]"
+              style={{ ...outlineGoldBtn, marginTop: 16, minHeight: 44 }}
+            >
+              Ver missão de hoje
+              <ArrowRight size={15} strokeWidth={2.3} />
             </button>
           </div>
         </div>
 
-        {/* ── MISSÃO DE HOJE ── */}
-        <div style={{ padding: "16px 16px 4px" }}>
+        {/* ── ATIVIDADE DE HOJE ── */}
+        <div style={sectionWrap}>
           <button
+            type="button"
             onClick={handleBoraFazer}
-            className="active:scale-[0.98]"
+            data-tilt="1"
+            className="active:scale-[0.985]"
             style={{
-              position: "relative", overflow: "hidden", width: "100%", textAlign: "left", cursor: "pointer",
-              borderRadius: 24, padding: "16px 16px", border: "1px solid rgba(255,255,255,.6)",
-              background: "linear-gradient(150deg,#FF9A5A 0%,#F27246 55%,#D9542E 100%)",
-              boxShadow: "0 16px 34px rgba(200,90,40,.34), inset 0 1.5px 0 rgba(255,255,255,.5)",
-              transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
-              animation: "bora-cascade .55s cubic-bezier(.22,1,.36,1) both",
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              textAlign: "left",
+              cursor: "pointer",
+              borderRadius: R.card,
+              padding: 0,
+              ...glass,
+              animation: "bora2-cascade .55s cubic-bezier(.22,1,.36,1) .08s both",
+              transition: "transform .28s cubic-bezier(.34,1.4,.64,1)",
             }}
           >
-            <div style={{ position: "absolute", inset: 0, background: "radial-gradient(120% 120% at 12% 10%,rgba(255,255,255,.28),transparent 55%)", pointerEvents: "none" }} />
-            <div style={{ position: "absolute", top: 0, left: 0, width: "70%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%)", animation: "bora-shine 6.5s ease-in-out infinite" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: 14, position: "relative", zIndex: 2 }}>
-              <div style={{ flex: "none", width: 54, height: 54, borderRadius: 17, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(130% 130% at 30% 22%, rgba(255,255,255,.5) 0%, rgba(255,255,255,.18) 55%, rgba(255,255,255,.06) 100%)", border: "1px solid rgba(255,255,255,.55)", boxShadow: "inset 0 1px 2px rgba(255,255,255,.7), 0 4px 10px rgba(0,0,0,.18)" }}>
-                <Icon d={D.palette} stroke="#fff" size={30} sw={1.9} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "1.4px", color: "rgba(255,255,255,.82)" }}>MISSÃO DE HOJE · {personalTag.toUpperCase()}</div>
-                <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#fff", lineHeight: 1.14, marginTop: 1 }}>{TODAY_ACTIVITY.titulo}</div>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.9)", marginTop: 2 }}>
-                  {firstName ? `${firstName} escolhe uma cor` : "Escolham uma cor"} e cacem 5 objetos dela · {TODAY_ACTIVITY.tela_min} min
-                </div>
-              </div>
-              <div style={{ flex: "none", width: 44, height: 44, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: "#fff", boxShadow: "0 6px 14px rgba(0,0,0,.24), inset 0 1px 1px rgba(255,255,255,.9)" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#D9622B" /></svg>
-              </div>
-            </div>
-          </button>
-        </div>
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(90% 100% at 88% 45%, rgba(255,180,80,.16), transparent 55%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "50%",
+                height: "100%",
+                background: "linear-gradient(100deg, transparent 0%, rgba(255,235,190,.1) 50%, transparent 100%)",
+                animation: "bora2-shine 7s ease-in-out infinite",
+                pointerEvents: "none",
+              }}
+            />
 
-        {/* ── DIÁRIO SEM TELA (stats reais → abre diário) ── */}
-        <div style={{ padding: "10px 16px 4px" }}>
-          <button
-            onClick={() => setDiaryOpen(true)}
-            className="active:scale-[0.99]"
-            style={{
-              position: "relative", overflow: "hidden", width: "100%", textAlign: "left", cursor: "pointer",
-              borderRadius: 22, padding: "15px 16px", border: "1.5px solid rgba(255,255,255,.85)",
-              background: "linear-gradient(155deg,rgba(255,255,255,.72),rgba(214,236,204,.66))",
-              backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)",
-              boxShadow: "0 12px 26px rgba(120,160,90,.2), inset 0 2px 0 rgba(255,255,255,.8)",
-              fontFamily: "'Nunito',sans-serif",
-            }}
-          >
-            <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 90% at 18% 6%,rgba(255,255,255,.55),transparent 52%)" }} />
-            <div style={{ position: "absolute", top: 0, left: 0, width: "62%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent 0%,rgba(255,255,255,.18) 50%,transparent 100%)", animation: "bora-shine 7.5s ease-in-out infinite" }} />
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, position: "relative", zIndex: 2 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 30, lineHeight: 1, filter: "drop-shadow(0 2px 3px rgba(0,0,0,.15))" }}>🌳</span>
-                <div>
-                  <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 22, color: "#2E7A4E", lineHeight: 1 }}>
-                    {heroMinutes}
-                    <span style={{ fontSize: 12, fontWeight: 800, marginLeft: 4, color: "#4E6B4A" }}>min sem tela</span>
-                  </div>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: "#4E6B4A", marginTop: 3 }}>
-                    {heroLeaves === 0
-                      ? "A arvorezinha tá esperando a 1ª folha 🌱"
-                      : `${heroLeaves} ${heroLeaves === 1 ? "folha conquistada" : "folhas conquistadas"}`}
-                  </div>
+            <div style={{ display: "flex", minHeight: 172, position: "relative", zIndex: 2 }}>
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  padding: "16px 10px 14px 16px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      fontSize: 10,
+                      fontWeight: 800,
+                      letterSpacing: "1.1px",
+                      color: "#F5D090",
+                    }}
+                  >
+                    <Sparkles size={11} color="#F0C060" />
+                    ATIVIDADE DE HOJE
+                  </span>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "4px 10px",
+                      borderRadius: R.btn,
+                      ...glassSoft,
+                      fontSize: 11,
+                      fontWeight: 800,
+                      color: "rgba(255,232,205,.9)",
+                    }}
+                  >
+                    <Clock size={11} />
+                    {TODAY_ACTIVITY.tela_min} min
+                  </span>
                 </div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: 999, background: "rgba(255,255,255,.7)", border: "1px solid rgba(255,255,255,.95)", boxShadow: "0 4px 10px rgba(120,160,90,.18), inset 0 1px 0 rgba(255,255,255,.9)" }}>
-                <Icon d={D.bolt} stroke="#E0742B" size={14} sw={1.9} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#B85F0E" }}>{heroStreak}</span>
-              </div>
-            </div>
-          </button>
-        </div>
 
-        {/* ── COMO A CRIANÇA TÁ AGORA? (filtro de energia) ── */}
-        <div style={{ padding: "20px 20px 6px" }}>
-          <h2 style={{ margin: "0 0 3px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 18, color: INK }}>
-            Como {firstName || "a criança"} tá agora?
-          </h2>
-          <div style={{ fontSize: 11.5, fontWeight: 700, color: "#8A6650", marginBottom: 12 }}>
-            Toque pra filtrar por energia. Toque de novo pra ver tudo.
-          </div>
-          <div style={{ display: "flex", gap: 9 }}>
-            {MOOD_PILLS.map((mo) => {
-              const on = mood === mo.key;
-              return (
-                <button
-                  key={mo.key}
-                  onClick={() => setMood(on ? null : mo.key)}
-                  className="active:scale-95"
+                <div
                   style={{
-                    display: "flex", alignItems: "center", gap: 8, padding: "11px 17px", borderRadius: 999, cursor: "pointer",
-                    fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 13,
-                    color: on ? "#fff" : "#6E4A2E",
-                    border: on ? "1px solid rgba(255,255,255,.6)" : "1px solid rgba(255,255,255,.95)",
-                    background: on ? "linear-gradient(160deg,#F79A3E,#E4722A)" : "rgba(255,255,255,.72)",
-                    backdropFilter: "blur(8px)",
-                    boxShadow: on
-                      ? "0 8px 18px rgba(210,110,40,.35), inset 0 1px 0 rgba(255,255,255,.4)"
-                      : "0 4px 10px rgba(120,70,40,.1), inset 0 1px 0 rgba(255,255,255,.8)",
-                    transition: "transform .2s",
+                    fontFamily: SERIF,
+                    fontWeight: 600,
+                    fontSize: 19,
+                    color: "#FFF6E8",
+                    lineHeight: 1.18,
+                    marginTop: 8,
+                    letterSpacing: "-0.2px",
                   }}
                 >
-                  <span style={{ flex: "none", width: 9, height: 9, borderRadius: 999, background: on ? "#fff" : mo.dot, boxShadow: on ? "none" : `0 0 6px ${hexA(mo.dot, 0.6)}` }} />
-                  {mo.label}
+                  {TODAY_ACTIVITY.titulo}
+                </div>
+                <p
+                  style={{
+                    margin: "6px 0 0",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                    color: "rgba(255,230,200,.7)",
+                    maxWidth: 188,
+                  }}
+                >
+                  {firstName ? `${firstName} escolhe` : "Escolham"} uma cor e sai pela casa caçando 5 objetos
+                  dessa cor. Quem achar primeiro conta uma história sobre o item.
+                </p>
+
+                <div style={{ marginTop: "auto", paddingTop: 12 }}>
+                  <span style={{ ...goldBtn, minHeight: 40, padding: "10px 16px" }}>
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "radial-gradient(120% 130% at 20% 10%, rgba(255,255,255,.32), transparent 55%)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                    <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      Bora fazer!
+                      <ArrowRight size={14} strokeWidth={2.5} />
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  position: "relative",
+                  width: "44%",
+                  flex: "none",
+                  minHeight: 172,
+                  borderRadius: `0 ${R.card - 2}px ${R.card - 2}px 0`,
+                  overflow: "hidden",
+                  margin: 4,
+                  marginLeft: 0,
+                }}
+              >
+                <img
+                  src={ASSETS.actArt}
+                  alt=""
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center",
+                    borderRadius: R.panel,
+                  }}
+                />
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "linear-gradient(90deg, rgba(28,18,10,.55) 0%, transparent 30%)",
+                    borderRadius: R.panel,
+                    pointerEvents: "none",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 10,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 36,
+                    height: 36,
+                    borderRadius: R.btn,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    ...pillGlass,
+                  }}
+                >
+                  <ArrowRight size={15} color="#FFE8C0" strokeWidth={2.3} />
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 5,
+                padding: "0 0 12px",
+                position: "relative",
+                zIndex: 2,
+              }}
+            >
+              {[0, 1, 2, 3, 4].map((i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: i === 0 ? 16 : 6,
+                    height: 6,
+                    borderRadius: 99,
+                    background: i === 0 ? "#F0C060" : "rgba(255,220,170,.28)",
+                    boxShadow: i === 0 ? "0 0 8px rgba(240,192,96,.55)" : "none",
+                    transition: "width .2s",
+                  }}
+                />
+              ))}
+            </div>
+          </button>
+        </div>
+
+        {/* ── HUMOR ── */}
+        <div style={sectionWrap}>
+          <div
+            style={{
+              ...glass,
+              borderRadius: R.card,
+              padding: "16px 14px 14px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 10,
+                marginBottom: 14,
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontFamily: SERIF,
+                  fontWeight: 600,
+                  fontSize: 17,
+                  color: "#FFF4E8",
+                  letterSpacing: "-0.2px",
+                  lineHeight: 1.2,
+                }}
+              >
+                Como {firstName || "ela"} tá agora?
+              </h2>
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: "rgba(255,220,180,.5)",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Toque para filtrar
+              </span>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 8,
+              }}
+            >
+              {MOOD_PILLS.map((mo) => {
+                const on = mood === mo.key;
+                return (
+                  <button
+                    key={mo.key}
+                    type="button"
+                    onClick={() => setMood(on ? null : mo.key)}
+                    aria-pressed={on}
+                    className="active:scale-95"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "12px 6px 11px",
+                      borderRadius: R.chip,
+                      cursor: "pointer",
+                      border: on
+                        ? "0.5px solid rgba(255,210,140,.6)"
+                        : "0.5px solid rgba(255,220,180,.18)",
+                      background: on
+                        ? "linear-gradient(165deg, rgba(255,200,100,.28), rgba(80,50,20,.4))"
+                        : "linear-gradient(165deg, rgba(255,240,220,.12), rgba(30,22,14,.28))",
+                      boxShadow: on
+                        ? "0 6px 18px rgba(180,100,20,.28), 0 1px 0 rgba(255,235,190,.28) inset"
+                        : "0 2px 8px rgba(0,0,0,.12), 0 1px 0 rgba(255,235,190,.12) inset",
+                      backdropFilter: "blur(32px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(32px) saturate(180%)",
+                      transition: "transform .18s, border-color .2s, background .2s",
+                      minHeight: 88,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 14,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: mo.iconBg,
+                        boxShadow:
+                          "0 4px 12px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.25) inset",
+                        fontSize: 18,
+                      }}
+                    >
+                      {mo.emoji}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: on ? "#FFE8C0" : "rgba(255,230,200,.78)",
+                        letterSpacing: "-0.1px",
+                      }}
+                    >
+                      {mo.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* ── EXPLORAR POR TIPO ── */}
+        <div style={sectionWrap}>
+          <SectionLabel
+            right={
+              mood ? (
+                <button
+                  type="button"
+                  onClick={() => setMood(null)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: 800,
+                    fontSize: 12,
+                    color: "#F0B050",
+                    padding: "8px 4px",
+                    minHeight: 44,
+                  }}
+                >
+                  limpar
+                </button>
+              ) : undefined
+            }
+          >
+            Explorar por tipo
+          </SectionLabel>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {filteredCats.map((c, idx) => {
+              const locked = !!c.premium && !isPremium;
+              return (
+                <button
+                  key={c.key}
+                  type="button"
+                  onClick={() => handleCategoryTap(c)}
+                  data-tilt="1"
+                  aria-label={locked ? `${c.label} (Premium)` : c.label}
+                  className="active:scale-[0.97]"
+                  style={{
+                    position: "relative",
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    borderRadius: R.panel,
+                    padding: 0,
+                    border: "0.5px solid rgba(255,220,180,.2)",
+                    background: c.grad,
+                    boxShadow: `0 10px 28px rgba(0,0,0,.28), 0 0 16px ${c.glow}, 0 1px 0 rgba(255,255,255,.14) inset`,
+                    transition: "transform .28s cubic-bezier(.34,1.4,.64,1)",
+                    animation: `bora2-cascade .5s cubic-bezier(.22,1,.36,1) ${0.04 * idx}s both`,
+                  }}
+                >
+                  <img
+                    src={ASSETS.cats[c.key]}
+                    alt=""
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      display: "block",
+                      filter: "saturate(1.05) contrast(1.02)",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      borderRadius: R.panel,
+                      background:
+                        "linear-gradient(145deg, rgba(255,255,255,.12) 0%, transparent 42%, rgba(0,0,0,.12) 100%)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "60%",
+                      height: "100%",
+                      background:
+                        "linear-gradient(100deg, transparent 0%, rgba(255,255,255,.1) 50%, transparent 100%)",
+                      animation: "bora2-shine 6.5s ease-in-out infinite",
+                      pointerEvents: "none",
+                    }}
+                  />
+                  {locked && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        zIndex: 2,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 3,
+                        padding: "4px 9px",
+                        borderRadius: R.btn,
+                        background: "linear-gradient(180deg,#FFE9A8,#F0BC40)",
+                        fontSize: 8.5,
+                        fontWeight: 900,
+                        color: "#6A4A10",
+                        letterSpacing: ".4px",
+                        boxShadow: "0 3px 10px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.5) inset",
+                      }}
+                    >
+                      <Crown size={9} />
+                      PREMIUM
+                    </span>
+                  )}
                 </button>
               );
             })}
           </div>
-        </div>
 
-        {/* ── EXPLORAR POR TIPO (categorias reais) ── */}
-        <div style={{ padding: "16px 20px 4px", display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-          <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 18, color: INK }}>Explorar por tipo</h2>
-          {mood && (
-            <button onClick={() => setMood(null)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 12, color: "#C15A2A", padding: 0, textDecoration: "underline" }}>
-              limpar filtro
-            </button>
-          )}
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: "0 16px 6px" }}>
-          {filteredCats.map((c) => {
-            const locked = !!c.premium && !isPremium;
-            return (
-              <button
-                key={c.key}
-                onClick={() => handleCategoryTap(c)}
-                className="active:scale-[0.97]"
-                style={{
-                  position: "relative", overflow: "hidden", textAlign: "left", cursor: "pointer",
-                  borderRadius: 22, padding: "14px 15px 15px", minHeight: 108,
-                  border: "1.5px solid rgba(255,255,255,.85)",
-                  background: `linear-gradient(155deg,${hexA(c.grad[0], 0.82)},${hexA(c.grad[1], 0.72)})`,
-                  backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)",
-                  boxShadow: `0 12px 26px ${hexA(c.grad[1], 0.3)}, inset 0 2px 0 rgba(255,255,255,.8)`,
-                  transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
-                  fontFamily: "'Nunito',sans-serif",
-                  animation: "bora-cascade .5s cubic-bezier(.22,1,.36,1) both",
-                  filter: locked ? "saturate(.9)" : "none",
-                }}
-              >
-                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 90% at 20% 8%,rgba(255,255,255,.5),transparent 52%)" }} />
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 2 }}>
-                  <div
-                    style={{
-                      position: "relative",
-                      flex: "none",
-                      width: 44,
-                      height: 44,
-                      borderRadius: 14,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      overflow: "hidden",
-                      background: "linear-gradient(150deg,rgba(255,255,255,.92),rgba(255,255,255,.55))",
-                      border: "1px solid rgba(255,255,255,.95)",
-                      boxShadow: `0 6px 14px ${hexA(c.grad[1], 0.35)}, inset 0 1px 2px rgba(255,255,255,.9)`,
-                    }}
-                  >
-                    <div style={{ position: "absolute", inset: 0, borderRadius: 13, background: "radial-gradient(120% 120% at 30% 20%,rgba(255,255,255,.8),transparent 60%)", pointerEvents: "none" }} />
-                    <div style={{ position: "absolute", top: "-40%", left: "-30%", width: "80%", height: "60%", background: "linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent)", animation: "bora-shine 5.5s ease-in-out infinite", pointerEvents: "none" }} />
-                    <span style={{ position: "relative", zIndex: 2 }}><Icon d={c.d} stroke={c.stroke} size={21} sw={1.9} /></span>
-                  </div>
-                  {locked && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 9px", borderRadius: 999, background: "linear-gradient(150deg,#FFE9A8,#F5C24E)", boxShadow: "0 3px 8px rgba(190,140,30,.3),inset 0 1px 0 rgba(255,255,255,.7)" }}>
-                      <Icon d={D.lock} stroke="#7A5A10" size={10} sw={2} />
-                      <span style={{ fontSize: 8.5, fontWeight: 900, letterSpacing: ".6px", color: "#7A5A10" }}>PREMIUM</span>
-                    </div>
-                  )}
-                </div>
-                <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 16, color: c.titleColor, marginTop: 34, position: "relative", zIndex: 2 }}>{c.label}</div>
-              </button>
-            );
-          })}
-        </div>
-        {filteredCats.length === 0 && (
-          <p style={{ textAlign: "center", marginTop: 8, fontSize: 13, fontWeight: 700, color: INK_SOFT, padding: "0 20px" }}>
-            Nenhum tipo pra essa energia agora. Toque em outro humor.
-          </p>
-        )}
-
-        {/* ── DESAFIO DA SEMANA (dados reais useDesafioSemana) ── */}
-        {desafio && (
-          <div style={{ padding: "16px 16px 4px" }}>
+          {filteredCats.length === 0 && (
             <div
               style={{
-                position: "relative", overflow: "hidden", borderRadius: 24, padding: 16,
-                border: "1.5px solid rgba(255,255,255,.85)",
-                background: "linear-gradient(155deg,rgba(232,244,214,.92),rgba(200,224,165,.8))",
-                backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)",
-                boxShadow: "0 14px 30px rgba(60,110,50,.18), inset 0 2px 0 rgba(255,255,255,.85)",
-                fontFamily: "'Nunito',sans-serif",
+                marginTop: 10,
+                padding: 18,
+                borderRadius: R.panel,
+                textAlign: "center",
+                ...glass,
+                fontSize: 13,
+                fontWeight: 700,
+                color: "rgba(255,230,200,.7)",
               }}
             >
-              <div aria-hidden style={{ position: "absolute", right: -10, bottom: -14, opacity: 0.16, pointerEvents: "none" }}>
-                <svg width="150" height="150" viewBox="0 0 24 24" fill="none"><path d="M12 3 3 20h18L12 3Zm0 5 4.5 12M12 8 7.5 20" stroke="#1E6B3E" strokeWidth="1.1" /></svg>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 7, position: "relative", zIndex: 2 }}>
-                <Icon d={D.users} stroke="#2E7A4E" size={15} sw={1.9} />
-                <span style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: "1.4px", color: "#2E7A4E" }}>DESAFIO DA SEMANA</span>
-              </div>
-              <h3 style={{ margin: "6px 0 6px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 20, color: "#1E4D30", position: "relative", zIndex: 2 }}>
-                {desafio.emoji} {desafio.titulo}
-              </h3>
-              <p style={{ margin: "0 0 14px", fontSize: 12, fontWeight: 700, lineHeight: 1.5, color: "#3F6B4C", maxWidth: 250, position: "relative", zIndex: 2 }}>
-                {desafio.descricao}
-              </p>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, position: "relative", zIndex: 2 }}>
-                <div style={{ padding: "7px 13px", borderRadius: 999, background: "rgba(255,255,255,.6)", border: "1px solid rgba(255,255,255,.9)", fontSize: 10.5, fontWeight: 900, color: "#2E7A4E", backdropFilter: "blur(6px)" }}>
-                  {desafio.hashtag}
-                </div>
-                <button
-                  onClick={shareDesafio}
-                  className="active:scale-95"
-                  style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 7, padding: "11px 17px", borderRadius: 999, cursor: "pointer", border: "none", background: "linear-gradient(160deg,#2E8A54,#1E6B3E)", color: "#EAFBF0", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 12.5, boxShadow: "0 8px 18px rgba(30,90,50,.4),inset 0 1px 0 rgba(255,255,255,.3)" }}
-                >
-                  <Icon d={D.share} stroke="#EAFBF0" size={15} sw={1.9} />
-                  Convidar
-                </button>
-              </div>
+              Nenhum tipo pra essa energia agora. Toque em outro humor.
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* ── CONVITE PREMIUM (dados reais useIndicacao) ── */}
-        <div style={{ padding: "12px 16px 4px" }}>
-          <div
+        {/* ── PREMIUM COZINHA ── */}
+        <div style={sectionWrap}>
+          <button
+            type="button"
+            onClick={() =>
+              isPremium
+                ? handleCategoryTap(CATS.find((c) => c.key === "cozinha")!)
+                : openPaywall("premium_locked")
+            }
+            data-tilt="1"
+            className="active:scale-[0.985]"
             style={{
-              position: "relative", overflow: "hidden", borderRadius: 24, padding: 16,
-              border: "1.5px solid rgba(255,255,255,.85)",
-              background: "linear-gradient(155deg,rgba(255,248,238,.9),rgba(255,232,208,.78))",
-              backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)",
-              boxShadow: "0 14px 30px rgba(200,120,50,.16), inset 0 2px 0 rgba(255,255,255,.85)",
-              fontFamily: "'Nunito',sans-serif",
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: 0,
+              padding: 0,
+              borderRadius: R.card,
+              cursor: "pointer",
+              ...glass,
+              textAlign: "left",
+              minHeight: 100,
+              transition: "transform .28s",
             }}
           >
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 13 }}>
-              <div style={{ flex: "none", width: 50, height: 50, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(130% 130% at 30% 22%,#FFD9A8,#F2823E 55%,#D9542E)", border: "1px solid rgba(255,255,255,.7)", boxShadow: "0 6px 15px rgba(200,90,40,.35),inset 0 1px 2px rgba(255,255,255,.6)" }}>
-                <Icon d={D.gift} stroke="#fff" size={24} sw={1.9} />
+            <div
+              style={{
+                position: "relative",
+                width: "36%",
+                flex: "none",
+                alignSelf: "stretch",
+                minHeight: 100,
+                margin: 5,
+                marginRight: 0,
+                borderRadius: R.panel,
+                overflow: "hidden",
+              }}
+            >
+              <img
+                src={ASSETS.premiumArt}
+                alt=""
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
+            <div style={{ flex: 1, minWidth: 0, padding: "14px 12px 14px 12px", position: "relative", zIndex: 2 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                <Crown size={12} color="#F0C060" />
+                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "1.1px", color: "#F0C060" }}>PREMIUM</span>
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "1.2px", color: "#D9622B" }}>CONVIDE UM PAI OU MÃE</div>
-                <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 17, color: "#1E4D30", lineHeight: 1.15, marginTop: 2 }}>Vocês dois ganham 1 mês Premium</div>
+              <div
+                style={{
+                  fontFamily: SERIF,
+                  fontWeight: 600,
+                  fontSize: 16,
+                  color: "#FFF4E8",
+                  lineHeight: 1.18,
+                  letterSpacing: "-0.2px",
+                }}
+              >
+                Cozinha em família
+              </div>
+              <p
+                style={{
+                  margin: "4px 0 0",
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: "rgba(255,230,200,.65)",
+                  lineHeight: 1.35,
+                }}
+              >
+                Sabores, aromas e momentos que viram memória.
+              </p>
+            </div>
+            <div style={{ paddingRight: 12, flex: "none" }}>
+              <span style={{ ...outlineGoldBtn, padding: "10px 14px", fontSize: 12.5, minHeight: 40 }}>
+                Conhecer
+                <ArrowRight size={13} />
+              </span>
+            </div>
+          </button>
+        </div>
+
+        {/* ── DESAFIO DA SEMANA ── */}
+        <div style={sectionWrap}>
+          <button
+            type="button"
+            onClick={shareDesafio}
+            data-tilt="1"
+            className="active:scale-[0.985]"
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              display: "block",
+              padding: 0,
+              borderRadius: R.card,
+              cursor: "pointer",
+              ...glass,
+              textAlign: "left",
+              minHeight: 152,
+              transition: "transform .28s",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                right: 5,
+                top: 5,
+                bottom: 5,
+                width: "48%",
+                borderRadius: R.panel,
+                overflow: "hidden",
+              }}
+            >
+              <img
+                src={ASSETS.challengeArt}
+                alt=""
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                }}
+              />
+            </div>
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(100deg, rgba(22,14,8,.88) 0%, rgba(22,14,8,.72) 42%, rgba(22,14,8,.15) 72%, transparent 100%)",
+                borderRadius: R.card,
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "48%",
+                height: "100%",
+                background:
+                  "linear-gradient(100deg, transparent 0%, rgba(255,220,150,.08) 50%, transparent 100%)",
+                animation: "bora2-shine 8s ease-in-out infinite",
+                pointerEvents: "none",
+              }}
+            />
+
+            <div style={{ position: "relative", zIndex: 2, padding: "16px", maxWidth: "54%" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Tent size={13} color="#F0C060" />
+                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "1.1px", color: "#F0C060" }}>
+                  DESAFIO DA SEMANA
+                </span>
+              </div>
+              <div
+                style={{
+                  fontFamily: SERIF,
+                  fontWeight: 600,
+                  fontSize: 18,
+                  color: "#FFF4E8",
+                  lineHeight: 1.15,
+                  marginTop: 6,
+                  letterSpacing: "-0.2px",
+                }}
+              >
+                {desafioTitulo}
+              </div>
+              <p
+                style={{
+                  margin: "6px 0 0",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  lineHeight: 1.4,
+                  color: "rgba(255,230,200,.7)",
+                }}
+              >
+                {desafioDesc}
+              </p>
+              <span style={{ ...goldBtn, marginTop: 12, padding: "10px 15px", fontSize: 12.5, minHeight: 40 }}>
+                Aceitar desafio
+                <ArrowRight size={13} strokeWidth={2.4} />
+              </span>
+            </div>
+
+            <div
+              style={{
+                position: "absolute",
+                right: 14,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 36,
+                height: 36,
+                borderRadius: R.btn,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                ...pillGlass,
+                zIndex: 3,
+              }}
+            >
+              <ArrowRight size={15} color="#FFE8C0" strokeWidth={2.3} />
+            </div>
+          </button>
+        </div>
+
+        {/* ── INDICAÇÃO ── */}
+        <div style={sectionWrap}>
+          <div
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              borderRadius: R.card,
+              ...glass,
+              padding: 16,
+              minHeight: 108,
+            }}
+          >
+            <img
+              src={ASSETS.referralArt}
+              alt=""
+              style={{
+                position: "absolute",
+                right: 64,
+                bottom: -2,
+                width: 132,
+                height: 96,
+                objectFit: "contain",
+                objectPosition: "center bottom",
+                filter: "drop-shadow(0 8px 16px rgba(0,0,0,.3))",
+                pointerEvents: "none",
+              }}
+            />
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12, position: "relative", zIndex: 2 }}>
+              <div
+                style={{
+                  flex: "none",
+                  width: 48,
+                  height: 48,
+                  borderRadius: R.chip,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "radial-gradient(130% 130% at 30% 22%, #FFD9A8, #F2823E 55%, #D9542E)",
+                  border: "0.5px solid rgba(255,255,255,.4)",
+                  boxShadow: "0 6px 16px rgba(200,90,40,.35), 0 1px 0 rgba(255,255,255,.45) inset",
+                }}
+              >
+                <Gift size={22} color="#fff" strokeWidth={1.9} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0, paddingRight: 88 }}>
+                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "1.1px", color: "#F0B050" }}>
+                  CONVIDE UM PAI OU MÃE
+                </div>
+                <div
+                  style={{
+                    fontFamily: SERIF,
+                    fontWeight: 600,
+                    fontSize: 16,
+                    color: "#FFF4E8",
+                    lineHeight: 1.2,
+                    marginTop: 3,
+                    letterSpacing: "-0.2px",
+                  }}
+                >
+                  Vocês dois ganham{" "}
+                  <span style={{ color: "#F0C060" }}>1 mês de Premium</span>
+                </div>
+                <p
+                  style={{
+                    margin: "5px 0 0",
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: "rgba(255,230,200,.62)",
+                    lineHeight: 1.35,
+                  }}
+                >
+                  Quanto mais família no Movimento Menos Tela, mais leve e incrível fica o mundo.
+                </p>
               </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 13 }}>
-              <div style={{ flex: 1, minWidth: 0, padding: "11px 14px", borderRadius: 14, background: "rgba(255,255,255,.55)", border: "1px solid rgba(255,255,255,.85)", fontFamily: "ui-monospace,monospace", fontSize: 11.5, fontWeight: 700, color: "#6E4A2E", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {indicacaoLoading ? "gerando seu link..." : indicacaoLink || "—"}
-              </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                marginTop: 12,
+                position: "relative",
+                zIndex: 2,
+              }}
+            >
               <button
-                onClick={copyRef}
-                disabled={!indicacaoLink}
-                className="active:scale-95"
-                style={{ flex: "none", display: "flex", alignItems: "center", gap: 5, padding: "11px 13px", borderRadius: 14, cursor: "pointer", background: copied ? "#2E7A4E" : "rgba(255,255,255,.85)", border: "1px solid rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 11.5, color: copied ? "#fff" : "#2E7A4E", boxShadow: "0 3px 8px rgba(120,70,40,.12)" }}
+                type="button"
+                onClick={shareRef}
+                disabled={!indicacaoLink && !indicacaoLoading}
+                className="active:scale-[0.97]"
+                style={{
+                  ...goldBtn,
+                  opacity: indicacaoLink || indicacaoLoading ? 1 : 0.55,
+                  padding: "11px 16px",
+                  fontSize: 12.5,
+                  minHeight: 42,
+                  animation: indicacaoLoading ? "bora2-pulse 1.4s ease-in-out infinite" : "none",
+                }}
               >
-                <Icon d={copied ? D.check : D.copy} stroke={copied ? "#fff" : "#2E7A4E"} size={13} sw={2} />
-                {copied ? "copiado" : "copiar"}
+                <Heart size={13} fill="currentColor" />
+                {indicacaoLoading ? "Gerando..." : "Convidar agora"}
+                <ArrowRight size={13} strokeWidth={2.4} />
               </button>
             </div>
-            <button
-              onClick={shareRef}
-              disabled={!indicacaoLink}
-              className="active:scale-[0.98]"
-              style={{ width: "100%", marginTop: 11, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: 14, borderRadius: 16, cursor: "pointer", border: "none", background: "linear-gradient(160deg,#F79A3E,#E4722A)", color: "#fff", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 14, boxShadow: "0 10px 24px rgba(210,110,40,.4),inset 0 1px 0 rgba(255,255,255,.4)" }}
-            >
-              <Icon d={D.share} stroke="#fff" size={17} sw={1.9} />
-              Convidar agora
-            </button>
           </div>
         </div>
 
-        {/* footer */}
-        <div style={{ padding: "6px 20px 16px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#C88F6E" }}>
+        {/* Surpresa da IA */}
+        <div style={{ ...sectionWrap, marginBottom: 8 }}>
+          <button
+            type="button"
+            onClick={handleSurprise}
+            className="active:scale-[0.98]"
+            style={{
+              width: "100%",
+              ...outlineGoldBtn,
+              justifyContent: "center",
+              padding: "14px 16px",
+              fontSize: 14,
+              minHeight: 48,
+              borderRadius: R.panel,
+              animation: "bora2-glow 3.5s ease-in-out infinite",
+            }}
+          >
+            <Sparkles size={16} color="#F0C060" />
+            Surpresa da IA{firstName ? ` pra ${firstName}` : ""}
+          </button>
+        </div>
+
+        <div
+          style={{
+            padding: `4px ${PAD}px 24px`,
+            textAlign: "center",
+            fontSize: 11,
+            fontWeight: 700,
+            color: "rgba(255,210,160,.38)",
+            letterSpacing: "0.2px",
+          }}
+        >
           Menos tela, mais memórias · Uma aventura por dia
         </div>
       </div>
