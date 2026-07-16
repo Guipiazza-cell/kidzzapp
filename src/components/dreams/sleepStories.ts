@@ -285,7 +285,11 @@ export interface SleepPlaylist {
   spotifyId: string;
   glow: string;
   gradient: string;
+  /** Capa gerada via Hermes/Codex (gpt-image) — padrão premium da ABA SONHOS */
+  cover: string;
 }
+
+const PL = "/exemplos/assets/sonhos-v2";
 
 export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
   {
@@ -296,6 +300,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DWZd79rJ6a7lp",
     glow: "#E8C5FF",
     gradient: "from-[#2a1340] via-[#5b2a86] to-[#8b5cf6]",
+    cover: `${PL}/pl-babies.png`,
   },
   {
     id: "small",
@@ -305,6 +310,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DX0UrRvztWcAU",
     glow: "#FFD66B",
     gradient: "from-[#3a2a1a] via-[#7a5a2a] to-[#c98a3a]",
+    cover: `${PL}/pl-teddy.png`,
   },
   {
     id: "kids",
@@ -314,6 +320,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DWZqd5JICZI0u",
     glow: "#9BE7B5",
     gradient: "from-[#0e2a22] via-[#1f4a3a] to-[#3f8b6c]",
+    cover: `${PL}/pl-moon.png`,
   },
   {
     id: "deep",
@@ -323,6 +330,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DWVV27DiNWxkR",
     glow: "#7BB6FF",
     gradient: "from-[#0e2a44] via-[#1f4e7a] to-[#3a8dde]",
+    cover: `${PL}/pl-family.png`,
   },
   {
     id: "piano",
@@ -332,6 +340,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DWTvNyxOwkztu",
     glow: "#E8B8FF",
     gradient: "from-[#1a1530] via-[#3a2a55] to-[#7a5a9a]",
+    cover: `${PL}/pl-piano.png`,
   },
   {
     id: "instrumental",
@@ -341,6 +350,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DWWMOmoXKqHTD",
     glow: "#C58AFF",
     gradient: "from-[#0f1535] via-[#1e1f55] to-[#0d1b2a]",
+    cover: `${PL}/pl-piano.png`,
   },
 ];
 

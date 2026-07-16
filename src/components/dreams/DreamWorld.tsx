@@ -1,17 +1,8 @@
-/* ── KIDZZ — Sessão Sonhos (redesign)
-   Porta fiel do mockup public/exemplos/Sonhos.dc.html (estilos inline 1:1)
-   ligado aos dados/lógica reais que o componente já usava:
-     - Hero cinematográfico (imagem cena-sonhos) + modo soninho
-     - CTA "Iniciar noite tranquila"  → handleStart
-     - Ações: respiração (PreSleep) + momento em família
-     - "A noite já está preparada"    → curadoria automática + sequência mágica
-     - Timer do soninho               → TIMER_OPTIONS
-     - Paisagens sonoras              → SOUND_PRESETS (mix, lock, "em breve")
-     - Histórias que abraçam          → SLEEP_STORIES + categorias + detalhe
-     - Playlists Calmaria             → SLEEP_PLAYLISTS (modal Spotify)
-     - Momentos em família            → FAMILY_MOMENTS (modal)
-     - Bloqueio/upsell Premium        → useEntitlement + handleCheckout
-   A barra inferior é a BottomNav global (o dock do design foi descartado).
+/* ── KIDZZ — Sessão Sonhos (premium v2)
+   Referência: public/telas/ABA SONHOS/*
+   Assets: public/exemplos/assets/sonhos-v2/* (gerados Hermes/Codex gpt-image)
+   Pessoas/família — sem lagarto nos assets novos.
+   Lógica real preservada (sons, histórias, timer, playlists, paywall).
 */
 import {
   useState, useCallback, useRef, useEffect, useMemo, type CSSProperties,
@@ -37,18 +28,50 @@ import { haptic } from "@/lib/haptics";
 const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
 const cardTap = { scale: 0.975 };
 
-/* ────────── Tokens visuais do design (Sonhos.dc.html) ────────── */
+/* ────────── Tokens visuais premium (ABA SONHOS) ────────── */
 const DREAM_BG =
-  "linear-gradient(180deg,#3E2C60 0%,#2C1C4C 34%,#241640 62%,#3A1E38 100%)";
-const HERO_IMG = "/exemplos/assets/cena-sonhos.png";
+  "linear-gradient(180deg,#2B1A4A 0%,#1E1238 36%,#160C2A 68%,#1A0E28 100%)";
+const ASSETS = {
+  hero: "/exemplos/assets/sonhos-v2/hero-family.png",
+  featHeart: "/exemplos/assets/sonhos-v2/feat-heart.png",
+  featStar: "/exemplos/assets/sonhos-v2/feat-star.png",
+  featMoon: "/exemplos/assets/sonhos-v2/feat-moon.png",
+  featPhoto: "/exemplos/assets/sonhos-v2/feat-photo.png",
+  kids: "/exemplos/assets/sonhos-v2/kids-gratitude.png",
+} as const;
+const HERO_IMG = ASSETS.hero;
 
-/* Card de vidro roxo (glass) — idêntico ao design */
+/* Liquid glass roxo (nível Bora, paleta noite) */
 const glassCard: CSSProperties = {
-  background: "linear-gradient(150deg,rgba(255,255,255,.13),rgba(120,90,200,.13))",
-  backdropFilter: "blur(16px) saturate(150%)",
-  WebkitBackdropFilter: "blur(16px) saturate(150%)",
-  border: "1px solid rgba(200,175,245,.28)",
-  boxShadow: "0 10px 22px rgba(40,20,80,.3), inset 0 1.5px 0 rgba(255,255,255,.25)",
+  background:
+    "linear-gradient(165deg, rgba(255,245,255,.16) 0%, rgba(160,120,230,.12) 42%, rgba(30,16,55,.42) 100%)",
+  backdropFilter: "blur(40px) saturate(190%)",
+  WebkitBackdropFilter: "blur(40px) saturate(190%)",
+  border: "0.5px solid rgba(220,190,255,.32)",
+  boxShadow:
+    "0 12px 40px rgba(10,4,30,.36), 0 1px 0 rgba(255,245,255,.28) inset, 0 -1px 0 rgba(0,0,0,.14) inset",
+};
+
+const goldCta: CSSProperties = {
+  position: "relative",
+  overflow: "hidden",
+  width: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  padding: "15px 18px",
+  minHeight: 52,
+  borderRadius: 999,
+  border: "0.5px solid rgba(255,235,190,.7)",
+  background: "linear-gradient(180deg,#FBE8A8 0%,#F0C25A 45%,#E0A030 100%)",
+  color: "#2A1608",
+  fontFamily: "'Nunito',system-ui,sans-serif",
+  fontWeight: 900,
+  fontSize: 15,
+  boxShadow:
+    "0 10px 28px rgba(180,100,20,.4), 0 1px 0 rgba(255,252,230,.9) inset, 0 -3px 8px rgba(100,50,0,.16) inset",
+  cursor: "pointer",
 };
 
 /* Botão de ícone "gloss" (brilho radial) — helper do design */
@@ -523,11 +546,11 @@ const DreamWorld = ({ onBack }: Props) => {
           >
             <img
               src={HERO_IMG}
-              alt="Gui, o camaleão, pronto para dormir"
+              alt="Família lendo juntos na hora de dormir"
               style={{
                 position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-                objectFit: "cover", objectPosition: "center 34%",
-                animation: "sonh-floaty 7s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)",
+                objectFit: "cover", objectPosition: "center 28%",
+                animation: "sonh-floaty 7s ease-in-out infinite", filter: "saturate(1.1) contrast(1.03)",
               }}
             />
             <div
@@ -581,34 +604,29 @@ const DreamWorld = ({ onBack }: Props) => {
 
           {/* título */}
           <div style={{ padding: "2px 24px", textAlign: "center", position: "relative", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both" }}>
-            <h1 style={{ margin: "0 auto 9px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 27, lineHeight: 1.2, color: "#F6EEFC", letterSpacing: "-.3px", maxWidth: 290, textShadow: "0 2px 16px rgba(0,0,0,.4)" }}>
+            <h1 style={{ margin: "0 auto 9px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 28, lineHeight: 1.18, color: "#F6EEFC", letterSpacing: "-.35px", maxWidth: 300, textShadow: "0 2px 18px rgba(0,0,0,.45)" }}>
               Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia.
             </h1>
-            <p style={{ margin: "0 auto", fontSize: 12.5, fontWeight: 700, lineHeight: 1.5, color: "rgba(224,210,242,.82)", maxWidth: 270 }}>
+            <p style={{ margin: "0 auto", fontSize: 13, fontWeight: 700, lineHeight: 1.5, color: "rgba(224,210,242,.84)", maxWidth: 280 }}>
               Histórias, sons e momentos para acalmar e conectar a família antes de dormir.
             </p>
           </div>
         </div>
 
-        {/* ── CTA principal ── */}
+        {/* ── CTA principal (dourado, mockup) ── */}
         <div style={{ padding: "16px 16px 0", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .14s both" }}>
           <motion.button
             onClick={handleStart}
             disabled={!hasSelection}
             whileTap={{ scale: 0.98 }}
             style={{
-              position: "relative", overflow: "hidden", width: "100%", display: "flex",
-              alignItems: "center", justifyContent: "center", gap: 9, padding: 15, borderRadius: 20,
+              ...goldCta,
               cursor: hasSelection ? "pointer" : "default",
-              background: "linear-gradient(135deg,rgba(150,110,225,.5),rgba(110,74,190,.7))",
-              backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid rgba(200,175,245,.45)",
-              boxShadow: "0 12px 28px rgba(70,40,140,.4),inset 0 1.5px 0 rgba(255,255,255,.35)",
-              fontSize: 14, fontWeight: 900, color: "#F6EEFC", opacity: hasSelection ? 1 : 0.55,
+              opacity: hasSelection ? 1 : 0.55,
             }}
           >
-            <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%)", animation: "sonh-shine 6s ease-in-out infinite" }} />
-            <Eyebrow d={P.moon} color="#F6EEFC" size={17} />
+            <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%)", animation: "sonh-shine 6s ease-in-out infinite" }} />
+            <Eyebrow d={P.moon} color="#2A1608" size={17} />
             Iniciar noite tranquila
           </motion.button>
           {!hasSelection && (
@@ -618,17 +636,56 @@ const DreamWorld = ({ onBack }: Props) => {
           )}
         </div>
 
+        {/* ── Benefícios (ícones 3D gerados) ── */}
+        <div
+          style={{
+            margin: "18px 16px 0",
+            padding: "16px 12px 14px",
+            borderRadius: 24,
+            ...glassCard,
+            animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .16s both",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: 12 }}>
+            <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#F6EEFC" }}>
+              Noites mágicas que transformam dias!
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {[
+              { img: ASSETS.featHeart, t: "Mais conexão", d: "Momentos de qualidade em família." },
+              { img: ASSETS.featStar, t: "Mais tranquilidade", d: "Sons e histórias que acalmam." },
+              { img: ASSETS.featMoon, t: "Melhores sonhos", d: "Rotinas leves e descansadas." },
+              { img: ASSETS.featPhoto, t: "Memórias que ficam", d: "Pequenos momentos para sempre." },
+            ].map((f) => (
+              <div key={f.t} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, textAlign: "center", padding: "6px 4px" }}>
+                <img
+                  src={f.img}
+                  alt=""
+                  style={{
+                    width: 56, height: 56, borderRadius: 16, objectFit: "cover",
+                    boxShadow: "0 8px 18px rgba(20,8,40,.35), 0 1px 0 rgba(255,255,255,.25) inset",
+                    border: "0.5px solid rgba(255,230,255,.28)",
+                  }}
+                />
+                <div style={{ fontSize: 12, fontWeight: 900, color: "#F3ECFA", lineHeight: 1.15 }}>{f.t}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(220,206,240,.62)", lineHeight: 1.25 }}>{f.d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── AÇÕES DA NOITE ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, padding: "12px 16px 0", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .2s both" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, padding: "14px 16px 0", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .2s both" }}>
           <motion.button
             onClick={() => { setView("presleep"); haptic("light"); }}
             whileTap={{ scale: 0.96 }}
-            style={{ position: "relative", overflow: "hidden", borderRadius: 20, padding: "14px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, ...glassCard }}
+            style={{ position: "relative", overflow: "hidden", borderRadius: 22, padding: "14px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, ...glassCard }}
           >
             <div style={gloss("#B8E8C0", "#5CB57A", "#2F7A4E")}>
               <Eyebrow d={P.wind} color="#fff" size={19} sw={1.8} />
             </div>
-            <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#F3ECFA", lineHeight: 1.15 }}>Respira com o Camaleão</div>
+            <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#F3ECFA", lineHeight: 1.15 }}>Respiração noturna</div>
             <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Inspira… segura… solta.</div>
           </motion.button>
           <motion.button
@@ -638,12 +695,12 @@ const DreamWorld = ({ onBack }: Props) => {
               haptic("light");
             }}
             whileTap={{ scale: 0.96 }}
-            style={{ position: "relative", overflow: "hidden", borderRadius: 20, padding: "14px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, ...glassCard }}
+            style={{ position: "relative", overflow: "hidden", borderRadius: 22, padding: "14px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, ...glassCard }}
           >
             <div style={gloss("#F0B8D0", "#E0679B", "#B03A72")}>
               <Eyebrow d={P.heart} color="#fff" size={19} sw={1.8} />
             </div>
-            <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#F3ECFA", lineHeight: 1.15 }}>Momento em família</div>
+            <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#F3ECFA", lineHeight: 1.15 }}>Momento em família</div>
             <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Uma pergunta para a noite.</div>
           </motion.button>
         </div>
@@ -1028,25 +1085,83 @@ const DreamWorld = ({ onBack }: Props) => {
                   }}
                   whileTap={cardTap}
                   transition={tapSpring}
-                  style={{ flex: "none", width: 180, scrollSnapAlign: "start", textAlign: "left", overflow: "hidden", position: "relative", borderRadius: 20, ...glassCard }}
+                  style={{
+                    flex: "none", width: 148, scrollSnapAlign: "start", textAlign: "left",
+                    overflow: "hidden", position: "relative", borderRadius: 22, ...glassCard,
+                  }}
                 >
-                  <div className={`relative h-32 bg-gradient-to-br ${pl.gradient}`}>
-                    <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 50%, ${pl.glow}55, transparent 70%)` }} />
-                    <span className="absolute top-3 left-3 text-3xl drop-shadow-lg">{pl.emoji}</span>
+                  <div style={{ position: "relative", height: 148, overflow: "hidden" }}>
+                    <img
+                      src={pl.cover}
+                      alt=""
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute", inset: 0,
+                        background: "linear-gradient(180deg, transparent 40%, rgba(12,6,28,.88) 100%)",
+                        pointerEvents: "none",
+                      }}
+                    />
                     {locked && (
-                      <span className="absolute top-3 right-3 p-1.5 rounded-full" style={{ background: "rgba(0,0,0,.4)" }}>
-                        <Lock size={12} className="text-white/80" />
+                      <span
+                        className="absolute top-2.5 right-2.5 p-1.5 rounded-full"
+                        style={{ background: "rgba(0,0,0,.45)", border: "0.5px solid rgba(255,255,255,.25)" }}
+                      >
+                        <Lock size={12} className="text-white/90" />
                       </span>
                     )}
-                  </div>
-                  <div style={{ padding: 12 }}>
-                    <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: ".4px", textTransform: "uppercase", color: pl.glow }}>{pl.ageRange}</div>
-                    <div style={{ fontSize: 14, fontFamily: "'Lora',serif", fontWeight: 600, color: "#F6EEFC", lineHeight: 1.15, marginTop: 2 }}>{pl.title}</div>
+                    <div style={{ position: "absolute", left: 10, right: 10, bottom: 10 }}>
+                      <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: ".5px", textTransform: "uppercase", color: pl.glow, textShadow: "0 1px 6px rgba(0,0,0,.5)" }}>
+                        {pl.ageRange}
+                      </div>
+                      <div style={{ fontSize: 13.5, fontFamily: "'Lora',serif", fontWeight: 600, color: "#F6EEFC", lineHeight: 1.15, marginTop: 2, textShadow: "0 1px 8px rgba(0,0,0,.55)" }}>
+                        {pl.title}
+                      </div>
+                    </div>
                   </div>
                 </motion.button>
               );
             })}
           </div>
+        </section>
+
+        {/* ── PERGUNTA DA NOITE (pessoas, asset gerado) ── */}
+        <section style={{ padding: "8px 16px 0" }}>
+          <motion.button
+            onClick={() => {
+              const moment = FAMILY_MOMENTS.find((x) => x.id === "grateful") ?? FAMILY_MOMENTS[0];
+              setOpenMoment(moment.id);
+              haptic("light");
+            }}
+            whileTap={{ scale: 0.985 }}
+            style={{
+              width: "100%", borderRadius: 24, overflow: "hidden", textAlign: "left", cursor: "pointer",
+              ...glassCard, padding: 0, display: "block",
+            }}
+          >
+            <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", minHeight: 128 }}>
+              <div style={{ padding: "16px 14px 16px 16px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Eyebrow d={P.heart} color="#FFC98A" size={14} />
+                  <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: "1.2px", color: "rgba(255,201,138,.85)" }}>
+                    PERGUNTA DA NOITE
+                  </span>
+                </div>
+                <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#F6EEFC", lineHeight: 1.3 }}>
+                  “Conte 3 coisas pelas quais somos gratos hoje.”
+                </div>
+              </div>
+              <div style={{ position: "relative", minHeight: 128 }}>
+                <img
+                  src={ASSETS.kids}
+                  alt="Crianças lendo juntas"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+                />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(22,12,42,.55) 0%, transparent 50%)" }} />
+              </div>
+            </div>
+          </motion.button>
         </section>
 
         {/* ── MOMENTOS EM FAMÍLIA ── */}
@@ -1063,7 +1178,7 @@ const DreamWorld = ({ onBack }: Props) => {
                 key={m.id}
                 onClick={() => { setOpenMoment(m.id); haptic("light"); }}
                 whileTap={{ scale: 0.97 }}
-                style={{ padding: "14px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderRadius: 20, ...glassCard }}
+                style={{ padding: "14px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderRadius: 22, ...glassCard }}
               >
                 <span style={{ fontSize: 24 }}>{m.emoji}</span>
                 <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 13.5, color: "#F3ECFA", lineHeight: 1.15 }}>{m.title}</div>
@@ -1117,14 +1232,20 @@ const DreamWorld = ({ onBack }: Props) => {
                 transition={{ type: "spring", stiffness: 280, damping: 30 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-center justify-between p-4">
-                  <div>
-                    <p style={{ fontSize: 10, fontWeight: 900, letterSpacing: ".4px", textTransform: "uppercase", color: pl.glow }}>{pl.ageRange}</p>
-                    <h3 style={{ fontSize: 18, fontFamily: "'Lora',serif", fontWeight: 600, color: "#F6EEFC" }}>{pl.emoji} {pl.title}</h3>
-                  </div>
-                  <button onClick={() => setOpenPlaylist(null)} className="p-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }}>
+                <div style={{ position: "relative", height: 120, overflow: "hidden" }}>
+                  <img src={pl.cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 20%, #2C1C4C 100%)" }} />
+                  <button
+                    onClick={() => setOpenPlaylist(null)}
+                    className="p-2 rounded-full absolute top-3 right-3"
+                    style={{ background: "rgba(0,0,0,0.4)", border: "0.5px solid rgba(255,255,255,.25)" }}
+                  >
                     <X size={16} className="text-white" />
                   </button>
+                  <div className="absolute left-4 bottom-3 right-12">
+                    <p style={{ fontSize: 10, fontWeight: 900, letterSpacing: ".4px", textTransform: "uppercase", color: pl.glow }}>{pl.ageRange}</p>
+                    <h3 style={{ fontSize: 18, fontFamily: "'Lora',serif", fontWeight: 600, color: "#F6EEFC" }}>{pl.title}</h3>
+                  </div>
                 </div>
                 <iframe
                   title={pl.title}
