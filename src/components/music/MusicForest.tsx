@@ -8,19 +8,12 @@ import { getMusicXp, type MusicAchievement } from "@/lib/musicXp";
 import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
 import GuidedActivityPlayer, { type GuidedActivity } from "./GuidedActivityPlayer";
+import { FONT, SERIF, R, PAD, glassLightSoft, pillGlassLight } from "@/lib/premiumUi";
 
 /**
- * MusicForest — Tela "Música" (redesign).
- *
- * Porta fiel do mockup public/exemplos/Musica.dc.html (estilos inline 1:1)
- * ligada aos dados/handlers reais que o componente já usava:
- *  - Categorias        → CATEGORIES (abrem CategoryScreen / Modo Viagem / paywall)
- *  - Mais maneiras     → pilares reais (Karaokê / Dance / Histórias / Crie)
- *  - Atividades        → ACTIVITIES reais (abrem GuidedActivityPlayer)
- *  - Favoritos         → localStorage kidzz_music_favs
- *  - Pontos            → getMusicXp()
- *  - Pais              → onOpenParental
- * A barra de navegação inferior é a BottomNav global (não duplicada aqui).
+ * MusicForest — Tela "Música" (premium v2 — nível Bora).
+ * Ref: public/telas/MUSICA/* · Assets: musica-v2 (Hermes/Codex)
+ * Floresta + liquid glass + família (sem lagarto).
  */
 
 interface Props {
@@ -40,10 +33,13 @@ interface Category {
   subtitle: string;
   gradient: string; // usado no hero da sub-tela
   dk: keyof typeof TINT; // chave de cor do design
-  tile: number; // mo-cat-{n}.png
+  /** Capa 3D gerada (Hermes/Codex) */
+  cover: string;
   novo?: boolean;
   tags: string[];
 }
+
+const MU = "/exemplos/assets/musica-v2";
 
 /* ── Paletas do design (renderVals) ── */
 const TINT: Record<string, [number, number, number]> = {
@@ -82,14 +78,15 @@ const D = {
   cap: "M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5",
 };
 
-/* ── Helpers de estilo (idênticos ao design, versão clara/creme) ── */
+/* ── Helpers de estilo (liquid glass premium, creme) ── */
 const glass = (r: number, g: number, b: number, aTop = 0.5, aBot = 0.16): CSSProperties => {
   const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
   return {
-    background: `linear-gradient(155deg, rgba(255,255,255,.9) 0%, ${rgba(aTop)} 28%, ${rgba((aTop + aBot) / 2)} 60%, ${rgba(aBot)} 85%, rgba(255,255,255,.6) 100%)`,
-    backdropFilter: "blur(20px) saturate(170%)", WebkitBackdropFilter: "blur(20px) saturate(170%)",
-    border: "1px solid rgba(255,255,255,1)",
-    boxShadow: `0 14px 32px rgba(110,85,30,.16), 0 0 26px ${rgba(0.2)}, inset 0 1.5px 0 rgba(255,255,255,1), inset 0 -10px 20px ${rgba(0.14)}`,
+    background: `linear-gradient(165deg, rgba(255,255,255,.92) 0%, ${rgba(aTop)} 32%, ${rgba((aTop + aBot) / 2)} 62%, ${rgba(aBot)} 88%, rgba(255,255,255,.62) 100%)`,
+    backdropFilter: "blur(36px) saturate(190%)",
+    WebkitBackdropFilter: "blur(36px) saturate(190%)",
+    border: "0.5px solid rgba(255,255,255,.98)",
+    boxShadow: `0 12px 36px rgba(110,85,30,.14), 0 2px 8px rgba(110,85,30,.06), 0 0 22px ${rgba(0.16)}, inset 0 1.5px 0 rgba(255,255,255,1), inset 0 -8px 18px ${rgba(0.1)}`,
   };
 };
 const gloss = (light: string, mid: string, deep: string, size = 40, radius = 14): CSSProperties => ({
@@ -118,11 +115,19 @@ const greenBadge: CSSProperties = {
 
 /* ── Dados: categorias (5) ── */
 const CATEGORIES: Category[] = [
-  { id: "featured", label: "Em destaque", subtitle: "As preferidas da família", gradient: "linear-gradient(135deg, hsl(38 95% 62%) 0%, hsl(28 92% 55%) 100%)", dk: "ouro", tile: 1, tags: ["featured"] },
-  { id: "emotion", label: "Para emocionar", subtitle: "Histórias que tocam o coração", gradient: "linear-gradient(135deg, hsl(150 55% 55%) 0%, hsl(160 50% 40%) 100%)", dk: "verde", tile: 2, tags: ["emotion", "bond"] },
-  { id: "adventure", label: "Aventura & Imaginação", subtitle: "Para sonhar e explorar", gradient: "linear-gradient(135deg, hsl(275 65% 62%) 0%, hsl(290 55% 48%) 100%)", dk: "lavanda", tile: 3, tags: ["adventure", "movement"] },
-  { id: "calm", label: "Para acalmar", subtitle: "Músicas para relaxar juntos", gradient: "linear-gradient(135deg, hsl(220 60% 62%) 0%, hsl(255 55% 55%) 100%)", dk: "indigo", tile: 4, tags: ["calm", "sleep"] },
-  { id: "travel", label: "Modo Viagem", subtitle: "Trilhas para qualquer lugar", gradient: "linear-gradient(135deg, hsl(190 65% 55%) 0%, hsl(200 60% 42%) 100%)", dk: "teal", tile: 5, novo: true, tags: ["travel"] },
+  { id: "featured", label: "Em destaque", subtitle: "As preferidas da família", gradient: "linear-gradient(135deg, hsl(38 95% 62%) 0%, hsl(28 92% 55%) 100%)", dk: "ouro", cover: `${MU}/cat-sun.png`, tags: ["featured"] },
+  { id: "emotion", label: "Para emocionar", subtitle: "Músicas que tocam o coração", gradient: "linear-gradient(135deg, hsl(150 55% 55%) 0%, hsl(160 50% 40%) 100%)", dk: "verde", cover: `${MU}/cat-heart.png`, tags: ["emotion", "bond"] },
+  { id: "adventure", label: "Aventura & Imaginação", subtitle: "Para sonhar e explorar", gradient: "linear-gradient(135deg, hsl(275 65% 62%) 0%, hsl(290 55% 48%) 100%)", dk: "lavanda", cover: `${MU}/cat-rocket.png`, tags: ["adventure", "movement"] },
+  { id: "calm", label: "Para acalmar", subtitle: "Músicas para relaxar juntos", gradient: "linear-gradient(135deg, hsl(220 60% 62%) 0%, hsl(255 55% 55%) 100%)", dk: "indigo", cover: `${MU}/cat-moon.png`, tags: ["calm", "sleep"] },
+  { id: "travel", label: "Modo Viagem", subtitle: "Trilhas sonoras para qualquer lugar", gradient: "linear-gradient(135deg, hsl(190 65% 55%) 0%, hsl(200 60% 42%) 100%)", dk: "teal", cover: `${MU}/cat-travel.png`, novo: true, tags: ["travel"] },
+];
+
+/* Sons ambiente (slots do design; usam áudio real quando existe) */
+const AMBIENT_SOUNDS: { id: string; label: string; emoji: string; slot: string; url?: string; free: boolean }[] = [
+  { id: "forest", label: "Floresta calma", emoji: "🌲", slot: "som_floresta", url: "/audio/forest-calm.mp3", free: true },
+  { id: "rain", label: "Chuva no telhado", emoji: "🌧️", slot: "som_chuva", url: "/audio/rain-soft.mp3", free: true },
+  { id: "ocean", label: "Ondas do mar", emoji: "🌊", slot: "som_ondas", url: "/audio/ocean-waves.mp3", free: false },
+  { id: "piano", label: "Piano do soninho", emoji: "🎹", slot: "som_piano", free: false },
 ];
 
 /* ── Dados: atividades guiadas reais ── */
@@ -172,23 +177,74 @@ const MusicKeyframes = () => (
   `}</style>
 );
 
-/* ── Fundo creme + orbes/notas flutuantes (comum às telas) ── */
-const CreamBackdrop = () => (
-  <>
-    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(45% 30% at 78% 26%,rgba(255,205,110,.20),transparent 70%),radial-gradient(42% 28% at 10% 55%,rgba(120,200,130,.13),transparent 70%),radial-gradient(50% 30% at 55% 90%,rgba(175,150,235,.10),transparent 70%)" }} />
-    <div style={{ position: "absolute", top: -60, left: -80, width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,215,120,.35),transparent 65%)", filter: "blur(28px)", animation: "mus-drift1 13s ease-in-out infinite", pointerEvents: "none" }} />
-    <div style={{ position: "absolute", top: "38%", left: -90, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(140,210,140,.25),transparent 65%)", filter: "blur(30px)", animation: "mus-drift2 17s ease-in-out 2s infinite", pointerEvents: "none" }} />
-    <div style={{ position: "absolute", bottom: 90, right: -100, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle,rgba(240,170,80,.25),transparent 65%)", filter: "blur(32px)", animation: "mus-drift1 19s ease-in-out 4s infinite", pointerEvents: "none" }} />
-    <div style={{ position: "absolute", top: "56%", left: "8%", pointerEvents: "none", animation: "mus-notefloat 9s ease-in-out infinite" }}>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#C9A050" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+/* ── Fundo floresta premium (print MUSICA) ── */
+const ForestBackdrop = ({ heroSrc }: { heroSrc: string }) => (
+  <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+    <img
+      src={heroSrc}
+      alt=""
+      style={{
+        position: "absolute", inset: 0, width: "100%", height: "100%",
+        objectFit: "cover", objectPosition: "center 20%",
+        filter: "saturate(1.15) brightness(0.92)", transform: "scale(1.08)",
+      }}
+    />
+    {/* raios + vinheta creme inferior (como o mockup) */}
+    <div
+      style={{
+        position: "absolute", inset: 0,
+        background:
+          "radial-gradient(60% 40% at 78% 8%, rgba(255,220,120,.55) 0%, transparent 62%)," +
+          "linear-gradient(180deg, rgba(20,40,20,.18) 0%, rgba(246,241,223,.15) 28%, rgba(246,241,223,.78) 58%, #F4EEDF 78%, #F0E9D0 100%)",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute", top: -40, right: -20, width: 220, height: 220, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,230,140,.55), transparent 68%)",
+        filter: "blur(8px)", animation: "mus-raysway 8s ease-in-out infinite",
+      }}
+    />
+    <div style={{ position: "absolute", top: "48%", left: "10%", animation: "mus-notefloat 10s ease-in-out infinite" }}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#E8B84A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
     </div>
-    <div style={{ position: "absolute", top: "72%", left: "82%", pointerEvents: "none", animation: "mus-notefloat 12s ease-in-out 4s infinite" }}>
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#A98CD8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+    <div style={{ position: "absolute", top: "62%", left: "78%", animation: "mus-notefloat 12s ease-in-out 3s infinite" }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#A98CD8" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
     </div>
-  </>
+  </div>
 );
 
 const CREAM_BG = "linear-gradient(180deg,#F6F1DF 0%,#F0E9D0 40%,#E8DFBF 75%,#DFD3AC 100%)";
+
+/** Glass colorido tipo mockup (categoria) */
+const catGlass = (r: number, g: number, b: number): CSSProperties => ({
+  background: `linear-gradient(165deg, rgba(255,255,255,.88) 0%, rgba(${r},${g},${b},.42) 48%, rgba(${r},${g},${b},.28) 100%)`,
+  border: "0.5px solid rgba(255,255,255,.95)",
+  borderRadius: 26,
+  boxShadow:
+    `0 14px 36px rgba(40,30,15,.14), 0 0 28px rgba(${r},${g},${b},.22), 0 1.5px 0 rgba(255,255,255,1) inset, 0 -8px 18px rgba(${r},${g},${b},.12) inset`,
+  backdropFilter: "blur(40px) saturate(200%)",
+  WebkitBackdropFilter: "blur(40px) saturate(200%)",
+});
+
+const modeTint: Record<string, CSSProperties> = {
+  ouro: {
+    background: "linear-gradient(165deg, rgba(255,255,255,.92) 0%, rgba(255,236,190,.72) 55%, rgba(255,220,150,.55) 100%)",
+    border: "0.5px solid rgba(255,255,255,.98)",
+  },
+  rosa: {
+    background: "linear-gradient(165deg, rgba(255,255,255,.92) 0%, rgba(255,220,232,.72) 55%, rgba(255,200,220,.5) 100%)",
+    border: "0.5px solid rgba(255,255,255,.98)",
+  },
+  azul: {
+    background: "linear-gradient(165deg, rgba(255,255,255,.92) 0%, rgba(210,230,255,.72) 55%, rgba(190,220,255,.5) 100%)",
+    border: "0.5px solid rgba(255,255,255,.98)",
+  },
+  verde: {
+    background: "linear-gradient(165deg, rgba(255,255,255,.92) 0%, rgba(210,245,220,.72) 55%, rgba(190,240,210,.5) 100%)",
+    border: "0.5px solid rgba(255,255,255,.98)",
+  },
+};
 
 const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, onOpenTravel }: Props) => {
   const { profile, tier } = useAuth();
@@ -313,80 +369,158 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 
   /* ── Modos (pilares reais) ── */
   const modos = [
-    { pillar: "morning" as Pillar, title: "Karaokê do Dia", sub: "Grátis — cante com o Kidzz", d: D.mic, k: "ouro", t: [240, 180, 70] as [number, number, number], badge: "NOVO", requiresPremium: false },
-    { pillar: "dance" as Pillar, title: "Dance com Kidzz", sub: "Mini-game de palmas", d: D.dance, k: "rosa", t: [240, 130, 170] as [number, number, number], badge: "PREMIUM", requiresPremium: true },
-    { pillar: "stories" as Pillar, title: "Histórias Cantadas", sub: "4 livros mágicos", d: D.book, k: "azul", t: [130, 175, 240] as [number, number, number], badge: "PREMIUM", requiresPremium: true },
-    { pillar: "create" as Pillar, title: "Crie Sua Música", sub: "Laboratório sonoro", d: D.lab, k: "verde", t: [140, 200, 110] as [number, number, number], badge: "PREMIUM", requiresPremium: true },
+    { pillar: "morning" as Pillar, title: "Karaokê do Dia", sub: "Grátis — cante com o Kidzz", d: D.mic, k: "ouro", t: [240, 180, 70] as [number, number, number], badge: "NOVO", requiresPremium: false, cover: `${MU}/modo-mic.png` },
+    { pillar: "dance" as Pillar, title: "Dance com Kidzz", sub: "Mini-game de palmas e movimento", d: D.dance, k: "rosa", t: [240, 130, 170] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-dance.png` },
+    { pillar: "stories" as Pillar, title: "Histórias Cantadas", sub: "4 livros mágicos narrados em canção", d: D.book, k: "azul", t: [130, 175, 240] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-book.png` },
+    { pillar: "create" as Pillar, title: "Crie Sua Música", sub: "Laboratório sonoro — monte a sua", d: D.lab, k: "verde", t: [140, 200, 110] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-create.png` },
   ];
 
   const destaques = ACTIVITIES.filter((a) => a.tags.includes("featured") || a.tags.includes("movement"));
+  const heroImg = `${MU}/hero-family.png`;
+
+  const playAmbient = (s: (typeof AMBIENT_SOUNDS)[number]) => {
+    if (!s.free && !isPremium) {
+      openPaywall("music_ambient");
+      return;
+    }
+    if (!s.url) {
+      showToast("Esse som chega em breve 🎵");
+      return;
+    }
+    try {
+      const a = new Audio(s.url);
+      a.loop = true;
+      a.volume = 0.45;
+      void a.play();
+      showToast(`Tocando: ${s.label}`);
+    } catch {
+      showToast("Não foi possível tocar o som.");
+    }
+  };
 
   return (
-    <div style={{ height: "100%", position: "relative", fontFamily: "'Nunito',system-ui,sans-serif", background: CREAM_BG }}>
+    <div style={{ height: "100%", position: "relative", fontFamily: FONT, background: "#1a2a18", color: "#2A2008" }}>
       <MusicKeyframes />
-      <CreamBackdrop />
+      <ForestBackdrop heroSrc={heroImg} />
 
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        style={{ height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", WebkitOverflowScrolling: "touch", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)", scrollbarWidth: "none", position: "relative" }}
+        style={{
+          height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
+          scrollbarWidth: "none", position: "relative", zIndex: 2,
+        }}
       >
-        {/* ── HERO ── */}
-        <div style={{ position: "relative" }}>
-          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 414, backgroundImage: "url('/exemplos/assets/cena-musica.png')", backgroundSize: "cover", backgroundPosition: "center", filter: "blur(46px) saturate(1.45)", opacity: 0.5, transform: "scale(1.22)", pointerEvents: "none" }} />
-          <div ref={heroWrapRef} style={{ position: "relative", width: "100%", height: 414, willChange: "transform", WebkitMaskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)", maskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)", animation: "mus-heroin .7s cubic-bezier(.22,1,.36,1) both" }}>
-            <img src="/exemplos/assets/cena-musica.png" alt="Gui, o camaleão, cantando com microfone dourado" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 34%", animation: "mus-floaty 6s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)" }} />
-            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(180deg,rgba(246,241,223,.2) 0%,rgba(246,241,223,0) 20%,rgba(246,241,223,.22) 48%,rgba(246,241,223,.6) 72%,rgba(246,241,223,.34) 84%,rgba(246,241,223,.12) 94%,transparent 100%)" }} />
+        {/* ── HERO (layout print: texto esq + arte dir) ── */}
+        <div style={{ position: "relative", minHeight: 420, paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)" }}>
+          {/* arte flutuante à direita */}
+          <div
+            ref={heroWrapRef}
+            style={{
+              position: "absolute", top: 48, right: -8, width: "58%", height: 320,
+              pointerEvents: "none", animation: "mus-heroin .75s cubic-bezier(.22,1,.36,1) both",
+            }}
+          >
+            <img
+              src={heroImg}
+              alt="Família tocando música"
+              style={{
+                width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%",
+                borderRadius: "0 0 0 48%",
+                maskImage: "radial-gradient(70% 70% at 60% 40%, #000 35%, transparent 78%)",
+                WebkitMaskImage: "radial-gradient(70% 70% at 60% 40%, #000 35%, transparent 78%)",
+                filter: "saturate(1.12) contrast(1.04)",
+                animation: "mus-floaty 7s ease-in-out infinite",
+                boxShadow: "0 20px 50px rgba(0,0,0,.25)",
+              }}
+            />
           </div>
-          <div style={{ position: "absolute", top: 0, right: 0, width: "44%", height: 236, pointerEvents: "none", background: "linear-gradient(180deg,rgba(255,232,170,.35) 0%,rgba(255,232,170,.1) 45%,transparent 75%)", filter: "blur(6px)", animation: "mus-raysway 7s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", top: 54, left: "56%", width: 6, height: 6, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 10px 3px rgba(255,205,110,.85)", animation: "mus-twinkle 3.2s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", top: 150, left: "48%", width: 4, height: 4, borderRadius: 99, background: "#EAD9FF", boxShadow: "0 0 8px 2px rgba(190,160,240,.75)", animation: "mus-sparklefloat 4.4s ease-in-out 1s infinite" }} />
-          <div style={{ position: "absolute", top: 200, left: "66%", width: 5, height: 5, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 9px 3px rgba(255,205,110,.7)", animation: "mus-sparklefloat 5.1s ease-in-out .4s infinite" }} />
 
-          <button onClick={onBack} className="active:scale-90" style={{ position: "absolute", top: 62, left: 16, width: 42, height: 42, borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.62)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(110,85,30,.18),inset 0 1px 0 rgba(255,255,255,1)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", zIndex: 6 }} aria-label="Voltar">
-            <Icon d={D.back} stroke="#3A2E14" size={19} sw={2.2} />
-          </button>
-          <div style={{ position: "absolute", top: 62, right: 16, display: "flex", gap: 8, zIndex: 6 }}>
-            <button onClick={onOpenParental} className="active:scale-95" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.62)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(110,85,30,.18),inset 0 1px 0 rgba(255,255,255,1)", fontWeight: 800, fontSize: 13, color: "#3A2E14", fontFamily: "'Nunito',sans-serif" }} aria-label="Painel dos pais">
-              <Icon d={D.shield} stroke="#2E8B72" size={15} sw={2} /> Pais
+          {/* chrome */}
+          <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
+            <button
+              onClick={onBack}
+              className="active:scale-90"
+              style={{ width: 44, height: 44, borderRadius: R.btn, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", ...pillGlassLight }}
+              aria-label="Voltar"
+            >
+              <Icon d={D.back} stroke="#3A2E14" size={19} sw={2.2} />
             </button>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 999, background: "rgba(255,255,255,.62)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(110,85,30,.18),inset 0 1px 0 rgba(255,255,255,1)", fontWeight: 900, fontSize: 13, color: "#3A2E14" }}>
-              <Icon d={D.cap} stroke="#E0A62B" size={14} sw={1.9} /> {xp}
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={onOpenParental}
+                className="active:scale-95"
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 14px", minHeight: 44, borderRadius: R.btn, cursor: "pointer", fontWeight: 800, fontSize: 13, color: "#3A2E14", ...pillGlassLight }}
+                aria-label="Painel dos pais"
+              >
+                <Icon d={D.shield} stroke="#2E8B72" size={15} sw={2} /> Pais
+              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 14px", minHeight: 44, borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#3A2E14", ...pillGlassLight }}>
+                <Icon d={D.cap} stroke="#E0A62B" size={14} sw={1.9} /> {xp}
+              </div>
             </div>
           </div>
-          <div style={{ padding: "14px 20px 2px", animation: "mus-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", zIndex: 4, position: "relative" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(255,255,255,.72)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,1)", boxShadow: "inset 0 1px 0 rgba(255,255,255,1),0 4px 12px rgba(110,85,30,.1)", fontWeight: 800, fontSize: 11.5, color: "#6B5A32", marginBottom: 10 }}>
-              {greetingWord()}, família!
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="#39B58A"><path d={D.heart} /></svg>
+
+          {/* copy */}
+          <div style={{ position: "relative", zIndex: 5, padding: "18px 20px 8px", maxWidth: "62%", animation: "mus-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
+            <div style={{ fontWeight: 800, fontSize: 13, color: "rgba(255,252,240,.92)", textShadow: "0 1px 8px rgba(0,0,0,.35)", marginBottom: 8 }}>
+              {greetingWord()}, família! <span style={{ color: "#7dffb0" }}>♥</span>
             </div>
-            <h1 style={{ margin: "0 0 7px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 28, lineHeight: 1.14, color: "#2A2008", letterSpacing: "-.3px" }}>
-              Música que <span style={{ color: "#D9992B" }}>conecta</span>, momentos que ficam.
+            <h1 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 30, lineHeight: 1.12, color: "#FFFDF6", letterSpacing: "-.4px", textShadow: "0 2px 18px rgba(0,0,0,.4)" }}>
+              Música que <span style={{ color: "#FFD36A" }}>conecta</span>, momentos que ficam.
             </h1>
-            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.45, color: "#7A6840", maxWidth: 280 }}>
-              Para soltar a voz, dançar e criar memórias em família.
+            <p style={{ margin: "0 0 16px", fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(255,248,230,.88)", textShadow: "0 1px 8px rgba(0,0,0,.3)", maxWidth: 240 }}>
+              Atividades com música para soltar a voz, dançar e criar memórias inesquecíveis juntos.
             </p>
+            <button
+              onClick={() => openCategory("featured")}
+              className="active:scale-[0.97]"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 22px", minHeight: 48,
+                borderRadius: R.btn, border: "0.5px solid rgba(255,255,255,.55)", cursor: "pointer",
+                fontWeight: 900, fontSize: 14.5, color: "#1a1a2e",
+                background: "linear-gradient(105deg,#F7B4D8 0%,#B4D0FF 42%,#9AE8D4 100%)",
+                boxShadow: "0 12px 32px rgba(40,60,100,.28), 0 1px 0 rgba(255,255,255,.8) inset",
+              }}
+            >
+              Explorar música →
+            </button>
           </div>
         </div>
 
-        {/* ── CATEGORIAS (scroll horizontal) ── */}
-        <div style={{ display: "flex", gap: 10, overflowX: "auto", padding: "8px 16px 4px", scrollbarWidth: "none", position: "relative", zIndex: 5, animation: "mus-rise .6s .1s both" }}>
+        {/* ── CATEGORIAS ── */}
+        <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "8px 16px 6px", scrollbarWidth: "none", position: "relative", zIndex: 5 }}>
           {CATEGORIES.map((cat) => {
             const [tr, tg, tb] = TINT[cat.dk];
             return (
               <button
                 key={cat.id}
                 onClick={() => openCategory(cat.id)}
-                className="active:scale-95"
-                style={{ position: "relative", overflow: "hidden", flex: "none", width: 128, borderRadius: 24, padding: "12px 11px 11px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 6, transition: "transform .2s", fontFamily: "'Nunito',sans-serif", ...glass(tr, tg, tb, 0.5, 0.18) }}
+                className="active:scale-[0.96]"
+                style={{
+                  position: "relative", overflow: "hidden", flex: "none", width: 148,
+                  padding: "14px 12px 12px", textAlign: "left", cursor: "pointer",
+                  display: "flex", flexDirection: "column", gap: 8, ...catGlass(tr, tg, tb),
+                }}
               >
-                <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%)", animation: "mus-shine 5.5s ease-in-out infinite" }} />
+                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "linear-gradient(115deg, transparent 0%, rgba(255,255,255,.35) 48%, transparent 72%)", mixBlendMode: "soft-light" }} />
                 {cat.novo && (
-                  <div style={{ position: "absolute", top: 9, right: 9, padding: "3px 9px", borderRadius: 999, background: "radial-gradient(130% 130% at 30% 22%,#FFF3C4 0%,#F2C55C 45%,#C98F1E 100%)", color: "#4A3300", fontSize: 9, fontWeight: 900, letterSpacing: ".4px", boxShadow: "0 3px 8px rgba(150,95,10,.4),inset 0 1px 0 rgba(255,255,255,.7)" }}>NOVO</div>
+                  <div style={{ position: "absolute", top: 10, right: 10, padding: "4px 10px", borderRadius: 999, zIndex: 2, ...goldBadge }}>NOVO</div>
                 )}
-                <div style={{ width: 52, height: 52, borderRadius: 17, backgroundImage: `url("/exemplos/assets/mo-cat-${cat.tile}.png")`, backgroundSize: "cover", backgroundPosition: "center", boxShadow: "0 6px 14px rgba(110,85,30,.28), inset 0 1px 0 rgba(255,255,255,.4)", marginBottom: 2 }} />
-                <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 13.5, color: "#2A2008", lineHeight: 1.15 }}>{cat.label}</div>
-                <div style={{ fontSize: 10, fontWeight: 800, color: "#7A6840", lineHeight: 1.3 }}>{cat.subtitle}</div>
-                <div style={glossArrow(...ARROWS[cat.dk])}>
+                <img
+                  src={cat.cover}
+                  alt=""
+                  style={{
+                    width: 72, height: 72, borderRadius: 22, objectFit: "cover",
+                    boxShadow: "0 10px 22px rgba(40,30,15,.22), 0 1px 0 rgba(255,255,255,.5) inset",
+                    border: "0.5px solid rgba(255,255,255,.75)",
+                  }}
+                />
+                <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#2A2008", lineHeight: 1.15 }}>{cat.label}</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#6B5A38", lineHeight: 1.3, minHeight: 28 }}>{cat.subtitle}</div>
+                <div style={{ alignSelf: "flex-end", ...glossArrow(...ARROWS[cat.dk]) }}>
                   <Icon d={D.arrow} size={12} sw={2.4} />
                 </div>
               </button>
@@ -394,42 +528,116 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           })}
         </div>
 
-        {/* ── MAIS MANEIRAS DE BRINCAR ── */}
-        <div>
-          <div style={{ padding: "20px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#2A2008" }}>Mais maneiras de brincar</h2>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9, padding: "0 16px" }}>
+        {/* ── MAIS MANEIRAS ── */}
+        <div style={{ padding: "18px 16px 0" }}>
+          <h2 style={{ margin: "0 4px 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#2A2008" }}>
+            Mais maneiras de brincar com música 🎵
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {modos.map((m) => {
               const locked = m.requiresPremium && !isPremium;
               return (
                 <button
                   key={m.pillar}
                   onClick={() => tryOpenPillar(m.pillar, m.requiresPremium)}
-                  className="active:scale-95"
-                  style={{ position: "relative", overflow: "hidden", borderRadius: 22, padding: "13px 13px 12px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 6, transition: "transform .2s", fontFamily: "'Nunito',sans-serif", ...glass(...m.t, 0.42, 0.14) }}
+                  className="active:scale-[0.97]"
+                  style={{
+                    position: "relative", overflow: "hidden", borderRadius: 26, padding: "14px 12px 14px",
+                    textAlign: "left", cursor: "pointer", minHeight: 128,
+                    boxShadow: "0 14px 36px rgba(40,30,15,.12), 0 1px 0 rgba(255,255,255,1) inset",
+                    backdropFilter: "blur(36px) saturate(190%)",
+                    WebkitBackdropFilter: "blur(36px) saturate(190%)",
+                    ...modeTint[m.k],
+                  }}
                 >
-                  <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.3) 50%,transparent 100%)", animation: "mus-shine 6s ease-in-out infinite" }} />
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
-                    <div style={gloss(...MODOS_G[m.k], 40, 14)}><Icon d={m.d} /></div>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                    <img
+                      src={m.cover}
+                      alt=""
+                      style={{
+                        width: 64, height: 64, borderRadius: 20, objectFit: "cover",
+                        boxShadow: "0 10px 20px rgba(40,30,15,.18)",
+                        border: "0.5px solid rgba(255,255,255,.9)",
+                      }}
+                    />
                     <div style={m.badge === "NOVO" ? greenBadge : goldBadge}>
                       {locked && <Icon d={D.lock} stroke="#4A3300" size={9} sw={2.2} />}
                       {m.badge}
                     </div>
                   </div>
-                  <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#2A2008", lineHeight: 1.18 }}>{m.title}</div>
-                  <div style={{ fontSize: 10.5, fontWeight: 800, color: "#7A6840", lineHeight: 1.35 }}>{m.sub}</div>
+                  <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: "#2A2008", lineHeight: 1.15, marginBottom: 4 }}>{m.title}</div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: "#6B5A38", lineHeight: 1.35 }}>{m.sub}</div>
+                  <div style={{ position: "absolute", right: 12, bottom: 12, ...glossArrow(...MODOS_G[m.k]) }}>
+                    <Icon d={D.arrow} size={12} sw={2.4} />
+                  </div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* ── ATIVIDADES EM DESTAQUE ── */}
-        <div>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "20px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#2A2008" }}>Atividades em destaque</h2>
-            <button onClick={() => openCategory("featured")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 12.5, color: "#C7841A", padding: 0 }}>Ver todas →</button>
+        {/* ── SONS PARA OUVIR ── */}
+        <div style={{ padding: "20px 16px 0" }}>
+          <h2 style={{ margin: "0 4px 4px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#2A2008" }}>
+            Sons para ouvir 🌿
+          </h2>
+          <p style={{ margin: "0 4px 12px", fontSize: 12.5, fontWeight: 700, color: "#7A6840" }}>
+            Deixe tocando ao fundo enquanto brincam
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {AMBIENT_SOUNDS.map((s) => {
+              const locked = !s.free && !isPremium;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => playAmbient(s)}
+                  className="active:scale-[0.99]"
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12, padding: "14px 14px",
+                    textAlign: "left", cursor: "pointer",
+                    ...glassLightSoft,
+                    borderRadius: 22,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 44, height: 44, borderRadius: 16, flex: "none",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 22, background: "rgba(255,255,255,.75)",
+                      boxShadow: "0 4px 12px rgba(40,30,15,.1), 0 1px 0 rgba(255,255,255,1) inset",
+                    }}
+                  >
+                    {s.emoji}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: "#2A2008" }}>{s.label}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#8A7850" }}>Slot: {s.slot}</div>
+                  </div>
+                  {locked && <span style={{ ...goldBadge }}>Premium</span>}
+                  <div
+                    style={{
+                      width: 40, height: 40, borderRadius: 999, flex: "none",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: "linear-gradient(160deg, #fff 0%, #f3ebe0 100%)",
+                      border: "0.5px solid rgba(255,255,255,1)",
+                      boxShadow: "0 6px 14px rgba(40,30,15,.12)",
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#3A2E14"><path d={D.play} /></svg>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── ATIVIDADES ── */}
+        <div style={{ paddingTop: 8 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "16px 20px 10px" }}>
+            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#2A2008" }}>Atividades em destaque</h2>
+            <button onClick={() => openCategory("featured")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: FONT, fontWeight: 900, fontSize: 12.5, color: "#C7841A", padding: 0 }}>
+              Ver todas →
+            </button>
           </div>
           <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 12px", scrollbarWidth: "none" }}>
             {destaques.map((a, i) => (
@@ -445,7 +653,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           </div>
         </div>
 
-        <div style={{ padding: "6px 20px 14px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#A08E60" }}>
+        <div style={{ padding: "8px 20px 16px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#8A7850" }}>
           Curadoria KIDZZ · Música para crescer junto
         </div>
       </div>
@@ -503,17 +711,17 @@ const CategoryScreen = ({
 }) => {
   const [tr, tg, tb] = TINT[category.dk];
   return (
-    <div style={{ height: "100%", position: "relative", fontFamily: "'Nunito',system-ui,sans-serif", background: CREAM_BG }}>
+    <div style={{ height: "100%", position: "relative", fontFamily: FONT, background: CREAM_BG }}>
       <MusicKeyframes />
-      <CreamBackdrop />
+      <ForestBackdrop heroSrc={category.cover} />
 
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 30, display: "flex", alignItems: "center", gap: 8, padding: "0 12px 8px", paddingTop: "max(env(safe-area-inset-top, 14px), 14px)" }}>
-        <button onClick={onBack} className="active:scale-90" style={{ flex: "none", width: 42, height: 42, borderRadius: 999, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", ...glass(tr, tg, tb, 0.5, 0.18) }} aria-label="Voltar">
+        <button onClick={onBack} className="active:scale-90" style={{ flex: "none", width: 44, height: 44, borderRadius: R.btn, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", ...pillGlassLight }} aria-label="Voltar">
           <Icon d={D.back} stroke="#3A2E14" size={19} sw={2.2} />
         </button>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 9, padding: "8px 14px", borderRadius: 999, ...glass(tr, tg, tb, 0.5, 0.18) }}>
-          <div style={{ width: 24, height: 24, borderRadius: 8, background: category.gradient, boxShadow: "inset 0 1px 0 rgba(255,255,255,.5)" }} />
-          <p style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#2A2008", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{category.label}</p>
+        <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 9, padding: "8px 14px", borderRadius: R.btn, ...pillGlassLight }}>
+          <img src={category.cover} alt="" style={{ width: 28, height: 28, borderRadius: 10, objectFit: "cover" }} />
+          <p style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#2A2008", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{category.label}</p>
         </div>
       </div>
 
