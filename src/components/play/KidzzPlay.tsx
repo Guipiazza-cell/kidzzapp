@@ -20,11 +20,10 @@ import LockedFeature from "@/components/LockedFeature";
 import KidzzHeader from "@/components/common/KidzzHeader";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
+import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 
-import imgCabana from "@/assets/brincar-act-cabana.jpg";
-import imgCaca from "@/assets/brincar-act-cacatesouro.jpg";
-import imgArte from "@/assets/brincar-act-arte.jpg";
-import imgAviao from "@/assets/brincar-act-aviao.jpg";
+/** Assets gerados Hermes/Codex — public/telas/brincar */
+const BR = "/exemplos/assets/brincar-v2";
 
 const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
 const MemoryGame = lazy(() => import("./games/MemoryGame"));
@@ -65,7 +64,7 @@ const FEATURED: FeaturedActivity[] = [
     id: "cabana",
     titulo: "Cabana Secreta",
     desc: "Monte um esconderijo incrível e conte histórias!",
-    img: imgCabana,
+    img: `${BR}/act-cabana.png`,
     tempo: "5 min",
     idade: "3–6 anos",
     energia: "leve",
@@ -77,7 +76,7 @@ const FEATURED: FeaturedActivity[] = [
     id: "caca",
     titulo: "Caça ao Tesouro",
     desc: "Encontre os objetos escondidos pela casa.",
-    img: imgCaca,
+    img: `${BR}/act-caca.png`,
     tempo: "10 min",
     idade: "4–8 anos",
     energia: "média",
@@ -90,7 +89,7 @@ const FEATURED: FeaturedActivity[] = [
     id: "arte",
     titulo: "Arte Sem Regras",
     desc: "Liberte a criatividade com tinta e imaginação.",
-    img: imgArte,
+    img: `${BR}/act-arte.png`,
     tempo: "15 min",
     idade: "3–10 anos",
     energia: "leve",
@@ -102,7 +101,7 @@ const FEATURED: FeaturedActivity[] = [
     id: "aviao",
     titulo: "Aviões de Papel",
     desc: "Quem faz o avião que voa mais longe?",
-    img: imgAviao,
+    img: `${BR}/act-aviao.png`,
     tempo: "7 min",
     idade: "5–9 anos",
     energia: "leve",
@@ -167,7 +166,7 @@ const D = {
   leaf: "M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11",
 };
 
-/* Liquid glass claro com tint colorido (fundo claro-esverdeado) */
+/* Liquid glass premium (nível Bora) com tint colorido */
 const glass = (
   r: number,
   g: number,
@@ -177,11 +176,11 @@ const glass = (
 ): CSSProperties => {
   const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
   return {
-    background: `linear-gradient(155deg, rgba(255,255,255,.9) 0%, ${rgba(aTop)} 28%, ${rgba((aTop + aBot) / 2)} 60%, ${rgba(aBot)} 85%, rgba(255,255,255,.6) 100%)`,
-    backdropFilter: "blur(20px) saturate(170%)",
-    WebkitBackdropFilter: "blur(20px) saturate(170%)",
-    border: "1px solid rgba(255,255,255,1)",
-    boxShadow: `0 14px 32px rgba(50,90,40,.18), 0 0 26px ${rgba(0.22)}, inset 0 1.5px 0 rgba(255,255,255,1), inset 0 -10px 20px ${rgba(0.16)}`,
+    background: `linear-gradient(165deg, rgba(255,255,255,.92) 0%, ${rgba(aTop)} 32%, ${rgba((aTop + aBot) / 2)} 62%, ${rgba(aBot)} 88%, rgba(255,255,255,.62) 100%)`,
+    backdropFilter: "blur(40px) saturate(195%)",
+    WebkitBackdropFilter: "blur(40px) saturate(195%)",
+    border: "0.5px solid rgba(255,255,255,.98)",
+    boxShadow: `0 14px 40px rgba(50,90,40,.16), 0 2px 8px rgba(50,90,40,.06), 0 0 24px ${rgba(0.2)}, inset 0 1.5px 0 rgba(255,255,255,1), inset 0 -10px 20px ${rgba(0.12)}`,
   };
 };
 const gloss = (
@@ -465,14 +464,17 @@ const KidzzPlay = ({
     sub: string;
     d: string;
     k: string;
+    cover: string;
     novo?: boolean;
     onClick: () => void;
   }[] = [
-    { key: "c1", title: "Missões do dia", sub: "Desafios rápidos em família", d: D.target, k: "laranja", onClick: () => setSub("missoes") },
-    { key: "c2", title: "Criar e Imaginar", sub: "Atividades criativas sem limites", d: D.brush, k: "verde", onClick: () => setSub("criar") },
-    { key: "c3", title: "Jogos e Desafios", sub: "Diversão que une todo mundo", d: D.gamepad, k: "roxo", onClick: () => setSub("jogos") },
-    { key: "c4", title: "Modo Viagem", sub: "Brincadeiras para o caminho", d: D.plane, k: "azul", novo: true, onClick: () => onOpenTravel?.() },
+    { key: "c1", title: "Missões do dia", sub: "Desafios rápidos em família", d: D.target, k: "laranja", cover: `${BR}/cat-missoes.png`, onClick: () => setSub("missoes") },
+    { key: "c2", title: "Criar & Imaginar", sub: "Atividades criativas sem limites", d: D.brush, k: "verde", cover: `${BR}/cat-criar.png`, onClick: () => setSub("criar") },
+    { key: "c3", title: "Jogos & Desafios", sub: "Diversão saudável para todos", d: D.gamepad, k: "roxo", cover: `${BR}/cat-jogos.png`, onClick: () => setSub("jogos") },
+    { key: "c4", title: "Modo Viagem", sub: "Atividades para qualquer lugar", d: D.plane, k: "azul", cover: `${BR}/cat-viagem.png`, novo: true, onClick: () => onOpenTravel?.() },
   ];
+
+  const heroImg = `${BR}/hero-kids.png`;
 
   /* Anel de progresso do desafio (2/3 — igual ao design) */
   const RING_CIRC = 207.3;
@@ -502,31 +504,30 @@ const KidzzPlay = ({
       transition={{ duration: 0.3 }}
       className="flex-1 relative overflow-hidden min-h-0"
       style={{
-        fontFamily: "'Nunito',system-ui,sans-serif",
-        background:
-          "linear-gradient(180deg,#F0F8EA 0%,#E4F1DD 40%,#D8EAD1 75%,#CCE2C6 100%)",
+        fontFamily: FONT,
+        background: "#1a2a18",
       }}
     >
-      {/* brilho radial de fundo */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(45% 30% at 78% 26%,rgba(255,210,120,.20),transparent 70%),radial-gradient(42% 28% at 10% 55%,rgba(120,220,180,.14),transparent 70%),radial-gradient(50% 30% at 55% 90%,rgba(175,150,235,.10),transparent 70%)",
-        }}
-      />
-      {/* orbes de luz que flutuam */}
-      <div style={{ position: "absolute", top: -60, left: -80, width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,220,130,.35),transparent 65%)", filter: "blur(28px)", animation: "brin-drift1 13s ease-in-out infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: "38%", left: -90, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(110,215,170,.28),transparent 65%)", filter: "blur(30px)", animation: "brin-drift2 17s ease-in-out 2s infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: 90, right: -100, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle,rgba(175,150,235,.22),transparent 65%)", filter: "blur(32px)", animation: "brin-drift1 19s ease-in-out 4s infinite", pointerEvents: "none" }} />
-      {/* folhas caindo */}
-      <div style={{ position: "absolute", top: 0, left: "22%", pointerEvents: "none", animation: "brin-leafdrift 16s linear 1s infinite" }}>
-        <Icon d={D.leaf} stroke="#5CB56A" size={15} sw={1.8} />
-      </div>
-      <div style={{ position: "absolute", top: 0, left: "72%", pointerEvents: "none", animation: "brin-leafdrift 21s linear 7s infinite" }}>
-        <Icon d={D.leaf} stroke="#84C45C" size={12} sw={1.8} />
+      {/* Fundo floresta full-bleed (print) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+        <img
+          src={heroImg}
+          alt=""
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center 18%",
+            filter: "saturate(1.12) brightness(0.92)", transform: "scale(1.06)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute", inset: 0,
+            background:
+              "radial-gradient(55% 38% at 80% 8%, rgba(255,220,120,.5) 0%, transparent 62%)," +
+              "linear-gradient(180deg, rgba(20,40,18,.22) 0%, rgba(240,248,234,.12) 26%, rgba(240,248,234,.72) 55%, #EAF4E2 72%, #E0EED8 100%)",
+          }}
+        />
+        <div style={{ position: "absolute", top: -30, right: -10, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,230,140,.5), transparent 68%)", filter: "blur(6px)", animation: "brin-raysway 8s ease-in-out infinite" }} />
       </div>
 
       <div
@@ -541,100 +542,99 @@ const KidzzPlay = ({
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
           scrollbarWidth: "none",
           position: "relative",
+          zIndex: 2,
         }}
       >
-        {/* ── HERO ── */}
-        <div style={{ position: "relative" }}>
-          {/* cópia borrada de fundo */}
-          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 414, backgroundImage: "url('/exemplos/assets/cena-brincar.png')", backgroundSize: "cover", backgroundPosition: "center", filter: "blur(46px) saturate(1.45)", opacity: 0.5, transform: "scale(1.22)", pointerEvents: "none" }} />
+        {/* ── HERO (texto esq + arte dir, como print) ── */}
+        <div style={{ position: "relative", minHeight: 360, paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}>
           <div
             ref={heroWrapRef}
             style={{
-              position: "relative",
-              width: "100%",
-              height: 414,
-              willChange: "transform",
-              WebkitMaskImage:
-                "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)",
-              maskImage:
-                "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)",
-              animation: "brin-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+              position: "absolute", top: 40, right: -12, width: "56%", height: 300,
+              pointerEvents: "none", animation: "brin-heroIn .7s cubic-bezier(.22,1,.36,1) both",
             }}
           >
             <img
-              src="/exemplos/assets/cena-brincar.png"
-              alt="Gui, o camaleão, com o coração brilhando"
-              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 34%", animation: "brin-floaty 6s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)" }}
+              src={heroImg}
+              alt="Crianças brincando na floresta"
+              style={{
+                width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%",
+                borderRadius: "0 0 0 48%",
+                maskImage: "radial-gradient(70% 70% at 58% 40%, #000 38%, transparent 78%)",
+                WebkitMaskImage: "radial-gradient(70% 70% at 58% 40%, #000 38%, transparent 78%)",
+                filter: "saturate(1.1)",
+                animation: "brin-floaty 6.5s ease-in-out infinite",
+              }}
             />
-            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(180deg,rgba(240,248,234,.2) 0%,rgba(240,248,234,0) 20%,rgba(240,248,234,.22) 48%,rgba(240,248,234,.6) 72%,rgba(240,248,234,.34) 84%,rgba(240,248,234,.12) 94%,transparent 100%)" }} />
-          </div>
-          {/* raio de luz + brilhos */}
-          <div style={{ position: "absolute", top: 0, left: 0, width: "46%", height: 236, pointerEvents: "none", background: "linear-gradient(180deg,rgba(255,240,190,.32) 0%,rgba(255,240,190,.10) 45%,transparent 75%)", filter: "blur(6px)", animation: "brin-raysway 7s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", top: 46, left: "56%", width: 6, height: 6, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 10px 3px rgba(255,205,110,.85)", animation: "brin-twinkle 3.2s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", top: 130, left: "47%", width: 4, height: 4, borderRadius: 99, background: "#FFF3CC", boxShadow: "0 0 8px 2px rgba(255,220,140,.75)", animation: "brin-sparklefloat 4.4s ease-in-out 1s infinite" }} />
-          <div style={{ position: "absolute", top: 196, left: "64%", width: 5, height: 5, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 9px 3px rgba(255,205,110,.7)", animation: "brin-sparklefloat 5.1s ease-in-out .4s infinite" }} />
-
-          {/* voltar */}
-          <button
-            type="button"
-            onClick={onBack}
-            className="active:scale-90"
-            style={{ position: "absolute", top: 62, left: 16, width: 42, height: 42, borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.95)", boxShadow: "0 6px 16px rgba(60,100,50,.2),inset 0 1px 0 rgba(255,255,255,1)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", zIndex: 6 }}
-          >
-            <Icon d={D.arrowBack} stroke="#1E3A28" size={19} sw={2.2} />
-          </button>
-          {/* Pais + Pontos */}
-          <div style={{ position: "absolute", top: 62, right: 16, display: "flex", gap: 8, zIndex: 6 }}>
-            <button
-              type="button"
-              onClick={onOpenParental}
-              className="active:scale-95"
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.95)", boxShadow: "0 6px 16px rgba(60,100,50,.2),inset 0 1px 0 rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: 13, color: "#1E3A28" }}
-            >
-              <Icon d={D.shield} stroke="#1E9A6E" size={15} sw={2} />
-              Pais
-            </button>
-            <button
-              type="button"
-              onClick={onOpenAchievements}
-              className="active:scale-95"
-              style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 13px", borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.6)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.95)", boxShadow: "0 6px 16px rgba(60,100,50,.2),inset 0 1px 0 rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: 13, color: "#1E3A28" }}
-            >
-              <Icon d={D.trophy} stroke="#E0A62B" size={14} sw={1.9} />
-              {sessionScore}
-            </button>
           </div>
 
-          {/* textos do hero */}
-          <div style={{ padding: "14px 20px 2px", animation: "brin-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", zIndex: 4, position: "relative" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 999, background: "rgba(255,255,255,.72)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,1)", boxShadow: "inset 0 1px 0 rgba(255,255,255,1),0 4px 12px rgba(60,100,50,.1)", fontWeight: 800, fontSize: 12, color: "#3E5A44", marginBottom: 11 }}>
-              {greeting}, família!
-              <span style={{ display: "inline-flex", animation: "brin-heartbeat 2.4s ease-in-out infinite" }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="#39B58A"><path d={D.heart} /></svg>
+          <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
+            <button
+              type="button"
+              onClick={onBack}
+              className="active:scale-90"
+              style={{ width: 44, height: 44, borderRadius: R.btn, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", ...pillGlassLight }}
+              aria-label="Voltar"
+            >
+              <Icon d={D.arrowBack} stroke="#1E3A28" size={19} sw={2.2} />
+            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                type="button"
+                onClick={onOpenParental}
+                className="active:scale-95"
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 14px", minHeight: 44, borderRadius: R.btn, cursor: "pointer", fontWeight: 800, fontSize: 13, color: "#1E3A28", ...pillGlassLight }}
+              >
+                <Icon d={D.shield} stroke="#1E9A6E" size={15} sw={2} />
+                Pais
+              </button>
+              <button
+                type="button"
+                onClick={onOpenAchievements}
+                className="active:scale-95"
+                style={{ display: "flex", alignItems: "center", gap: 5, padding: "0 14px", minHeight: 44, borderRadius: R.btn, cursor: "pointer", fontWeight: 900, fontSize: 13, color: "#1E3A28", ...pillGlassLight }}
+              >
+                <Icon d={D.trophy} stroke="#E0A62B" size={14} sw={1.9} />
+                {sessionScore}
+              </button>
+            </div>
+          </div>
+
+          <div style={{ position: "relative", zIndex: 5, padding: "16px 20px 8px", maxWidth: "62%", animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
+            <div style={{ fontWeight: 800, fontSize: 13, color: "rgba(255,252,240,.95)", textShadow: "0 1px 8px rgba(0,0,0,.35)", marginBottom: 8 }}>
+              {greeting}, família!{" "}
+              <span style={{ display: "inline-flex", verticalAlign: "middle", animation: "brin-heartbeat 2.4s ease-in-out infinite" }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#7dffb0"><path d={D.heart} /></svg>
               </span>
             </div>
-            <h1 style={{ margin: "0 0 8px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 29, lineHeight: 1.13, color: "#17301F", letterSpacing: "-.3px" }}>
-              Brincar faz parte da <span style={{ color: "#2E9A63" }}>magia</span> de crescer.
+            <h1 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 30, lineHeight: 1.12, color: "#FFFDF6", letterSpacing: "-.4px", textShadow: "0 2px 18px rgba(0,0,0,.4)" }}>
+              Brincar faz parte da <span style={{ color: "#8BE08A" }}>magia</span> de crescer.
             </h1>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "#557A5E", maxWidth: 300 }}>
-              Escolha uma atividade e transforme qualquer momento em diversão e conexão.
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(255,248,230,.9)", textShadow: "0 1px 8px rgba(0,0,0,.3)", maxWidth: 250 }}>
+              Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
             </p>
           </div>
         </div>
 
-        {/* ── CATEGORIAS (2x2) ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, padding: "10px 16px 0", position: "relative", zIndex: 5, animation: "brin-rise .6s .1s both" }}>
+        {/* ── CATEGORIAS (2x2) com ícones gerados ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: "8px 16px 0", position: "relative", zIndex: 5, animation: "brin-rise .6s .1s both" }}>
           {categorias.map((c) => (
-            <button key={c.key} type="button" onClick={c.onClick} className="active:scale-95" style={categoryCardStyle(c.k)}>
+            <button key={c.key} type="button" onClick={c.onClick} className="active:scale-[0.96]" style={{ ...categoryCardStyle(c.k), borderRadius: 26, minHeight: 148, padding: "14px 13px 12px" }}>
               <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%)", animation: "brin-shine 5.5s ease-in-out infinite" }} />
               {c.novo && (
-                <div style={{ position: "absolute", top: 10, right: 10, padding: "3px 9px", borderRadius: 999, background: "radial-gradient(130% 130% at 30% 22%,#FFF3C4 0%,#F2C55C 45%,#C98F1E 100%)", color: "#4A3300", fontSize: 9, fontWeight: 900, letterSpacing: ".4px", boxShadow: "0 3px 8px rgba(150,95,10,.4),inset 0 1px 0 rgba(255,255,255,.7)", animation: "brin-wiggle 2.6s ease-in-out infinite" }}>NOVO</div>
+                <div style={{ position: "absolute", top: 10, right: 10, zIndex: 2, padding: "3px 9px", borderRadius: 999, background: "radial-gradient(130% 130% at 30% 22%,#FFF3C4 0%,#F2C55C 45%,#C98F1E 100%)", color: "#4A3300", fontSize: 9, fontWeight: 900, letterSpacing: ".4px", boxShadow: "0 3px 8px rgba(150,95,10,.4),inset 0 1px 0 rgba(255,255,255,.7)" }}>NOVO</div>
               )}
-              <div style={gloss(...GLOSSY[c.k], 44, 15)}>
-                <Icon d={c.d} size={22} sw={1.8} />
-              </div>
-              <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#17301F", lineHeight: 1.15 }}>{c.title}</div>
-              <div style={{ fontSize: 10.5, fontWeight: 800, color: "#557A5E", lineHeight: 1.35 }}>{c.sub}</div>
+              <img
+                src={c.cover}
+                alt=""
+                style={{
+                  width: 56, height: 56, borderRadius: 18, objectFit: "cover", marginBottom: 4,
+                  boxShadow: "0 8px 18px rgba(50,90,40,.22), 0 1px 0 rgba(255,255,255,.5) inset",
+                  border: "0.5px solid rgba(255,255,255,.8)",
+                }}
+              />
+              <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: "#17301F", lineHeight: 1.15 }}>{c.title}</div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#557A5E", lineHeight: 1.35 }}>{c.sub}</div>
               <div style={glossArrow(...GLOSSY[c.k])}>
                 <Icon d={D.arrow} size={13} sw={2.4} />
               </div>
@@ -645,7 +645,7 @@ const KidzzPlay = ({
         {/* ── PARA BRINCAR AGORA ── */}
         <div>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "20px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#17301F" }}>Para brincar agora</h2>
+            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Para brincar agora ✨</h2>
             <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todas →</button>
           </div>
           <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 12px", scrollbarWidth: "none" }}>
@@ -657,7 +657,7 @@ const KidzzPlay = ({
                   type="button"
                   onClick={() => openFeatured(f)}
                   className="active:scale-[.97]"
-                  style={{ flex: "none", width: 168, height: 220, borderRadius: 22, position: "relative", overflow: "hidden", cursor: "pointer", padding: 0, textAlign: "left", boxShadow: "0 14px 30px rgba(50,90,40,.28),inset 0 1px 0 rgba(255,255,255,.5)", border: "1px solid rgba(255,255,255,.6)", animation: "brin-rise .45s both", transition: "transform .2s" }}
+                  style={{ flex: "none", width: 172, height: 228, borderRadius: 24, position: "relative", overflow: "hidden", cursor: "pointer", padding: 0, textAlign: "left", boxShadow: "0 16px 36px rgba(50,90,40,.26), 0 1px 0 rgba(255,255,255,.55) inset", border: "0.5px solid rgba(255,255,255,.75)", animation: "brin-rise .45s both", transition: "transform .2s" }}
                 >
                   <img src={f.img} alt={f.titulo} loading="lazy" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                   <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: f.scrim }} />
@@ -687,11 +687,11 @@ const KidzzPlay = ({
         {/* ── DESAFIOS EM FAMÍLIA ── */}
         <div>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "14px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 19, color: "#17301F" }}>Desafios em família</h2>
+            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Desafios em família ✨</h2>
             <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todos →</button>
           </div>
           <div style={{ padding: "0 16px" }}>
-            <div style={{ position: "relative", overflow: "hidden", borderRadius: 26, padding: "16px 16px 14px", background: "linear-gradient(155deg,rgba(255,255,255,.35) 0%,rgba(139,105,240,.78) 24%,rgba(120,88,220,.68) 60%,rgba(98,70,190,.75) 100%)", backdropFilter: "blur(20px) saturate(170%)", WebkitBackdropFilter: "blur(20px) saturate(170%)", border: "1px solid rgba(255,255,255,.6)", boxShadow: "0 16px 36px rgba(90,60,180,.35),0 0 28px rgba(139,105,240,.3),inset 0 1.5px 0 rgba(255,255,255,.7),inset 0 -10px 22px rgba(40,20,100,.25)", animation: "brin-rise .5s .15s both" }}>
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 28, padding: "16px 16px 14px", background: "linear-gradient(155deg,rgba(255,255,255,.38) 0%,rgba(139,105,240,.8) 24%,rgba(120,88,220,.7) 60%,rgba(98,70,190,.78) 100%)", backdropFilter: "blur(36px) saturate(190%)", WebkitBackdropFilter: "blur(36px) saturate(190%)", border: "0.5px solid rgba(255,255,255,.7)", boxShadow: "0 18px 40px rgba(90,60,180,.38),0 0 28px rgba(139,105,240,.28),inset 0 1.5px 0 rgba(255,255,255,.75),inset 0 -10px 22px rgba(40,20,100,.25)", animation: "brin-rise .5s .15s both" }}>
               <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%)", animation: "brin-shine 6s ease-in-out infinite" }} />
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
                 <div style={{ width: 26, height: 26, borderRadius: 9, background: "rgba(255,255,255,.24)", border: "1px solid rgba(255,255,255,.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
