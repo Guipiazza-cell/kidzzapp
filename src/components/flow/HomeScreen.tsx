@@ -13,18 +13,30 @@ import SOSModal from "@/components/sos/SOSModal";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 
-/* ───────────── KIDZZ HOME • REDESIGN "PERGUNTAS" (forest / cinematic) ─────────────
-   Porta fiel do mockup public/exemplos/Perguntas.dc.html (estilos inline 1:1)
-   ligado aos dados reais do app:
-     - Saudação contextual        → getGreeting(childName)
-     - Perguntar (mic/texto)      → onSubmit + Web Speech API
-     - Sugestões "Hoje para você" → CATEGORIZED_QUESTIONS por faixa etária/interesses
-     - Última grátis / Liberar    → questionsRemaining()/isPremium + kidzz:open-plans
-     - SOS KIDZZ                  → SOSModal
-     - Hora do reencontro         → RitualFlow (ritual da família)
-     - Sound / Presente / Sino / Pais → toggles e portões parentais reais
-   A barra inferior é a BottomNav global (não duplicada aqui).
-   ──────────────────────────────────────────────────────────────────────────── */
+/* ───────────── KIDZZ HOME • PERGUNTAS premium v2 ─────────────
+   Ref: public/telas/PERGUNTAS/* · Assets: perguntas-v2 (Hermes/Codex)
+   Mix Gui (lagarto) + família. Lógica real preservada (mic, sugestões, SOS, ritual, paywall).
+   ───────────────────────────────────────────────────────────── */
+
+const PQ = "/exemplos/assets/perguntas-v2";
+
+/** Capa gerada para sugestões conhecidas (senão usa emoji) */
+const SUG_COVER: Record<string, string> = {
+  peixe: `${PQ}/sug-peixes.png`,
+  peixes: `${PQ}/sug-peixes.png`,
+  chuva: `${PQ}/sug-chuva.png`,
+  "arco-íris": `${PQ}/sug-arcoiris.png`,
+  arcoiris: `${PQ}/sug-arcoiris.png`,
+  "arco íris": `${PQ}/sug-arcoiris.png`,
+};
+
+function suggestionCover(text: string): string | null {
+  const t = text.toLowerCase();
+  for (const [k, v] of Object.entries(SUG_COVER)) {
+    if (t.includes(k)) return v;
+  }
+  return null;
+}
 
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; emoji: string; category: string }[]> = {
   "0-3": [
@@ -114,15 +126,15 @@ const discCardStyle: CSSProperties = {
   alignItems: "center",
   gap: 13,
   padding: "13px 14px",
-  borderRadius: 22,
+  borderRadius: 24,
   cursor: "pointer",
   textAlign: "left",
   width: "100%",
-  border: "1px solid rgba(255,248,228,.6)",
-  background: "linear-gradient(150deg,rgba(246,238,214,.9),rgba(228,214,180,.8))",
-  backdropFilter: "blur(14px) saturate(150%)",
-  WebkitBackdropFilter: "blur(14px) saturate(150%)",
-  boxShadow: "0 14px 30px rgba(40,50,20,.24), inset 0 1.5px 0 rgba(255,255,255,.8)",
+  border: "0.5px solid rgba(255,248,228,.75)",
+  background: "linear-gradient(165deg,rgba(255,250,235,.92),rgba(236,224,190,.78))",
+  backdropFilter: "blur(36px) saturate(185%)",
+  WebkitBackdropFilter: "blur(36px) saturate(185%)",
+  boxShadow: "0 14px 36px rgba(40,50,20,.2), 0 2px 8px rgba(40,50,20,.06), inset 0 1.5px 0 rgba(255,255,255,.9)",
   fontFamily: "'Nunito',sans-serif",
   transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
 };
@@ -342,10 +354,10 @@ const HomeScreen = ({
           left: "-6%",
           width: "112%",
           height: "118%",
-          backgroundImage: "url('/exemplos/assets/cena-perguntas.png')",
+          backgroundImage: `url('${PQ}/bg-floresta.png')`,
           backgroundSize: "cover",
-          backgroundPosition: "center 32%",
-          filter: "blur(2px) saturate(1.4) brightness(1.08)",
+          backgroundPosition: "center 28%",
+          filter: "blur(1.5px) saturate(1.35) brightness(1.05)",
           pointerEvents: "none",
         }}
       />
@@ -530,28 +542,29 @@ const HomeScreen = ({
               borderRadius: 28,
               minHeight: 250,
               padding: "22px 20px 20px",
-              background: "linear-gradient(150deg,rgba(96,78,50,.6),rgba(52,42,26,.48))",
-              backdropFilter: "blur(20px) saturate(150%)",
-              WebkitBackdropFilter: "blur(20px) saturate(150%)",
-              border: "1px solid rgba(255,228,160,.34)",
-              boxShadow: "0 20px 46px rgba(0,0,0,.4),inset 0 2px 0 rgba(255,240,200,.28)",
+              background: "linear-gradient(165deg,rgba(96,78,50,.58),rgba(52,42,26,.42))",
+              backdropFilter: "blur(40px) saturate(185%)",
+              WebkitBackdropFilter: "blur(40px) saturate(185%)",
+              border: "0.5px solid rgba(255,228,160,.42)",
+              boxShadow: "0 20px 48px rgba(0,0,0,.42),inset 0 2px 0 rgba(255,240,200,.32)",
               animation: "perg-heroIn .7s cubic-bezier(.22,1,.36,1) .08s both",
             }}
           >
             {/* shine sweep */}
             <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent,rgba(255,244,210,.14) 50%,transparent)", animation: "perg-shine 7s ease-in-out infinite" }} />
 
-            {/* Gui, o camaleão */}
+            {/* Gui, o camaleão (asset Hermes) */}
             <img
-              src="/exemplos/assets/gui-arms.jpeg"
-              alt="Gui, o camaleão, com o coração brilhando"
+              src={`${PQ}/gui-hero.png`}
+              alt="Gui, o camaleão"
               draggable={false}
               style={{
                 position: "absolute",
-                right: -30,
-                bottom: -14,
-                height: 270,
+                right: -18,
+                bottom: -8,
+                height: 250,
                 width: "auto",
+                maxWidth: "52%",
                 objectFit: "contain",
                 WebkitMaskImage: "radial-gradient(76% 80% at 50% 46%,#000 56%,rgba(0,0,0,.5) 76%,transparent 100%)",
                 maskImage: "radial-gradient(76% 80% at 50% 46%,#000 56%,rgba(0,0,0,.5) 76%,transparent 100%)",
@@ -590,7 +603,7 @@ const HomeScreen = ({
 
         {/* ── CARD "ME PERGUNTE QUALQUER COISA" ── */}
         <div style={{ padding: "14px 15px 0", position: "relative", zIndex: 4, animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) .16s both" }}>
-          <div style={{ borderRadius: 26, padding: 17, background: "linear-gradient(150deg,rgba(90,74,48,.56),rgba(50,40,26,.46))", backdropFilter: "blur(20px) saturate(150%)", WebkitBackdropFilter: "blur(20px) saturate(150%)", border: "1px solid rgba(255,228,160,.32)", boxShadow: "0 16px 34px rgba(0,0,0,.34),inset 0 1.5px 0 rgba(255,240,200,.24)" }}>
+          <div style={{ borderRadius: 28, padding: 17, background: "linear-gradient(165deg,rgba(90,74,48,.55),rgba(50,40,26,.42))", backdropFilter: "blur(40px) saturate(185%)", WebkitBackdropFilter: "blur(40px) saturate(185%)", border: "0.5px solid rgba(255,228,160,.4)", boxShadow: "0 16px 40px rgba(0,0,0,.36),inset 0 1.5px 0 rgba(255,240,200,.28)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4l1.6 4.8L18 10l-4.4 1.2L12 16l-1.6-4.8L6 10l4.4-1.2L12 4Z" fill="#8FE0A0" stroke="#4EA35E" strokeWidth="1" strokeLinejoin="round" /></svg>
               <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 20, color: CREAM, textShadow: "0 1px 6px rgba(0,0,0,.3)" }}>Me pergunte qualquer coisa!</h2>
@@ -702,6 +715,7 @@ const HomeScreen = ({
           >
             {visibleSuggestions.map((q, i) => {
               const v = DISC_VARIANTS[i % DISC_VARIANTS.length];
+              const cover = suggestionCover(q.text);
               return (
                 <button
                   key={q.text}
@@ -711,11 +725,15 @@ const HomeScreen = ({
                   style={{ ...discCardStyle, opacity: submitting || isFreeLimitReached ? 0.5 : 1 }}
                 >
                   <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "46%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent,rgba(255,255,255,.14) 50%,transparent)", animation: "perg-shine 7s ease-in-out infinite", zIndex: 3 }} />
-                  {/* cena / emoji — tile glossy com specular + vinheta pra dar profundidade */}
-                  <div style={{ flex: "none", width: 78, height: 78, borderRadius: 18, overflow: "hidden", border: "1px solid rgba(255,255,255,.5)", boxShadow: "0 6px 14px rgba(0,0,0,.24), inset 0 1.5px 1px rgba(255,255,255,.55), inset 0 -10px 16px rgba(0,0,0,.2)", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", background: v.grad }}>
-                    <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(82% 62% at 28% 16%,rgba(255,255,255,.5),rgba(255,255,255,.12) 46%,transparent 70%)" }} />
-                    <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(120% 90% at 50% 118%,rgba(0,0,0,.22),transparent 60%)" }} />
-                    <span style={{ position: "relative", fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 5px rgba(0,0,0,.32))" }}>{q.emoji}</span>
+                  <div style={{ flex: "none", width: 78, height: 78, borderRadius: 18, overflow: "hidden", border: "0.5px solid rgba(255,255,255,.7)", boxShadow: "0 8px 16px rgba(0,0,0,.22), inset 0 1.5px 1px rgba(255,255,255,.55)", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", background: v.grad }}>
+                    {cover ? (
+                      <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <>
+                        <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(82% 62% at 28% 16%,rgba(255,255,255,.5),rgba(255,255,255,.12) 46%,transparent 70%)" }} />
+                        <span style={{ position: "relative", fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 5px rgba(0,0,0,.32))" }}>{q.emoji}</span>
+                      </>
+                    )}
                   </div>
                   <div style={{ flex: 1, minWidth: 0, position: "relative", zIndex: 2 }}>
                     <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 16.5, lineHeight: 1.1, color: "#26401E" }}>{q.text}</div>
@@ -783,7 +801,7 @@ const HomeScreen = ({
             style={{ position: "relative", overflow: "hidden", width: "100%", textAlign: "left", display: "flex", alignItems: "stretch", gap: 0, borderRadius: 26, cursor: "pointer", background: "linear-gradient(150deg,rgba(210,180,230,.26),rgba(150,120,200,.2))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(225,205,245,.42)", boxShadow: "0 16px 34px rgba(60,40,110,.3),inset 0 1.5px 0 rgba(255,255,255,.32)" }}
           >
             <div style={{ flex: "none", width: 118, position: "relative", overflow: "hidden" }}>
-              <img src="/exemplos/assets/hi-familia.png" alt="Família se abraçando" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 22%" }} />
+              <img src={`${PQ}/familia-abraco.png`} alt="Família se abraçando" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 22%" }} />
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(100deg,transparent 55%,rgba(180,150,220,.55) 100%)" }} />
             </div>
             <div style={{ flex: 1, minWidth: 0, padding: "15px 14px 15px 13px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
