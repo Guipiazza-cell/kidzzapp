@@ -3,19 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Share2, Sparkles, Clock, Baby, Boxes, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { haptic } from "@/lib/haptics";
-import { DISCOVER_THEMES, type Theme, type Activity } from "./discoverData";
+import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
+import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 
 // ============================================================
-// DiscoverScreen, aba "Descobrir"
-// Porta fiel do mockup public/exemplos/Descobrir.dc.html (estilos inline 1:1)
-// ligada aos dados reais do app:
-//  - Temas / descrições / nº de descobertas  → DISCOVER_THEMES
-//  - Pontos                                    → profile.points
-//  - Abrir tema                                → openTheme (ThemeDetail)
-//  - Voltar                                    → onBack
-// A barra de navegação inferior é a BottomNav global (não duplicada aqui).
-// O detalhe do tema (ThemeDetail/ActivityCard) não faz parte deste mockup e
-// foi preservado 1:1 (toda a lógica de premium, selo e compartilhamento).
+// DiscoverScreen — premium v2 (ref: public/telas/DESCOBRIR)
+// Assets: descobrir-v2 (Hermes/Codex) · mix família + Gui
+// Lógica real preservada: temas, atividades, premium, selo, share.
 // ============================================================
 
 interface Props {
@@ -164,15 +158,15 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
   const count = theme.activities.length;
 
   const cardStyle: CSSProperties = {
-    position: "relative", overflow: "hidden", display: "flex", minHeight: 150,
-    borderRadius: 24, cursor: "pointer", textAlign: "left", width: "100%", padding: 0,
-    border: "1px solid rgba(255,255,255,.7)",
+    position: "relative", overflow: "hidden", display: "flex", minHeight: 158,
+    borderRadius: 26, cursor: "pointer", textAlign: "left", width: "100%", padding: 0,
+    border: "0.5px solid rgba(255,255,255,.92)",
     transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
-    fontFamily: "'Nunito',sans-serif",
+    fontFamily: FONT,
     background: v.panel,
-    backdropFilter: "blur(16px) saturate(150%)",
-    WebkitBackdropFilter: "blur(16px) saturate(150%)",
-    boxShadow: "0 14px 30px rgba(70,80,40,.16), inset 0 1.5px 0 rgba(255,255,255,.7)",
+    backdropFilter: "blur(36px) saturate(185%)",
+    WebkitBackdropFilter: "blur(36px) saturate(185%)",
+    boxShadow: "0 14px 36px rgba(70,80,40,.14), 0 2px 8px rgba(70,80,40,.05), inset 0 1.5px 0 rgba(255,255,255,.85)",
     animation: "disc-cascade .55s cubic-bezier(.22,1,.36,1) both",
   };
   const pillStyle: CSSProperties = {
@@ -192,13 +186,13 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
       aria-label={`Abrir tema ${theme.title}`}
     >
       <div style={{ flex: 1, minWidth: 0, padding: "15px 15px 14px", display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
-        <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 20, color: v.titleColor, lineHeight: 1.12, marginBottom: 5, display: "flex", alignItems: "center", gap: 7 }}>
+        <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 21, color: v.titleColor, lineHeight: 1.12, marginBottom: 5, display: "flex", alignItems: "center", gap: 7 }}>
           {theme.title}
           <span style={glossChip(...v.chip)}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d={v.d} stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </span>
         </div>
-        <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.4, color: v.subColor, marginBottom: "auto", maxWidth: 170 }}>
+        <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.4, color: v.subColor, marginBottom: "auto", maxWidth: 170 }}>
           {theme.description}
         </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 14 }}>
@@ -208,11 +202,11 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
           </div>
         </div>
       </div>
-      <div style={{ position: "relative", width: "44%", flex: "none", overflow: "hidden" }}>
-        <div
-          role="img"
-          aria-label={theme.title}
-          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundImage: `url("/exemplos/assets/de-${theme.id}.png")`, backgroundSize: "cover", backgroundPosition: "center" }}
+      <div style={{ position: "relative", width: "46%", flex: "none", overflow: "hidden" }}>
+        <img
+          src={theme.image}
+          alt={theme.title}
+          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
         />
         <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", background: `linear-gradient(90deg, ${v.fade} 0%, transparent 85%)` }} />
         <div style={{ position: "absolute", top: 0, left: 0, width: "60%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.18) 50%,transparent 100%)", animation: "disc-shine 6s ease-in-out infinite" }} />
@@ -894,92 +888,119 @@ const DiscoverScreen = ({ onBack }: Props) => {
   }, [childName]);
 
   return (
-    <div style={{ height: "100%", position: "relative", fontFamily: "'Nunito',system-ui,sans-serif", background: "linear-gradient(180deg,#F4F0DE 0%,#EDE7D0 40%,#E4DCC0 75%,#DAD0AE 100%)" }}>
+    <div style={{ height: "100%", position: "relative", fontFamily: FONT, background: "linear-gradient(180deg,#FFFCF8 0%,#F7F2E8 45%,#F0EAD8 100%)" }}>
       <style>{KEYFRAMES}</style>
 
-      {/* atmosfera: brilhos e orbes que flutuam */}
-      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", background: "radial-gradient(45% 30% at 78% 26%,rgba(120,190,90,.14),transparent 70%),radial-gradient(42% 28% at 10% 55%,rgba(255,210,120,.14),transparent 70%),radial-gradient(50% 30% at 55% 90%,rgba(90,150,90,.12),transparent 70%)" }} />
-      <div style={{ position: "absolute", top: -60, left: -80, width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle,rgba(150,200,110,.28),transparent 65%)", filter: "blur(28px)", animation: "disc-drift1 13s ease-in-out infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: "38%", left: -90, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,215,120,.24),transparent 65%)", filter: "blur(30px)", animation: "disc-drift2 17s ease-in-out 2s infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: 90, right: -100, width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle,rgba(110,175,100,.22),transparent 65%)", filter: "blur(32px)", animation: "disc-drift1 19s ease-in-out 4s infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 0, left: "24%", pointerEvents: "none", animation: "disc-leafdrift 17s linear 1s infinite" }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#7FB86A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </div>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(50% 32% at 82% 12%,rgba(120,190,90,.12),transparent 70%),radial-gradient(42% 28% at 8% 50%,rgba(255,210,120,.12),transparent 70%)" }} />
+      <div style={{ position: "absolute", top: -50, right: -40, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle,rgba(180,220,140,.3),transparent 68%)", filter: "blur(18px)", pointerEvents: "none" }} />
 
-      {/* conteúdo rolável */}
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        style={{ height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)", scrollbarWidth: "none", position: "relative", WebkitOverflowScrolling: "touch" }}
+        style={{ height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)", scrollbarWidth: "none", position: "relative", WebkitOverflowScrolling: "touch", zIndex: 2 }}
       >
-        {/* ── HERO ── */}
-        <div style={{ position: "relative" }}>
-          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 414, backgroundImage: "url('/exemplos/assets/cena-descobrir.png')", backgroundSize: "cover", backgroundPosition: "center", filter: "blur(46px) saturate(1.45)", opacity: 0.5, transform: "scale(1.22)", pointerEvents: "none" }} />
-          <div
-            ref={heroWrapRef}
-            style={{ position: "relative", width: "100%", height: 414, willChange: "transform", WebkitMaskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)", maskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)", animation: "disc-heroIn .7s cubic-bezier(.22,1,.36,1) both" }}
-          >
-            <img
-              src="/exemplos/assets/cena-descobrir.png"
-              alt="Gui, o camaleão, explorando o mundo"
-              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 34%", animation: "disc-floaty 6s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)" }}
-            />
-            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(180deg,rgba(244,240,222,.2) 0%,rgba(244,240,222,0) 20%,rgba(244,240,222,.22) 48%,rgba(244,240,222,.6) 72%,rgba(244,240,222,.34) 84%,rgba(244,240,222,.12) 94%,transparent 100%)" }} />
-          </div>
-
-          {/* lupa flutuante */}
-          <div style={{ position: "absolute", top: 36, left: "20%", animation: "disc-lensfloat 5s ease-in-out infinite", zIndex: 5 }}>
-            <svg width="58" height="58" viewBox="0 0 64 64" fill="none">
-              <circle cx="26" cy="26" r="18" fill="rgba(210,235,245,.5)" stroke="#C9D2D8" strokeWidth="3" />
-              <circle cx="26" cy="26" r="18" fill="none" stroke="rgba(255,255,255,.8)" strokeWidth="1.5" />
-              <ellipse cx="20" cy="20" rx="5" ry="7" fill="rgba(255,255,255,.55)" transform="rotate(-30 20 20)" />
-              <rect x="38" y="38" width="20" height="8" rx="4" fill="#8A6A3A" transform="rotate(45 44 42)" />
-              <rect x="38" y="38" width="20" height="8" rx="4" fill="url(#disc-lens-grad)" transform="rotate(45 44 42)" />
-              <defs><linearGradient id="disc-lens-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#C89A5A" /><stop offset="1" stopColor="#7A5424" /></linearGradient></defs>
-            </svg>
-          </div>
-          <div style={{ position: "absolute", top: 70, left: "56%", width: 5, height: 5, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 10px 3px rgba(255,205,110,.8)", animation: "disc-twinkle 3.2s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", top: 150, left: "66%", width: 4, height: 4, borderRadius: 99, background: "#D6F0B8", boxShadow: "0 0 8px 2px rgba(150,210,120,.75)", animation: "disc-sparklefloat 4.4s ease-in-out 1s infinite" }} />
-
-          {/* voltar */}
+        {/* top chrome */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: `calc(env(safe-area-inset-top, 0px) + 10px) ${PAD}px 0` }}>
           <button
             type="button"
             onClick={() => { haptic("light"); onBack?.(); }}
             aria-label="Voltar"
             className="active:scale-90"
-            style={{ position: "absolute", top: 62, left: 16, width: 42, height: 42, borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.62)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(80,90,40,.18),inset 0 1px 0 rgba(255,255,255,1)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .2s", zIndex: 6 }}
+            style={{ width: 44, height: 44, borderRadius: R.btn, display: "flex", alignItems: "center", justifyContent: "center", ...pillGlassLight }}
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m6-6-6 6 6 6" stroke="#2E3A1E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
-
-          {/* chip pontos (Pais fica só no dock global, sem duplicar) */}
-          <div style={{ position: "absolute", top: 62, right: 16, display: "flex", gap: 8, zIndex: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 999, background: "rgba(255,255,255,.62)", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 6px 16px rgba(80,90,40,.18),inset 0 1px 0 rgba(255,255,255,1)", fontWeight: 900, fontSize: 13, color: "#2E3A1E" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5" stroke="#E0A62B" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              {pontos}
-            </div>
-          </div>
-
-          {/* título */}
-          <div style={{ padding: "14px 20px 2px", animation: "disc-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", zIndex: 4, position: "relative" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#4E9A3E" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.8px", color: "#5E7A3E" }}>DESCOBRIR</span>
-            </div>
-            <h1 style={{ margin: "0 0 7px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 29, lineHeight: 1.13, color: "#20260F", letterSpacing: "-.3px" }}>
-              Vamos explorar o <span style={{ color: "#C7841A" }}>mundo</span> juntos?
-            </h1>
-            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.45, color: "#5F6B44", maxWidth: 290 }}>
-              Escolha um tema e mergulhem em descobertas que despertam a curiosidade e viram memórias.
-            </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 14px", minHeight: 44, borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#2E3A1E", ...pillGlassLight }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5" stroke="#E0A62B" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            {pontos}
           </div>
         </div>
 
-        {/* ── CARDS DE TEMA ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 13, padding: "16px 16px 6px" }}>
-          {DISCOVER_THEMES.map((theme) => (
-            <ThemeCard key={theme.id} theme={theme} onOpen={() => setOpenTheme(theme)} />
-          ))}
+        {/* ── HERO (família + Gui) ── */}
+        <div style={{ position: "relative", padding: `12px ${PAD}px 0`, minHeight: 300 }}>
+          <div ref={heroWrapRef} style={{ position: "relative", zIndex: 2, maxWidth: "58%", animation: "disc-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
+              <span style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(70,112,58,.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#46703A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </span>
+              <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 32, color: "#1F2A18", letterSpacing: "-.4px" }}>
+                Descobrir
+              </h1>
+            </div>
+            <p style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 600, fontSize: 18, lineHeight: 1.25, color: "#2A3220" }}>
+              Vamos explorar o mundo juntos?
+            </p>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(42,37,32,0.68)", maxWidth: 240 }}>
+              Escolha um tema e mergulhem em descobertas que despertam a curiosidade e criam memórias.
+            </p>
+          </div>
+
+          <img
+            src={DISCOVER_IMAGES.hero}
+            alt="Família explorando juntos"
+            style={{
+              position: "absolute", top: 0, right: -8, width: "54%", height: 280,
+              objectFit: "cover", objectPosition: "center 20%",
+              borderRadius: "28px 0 0 40%",
+              maskImage: "radial-gradient(72% 72% at 55% 42%, #000 40%, transparent 78%)",
+              WebkitMaskImage: "radial-gradient(72% 72% at 55% 42%, #000 40%, transparent 78%)",
+              filter: "saturate(1.06)",
+              animation: "disc-floaty 7s ease-in-out infinite",
+              pointerEvents: "none",
+            }}
+          />
+          {/* Gui pequenino no canto — mix lagarto */}
+          <img
+            src={DISCOVER_IMAGES.heroGui}
+            alt=""
+            style={{
+              position: "absolute", bottom: 8, right: 12, width: 64, height: 64,
+              objectFit: "cover", borderRadius: 18,
+              boxShadow: "0 8px 18px rgba(40,50,20,.18)",
+              border: "0.5px solid rgba(255,255,255,.9)",
+              zIndex: 3,
+            }}
+          />
+        </div>
+
+        {/* ── EXPLORE POR TEMAS ── */}
+        <div style={{ padding: `8px ${PAD}px 0` }}>
+          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#1F2A18" }}>
+            Explore por temas
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {([...DISCOVER_THEMES] as Theme[])
+              .sort((a, b) => {
+                const order = ["natureza", "animais", "espaco", "coisas"];
+                return order.indexOf(a.id) - order.indexOf(b.id);
+              })
+              .map((theme) => (
+                <ThemeCard key={theme.id} theme={theme} onOpen={() => setOpenTheme(theme)} />
+              ))}
+          </div>
+        </div>
+
+        {/* dica com Gui */}
+        <div
+          style={{
+            margin: `18px ${PAD}px 8px`,
+            padding: 14,
+            borderRadius: 22,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            background: "linear-gradient(160deg, rgba(255,255,255,.9), rgba(230,245,220,.75))",
+            border: "0.5px solid rgba(255,255,255,.95)",
+            boxShadow: "0 10px 28px rgba(70,90,40,.1)",
+          }}
+        >
+          <img src={DISCOVER_IMAGES.heroGui} alt="" style={{ width: 52, height: 52, borderRadius: 16, objectFit: "cover", flexShrink: 0 }} />
+          <div className="min-w-0">
+            <div style={{ fontSize: 13, fontWeight: 900, color: "#2A3220" }}>Dica do Kidzz 💚</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(42,37,32,0.62)", lineHeight: 1.35, marginTop: 2 }}>
+              Leve as crianças para observar a natureza com calma. Cada detalhe vira uma grande descoberta!
+            </div>
+          </div>
         </div>
 
         <div style={{ padding: "6px 20px 16px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#9A9160" }}>

@@ -30,13 +30,14 @@ export type Theme = {
   activities: Activity[];
 };
 
-// Slots de imagem nomeados: troque os caminhos quando subir as artes finais.
+// Assets premium (Hermes/Codex) — mix família + Gui
 export const DISCOVER_IMAGES = {
-  hero: "/discover/hero-pai-filho.jpg",
-  imgAnimais: "/discover/animais-leao.jpg",
-  imgEspaco: "/discover/espaco-astronauta.jpg",
-  imgNatureza: "/discover/natureza-muda.jpg",
-  imgCoisas: "/discover/coisas-carrinho.jpg",
+  hero: "/exemplos/assets/descobrir-v2/hero-familia.png",
+  heroGui: "/exemplos/assets/descobrir-v2/hero-gui.png",
+  imgAnimais: "/exemplos/assets/descobrir-v2/tema-animais.png",
+  imgEspaco: "/exemplos/assets/descobrir-v2/tema-espaco.png",
+  imgNatureza: "/exemplos/assets/descobrir-v2/tema-natureza.png",
+  imgCoisas: "/exemplos/assets/descobrir-v2/tema-coisas.png",
 };
 
 export const DISCOVER_THEMES: Theme[] = [
