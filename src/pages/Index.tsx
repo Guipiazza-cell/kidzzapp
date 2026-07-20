@@ -421,7 +421,17 @@ const Index = () => {
     ),
     bora: () => <BoraScreen onBack={backToHome} />,
     discover: () => <DiscoverScreen onBack={backToHome} />,
-    memories: () => <AreaGate area="memorias"><MemoriesAlbum onBack={backToHome} onNavigateToChat={backToHome} onNavigateToStories={() => switchTab("explore")} /></AreaGate>,
+    memories: () => (
+      <AreaGate area="memorias">
+        <MemoriesAlbum
+          onBack={backToHome}
+          onNavigateToChat={backToHome}
+          onNavigateToStories={() => switchTab("explore")}
+          onNavigateToPlay={() => switchTab("play")}
+          onOpenParent={() => setShowParentalGateForDashboard(true)}
+        />
+      </AreaGate>
+    ),
     moments: () => <AreaGate area="momentos"><MomentsPlaylists onBack={() => { backToHome(); evolution.evolve("moment"); }} /></AreaGate>,
     cinema: () => <AreaGate area="cinema"><FamilyCinema onBack={backToHome} /></AreaGate>,
     wellness: () => <AreaGate area="kalm"><WellnessHub onBack={backToHome} initialExperienceId={kalmInitialExperience} onConsumedInitial={() => setKalmInitialExperience(null)} /></AreaGate>,
