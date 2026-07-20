@@ -15,15 +15,19 @@ import WellnessGrowth from "./WellnessGrowth";
 import KalmSections from "@/components/kalm/KalmSections";
 import KidzzHeader from "@/components/common/KidzzHeader";
 import { pickFemaleVoice, SOFT_RATE, SOFT_PITCH, SOFT_VOLUME } from "@/lib/ttsVoice";
+import KalmPremiumHome from "./KalmPremiumHome";
 
-/* ── KIDZZ Wellness — "Spa Emocional da Apple" v2
-   Paleta sálvia + esmeralda + creme + dourado fosco.
-   Hero cinematográfico, camaleão respirando, frases rotativas,
-   4 ações rápidas (Relaxar / Ritual / SOS / Dormir), biblioteca
-   de sons expandida e área Dormir premium.
+/* ── KIDZZ Wellness / KALM
+   Home premium: KalmPremiumHome (ref public/telas/kalm/).
+   Sub-views preservadas (breath, sleep, sounds, etc.).
 */
 
-interface Props { onBack: () => void; initialExperienceId?: string | null; onConsumedInitial?: () => void; }
+interface Props {
+  onBack: () => void;
+  initialExperienceId?: string | null;
+  onConsumedInitial?: () => void;
+  onOpenParent?: () => void;
+}
 
 type View =
   | "home"
@@ -428,11 +432,12 @@ const KalmIcon = ({ d, stroke = "#fff", size = 21, sw = 1.8 }: { d: string; stro
 );
 
 /* Ações rápidas → views reais */
+/* Ordem do print: Relaxar · Dormir · SOS · Ritual */
 const KALM_ACTIONS: { key: string; title: string; sub: string; d: string; t: KTint; g: KGloss; view: View }[] = [
   { key: "a1", title: "Relaxar agora", sub: "Respiração guiada",  d: KD.wind,    t: [95, 180, 120],  g: ["#B8E8C0", "#5CB57A", "#2F7A4E"], view: "breath" },
-  { key: "a2", title: "Ritual rápido", sub: "2 minutos de calma",  d: KD.sparkle, t: [200, 180, 120], g: ["#FFE9B8", "#E0B85C", "#B08A2E"], view: "mindful" },
+  { key: "a2", title: "Dormir melhor", sub: "Prepare a noite",     d: KD.moon,    t: [160, 160, 220], g: ["#D2CCF0", "#8A7AD8", "#5E4EA8"], view: "sleep" },
   { key: "a3", title: "SOS emocional", sub: "Acolhimento agora",   d: KD.sos,     t: [210, 150, 150], g: ["#F0C8C8", "#D87A7A", "#A84E4E"], view: "sos" },
-  { key: "a4", title: "Dormir melhor", sub: "Prepare a noite",     d: KD.moon,    t: [160, 160, 220], g: ["#D2CCF0", "#8A7AD8", "#5E4EA8"], view: "sleep" },
+  { key: "a4", title: "Ritual rápido", sub: "2 minutos de calma",  d: KD.sparkle, t: [200, 180, 120], g: ["#FFE9B8", "#E0B85C", "#B08A2E"], view: "mindful" },
 ];
 
 /* Quick Relief → views reais */
@@ -571,9 +576,51 @@ const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: 
             </div>
           )}
 
-          <div style={{ padding: "2px 20px", textAlign: "center", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", position: "relative" }}>
-            <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.8px", color: "#5E8A5E", marginBottom: 8 }}>{saudacaoCaps}, FAMÍLIA</div>
-            <h1 style={{ margin: "0 auto", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 24, lineHeight: 1.2, color: "#1B301F", letterSpacing: "-.2px", maxWidth: 280 }}>Hoje é um bom dia para <span style={{ color: "#3E9A5E" }}>respirar</span>.</h1>
+          <div style={{ padding: "2px 20px 8px", textAlign: "left", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", position: "relative", maxWidth: 320 }}>
+            {/* Tagline sob a marca — sem coração amarelo (pedido do design) */}
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                lineHeight: 1.35,
+                color: "rgba(27,48,31,.78)",
+                marginBottom: 14,
+                textShadow: "0 1px 8px rgba(255,255,255,.55)",
+              }}
+            >
+              Desligue a tela, ligue a infância.
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#3E7A4A", marginBottom: 8 }}>
+              {saudacaoCaps === "BOM DIA" ? "Bom dia" : saudacaoCaps === "BOA TARDE" ? "Boa tarde" : "Boa noite"}, família!
+            </div>
+            <h1
+              style={{
+                margin: "0 0 8px",
+                fontFamily: "'Lora',serif",
+                fontWeight: 600,
+                fontSize: 28,
+                lineHeight: 1.12,
+                color: "#1B301F",
+                letterSpacing: "-.3px",
+                maxWidth: 280,
+              }}
+            >
+              Pequenos gestos,
+              <br />
+              grandes <span style={{ color: "#3E9A5E" }}>conexões</span>.
+            </h1>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 13.5,
+                fontWeight: 700,
+                lineHeight: 1.4,
+                color: "rgba(27,48,31,.72)",
+                maxWidth: 260,
+              }}
+            >
+              Cada escolha de hoje, transforma o amanhã.
+            </p>
           </div>
         </div>
 
@@ -1684,7 +1731,7 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
 
 
 /* ────────────── ROOT ────────────── */
-const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) => {
+const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial, onOpenParent }: Props) => {
   const [view, setView] = useState<View>("home");
   const [cinemaOpen, setCinemaOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -1694,8 +1741,56 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
   const go = useCallback((v: View) => { setView(v); resetScroll(); }, [resetScroll]);
   const back = useCallback(() => { setView("home"); resetScroll(); }, [resetScroll]);
 
-  // Quando vier uma experiência inicial (do SOS), garante que estamos na home
   useEffect(() => { if (initialExperienceId) setView("home"); }, [initialExperienceId]);
+
+  // Home premium é tela cheia com scroll próprio (como Bora).
+  // Sub-views usam o scroll do shell + Atmosphere.
+  if (view === "home") {
+    return (
+      <div className="h-full w-full relative" style={{ background: "#D8E8D0" }}>
+        <KalmPremiumHome
+          go={go}
+          onBack={onBack}
+          onOpenParent={onOpenParent}
+          initialExperienceId={initialExperienceId}
+          onConsumedInitial={onConsumedInitial}
+        />
+        <motion.button
+          type="button"
+          onClick={() => { haptic("medium"); setCinemaOpen(true); }}
+          className="fixed left-1/2 -translate-x-1/2 z-[40] flex items-center gap-2 px-5 py-3 rounded-full active:scale-[0.97] transition-transform touch-manipulation"
+          style={{
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 100px)",
+            background:
+              "linear-gradient(165deg, rgba(255,255,255,.9) 0%, rgba(230,245,220,.75) 100%)",
+            border: "0.5px solid rgba(255,255,255,.95)",
+            boxShadow:
+              "0 12px 32px rgba(40,70,40,.22), 0 1px 0 rgba(255,255,255,1) inset",
+            backdropFilter: "blur(28px) saturate(180%)",
+            WebkitBackdropFilter: "blur(28px) saturate(180%)",
+            touchAction: "manipulation",
+            fontFamily: "'Nunito',system-ui,sans-serif",
+          }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, type: "spring", stiffness: 220, damping: 22 }}
+          aria-label="Abrir Modo cinemático"
+        >
+          <Clapperboard size={16} style={{ color: "#2E6A3E" }} />
+          <span className="text-[12px] font-black tracking-tight" style={{ color: "#1B301F" }}>
+            Modo cinemático
+          </span>
+          <span
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+            style={{ background: "#3E9A5E", color: "white" }}
+          >
+            90s
+          </span>
+        </motion.button>
+        <WellnessCinema open={cinemaOpen} onClose={() => setCinemaOpen(false)} />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -1722,7 +1817,6 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            {view === "home"       && <Home go={go} onBack={onBack} initialExperienceId={initialExperienceId} onConsumedInitial={onConsumedInitial} />}
             {view === "sos"        && <BreathView onBack={back} sos />}
             {view === "breath"     && <BreathView onBack={back} />}
             {view === "sounds"     && <SoundsView onBack={back} />}
@@ -1734,39 +1828,9 @@ const WellnessHub = ({ onBack, initialExperienceId, onConsumedInitial }: Props) 
             {view === "journey"    && <JourneyView onBack={back} />}
             {view === "sleep"      && <SleepView onBack={back} go={go} />}
             {view === "family"     && <FamilyView onBack={back} />}
-
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {/* CTA flutuante — Modo cinemático */}
-      {view === "home" && (
-        <motion.button
-          type="button"
-          onClick={() => { haptic("medium"); setCinemaOpen(true); }}
-          className="fixed left-1/2 -translate-x-1/2 z-[40] flex items-center gap-2 px-5 py-3 rounded-full active:scale-[0.97] transition-transform touch-manipulation"
-          style={{
-            bottom: "calc(env(safe-area-inset-bottom, 0px) + 100px)",
-            background: "linear-gradient(135deg, hsl(150 30% 96%) 0%, hsl(140 35% 88%) 60%, hsl(150 35% 80%) 100%)",
-            border: "1px solid hsl(0 0% 100% / 0.85)",
-            boxShadow: "0 1px 0 hsl(0 0% 100% / 0.9) inset, 0 14px 32px -14px hsl(150 30% 25% / 0.4)",
-            touchAction: "manipulation",
-          }}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, type: "spring", stiffness: 220, damping: 22 }}
-          aria-label="Abrir Modo cinemático"
-        >
-          <Clapperboard size={16} style={{ color: "hsl(150 35% 28%)" }} />
-          <span className="text-[12px] font-black tracking-tight" style={{ color: "hsl(150 35% 22%)" }}>
-            Modo cinemático
-          </span>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "hsl(150 35% 28%)", color: "white" }}>
-            90s
-          </span>
-        </motion.button>
-      )}
-
       <WellnessCinema open={cinemaOpen} onClose={() => setCinemaOpen(false)} />
     </div>
   );

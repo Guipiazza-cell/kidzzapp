@@ -34,9 +34,9 @@ const glassChrome: React.CSSProperties = {
 
 const greetByHour = () => {
   const h = new Date().getHours();
-  if (h < 12) return "BOM DIA, FAMÍLIA 💚";
-  if (h < 18) return "BOA TARDE, FAMÍLIA 💚";
-  return "BOA NOITE, FAMÍLIA 💚";
+  if (h < 12) return "BOM DIA, FAMÍLIA";
+  if (h < 18) return "BOA TARDE, FAMÍLIA";
+  return "BOA NOITE, FAMÍLIA";
 };
 
 // Metáfora do tempo (5 estados). Mapeia para MoodValue existente.
