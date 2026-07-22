@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
+import KidzzLogo from "@/components/common/KidzzLogo";
 
 // ============================================================
 // DiscoverScreen — premium v2 (ref: public/telas/DESCOBRIR)
@@ -899,38 +900,50 @@ const DiscoverScreen = ({ onBack }: Props) => {
         onScroll={onScroll}
         style={{ height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)", scrollbarWidth: "none", position: "relative", WebkitOverflowScrolling: "touch", zIndex: 2 }}
       >
-        {/* top chrome */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: `calc(env(safe-area-inset-top, 0px) + 10px) ${PAD}px 0` }}>
+        {/* top chrome: voltar · logo · pontos */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: `calc(env(safe-area-inset-top, 0px) + 10px) ${PAD}px 0`, gap: 10 }}>
           <button
             type="button"
             onClick={() => { haptic("light"); onBack?.(); }}
             aria-label="Voltar"
             className="active:scale-90"
-            style={{ width: 44, height: 44, borderRadius: R.btn, display: "flex", alignItems: "center", justifyContent: "center", ...pillGlassLight }}
+            style={{ width: 44, height: 44, flex: "none", borderRadius: R.btn, display: "flex", alignItems: "center", justifyContent: "center", ...pillGlassLight }}
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m6-6-6 6 6 6" stroke="#2E3A1E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 14px", minHeight: 44, borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#2E3A1E", ...pillGlassLight }}>
+          <div style={{ flex: 1, display: "flex", justifyContent: "center", minWidth: 0 }}>
+            <KidzzLogo height={26} light />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 14px", minHeight: 44, flex: "none", borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#2E3A1E", ...pillGlassLight }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5" stroke="#E0A62B" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
             {pontos}
           </div>
         </div>
 
-        {/* ── HERO (família + Gui) ── */}
-        <div style={{ position: "relative", padding: `12px ${PAD}px 0`, minHeight: 300 }}>
-          <div ref={heroWrapRef} style={{ position: "relative", zIndex: 2, maxWidth: "58%", animation: "disc-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
-              <span style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(70,112,58,.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#46703A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        {/* ── HERO: texto + foto família (sem camaleão quadrado) ── */}
+        <div style={{ position: "relative", padding: `16px ${PAD}px 4px`, minHeight: 268 }}>
+          <div
+            ref={heroWrapRef}
+            style={{
+              position: "relative",
+              zIndex: 2,
+              maxWidth: "52%",
+              paddingTop: 4,
+              animation: "disc-cascade .55s cubic-bezier(.22,1,.36,1) both",
+            }}
+          >
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ width: 30, height: 30, borderRadius: 999, background: "rgba(70,112,58,.12)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#46703A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </span>
-              <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 32, color: "#1F2A18", letterSpacing: "-.4px" }}>
+              <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 30, color: "#1F2A18", letterSpacing: "-.4px", lineHeight: 1.05 }}>
                 Descobrir
               </h1>
             </div>
-            <p style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 600, fontSize: 18, lineHeight: 1.25, color: "#2A3220" }}>
+            <p style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 17, lineHeight: 1.28, color: "#2A3220" }}>
               Vamos explorar o mundo juntos?
             </p>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(42,37,32,0.68)", maxWidth: 240 }}>
+            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.48, color: "rgba(42,37,32,0.68)", maxWidth: 210 }}>
               Escolha um tema e mergulhem em descobertas que despertam a curiosidade e criam memórias.
             </p>
           </div>
@@ -939,26 +952,22 @@ const DiscoverScreen = ({ onBack }: Props) => {
             src={DISCOVER_IMAGES.hero}
             alt="Família explorando juntos"
             style={{
-              position: "absolute", top: 0, right: -8, width: "54%", height: 280,
-              objectFit: "cover", objectPosition: "center 20%",
-              borderRadius: "28px 0 0 40%",
-              maskImage: "radial-gradient(72% 72% at 55% 42%, #000 40%, transparent 78%)",
-              WebkitMaskImage: "radial-gradient(72% 72% at 55% 42%, #000 40%, transparent 78%)",
-              filter: "saturate(1.06)",
+              position: "absolute",
+              top: 4,
+              right: -4,
+              width: "50%",
+              height: 250,
+              objectFit: "cover",
+              objectPosition: "center 18%",
+              borderRadius: "32px 20px 48% 28%",
+              boxShadow: "0 18px 36px rgba(60,70,40,.14)",
+              maskImage: "linear-gradient(100deg, transparent 0%, #000 18%, #000 78%, transparent 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(100deg, transparent 0%, #000 18%, #000 78%, transparent 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
+              WebkitMaskComposite: "source-in",
+              maskComposite: "intersect",
+              filter: "saturate(1.05)",
               animation: "disc-floaty 7s ease-in-out infinite",
               pointerEvents: "none",
-            }}
-          />
-          {/* Gui pequenino no canto — mix lagarto */}
-          <img
-            src={DISCOVER_IMAGES.heroGui}
-            alt=""
-            style={{
-              position: "absolute", bottom: 8, right: 12, width: 64, height: 64,
-              objectFit: "cover", borderRadius: 18,
-              boxShadow: "0 8px 18px rgba(40,50,20,.18)",
-              border: "0.5px solid rgba(255,255,255,.9)",
-              zIndex: 3,
             }}
           />
         </div>
@@ -980,7 +989,7 @@ const DiscoverScreen = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* dica com Gui */}
+        {/* dica (sem camaleão quadrado — só tipografia + ícone) */}
         <div
           style={{
             margin: `18px ${PAD}px 8px`,
@@ -989,12 +998,27 @@ const DiscoverScreen = ({ onBack }: Props) => {
             display: "flex",
             alignItems: "center",
             gap: 12,
-            background: "linear-gradient(160deg, rgba(255,255,255,.9), rgba(230,245,220,.75))",
+            background: "linear-gradient(160deg, rgba(255,255,255,.92), rgba(236,246,230,.8))",
             border: "0.5px solid rgba(255,255,255,.95)",
             boxShadow: "0 10px 28px rgba(70,90,40,.1)",
           }}
         >
-          <img src={DISCOVER_IMAGES.heroGui} alt="" style={{ width: 52, height: 52, borderRadius: 16, objectFit: "cover", flexShrink: 0 }} />
+          <div
+            aria-hidden
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 16,
+              flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "radial-gradient(130% 130% at 30% 22%, #E8F8E8, #8FCF7A 55%, #4E9A42)",
+              boxShadow: "0 6px 14px rgba(60,120,50,.22), inset 0 1px 1px rgba(255,255,255,.55)",
+            }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </div>
           <div className="min-w-0">
             <div style={{ fontSize: 13, fontWeight: 900, color: "#2A3220" }}>Dica do Kidzz 💚</div>
             <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(42,37,32,0.62)", lineHeight: 1.35, marginTop: 2 }}>

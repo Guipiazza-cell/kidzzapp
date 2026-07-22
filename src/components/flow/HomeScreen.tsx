@@ -12,6 +12,7 @@ import { haptic } from "@/lib/haptics";
 import SOSModal from "@/components/sos/SOSModal";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
+import KidzzLogo from "@/components/common/KidzzLogo";
 
 /* ───────────── KIDZZ HOME • PERGUNTAS premium v2 ─────────────
    Ref: public/telas/PERGUNTAS/* · Assets: perguntas-v2 (Hermes/Codex)
@@ -97,11 +98,11 @@ const CREAM = "#FBF4E4";
 const CREAM_SOFT = "rgba(240,234,220,.82)";
 const GREEN_LIGHT = "#8FE3AD";
 
-/* ── Variantes de cor dos cards de descoberta (do DSC do mockup) ── */
+/* ── Mini-covers pérola (acentos suaves, sem bloco colorido pesado) ── */
 const DISC_VARIANTS: { grad: string; accent: string; arrow: [string, string, string]; badgeColor: string }[] = [
-  { grad: "linear-gradient(160deg,#7FC96A,#2E7A3E)", accent: "#5EAE4E", arrow: ["#8FD07A", "#4E9A3A", "#2E7A26"], badgeColor: "#2E7A3E" },
-  { grad: "linear-gradient(160deg,#A8CCF0,#5E86C0)", accent: "#4E8AD8", arrow: ["#8FB8F0", "#4E86D8", "#2E5AA8"], badgeColor: "#2E5A9A" },
-  { grad: "linear-gradient(160deg,#FFD48A,#E0952E)", accent: "#E0952E", arrow: ["#FFD48A", "#F0A53E", "#D9822A"], badgeColor: "#B0701A" },
+  { grad: "linear-gradient(160deg,#F2FBF4,#D8F0DE 55%,#C0E4C8)", accent: "#5EAE4E", arrow: ["#E8F8EC", "#8FD07A", "#4E9A3A"], badgeColor: "#3E7A42" },
+  { grad: "linear-gradient(160deg,#F4F8FD,#DCE8F8 55%,#C8DCF0)", accent: "#5E8EC8", arrow: ["#EEF4FC", "#9EC0EC", "#4E7AB8"], badgeColor: "#3E6A9A" },
+  { grad: "linear-gradient(160deg,#FFFBF4,#F8ECD8 55%,#F0DCB8)", accent: "#D0A04A", arrow: ["#FFF6E8", "#F0C878", "#D0A04A"], badgeColor: "#9A7028" },
 ];
 
 /* ── Helper: botão gloss circular (verde metálico do mockup) ── */
@@ -118,7 +119,7 @@ const glossGreen = (size: number, radius = 999): CSSProperties => ({
   boxShadow: "0 8px 18px rgba(40,110,60,.45),inset 0 1.5px 2px rgba(255,255,255,.6)",
 });
 
-/* ── Estilo do card de descoberta (cream glass do mockup) ── */
+/* ── Cards "Hoje para você": pérola esbranquiçada (menos contraste com a floresta) ── */
 const discCardStyle: CSSProperties = {
   position: "relative",
   overflow: "hidden",
@@ -130,11 +131,13 @@ const discCardStyle: CSSProperties = {
   cursor: "pointer",
   textAlign: "left",
   width: "100%",
-  border: "0.5px solid rgba(255,248,228,.75)",
-  background: "linear-gradient(165deg,rgba(255,250,235,.92),rgba(236,224,190,.78))",
-  backdropFilter: "blur(36px) saturate(185%)",
-  WebkitBackdropFilter: "blur(36px) saturate(185%)",
-  boxShadow: "0 14px 36px rgba(40,50,20,.2), 0 2px 8px rgba(40,50,20,.06), inset 0 1.5px 0 rgba(255,255,255,.9)",
+  border: "0.5px solid rgba(255,255,255,.88)",
+  background:
+    "linear-gradient(155deg, rgba(255,255,255,.94) 0%, rgba(248,250,246,.88) 48%, rgba(236,242,238,.82) 100%)",
+  backdropFilter: "blur(36px) saturate(160%)",
+  WebkitBackdropFilter: "blur(36px) saturate(160%)",
+  boxShadow:
+    "0 12px 28px rgba(20,40,20,.16), 0 2px 6px rgba(20,40,20,.05), inset 0 1.5px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(200,220,200,.25)",
   fontFamily: "'Nunito',sans-serif",
   transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
 };
@@ -240,7 +243,12 @@ const HomeScreen = ({
     setSubmitting(true);
     haptic("light");
     sfx("click");
-    onSubmit(text.trim());
+    try {
+      onSubmit(text.trim());
+    } finally {
+      // Se o fluxo não trocar de tela (paywall/limite/guest), libera o botão de novo.
+      window.setTimeout(() => setSubmitting(false), 600);
+    }
   };
 
   const toggleSound = () => {
@@ -440,24 +448,8 @@ const HomeScreen = ({
             )}
           </button>
 
-          {/* KIDZZ wordmark */}
-          <div
-            className="select-none"
-            style={{
-              position: "relative",
-              fontFamily: "'Lora',serif",
-              fontWeight: 700,
-              fontSize: 33,
-              letterSpacing: 5,
-              background: "linear-gradient(180deg,#CFF29A 0%,#82CF58 44%,#3E8A2E 100%)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-              filter: "drop-shadow(0 2px 8px rgba(90,180,80,.45)) drop-shadow(0 1px 0 rgba(255,255,255,.2))",
-            }}
-          >
-            KIDZZ
-          </div>
+          {/* Logo oficial KIDZZ */}
+          <KidzzLogo height={36} style={{ maxWidth: 168 }} />
 
           {/* presente · sino · pais */}
           <div style={islandStyle}>
@@ -553,24 +545,27 @@ const HomeScreen = ({
             {/* shine sweep */}
             <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent,rgba(255,244,210,.14) 50%,transparent)", animation: "perg-shine 7s ease-in-out infinite" }} />
 
-            {/* Gui, o camaleão (asset Hermes) */}
+            {/* Gui — mascote oficial (melhor cutout) */}
             <img
-              src={`${PQ}/gui-hero.png`}
-              alt="Gui, o camaleão"
+              src={`${PQ}/gui-hero-v2.png`}
+              alt="Gui, o camaleão do Kidzz"
               draggable={false}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = `${PQ}/gui-hero.png`;
+              }}
               style={{
                 position: "absolute",
-                right: -18,
-                bottom: -8,
-                height: 250,
+                right: -6,
+                bottom: -4,
+                height: 248,
                 width: "auto",
-                maxWidth: "52%",
+                maxWidth: "54%",
                 objectFit: "contain",
-                WebkitMaskImage: "radial-gradient(76% 80% at 50% 46%,#000 56%,rgba(0,0,0,.5) 76%,transparent 100%)",
-                maskImage: "radial-gradient(76% 80% at 50% 46%,#000 56%,rgba(0,0,0,.5) 76%,transparent 100%)",
-                filter: "drop-shadow(0 16px 26px rgba(0,0,0,.45))",
+                objectPosition: "center bottom",
+                filter: "drop-shadow(0 16px 28px rgba(0,0,0,.42))",
                 animation: "perg-floaty 6s ease-in-out infinite",
                 zIndex: 2,
+                pointerEvents: "none",
               }}
             />
 
@@ -725,23 +720,23 @@ const HomeScreen = ({
                   style={{ ...discCardStyle, opacity: submitting || isFreeLimitReached ? 0.5 : 1 }}
                 >
                   <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "46%", height: "100%", pointerEvents: "none", background: "linear-gradient(100deg,transparent,rgba(255,255,255,.14) 50%,transparent)", animation: "perg-shine 7s ease-in-out infinite", zIndex: 3 }} />
-                  <div style={{ flex: "none", width: 78, height: 78, borderRadius: 18, overflow: "hidden", border: "0.5px solid rgba(255,255,255,.7)", boxShadow: "0 8px 16px rgba(0,0,0,.22), inset 0 1.5px 1px rgba(255,255,255,.55)", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", background: v.grad }}>
+                  <div style={{ flex: "none", width: 78, height: 78, borderRadius: 18, overflow: "hidden", border: "0.5px solid rgba(255,255,255,.92)", boxShadow: "0 6px 14px rgba(40,60,40,.12), inset 0 1.5px 1px rgba(255,255,255,.7)", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", background: v.grad }}>
                     {cover ? (
                       <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     ) : (
                       <>
-                        <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(82% 62% at 28% 16%,rgba(255,255,255,.5),rgba(255,255,255,.12) 46%,transparent 70%)" }} />
-                        <span style={{ position: "relative", fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 5px rgba(0,0,0,.32))" }}>{q.emoji}</span>
+                        <span aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(82% 62% at 28% 16%,rgba(255,255,255,.72),rgba(255,255,255,.2) 46%,transparent 70%)" }} />
+                        <span style={{ position: "relative", fontSize: 36, lineHeight: 1, filter: "drop-shadow(0 1px 3px rgba(0,0,0,.14))" }}>{q.emoji}</span>
                       </>
                     )}
                   </div>
                   <div style={{ flex: 1, minWidth: 0, position: "relative", zIndex: 2 }}>
-                    <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 16.5, lineHeight: 1.1, color: "#26401E" }}>{q.text}</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, fontSize: 10.5, fontWeight: 800, color: "#5E7A50" }}>
+                    <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 16.5, lineHeight: 1.14, color: "#2A3A28" }}>{q.text}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, fontSize: 10.5, fontWeight: 800, color: "#6A7E64" }}>
                       <span style={{ width: 5, height: 5, borderRadius: 99, background: v.accent, boxShadow: "0 0 5px " + v.accent }} />
                       Toque para descobrir
                     </div>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, padding: "4px 10px", borderRadius: 999, background: "rgba(255,255,255,.5)", border: "1px solid rgba(255,255,255,.85)" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 7, padding: "4px 10px", borderRadius: 999, background: "rgba(255,255,255,.72)", border: "1px solid rgba(220,230,220,.9)" }}>
                       <span style={{ width: 6, height: 6, borderRadius: 99, background: v.accent, boxShadow: "0 0 6px " + v.accent }} />
                       <span style={{ fontSize: 9.5, fontWeight: 900, color: v.badgeColor }}>{q.category}</span>
                     </div>

@@ -46,6 +46,7 @@ import {
   goldBtn,
   sectionWrap,
 } from "@/lib/premiumUi";
+import KidzzLogo from "@/components/common/KidzzLogo";
 
 const AS = "/exemplos/assets/kalm-v2";
 const AV = "v7";
@@ -509,6 +510,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
             <ArrowLeft size={19} color={INK} strokeWidth={2.1} />
           </button>
 
+          {/* Logo oficial KIDZZ (padrão do site) */}
           <div
             style={{
               flex: 1,
@@ -516,28 +518,11 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 6,
               height: 44,
-              padding: "0 14px",
-              borderRadius: R.btn,
-              ...pillGlass,
+              padding: "0 8px",
             }}
           >
-            <Leaf size={14} color={EM} strokeWidth={2.2} style={{ flexShrink: 0 }} />
-            <span
-              style={{
-                fontWeight: 800,
-                fontSize: 15,
-                color: INK,
-                letterSpacing: "-0.2px",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              KALM
-            </span>
-            <Sparkles size={13} color={EM_SOFT} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+            <KidzzLogo height={28} light />
           </div>
 
           <button
@@ -585,21 +570,22 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
           </div>
         </div>
 
-        {/* ═══ HERO (estrutura Bora: texto esq + arte mascarada dir) ═══ */}
-        <div style={{ position: "relative", padding: `4px ${PAD}px 14px`, minHeight: 248 }}>
+        {/* ═══ HERO: tipografia limpa + arte família ═══ */}
+        <div style={{ position: "relative", padding: `6px ${PAD}px 18px`, minHeight: 252 }}>
           <div
             ref={heroArtRef}
             style={{
               position: "absolute",
-              right: 0,
+              right: -2,
               top: 0,
-              width: "66%",
-              height: 220,
+              width: "52%",
+              height: 228,
               willChange: "transform",
               animation: "kalm2-heroIn .75s cubic-bezier(.22,1,.36,1) both",
               pointerEvents: "none",
-              borderRadius: `0 ${R.card}px ${R.card}px 0`,
+              borderRadius: "28px 18px 42% 24%",
               overflow: "hidden",
+              boxShadow: "0 16px 34px rgba(40,70,40,.14)",
             }}
           >
             <img
@@ -609,31 +595,17 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                objectPosition: "58% 28%",
+                objectPosition: "55% 22%",
                 maskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                  "linear-gradient(100deg, transparent 0%, #000 14%, #000 86%, transparent 100%), linear-gradient(180deg, #000 72%, transparent 100%)",
                 WebkitMaskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                  "linear-gradient(100deg, transparent 0%, #000 14%, #000 86%, transparent 100%), linear-gradient(180deg, #000 72%, transparent 100%)",
                 WebkitMaskComposite: "source-in",
                 maskComposite: "intersect",
-                filter: "saturate(1.1) contrast(1.03)",
+                filter: "saturate(1.08) contrast(1.02)",
               }}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = "/exemplos/assets/cena-kalm.png";
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                right: "16%",
-                bottom: 32,
-                width: 64,
-                height: 64,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(255,210,120,.35), transparent 70%)",
-                filter: "blur(8px)",
-                animation: "kalm2-floaty 6s ease-in-out infinite",
               }}
             />
           </div>
@@ -642,40 +614,45 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
             style={{
               position: "relative",
               zIndex: 3,
-              maxWidth: "56%",
-              paddingTop: 12,
+              maxWidth: "50%",
+              paddingTop: 10,
+              paddingRight: 8,
               animation: "kalm2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
             }}
           >
             <div
               style={{
-                fontFamily: SERIF,
-                fontWeight: 700,
-                fontSize: 24,
-                letterSpacing: "0.6px",
-                color: INK,
-                textShadow: "0 1px 0 rgba(255,255,255,.45)",
-                marginBottom: 3,
-                lineHeight: 1,
+                fontSize: 11.5,
+                fontWeight: 800,
+                color: INK2,
+                marginBottom: 8,
+                lineHeight: 1.35,
+                letterSpacing: "0.01em",
               }}
             >
-              KIDZZ
-            </div>
-            {/* SEM 💛 */}
-            <div style={{ fontSize: 12, fontWeight: 700, color: INK2, marginBottom: 10, lineHeight: 1.35 }}>
               Desligue a tela, ligue a infância.
             </div>
-            <div style={{ fontSize: 12.5, fontWeight: 800, color: EM, marginBottom: 6 }}>{greet}</div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 800,
+                color: EM,
+                marginBottom: 8,
+                letterSpacing: "0.02em",
+              }}
+            >
+              {greet}
+            </div>
             <h1
               style={{
                 margin: 0,
                 fontFamily: SERIF,
                 fontWeight: 600,
-                fontSize: 26,
-                lineHeight: 1.12,
+                fontSize: 25,
+                lineHeight: 1.14,
                 color: INK,
-                letterSpacing: "-0.4px",
-                textShadow: "0 1px 12px rgba(255,255,255,.4)",
+                letterSpacing: "-0.35px",
+                textShadow: "0 1px 10px rgba(255,255,255,.45)",
               }}
             >
               Pequenos gestos,
@@ -684,16 +661,15 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
             </h1>
             <p
               style={{
-                margin: "8px 0 0",
+                margin: "10px 0 0",
                 fontSize: 12.5,
                 fontWeight: 600,
-                lineHeight: 1.4,
+                lineHeight: 1.42,
                 color: INK2,
-                maxWidth: 190,
-                textShadow: "0 1px 6px rgba(255,255,255,.35)",
+                maxWidth: 188,
               }}
             >
-              Cada escolha de hoje, transforma o amanhã.
+              Cada escolha de hoje transforma o amanhã.
             </p>
           </div>
         </div>

@@ -12,6 +12,7 @@ import kalmHeroChameleon from "@/assets/kalm-hero-chameleon.jpg";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
+import KidzzLogo from "@/components/common/KidzzLogo";
 import { findActivity, type Activity } from "./data";
 import {
   useMood, useParentMood, useKalmStreak, useWeekStats, useDailySuggestion,
@@ -155,67 +156,69 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         }}
       />
 
-      {/* Header */}
+      {/* Header — logo oficial KIDZZ */}
       <div className="relative px-4 pt-[max(14px,env(safe-area-inset-top))] pb-3 flex items-center gap-2">
         <button
           onClick={() => { haptic("light"); onBack(); }}
           aria-label="Voltar"
-          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95"
+          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95 flex-none"
           style={glassChrome}
         >
           <ArrowLeft size={18} style={{ color: ink }} />
         </button>
-        <div
-          className="flex-1 h-11 rounded-full flex items-center justify-center text-[13.5px] font-bold gap-1.5"
-          style={{ ...glassChrome, color: ink }}
-        >
-          🌿 KALM · bem-estar da família
+        <div className="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 px-1">
+          <KidzzLogo height={28} />
+          <span
+            className="text-[9px] font-bold tracking-[0.16em] uppercase"
+            style={{ color: inkMuted }}
+          >
+            KALM · bem-estar
+          </span>
         </div>
         <div
-          className="h-11 px-3 rounded-full flex items-center gap-1 text-[11.5px] font-bold"
+          className="h-11 px-3 rounded-full flex items-center gap-1 text-[11.5px] font-bold flex-none"
           style={{ ...glassChrome, color: gold }}
         >
           ⚡ {streak.count || 1}
         </div>
       </div>
 
-      {/* Herói */}
+      {/* Herói — tipografia limpa + mascote */}
       <section className="relative px-5 pt-2">
-        <div className="flex items-start gap-2">
-          <div className="flex-1 min-w-0 pt-1">
+        <div className="flex items-start gap-3">
+          <div className="flex-1 min-w-0 pt-1 pr-1">
             <p
-              className="text-[11px] font-bold tracking-[0.20em] flex items-center gap-1"
+              className="text-[11px] font-bold tracking-[0.18em]"
               style={{ color: gold }}
             >
               {greetByHour()}
             </p>
+            <p className="mt-1.5 text-[12px] font-semibold leading-snug" style={{ color: inkSoft }}>
+              Desligue a tela, ligue a infância.
+            </p>
             <h1
-              className="mt-2 leading-[1.02]"
+              className="mt-2.5 leading-[1.08]"
               style={{
                 color: ink,
                 fontFamily: "'Fraunces','Nunito',serif",
-                fontSize: "clamp(26px, 7.8vw, 34px)",
+                fontSize: "clamp(24px, 7.2vw, 32px)",
                 fontWeight: 600,
-                letterSpacing: "-0.01em",
+                letterSpacing: "-0.015em",
               }}
             >
-              Cuidar das
-              <br />emoções hoje,
-              <br />
+              Cuidar das emoções hoje{" "}
               <span
                 style={{
                   fontStyle: "italic",
                   color: gold,
-                  borderBottom: `2px solid ${greenDeep}`,
-                  paddingBottom: 2,
                   textShadow: "0 0 24px rgba(232,185,58,0.25)",
                 }}
               >
                 transforma o amanhã.
               </span>
             </h1>
-            <p className="mt-3 text-[13.5px] leading-snug" style={{ color: inkSoft }}>
-              Pequenas escolhas hoje,<br />grandes conexões sempre.
+            <p className="mt-3 text-[13px] leading-[1.4] max-w-[200px]" style={{ color: inkSoft }}>
+              Pequenas escolhas hoje, grandes conexões sempre.
             </p>
           </div>
           <img
@@ -223,7 +226,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
             alt="Camaleão meditando"
             width={1024}
             height={1024}
-            className="w-[42%] max-w-[180px] h-auto object-contain flex-shrink-0 -mr-1 -mt-1"
+            className="w-[40%] max-w-[168px] h-auto object-contain flex-shrink-0 -mr-1 -mt-1"
             style={{
               filter:
                 "drop-shadow(0 12px 28px rgba(232,185,58,0.28)) drop-shadow(0 4px 12px rgba(127,176,105,0.20))",

@@ -1,23 +1,24 @@
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { haptic } from "@/lib/haptics";
+import KidzzLogo from "./KidzzLogo";
 
 /**
- * KidzzHeader — header padrão do app (modelo da tela Descobrir).
- * Barra glass sticky com botão voltar à esquerda, marca "KIDZZ" centralizada
- * e, à direita, um slot opcional (ações funcionais como Pais/galeria) ou spacer.
- * Usado em todas as telas, exceto Perguntas (home).
+ * KidzzHeader — header padrão do app.
+ * Barra glass sticky com botão voltar, logo KIDZZ oficial centralizado
+ * e, à direita, um slot opcional (Pais/galeria) ou spacer.
  */
 const INK = "#2A2520";
-const SAGE_DEEP = "#46703A";
 
 interface Props {
   onBack?: () => void;
   /** Ações à direita (ex: Pais, galeria). Se ausente, mantém spacer p/ centralizar a marca. */
   right?: ReactNode;
+  /** Esconde a tagline abaixo do logo. */
+  hideTagline?: boolean;
 }
 
-const KidzzHeader = ({ onBack, right }: Props) => {
+const KidzzHeader = ({ onBack, right, hideTagline }: Props) => {
   return (
     <div
       className="sticky top-0 z-30"
@@ -49,30 +50,22 @@ const KidzzHeader = ({ onBack, right }: Props) => {
         >
           <ArrowLeft size={20} color={INK} strokeWidth={2.2} />
         </button>
-        <div className="flex flex-col items-center leading-tight">
-          <span
-            style={{
-              fontFamily: "'Nunito', system-ui, sans-serif",
-              fontWeight: 700,
-              fontSize: 24,
-              letterSpacing: "0.04em",
-              color: SAGE_DEEP,
-            }}
-          >
-            KIDZZ
-          </span>
-          <span
-            style={{
-              fontFamily: "'Nunito', system-ui, sans-serif",
-              fontSize: 9.5,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "#7d6e5b",
-              marginTop: -2,
-            }}
-          >
-            Menos tela. Mais memórias.
-          </span>
+        <div className="flex flex-col items-center leading-tight min-w-0">
+          <KidzzLogo height={28} light />
+          {!hideTagline && (
+            <span
+              style={{
+                fontFamily: "'Nunito', system-ui, sans-serif",
+                fontSize: 9.5,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#7d6e5b",
+                marginTop: 2,
+              }}
+            >
+              Menos tela. Mais memórias.
+            </span>
+          )}
         </div>
         {/* Ações à direita ou spacer p/ manter a marca centralizada */}
         {right ? (

@@ -128,7 +128,7 @@ const Index = () => {
   // onboarding ("Ops! Algo deu errado"). Esse era o bug raiz.
   // ============================================================
   const navigate = useNavigate();
-  const { profile, loading, updateProfile, canAskQuestion, user } = useAuth();
+  const { profile, loading, updateProfile, canAskQuestion, user, session } = useAuth();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
   usePWAUpdate();
@@ -334,13 +334,24 @@ const Index = () => {
   const childName = profile?.child_name ?? "";
 
   const handleQuestionSubmit = useCallback((q: string) => {
+    // Sem sessão → login claro (antes o GeneratingScreen falhava e “nada acontecia”)
+    if (!user || !session?.access_token) {
+      import("sonner").then(({ toast }) =>
+        toast.message("Entre na sua conta para fazer perguntas 💬", {
+          description: "Assim a gente salva as respostas da família.",
+          action: { label: "Entrar", onClick: () => navigate("/auth") },
+        })
+      );
+      navigate("/auth");
+      return;
+    }
     if (!canAskQuestion()) {
       setContextualPaywall({ open: true, context: "question_limit", meta: { count: profile?.questions_used ?? 0 } });
       return;
     }
     setQuestion(q);
     setStep("generating");
-  }, [canAskQuestion, profile?.questions_used]);
+  }, [canAskQuestion, profile?.questions_used, user, session?.access_token, navigate]);
 
   const handleAnswerReady = useCallback((text: string) => {
     setAnswer(text);
