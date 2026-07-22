@@ -316,7 +316,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           <button onClick={handleShare}
             className="mt-3 h-10 px-4 rounded-full font-bold text-[12.5px] flex items-center gap-1.5 active:scale-95"
             style={{ background: "#fff", color: ink, border: "1px solid rgba(42,37,32,0.10)" }}>
-            <Share2 size={13} /> Compartilhar
+            <Share2 size={13} /> {shareMsg || "Compartilhar"}
           </button>
         </div>
       </section>
