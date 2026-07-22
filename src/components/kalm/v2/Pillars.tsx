@@ -12,16 +12,18 @@ import {
 } from "./data";
 import { useJar, useWins } from "./state";
 
-const ink = "#2A2520";
-const inkSoft = "#5A6660";
-const cream = "#FFFCF8";
+// Paleta escura florestal (mesma da KalmHome)
+const ink = "#F1EEE4";
+const inkSoft = "rgba(241,238,228,0.68)";
+const cream = "rgba(255,255,255,0.045)"; // "card" escuro translúcido
+const bgDark = "linear-gradient(180deg,#0E1712 0%,#0B1310 60%,#0A110E 100%)";
 
 const glass: React.CSSProperties = {
-  background: "rgba(255,252,248,0.55)",
-  border: "1px solid rgba(255,255,255,0.6)",
+  background: "linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+  border: "1px solid rgba(255,255,255,0.10)",
   backdropFilter: "blur(24px) saturate(140%)",
   WebkitBackdropFilter: "blur(24px) saturate(140%)",
-  boxShadow: "0 8px 32px rgba(42,37,32,0.10)",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
 };
 
 const TopBar = ({ title, tint, onBack }: { title: string; tint: string; onBack: () => void }) => (
