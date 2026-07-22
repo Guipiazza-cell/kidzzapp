@@ -816,13 +816,25 @@ const WeeklySummary = () => {
     return { winCount, gratCount };
   }, [wins, grats]);
 
+  const [shareMsg, setShareMsg] = useState<string>("");
   const share = async () => {
     haptic("light");
     const text = `Esta semana minha família completou ${stats.winCount} tarefas e registrou ${stats.gratCount} momentos felizes no KIDZZ ✨`;
+    const url = typeof window !== "undefined" ? window.location.origin : undefined;
     try {
-      if (navigator.share) await navigator.share({ text });
-      else await navigator.clipboard.writeText(text);
-    } catch {}
+      if (typeof navigator !== "undefined" && (navigator as any).share) {
+        await (navigator as any).share({ title: "KIDZZ · Resumo da semana", text, url });
+        setShareMsg("Compartilhado ✨");
+      } else if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url ? `${text}\n${url}` : text);
+        setShareMsg("Texto copiado ✨");
+      } else {
+        setShareMsg("Compartilhamento indisponível");
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") setShareMsg("Não foi possível compartilhar");
+    }
+    window.setTimeout(() => setShareMsg(""), 1800);
   };
 
   return (
