@@ -109,7 +109,7 @@ export const PilarSentir = ({ onBack, onOpen, isPremium }:
   const nomear = pickIds(["escuta-coracao", "aperta-limao", "soltar-balao", "sentir-vento"]);
 
   return (
-    <div className="min-h-full pb-24" style={{ background: cream }}>
+    <div className="min-h-full pb-24" style={{ background: bgDark }}>
       <TopBar title="🌦 Sentir" tint={tint} onBack={onBack} />
       <PillarHero kicker="Emoção" title="Nomear é acalmar."
         subtitle="Reconhecer o que sentimos já é metade do caminho." tint={tint} />
@@ -162,7 +162,7 @@ export const PilarAgradecer = ({ onBack, onOpen, isPremium }:
   const outras = pickIds(["tres-boas", "caca-beleza", "elogio-especifico", "diario-uma-linha", "tres-gratidoes"]);
 
   return (
-    <div className="min-h-full pb-24" style={{ background: cream }}>
+    <div className="min-h-full pb-24" style={{ background: bgDark }}>
       <TopBar title="🫙 Agradecer" tint={tint} onBack={onBack} />
       <PillarHero kicker="Gratidão & memória" title="Guardar o que foi bom."
         subtitle="Saborear pequenos brilhos multiplica a alegria." tint={tint} />
@@ -261,7 +261,7 @@ export const PilarMover = ({ onBack, onOpen, isPremium }:
     "festival-risada", "nuvem-macia", "sentir-vento",
   ]);
   return (
-    <div className="min-h-full pb-24" style={{ background: cream }}>
+    <div className="min-h-full pb-24" style={{ background: bgDark }}>
       <TopBar title="🌿 Mover" tint={tint} onBack={onBack} />
       <PillarHero kicker="Corpo em movimento" title="Um minuto muda tudo."
         subtitle="Movimento leve regula a emoção pelo corpo." tint={tint} />
@@ -290,7 +290,7 @@ export const PilarNutrir = ({ onBack, onOpen, isPremium }:
   const juntos = pickIds(["cozinhar-juntos", "refeicao-sem-tela"]);
 
   return (
-    <div className="min-h-full pb-24" style={{ background: cream }}>
+    <div className="min-h-full pb-24" style={{ background: bgDark }}>
       <TopBar title="🍎 Nutrir" tint={tint} onBack={onBack} />
       <PillarHero kicker="Alimentação com consciência" title="Cor, água e presença."
         subtitle="Nada de dieta, calorias ou peso. Aqui é vínculo e prazer de comer junto." tint={tint} />
@@ -335,7 +335,7 @@ export const PilarConectar = ({ onBack, onOpen, isPremium }:
     "maos-cuidam", "caminhada-maos",
   ]);
   return (
-    <div className="min-h-full pb-24" style={{ background: cream }}>
+    <div className="min-h-full pb-24" style={{ background: bgDark }}>
       <TopBar title="💚 Conectar" tint={tint} onBack={onBack} />
       <PillarHero kicker="Bondade & vínculo" title="A família é o abrigo."
         subtitle="Pequenos gestos hoje, memórias que ficam para sempre." tint={tint} />
@@ -360,7 +360,7 @@ export const PilarCuidar = ({ onBack, onOpen, isPremium }:
   const dica = dicas[new Date().getDate() % dicas.length];
 
   return (
-    <div className="min-h-full pb-24" style={{ background: cream }}>
+    <div className="min-h-full pb-24" style={{ background: bgDark }}>
       <TopBar title="☕ Cuidar de quem cuida" tint={tint} onBack={onBack} />
       <PillarHero kicker="Para você, mãe e pai" title="Pausas diurnas, sem culpa."
         subtitle="Cuidar de si é a base de toda a família." tint={tint} />
