@@ -658,16 +658,39 @@ const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: 
           </div>
         </div>
 
-        {/* ── Sussurro do KIDZZ (texto dinâmico real) ── */}
+        {/* ── Sussurro do KIDZZ (texto dinâmico real + Play → floresta) ── */}
         <div style={{ padding: "14px 16px 0", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .26s both" }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", borderRadius: 22, padding: "14px 15px", background: "linear-gradient(155deg,rgba(206,232,196,.72),rgba(180,215,175,.5))", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 10px 22px rgba(50,90,50,.12),inset 0 1.5px 0 rgba(255,255,255,.9)" }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", borderRadius: 22, padding: "14px 15px", background: "linear-gradient(155deg,rgba(206,232,196,.72),rgba(180,215,175,.5))", backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 10px 22px rgba(50,90,50,.12),inset 0 1.5px 0 rgba(255,255,255,.9)" }}>
             <div style={{ flex: "none", width: 40, height: 40, borderRadius: 13, background: "radial-gradient(130% 130% at 30% 22%,#D8F0C8,#6FBE6A 55%,#3E8A4E)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 14px rgba(40,110,50,.35),inset 0 1px 1px rgba(255,255,255,.5)" }}>
               <KalmIcon d={KD.leaf} size={20} />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: "1.2px", color: "#3E7A4A", marginBottom: 4 }}>SUSSURRO DO KIDZZ</div>
               <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.5, color: "#274A30" }}>{whisper}</div>
             </div>
+            {(() => {
+              const forest = KALM_SOUNDSCAPES[0];
+              const playing = soundOn === forest.key;
+              return (
+                <button
+                  onClick={() => toggleSound(forest)}
+                  aria-label={playing ? "Pausar sons da floresta" : "Tocar sons da floresta"}
+                  aria-pressed={playing}
+                  className="active:scale-95"
+                  style={{ flex: "none", width: 44, height: 44, borderRadius: 999, background: playing ? "#2E7A4A" : "rgba(255,255,255,.92)", boxShadow: playing ? "0 6px 14px rgba(46,122,74,.4)" : "0 4px 10px rgba(0,0,0,.15)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,255,255,.7)", transition: "background .2s, box-shadow .2s" }}
+                >
+                  {playing ? (
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 14 }}>
+                      <span style={{ width: 3, height: "100%", borderRadius: 2, background: "#fff", animation: "kalm-eq .8s ease-in-out infinite" }} />
+                      <span style={{ width: 3, height: "100%", borderRadius: 2, background: "#fff", animation: "kalm-eq .8s ease-in-out .22s infinite" }} />
+                      <span style={{ width: 3, height: "100%", borderRadius: 2, background: "#fff", animation: "kalm-eq .8s ease-in-out .44s infinite" }} />
+                    </div>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#2E7A4A" aria-hidden><path d="M8 5v14l11-7z" /></svg>
+                  )}
+                </button>
+              );
+            })()}
           </div>
         </div>
 
