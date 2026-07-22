@@ -83,13 +83,25 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
     setMood(v); markToday();
   };
 
+  const [shareMsg, setShareMsg] = useState<string>("");
   const handleShare = async () => {
     const txt = `Esta semana nossa família guardou ${weekStats.tarefas} vitórias e ${weekStats.momentos} momentos felizes 💚 — KALM by Kidzz`;
+    const url = typeof window !== "undefined" ? window.location.origin : undefined;
     try {
-      if (navigator.share) await navigator.share({ title: "KALM by Kidzz", text: txt });
-      else await navigator.clipboard.writeText(txt);
+      if (typeof navigator !== "undefined" && (navigator as any).share) {
+        await (navigator as any).share({ title: "KALM by Kidzz", text: txt, url });
+        setShareMsg("Compartilhado ✨");
+      } else if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url ? `${txt}\n${url}` : txt);
+        setShareMsg("Texto copiado ✨");
+      } else {
+        setShareMsg("Compartilhamento indisponível");
+      }
       haptic("light");
-    } catch { /* noop */ }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") setShareMsg("Não foi possível compartilhar");
+    }
+    window.setTimeout(() => setShareMsg(""), 1800);
   };
 
   const suggestionActivity = suggestion.activityId ? findActivity(suggestion.activityId) : null;
