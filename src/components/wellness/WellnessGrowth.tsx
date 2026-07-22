@@ -858,7 +858,7 @@ const WeeklySummary = () => {
           className="mt-3 w-full h-11 rounded-full text-[13px] font-semibold flex items-center justify-center gap-2"
           style={{ background: "#fff", color: emerald }}
         >
-          <Share2 size={14} /> Compartilhar
+          <Share2 size={14} /> {shareMsg || "Compartilhar"}
         </button>
       </Surface>
     </div>
