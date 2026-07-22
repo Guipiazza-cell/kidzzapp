@@ -436,11 +436,12 @@ const Index = () => {
     cinema: () => <AreaGate area="cinema"><FamilyCinema onBack={backToHome} /></AreaGate>,
     wellness: () => (
       <AreaGate area="kalm">
-        <WellnessHub
+        <KalmV2
           onBack={backToHome}
+          onGoDreams={() => switchTab("dreams")}
+          onOpenParents={() => setShowParentalGateForDashboard(true)}
           initialExperienceId={kalmInitialExperience}
           onConsumedInitial={() => setKalmInitialExperience(null)}
-          onOpenParent={() => setShowParentalGateForDashboard(true)}
         />
       </AreaGate>
     ),
