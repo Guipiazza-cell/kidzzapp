@@ -10,16 +10,18 @@ import {
   JOURNEYS, MOTOR_TINT, type Activity,
 } from "./data";
 
-const ink = "#2A2520";
-const inkSoft = "#5A6660";
-const cream = "#FFFCF8";
+// Paleta escura florestal (mesma da KalmHome)
+const ink = "#F1EEE4";
+const inkSoft = "rgba(241,238,228,0.68)";
+const cream = "rgba(255,255,255,0.045)"; // card escuro translúcido
+const bgDark = "linear-gradient(180deg,#0E1712 0%,#0B1310 60%,#0A110E 100%)";
 
 const glassCard: React.CSSProperties = {
-  background: "rgba(255,252,248,0.55)",
-  border: "1px solid rgba(255,255,255,0.6)",
+  background: "linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+  border: "1px solid rgba(255,255,255,0.10)",
   backdropFilter: "blur(24px) saturate(140%)",
   WebkitBackdropFilter: "blur(24px) saturate(140%)",
-  boxShadow: "0 8px 32px rgba(42,37,32,0.10)",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
 };
 
 const TopBar = ({ title, onBack }: { title: string; onBack: () => void }) => (
@@ -79,7 +81,7 @@ const ActivityCard = ({ a, onOpen, locked }: { a: Activity; onOpen: () => void; 
 /* ─────────────── RELAXAR AGORA ─────────────── */
 export const RelaxarAgora = ({ onBack, onOpen, isPremium }:
   { onBack: () => void; onOpen: (a: Activity) => void; isPremium: boolean }) => (
-  <div className="min-h-full pb-20" style={{ background: cream }}>
+  <div className="min-h-full pb-20" style={{ background: bgDark }}>
     <TopBar title="Alívio em minutos" onBack={onBack} />
     <div className="px-5 pt-2">
       <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
@@ -206,7 +208,7 @@ export const RitualRapido = ({ onBack, onOpen }:
   ];
 
   return (
-    <div className="min-h-full pb-20" style={{ background: cream }}>
+    <div className="min-h-full pb-20" style={{ background: bgDark }}>
       <TopBar title="Ritual rápido" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#E8821A" }}>
@@ -267,7 +269,7 @@ export const SosEmocional = ({ onBack, onOpen, onOpenParents }:
   };
 
   return (
-    <div className="min-h-full pb-20" style={{ background: cream }}>
+    <div className="min-h-full pb-20" style={{ background: bgDark }}>
       <TopBar title="SOS emocional" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
@@ -387,7 +389,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
   ];
 
   return (
-    <div className="min-h-full pb-20" style={{ background: cream }}>
+    <div className="min-h-full pb-20" style={{ background: bgDark }}>
       <TopBar title="Vínculo em família" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#C9A227" }}>
