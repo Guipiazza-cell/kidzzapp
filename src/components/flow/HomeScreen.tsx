@@ -24,9 +24,10 @@ const BRAND = "/exemplos/assets/brand";
 
 const ASSETS = {
   bg: `${PQ}/bg-floresta.png`,
-  gui: `${PQ}/gui-hero-mock.png`,
-  guiFallback: `${BRAND}/gui-cutout-alpha.png`,
-  guiFallback2: `${PQ}/gui-hero.png`,
+  /** Soft-edge cutout (sem “quadrado”) */
+  gui: `${PQ}/gui-hero-soft.png`,
+  guiFallback: `${PQ}/gui-hero-mock.png`,
+  guiFallback2: `${BRAND}/gui-cutout-alpha.png`,
   family: `${PQ}/family-ask.png`,
   familyFallback: `${PQ}/familia-abraco.png`,
   peixes: `${PQ}/sug-peixes.png`,
@@ -396,22 +397,30 @@ const HomeScreen = ({
             draggable={false}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
-              if (el.src.includes("gui-hero-mock")) el.src = ASSETS.guiFallback;
-              else if (el.src.includes("gui-cutout")) el.src = ASSETS.guiFallback2;
+              if (el.src.includes("gui-hero-soft")) el.src = ASSETS.guiFallback;
+              else if (el.src.includes("gui-hero-mock")) el.src = ASSETS.guiFallback2;
             }}
             style={{
               position: "absolute",
-              right: -8,
-              top: 0,
-              width: "52%",
-              maxWidth: 220,
-              height: 250,
+              right: -4,
+              top: -4,
+              width: "54%",
+              maxWidth: 230,
+              height: 260,
               objectFit: "contain",
               objectPosition: "center bottom",
-              filter: "drop-shadow(0 18px 28px rgba(40,70,20,.28))",
+              /* borda suave — some o retângulo */
+              WebkitMaskImage:
+                "radial-gradient(68% 72% at 52% 48%, #000 48%, rgba(0,0,0,.85) 62%, rgba(0,0,0,.35) 78%, transparent 92%)",
+              maskImage:
+                "radial-gradient(68% 72% at 52% 48%, #000 48%, rgba(0,0,0,.85) 62%, rgba(0,0,0,.35) 78%, transparent 92%)",
+              filter: "drop-shadow(0 16px 26px rgba(40,70,20,.22))",
               animation: "perg-floaty 6.5s ease-in-out infinite",
               pointerEvents: "none",
               zIndex: 2,
+              background: "transparent",
+              border: "none",
+              borderRadius: 0,
             }}
           />
         </section>
@@ -860,7 +869,15 @@ const HomeScreen = ({
                 src={ASSETS.gui}
                 alt=""
                 onError={(e) => { (e.target as HTMLImageElement).src = ASSETS.guiFallback; }}
-                style={{ width: 56, height: 56, objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,.12))" }}
+                style={{
+                  width: 56,
+                  height: 56,
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 4px 8px rgba(0,0,0,.12))",
+                  WebkitMaskImage: "radial-gradient(circle at 50% 50%, #000 55%, transparent 88%)",
+                  maskImage: "radial-gradient(circle at 50% 50%, #000 55%, transparent 88%)",
+                  background: "transparent",
+                }}
               />
               <span
                 style={{
