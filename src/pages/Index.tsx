@@ -308,10 +308,14 @@ const Index = () => {
       switchTab("wellness");
     };
     window.addEventListener("kidzz:open-kalm", openKalm);
+    // Pais global (headers de Cinema/Momentos/etc. sem prop onOpenParent)
+    const openParents = () => setShowParentalGateForDashboard(true);
+    window.addEventListener("kidzz:open-parents", openParents);
     return () => {
       window.removeEventListener("kidzz:open-plans", openPlans);
       window.removeEventListener("kidzz:open-journey", openJourney);
       window.removeEventListener("kidzz:open-kalm", openKalm);
+      window.removeEventListener("kidzz:open-parents", openParents);
     };
   }, [switchTab]);
 

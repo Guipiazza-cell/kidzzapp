@@ -35,12 +35,65 @@ const ASSETS = {
   arco: `${PQ}/sug-arcoiris.png`,
 };
 
-/** Cards “Hoje para você” — exatamente o trio do mockup (com capas) */
-const HOJE_MOCK: { text: string; category: string; cover: string; arrow: string }[] = [
-  { text: "Onde moram os peixes?", category: "Natureza", cover: ASSETS.peixes, arrow: "#2E9A6A" },
-  { text: "Por que a chuva cai?", category: "Natureza", cover: ASSETS.chuva, arrow: "#3E8AD0" },
-  { text: "Como o arco-íris aparece?", category: "Cores", cover: ASSETS.arco, arrow: "#E0A030" },
-];
+/** Capas premium para sugestões (mock + catálogo completo) */
+const SUG_COVER: Record<string, string> = {
+  peixe: ASSETS.peixes,
+  peixes: ASSETS.peixes,
+  chuva: ASSETS.chuva,
+  "arco-íris": ASSETS.arco,
+  arcoiris: ASSETS.arco,
+  "arco íris": ASSETS.arco,
+};
+
+function suggestionCover(text: string): string | null {
+  const t = text.toLowerCase();
+  for (const [k, v] of Object.entries(SUG_COVER)) {
+    if (t.includes(k)) return v;
+  }
+  return null;
+}
+
+/** Catálogo completo por idade — NÃO reduzir itens, só redesign visual */
+const CATEGORIZED_QUESTIONS: Record<string, { text: string; category: string }[]> = {
+  "0-3": [
+    { text: "Por que o céu é azul?", category: "Natureza" },
+    { text: "Que som o gato faz?", category: "Animais" },
+    { text: "De que cor é o sol?", category: "Cores" },
+    { text: "Onde moram os peixes?", category: "Natureza" },
+    { text: "Por que a chuva cai?", category: "Natureza" },
+    { text: "Como o arco-íris aparece?", category: "Cores" },
+  ],
+  "3-7": [
+    { text: "Por que sentimos saudade?", category: "Emoções" },
+    { text: "Como os animais sabem o que fazer?", category: "Natureza" },
+    { text: "Por que o céu muda de cor?", category: "Universo" },
+    { text: "O que faz alguém ser feliz de verdade?", category: "Emoções" },
+    { text: "Por que a natureza é tão organizada?", category: "Natureza" },
+    { text: "Como surgem as ideias?", category: "Mente" },
+  ],
+  "7-10": [
+    { text: "O que existia antes do universo?", category: "Universo" },
+    { text: "Por que o tempo existe?", category: "Universo" },
+    { text: "Como os pensamentos aparecem?", category: "Mente" },
+    { text: "O que é certo e errado?", category: "Filosofia" },
+    { text: "Por que sentimos saudade?", category: "Emoções" },
+    { text: "Como surgem as ideias?", category: "Mente" },
+  ],
+};
+
+const CATEGORY_CHIPS = [
+  "Todas",
+  "Natureza",
+  "Animais",
+  "Cores",
+  "Emoções",
+  "Universo",
+  "Mente",
+  "Filosofia",
+] as const;
+
+const ARROW_COLORS = ["#2E9A6A", "#3E8AD0", "#E0A030", "#C2787F", "#7C6AC7"];
+const SUGGESTION_COUNT = 3;
 
 interface Props {
   onSubmit: (question: string) => void;
@@ -78,6 +131,7 @@ const KEYFRAMES = `
 const HomeScreen = ({
   onSubmit,
   onOpenAchievements,
+  onOpenReferral,
   onTabChange,
 }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining } = useAuth();
@@ -93,6 +147,8 @@ const HomeScreen = ({
   const [ritualOpen, setRitualOpen] = useState(false);
   const [muted, setMuted] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [catChip, setCatChip] = useState<(typeof CATEGORY_CHIPS)[number]>("Todas");
+  const [suggestionPage, setSuggestionPage] = useState(0);
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const currentRitual = useMemo(() => getCurrentRitual(), []);
@@ -102,6 +158,49 @@ const HomeScreen = ({
   useEffect(() => () => { try { recognitionRef.current?.stop(); } catch { /* */ } }, []);
 
   const childName = profile?.child_name || "amigo";
+  const ageRange = profile?.age_range || "3-7";
+  const interests = (profile as { child_interests?: string[] } | null)?.child_interests;
+  const ageQuestions = CATEGORIZED_QUESTIONS[ageRange] || CATEGORIZED_QUESTIONS["3-7"];
+
+  const filteredQuestions = useMemo(() => {
+    let list = ageQuestions;
+    if (interests && interests.length > 0) {
+      const map: Record<string, string[]> = {
+        Espaço: ["Universo"],
+        Natureza: ["Natureza"],
+        Ciência: ["Mente", "Universo"],
+        Arte: ["Emoções"],
+        Animais: ["Natureza", "Animais"],
+      };
+      const cats = interests.flatMap((i) => map[i] || []);
+      if (cats.length) {
+        const matched = ageQuestions.filter((q) => cats.includes(q.category));
+        const rest = ageQuestions.filter((q) => !cats.includes(q.category));
+        list = [...matched, ...rest];
+      }
+    }
+    if (catChip !== "Todas") {
+      list = list.filter((q) => q.category === catChip);
+    }
+    return list;
+  }, [ageQuestions, interests, catChip]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredQuestions.length / SUGGESTION_COUNT));
+  const visibleSuggestions = filteredQuestions.slice(
+    suggestionPage * SUGGESTION_COUNT,
+    suggestionPage * SUGGESTION_COUNT + SUGGESTION_COUNT
+  );
+
+  useEffect(() => {
+    setSuggestionPage(0);
+  }, [catChip, ageRange]);
+
+  useEffect(() => {
+    if (totalPages <= 1) return;
+    const iv = setInterval(() => setSuggestionPage((p) => (p + 1) % totalPages), 18000);
+    return () => clearInterval(iv);
+  }, [totalPages]);
+
   const streakDays = profile?.streak_days ?? 0;
   const isFreeLimitReached = !canAskQuestion();
   const remaining = questionsRemaining();
@@ -682,9 +781,9 @@ const HomeScreen = ({
           </div>
         </section>
 
-        {/* ── HOJE PARA VOCÊ — grid 3 ── */}
+        {/* ── HOJE PARA VOCÊ — catálogo completo (design mock, itens reais) ── */}
         <section style={{ padding: "18px 16px 0" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 10 }}>
             <h2
               style={{
                 margin: 0,
@@ -697,108 +796,159 @@ const HomeScreen = ({
               Hoje para você{" "}
               <span style={{ fontSize: 14, color: "#D0A030" }}>✦</span>
             </h2>
-            {onOpenAchievements && (
-              <button
-                type="button"
-                onClick={() => { haptic("light"); sfx("click"); onOpenAchievements(); }}
-                style={{
-                  border: "none", background: "none", cursor: "pointer",
-                  fontWeight: 900, fontSize: 12, color: "#5A7A48",
-                  display: "flex", alignItems: "center", gap: 3, padding: 0,
-                }}
-              >
-                Ver todas
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="#5A7A48" strokeWidth="2.2" strokeLinecap="round" /></svg>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                haptic("light");
+                sfx("click");
+                if (totalPages > 1) setSuggestionPage((p) => (p + 1) % totalPages);
+                else onOpenAchievements?.();
+              }}
+              style={{
+                border: "none", background: "none", cursor: "pointer",
+                fontWeight: 900, fontSize: 12, color: "#5A7A48",
+                display: "flex", alignItems: "center", gap: 3, padding: 0,
+              }}
+            >
+              Ver todas
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="#5A7A48" strokeWidth="2.2" strokeLinecap="round" /></svg>
+            </button>
           </div>
 
+          {/* Chips de categoria — só filtram, não removem do catálogo */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: 10,
+              display: "flex",
+              gap: 8,
+              overflowX: "auto",
+              paddingBottom: 10,
+              scrollbarWidth: "none",
             }}
           >
-            {HOJE_MOCK.map((q) => (
-              <button
-                key={q.text}
-                type="button"
-                onClick={() => submit(q.text)}
-                disabled={submitting || isFreeLimitReached}
-                className="active:scale-[.97]"
-                style={{
-                  position: "relative",
-                  overflow: "hidden",
-                  borderRadius: 20,
-                  padding: 0,
-                  textAlign: "left",
-                  cursor: submitting || isFreeLimitReached ? "default" : "pointer",
-                  border: "0.5px solid rgba(255,255,255,.9)",
-                  boxShadow: "0 10px 24px rgba(40,60,20,.12)",
-                  background: "#fff",
-                  opacity: submitting || isFreeLimitReached ? 0.55 : 1,
-                  fontFamily: "'Nunito', sans-serif",
-                }}
-              >
-                <div style={{ position: "relative", height: 92, overflow: "hidden" }}>
-                  <img
-                    src={q.cover}
-                    alt=""
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: 8,
-                      bottom: 8,
-                      width: 28,
-                      height: 28,
-                      borderRadius: 999,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: q.arrow,
-                      boxShadow: "0 4px 10px rgba(0,0,0,.22)",
-                      border: "1px solid rgba(255,255,255,.5)",
-                    }}
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></svg>
-                  </div>
-                </div>
-                <div style={{ padding: "8px 9px 10px" }}>
-                  <div
-                    style={{
-                      fontFamily: "'Lora', Georgia, serif",
-                      fontWeight: 600,
-                      fontSize: 12,
-                      lineHeight: 1.2,
-                      color: "#1F2E18",
-                      minHeight: 30,
-                    }}
-                  >
-                    {q.text}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 6,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "2px 7px",
-                      borderRadius: 999,
-                      background: "rgba(100,160,80,.12)",
-                      fontSize: 9,
-                      fontWeight: 900,
-                      color: "#3E7A42",
-                    }}
-                  >
-                    {q.category}
-                  </div>
-                </div>
-              </button>
-            ))}
+            {CATEGORY_CHIPS.map((c) => {
+              const active = catChip === c;
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => { haptic("light"); setCatChip(c); }}
+                  style={{
+                    flex: "none",
+                    padding: "8px 12px",
+                    borderRadius: 999,
+                    fontWeight: 800,
+                    fontSize: 11.5,
+                    cursor: "pointer",
+                    border: active ? "1px solid rgba(90,160,70,.45)" : "1px solid rgba(255,255,255,.9)",
+                    background: active
+                      ? "linear-gradient(160deg, rgba(180,230,160,.55), rgba(140,200,120,.35))"
+                      : "rgba(255,255,255,.7)",
+                    color: active ? "#1F4A28" : "#4A5A38",
+                    boxShadow: active ? "0 4px 12px rgba(60,120,40,.15)" : "none",
+                  }}
+                >
+                  {c}
+                </button>
+              );
+            })}
           </div>
+
+          {visibleSuggestions.length === 0 ? (
+            <p style={{ margin: "8px 0", fontSize: 13, fontWeight: 700, color: "rgba(50,70,40,.6)" }}>
+              Nenhuma pergunta nesta categoria — escolha “Todas” ou outra faixa.
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: visibleSuggestions.length >= 3 ? "1fr 1fr 1fr" : `repeat(${visibleSuggestions.length}, 1fr)`,
+                gap: 10,
+              }}
+            >
+              {visibleSuggestions.map((q, i) => {
+                const cover = suggestionCover(q.text);
+                const arrow = ARROW_COLORS[i % ARROW_COLORS.length];
+                return (
+                  <button
+                    key={q.text}
+                    type="button"
+                    onClick={() => submit(q.text)}
+                    disabled={submitting || isFreeLimitReached}
+                    className="active:scale-[.97]"
+                    style={{
+                      position: "relative",
+                      overflow: "hidden",
+                      borderRadius: 20,
+                      padding: 0,
+                      textAlign: "left",
+                      cursor: submitting || isFreeLimitReached ? "default" : "pointer",
+                      border: "0.5px solid rgba(255,255,255,.9)",
+                      boxShadow: "0 10px 24px rgba(40,60,20,.12)",
+                      background: "#fff",
+                      opacity: submitting || isFreeLimitReached ? 0.55 : 1,
+                      fontFamily: "'Nunito', sans-serif",
+                    }}
+                  >
+                    <div style={{ position: "relative", height: 92, overflow: "hidden", background: "linear-gradient(160deg,#E8F5E0,#D0E8F8)" }}>
+                      {cover ? (
+                        <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", fontSize: 28, fontWeight: 900, color: "rgba(40,70,30,.35)" }}>?</div>
+                      )}
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: 8,
+                          bottom: 8,
+                          width: 28,
+                          height: 28,
+                          borderRadius: 999,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: arrow,
+                          boxShadow: "0 4px 10px rgba(0,0,0,.22)",
+                          border: "1px solid rgba(255,255,255,.5)",
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></svg>
+                      </div>
+                    </div>
+                    <div style={{ padding: "8px 9px 10px" }}>
+                      <div
+                        style={{
+                          fontFamily: "'Lora', Georgia, serif",
+                          fontWeight: 600,
+                          fontSize: 12,
+                          lineHeight: 1.2,
+                          color: "#1F2E18",
+                          minHeight: 30,
+                        }}
+                      >
+                        {q.text}
+                      </div>
+                      <div
+                        style={{
+                          marginTop: 6,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          padding: "2px 7px",
+                          borderRadius: 999,
+                          background: "rgba(100,160,80,.12)",
+                          fontSize: 9,
+                          fontWeight: 900,
+                          color: "#3E7A42",
+                        }}
+                      >
+                        {q.category}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* ── SOS ── */}
@@ -892,6 +1042,71 @@ const HomeScreen = ({
               >
                 Acessar ›
               </span>
+            </div>
+          </button>
+        </section>
+
+        {/* ── HORA DO REENCONTRO (ritual) — item real, só redesenho ── */}
+        <section style={{ padding: "10px 16px 4px" }}>
+          <button
+            type="button"
+            onClick={() => { haptic("medium"); sfx("click"); setRitualOpen(true); }}
+            className="active:scale-[.99]"
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              textAlign: "left",
+              display: "flex",
+              alignItems: "stretch",
+              borderRadius: 24,
+              cursor: "pointer",
+              background: "linear-gradient(150deg, rgba(230,210,250,.55), rgba(200,180,240,.4))",
+              border: "0.5px solid rgba(220,200,255,.75)",
+              boxShadow: "0 12px 28px rgba(80,50,140,.12), inset 0 1px 0 rgba(255,255,255,.75)",
+            }}
+          >
+            <div style={{ flex: "none", width: 108, position: "relative", overflow: "hidden" }}>
+              <img
+                src={`${PQ}/familia-abraco.png`}
+                alt="Família se abraçando"
+                draggable={false}
+                style={{ width: "100%", height: "100%", minHeight: 112, objectFit: "cover", objectPosition: "center 22%" }}
+              />
+            </div>
+            <div style={{ flex: 1, minWidth: 0, padding: "14px 48px 14px 12px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: 1.1, color: "#7A5AB0", marginBottom: 4 }}>
+                TRANSIÇÃO SUAVE PARA A NOITE
+              </div>
+              <div style={{ fontFamily: "'Lora', Georgia, serif", fontWeight: 600, fontSize: 18, color: "#3A2A56", marginBottom: 4 }}>
+                Hora do reencontro
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#5E4A7A", lineHeight: 1.35 }}>
+                Momentos que acolhem e transformam o fim do dia em conexão.
+              </div>
+              <div style={{ display: "flex", gap: 10, marginTop: 8, fontSize: 10.5, fontWeight: 900, color: "#6A5490" }}>
+                <span>3 min</span>
+                <span>·</span>
+                <span>3 passos</span>
+              </div>
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                right: 14,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 46,
+                height: 46,
+                borderRadius: 999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "radial-gradient(130% 130% at 30% 22%, #F4EAFB, #C9A8E8 55%, #9A6ACE)",
+                boxShadow: "0 8px 16px rgba(120,70,180,.35)",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ marginLeft: 2 }}><path d="M8 5v14l11-7z" /></svg>
             </div>
           </button>
         </section>

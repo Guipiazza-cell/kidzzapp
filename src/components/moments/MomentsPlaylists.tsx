@@ -445,7 +445,14 @@ const MomentsPlaylists = ({ onBack }: Props) => {
             <ArrowLeft size={19} color={INK} strokeWidth={2.1} />
           </button>
           <div style={{ flex: 1 }} />
-          <div
+          <button
+            type="button"
+            onClick={() => {
+              haptic("light");
+              window.dispatchEvent(new CustomEvent("kidzz:open-parents"));
+            }}
+            aria-label="Área dos pais"
+            className="active:scale-90"
             style={{
               height: 40,
               borderRadius: R.btn,
@@ -457,10 +464,12 @@ const MomentsPlaylists = ({ onBack }: Props) => {
               fontWeight: 800,
               fontSize: 12.5,
               color: INK,
+              cursor: "pointer",
+              fontFamily: FONT,
             }}
           >
             <Shield size={14} color={EM} /> Pais
-          </div>
+          </button>
           <div
             style={{
               height: 40,
