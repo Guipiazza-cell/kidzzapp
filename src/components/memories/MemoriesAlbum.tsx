@@ -831,7 +831,7 @@ const MemoriesAlbum = ({
                   }}
                 >
                   <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
-                    Em andamento 🌱
+                    Em andamento
                   </h2>
                 </div>
                 <div

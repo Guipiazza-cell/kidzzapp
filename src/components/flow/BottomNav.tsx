@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } fr
 import {
   MessageCircle, Leaf, Moon, BookOpen, Puzzle, CalendarDays,
   Star, Clapperboard, Music2, Image as ImageIcon, Sparkles,
-  Crown, Shield, ChevronLeft, ChevronRight, Compass,
+  ChevronLeft, ChevronRight, Compass,
 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
@@ -132,47 +132,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
         background: "transparent",
       }}
     >
-      {/* Pais / Assinar — chips de vidro (adaptam claro/escuro) */}
-      {!immersiveTab && (onOpenParents || (onOpenPlans && !isPremium)) && (
-        <div className="w-full flex items-center justify-end gap-1.5 mb-2 pr-1">
-          {onOpenParents && (
-            <button
-              type="button"
-              onClick={() => { haptic("light"); sfx("click"); onOpenParents(); }}
-              aria-label="Pais"
-              className="h-8 rounded-full px-3 text-[11.5px] font-bold flex items-center gap-1 active:scale-95"
-              style={{
-                color: dark ? "#F4EFE2" : "#3A2E1E",
-                background: dark ? "rgba(255,255,255,.14)" : "rgba(255,255,255,.78)",
-                border: `1px solid ${dark ? "rgba(255,255,255,.3)" : "rgba(255,255,255,1)"}`,
-                backdropFilter: "blur(16px) saturate(150%)",
-                WebkitBackdropFilter: "blur(16px) saturate(150%)",
-                boxShadow: "0 6px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.6)",
-                fontFamily: "'Nunito', system-ui, sans-serif",
-              }}
-            >
-              <Shield size={12} style={{ color: "#3FA89B" }} />
-              Pais
-            </button>
-          )}
-          {onOpenPlans && !isPremium && (
-            <button
-              type="button"
-              onClick={() => { haptic("medium"); sfx("click"); onOpenPlans(); }}
-              aria-label="Assinar"
-              className="h-8 rounded-full px-3 text-[11.5px] font-bold text-white flex items-center gap-1 active:scale-95"
-              style={{
-                background: "linear-gradient(135deg, #F79A3E, #E4722A)",
-                boxShadow: "0 10px 24px -4px rgba(210,110,40,.5), inset 0 1px 0 rgba(255,255,255,.4)",
-                fontFamily: "'Nunito', system-ui, sans-serif",
-              }}
-            >
-              <Crown size={12} />
-              Assinar
-            </button>
-          )}
-        </div>
-      )}
+      {/* Pais/Assinar flutuante REMOVIDO (relatório design): cobria conteúdo.
+          Pais fica no header de cada aba; Assinar via paywall / header / planos. */}
 
       {/* Dock de vidro (premium, harmoniza com a tela) */}
       <div

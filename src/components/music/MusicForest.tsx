@@ -122,13 +122,28 @@ const CATEGORIES: Category[] = [
   { id: "travel", label: "Modo Viagem", subtitle: "Trilhas sonoras para qualquer lugar", gradient: "linear-gradient(135deg, hsl(190 65% 55%) 0%, hsl(200 60% 42%) 100%)", dk: "teal", cover: `${MU}/cat-travel.png`, novo: true, tags: ["travel"] },
 ];
 
-/* Sons ambiente (slots do design; usam áudio real quando existe) */
-const AMBIENT_SOUNDS: { id: string; label: string; emoji: string; slot: string; url?: string; free: boolean }[] = [
-  { id: "forest", label: "Floresta calma", emoji: "🌲", slot: "som_floresta", url: "/audio/forest-calm.mp3", free: true },
-  { id: "rain", label: "Chuva no telhado", emoji: "🌧️", slot: "som_chuva", url: "/audio/rain-soft.mp3", free: true },
-  { id: "ocean", label: "Ondas do mar", emoji: "🌊", slot: "som_ondas", url: "/audio/ocean-waves.mp3", free: false },
-  { id: "piano", label: "Piano do soninho", emoji: "🎹", slot: "som_piano", free: false },
+/* Sons ambiente — descrição humana (nunca expor id interno de slot) */
+const AMBIENT_SOUNDS: { id: string; label: string; desc: string; url?: string; free: boolean }[] = [
+  { id: "forest", label: "Floresta calma", desc: "Sons da natureza", url: "/audio/forest-calm.mp3", free: true },
+  { id: "rain", label: "Chuva no telhado", desc: "Para relaxar juntos", url: "/audio/rain-soft.mp3", free: true },
+  { id: "ocean", label: "Ondas do mar", desc: "Para acalmar", url: "/audio/ocean-waves.mp3", free: false },
+  { id: "piano", label: "Piano do soninho", desc: "Para dormir", free: false },
 ];
+
+/** Selo PREMIUM padrão (dourado + cadeado) — referência do relatório de design */
+const premiumSeal: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  padding: "4px 10px",
+  borderRadius: 999,
+  background: "radial-gradient(130% 130% at 30% 22%, #FFF3C4 0%, #F2C55C 45%, #C98F1E 100%)",
+  color: "#4A3300",
+  fontSize: 9,
+  fontWeight: 900,
+  letterSpacing: ".5px",
+  boxShadow: "0 3px 8px rgba(150,95,10,.4), inset 0 1px 0 rgba(255,255,255,.7)",
+};
 
 /* ── Dados: atividades guiadas reais ── */
 const ACTIVITIES: GuidedActivity[] = [
@@ -250,6 +265,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
   const { profile, tier } = useAuth();
   const childName = profile?.child_name || "amigo";
   const isPremium = tier === "premium";
+  // Troféu global da família (mesmo valor das outras abas) — não o XP só de música
+  const pontosFamilia = profile?.points ?? 0;
 
   const [activePillar, setActivePillar] = useState<Pillar | null>(null);
   const [activeCategory, setActiveCategory] = useState<CategoryId | null>(null);
@@ -457,8 +474,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
               >
                 <Icon d={D.shield} stroke="#2E8B72" size={15} sw={2} /> Pais
               </button>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 14px", minHeight: 44, borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#3A2E14", ...pillGlassLight }}>
-                <Icon d={D.cap} stroke="#E0A62B" size={14} sw={1.9} /> {xp}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 14px", minHeight: 44, borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#3A2E14", ...pillGlassLight }} aria-label={`${pontosFamilia} pontos da família`}>
+                <Icon d={D.cap} stroke="#E0A62B" size={14} sw={1.9} /> {pontosFamilia}
               </div>
             </div>
           </div>
@@ -479,10 +496,10 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
               className="active:scale-[0.97]"
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 22px", minHeight: 48,
-                borderRadius: R.btn, border: "0.5px solid rgba(255,255,255,.55)", cursor: "pointer",
-                fontWeight: 900, fontSize: 14.5, color: "#1a1a2e",
-                background: "linear-gradient(105deg,#F7B4D8 0%,#B4D0FF 42%,#9AE8D4 100%)",
-                boxShadow: "0 12px 32px rgba(40,60,100,.28), 0 1px 0 rgba(255,255,255,.8) inset",
+                borderRadius: R.btn, border: "0.5px solid rgba(255,235,150,.65)", cursor: "pointer",
+                fontWeight: 900, fontSize: 14.5, color: "#4A3300",
+                background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F5C24E 55%, #E0A52E)",
+                boxShadow: "0 12px 28px rgba(180,120,20,.4), 0 1px 0 rgba(255,255,255,.7) inset",
               }}
             >
               Explorar música →
@@ -512,6 +529,10 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                 <img
                   src={cat.cover}
                   alt=""
+                  onError={(e) => {
+                    const el = e.target as HTMLImageElement;
+                    el.src = `${MU}/cat-sun.png`;
+                  }}
                   style={{
                     width: 72, height: 72, borderRadius: 22, objectFit: "cover",
                     boxShadow: "0 10px 22px rgba(40,30,15,.22), 0 1px 0 rgba(255,255,255,.5) inset",
@@ -531,7 +552,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
         {/* ── MAIS MANEIRAS ── */}
         <div style={{ padding: "18px 16px 0" }}>
           <h2 style={{ margin: "0 4px 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#2A2008" }}>
-            Mais maneiras de brincar com música 🎵
+            Mais maneiras de brincar com música
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {modos.map((m) => {
@@ -560,7 +581,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                         border: "0.5px solid rgba(255,255,255,.9)",
                       }}
                     />
-                    <div style={m.badge === "NOVO" ? greenBadge : goldBadge}>
+                    <div style={m.badge === "NOVO" ? greenBadge : premiumSeal}>
                       {locked && <Icon d={D.lock} stroke="#4A3300" size={9} sw={2.2} />}
                       {m.badge}
                     </div>
@@ -579,7 +600,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
         {/* ── SONS PARA OUVIR ── */}
         <div style={{ padding: "20px 16px 0" }}>
           <h2 style={{ margin: "0 4px 4px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#2A2008" }}>
-            Sons para ouvir 🌿
+            Sons para ouvir
           </h2>
           <p style={{ margin: "0 4px 12px", fontSize: 12.5, fontWeight: 700, color: "#7A6840" }}>
             Deixe tocando ao fundo enquanto brincam
@@ -597,33 +618,39 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                     textAlign: "left", cursor: "pointer",
                     ...glassLightSoft,
                     borderRadius: 22,
+                    background: "linear-gradient(165deg, rgba(255,255,255,.94), rgba(250,246,236,.88))",
                   }}
                 >
                   <div
                     style={{
                       width: 44, height: 44, borderRadius: 16, flex: "none",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 22, background: "rgba(255,255,255,.75)",
-                      boxShadow: "0 4px 12px rgba(40,30,15,.1), 0 1px 0 rgba(255,255,255,1) inset",
+                      background: "radial-gradient(130% 130% at 30% 22%, #FFF8E8, #E8D8B0 55%, #C8B080)",
+                      boxShadow: "0 4px 12px rgba(40,30,15,.12), 0 1px 0 rgba(255,255,255,1) inset",
                     }}
                   >
-                    {s.emoji}
+                    <Icon d={D.note} stroke="#6A5430" size={18} sw={1.9} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: "#2A2008" }}>{s.label}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#8A7850" }}>Slot: {s.slot}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#8A7850" }}>{s.desc}</div>
                   </div>
-                  {locked && <span style={{ ...goldBadge }}>Premium</span>}
+                  {locked && (
+                    <span style={premiumSeal}>
+                      <Icon d={D.lock} stroke="#4A3300" size={9} sw={2.2} />
+                      PREMIUM
+                    </span>
+                  )}
                   <div
                     style={{
                       width: 40, height: 40, borderRadius: 999, flex: "none",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "linear-gradient(160deg, #fff 0%, #f3ebe0 100%)",
-                      border: "0.5px solid rgba(255,255,255,1)",
-                      boxShadow: "0 6px 14px rgba(40,30,15,.12)",
+                      background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F2C55C 55%, #C98F1E)",
+                      border: "1px solid rgba(255,255,255,.7)",
+                      boxShadow: "0 6px 14px rgba(150,100,20,.35), inset 0 1px 0 rgba(255,255,255,.6)",
                     }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#3A2E14"><path d={D.play} /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#3A2E14" style={{ marginLeft: 1 }}><path d={D.play} /></svg>
                   </div>
                 </button>
               );
@@ -673,14 +700,36 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 const ActivityCard = ({
   activity, index, favorite, onFav, onOpen, full = false,
 }: { activity: GuidedActivity; index: number; favorite: boolean; onFav: () => void; onOpen: () => void; full?: boolean }) => {
-  const foot = FOOT[index % FOOT.length];
+  // Fundo de card unificado (sem arco-íris por item) — padrão do relatório
+  const foot: [string, string] = ["#3A3220", "#2A2418"];
   return (
     <div style={{ flex: "none", width: full ? "100%" : 168, borderRadius: 22, position: "relative", overflow: "hidden", boxShadow: "0 14px 30px rgba(110,85,30,.26),inset 0 1px 0 rgba(255,255,255,.4)", border: "1px solid rgba(255,255,255,.55)", animation: "mus-rise .45s both" }}>
       <div style={{ position: "relative", height: 140, overflow: "hidden" }}>
         <button onClick={onOpen} aria-label={activity.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", padding: 0, border: "none", cursor: "pointer", backgroundImage: `url("${activityAsset(index)}")`, backgroundSize: "cover", backgroundPosition: "center" }} />
         <div style={{ position: "absolute", top: 8, left: 8, padding: "4px 11px", borderRadius: 999, background: "rgba(255,253,246,.88)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 3px 8px rgba(0,0,0,.18)", color: "#3A2E14", fontSize: 10, fontWeight: 900, pointerEvents: "none" }}>{activity.minutes} min</div>
-        <button onClick={onOpen} className="active:scale-90" style={{ position: "absolute", top: "58%", left: "50%", transform: "translate(-50%,-50%)", width: 50, height: 50, borderRadius: 999, cursor: "pointer", background: "rgba(255,255,255,.26)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", border: "1.5px solid rgba(255,255,255,.75)", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .25s" }} aria-label={`Abrir ${activity.title}`}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" style={{ marginLeft: 3 }}><path d={D.play} /></svg>
+        {/* UM play dourado (sem duplicar círculo translúcido no centro) */}
+        <button
+          onClick={onOpen}
+          className="active:scale-90"
+          style={{
+            position: "absolute",
+            right: 10,
+            bottom: 10,
+            width: 42,
+            height: 42,
+            borderRadius: 999,
+            cursor: "pointer",
+            background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F2C55C 55%, #C98F1E)",
+            border: "1px solid rgba(255,255,255,.75)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 8px 16px rgba(120,80,10,.4), inset 0 1.5px 1px rgba(255,255,255,.65)",
+            zIndex: 2,
+          }}
+          aria-label={`Abrir ${activity.title}`}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#3A2E14" style={{ marginLeft: 2 }}><path d={D.play} /></svg>
         </button>
         <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 30, background: `linear-gradient(180deg, rgba(0,0,0,0), ${foot[0]})`, pointerEvents: "none" }} />
       </div>

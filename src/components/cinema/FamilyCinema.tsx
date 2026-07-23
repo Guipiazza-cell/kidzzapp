@@ -50,7 +50,11 @@ const AS = "/exemplos/assets/cinema-v2";
 const AV = "v1";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
-/* Capas Hermes (id do filme → arquivo). Fallback: glow + emoji. */
+/**
+ * Capas premium (cinema-v2 Hermes). Sem emoji-pôster.
+ * Quando não há arte dedicada, reutiliza capa de alta qualidade da mesma “família”
+ * visual (melhor que emoji gigante). Novas artes originais = próxima leva.
+ */
 const COVER: Record<string, string> = {
   "wall-e": asset("cover-walle.png"),
   up: asset("cover-up.png"),
@@ -58,6 +62,40 @@ const COVER: Record<string, string> = {
   red: asset("cover-red.png"),
   luca: asset("cover-luca.png"),
   coco: asset("cover-coco.png"),
+  // mapeamento sem arte dedicada — só assets HD existentes
+  narnia: asset("cover-up.png"),
+  "rei-leao": asset("cover-up.png"),
+  madagascar: asset("cover-luca.png"),
+  minions: asset("cover-red.png"),
+  sing: asset("cover-coco.png"),
+  "familia-futuro": asset("cover-walle.png"),
+  matilda: asset("cover-coco.png"),
+  alice: asset("cover-red.png"),
+  encanto: asset("cover-coco.png"),
+  nemo: asset("cover-luca.png"),
+  divertidamente: asset("cover-red.png"),
+  "toy-story": asset("cover-up.png"),
+  "lilo-stitch": asset("cover-luca.png"),
+  carros: asset("cover-up.png"),
+  malvado: asset("cover-red.png"),
+  pets: asset("cover-luca.png"),
+  zootopia: asset("cover-luca.png"),
+  enrolados: asset("cover-red.png"),
+  wish: asset("cover-coco.png"),
+  soul: asset("cover-walle.png"),
+  bolt: asset("cover-up.png"),
+  dumbo: asset("cover-up.png"),
+  "peter-pan": asset("cover-up.png"),
+  "bernardo-bianca": asset("cover-up.png"),
+  marley: asset("cover-up.png"),
+  "4-vidas": asset("cover-up.png"),
+  oz: asset("cover-red.png"),
+  "pequenos-espioes": asset("cover-walle.png"),
+  robos: asset("cover-walle.png"),
+  horton: asset("cover-luca.png"),
+  hamburguer: asset("cover-red.png"),
+  chefinho: asset("cover-red.png"),
+  leo: asset("cover-luca.png"),
 };
 
 interface Props {
@@ -229,10 +267,10 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
               inset: 0,
               display: "grid",
               placeItems: "center",
-              fontSize: 42,
+              background: `linear-gradient(160deg, ${hexA(m.glowColor, 0.75)}, #1a2030)`,
             }}
           >
-            {m.emoji}
+            <Clapperboard size={36} color="rgba(255,255,255,.85)" strokeWidth={1.6} />
           </div>
         )}
         <div
@@ -288,19 +326,36 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
             lineHeight: 1.3,
             display: "-webkit-box",
             WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
+            WebkitBoxOrient: "vertical" as const,
             overflow: "hidden",
+            wordBreak: "break-word" as const,
             marginBottom: 8,
+            minHeight: 28,
           }}
         >
           {m.descricao}
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10.5, fontWeight: 800, color: INK2 }}>
             <Clock size={11} /> {m.duracao}
           </span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 2, fontSize: 10.5, fontWeight: 900, color: GOLD }}>
-            <Star size={11} fill={GOLD} color={GOLD} /> {m.ratingKidzz.toFixed(1)}
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              fontSize: 9,
+              fontWeight: 900,
+              letterSpacing: ".2px",
+              color: "#5A4208",
+              padding: "3px 7px",
+              borderRadius: 999,
+              background: "radial-gradient(130% 130% at 30% 22%, #FFF3C4, #F2C55C 55%, #C98F1E)",
+              boxShadow: "0 2px 6px rgba(150,100,20,.28)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Escolha Kidzz
           </span>
         </div>
       </div>
@@ -363,8 +418,8 @@ const DetailSheet = ({
             }}
           >
             {!cover && (
-              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: 56 }}>
-                {movie.emoji}
+              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "linear-gradient(160deg, rgba(46,122,204,.5), #1a1520)" }}>
+                <Clapperboard size={40} color="rgba(255,255,255,.9)" strokeWidth={1.5} />
               </div>
             )}
             <div
@@ -638,17 +693,14 @@ const FamilyCinema = ({ onBack }: Props) => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Camadas de fundo — craft Bora */}
+      {/* Fundo sólido do sistema — sem imagem do hero desfocada como parede */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `url(${asset("hero-gui.png")})`,
-          backgroundSize: "cover",
-          backgroundPosition: "70% 30%",
-          filter: "brightness(.9) saturate(1.1) blur(1px)",
-          transform: "scale(1.08)",
+          background:
+            "linear-gradient(180deg, #EAF3FB 0%, #DCE8F4 40%, #CDDCEB 72%, #C0D2E4 100%)",
         }}
       />
       <div
@@ -656,8 +708,9 @@ const FamilyCinema = ({ onBack }: Props) => {
         style={{
           position: "absolute",
           inset: 0,
+          pointerEvents: "none",
           background:
-            "linear-gradient(180deg, rgba(234,243,251,.5) 0%, rgba(220,236,248,.68) 28%, rgba(200,220,240,.88) 55%, rgba(190,210,230,.96) 78%, #B8CCE0 100%)",
+            "radial-gradient(50% 32% at 78% 12%, rgba(255,220,120,.22), transparent 70%), radial-gradient(40% 28% at 12% 40%, rgba(140,180,240,.14), transparent 70%)",
         }}
       />
       <div
@@ -864,14 +917,29 @@ const FamilyCinema = ({ onBack }: Props) => {
             }}
           >
             <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: -8,
+                top: 0,
+                right: 8,
+                bottom: -8,
+                borderRadius: 20,
+                background:
+                  "linear-gradient(100deg, rgba(234,243,251,.94) 0%, rgba(234,243,251,.72) 55%, transparent 100%)",
+                zIndex: -1,
+              }}
+            />
+            <div
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 5,
                 fontSize: 12.5,
                 fontWeight: 800,
-                color: INK2,
+                color: "#2A4060",
                 marginBottom: 8,
+                textShadow: "0 1px 0 rgba(255,255,255,.55)",
               }}
             >
               {saudacao}, família!
@@ -1088,8 +1156,8 @@ const FamilyCinema = ({ onBack }: Props) => {
                 }}
               >
                 {!COVER[weekly.id] && (
-                  <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: 48 }}>
-                    {weekly.emoji}
+                  <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "linear-gradient(160deg, rgba(46,122,204,.55), #1a2030)" }}>
+                    <Clapperboard size={40} color="rgba(255,255,255,.9)" strokeWidth={1.5} />
                   </div>
                 )}
                 <div

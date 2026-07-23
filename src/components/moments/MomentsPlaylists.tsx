@@ -318,17 +318,14 @@ const MomentsPlaylists = ({ onBack }: Props) => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Camadas — craft Bora, paleta dourada do print */}
+      {/* Fundo sólido do sistema — sem imagem do hero desfocada como parede */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `url(${asset("hero-gui.png")})`,
-          backgroundSize: "cover",
-          backgroundPosition: "70% 25%",
-          filter: "brightness(.92) saturate(1.1) blur(1px)",
-          transform: "scale(1.08)",
+          background:
+            "linear-gradient(180deg, #F7F2E6 0%, #EFE8D6 40%, #E4E0C8 72%, #D8D8B8 100%)",
         }}
       />
       <div
@@ -336,8 +333,9 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         style={{
           position: "absolute",
           inset: 0,
+          pointerEvents: "none",
           background:
-            "linear-gradient(180deg, rgba(250,246,236,.55) 0%, rgba(240,236,220,.7) 28%, rgba(228,236,210,.88) 55%, rgba(216,228,200,.96) 78%, #D0E0C0 100%)",
+            "radial-gradient(50% 32% at 78% 12%, rgba(255,210,100,.22), transparent 70%), radial-gradient(40% 28% at 12% 40%, rgba(160,200,120,.12), transparent 70%)",
         }}
       />
       <div
@@ -543,7 +541,22 @@ const MomentsPlaylists = ({ onBack }: Props) => {
               animation: "mom2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
             }}
           >
-            <div style={{ fontSize: 12.5, fontWeight: 800, color: INK2, marginBottom: 8 }}>
+            {/* Scrim sutil atrás do texto do hero */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: -8,
+                top: 0,
+                right: 8,
+                bottom: -8,
+                borderRadius: 20,
+                background:
+                  "linear-gradient(100deg, rgba(247,242,230,.92) 0%, rgba(247,242,230,.72) 55%, transparent 100%)",
+                zIndex: -1,
+              }}
+            />
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: "#5A4A30", marginBottom: 8, textShadow: "0 1px 0 rgba(255,255,255,.6)" }}>
               {saudacao}, família!
             </div>
             <h1
@@ -553,9 +566,9 @@ const MomentsPlaylists = ({ onBack }: Props) => {
                 fontWeight: 600,
                 fontSize: 28,
                 lineHeight: 1.1,
-                color: INK,
+                color: "#1A2410",
                 letterSpacing: "-0.4px",
-                textShadow: "0 1px 12px rgba(255,255,255,.5)",
+                textShadow: "0 1px 0 rgba(255,255,255,.55)",
               }}
             >
               Momentos que{" "}
@@ -569,7 +582,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
                 fontSize: 12.5,
                 fontWeight: 600,
                 lineHeight: 1.4,
-                color: INK2,
+                color: "#5A4A30",
                 maxWidth: 200,
               }}
             >
