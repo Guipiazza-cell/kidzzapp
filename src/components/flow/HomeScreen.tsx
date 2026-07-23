@@ -24,10 +24,10 @@ const BRAND = "/exemplos/assets/brand";
 
 const ASSETS = {
   bg: `${PQ}/bg-floresta.png`,
-  /** Soft-edge cutout (sem “quadrado”) */
-  gui: `${PQ}/gui-hero-soft.png`,
-  guiFallback: `${PQ}/gui-hero-mock.png`,
-  guiFallback2: `${BRAND}/gui-cutout-alpha.png`,
+  /** Original do usuário (mão no coração) com borda esmaecida — parte do cenário */
+  gui: `${PQ}/gui-hero-scene.png`,
+  guiFallback: `${PQ}/gui-hero-soft.png`,
+  guiFallback2: `${PQ}/gui-original-heart.jpg`,
   family: `${PQ}/family-ask.png`,
   familyFallback: `${PQ}/familia-abraco.png`,
   peixes: `${PQ}/sug-peixes.png`,
@@ -490,38 +490,49 @@ const HomeScreen = ({
             </p>
           </div>
 
-          <img
-            src={ASSETS.gui}
-            alt="Gui, o camaleão Kidzz"
-            draggable={false}
-            onError={(e) => {
-              const el = e.target as HTMLImageElement;
-              if (el.src.includes("gui-hero-soft")) el.src = ASSETS.guiFallback;
-              else if (el.src.includes("gui-hero-mock")) el.src = ASSETS.guiFallback2;
-            }}
+          {/* Gui original — sem card/quadrado: alpha feather + máscara esmaecida no cenário */}
+          <div
+            aria-hidden={false}
             style={{
               position: "absolute",
-              right: -4,
-              top: -4,
-              width: "54%",
-              maxWidth: 230,
-              height: 260,
-              objectFit: "contain",
-              objectPosition: "center bottom",
-              /* borda suave — some o retângulo */
-              WebkitMaskImage:
-                "radial-gradient(68% 72% at 52% 48%, #000 48%, rgba(0,0,0,.85) 62%, rgba(0,0,0,.35) 78%, transparent 92%)",
-              maskImage:
-                "radial-gradient(68% 72% at 52% 48%, #000 48%, rgba(0,0,0,.85) 62%, rgba(0,0,0,.35) 78%, transparent 92%)",
-              filter: "drop-shadow(0 16px 26px rgba(40,70,20,.22))",
-              animation: "perg-floaty 6.5s ease-in-out infinite",
+              right: -18,
+              top: -12,
+              width: "58%",
+              maxWidth: 248,
+              height: 280,
               pointerEvents: "none",
               zIndex: 2,
-              background: "transparent",
-              border: "none",
-              borderRadius: 0,
+              /* dissolve total nas bordas do retângulo */
+              WebkitMaskImage:
+                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
+              maskImage:
+                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
+              animation: "perg-floaty 6.5s ease-in-out infinite",
             }}
-          />
+          >
+            <img
+              src={ASSETS.gui}
+              alt="Gui, o camaleão Kidzz"
+              draggable={false}
+              onError={(e) => {
+                const el = e.target as HTMLImageElement;
+                if (el.src.includes("gui-hero-scene")) el.src = ASSETS.guiFallback;
+                else if (el.src.includes("gui-hero-soft")) el.src = ASSETS.guiFallback2;
+              }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center 60%",
+                background: "transparent",
+                border: "none",
+                borderRadius: 0,
+                boxShadow: "none",
+                /* sombra orgânica no chão, não moldura */
+                filter: "drop-shadow(0 22px 18px rgba(30,50,15,.28))",
+              }}
+            />
+          </div>
         </section>
 
         {/* ── 2 PILLS: grátis + liberar ── */}
@@ -1020,13 +1031,17 @@ const HomeScreen = ({
                 alt=""
                 onError={(e) => { (e.target as HTMLImageElement).src = ASSETS.guiFallback; }}
                 style={{
-                  width: 56,
-                  height: 56,
+                  width: 64,
+                  height: 64,
                   objectFit: "contain",
-                  filter: "drop-shadow(0 4px 8px rgba(0,0,0,.12))",
-                  WebkitMaskImage: "radial-gradient(circle at 50% 50%, #000 55%, transparent 88%)",
-                  maskImage: "radial-gradient(circle at 50% 50%, #000 55%, transparent 88%)",
+                  objectPosition: "center",
                   background: "transparent",
+                  border: "none",
+                  filter: "drop-shadow(0 6px 10px rgba(40,60,20,.2))",
+                  WebkitMaskImage:
+                    "radial-gradient(circle at 50% 48%, #000 42%, rgba(0,0,0,.7) 62%, transparent 88%)",
+                  maskImage:
+                    "radial-gradient(circle at 50% 48%, #000 42%, rgba(0,0,0,.7) 62%, transparent 88%)",
                 }}
               />
               <span
