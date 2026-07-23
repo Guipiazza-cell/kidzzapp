@@ -773,7 +773,7 @@ const FamilyCinema = ({ onBack }: Props) => {
           WebkitOverflowScrolling: "touch",
           touchAction: "pan-y",
           overscrollBehavior: "contain",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 132px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
           scrollbarWidth: "none",
           position: "relative",
           zIndex: 2,

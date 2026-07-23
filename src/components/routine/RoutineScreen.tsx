@@ -291,12 +291,14 @@ const TaskRow = ({
             borderRadius: 999,
             border: "none",
             cursor: "pointer",
-            background: `linear-gradient(180deg, ${meta.btn}ee 0%, ${meta.btn} 55%, ${meta.btnDone} 100%)`,
+            /* Sólido por período — sem degradê bugado dourado→verde (relatório r2) */
+            background: meta.btn,
             color: "#fff",
             fontFamily: FONT,
             fontSize: 12,
             fontWeight: 900,
             boxShadow: `0 6px 14px ${meta.btn}55, inset 0 1px 0 rgba(255,255,255,.35)`,
+            transition: "transform .15s ease, filter .2s ease",
           }}
         >
           Já fiz
@@ -698,7 +700,7 @@ const RoutineScreen = () => {
           WebkitOverflowScrolling: "touch",
           touchAction: "pan-y",
           overscrollBehavior: "contain",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 132px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
           scrollbarWidth: "none",
           position: "relative",
           zIndex: 2,

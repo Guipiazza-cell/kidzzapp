@@ -9,7 +9,7 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Play, Lock, Crown, ChevronRight, Volume2, Headphones,
+  Play, Crown, ChevronRight, Volume2, Headphones,
   X, ExternalLink, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,7 @@ import {
 } from "./sleepStories";
 import PreSleep from "./PreSleep";
 import { haptic } from "@/lib/haptics";
+import PremiumSeal from "@/components/common/PremiumSeal";
 
 /* Spring premium reusável para microinterações */
 const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
@@ -87,6 +88,7 @@ const gloss = (
 
 /* Paths SVG (extraídos do design) */
 const P = {
+  back: "M19 12H5m6-6-6 6 6 6",
   moon: "M20 13.5A8 8 0 0 1 10.5 4 8 8 0 1 0 20 13.5Z",
   sun: "M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-15v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8",
   wind: "M3 8h10a2.5 2.5 0 1 0-2.5-2.5M3 12h14a2.5 2.5 0 1 1-2.5 2.5M3 16h8a2 2 0 1 1-2 2",
@@ -488,7 +490,7 @@ const DreamWorld = ({ onBack }: Props) => {
                     className="text-xs px-3 py-1.5 rounded-full"
                     style={{ color: "rgba(255,255,255,.7)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(200,175,245,0.2)" }}
                   >
-                    {s.emoji} {s.label}
+                    <img src={s.icon} alt="" width={14} height={14} style={{ width: 14, height: 14, borderRadius: 4, objectFit: "cover", display: "inline-block", verticalAlign: "middle", marginRight: 4 }} /> {s.label}
                   </span>
                 ) : null;
               })}
@@ -568,39 +570,66 @@ const DreamWorld = ({ onBack }: Props) => {
             />
           </div>
 
-          {/* pill de contexto */}
+          {/* Header padrão: voltar · Sonhos · troféu · modo soninho (lua, não sol) */}
           <div
             style={{
-              position: "absolute", top: 60, left: 16, display: "flex", alignItems: "center", gap: 7,
-              padding: "8px 14px", borderRadius: 999, background: "rgba(255,255,255,.1)",
-              backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
-              border: "1px solid rgba(255,255,255,.3)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,.3)", fontSize: 11, fontWeight: 900,
-              letterSpacing: ".8px", color: "#EADCF8", zIndex: 6,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              zIndex: 8,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "calc(env(safe-area-inset-top, 0px) + 10px) 14px 0",
             }}
           >
-            <Eyebrow d={P.moon} color="#C9A8F0" size={14} />
-            SESSÃO SONHOS
+            <button
+              type="button"
+              onClick={() => { haptic("light"); onBack?.(); }}
+              aria-label="Voltar"
+              className="active:scale-90"
+              style={{
+                width: 44, height: 44, borderRadius: 999, flex: "none",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: "rgba(255,255,255,.12)", backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                border: "1px solid rgba(255,255,255,.28)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,.25)",
+              }}
+            >
+              <Eyebrow d={P.back} color="#F6EEFC" size={18} />
+            </button>
+            <div
+              style={{
+                flex: 1, minHeight: 44, borderRadius: 999,
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                background: "rgba(255,255,255,.1)", backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                border: "1px solid rgba(255,255,255,.28)",
+                fontSize: 13, fontWeight: 800, color: "#F6EEFC",
+              }}
+            >
+              <Eyebrow d={P.moon} color="#C9A8F0" size={14} />
+              Sonhos
+            </div>
+            <motion.button
+              onClick={() => { setSleepyMode((s) => !s); haptic("light"); }}
+              aria-pressed={sleepyMode}
+              whileTap={{ scale: 0.94 }}
+              style={{
+                height: 44, padding: "0 12px", borderRadius: 999, cursor: "pointer", flex: "none",
+                display: "flex", alignItems: "center", gap: 6,
+                background: sleepyMode ? "rgba(255,201,138,.16)" : "rgba(255,255,255,.1)",
+                backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
+                border: `1px solid ${sleepyMode ? "rgba(255,201,138,.5)" : "rgba(255,255,255,.28)"}`,
+                fontSize: 12, fontWeight: 800, color: "#F5E9CE",
+              }}
+            >
+              <Eyebrow d={P.moon} color="#FFCF8A" size={14} />
+              {sleepyMode ? "Ativo" : "Soninho"}
+            </motion.button>
           </div>
-
-          {/* modo soninho (real) */}
-          <motion.button
-            onClick={() => { setSleepyMode(s => !s); haptic("light"); }}
-            aria-pressed={sleepyMode}
-            whileTap={{ scale: 0.94 }}
-            style={{
-              position: "absolute", top: 60, right: 16, display: "flex", alignItems: "center", gap: 6,
-              padding: "8px 14px", borderRadius: 999, cursor: "pointer",
-              background: sleepyMode ? "rgba(255,201,138,.16)" : "rgba(255,255,255,.1)",
-              backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
-              border: `1px solid ${sleepyMode ? "rgba(255,201,138,.5)" : "rgba(255,255,255,.3)"}`,
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,.3)", fontSize: 12, fontWeight: 800,
-              color: "#F5E9CE", zIndex: 6,
-            }}
-          >
-            <Eyebrow d={sleepyMode ? P.moon : P.sun} color="#FFCF8A" size={14} />
-            {sleepyMode ? "Soninho ativo" : "Modo soninho"}
-          </motion.button>
 
           {/* título */}
           <div style={{ padding: "2px 24px", textAlign: "center", position: "relative", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both" }}>
@@ -786,7 +815,7 @@ const DreamWorld = ({ onBack }: Props) => {
                   </div>
                   {canAccess(story.free)
                     ? <ChevronRight size={18} style={{ color: "rgba(220,206,240,.6)" }} />
-                    : <Lock size={16} style={{ color: "rgba(220,206,240,.45)" }} />}
+                    : <PremiumSeal iconOnly size="sm" />}
                 </motion.button>
 
                 {/* Som ideal + Playlist da noite */}
@@ -799,7 +828,7 @@ const DreamWorld = ({ onBack }: Props) => {
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "1.2px", color: "#A9C4A0", marginBottom: 7 }}>SOM IDEAL</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ fontSize: 18 }}>{sound.emoji}</span>
+                      <img src={sound.icon} alt="" width={22} height={22} style={{ width: 22, height: 22, borderRadius: 8, objectFit: "cover" }} />
                       <span style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14, color: "#F3ECFA" }}>{sound.label}</span>
                     </div>
                   </motion.button>
@@ -818,7 +847,7 @@ const DreamWorld = ({ onBack }: Props) => {
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "1.2px", color: "#A9B6E8", marginBottom: 7 }}>PLAYLIST DA NOITE</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ fontSize: 18 }}>{playlist.emoji}</span>
+                      <img src={playlist.cover} alt="" width={22} height={22} style={{ width: 22, height: 22, borderRadius: 8, objectFit: "cover" }} />
                       <span style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14, color: "#F3ECFA", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{playlist.title}</span>
                     </div>
                   </motion.button>
@@ -915,7 +944,7 @@ const DreamWorld = ({ onBack }: Props) => {
                 >
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.5))", pointerEvents: "none" }} />
                   <div style={{ position: "absolute", top: 11, left: 11, width: 32, height: 32, borderRadius: 11, background: "rgba(255,255,255,.2)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,.35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
-                    {sound.emoji}
+                    <img src={sound.icon} alt="" width={28} height={28} style={{ width: 28, height: 28, borderRadius: 10, objectFit: "cover" }} />
                   </div>
                   <div style={{ position: "absolute", top: 11, right: 11, width: 34, height: 34, borderRadius: 999, background: "rgba(255,255,255,.94)", boxShadow: "0 4px 12px rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {isActive ? (
@@ -925,7 +954,7 @@ const DreamWorld = ({ onBack }: Props) => {
                         <div style={{ width: 3, borderRadius: 2, background: "#5E3AA8", animation: "sonh-eq3 .7s ease-in-out infinite" }} />
                       </div>
                     ) : locked ? (
-                      <Lock size={15} style={{ color: "#5E3AA8" }} />
+                      <PremiumSeal iconOnly size="sm" />
                     ) : (
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="#5E3AA8"><path d="M8 5v14l11-7z" /></svg>
                     )}
@@ -955,7 +984,7 @@ const DreamWorld = ({ onBack }: Props) => {
                   const s = SOUND_PRESETS.find((p) => p.id === id);
                   return s ? (
                     <div key={id} className="flex items-center gap-3">
-                      <span className="text-xl w-7 text-center">{s.emoji}</span>
+                      <img src={s.icon} alt="" className="w-7 h-7 rounded-lg object-cover" />
                       <Slider
                         value={[vol * 100]}
                         onValueChange={([v]) => setVolume(id, v / 100)}
@@ -981,7 +1010,7 @@ const DreamWorld = ({ onBack }: Props) => {
           />
           {/* Categorias */}
           <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "0 16px 12px" }} className="scrollbar-none">
-            {[{ id: "all", label: "Todas", emoji: "✨" }, ...STORY_CATEGORIES].map((cat) => {
+            {[{ id: "all", label: "Todas", icon: "/exemplos/assets/icons-3d/sparkle.png" }, ...STORY_CATEGORIES].map((cat) => {
               const on = activeCategory === cat.id;
               return (
                 <button
@@ -995,7 +1024,8 @@ const DreamWorld = ({ onBack }: Props) => {
                     border: `1px solid ${on ? "rgba(200,175,245,.5)" : "rgba(200,175,245,.2)"}`,
                   }}
                 >
-                  {cat.emoji} {cat.label}
+                  <img src={cat.icon} alt="" width={16} height={16} style={{ width: 16, height: 16, borderRadius: 5, objectFit: "cover", marginRight: 5, verticalAlign: "middle", display: "inline-block" }} />
+                  {cat.label}
                 </button>
               );
             })}
@@ -1052,7 +1082,7 @@ const DreamWorld = ({ onBack }: Props) => {
                       </span>
                     )}
                     {locked
-                      ? <Lock size={16} style={{ color: "rgba(220,206,240,.35)" }} />
+                      ? <PremiumSeal iconOnly size="sm" />
                       : isSelected
                         ? <div style={{ width: 24, height: 24, borderRadius: 999, background: "#8A5ED8", display: "flex", alignItems: "center", justifyContent: "center" }}><Play size={11} className="text-white ml-0.5" /></div>
                         : <ChevronRight size={16} style={{ color: "rgba(220,206,240,.3)" }} />}
@@ -1108,7 +1138,7 @@ const DreamWorld = ({ onBack }: Props) => {
                         className="absolute top-2.5 right-2.5 p-1.5 rounded-full"
                         style={{ background: "rgba(0,0,0,.45)", border: "0.5px solid rgba(255,255,255,.25)" }}
                       >
-                        <Lock size={12} className="text-white/90" />
+                        <PremiumSeal iconOnly size="sm" />
                       </span>
                     )}
                     <div style={{ position: "absolute", left: 10, right: 10, bottom: 10 }}>
@@ -1180,7 +1210,7 @@ const DreamWorld = ({ onBack }: Props) => {
                 whileTap={{ scale: 0.97 }}
                 style={{ padding: "14px 14px 13px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderRadius: 22, ...glassCard }}
               >
-                <span style={{ fontSize: 24 }}>{m.emoji}</span>
+                <img src={m.icon} alt="" width={40} height={40} style={{ width: 40, height: 40, borderRadius: 14, objectFit: "cover", boxShadow: "0 6px 14px rgba(0,0,0,.25)" }} />
                 <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 13.5, color: "#F3ECFA", lineHeight: 1.15 }}>{m.title}</div>
               </motion.button>
             ))}
@@ -1204,7 +1234,7 @@ const DreamWorld = ({ onBack }: Props) => {
               onClick={() => handleCheckout("premium")}
               style={{ width: "100%", padding: 13, borderRadius: 16, cursor: "pointer", border: "none", fontWeight: 900, fontSize: 14, color: "#fff", background: "linear-gradient(135deg,#8A5ED8,#C98A3A)", boxShadow: "0 10px 24px rgba(90,50,150,.4),inset 0 1px 0 rgba(255,255,255,.3)" }}
             >
-              ✨ Ativar Premium
+              Ativar Premium
             </button>
           </motion.div>
         )}
@@ -1287,7 +1317,7 @@ const DreamWorld = ({ onBack }: Props) => {
                 initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <span className="text-5xl block">{m.emoji}</span>
+                <img src={m.icon} alt="" className="w-16 h-16 rounded-2xl object-cover mx-auto block" />
                 <p style={{ fontSize: 11, fontWeight: 900, letterSpacing: "1.2px", textTransform: "uppercase", color: "rgba(255,201,138,.7)" }}>{m.title}</p>
                 <p style={{ fontSize: 18, fontWeight: 700, color: "#F6EEFC", lineHeight: 1.4 }}>{m.prompt}</p>
                 <button

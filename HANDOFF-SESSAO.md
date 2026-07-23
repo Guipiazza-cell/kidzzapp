@@ -240,4 +240,29 @@ Dev: porta **8080** (`vite.config.ts`).
 1. Commit + push no `main` (GitHub)
 2. **Publish** na Lovable (push sozinho não publica o site ao vivo)
 
-*Última atualização: 2026-07-23 · PDF rodada 3 aplicada (parcial alta prioridade)*
+---
+
+## Sessão 2026-07-23 tarde — Rodada 2 + 3 (Hermes + lote 1/2)
+
+### Hermes (openai-codex gpt-image-2)
+Ícones em `public/exemplos/assets/icons-3d/`:
+- **Gerados Hermes:** `rain.png`, `heart.png`, `moon.png`, `star.png`
+- **Semeados de packs premium** (mesma família visual): forest, ocean, shield, sun, book, family, imagination, values, memories, music, sleep, sparkle, calm
+
+### Aplicado (Lote 1 + parte Lote 2/3)
+- Dock: padding 168px nas abas críticas; Pais/Assinar flutuante já removido
+- `PremiumSeal` + `Icon3D` + `kidzzIcons.ts` (padrão único de premium e ícones)
+- Sonhos: header com voltar + título + modo soninho (ícone **lua**, não sol); sons/categorias/momentos sem emoji; locks → PremiumSeal
+- Histórias: **base escura + dourado**; benefícios com ícones 3D; selo PREMIUM
+- Rotina: botão **Já fiz** sólido (sem degradê bugado); padding dock
+- sleepStories: `icon` fields nos sons, categorias e momentos
+
+### Ainda pendente
+- Resto dos ícones 100% Hermes (continuar gerando no mesmo estilo)
+- Capas de cinema dedicadas (direitos)
+- Micro-interações (Parte UAU 6)
+- Kizz estado por aba
+- Compartilhar em Sonhos
+- Polimento visual de cards em Histórias (vários ainda usam glass claro)
+
+*Última atualização: 2026-07-23 tarde · lote design r2+r3*

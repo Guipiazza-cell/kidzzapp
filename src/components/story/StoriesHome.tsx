@@ -17,6 +17,9 @@ import StoryFactory from "./StoryFactory";
 import ReadingMode from "./ReadingMode";
 import { LIBRARY_STORIES } from "./storyLibrary";
 import { FONT, SERIF, R, PAD, glassLight, glassLightSoft, pillGlassLight, goldBtn } from "@/lib/premiumUi";
+import PremiumSeal from "@/components/common/PremiumSeal";
+import Icon3D from "@/components/common/Icon3D";
+import { STORY_BENEFIT_ICONS } from "@/lib/kidzzIcons";
 
 const HI = "/exemplos/assets/historias-v2";
 
@@ -43,12 +46,7 @@ const COLLECTIONS = [
   { key: "familia", label: "Família", desc: "Fortalece os laços", img: `${HI}/feat-familia.png`, tag: "familia" },
 ];
 
-const BENEFITS = [
-  { emoji: "🧠", title: "Imaginação", sub: "Estimula criatividade" },
-  { emoji: "💛", title: "Vínculos", sub: "Fortalece conexão" },
-  { emoji: "🛡️", title: "Valores", sub: "Histórias que inspiram" },
-  { emoji: "✨", title: "Memórias", sub: "Para toda a vida" },
-];
+const BENEFITS = STORY_BENEFIT_ICONS;
 
 const tileGlass = (r: number, g: number, b: number): CSSProperties => ({
   background: `linear-gradient(165deg, rgba(255,255,255,.92) 0%, rgba(${r},${g},${b},.38) 50%, rgba(${r},${g},${b},.22) 100%)`,
@@ -124,20 +122,21 @@ const StoriesHome = ({ onBack }: Props) => {
       className="flex-1 flex flex-col overflow-hidden relative min-h-0"
       style={{
         fontFamily: FONT,
-        background: "linear-gradient(180deg,#FFF9F0 0%,#F7F0E4 42%,#F0E8D6 100%)",
+        /* Base escura + acento dourado (relatório rodada 2) */
+        background: "linear-gradient(180deg,#1A1410 0%,#241C16 42%,#2A2218 100%)",
+        color: "#F6F1E8",
       }}
     >
-      {/* orbes quentes */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div style={{ position: "absolute", top: -80, right: -60, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,200,120,.45),transparent 68%)", filter: "blur(20px)" }} />
-        <div style={{ position: "absolute", top: 220, left: -80, width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(180,220,160,.28),transparent 68%)", filter: "blur(24px)" }} />
+        <div style={{ position: "absolute", top: -80, right: -60, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,180,80,.22),transparent 68%)", filter: "blur(20px)" }} />
+        <div style={{ position: "absolute", top: 220, left: -80, width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle,rgba(120,90,40,.18),transparent 68%)", filter: "blur(24px)" }} />
       </div>
 
       <div
         className="flex-1 relative z-10 overflow-y-auto overflow-x-hidden overscroll-contain"
         style={{
           WebkitOverflowScrolling: "touch",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 132px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
         }}
       >
         {/* ── TOP BAR ── */}
@@ -150,7 +149,7 @@ const StoriesHome = ({ onBack }: Props) => {
             paddingLeft: PAD,
             paddingRight: PAD,
             paddingBottom: 10,
-            background: "linear-gradient(180deg, rgba(255,249,240,.92) 0%, rgba(255,249,240,.55) 70%, transparent 100%)",
+            background: "linear-gradient(180deg, rgba(26,20,16,.92) 0%, rgba(26,20,16,.55) 70%, transparent 100%)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
           }}
@@ -160,27 +159,26 @@ const StoriesHome = ({ onBack }: Props) => {
               type="button"
               onClick={() => { haptic("light"); onBack(); }}
               className="active:scale-95"
-              style={{ width: 44, height: 44, borderRadius: R.btn, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, ...pillGlassLight }}
+              style={{
+                width: 44, height: 44, borderRadius: R.btn, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.2)",
+                backdropFilter: "blur(12px)",
+              }}
               aria-label="Voltar"
             >
-              <ArrowRight size={18} style={{ transform: "rotate(180deg)", color: "#2A2520" }} />
+              <ArrowRight size={18} style={{ transform: "rotate(180deg)", color: "#F6F1E8" }} />
             </button>
             <div
               className="flex-1 min-w-0 flex items-center justify-center gap-2 px-3"
-              style={{ minHeight: 44, borderRadius: R.btn, ...pillGlassLight }}
+              style={{
+                minHeight: 44, borderRadius: R.btn,
+                background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.2)",
+                backdropFilter: "blur(12px)",
+              }}
             >
-              <BookOpen size={15} color="#E8821A" />
-              <span style={{ fontWeight: 800, fontSize: 13.5, color: "#2A2520" }}>Fábrica de Histórias</span>
-              <span
-                style={{
-                  fontSize: 9, fontWeight: 900, letterSpacing: "0.06em",
-                  padding: "3px 8px", borderRadius: 999, color: "#5A3A00",
-                  background: "linear-gradient(180deg,#FFE9A8,#F0C050)",
-                  boxShadow: "0 2px 8px rgba(180,120,20,.25)",
-                }}
-              >
-                EXCLUSIVO
-              </span>
+              <BookOpen size={15} color="#F0C25A" />
+              <span style={{ fontWeight: 800, fontSize: 13.5, color: "#F6F1E8" }}>Histórias</span>
+              <PremiumSeal />
             </div>
           </div>
         </div>
@@ -196,14 +194,15 @@ const StoriesHome = ({ onBack }: Props) => {
                   fontWeight: 600,
                   fontSize: 30,
                   lineHeight: 1.12,
-                  color: "#1A2E22",
+                  color: "#F6F1E8",
                   letterSpacing: "-0.4px",
+                  textShadow: "0 2px 16px rgba(0,0,0,.45)",
                 }}
               >
                 Histórias que{" "}
-                <span style={{ color: "#E8821A" }}>criam memórias</span>.
+                <span style={{ color: "#F0C25A" }}>criam memórias</span>.
               </h1>
-              <p style={{ margin: "10px 0 14px", fontSize: 13.5, fontWeight: 700, lineHeight: 1.45, color: "rgba(42,37,32,0.72)" }}>
+              <p style={{ margin: "10px 0 14px", fontSize: 13.5, fontWeight: 700, lineHeight: 1.45, color: "rgba(246,241,232,0.72)" }}>
                 Criamos histórias únicas com o nome, o rosto e o mundo do seu filho.
               </p>
               <div
@@ -319,8 +318,8 @@ const StoriesHome = ({ onBack }: Props) => {
 
         {/* ── BENEFÍCIOS ── */}
         <section style={{ padding: `18px ${PAD}px 0` }}>
-          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 18, color: "#1F2A22", textAlign: "center" }}>
-            Histórias que moldam o futuro ✨
+          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 18, color: "#F6F1E8", textAlign: "center" }}>
+            Histórias que moldam o futuro
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {BENEFITS.map((b) => (
@@ -329,13 +328,17 @@ const StoriesHome = ({ onBack }: Props) => {
                 style={{
                   padding: "14px 12px",
                   textAlign: "center",
-                  ...glassLightSoft,
                   borderRadius: 20,
+                  background: "linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.04))",
+                  border: "0.5px solid rgba(255,255,255,.16)",
+                  backdropFilter: "blur(20px)",
                 }}
               >
-                <div style={{ fontSize: 28, marginBottom: 6 }}>{b.emoji}</div>
-                <div style={{ fontSize: 13, fontWeight: 900, color: "#2A2520" }}>{b.title}</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(42,37,32,0.55)", marginTop: 2 }}>{b.sub}</div>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                  <Icon3D src={b.src} fallback={b.fb} size={48} radius={16} alt={b.title} />
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 900, color: "#F6F1E8" }}>{b.title}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(246,241,232,0.55)", marginTop: 2 }}>{b.sub}</div>
               </div>
             ))}
           </div>
@@ -343,7 +346,7 @@ const StoriesHome = ({ onBack }: Props) => {
 
         {/* ── COLEÇÕES ── */}
         <section style={{ padding: `20px ${PAD}px 0` }}>
-          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#1F2A22" }}>
+          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#F6F1E8" }}>
             Coleções especiais
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

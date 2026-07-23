@@ -230,18 +230,22 @@ respirando junto com você, embalando seu sono.`,
 
 export type SleepCategory = SleepStory["category"];
 
-export const STORY_CATEGORIES: { id: SleepCategory; label: string; emoji: string }[] = [
-  { id: "calma", label: "Calmas", emoji: "🌙" },
-  { id: "aventura", label: "Aventuras leves", emoji: "🪁" },
-  { id: "gratidao", label: "Gratidão", emoji: "💛" },
-  { id: "valores", label: "Valores", emoji: "🌱" },
-  { id: "biblia", label: "Bíblia infantil", emoji: "📖" },
+const IC = "/exemplos/assets/icons-3d";
+
+export const STORY_CATEGORIES: { id: SleepCategory; label: string; icon: string }[] = [
+  { id: "calma", label: "Calmas", icon: `${IC}/moon.png` },
+  { id: "aventura", label: "Aventuras leves", icon: `${IC}/star.png` },
+  { id: "gratidao", label: "Gratidão", icon: `${IC}/heart.png` },
+  { id: "valores", label: "Valores", icon: `${IC}/values.png` },
+  { id: "biblia", label: "Bíblia infantil", icon: `${IC}/book.png` },
 ];
 
 export interface SoundPreset {
   id: string;
   label: string;
-  emoji: string;
+  /** @deprecated use icon */
+  emoji?: string;
+  icon: string;
   free: boolean;
   url?: string;
   category: "natureza" | "agua" | "ambiente" | "bebe" | "instrumento";
@@ -249,23 +253,23 @@ export interface SoundPreset {
 
 /* Apenas sons com URL real são reproduzíveis. Outros aparecem com badge "Em breve". */
 export const SOUND_PRESETS: SoundPreset[] = [
-  { id: "rain", label: "Chuva", emoji: "🌧️", free: true, url: "/audio/rain-soft.mp3", category: "agua" },
-  { id: "forest", label: "Floresta", emoji: "🌲", free: false, url: "/audio/forest-calm.mp3", category: "natureza" },
-  { id: "ocean", label: "Oceano", emoji: "🌊", free: false, url: "/audio/ocean-waves.mp3", category: "agua" },
-  { id: "white", label: "Ruído branco", emoji: "📻", free: false, url: "/audio/white-noise.mp3", category: "ambiente" },
-  { id: "rain-window", label: "Chuva na janela", emoji: "🪟", free: false, category: "agua" },
-  { id: "waterfall", label: "Cachoeira", emoji: "💦", free: false, category: "agua" },
-  { id: "wind", label: "Vento leve", emoji: "🍃", free: false, category: "natureza" },
-  { id: "fire", label: "Fogueira", emoji: "🔥", free: false, category: "ambiente" },
-  { id: "piano", label: "Piano suave", emoji: "🎹", free: false, category: "instrumento" },
-  { id: "pink", label: "Ruído rosa", emoji: "🎚️", free: false, category: "ambiente" },
-  { id: "heart", label: "Batimentos", emoji: "💗", free: false, category: "bebe" },
-  { id: "womb", label: "Som do útero", emoji: "🫧", free: false, category: "bebe" },
-  { id: "fan", label: "Ventilador", emoji: "🌀", free: false, category: "ambiente" },
-  { id: "train", label: "Trem noturno", emoji: "🚂", free: false, category: "ambiente" },
-  { id: "cafe", label: "Cafeteria", emoji: "☕", free: false, category: "ambiente" },
-  { id: "lake", label: "Lago", emoji: "🏞️", free: false, category: "agua" },
-  { id: "birds", label: "Pássaros", emoji: "🐦", free: false, category: "natureza" },
+  { id: "rain", label: "Chuva", icon: `${IC}/rain.png`, free: true, url: "/audio/rain-soft.mp3", category: "agua" },
+  { id: "forest", label: "Floresta", icon: `${IC}/forest.png`, free: false, url: "/audio/forest-calm.mp3", category: "natureza" },
+  { id: "ocean", label: "Oceano", icon: `${IC}/ocean.png`, free: false, url: "/audio/ocean-waves.mp3", category: "agua" },
+  { id: "white", label: "Ruído branco", icon: `${IC}/calm.png`, free: false, url: "/audio/white-noise.mp3", category: "ambiente" },
+  { id: "rain-window", label: "Chuva na janela", icon: `${IC}/rain.png`, free: false, category: "agua" },
+  { id: "waterfall", label: "Cachoeira", icon: `${IC}/ocean.png`, free: false, category: "agua" },
+  { id: "wind", label: "Vento leve", icon: `${IC}/forest.png`, free: false, category: "natureza" },
+  { id: "fire", label: "Fogueira", icon: `${IC}/sun.png`, free: false, category: "ambiente" },
+  { id: "piano", label: "Piano suave", icon: `${IC}/music.png`, free: false, category: "instrumento" },
+  { id: "pink", label: "Ruído rosa", icon: `${IC}/sparkle.png`, free: false, category: "ambiente" },
+  { id: "heart", label: "Batimentos", icon: `${IC}/heart.png`, free: false, category: "bebe" },
+  { id: "womb", label: "Som do útero", icon: `${IC}/sleep.png`, free: false, category: "bebe" },
+  { id: "fan", label: "Ventilador", icon: `${IC}/calm.png`, free: false, category: "ambiente" },
+  { id: "train", label: "Trem noturno", icon: `${IC}/moon.png`, free: false, category: "ambiente" },
+  { id: "cafe", label: "Cafeteria", icon: `${IC}/sun.png`, free: false, category: "ambiente" },
+  { id: "lake", label: "Lago", icon: `${IC}/ocean.png`, free: false, category: "agua" },
+  { id: "birds", label: "Pássaros", icon: `${IC}/forest.png`, free: false, category: "natureza" },
 ];
 
 export const TIMER_OPTIONS = [
@@ -355,11 +359,11 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
 ];
 
 /* ── Momentos em família — perguntas noturnas ── */
-export const FAMILY_MOMENTS: { id: string; emoji: string; title: string; prompt: string }[] = [
-  { id: "best", emoji: "🌟", title: "O melhor de hoje", prompt: "Qual foi o melhor momento do seu dia?" },
-  { id: "brave", emoji: "🦁", title: "Coragem", prompt: "Hoje você foi corajoso quando…?" },
-  { id: "grateful", emoji: "💛", title: "Gratidão", prompt: "Conte 3 coisas pelas quais somos gratos hoje." },
-  { id: "kind", emoji: "🤝", title: "Gentileza", prompt: "Você fez alguém sorrir hoje? Como?" },
-  { id: "learn", emoji: "🌱", title: "Aprendizado", prompt: "O que você descobriu hoje?" },
-  { id: "love", emoji: "💜", title: "Amor", prompt: "Para quem você quer mandar um abraço agora?" },
+export const FAMILY_MOMENTS: { id: string; icon: string; title: string; prompt: string }[] = [
+  { id: "best", icon: `${IC}/star.png`, title: "O melhor de hoje", prompt: "Qual foi o melhor momento do seu dia?" },
+  { id: "brave", icon: `${IC}/shield.png`, title: "Coragem", prompt: "Hoje você foi corajoso quando…?" },
+  { id: "grateful", icon: `${IC}/heart.png`, title: "Gratidão", prompt: "Conte 3 coisas pelas quais somos gratos hoje." },
+  { id: "kind", icon: `${IC}/sparkle.png`, title: "Gentileza", prompt: "Você fez alguém sorrir hoje? Como?" },
+  { id: "learn", icon: `${IC}/values.png`, title: "Aprendizado", prompt: "O que você descobriu hoje?" },
+  { id: "love", icon: `${IC}/family.png`, title: "Amor", prompt: "Para quem você quer mandar um abraço agora?" },
 ];
