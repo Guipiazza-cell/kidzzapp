@@ -34,24 +34,58 @@ const ASSETS = {
   peixes: `${PQ}/sug-peixes.png`,
   chuva: `${PQ}/sug-chuva.png`,
   arco: `${PQ}/sug-arcoiris.png`,
+  universo: `${PQ}/sug-universo.png`,
+  mente: `${PQ}/sug-mente.png`,
+  emocoes: `${PQ}/sug-emocoes.png`,
+  natureza: `${PQ}/sug-natureza.png`,
+  animais: `${PQ}/sug-animais.png`,
+  cores: `${PQ}/sug-cores.png`,
+  filosofia: `${PQ}/sug-filosofia.png`,
 };
 
-/** Capas premium para sugestões (mock + catálogo completo) */
-const SUG_COVER: Record<string, string> = {
+/** Capas por palavra no texto (específicas) */
+const SUG_COVER_KEYWORD: Record<string, string> = {
   peixe: ASSETS.peixes,
   peixes: ASSETS.peixes,
   chuva: ASSETS.chuva,
   "arco-íris": ASSETS.arco,
   arcoiris: ASSETS.arco,
   "arco íris": ASSETS.arco,
+  gato: ASSETS.animais,
+  animais: ASSETS.animais,
+  sol: ASSETS.cores,
+  céu: ASSETS.universo,
+  ceu: ASSETS.universo,
+  universo: ASSETS.universo,
+  tempo: ASSETS.universo,
+  pensamento: ASSETS.mente,
+  pensamentos: ASSETS.mente,
+  ideias: ASSETS.mente,
+  saudade: ASSETS.emocoes,
+  feliz: ASSETS.emocoes,
+  certo: ASSETS.filosofia,
+  errado: ASSETS.filosofia,
+  natureza: ASSETS.natureza,
 };
 
-function suggestionCover(text: string): string | null {
+/** Capas por categoria do catálogo — nunca deixa card sem arte */
+const SUG_COVER_CATEGORY: Record<string, string> = {
+  Natureza: ASSETS.natureza,
+  Animais: ASSETS.animais,
+  Cores: ASSETS.cores,
+  Emoções: ASSETS.emocoes,
+  Universo: ASSETS.universo,
+  Mente: ASSETS.mente,
+  Filosofia: ASSETS.filosofia,
+};
+
+function suggestionCover(text: string, category?: string): string {
   const t = text.toLowerCase();
-  for (const [k, v] of Object.entries(SUG_COVER)) {
+  for (const [k, v] of Object.entries(SUG_COVER_KEYWORD)) {
     if (t.includes(k)) return v;
   }
-  return null;
+  if (category && SUG_COVER_CATEGORY[category]) return SUG_COVER_CATEGORY[category];
+  return ASSETS.natureza;
 }
 
 /** Catálogo completo por idade — NÃO reduzir itens, só redesign visual */
@@ -875,7 +909,7 @@ const HomeScreen = ({
               }}
             >
               {visibleSuggestions.map((q, i) => {
-                const cover = suggestionCover(q.text);
+                const cover = suggestionCover(q.text, q.category);
                 const arrow = ARROW_COLORS[i % ARROW_COLORS.length];
                 return (
                   <button
@@ -899,11 +933,14 @@ const HomeScreen = ({
                     }}
                   >
                     <div style={{ position: "relative", height: 92, overflow: "hidden", background: "linear-gradient(160deg,#E8F5E0,#D0E8F8)" }}>
-                      {cover ? (
-                        <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", fontSize: 28, fontWeight: 900, color: "rgba(40,70,30,.35)" }}>?</div>
-                      )}
+                      <img
+                        src={cover}
+                        alt=""
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = ASSETS.natureza;
+                        }}
+                      />
                       <div
                         style={{
                           position: "absolute",
