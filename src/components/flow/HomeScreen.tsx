@@ -14,6 +14,17 @@ import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 import KidzzLogo from "@/components/common/KidzzLogo";
 import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+/** Capas no bundle Vite (hash) — não dependem de /public após publish */
+import coverPeixes from "@/assets/perguntas-covers/sug-peixes.png";
+import coverChuva from "@/assets/perguntas-covers/sug-chuva.png";
+import coverArco from "@/assets/perguntas-covers/sug-arcoiris.png";
+import coverUniverso from "@/assets/perguntas-covers/sug-universo.png";
+import coverMente from "@/assets/perguntas-covers/sug-mente.png";
+import coverEmocoes from "@/assets/perguntas-covers/sug-emocoes.png";
+import coverNatureza from "@/assets/perguntas-covers/sug-natureza.png";
+import coverAnimais from "@/assets/perguntas-covers/sug-animais.png";
+import coverCores from "@/assets/perguntas-covers/sug-cores.png";
+import coverFilosofia from "@/assets/perguntas-covers/sug-filosofia.png";
 
 /* ───────────── KIDZZ HOME • PERGUNTAS — mockup premium 1:1 ─────────────
    Ref visual: mockup floresta clara dourada + Gui + cards glass claros.
@@ -31,16 +42,16 @@ const ASSETS = {
   guiFallback2: `${PQ}/gui-original-heart.jpg`,
   family: `${PQ}/family-ask.png`,
   familyFallback: `${PQ}/familia-abraco.png`,
-  peixes: `${PQ}/sug-peixes.png`,
-  chuva: `${PQ}/sug-chuva.png`,
-  arco: `${PQ}/sug-arcoiris.png`,
-  universo: `${PQ}/sug-universo.png`,
-  mente: `${PQ}/sug-mente.png`,
-  emocoes: `${PQ}/sug-emocoes.png`,
-  natureza: `${PQ}/sug-natureza.png`,
-  animais: `${PQ}/sug-animais.png`,
-  cores: `${PQ}/sug-cores.png`,
-  filosofia: `${PQ}/sug-filosofia.png`,
+  peixes: coverPeixes,
+  chuva: coverChuva,
+  arco: coverArco,
+  universo: coverUniverso,
+  mente: coverMente,
+  emocoes: coverEmocoes,
+  natureza: coverNatureza,
+  animais: coverAnimais,
+  cores: coverCores,
+  filosofia: coverFilosofia,
 };
 
 /** Capas por palavra no texto (específicas) */
@@ -79,6 +90,17 @@ const SUG_COVER_CATEGORY: Record<string, string> = {
   Filosofia: ASSETS.filosofia,
 };
 
+/** Fundo colorido por categoria se a imagem falhar (nunca "?") */
+const SUG_BG: Record<string, string> = {
+  Natureza: "linear-gradient(160deg,#C8E6B8,#7CB86A)",
+  Animais: "linear-gradient(160deg,#FFE4A8,#E8A84A)",
+  Cores: "linear-gradient(160deg,#FFD0E8,#A8D8FF 50%,#FFF0A0)",
+  Emoções: "linear-gradient(160deg,#FFD4C8,#F0A0B8)",
+  Universo: "linear-gradient(160deg,#1A2040,#4A60A0 55%,#C8A0E8)",
+  Mente: "linear-gradient(160deg,#D8D0F8,#A0C8F0)",
+  Filosofia: "linear-gradient(160deg,#2A2040,#C8A060)",
+};
+
 function suggestionCover(text: string, category?: string): string {
   const t = text.toLowerCase();
   for (const [k, v] of Object.entries(SUG_COVER_KEYWORD)) {
@@ -86,6 +108,11 @@ function suggestionCover(text: string, category?: string): string {
   }
   if (category && SUG_COVER_CATEGORY[category]) return SUG_COVER_CATEGORY[category];
   return ASSETS.natureza;
+}
+
+function suggestionBg(category?: string): string {
+  if (category && SUG_BG[category]) return SUG_BG[category];
+  return "linear-gradient(160deg,#E8F5E0,#D0E8F8)";
 }
 
 /** Catálogo completo por idade — NÃO reduzir itens, só redesign visual */
@@ -910,6 +937,7 @@ const HomeScreen = ({
             >
               {visibleSuggestions.map((q, i) => {
                 const cover = suggestionCover(q.text, q.category);
+                const bg = suggestionBg(q.category);
                 const arrow = ARROW_COLORS[i % ARROW_COLORS.length];
                 return (
                   <button
@@ -932,13 +960,29 @@ const HomeScreen = ({
                       fontFamily: "'Nunito', sans-serif",
                     }}
                   >
-                    <div style={{ position: "relative", height: 92, overflow: "hidden", background: "linear-gradient(160deg,#E8F5E0,#D0E8F8)" }}>
+                    <div
+                      style={{
+                        position: "relative",
+                        height: 92,
+                        overflow: "hidden",
+                        background: bg,
+                      }}
+                    >
                       <img
                         src={cover}
                         alt=""
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        loading="lazy"
+                        decoding="async"
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = ASSETS.natureza;
+                          /* esconde img quebrada — fica o gradiente da categoria */
+                          (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />
                       <div
