@@ -4,8 +4,11 @@
  */
 import type { CSSProperties } from "react";
 
+import { CAMALEAO } from "@/lib/camaleaoOficial";
+
 export const KIDZZ_LOGO_SRC = "/exemplos/assets/brand/kidzz-wordmark-alpha.png";
-export const KIDZZ_GUI_SRC = "/exemplos/assets/brand/gui-cutout-alpha.png";
+/** Camaleão original soft (sem retângulo). */
+export const KIDZZ_GUI_SRC = CAMALEAO.armsSoft;
 
 type Props = {
   /** Altura em px (largura escala automático). Default 34. */

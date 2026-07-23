@@ -11,11 +11,12 @@ import {
   type Activity,
 } from "@/lib/weeklyActivities";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 
 /**
  * MemoriesAlbum — redesign premium v2
  * Ref: public/telas/memorias/
- * Assets: memorias-v2 (Hermes/Codex) · mix Gui + família
+ * Assets: camaleão original soft · mix Gui + família
  *
  * Dados reais de consumo (nunca mock fixo de conteúdo):
  *  - Momentos guardados  → memories do usuário (useMemories)
@@ -27,8 +28,8 @@ import { FONT, SERIF, R } from "@/lib/premiumUi";
  */
 
 const AS = "/exemplos/assets/memorias-v2";
-/** bump ao regenerar assets Hermes (cache bust no browser) */
-const AV = "v2";
+/** bump ao regenerar assets (cache bust no browser) */
+const AV = "v3";
 const asset = (name: string) => `${AS}/${name}?${AV}`;
 
 interface MemoriesAlbumProps {
@@ -534,7 +535,7 @@ const MemoriesAlbum = ({
         <div style={{ position: "relative", height: 352 }}>
           <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 316, overflow: "hidden" }}>
             <img
-              src={asset("hero-gui.png")}
+              src={CAMALEAO.heartSoft}
               alt="Gui, o camaleão, escrevendo memórias no diário"
               style={{
                 position: "absolute",
@@ -542,14 +543,14 @@ const MemoriesAlbum = ({
                 left: 0,
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
-                objectPosition: "center 28%",
+                objectFit: "contain",
+                objectPosition: "center 30%",
                 animation: "memv2-floaty 6s ease-in-out infinite",
-                WebkitMaskImage:
-                  "radial-gradient(130% 96% at 50% 24%,#000 52%,rgba(0,0,0,.4) 76%,transparent 100%)",
-                maskImage:
-                  "radial-gradient(130% 96% at 50% 24%,#000 52%,rgba(0,0,0,.4) 76%,transparent 100%)",
-                filter: "saturate(1.08) contrast(1.02)",
+                ...CAMALEAO_SCENE_MASK,
+                filter: "drop-shadow(0 16px 24px rgba(40,30,20,.26))",
+              }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = CAMALEAO.heart;
               }}
             />
           </div>

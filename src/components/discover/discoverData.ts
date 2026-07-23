@@ -1,5 +1,6 @@
 // Dados da aba Descobrir, fácil de editar/expandir
 // {nome} é substituído pelo nome da criança em runtime.
+import { CAMALEAO } from "@/lib/camaleaoOficial";
 
 export type Activity = {
   id: string;
@@ -30,10 +31,10 @@ export type Theme = {
   activities: Activity[];
 };
 
-// Assets premium (Hermes/Codex) — mix família + Gui
+// Assets premium — mix família + Gui original soft
 export const DISCOVER_IMAGES = {
   hero: "/exemplos/assets/descobrir-v2/hero-familia.png",
-  heroGui: "/exemplos/assets/descobrir-v2/hero-gui.png",
+  heroGui: CAMALEAO.armsSoft,
   imgAnimais: "/exemplos/assets/descobrir-v2/tema-animais.png",
   imgEspaco: "/exemplos/assets/descobrir-v2/tema-espaco.png",
   imgNatureza: "/exemplos/assets/descobrir-v2/tema-natureza.png",

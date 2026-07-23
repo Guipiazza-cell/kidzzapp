@@ -46,8 +46,10 @@ import {
   sectionWrap,
 } from "@/lib/premiumUi";
 
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+
 const AS = "/exemplos/assets/momentos-v2";
-const AV = "v1";
+const AV = "v3";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 /** Capas Hermes por mood (fallback: gradient) */
@@ -506,23 +508,18 @@ const MomentsPlaylists = ({ onBack }: Props) => {
             }}
           >
             <img
-              src={asset("hero-gui.png")}
+              src={CAMALEAO.headphonesSoft}
               alt="Gui com fones de ouvido"
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
-                objectPosition: "55% 20%",
-                maskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 22%, #000 82%, transparent 100%), linear-gradient(180deg, #000 55%, transparent 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 22%, #000 82%, transparent 100%), linear-gradient(180deg, #000 55%, transparent 100%)",
-                WebkitMaskComposite: "source-in",
-                maskComposite: "intersect",
-                filter: "saturate(1.08) contrast(1.02)",
+                objectFit: "contain",
+                objectPosition: "right bottom",
+                ...CAMALEAO_SCENE_MASK,
+                filter: "drop-shadow(0 14px 22px rgba(40,30,20,.28))",
               }}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/exemplos/assets/cena-momentos.png";
+                (e.target as HTMLImageElement).src = CAMALEAO.headphones;
               }}
             />
             <div

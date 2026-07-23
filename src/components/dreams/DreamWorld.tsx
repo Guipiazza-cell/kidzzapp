@@ -24,6 +24,7 @@ import {
 import PreSleep from "./PreSleep";
 import { haptic } from "@/lib/haptics";
 import PremiumSeal from "@/components/common/PremiumSeal";
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 
 /* Spring premium reusável para microinterações */
 const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
@@ -32,8 +33,11 @@ const cardTap = { scale: 0.975 };
 /* ────────── Tokens visuais premium (ABA SONHOS) ────────── */
 const DREAM_BG =
   "linear-gradient(180deg,#2B1A4A 0%,#1E1238 36%,#160C2A 68%,#1A0E28 100%)";
+
 const ASSETS = {
-  hero: "/exemplos/assets/sonhos-v2/hero-family.png",
+  /** Camaleão original sleepy (sem retângulo) */
+  hero: CAMALEAO.sleepySoft,
+  heroFallback: CAMALEAO.sleepy,
   featHeart: "/exemplos/assets/sonhos-v2/feat-heart.png",
   featStar: "/exemplos/assets/sonhos-v2/feat-star.png",
   featMoon: "/exemplos/assets/sonhos-v2/feat-moon.png",
@@ -541,18 +545,21 @@ const DreamWorld = ({ onBack }: Props) => {
           <div
             style={{
               position: "relative", width: "100%", height: 414, willChange: "transform",
-              WebkitMaskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)",
-              maskImage: "radial-gradient(125% 94% at 50% 22%,#000 50%,rgba(0,0,0,.42) 74%,transparent 100%)",
+              ...CAMALEAO_SCENE_MASK,
               animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both",
             }}
           >
             <img
               src={HERO_IMG}
-              alt="Família lendo juntos na hora de dormir"
+              alt="Gui, o camaleão, pronto para dormir"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = ASSETS.heroFallback;
+              }}
               style={{
                 position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-                objectFit: "cover", objectPosition: "center 28%",
-                animation: "sonh-floaty 7s ease-in-out infinite", filter: "saturate(1.1) contrast(1.03)",
+                objectFit: "contain", objectPosition: "center 28%",
+                animation: "sonh-floaty 7s ease-in-out infinite",
+                filter: "drop-shadow(0 18px 24px rgba(20,10,40,.35))",
               }}
             />
             <div

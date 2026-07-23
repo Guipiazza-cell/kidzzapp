@@ -33,8 +33,10 @@ import {
   sectionWrap,
 } from "@/lib/premiumUi";
 
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+
 const AS = "/exemplos/assets/rotina-v2";
-const AV = "v1";
+const AV = "v3";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 const INK = "#3A2418";
@@ -624,7 +626,7 @@ const RoutineScreen = () => {
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `url(${asset("hero-gui.png")})`,
+          backgroundImage: `url(${CAMALEAO.armsSoft})`,
           backgroundSize: "cover",
           backgroundPosition: "72% 18%",
           filter: "brightness(.96) saturate(1.08)",
@@ -842,7 +844,7 @@ const RoutineScreen = () => {
             }}
           >
             <img
-              src={asset("hero-gui.png")}
+              src={CAMALEAO.armsSoft}
               alt="Gui, o camaleão, com o calendário da rotina"
               style={{
                 position: "absolute",
@@ -852,8 +854,12 @@ const RoutineScreen = () => {
                 height: "100%",
                 objectFit: "contain",
                 objectPosition: "right bottom",
+                ...CAMALEAO_SCENE_MASK,
                 filter: "drop-shadow(0 12px 28px rgba(80,50,30,.28))",
                 pointerEvents: "none",
+              }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = CAMALEAO.arms;
               }}
             />
           </div>

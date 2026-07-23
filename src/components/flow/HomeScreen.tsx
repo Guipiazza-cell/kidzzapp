@@ -13,6 +13,7 @@ import SOSModal from "@/components/sos/SOSModal";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 import KidzzLogo from "@/components/common/KidzzLogo";
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 
 /* ───────────── KIDZZ HOME • PERGUNTAS — mockup premium 1:1 ─────────────
    Ref visual: mockup floresta clara dourada + Gui + cards glass claros.
@@ -24,9 +25,9 @@ const BRAND = "/exemplos/assets/brand";
 
 const ASSETS = {
   bg: `${PQ}/bg-floresta.png`,
-  /** Original do usuário (mão no coração) com borda esmaecida — parte do cenário */
-  gui: `${PQ}/gui-hero-scene.png`,
-  guiFallback: `${PQ}/gui-hero-soft.png`,
+  /** Original do cliente (mão no coração) com borda esmaecida — parte do cenário */
+  gui: CAMALEAO.heartSoft,
+  guiFallback: CAMALEAO.heart,
   guiFallback2: `${PQ}/gui-original-heart.jpg`,
   family: `${PQ}/family-ask.png`,
   familyFallback: `${PQ}/familia-abraco.png`,
@@ -503,10 +504,7 @@ const HomeScreen = ({
               pointerEvents: "none",
               zIndex: 2,
               /* dissolve total nas bordas do retângulo */
-              WebkitMaskImage:
-                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
-              maskImage:
-                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
+              ...CAMALEAO_SCENE_MASK,
               animation: "perg-floaty 6.5s ease-in-out infinite",
             }}
           >
@@ -516,8 +514,8 @@ const HomeScreen = ({
               draggable={false}
               onError={(e) => {
                 const el = e.target as HTMLImageElement;
-                if (el.src.includes("gui-hero-scene")) el.src = ASSETS.guiFallback;
-                else if (el.src.includes("gui-hero-soft")) el.src = ASSETS.guiFallback2;
+                if (el.src.includes("heart-soft")) el.src = ASSETS.guiFallback;
+                else el.src = ASSETS.guiFallback2;
               }}
               style={{
                 width: "100%",

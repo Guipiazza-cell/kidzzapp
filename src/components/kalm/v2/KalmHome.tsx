@@ -8,7 +8,7 @@ import {
   ArrowLeft, Heart, Leaf, Droplet, Users, Coffee, LifeBuoy,
   Share2, Sparkles, ChevronRight,
 } from "lucide-react";
-import kalmHeroChameleon from "@/assets/kalm-hero-chameleon.jpg";
+import kalmHeroChameleon from "@/assets/kalm-hero-chameleon.webp";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
@@ -224,12 +224,16 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           <img
             src={kalmHeroChameleon}
             alt="Camaleão meditando"
-            width={1024}
-            height={1024}
+            width={666}
+            height={1000}
             className="w-[40%] max-w-[168px] h-auto object-contain flex-shrink-0 -mr-1 -mt-1"
             style={{
               filter:
                 "drop-shadow(0 12px 28px rgba(232,185,58,0.28)) drop-shadow(0 4px 12px rgba(127,176,105,0.20))",
+              WebkitMaskImage:
+                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
+              maskImage:
+                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
             }}
           />
         </div>

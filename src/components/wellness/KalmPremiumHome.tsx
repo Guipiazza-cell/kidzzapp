@@ -48,8 +48,10 @@ import {
 } from "@/lib/premiumUi";
 import KidzzLogo from "@/components/common/KidzzLogo";
 
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+
 const AS = "/exemplos/assets/kalm-v2";
-const AV = "v7";
+const AV = "v8";
 const img = (n: string) => `${AS}/${n}?${AV}`;
 
 export type KalmView =
@@ -605,7 +607,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
                 filter: "saturate(1.08) contrast(1.02)",
               }}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/exemplos/assets/cena-kalm.png";
+                (e.target as HTMLImageElement).src = CAMALEAO.armsSoft;
               }}
             />
           </div>
@@ -824,20 +826,22 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
                 }}
               >
                 <img
-                  src={img("gui-meditate.png")}
-                  alt=""
+                  src={CAMALEAO.heartSoft}
+                  alt="Gui meditando"
                   style={{
                     position: "absolute",
                     inset: 0,
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "contain",
                     objectPosition: "center 20%",
                     borderRadius: R.panel,
                     animation: "kalm2-breathe 5s ease-in-out infinite",
+                    ...CAMALEAO_SCENE_MASK,
+                    filter: "drop-shadow(0 10px 18px rgba(40,60,30,.22))",
                   }}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/exemplos/assets/hero-kalm.png";
+                    (e.target as HTMLImageElement).src = CAMALEAO.heart;
                   }}
                 />
                 <div
@@ -932,19 +936,20 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
               <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "1px", color: EM }}>SUSSURRO DO KIDZZ</div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flex: 1 }}>
                 <img
-                  src={img("gui-whisper.png")}
-                  alt=""
+                  src={CAMALEAO.headphonesSoft}
+                  alt="Gui"
                   style={{
                     width: 48,
                     height: 48,
                     borderRadius: 14,
-                    objectFit: "cover",
+                    objectFit: "contain",
                     flex: "none",
-                    border: "0.5px solid rgba(255,255,255,.9)",
+                    background: "rgba(255,255,255,.35)",
                     boxShadow: "0 4px 12px rgba(40,70,40,.14)",
+                    ...CAMALEAO_SCENE_MASK,
                   }}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/exemplos/assets/hero-kalm.png";
+                    (e.target as HTMLImageElement).src = CAMALEAO.headphones;
                   }}
                 />
                 <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: INK, lineHeight: 1.35 }}>
@@ -1108,7 +1113,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
                 {streak.count > 0 ? ` · ${streak.count}d` : ""}
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8, gap: 6 }}>
-                <img src={img("gui-small.png")} alt="" style={{ width: 40, height: 40, objectFit: "contain" }} />
+                <img src={CAMALEAO.heartSoft} alt="" style={{ width: 40, height: 40, objectFit: "contain", ...CAMALEAO_SCENE_MASK }} />
                 <button
                   type="button"
                   onClick={share}
