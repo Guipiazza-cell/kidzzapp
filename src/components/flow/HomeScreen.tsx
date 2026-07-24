@@ -472,8 +472,7 @@ const HomeScreen = ({
                 textAlign: "center",
               }}
             >
-              Desligue a tela, ligue a infância.{" "}
-              <span style={{ color: "#E8A030" }}>♥</span>
+              Desligue a tela, ligue a infância.
             </span>
           </div>
 
