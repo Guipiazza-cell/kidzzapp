@@ -6,10 +6,12 @@ import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 import KidzzLogo from "@/components/common/KidzzLogo";
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import heroDescobrir from "@/assets/descobrir-hero.webp";
 
 // ============================================================
 // DiscoverScreen — premium v2 (ref: public/telas/DESCOBRIR)
-// Assets: descobrir-v2 (Hermes/Codex) · mix família + Gui
+// Assets: hero floresta + Gui original · temas descobrir-v2
 // Lógica real preservada: temas, atividades, premium, selo, share.
 // ============================================================
 
@@ -920,56 +922,95 @@ const DiscoverScreen = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* ── HERO: texto + foto família (sem camaleão quadrado) ── */}
-        <div style={{ position: "relative", padding: `16px ${PAD}px 4px`, minHeight: 268 }}>
+        {/* ── HERO premium: floresta dourada + Gui original ── */}
+        <div
+          ref={heroWrapRef}
+          style={{
+            position: "relative",
+            margin: `12px ${PAD}px 6px`,
+            minHeight: 268,
+            borderRadius: 28,
+            overflow: "hidden",
+            boxShadow: "0 16px 36px rgba(60,70,40,.16)",
+            animation: "disc-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+          }}
+        >
+          <img
+            src={heroDescobrir}
+            alt="Gui, o camaleão, explorando a floresta"
+            draggable={false}
+            onError={(e) => {
+              const el = e.target as HTMLImageElement;
+              if (!el.src.includes("hero-oficial")) el.src = DISCOVER_IMAGES.hero;
+              else el.src = CAMALEAO.armsSoft;
+            }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "58% 30%",
+              animation: "disc-floaty 7s ease-in-out infinite",
+            }}
+          />
+          {/* Véu legível à esquerda + fade inferior */}
           <div
-            ref={heroWrapRef}
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(100deg, rgba(255,252,248,.90) 0%, rgba(255,250,240,.58) 36%, rgba(255,250,240,.12) 60%, transparent 78%)," +
+                "linear-gradient(180deg, transparent 58%, rgba(255,252,248,.72) 88%, #FFFCF8 100%)",
+              pointerEvents: "none",
+            }}
+          />
+          {/* Reforço Gui soft */}
+          <img
+            src={CAMALEAO.armsSoft}
+            alt=""
+            aria-hidden
+            draggable={false}
+            style={{
+              position: "absolute",
+              right: -8,
+              bottom: -4,
+              width: "50%",
+              maxWidth: 210,
+              height: "86%",
+              objectFit: "contain",
+              objectPosition: "right bottom",
+              pointerEvents: "none",
+              filter: "drop-shadow(0 14px 18px rgba(40,60,20,.26))",
+              ...CAMALEAO_SCENE_MASK,
+            }}
+          />
+
+          <div
             style={{
               position: "relative",
               zIndex: 2,
-              maxWidth: "52%",
-              paddingTop: 4,
+              maxWidth: "54%",
+              padding: "22px 16px 28px",
               animation: "disc-cascade .55s cubic-bezier(.22,1,.36,1) both",
             }}
           >
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <span style={{ width: 30, height: 30, borderRadius: 999, background: "rgba(70,112,58,.12)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}>
+              <span style={{ width: 30, height: 30, borderRadius: 999, background: "rgba(70,112,58,.14)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none", boxShadow: "0 1px 0 rgba(255,255,255,.6)" }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#46703A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </span>
-              <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 30, color: "#1F2A18", letterSpacing: "-.4px", lineHeight: 1.05 }}>
+              <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 30, color: "#1F2A18", letterSpacing: "-.4px", lineHeight: 1.05, textShadow: "0 1px 0 rgba(255,255,255,.55)" }}>
                 Descobrir
               </h1>
             </div>
-            <p style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 17, lineHeight: 1.28, color: "#2A3220" }}>
+            <p style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 17, lineHeight: 1.28, color: "#2A3220", textShadow: "0 1px 0 rgba(255,255,255,.4)" }}>
               Vamos explorar o mundo juntos?
             </p>
-            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.48, color: "rgba(42,37,32,0.68)", maxWidth: 210 }}>
+            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.48, color: "rgba(42,37,32,0.78)", maxWidth: 210 }}>
               Escolha um tema e mergulhem em descobertas que despertam a curiosidade e criam memórias.
             </p>
           </div>
-
-          <img
-            src={DISCOVER_IMAGES.hero}
-            alt="Família explorando juntos"
-            style={{
-              position: "absolute",
-              top: 4,
-              right: -4,
-              width: "50%",
-              height: 250,
-              objectFit: "cover",
-              objectPosition: "center 18%",
-              borderRadius: "32px 20px 48% 28%",
-              boxShadow: "0 18px 36px rgba(60,70,40,.14)",
-              maskImage: "linear-gradient(100deg, transparent 0%, #000 18%, #000 78%, transparent 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(100deg, transparent 0%, #000 18%, #000 78%, transparent 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
-              WebkitMaskComposite: "source-in",
-              maskComposite: "intersect",
-              filter: "saturate(1.05)",
-              animation: "disc-floaty 7s ease-in-out infinite",
-              pointerEvents: "none",
-            }}
-          />
         </div>
 
         {/* ── EXPLORE POR TEMAS ── */}

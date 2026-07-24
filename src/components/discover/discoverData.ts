@@ -31,9 +31,10 @@ export type Theme = {
   activities: Activity[];
 };
 
-// Assets premium — mix família + Gui original soft
+// Assets premium — hero floresta + Gui original (arms / explorador)
 export const DISCOVER_IMAGES = {
-  hero: "/exemplos/assets/descobrir-v2/hero-familia.png",
+  /** Hero premium (public, cache-bust manual se precisar) */
+  hero: "/exemplos/assets/descobrir-v2/hero-oficial.png?v=1",
   heroGui: CAMALEAO.armsSoft,
   imgAnimais: "/exemplos/assets/descobrir-v2/tema-animais.png",
   imgEspaco: "/exemplos/assets/descobrir-v2/tema-espaco.png",
