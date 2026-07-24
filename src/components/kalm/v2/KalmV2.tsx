@@ -47,7 +47,13 @@ const KalmV2 = ({ onBack, onGoDreams, onOpenParents, initialExperienceId, onCons
   return (
     <div
       className="h-full min-h-0 flex flex-col relative overflow-y-auto overflow-x-hidden"
-      style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", touchAction: "pan-y" }}
+      style={{
+        WebkitOverflowScrolling: "touch",
+        overscrollBehavior: "contain",
+        touchAction: "pan-y",
+        /* garante que o fim do conteúdo não fique atrás do dock */
+        paddingBottom: 0,
+      }}
     >
       {view === "home" && (
         <KalmHome

@@ -81,7 +81,7 @@ const ActivityCard = ({ a, onOpen, locked }: { a: Activity; onOpen: () => void; 
 /* ─────────────── RELAXAR AGORA ─────────────── */
 export const RelaxarAgora = ({ onBack, onOpen, isPremium }:
   { onBack: () => void; onOpen: (a: Activity) => void; isPremium: boolean }) => (
-  <div className="min-h-full pb-20" style={{ background: bgDark }}>
+  <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
     <TopBar title="Alívio em minutos" onBack={onBack} />
     <div className="px-5 pt-2">
       <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
@@ -208,7 +208,7 @@ export const RitualRapido = ({ onBack, onOpen }:
   ];
 
   return (
-    <div className="min-h-full pb-20" style={{ background: bgDark }}>
+    <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
       <TopBar title="Ritual rápido" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#E8821A" }}>
@@ -269,7 +269,7 @@ export const SosEmocional = ({ onBack, onOpen, onOpenParents }:
   };
 
   return (
-    <div className="min-h-full pb-20" style={{ background: bgDark }}>
+    <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
       <TopBar title="SOS emocional" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
@@ -389,7 +389,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
   ];
 
   return (
-    <div className="min-h-full pb-20" style={{ background: bgDark }}>
+    <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
       <TopBar title="Vínculo em família" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#C9A227" }}>
