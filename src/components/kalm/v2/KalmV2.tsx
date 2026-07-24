@@ -45,7 +45,10 @@ const KalmV2 = ({ onBack, onGoDreams, onOpenParents, initialExperienceId, onCons
   const backHome = useCallback(() => setView("home"), []);
 
   return (
-    <>
+    <div
+      className="h-full min-h-0 flex flex-col relative overflow-y-auto overflow-x-hidden"
+      style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", touchAction: "pan-y" }}
+    >
       {view === "home" && (
         <KalmHome
           onBack={onBack}
@@ -69,7 +72,7 @@ const KalmV2 = ({ onBack, onGoDreams, onOpenParents, initialExperienceId, onCons
         onClose={() => setActivity(null)}
         onSaveMoment={() => { /* já rastreado em GuidedPlayer via badges/streak */ }}
       />
-    </>
+    </div>
   );
 };
 

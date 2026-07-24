@@ -135,7 +135,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
 
   return (
     <div
-      className="h-full min-h-0 relative overflow-y-auto overflow-x-hidden pb-32"
+      className="min-h-full relative pb-32"
       style={{
         background:
           "radial-gradient(120% 60% at 50% 0%, rgba(232,185,58,0.10) 0%, transparent 55%)," +
@@ -143,9 +143,6 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           "linear-gradient(180deg, #0E1712 0%, #131F18 45%, #0B1310 100%)",
         fontFamily: "'Nunito', system-ui, sans-serif",
         color: ink,
-        WebkitOverflowScrolling: "touch",
-        overscrollBehavior: "contain",
-        touchAction: "pan-y",
       }}
     >
       {/* Vinheta florestal decorativa (não interativa) */}
