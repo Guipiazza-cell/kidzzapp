@@ -31,23 +31,23 @@ const goldSoft = "#D4A017";
 const green = "#7FB069";
 const greenDeep = "#46703A";
 
-/* Glass frosted escuro com brilho dourado/verde muito suave */
+/* Glass escuro opaco o bastante para não lavar sobre o hero claro */
 const glassChrome: React.CSSProperties = {
-  background: "linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-  border: "1px solid rgba(255,255,255,0.10)",
-  backdropFilter: "blur(24px) saturate(140%)",
-  WebkitBackdropFilter: "blur(24px) saturate(140%)",
-  boxShadow:
-    "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
-};
-
-const glassCard: React.CSSProperties = {
-  background: "linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015))",
-  border: "1px solid rgba(255,255,255,0.09)",
+  background: "linear-gradient(155deg, rgba(28,42,34,0.88), rgba(14,23,18,0.92))",
+  border: "1px solid rgba(255,255,255,0.14)",
   backdropFilter: "blur(20px) saturate(140%)",
   WebkitBackdropFilter: "blur(20px) saturate(140%)",
   boxShadow:
-    "0 10px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.06)",
+    "0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.10)",
+};
+
+const glassCard: React.CSSProperties = {
+  background: "linear-gradient(165deg, rgba(36,52,42,0.96), rgba(18,28,22,0.98))",
+  border: "1px solid rgba(255,255,255,0.12)",
+  backdropFilter: "blur(16px) saturate(130%)",
+  WebkitBackdropFilter: "blur(16px) saturate(130%)",
+  boxShadow:
+    "0 12px 28px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.08)",
 };
 
 const greetByHour = () => {
@@ -269,8 +269,19 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         </div>
       </section>
 
+      {/* Corpo sólido escuro — evita cards esbranquiçados sobre o hero claro */}
+      <div
+        className="relative z-[3]"
+        style={{
+          marginTop: -4,
+          background:
+            "linear-gradient(180deg, rgba(14,23,18,0.72) 0%, #0E1712 36px, #0B1310 100%)",
+          borderRadius: "24px 24px 0 0",
+          boxShadow: "0 -12px 40px rgba(0,0,0,.35)",
+        }}
+      >
       {/* Sugestão do dia (dinâmica) */}
-      <section className="relative px-5 pt-6">
+      <section className="relative px-5 pt-5">
         <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: gold }}>
           ✨ Sugestão de hoje
         </p>
@@ -284,10 +295,10 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           style={{
             ...glassCard,
             background:
-              "linear-gradient(140deg, rgba(232,185,58,0.18), rgba(232,185,58,0.04) 60%, rgba(255,255,255,0.02))",
-            border: "1px solid rgba(232,185,58,0.28)",
+              "linear-gradient(145deg, rgba(232,185,58,0.24), rgba(22,34,26,0.98) 58%)",
+            border: "1px solid rgba(232,185,58,0.34)",
             boxShadow:
-              "0 10px 30px rgba(0,0,0,0.35), 0 0 40px rgba(232,185,58,0.10) inset, inset 0 1px 0 rgba(255,255,255,0.08)",
+              "0 10px 30px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.08)",
           }}
         >
           <div className="flex items-start gap-3">
@@ -409,17 +420,17 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
                 className="text-left rounded-[20px] p-3.5 active:scale-[0.98]"
                 style={{
                   ...glassCard,
-                  background: `linear-gradient(160deg, ${p.tint}22, rgba(255,255,255,0.02) 60%)`,
-                  border: `1px solid ${p.tint}30`,
+                  background: `linear-gradient(160deg, ${p.tint}28, rgba(22,34,26,0.98) 62%)`,
+                  border: `1px solid ${p.tint}45`,
                   minHeight: 118,
                 }}
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{
-                    background: `${p.tint}22`,
-                    border: `1px solid ${p.tint}35`,
-                    boxShadow: `0 0 20px ${p.tint}18`,
+                    background: `${p.tint}30`,
+                    border: `1px solid ${p.tint}50`,
+                    boxShadow: `0 0 20px ${p.tint}22`,
                   }}
                 >
                   <Icon size={20} style={{ color: p.tint }} strokeWidth={2} />
@@ -442,11 +453,9 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           onClick={() => { haptic("medium"); onGoSos(); }}
           className="w-full rounded-[18px] p-3.5 flex items-center gap-3 active:scale-[0.98]"
           style={{
-            background: "linear-gradient(140deg, rgba(214,63,92,0.16), rgba(214,63,92,0.04))",
-            border: "1px solid rgba(214,63,92,0.28)",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            boxShadow: "0 10px 26px rgba(0,0,0,0.30)",
+            background: "linear-gradient(140deg, rgba(214,63,92,0.32), rgba(28,18,22,0.98))",
+            border: "1px solid rgba(240,100,120,0.45)",
+            boxShadow: "0 10px 26px rgba(0,0,0,0.40)",
           }}
         >
           <div
@@ -460,8 +469,8 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
             <LifeBuoy size={20} />
           </div>
           <div className="flex-1 text-left">
-            <p className="text-[13.5px] font-bold" style={{ color: ink }}>SOS emocional</p>
-            <p className="text-[11.5px]" style={{ color: inkSoft }}>
+            <p className="text-[13.5px] font-bold" style={{ color: "#FFE8EC" }}>SOS emocional</p>
+            <p className="text-[11.5px]" style={{ color: "rgba(255,230,235,0.78)" }}>
               Apoio imediato quando a emoção fica grande demais.
             </p>
           </div>
@@ -476,10 +485,10 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           style={{
             ...glassCard,
             background:
-              "linear-gradient(140deg, rgba(127,176,105,0.22), rgba(70,112,58,0.10) 60%, rgba(255,255,255,0.02))",
-            border: "1px solid rgba(127,176,105,0.30)",
+              "linear-gradient(140deg, rgba(127,176,105,0.28), rgba(18,28,22,0.98) 65%)",
+            border: "1px solid rgba(127,176,105,0.40)",
             boxShadow:
-              "0 12px 32px rgba(0,0,0,0.35), 0 0 40px rgba(127,176,105,0.10) inset, inset 0 1px 0 rgba(255,255,255,0.08)",
+              "0 12px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.08)",
           }}
         >
           <p className="text-[11px] font-bold tracking-[0.20em] uppercase" style={{ color: gold }}>
@@ -511,10 +520,8 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           onClick={() => { haptic("light"); onGoDreams(); }}
           className="w-full rounded-[16px] p-3.5 flex items-center gap-3 active:scale-[0.98]"
           style={{
-            background: "linear-gradient(140deg, rgba(108,92,184,0.18), rgba(108,92,184,0.04))",
-            border: "1px solid rgba(108,92,184,0.28)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
+            background: "linear-gradient(140deg, rgba(108,92,184,0.30), rgba(18,16,32,0.98))",
+            border: "1px solid rgba(150,130,220,0.40)",
           }}
         >
           <span className="text-[22px]">🌙</span>
@@ -527,6 +534,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           <ChevronRight size={16} style={{ color: "#B4A6EE" }} />
         </button>
       </section>
+      </div>
     </div>
   );
 };
