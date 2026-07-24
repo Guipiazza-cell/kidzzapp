@@ -157,37 +157,35 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         }}
       />
 
-      {/* ═══ HERO cinematográfico — família + camaleão original ═══ */}
-      <section className="relative" style={{ minHeight: 340 }}>
-        {/* Arte full-bleed: família na floresta + Gui original */}
+      {/* ═══ HERO cinematográfico — só arte (texto abaixo, sem cobrir personagens) ═══ */}
+      <section className="relative" style={{ height: 300 }}>
         <div
           aria-hidden
           className="absolute inset-0 overflow-hidden"
           style={{
-            height: 340,
+            height: 300,
             WebkitMaskImage:
-              "linear-gradient(180deg, #000 58%, rgba(0,0,0,.55) 78%, transparent 100%)",
+              "linear-gradient(180deg, #000 62%, rgba(0,0,0,.5) 82%, transparent 100%)",
             maskImage:
-              "linear-gradient(180deg, #000 58%, rgba(0,0,0,.55) 78%, transparent 100%)",
+              "linear-gradient(180deg, #000 62%, rgba(0,0,0,.5) 82%, transparent 100%)",
           }}
         >
           <img
             src={kalmHeroFamily}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: "50% 28%" }}
+            style={{ objectPosition: "50% 22%" }}
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(100deg, rgba(8,14,10,.72) 0%, rgba(8,14,10,.38) 42%, rgba(8,14,10,.12) 68%, transparent 100%)," +
-                "linear-gradient(180deg, rgba(8,14,10,.35) 0%, transparent 40%, rgba(14,23,18,.55) 100%)",
+                "linear-gradient(180deg, rgba(8,14,10,.45) 0%, transparent 36%, rgba(14,23,18,.55) 100%)",
             }}
           />
         </div>
 
-        {/* Gui original soft (reforço à direita, borda esmaecida) */}
+        {/* Gui original soft (direita) */}
         <img
           src={CAMALEAO.heartSoft}
           alt="Gui, o camaleão Kidzz"
@@ -195,9 +193,9 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           className="pointer-events-none absolute"
           style={{
             right: -8,
-            bottom: 12,
-            width: "46%",
-            maxWidth: 200,
+            bottom: 4,
+            width: "48%",
+            maxWidth: 210,
             height: "auto",
             objectFit: "contain",
             filter: "drop-shadow(0 14px 22px rgba(0,0,0,.45))",
@@ -209,7 +207,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           }}
         />
 
-        {/* Top chrome */}
+        {/* Top chrome — só logo / nav */}
         <div className="relative z-10 px-4 pt-[max(14px,env(safe-area-inset-top))] pb-2 flex items-center gap-2">
           <button
             onClick={() => { haptic("light"); onBack(); }}
@@ -225,7 +223,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
               className="text-[9px] font-bold tracking-[0.14em]"
               style={{ color: "rgba(241,238,228,0.78)" }}
             >
-              Desligue a tela, ligue a infância. 💛
+              Desligue a tela, ligue a infância.
             </span>
           </div>
           <div
@@ -235,53 +233,52 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
             ⚡ {streak.count || 1}
           </div>
         </div>
-
-        {/* Copy do mockup */}
-        <div className="relative z-10 px-5 pt-3 pb-6 max-w-[58%]">
-          <p
-            className="text-[12px] font-extrabold"
-            style={{ color: gold }}
-          >
-            {greetByHour()} 💛
-          </p>
-          <h1
-            className="mt-2 leading-[1.08]"
-            style={{
-              color: ink,
-              fontFamily: "'Fraunces','Nunito',serif",
-              fontSize: "clamp(24px, 7vw, 30px)",
-              fontWeight: 600,
-              letterSpacing: "-0.02em",
-              textShadow: "0 2px 16px rgba(0,0,0,.35)",
-            }}
-          >
-            Pequenos gestos,
-            <br />
-            grandes{" "}
-            <span style={{ color: green, fontStyle: "italic" }}>conexões</span>.
-          </h1>
-          <p
-            className="mt-2.5 text-[13px] leading-[1.4] font-semibold"
-            style={{ color: inkSoft, maxWidth: 200 }}
-          >
-            Cada escolha de hoje transforma o amanhã.
-          </p>
-        </div>
       </section>
 
-      {/* Corpo sólido escuro — evita cards esbranquiçados sobre o hero claro */}
+      {/* Corpo escuro — texto do hero + cards (texto na faixa do quadrado) */}
       <div
         className="relative z-[3]"
         style={{
-          marginTop: -4,
+          marginTop: -28,
           background:
-            "linear-gradient(180deg, rgba(14,23,18,0.72) 0%, #0E1712 36px, #0B1310 100%)",
+            "linear-gradient(180deg, rgba(14,23,18,0.88) 0%, #0E1712 48px, #0B1310 100%)",
           borderRadius: "24px 24px 0 0",
           boxShadow: "0 -12px 40px rgba(0,0,0,.35)",
         }}
       >
+      {/* Copy do mockup — abaixo dos personagens, sem sobrepor */}
+      <section className="relative px-5 pt-4 pb-1">
+        <p
+          className="text-[12px] font-extrabold"
+          style={{ color: gold }}
+        >
+          {greetByHour()}
+        </p>
+        <h1
+          className="mt-1.5 leading-[1.08]"
+          style={{
+            color: ink,
+            fontFamily: "'Fraunces','Nunito',serif",
+            fontSize: "clamp(24px, 7vw, 30px)",
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Pequenos gestos,
+          <br />
+          grandes{" "}
+          <span style={{ color: green, fontStyle: "italic" }}>conexões</span>.
+        </h1>
+        <p
+          className="mt-2 text-[13px] leading-[1.4] font-semibold"
+          style={{ color: inkSoft, maxWidth: 280 }}
+        >
+          Cada escolha de hoje transforma o amanhã.
+        </p>
+      </section>
+
       {/* Sugestão do dia (dinâmica) */}
-      <section className="relative px-5 pt-5">
+      <section className="relative px-5 pt-4">
         <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: gold }}>
           ✨ Sugestão de hoje
         </p>
