@@ -8,7 +8,8 @@ import {
   ArrowLeft, Heart, Leaf, Droplet, Users, Coffee, LifeBuoy,
   Share2, Sparkles, ChevronRight,
 } from "lucide-react";
-import kalmHeroChameleon from "@/assets/kalm-hero-chameleon.webp";
+import kalmHeroFamily from "@/assets/kalm-hero-family.webp";
+import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,9 +52,9 @@ const glassCard: React.CSSProperties = {
 
 const greetByHour = () => {
   const h = new Date().getHours();
-  if (h < 12) return "BOM DIA, FAMÍLIA";
-  if (h < 18) return "BOA TARDE, FAMÍLIA";
-  return "BOA NOITE, FAMÍLIA";
+  if (h < 12) return "Bom dia, família!";
+  if (h < 18) return "Boa tarde, família!";
+  return "Boa noite, família!";
 };
 
 // Metáfora do tempo (5 estados). Mapeia para MoodValue existente.
@@ -156,86 +157,115 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         }}
       />
 
-      {/* Header — logo oficial KIDZZ */}
-      <div className="relative px-4 pt-[max(14px,env(safe-area-inset-top))] pb-3 flex items-center gap-2">
-        <button
-          onClick={() => { haptic("light"); onBack(); }}
-          aria-label="Voltar"
-          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95 flex-none"
-          style={glassChrome}
-        >
-          <ArrowLeft size={18} style={{ color: ink }} />
-        </button>
-        <div className="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 px-1">
-          <KidzzLogo height={28} />
-          <span
-            className="text-[9px] font-bold tracking-[0.16em] uppercase"
-            style={{ color: inkMuted }}
-          >
-            KALM · bem-estar
-          </span>
-        </div>
+      {/* ═══ HERO cinematográfico — família + camaleão original ═══ */}
+      <section className="relative" style={{ minHeight: 340 }}>
+        {/* Arte full-bleed: família na floresta + Gui original */}
         <div
-          className="h-11 px-3 rounded-full flex items-center gap-1 text-[11.5px] font-bold flex-none"
-          style={{ ...glassChrome, color: gold }}
+          aria-hidden
+          className="absolute inset-0 overflow-hidden"
+          style={{
+            height: 340,
+            WebkitMaskImage:
+              "linear-gradient(180deg, #000 58%, rgba(0,0,0,.55) 78%, transparent 100%)",
+            maskImage:
+              "linear-gradient(180deg, #000 58%, rgba(0,0,0,.55) 78%, transparent 100%)",
+          }}
         >
-          ⚡ {streak.count || 1}
-        </div>
-      </div>
-
-      {/* Herói — tipografia limpa + mascote */}
-      <section className="relative px-5 pt-2">
-        <div className="flex items-start gap-3">
-          <div className="flex-1 min-w-0 pt-1 pr-1">
-            <p
-              className="text-[11px] font-bold tracking-[0.18em]"
-              style={{ color: gold }}
-            >
-              {greetByHour()}
-            </p>
-            <p className="mt-1.5 text-[12px] font-semibold leading-snug" style={{ color: inkSoft }}>
-              Desligue a tela, ligue a infância.
-            </p>
-            <h1
-              className="mt-2.5 leading-[1.08]"
-              style={{
-                color: ink,
-                fontFamily: "'Fraunces','Nunito',serif",
-                fontSize: "clamp(24px, 7.2vw, 32px)",
-                fontWeight: 600,
-                letterSpacing: "-0.015em",
-              }}
-            >
-              Cuidar das emoções hoje{" "}
-              <span
-                style={{
-                  fontStyle: "italic",
-                  color: gold,
-                  textShadow: "0 0 24px rgba(232,185,58,0.25)",
-                }}
-              >
-                transforma o amanhã.
-              </span>
-            </h1>
-            <p className="mt-3 text-[13px] leading-[1.4] max-w-[200px]" style={{ color: inkSoft }}>
-              Pequenas escolhas hoje, grandes conexões sempre.
-            </p>
-          </div>
           <img
-            src={kalmHeroChameleon}
-            alt="Camaleão meditando"
-            width={666}
-            height={1000}
-            className="w-[40%] max-w-[168px] h-auto object-contain flex-shrink-0 -mr-1 -mt-1"
+            src={kalmHeroFamily}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: "50% 28%" }}
+          />
+          <div
+            className="absolute inset-0"
             style={{
-              filter:
-                "drop-shadow(0 12px 28px rgba(232,185,58,0.28)) drop-shadow(0 4px 12px rgba(127,176,105,0.20))",
-              WebkitMaskImage:
-                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
-              maskImage:
-                "radial-gradient(74% 78% at 50% 52%, #000 38%, rgba(0,0,0,.92) 52%, rgba(0,0,0,.55) 68%, rgba(0,0,0,.18) 82%, transparent 96%)",
+              background:
+                "linear-gradient(100deg, rgba(8,14,10,.72) 0%, rgba(8,14,10,.38) 42%, rgba(8,14,10,.12) 68%, transparent 100%)," +
+                "linear-gradient(180deg, rgba(8,14,10,.35) 0%, transparent 40%, rgba(14,23,18,.55) 100%)",
             }}
           />
+        </div>
+
+        {/* Gui original soft (reforço à direita, borda esmaecida) */}
+        <img
+          src={CAMALEAO.heartSoft}
+          alt="Gui, o camaleão Kidzz"
+          draggable={false}
+          className="pointer-events-none absolute"
+          style={{
+            right: -8,
+            bottom: 12,
+            width: "46%",
+            maxWidth: 200,
+            height: "auto",
+            objectFit: "contain",
+            filter: "drop-shadow(0 14px 22px rgba(0,0,0,.45))",
+            ...CAMALEAO_SCENE_MASK,
+            zIndex: 2,
+          }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = CAMALEAO.heart;
+          }}
+        />
+
+        {/* Top chrome */}
+        <div className="relative z-10 px-4 pt-[max(14px,env(safe-area-inset-top))] pb-2 flex items-center gap-2">
+          <button
+            onClick={() => { haptic("light"); onBack(); }}
+            aria-label="Voltar"
+            className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95 flex-none"
+            style={{ ...glassChrome, background: "rgba(255,255,255,0.12)" }}
+          >
+            <ArrowLeft size={18} style={{ color: ink }} />
+          </button>
+          <div className="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 px-1">
+            <KidzzLogo height={28} />
+            <span
+              className="text-[9px] font-bold tracking-[0.14em]"
+              style={{ color: "rgba(241,238,228,0.78)" }}
+            >
+              Desligue a tela, ligue a infância. 💛
+            </span>
+          </div>
+          <div
+            className="h-11 px-3 rounded-full flex items-center gap-1 text-[11.5px] font-bold flex-none"
+            style={{ ...glassChrome, color: gold, background: "rgba(255,255,255,0.12)" }}
+          >
+            ⚡ {streak.count || 1}
+          </div>
+        </div>
+
+        {/* Copy do mockup */}
+        <div className="relative z-10 px-5 pt-3 pb-6 max-w-[58%]">
+          <p
+            className="text-[12px] font-extrabold"
+            style={{ color: gold }}
+          >
+            {greetByHour()} 💛
+          </p>
+          <h1
+            className="mt-2 leading-[1.08]"
+            style={{
+              color: ink,
+              fontFamily: "'Fraunces','Nunito',serif",
+              fontSize: "clamp(24px, 7vw, 30px)",
+              fontWeight: 600,
+              letterSpacing: "-0.02em",
+              textShadow: "0 2px 16px rgba(0,0,0,.35)",
+            }}
+          >
+            Pequenos gestos,
+            <br />
+            grandes{" "}
+            <span style={{ color: green, fontStyle: "italic" }}>conexões</span>.
+          </h1>
+          <p
+            className="mt-2.5 text-[13px] leading-[1.4] font-semibold"
+            style={{ color: inkSoft, maxWidth: 200 }}
+          >
+            Cada escolha de hoje transforma o amanhã.
+          </p>
         </div>
       </section>
 

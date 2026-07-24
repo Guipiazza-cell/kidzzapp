@@ -51,8 +51,10 @@ import KidzzLogo from "@/components/common/KidzzLogo";
 import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 
 const AS = "/exemplos/assets/kalm-v2";
-const AV = "v8";
+const AV = "v9";
 const img = (n: string) => `${AS}/${n}?${AV}`;
+/** Hero oficial: família + camaleão original (não o CGI verde genérico) */
+const HERO_FAMILY = `${AS}/hero-family-oficial.png?${AV}`;
 
 export type KalmView =
   | "home" | "sos" | "breath" | "sounds" | "mindful" | "pause"
@@ -372,7 +374,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `url(${img("hero-family.png")})`,
+          backgroundImage: `url(${HERO_FAMILY})`,
           backgroundSize: "cover",
           backgroundPosition: "50% 18%",
           filter: "brightness(.88) saturate(1.12) blur(1px)",
@@ -591,8 +593,8 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
             }}
           >
             <img
-              src={img("hero-family.png")}
-              alt="Família e Gui na floresta"
+              src={HERO_FAMILY}
+              alt="Família e Gui, o camaleão original, na floresta"
               style={{
                 width: "100%",
                 height: "100%",
@@ -607,7 +609,25 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
                 filter: "saturate(1.08) contrast(1.02)",
               }}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.armsSoft;
+                (e.target as HTMLImageElement).src = CAMALEAO.heartSoft;
+              }}
+            />
+            {/* Reforço: Gui original soft por cima (borda esmaecida) */}
+            <img
+              src={CAMALEAO.heartSoft}
+              alt=""
+              aria-hidden
+              style={{
+                position: "absolute",
+                right: -6,
+                bottom: -8,
+                width: "78%",
+                height: "92%",
+                objectFit: "contain",
+                objectPosition: "right bottom",
+                pointerEvents: "none",
+                filter: "drop-shadow(0 12px 18px rgba(30,50,20,.28))",
+                ...CAMALEAO_SCENE_MASK,
               }}
             />
           </div>
