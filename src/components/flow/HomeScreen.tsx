@@ -25,6 +25,7 @@ import coverNatureza from "@/assets/perguntas-covers/sug-natureza.png";
 import coverAnimais from "@/assets/perguntas-covers/sug-animais.png";
 import coverCores from "@/assets/perguntas-covers/sug-cores.png";
 import coverFilosofia from "@/assets/perguntas-covers/sug-filosofia.png";
+import heroPerguntas from "@/assets/perguntas-hero.webp";
 
 /* ───────────── KIDZZ HOME • PERGUNTAS — mockup premium 1:1 ─────────────
    Ref visual: mockup floresta clara dourada + Gui + cards glass claros.
@@ -36,6 +37,9 @@ const BRAND = "/exemplos/assets/brand";
 
 const ASSETS = {
   bg: `${PQ}/bg-floresta.png`,
+  /** Hero premium: floresta dourada + Gui original (bundle) */
+  hero: heroPerguntas,
+  heroPublic: `${PQ}/hero-oficial.png`,
   /** Original do cliente (mão no coração) com borda esmaecida — parte do cenário */
   gui: CAMALEAO.heartSoft,
   guiFallback: CAMALEAO.heart,
@@ -507,16 +511,72 @@ const HomeScreen = ({
           </div>
         </div>
 
-        {/* ── HERO: copy + Gui ── */}
+        {/* ── HERO premium: floresta dourada + Gui original ── */}
         <section
           style={{
             position: "relative",
-            padding: "10px 16px 4px",
-            minHeight: 248,
+            margin: "4px 12px 8px",
+            minHeight: 268,
+            borderRadius: 28,
+            overflow: "hidden",
             animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) both",
+            boxShadow: "0 16px 36px rgba(40,70,30,.16)",
           }}
         >
-          <div style={{ position: "relative", zIndex: 3, maxWidth: "54%", paddingTop: 6 }}>
+          {/* Arte full-bleed */}
+          <img
+            src={ASSETS.hero}
+            alt="Gui, o camaleão, na floresta dourada"
+            draggable={false}
+            onError={(e) => {
+              const el = e.target as HTMLImageElement;
+              if (!el.src.includes("hero-oficial")) el.src = ASSETS.heroPublic;
+              else el.src = ASSETS.gui;
+            }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "62% 28%",
+              animation: "perg-floaty 7s ease-in-out infinite",
+            }}
+          />
+          {/* Véu legível à esquerda (texto) + fade inferior */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(100deg, rgba(255,250,235,.88) 0%, rgba(255,248,230,.55) 38%, rgba(255,248,230,.12) 62%, transparent 78%)," +
+                "linear-gradient(180deg, transparent 55%, rgba(248,244,234,.75) 88%, #F8F4EA 100%)",
+              pointerEvents: "none",
+            }}
+          />
+          {/* Reforço Gui soft se o crop cortar o personagem */}
+          <img
+            src={ASSETS.gui}
+            alt=""
+            aria-hidden
+            draggable={false}
+            style={{
+              position: "absolute",
+              right: -10,
+              bottom: -6,
+              width: "52%",
+              maxWidth: 220,
+              height: "88%",
+              objectFit: "contain",
+              objectPosition: "right bottom",
+              pointerEvents: "none",
+              filter: "drop-shadow(0 16px 20px rgba(30,50,15,.28))",
+              ...CAMALEAO_SCENE_MASK,
+            }}
+          />
+
+          <div style={{ position: "relative", zIndex: 3, maxWidth: "52%", padding: "22px 16px 28px" }}>
             <h1
               style={{
                 margin: 0,
@@ -526,17 +586,14 @@ const HomeScreen = ({
                 lineHeight: 1.08,
                 letterSpacing: "-0.5px",
                 color: "#1F2E18",
-                textShadow: "0 1px 0 rgba(255,255,255,.5)",
+                textShadow: "0 1px 0 rgba(255,255,255,.55)",
               }}
             >
               Pergunte.
               <br />
               Descubra.
               <br />
-              <span style={{ color: "#3E9A52" }}>
-                Conecte-se.{" "}
-                <span style={{ fontSize: "0.72em", color: "#3E9A52" }}>♥</span>
-              </span>
+              <span style={{ color: "#3E9A52" }}>Conecte-se.</span>
             </h1>
             <p
               style={{
@@ -544,53 +601,12 @@ const HomeScreen = ({
                 fontSize: 13.5,
                 fontWeight: 700,
                 lineHeight: 1.4,
-                color: "rgba(40,55,30,.72)",
+                color: "rgba(40,55,30,.78)",
                 maxWidth: 200,
               }}
             >
               Respostas que acolhem, conversas que transformam momentos em memórias.
             </p>
-          </div>
-
-          {/* Gui original — sem card/quadrado: alpha feather + máscara esmaecida no cenário */}
-          <div
-            aria-hidden={false}
-            style={{
-              position: "absolute",
-              right: -18,
-              top: -12,
-              width: "58%",
-              maxWidth: 248,
-              height: 280,
-              pointerEvents: "none",
-              zIndex: 2,
-              /* dissolve total nas bordas do retângulo */
-              ...CAMALEAO_SCENE_MASK,
-              animation: "perg-floaty 6.5s ease-in-out infinite",
-            }}
-          >
-            <img
-              src={ASSETS.gui}
-              alt="Gui, o camaleão Kidzz"
-              draggable={false}
-              onError={(e) => {
-                const el = e.target as HTMLImageElement;
-                if (el.src.includes("heart-soft")) el.src = ASSETS.guiFallback;
-                else el.src = ASSETS.guiFallback2;
-              }}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "center 60%",
-                background: "transparent",
-                border: "none",
-                borderRadius: 0,
-                boxShadow: "none",
-                /* sombra orgânica no chão, não moldura */
-                filter: "drop-shadow(0 22px 18px rgba(30,50,15,.28))",
-              }}
-            />
           </div>
         </section>
 
