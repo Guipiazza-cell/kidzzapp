@@ -13,7 +13,7 @@ import SOSModal from "@/components/sos/SOSModal";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 import KidzzLogo from "@/components/common/KidzzLogo";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import { CAMALEAO } from "@/lib/camaleaoOficial";
 /** Capas no bundle Vite (hash) — não dependem de /public após publish */
 import coverPeixes from "@/assets/perguntas-covers/sug-peixes.png";
 import coverChuva from "@/assets/perguntas-covers/sug-chuva.png";
@@ -283,12 +283,21 @@ const HomeScreen = ({
     : "Responda agora e mantenha sua sequência.";
 
   const submit = (text: string) => {
-    if (!text.trim() || submitting) return;
+    const q = text.trim();
+    if (!q || submitting) return;
+    // Limite free / auth: o parent (Index) abre paywall ou login
+    if (!canAskQuestion()) {
+      haptic("medium");
+      sfx("click");
+      onSubmit(q);
+      return;
+    }
     setSubmitting(true);
     haptic("light");
     sfx("click");
     try {
-      onSubmit(text.trim());
+      onSubmit(q);
+      setInput("");
     } finally {
       window.setTimeout(() => setSubmitting(false), 600);
     }
@@ -430,15 +439,17 @@ const HomeScreen = ({
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
         }}
       >
-        {/* ── HEADER ── */}
+        {/* ── HEADER (safe-area + 3 colunas equilibradas, nada cortado) ── */}
         <div
           style={{
-            display: "flex",
+            display: "grid",
+            gridTemplateColumns: "44px 1fr auto",
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: 10,
-            padding: "0 14px",
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)",
+            gap: 8,
+            paddingLeft: 14,
+            paddingRight: 14,
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+            minHeight: "calc(env(safe-area-inset-top, 0px) + 54px)",
           }}
         >
           <button
@@ -460,23 +471,27 @@ const HomeScreen = ({
             )}
           </button>
 
-          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <KidzzLogo height={34} light style={{ maxWidth: 160 }} />
+          <div style={{ minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            <KidzzLogo height={28} light style={{ maxWidth: "100%", maxHeight: 28 }} />
             <span
               style={{
                 marginTop: 2,
-                fontSize: 10.5,
+                fontSize: 9.5,
                 fontWeight: 700,
                 color: "rgba(50,70,40,.72)",
                 letterSpacing: ".01em",
                 textAlign: "center",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "100%",
               }}
             >
               Desligue a tela, ligue a infância.
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flex: "none" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, justifySelf: "end", flexShrink: 0 }}>
             <button
               type="button"
               onClick={() => setShowParentalGateForDashboard(true)}
@@ -486,6 +501,7 @@ const HomeScreen = ({
                 position: "relative",
                 width: 40, height: 40, borderRadius: 999,
                 display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
                 ...glassLight,
               }}
             >
@@ -498,9 +514,11 @@ const HomeScreen = ({
               aria-label="Área dos pais"
               className="active:scale-90"
               style={{
-                height: 40, padding: "0 11px", borderRadius: 999,
+                height: 40, padding: "0 12px", borderRadius: 999,
                 display: "flex", alignItems: "center", gap: 5,
                 fontWeight: 800, fontSize: 12, color: "#3A4A2A",
+                flexShrink: 0,
+                whiteSpace: "nowrap",
                 ...glassLight,
               }}
             >
@@ -510,19 +528,18 @@ const HomeScreen = ({
           </div>
         </div>
 
-        {/* ── HERO premium: floresta dourada + Gui original ── */}
+        {/* ── HERO premium: floresta dourada + Gui original (1 só — sem overlay fantasma) ── */}
         <section
           style={{
             position: "relative",
-            margin: "4px 12px 8px",
-            minHeight: 268,
+            margin: "8px 12px 10px",
+            minHeight: 248,
             borderRadius: 28,
             overflow: "hidden",
             animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) both",
             boxShadow: "0 16px 36px rgba(40,70,30,.16)",
           }}
         >
-          {/* Arte full-bleed */}
           <img
             src={ASSETS.hero}
             alt="Gui, o camaleão, na floresta dourada"
@@ -538,70 +555,66 @@ const HomeScreen = ({
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              objectPosition: "62% 28%",
-              animation: "perg-floaty 7s ease-in-out infinite",
+              objectPosition: "68% 24%",
             }}
           />
-          {/* Véu legível à esquerda (texto) + fade inferior */}
+          {/* Véu legível à esquerda (texto) + fade inferior — sem segundo Gui */}
           <div
             aria-hidden
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(100deg, rgba(255,250,235,.88) 0%, rgba(255,248,230,.55) 38%, rgba(255,248,230,.12) 62%, transparent 78%)," +
-                "linear-gradient(180deg, transparent 55%, rgba(248,244,234,.75) 88%, #F8F4EA 100%)",
+                "linear-gradient(105deg, rgba(255,250,235,.92) 0%, rgba(255,248,230,.62) 34%, rgba(255,248,230,.14) 58%, transparent 74%)," +
+                "linear-gradient(180deg, transparent 58%, rgba(248,244,234,.78) 90%, #F8F4EA 100%)",
               pointerEvents: "none",
-            }}
-          />
-          {/* Reforço Gui soft se o crop cortar o personagem */}
-          <img
-            src={ASSETS.gui}
-            alt=""
-            aria-hidden
-            draggable={false}
-            style={{
-              position: "absolute",
-              right: -10,
-              bottom: -6,
-              width: "52%",
-              maxWidth: 220,
-              height: "88%",
-              objectFit: "contain",
-              objectPosition: "right bottom",
-              pointerEvents: "none",
-              filter: "drop-shadow(0 16px 20px rgba(30,50,15,.28))",
-              ...CAMALEAO_SCENE_MASK,
             }}
           />
 
-          <div style={{ position: "relative", zIndex: 3, maxWidth: "52%", padding: "22px 16px 28px" }}>
+          <div
+            style={{
+              position: "relative",
+              zIndex: 3,
+              maxWidth: "56%",
+              padding: "20px 14px 24px 16px",
+            }}
+          >
             <h1
               style={{
                 margin: 0,
                 fontFamily: "'Lora', Georgia, serif",
                 fontWeight: 700,
-                fontSize: "clamp(28px, 8vw, 34px)",
-                lineHeight: 1.08,
-                letterSpacing: "-0.5px",
+                fontSize: "clamp(26px, 7.2vw, 32px)",
+                lineHeight: 1.12,
+                letterSpacing: "-0.4px",
                 color: "#1F2E18",
                 textShadow: "0 1px 0 rgba(255,255,255,.55)",
+                hyphens: "none",
+                WebkitHyphens: "none",
+                wordBreak: "keep-all",
+                overflowWrap: "normal",
               }}
             >
-              Pergunte.
-              <br />
-              Descubra.
-              <br />
-              <span style={{ color: "#3E9A52" }}>Conecte-se.</span>
+              <span style={{ display: "block" }}>Pergunte.</span>
+              <span style={{ display: "block" }}>Descubra.</span>
+              <span
+                style={{
+                  display: "inline-block",
+                  color: "#3E9A52",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Conecte-se.
+              </span>
             </h1>
             <p
               style={{
                 margin: "12px 0 0",
-                fontSize: 13.5,
+                fontSize: 13,
                 fontWeight: 700,
                 lineHeight: 1.4,
                 color: "rgba(40,55,30,.78)",
-                maxWidth: 200,
+                maxWidth: 190,
               }}
             >
               Respostas que acolhem, conversas que transformam momentos em memórias.
@@ -736,14 +749,14 @@ const HomeScreen = ({
                 Descubra respostas e crie conversas incríveis juntos.
               </p>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <motion.button
                   type="button"
                   onClick={toggleMic}
                   whileTap={{ scale: 0.9 }}
                   aria-label={isListening ? "Parar de ouvir" : "Falar"}
                   style={{
-                    width: 46, height: 46, borderRadius: 999, flex: "none",
+                    width: 54, height: 54, borderRadius: 999, flex: "none",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     background: "radial-gradient(130% 130% at 30% 22%, #A8E8B8, #4EA35E 55%, #2E7A42)",
                     border: "1px solid rgba(255,255,255,.65)",
@@ -754,7 +767,7 @@ const HomeScreen = ({
                     cursor: "pointer",
                   }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-5a3.5 3.5 0 1 0-7 0v5A3.5 3.5 0 0 0 12 15Zm6-4a6 6 0 0 1-12 0m6 6v3.5m-3 0h6" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-5a3.5 3.5 0 1 0-7 0v5A3.5 3.5 0 0 0 12 15Zm6-4a6 6 0 0 1-12 0m6 6v3.5m-3 0h6" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" /></svg>
                 </motion.button>
 
                 <input
@@ -768,12 +781,13 @@ const HomeScreen = ({
                   style={{
                     flex: 1,
                     minWidth: 0,
-                    padding: "13px 14px",
-                    borderRadius: 16,
+                    height: 54,
+                    padding: "0 16px",
+                    borderRadius: 18,
                     border: "1px solid rgba(200,210,180,.55)",
-                    background: "rgba(255,255,255,.72)",
+                    background: "rgba(255,255,255,.82)",
                     fontFamily: "'Nunito', sans-serif",
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: 700,
                     color: "#2A3A20",
                     outline: "none",
@@ -789,7 +803,7 @@ const HomeScreen = ({
                   whileTap={{ scale: 0.9 }}
                   aria-label="Enviar pergunta"
                   style={{
-                    width: 46, height: 46, borderRadius: 999, flex: "none",
+                    width: 54, height: 54, borderRadius: 999, flex: "none",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     border: "1px solid rgba(255,255,255,.7)",
                     cursor: hasQ ? "pointer" : "default",
