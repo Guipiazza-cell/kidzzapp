@@ -151,6 +151,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
           ref={scrollerRef}
           onScroll={onScroll}
           className="kidzz-dock-scroller"
+          data-dock-scroller
           style={{
             display: "flex",
             gap: 2,
@@ -172,6 +173,8 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                 type="button"
                 onClick={() => handle(tab.id)}
                 aria-label={tab.label}
+                data-dock-tab={tab.id}
+                data-testid={`dock-tab-${tab.id}`}
                 aria-current={isActive ? "page" : undefined}
                 className="active:scale-90"
                 style={{
