@@ -29,11 +29,16 @@ const ScrollToTop = () => {
 
 const AppShell = () => {
   const { pathname } = useLocation();
-  const isLandingQuiz = pathname === "/lp";
 
   return (
     <Suspense fallback={null}>
-      {isLandingQuiz ? <LandingQuiz /> : <MainApp />}
+      {pathname === "/lp" ? (
+        <LandingPremium />
+      ) : pathname === "/lp-quiz" ? (
+        <LandingQuiz />
+      ) : (
+        <MainApp />
+      )}
     </Suspense>
   );
 };
