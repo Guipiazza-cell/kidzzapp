@@ -206,7 +206,7 @@ function Phone({
           className="relative overflow-hidden rounded-[38px]"
           style={{
             background: "linear-gradient(180deg,#FBFAF6 0%,#F1F4EE 100%)",
-            aspectRatio: "9 / 19.2",
+            aspectRatio: "9 / 17",
           }}
         >
           <div className="absolute left-1/2 top-2 z-20 h-[22px] w-[74px] -translate-x-1/2 rounded-full bg-[#1c231e]/85" />
@@ -667,6 +667,7 @@ export default function LandingPremium() {
             width={1920}
             height={1280}
             className="h-[118%] w-full object-cover"
+            style={{ objectPosition: "50% 68%" }}
           />
           <div
             className="absolute inset-0"
@@ -779,7 +780,15 @@ export default function LandingPremium() {
 
       {/* ══ FEATURE PHONES ══ */}
       <section className="relative px-6 py-24 sm:py-32">
-        <div className="mx-auto max-w-6xl">
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(70% 45% at 20% 5%, rgba(203,232,214,0.55), transparent 65%), radial-gradient(60% 40% at 85% 60%, rgba(255,238,199,0.6), transparent 65%), linear-gradient(180deg,#F4F6F0,#F8F5EC)",
+          }}
+        />
+        <div className="relative mx-auto max-w-6xl">
           <Reveal className="mx-auto max-w-2xl text-center">
             <span className="text-[11px] uppercase tracking-[0.3em] text-[#7d8b82]">Por dentro</span>
             <h2
@@ -843,9 +852,9 @@ export default function LandingPremium() {
                 style={{
                   boxShadow: "0 70px 120px -60px rgba(160,120,40,0.75)",
                   WebkitMaskImage:
-                    "radial-gradient(74% 74% at 50% 50%, #000 60%, rgba(0,0,0,0.6) 80%, transparent 97%)",
+                    "radial-gradient(66% 66% at 50% 50%, #000 46%, rgba(0,0,0,0.55) 72%, transparent 92%)",
                   maskImage:
-                    "radial-gradient(74% 74% at 50% 50%, #000 60%, rgba(0,0,0,0.6) 80%, transparent 97%)",
+                    "radial-gradient(66% 66% at 50% 50%, #000 46%, rgba(0,0,0,0.55) 72%, transparent 92%)",
                 }}
               />
               {["Primeiro dente", "Colo de domingo", "Risada no banho"].map((m, i) => (
@@ -855,8 +864,8 @@ export default function LandingPremium() {
                   style={{
                     ...glass,
                     top: `${12 + i * 30}%`,
-                    left: i % 2 === 0 ? "-14%" : "auto",
-                    right: i % 2 === 0 ? "auto" : "-12%",
+                    left: i % 2 === 0 ? "-6%" : "auto",
+                    right: i % 2 === 0 ? "auto" : "-4%",
                   }}
                   animate={reduce ? undefined : { y: [0, -10, 0] }}
                   transition={{ duration: 6 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.6 }}
