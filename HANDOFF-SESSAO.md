@@ -1,6 +1,6 @@
-# Handoff — sessão 2026-07-23 → 2026-07-27
+# Handoff — sessão 2026-07-29
 
-Documento para **continuar na próxima sessão**. Ler isto primeiro.
+Documento para **continuar amanhã**. Ler isto primeiro.
 
 ---
 
@@ -9,200 +9,202 @@ Documento para **continuar na próxima sessão**. Ler isto primeiro.
 | Item | Status |
 |------|--------|
 | Branch | `main` |
-| HEAD | `4dca922` |
-| Push GitHub | **Sim** (`origin/main` = `4dca922`) |
-| Conta freela (commit + push) | `samuelfajreldines01` |
-| Publish Lovable | **Manual** — cliente/dev precisa Publish no Lovable para prod `kidzz.app` |
-| Worktree | `/Users/alefsantos/dev/kidzzapp` |
+| HEAD | `c617cc3` |
+| Push GitHub | **Sim** — `origin/main` = `c617cc3` |
+| Repo | `https://github.com/Guipiazza-cell/kidzzapp.git` |
+| Conta freela (commit + push) | `samuelfajreldines01 <285205407+samuelfajreldines01@users.noreply.github.com>` |
+| Worktree desta sessão | `/Volumes/SSD/Desktop/_Projetos/kidz/kidzzapp-repo` |
+| Publish Lovable | **Manual** — sync/publish no Lovable para ir pro ar |
+| SQL cota no banco | **PENDENTE no Supabase** (migration pronta no repo) |
+| Redeploy edge functions | **PENDENTE** (`kidzz-chat`, `generate-story`) |
 
-**Tema da sessão:** camaleões originais em todas as telas + polish UI (Perguntas/KALM/Descobrir) + suite E2E Playwright.
+**Tema da sessão:** polish live page-by-page (onboarding → Home/Descobrir → SOS → KALM) + fix cota peixes/chuva + push pra Lovable.
 
 ---
 
 ## Identidade Git (freela Kidzz)
 
 - Autor/commit: `samuelfajreldines01 <285205407+samuelfajreldines01@users.noreply.github.com>`
-- Push: conta ativa do `gh` deve ser **`samuelfajreldines01`** (não `alefdssantos` — 403 no repo)
-- Nunca usar `samuelfaj` / `samuelfajreldines@gmail.com`
+- **Nunca** usar `samuelfaj` / `samuelfajreldines@gmail.com`
+- Repo do cliente: `Guipiazza-cell/kidzzapp`
 
 ```bash
-gh auth switch -u samuelfajreldines01
-gh auth setup-git
+cd /Volumes/SSD/Desktop/_Projetos/kidz/kidzzapp-repo
+gh auth switch -u samuelfajreldines01   # se precisar push
 ```
 
 ---
 
-## O que o cliente pediu (áudio + feedbacks)
+## Commits no `main` (esta janela)
 
-### Áudio WhatsApp `Ptt 2026-07-23 at 17.25.54.ogg` (~1min)
+| Hash | Mensagem |
+|------|----------|
+| `c8d7ba4` | feat(onboarding): telas de nome e idade com arte full-bleed |
+| `445e0c9` | feat(onboarding): tela de interesses full-bleed com cards temáticos |
+| `c617cc3` | feat(kalm): polish UI diurna, fix scroll/dock e cota resiliente |
 
-1. **Gui/camaleão** = “alma do negócio” — em todas as abas, chamativo (originais)
-2. **Perguntar sem cadastro** — hoje exige login (Index redireciona `/auth`) — **ainda pendente**
-3. **Tirar validação “senha vazou na internet”** no cadastro (HIBP) — **ainda pendente**
-4. **Reset de senha**: e-mail chega sem link — bug estrutural — **ainda pendente**
-5. Pressão de prazo (“consegue hoje?”)
-
-### Feedbacks visuais posteriores
-
-- Logo translúcida (conceito glass / sem cor fixa) — **só discutido, não implementado 100%**
-- Cards “Hoje para você” com `?` → capas geradas por categoria
-- KALM: header estilo mockup com Gui original; texto não cobrir personagem; sem 💛; scroll + padding do dock
-- Perguntas iPhone: hífen em “Conecte-se”, sombra dupla do Gui, header cortado, barra maior
-- Descobrir: hero premium
+Tudo já em `origin/main`.
 
 ---
 
-## O que foi implementado (esta janela de trabalho)
+## O que foi feito (checklist)
 
-### 1) Camaleões originais (cliente)
+### Onboarding
+- [x] Nome: hero full-bleed, frame unificado (`heroFrame` / objectPosition)
+- [x] Idade: arte full-bleed
+- [x] Interesses: cards temáticos com imagens (`interest-cards/*.webp`), sem emoji-clutter
+- [x] Commits de onboarding no main
 
-Fonte: `public/camaleao/originais/` + pack soft:
+### Home / Perguntas
+- [x] Hero cover, input full-width no card “perguntar”
+- [x] Logo removido onde pedido; **Pais** restaurado no header
+- [x] Ajustes de copy/layout
 
-`public/exemplos/assets/camaleao-oficial/`
+### Descobrir
+- [x] Um camaleão (removeu duplicado)
+- [x] Polish visual leve
 
-| Pose | Uso típico |
-|------|------------|
-| heart | Perguntas, Memórias, KALM |
-| arms | Cinema, Rotina, Descobrir, brand |
-| headphones | Momentos |
-| sleepy | Sonhos |
+### SOS
+- [x] Modal redesenhado (picker SVG animado — `SOSPickerIcons.tsx`)
+- [x] Crisis flow sem emojis
+- [x] Sem camaleão “gui” solto no card onde pediram
 
-Lib: `src/lib/camaleaoOficial.ts` → `CAMALEAO.*` + `CAMALEAO_SCENE_MASK`
+### KALM (foco principal da 2ª metade)
+- [x] Home: sem logo duplicado, sem 2º camaleão, weather icons SVG (`WeatherIcons.tsx`)
+- [x] Card do jarro → agradecer (`jarro-gratidao.webp`)
+- [x] Hero família **regenerado 4:3** nítido (`kalm-hero-family.webp`) — Gui inteiro
+- [x] **Pillars** redesenhados: `ActivityCard` com ícone Lucide + card opaco (sem caixa de imagem vazia)
+- [x] TopBars sem emoji
+- [x] Scroll ao abrir pilar **sempre no topo** (`KalmV2` + ref)
+- [x] Fundo opaco `#0B1310` (não vaza MagicalBackground claro)
+- [x] Cards com `touchAction: "pan-y"` (scroll iOS em cima dos botões)
+- [x] Dock **escuro/opaco** na aba `wellness` (`BottomNav` DARK_SCREENS + estilo florestal)
+- [x] Padding dock unificado: `KALM_DOCK_CLEARANCE` em `src/components/kalm/v2/layout.ts`
 
-Webps de mascote em `src/assets/` e `src/assets/kidzz/*` também viraram originais soft.
+### Cota (peixes/chuva / QUOTA_ERROR infinito)
+- [x] Front: `useEntitlement.consumeQuota`, GeneratingScreen/ChatScreen erros
+- [x] Edge: `kidzz-chat` + `generate-story` tentam RPC com/sem `_crianca_id`
+- [x] Migration: `supabase/migrations/20260729000001_fix_increment_usage_resilient.sql`
+- [ ] **Aplicar SQL no Supabase (SQL Editor)** ← amanhã / cliente
+- [ ] **Redeploy** functions `kidzz-chat` e `generate-story`
 
-### 2) Perguntas — `HomeScreen.tsx`
+Limites na migration:
 
-- Hero premium: `src/assets/perguntas-hero.webp` + `public/.../perguntas-v2/hero-oficial.png`
-- Capas “Hoje para você”: `src/assets/perguntas-covers/*` (por categoria, sem `?`)
-- Header grid + safe-area (logo/Pais sem cortar)
-- “Conecte-se.” com `whiteSpace: nowrap` (sem hífen)
-- **Sem** overlay fantasma do Gui (só a arte do hero)
-- Barra de pergunta 54px
-- Submit reforça limite free via parent
+| Plano | Perguntas | Histórias |
+|-------|-----------|-----------|
+| free | 3 | 1 |
+| kidzz | 30 | 3 |
+| premium | 60 | 5 |
 
-### 3) KALM — path ativo: `KalmV2` → `KalmHome.tsx`
+Timezone da cota: `America/Sao_Paulo`.
 
-**Não** é `KalmPremiumHome` no Index.
+---
 
-- Hero família + Gui: `src/assets/kalm-hero-family.webp` + `kalm-v2/hero-family-oficial.png`
-- Texto (“Pequenos gestos…”) **abaixo** do hero (faixa escura)
-- Cards opacos (não esbranquiçados)
-- Scroll: container `KalmV2` com `overflow-y-auto`
-- Padding inferior: `calc(safe-area + 168px)` (home + pilares + SOS)
-
-### 4) Descobrir — `DiscoverScreen.tsx`
-
-- Hero: `src/assets/descobrir-hero.webp` + `descobrir-v2/hero-oficial.png`
-- Card arredondado + Gui arms soft
-- `data-dock-tab` no BottomNav para E2E
-
-### 5) E2E Playwright — **30/30 green**
+## Arquivos-chave tocados
 
 ```
-e2e/
-  auth.setup.ts          # guest localStorage
-  helpers/guest.ts
-  helpers/nav.ts
-  specs/00…08-*.spec.ts
-  FEATURE-MATRIX.md
-  README.md
-playwright.config.ts     # standalone Chromium mobile viewport
+src/components/kalm/v2/KalmHome.tsx
+src/components/kalm/v2/KalmV2.tsx
+src/components/kalm/v2/Pillars.tsx
+src/components/kalm/v2/SubScreens.tsx
+src/components/kalm/v2/WeatherIcons.tsx   (novo)
+src/components/kalm/v2/layout.ts          (novo)
+src/components/flow/BottomNav.tsx
+src/components/flow/HomeScreen.tsx
+src/components/discover/DiscoverScreen.tsx
+src/components/sos/SOSModal.tsx
+src/components/sos/SOSPickerIcons.tsx     (novo)
+src/components/sos/SOSCrisisFlow.tsx
+src/hooks/useEntitlement.ts
+src/lib/plans.ts
+src/contexts/AuthContext.tsx
+src/pages/Index.tsx
+src/assets/kalm-hero-family.webp
+src/assets/kidzz/jarro-gratidao.webp
+supabase/functions/kidzz-chat/index.ts
+supabase/functions/generate-story/index.ts
+supabase/migrations/20260729000001_fix_increment_usage_resilient.sql
 ```
+
+---
+
+## NÃO commitado (lixo local — ignorar)
+
+- `output/` (transcrições whatsapp)
+- `supabase/.temp/`
+- `src/assets/kalm-hero-family.prev.webp` (backup)
+- JPGs soltos de onboarding não referenciados (`age-onboarding-hero.jpg`, `name-onboarding-hero*.jpg`, etc.)
+- `jarro-gratidao-14.webp` (variante não usada; o app usa `jarro-gratidao.webp`)
+
+---
+
+## Como publicar no Lovable
+
+1. Repo já está no GitHub `main` (`c617cc3`).
+2. No Lovable: **Sync / Rebuild / Publish** do projeto ligado a esse repo.
+3. **Antes ou logo após publish**, no Supabase do projeto:
+   - SQL Editor → colar e rodar  
+     `supabase/migrations/20260729000001_fix_increment_usage_resilient.sql`
+   - Redeploy: `kidzz-chat`, `generate-story`
+4. Smoke test prod/staging:
+   - Onboarding (nome → idade → interesses)
+   - 1 pergunta + 1 história (não pode ficar infinito em “gerando”)
+   - KALM → cada pilar → scroll, cards, dock escuro, sem fundo branco
+   - SOS modal
+
+---
+
+## Bugs que já corrigimos (não reabrir sem evidência)
+
+| Sintoma | Causa | Fix |
+|---------|--------|-----|
+| Cards do pilar “vazios / sem imagem / lavados” | Slot de imagem vazio + card quase transparente + texto claro em fundo claro | ActivityCard opaco + ícone Lucide |
+| Abria no final da tela | Scroll do KalmV2 preservado ao trocar view | `scrollTop = 0` no change de `view` |
+| Não scrollava nos cards (iOS) | `button { touch-action: manipulation }` | `touchAction: "pan-y"` nos cards |
+| Névoa branca embaixo dos cards | MagicalBackground claro + dock branco + blur | Fundo `#0B1310` + dock dark opaco em `wellness` |
+| Gui cortado/borrado no hero KALM | Crop 16:9 + scale + asset fraco | Arte 4:3 regenerada + objectPosition |
+| QUOTA_ERROR infinito (peixes/chuva) | RPC `increment_usage` sem `_crianca_id` / assinatura | Migration + edges multi-attempt |
+
+---
+
+## Pendências / próximos passos (amanhã)
+
+### Obrigatório operacional
+1. **Confirmar** se Lovable publicou o `c617cc3`
+2. **Rodar SQL** da cota no Supabase (se ainda não rodou)
+3. **Redeploy** `kidzz-chat` + `generate-story`
+4. Smoke test real no ambiente publicado
+
+### Produto (ainda abertos de sessões anteriores)
+- Perguntar sem cadastro
+- Remover validação HIBP “senha vazou”
+- Reset de senha sem link no e-mail
+- Logo glass 100% (conceito)
+- Batch de polish em abas ainda não revistas (Sonhos, Histórias, Brincar, etc.) se o cliente pedir
+
+### UI KALM (se o cliente reclamar de novo)
+- Conferir scroll/dock em iPhone físico após publish (HMR local ≠ prod)
+- Se quiser **imagens reais** por atividade (hoje é ícone + gradiente; `imgSlot` no data ainda é placeholder sem asset map)
+
+---
+
+## Dev local
 
 ```bash
-npx playwright install chromium   # 1x
-npm run test:e2e                  # suite
-npm run test:e2e:smoke
-npm run test:e2e:ui
+cd /Volumes/SSD/Desktop/_Projetos/kidz/kidzzapp-repo
+npm run dev -- --host 127.0.0.1 --port 5174
 ```
 
-**Guest** sem produção. NÃO cobre: IA real, Stripe, OAuth, e-mail reset (manual/staging).
-
-### Commits recentes (ordem)
-
-```
-4dca922 test(e2e): suite Playwright cobrindo todas as features do produto
-81562d3 fix(perguntas): polish iPhone — header, hífen, Gui e barra
-14c35d4 feat(descobrir): hero premium com floresta + Gui original
-5ade49c / 0a43eaf feat(perguntas) hero + sem coração tagline
-45ad1f8 / 7f11ae5 / ebfb58a / 396e6e1 / 06064c2 fix(kalm) scroll, contraste, texto, dock
-e88071c feat(kalm): hero do mockup com camaleão original
-6b42f8b fix(perguntas): capas no bundle Vite
-```
+Env: `.env` local já existe (não commitar secrets).
 
 ---
 
-## Pendências prioritárias (próxima sessão)
+## Tom com o cliente
 
-### P0 — Bugs cliente (áudio)
-
-1. **Perguntar sem login** — hoje `handleQuestionSubmit` exige `user` + `session` → `/auth`
-2. **Remover check HIBP** (“senha vazou na internet”) no signup
-3. **Reset senha sem link no e-mail** — template Supabase / redirect URL / edge
-
-### P1 — Produto / design
-
-4. **Logo KIDZZ translúcida** (conceito glass / sem cor fixa) — asset atual ainda é wordmark verde jelly
-5. **Publish Lovable** + hard refresh iPhone para validar prod
-6. Conferir se prod `kidzz.app` já está no HEAD `4dca922` (antes costumava ficar atrás)
-
-### P2 — Qualidade
-
-7. Expandir E2E com staging (pergunta real, paywall Stripe test mode)
-8. Limpar lixo untracked no repo (zips, WhatsApp, `.env.local-backup-temp`) — **não commitar secrets**
+- Freela: polish visual + cota + onboarding arte.
+- Entrega no GitHub pronta; **ar no Lovable** depende de Publish + SQL + redeploy functions.
+- Não escrever em produção SQL/dados sem OK explícito (só a migration de função `increment_usage` que o cliente/dev aplica no SQL Editor).
 
 ---
 
-## Arquitetura útil (não esquecer)
-
-| Aba dock | `AppTab` id | data-tab | Entry |
-|----------|-------------|----------|--------|
-| Perguntas | `chat` | `perguntas` | `HomeScreen` via `ChatFlow` |
-| Descobrir | `discover` | `descobrir` | `DiscoverScreen` |
-| KALM | `wellness` | `kalm` | **`KalmV2` → `KalmHome`** |
-| Sonhos | `dreams` | `sonhos` | `DreamWorld` |
-| Histórias | `explore` | `historias` | Stories |
-| Brincar | `play` | `brincar` | KidzzPlay |
-| Bora! | `bora` | `bora` | BoraScreen |
-| Rotina | `routine` | `rotina` | RoutineScreen |
-| Momentos | `moments` | `momentos` | MomentsPlaylists |
-| Cinema | `cinema` | `cinema` | FamilyCinema |
-| Música | `music` | `musica` | MusicForest (pode redirecionar) |
-| Memórias | `memories` | `memorias` | MemoriesAlbum |
-
-Dock: `src/components/flow/BottomNav.tsx` — `data-dock-tab`, `data-kidzz-dock`, `data-dock-scroller`.
-
-Guest bootstrap: `kidzz_guest_profile` + `kidzz_account_step_done` + splash flags (ver `e2e/helpers/guest.ts`).
-
----
-
-## Working tree sujo (não stagear sem pedido)
-
-```
-M  supabase/functions/mcp/index.ts
-?? .env.local-backup-temp
-?? zips / WhatsApp / design-src / public/TELAS / camaleao WhatsApp zip
-```
-
----
-
-## Como puxar na próxima sessão
-
-1. Abrir worktree `/Users/alefsantos/dev/kidzzapp`
-2. `git pull origin main` (conta `samuelfajreldines01`)
-3. Ler este `HANDOFF-SESSAO.md`
-4. Priorizar P0 do cliente (login free / senha / reset)
-5. Validar prod após Publish Lovable
-
-### Comando útil
-
-```bash
-gh auth switch -u samuelfajreldines01 && gh auth setup-git
-git status -sb && git log -5 --oneline
-npm run test:e2e:smoke
-```
-
----
-
-*Gerado em 2026-07-27 para handoff contínuo Kidzz freela.*
+*Atualizado em 2026-07-29 — sessão polish KALM + push `c617cc3`.*
