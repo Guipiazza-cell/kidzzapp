@@ -661,21 +661,30 @@ export default function LandingPremium() {
       <section ref={heroRef} className="relative min-h-[100svh] w-full overflow-hidden">
         <motion.div className="absolute inset-0" style={{ y: reduce ? 0 : bgY }}>
           <img
+            src={forestPortrait}
+            alt=""
+            aria-hidden
+            width={1024}
+            height={1536}
+            className="h-[118%] w-full object-cover md:hidden"
+            style={{ objectPosition: "50% 45%" }}
+          />
+          <img
             src={forestBg}
             alt=""
             aria-hidden
             width={1920}
             height={1280}
-            className="h-[118%] w-full object-cover"
-            style={{ objectPosition: "50% 68%" }}
+            className="hidden h-[118%] w-full object-cover md:block"
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(252,250,244,0.35) 0%, rgba(252,250,244,0.12) 40%, rgba(252,250,244,0.92) 100%)",
+                "linear-gradient(180deg, rgba(252,250,244,0.62) 0%, rgba(252,250,244,0.30) 42%, rgba(252,250,244,0.95) 100%)",
             }}
           />
+
         </motion.div>
         <SunRays />
         <Particles count={22} />
