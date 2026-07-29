@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
-import OnboardingShell from "./onboarding/OnboardingShell";
 import { useAuth } from "@/contexts/AuthContext";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
-import brandChameleonsDuo from "@/assets/kidzz/brand-chameleons-duo.webp";
+import nameHero from "@/assets/kidzz/name-onboarding-hero-v2.webp";
+import { ONBOARDING_HERO_FRAME, ONBOARDING_GLASS_PANEL } from "./onboarding/heroFrame";
 
 const NameOnboarding = () => {
   const { updateProfile } = useAuth();
@@ -13,7 +13,6 @@ const NameOnboarding = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Pré-aquece os mascotes que vêm a seguir
   useEffect(() => {
     const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void) => void);
     const run = () => {
@@ -24,7 +23,8 @@ const NameOnboarding = () => {
         img.src = `/src/assets/kidzz/${s}.webp`;
       });
     };
-    if (ric) ric(run); else setTimeout(run, 400);
+    if (ric) ric(run);
+    else setTimeout(run, 400);
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -52,79 +52,63 @@ const NameOnboarding = () => {
   const filled = !!name.trim();
 
   return (
-    <OnboardingShell tone="warm">
-      {/* Progresso topo */}
-      <div className="pt-[max(env(safe-area-inset-top,16px),20px)] px-6">
-        <OnboardingProgress step={1} />
+    <div className="fixed inset-0 w-full h-[100dvh] max-w-[100vw] overflow-hidden bg-[#0B1A12]">
+      {/* Mesma arte, asset já em 1080×2340 nítido — preenche sem blur/quadro */}
+      <img
+        src={nameHero}
+        alt="Kidzz — Qual o seu nome?"
+        className="absolute inset-0 block h-full w-full select-none pointer-events-none"
+        style={ONBOARDING_HERO_FRAME}
+        draggable={false}
+      />
+
+      <div className="absolute inset-x-0 top-0 z-10 pt-[max(env(safe-area-inset-top,6px),8px)] px-5">
+        <OnboardingProgress step={1} showLabel={false} showCounter={false} />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <motion.div
-          className="relative w-[min(72vw,280px)] aspect-square flex items-center justify-center"
-          initial={{ scale: 0.88, opacity: 0, y: 12 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 180, damping: 16 }}
+      <motion.div
+        className="absolute inset-x-0 bottom-0 z-20 px-4"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom, 10px), 14px)" }}
+        initial={{ y: 16, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div
+          className="mx-auto w-full max-w-sm space-y-2 rounded-[26px] px-3 py-3"
+          style={ONBOARDING_GLASS_PANEL}
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-[12%] rounded-full blur-2xl opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle, hsl(42 95% 70% / 0.45) 0%, hsl(280 70% 75% / 0.2) 45%, transparent 70%)",
+          <h1 className="sr-only">Qual o seu nome?</h1>
+
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (error) setError("");
             }}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            placeholder="Seu nome"
+            className="w-full rounded-2xl py-3.5 px-5 text-center text-lg font-bold text-gray-900 placeholder:text-gray-500/80 focus:outline-none"
+            style={{
+              background: "rgba(255,255,255,0.8)",
+              border: filled
+                ? "1.5px solid rgba(232,160,32,0.7)"
+                : "1.5px solid rgba(255,255,255,0.7)",
+              boxShadow: filled
+                ? "0 0 0 3px rgba(232,160,32,0.16)"
+                : "0 4px 12px rgba(0,0,0,0.06)",
+            }}
+            autoFocus
+            maxLength={20}
+            autoComplete="given-name"
+            enterKeyHint="done"
           />
-          <img
-            src={brandChameleonsDuo}
-            alt="Kidzz — camaleões da marca"
-            className="relative z-10 w-full h-full object-contain drop-shadow-[0_18px_36px_rgba(0,0,0,0.14)] select-none"
-            draggable={false}
-          />
-        </motion.div>
-
-        <motion.h1
-          className="text-[26px] leading-tight font-black text-gray-900 text-center mt-3"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
-          Como você se chama?
-        </motion.h1>
-
-        <motion.div
-          className="w-full max-w-sm mt-7 space-y-4"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-        >
-          <div className="relative">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (error) setError("");
-              }}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              placeholder="Seu nome"
-              className="w-full py-5 px-6 rounded-2xl text-gray-900 text-xl font-bold text-center placeholder:text-gray-400 focus:outline-none transition-[opacity,transform,box-shadow]"
-              style={{
-                background: "rgba(255,255,255,0.65)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: filled ? "1.5px solid hsl(35 95% 58% / 0.55)" : "1.5px solid rgba(255,255,255,0.7)",
-                boxShadow: filled
-                  ? "0 0 24px hsl(35 95% 58% / 0.28), inset 0 0 12px hsl(35 95% 58% / 0.06)"
-                  : "0 6px 18px rgba(0,0,0,0.06)",
-              }}
-              autoFocus
-              maxLength={20}
-            />
-          </div>
 
           {error && (
             <motion.p
-              className="text-kid-orange text-center text-sm font-bold"
-              initial={{ opacity: 0, y: -5 }}
+              className="text-center text-sm font-bold"
+              style={{ color: "#FFE0A0" }}
+              initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
             >
               {error}
@@ -132,17 +116,21 @@ const NameOnboarding = () => {
           )}
 
           <motion.button
+            type="button"
             onClick={handleSubmit}
             disabled={saving}
-            className="relative w-full py-5 rounded-2xl text-white font-extrabold text-lg overflow-hidden min-h-[56px] disabled:opacity-50 active:scale-[0.98]"
+            className="relative min-h-[48px] w-full overflow-hidden rounded-2xl py-3.5 text-base font-extrabold disabled:opacity-50 active:scale-[0.98]"
             style={{
+              color: "#fff",
               background: filled
-                ? "linear-gradient(135deg, hsl(35 95% 58%), hsl(28 95% 62%) 60%, hsl(45 95% 62%))"
-                : "linear-gradient(135deg, hsl(35 35% 70%), hsl(35 25% 75%))",
+                ? "linear-gradient(135deg, rgba(232,160,32,0.95) 0%, rgba(212,120,26,0.95) 55%, rgba(62,154,82,0.9) 130%)"
+                : "rgba(90, 78, 58, 0.45)",
+              border: filled
+                ? "1px solid rgba(255,220,140,0.45)"
+                : "1px solid rgba(255,255,255,0.28)",
               boxShadow: filled
-                ? "0 0 28px hsl(35 95% 58% / 0.55), 0 10px 24px rgba(0,0,0,0.15)"
-                : "0 6px 16px rgba(0,0,0,0.08)",
-              transition: "box-shadow 300ms ease, background 300ms ease",
+                ? "0 8px 20px rgba(212,120,26,0.32)"
+                : "0 4px 12px rgba(0,0,0,0.1)",
             }}
             whileTap={{ scale: 0.97 }}
           >
@@ -151,7 +139,7 @@ const NameOnboarding = () => {
                 className="absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)",
+                    "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%)",
                 }}
                 initial={{ x: "-110%" }}
                 animate={{ x: "120%" }}
@@ -162,18 +150,19 @@ const NameOnboarding = () => {
               {saving ? "Entrando…" : filled ? "Continuar →" : "Continuar"}
             </span>
           </motion.button>
-        </motion.div>
 
-        <motion.p
-          className="text-gray-500 text-[10px] mt-6 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-        >
-          🔒 Seguro • Sem anúncios • Feito para crianças
-        </motion.p>
-      </div>
-    </OnboardingShell>
+          <p
+            className="text-center text-[10px] font-semibold"
+            style={{
+              color: "rgba(255,248,230,0.82)",
+              textShadow: "0 1px 3px rgba(0,0,0,0.35)",
+            }}
+          >
+            🔒 Seguro • Sem anúncios • Feito para crianças
+          </p>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
