@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import KidzzChameleon from "./kidzz/KidzzChameleon";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
 import OnboardingShell from "./onboarding/OnboardingShell";
 import { useAuth } from "@/contexts/AuthContext";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
+import brandChameleonsDuo from "@/assets/kidzz/brand-chameleons-duo.webp";
 
 const NameOnboarding = () => {
   const { updateProfile } = useAuth();
@@ -60,11 +60,25 @@ const NameOnboarding = () => {
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <motion.div
-          initial={{ scale: 0, opacity: 0, y: 12 }}
+          className="relative w-[min(72vw,280px)] aspect-square flex items-center justify-center"
+          initial={{ scale: 0.88, opacity: 0, y: 12 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 180, damping: 14 }}
+          transition={{ type: "spring", stiffness: 180, damping: 16 }}
         >
-          <KidzzChameleon state="cosmic" mood={filled ? "happy" : "curious"} size="xl" interactive showParticles />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-[12%] rounded-full blur-2xl opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle, hsl(42 95% 70% / 0.45) 0%, hsl(280 70% 75% / 0.2) 45%, transparent 70%)",
+            }}
+          />
+          <img
+            src={brandChameleonsDuo}
+            alt="Kidzz — camaleões da marca"
+            className="relative z-10 w-full h-full object-contain drop-shadow-[0_18px_36px_rgba(0,0,0,0.14)] select-none"
+            draggable={false}
+          />
         </motion.div>
 
         <motion.h1
@@ -73,7 +87,7 @@ const NameOnboarding = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
         >
-          Como você se chama? ✨
+          Como você se chama?
         </motion.h1>
 
         <motion.div
