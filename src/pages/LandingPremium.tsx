@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 
 import forestBg from "@/assets/lp/forest-cinematic.jpg";
+import forestPortrait from "@/assets/lp/forest-portrait.jpg";
 import jarImg from "@/assets/lp/gratitude-jar.jpg";
 import handsImg from "@/assets/lp/hands-forest.jpg";
 import family1 from "@/assets/lp/family-1.jpg";
@@ -1040,19 +1041,28 @@ export default function LandingPremium() {
       {/* ══ FINAL CTA ══ */}
       <section className="relative min-h-[100svh] overflow-hidden">
         <img
+          src={forestPortrait}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          width={1024}
+          height={1536}
+          className="absolute inset-0 h-full w-full object-cover md:hidden"
+        />
+        <img
           src={forestBg}
           alt=""
           aria-hidden
           loading="lazy"
           width={1920}
           height={1280}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 hidden h-full w-full object-cover md:block"
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(252,250,244,0.55) 0%, rgba(252,250,244,0.2) 45%, rgba(252,250,244,0.95) 100%)",
+              "linear-gradient(180deg, rgba(252,250,244,0.72) 0%, rgba(252,250,244,0.38) 45%, rgba(252,250,244,0.97) 100%)",
           }}
         />
         <SunRays />
