@@ -71,9 +71,10 @@ export const PLAN_ACCESS: Record<Plan, Record<Area, AccessLevel>> = {
  * Os números são tetos invisíveis que sinalizam "Kidzz sonolento".
  */
 export const DAILY_LIMITS: Record<Plan, { perguntas: number; historias: number }> = {
-  free:    { perguntas: 2,  historias: 1 },
-  kidzz:   { perguntas: 10, historias: 5 },
-  premium: { perguntas: 10, historias: 5 },
+  // Alinhado com increment_usage no servidor (America/Sao_Paulo)
+  free:    { perguntas: 3,  historias: 1 },
+  kidzz:   { perguntas: 30, historias: 3 },
+  premium: { perguntas: 60, historias: 5 },
 };
 
 /** Plano mínimo necessário para acessar uma área completamente. */

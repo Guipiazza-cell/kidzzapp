@@ -481,7 +481,9 @@ const Index = () => {
   // A PARTIR DAQUI: returns condicionais (gates de onboarding).
   // Nenhum hook pode ser declarado abaixo desta linha.
   // ============================================================
-  if (loading) return null;
+  // AuthContext já faz fail-open em ~3.5s. Não bloquear a UI em null eterno:
+  // se loading ainda true, segue com profile seed/guest (NameOnboarding etc.).
+  if (loading && !profile) return null;
 
   // ÚNICA fonte da verdade pra usuário autenticado: profile.onboarding_done.
   // Enquanto for false, mostramos a sequência de telas que faltam preencher.
@@ -533,7 +535,14 @@ const Index = () => {
                   data-tab={APP_TAB_DATA[tabId] ?? tabId}
                   aria-hidden={!isActive}
                   className="absolute inset-0 flex flex-col min-h-0"
-                  style={{ display: isActive ? "flex" : "none" }}
+                  style={{
+                    display: isActive ? "flex" : "none",
+                    // KALM e Sonhos: fundo opaco pra não vazar MagicalBackground claro
+                    background:
+                      tabId === "wellness" || tabId === "dreams"
+                        ? "#0B1310"
+                        : undefined,
+                  }}
                 >
                   <TabErrorBoundary resetKey={tabId} label={tabId} onBack={backToHome}>
                     <Suspense fallback={null}>{render()}</Suspense>

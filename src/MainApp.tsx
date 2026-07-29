@@ -24,6 +24,8 @@ const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isReady } = useAuth();
+  // Não prender em tela preta se o auth demorar: após o fail-open do Auth
+  // isReady vira true. Enquanto isso, null é ok por no máx ~3s.
   if (!isReady) return null;
   return <>{children}</>;
 };

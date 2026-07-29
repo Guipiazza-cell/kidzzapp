@@ -6,7 +6,7 @@ import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 import KidzzLogo from "@/components/common/KidzzLogo";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import { CAMALEAO } from "@/lib/camaleaoOficial";
 import heroDescobrir from "@/assets/descobrir-hero.webp";
 
 // ============================================================
@@ -77,7 +77,8 @@ const THEME_VISUAL: Record<Theme["id"], ThemeVisual> = {
   espaco: {
     panel: "linear-gradient(150deg,rgba(60,80,120,.5),rgba(20,32,58,.92))",
     titleColor: "#EAF0FA", subColor: "rgba(210,222,240,.82)",
-    chip: ["#C2CBFF", "#6E7FE8", "#4152B8"], arrow: ["#FFFFFF", "#E8ECF4", "#B8C2D2"],
+    // Seta em azul (antes era branca/clara → sumia no fundo claro)
+    chip: ["#C2CBFF", "#6E7FE8", "#4152B8"], arrow: ["#C2CBFF", "#6E7FE8", "#4152B8"],
     pillDark: true, fade: "rgba(20,32,58,.92)", novo: false, d: PATHS.planet,
   },
   natureza: {
@@ -950,7 +951,8 @@ const DiscoverScreen = ({ onBack }: Props) => {
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              objectPosition: "58% 30%",
+              // Um camaleão só (sem overlay armsSoft); enquadra o Gui da arte
+              objectPosition: "72% 38%",
               animation: "disc-floaty 7s ease-in-out infinite",
             }}
           />
@@ -961,29 +963,9 @@ const DiscoverScreen = ({ onBack }: Props) => {
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(100deg, rgba(255,252,248,.90) 0%, rgba(255,250,240,.58) 36%, rgba(255,250,240,.12) 60%, transparent 78%)," +
+                "linear-gradient(100deg, rgba(255,252,248,.90) 0%, rgba(255,250,240,.58) 36%, rgba(255,250,240,.12) 58%, transparent 74%)," +
                 "linear-gradient(180deg, transparent 58%, rgba(255,252,248,.72) 88%, #FFFCF8 100%)",
               pointerEvents: "none",
-            }}
-          />
-          {/* Reforço Gui soft */}
-          <img
-            src={CAMALEAO.armsSoft}
-            alt=""
-            aria-hidden
-            draggable={false}
-            style={{
-              position: "absolute",
-              right: -8,
-              bottom: -4,
-              width: "50%",
-              maxWidth: 210,
-              height: "86%",
-              objectFit: "contain",
-              objectPosition: "right bottom",
-              pointerEvents: "none",
-              filter: "drop-shadow(0 14px 18px rgba(40,60,20,.26))",
-              ...CAMALEAO_SCENE_MASK,
             }}
           />
 

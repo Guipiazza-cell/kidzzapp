@@ -104,14 +104,44 @@ serve(async (req) => {
     }
 
     // Defesa em profundidade: incrementa via RPC (fonte única).
+    // Compat: schema novo (tipo + crianca_id) e antigo (só tipo).
     {
-      const { data: quotaData, error: quotaErr } = await (supabaseUser as any).rpc(
-        "increment_usage",
-        { _tipo: "historias" }
-      );
-      if (quotaErr) {
-        console.error("[GENERATE-STORY] increment_usage error:", quotaErr.message);
-        return new Response(JSON.stringify({ error: "QUOTA_ERROR" }), {
+      let criancaId: string | null =
+        typeof (body as any)?.criancaId === "string" ? (body as any).criancaId : null;
+      if (!criancaId) {
+        const { data: childRow } = await supabaseUser
+          .from("criancas")
+          .select("id")
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        criancaId = (childRow as any)?.id ?? null;
+      }
+
+      const attempts: Record<string, unknown>[] = [];
+      if (criancaId) attempts.push({ _tipo: "historias", _crianca_id: criancaId });
+      attempts.push({ _tipo: "historias", _crianca_id: null });
+      attempts.push({ _tipo: "historias" });
+
+      let quotaData: any = null;
+      let lastErr: string | null = null;
+      for (const args of attempts) {
+        const r = await (supabaseUser as any).rpc("increment_usage", args);
+        if (!r.error) {
+          quotaData = r.data;
+          lastErr = null;
+          break;
+        }
+        lastErr = r.error?.message ?? "rpc error";
+      }
+
+      if (lastErr) {
+        console.error("[GENERATE-STORY] increment_usage error:", lastErr);
+        return new Response(JSON.stringify({
+          error: "QUOTA_ERROR",
+          message: "Não foi possível validar seu limite agora. Tente de novo em instantes.",
+          detail: lastErr,
+        }), {
           status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }

@@ -12,7 +12,6 @@ import { haptic } from "@/lib/haptics";
 import SOSModal from "@/components/sos/SOSModal";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
-import KidzzLogo from "@/components/common/KidzzLogo";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
 /** Capas no bundle Vite (hash) — não dependem de /public após publish */
 import coverPeixes from "@/assets/perguntas-covers/sug-peixes.png";
@@ -471,25 +470,7 @@ const HomeScreen = ({
             )}
           </button>
 
-          <div style={{ minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            <KidzzLogo height={28} light style={{ maxWidth: "100%", maxHeight: 28 }} />
-            <span
-              style={{
-                marginTop: 2,
-                fontSize: 9.5,
-                fontWeight: 700,
-                color: "rgba(50,70,40,.72)",
-                letterSpacing: ".01em",
-                textAlign: "center",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                maxWidth: "100%",
-              }}
-            >
-              Desligue a tela, ligue a infância.
-            </span>
-          </div>
+          <div style={{ minWidth: 0 }} />
 
           <div style={{ display: "flex", alignItems: "center", gap: 6, justifySelf: "end", flexShrink: 0 }}>
             <button
@@ -533,7 +514,7 @@ const HomeScreen = ({
           style={{
             position: "relative",
             margin: "8px 12px 10px",
-            minHeight: 248,
+            minHeight: 272,
             borderRadius: 28,
             overflow: "hidden",
             animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) both",
@@ -555,7 +536,8 @@ const HomeScreen = ({
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              objectPosition: "68% 24%",
+              // Cover limpo: Gui completo à direita (sem crop quebrado)
+              objectPosition: "68% 30%",
             }}
           />
           {/* Véu legível à esquerda (texto) + fade inferior — sem segundo Gui */}
@@ -565,8 +547,8 @@ const HomeScreen = ({
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(105deg, rgba(255,250,235,.92) 0%, rgba(255,248,230,.62) 34%, rgba(255,248,230,.14) 58%, transparent 74%)," +
-                "linear-gradient(180deg, transparent 58%, rgba(248,244,234,.78) 90%, #F8F4EA 100%)",
+                "linear-gradient(105deg, rgba(255,250,235,.92) 0%, rgba(255,248,230,.55) 34%, rgba(255,248,230,.1) 56%, transparent 72%)," +
+                "linear-gradient(180deg, transparent 62%, rgba(248,244,234,.78) 90%, #F8F4EA 100%)",
               pointerEvents: "none",
             }}
           />
@@ -575,8 +557,8 @@ const HomeScreen = ({
             style={{
               position: "relative",
               zIndex: 3,
-              maxWidth: "56%",
-              padding: "20px 14px 24px 16px",
+              maxWidth: "54%",
+              padding: "22px 12px 24px 16px",
             }}
           >
             <h1
@@ -584,7 +566,7 @@ const HomeScreen = ({
                 margin: 0,
                 fontFamily: "'Lora', Georgia, serif",
                 fontWeight: 700,
-                fontSize: "clamp(26px, 7.2vw, 32px)",
+                fontSize: "clamp(28px, 7.6vw, 34px)",
                 lineHeight: 1.12,
                 letterSpacing: "-0.4px",
                 color: "#1F2E18",
@@ -595,17 +577,7 @@ const HomeScreen = ({
                 overflowWrap: "normal",
               }}
             >
-              <span style={{ display: "block" }}>Pergunte.</span>
-              <span style={{ display: "block" }}>Descubra.</span>
-              <span
-                style={{
-                  display: "inline-block",
-                  color: "#3E9A52",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Conecte-se.
-              </span>
+              Pergunte e Descubra.
             </h1>
             <p
               style={{
@@ -730,153 +702,132 @@ const HomeScreen = ({
           >
             <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "50%", height: "100%", background: "linear-gradient(105deg, transparent, rgba(255,255,255,.35) 50%, transparent)", animation: "perg-shine 7s ease-in-out infinite", pointerEvents: "none" }} />
 
-            <div style={{ position: "relative", zIndex: 2, maxWidth: "58%" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4l1.6 4.8L18 10l-4.4 1.2L12 16l-1.6-4.8L6 10l4.4-1.2L12 4Z" fill="#5CB57A" /></svg>
-                <h2
-                  style={{
-                    margin: 0,
-                    fontFamily: "'Lora', Georgia, serif",
-                    fontWeight: 600,
-                    fontSize: 18,
-                    color: "#1F2E18",
-                  }}
-                >
-                  Me pergunte qualquer coisa!
-                </h2>
-              </div>
-              <p style={{ margin: "0 0 12px", fontSize: 12, fontWeight: 700, color: "rgba(50,70,40,.65)", lineHeight: 1.35 }}>
-                Descubra respostas e crie conversas incríveis juntos.
-              </p>
-
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <motion.button
-                  type="button"
-                  onClick={toggleMic}
-                  whileTap={{ scale: 0.9 }}
-                  aria-label={isListening ? "Parar de ouvir" : "Falar"}
-                  style={{
-                    width: 54, height: 54, borderRadius: 999, flex: "none",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    background: "radial-gradient(130% 130% at 30% 22%, #A8E8B8, #4EA35E 55%, #2E7A42)",
-                    border: "1px solid rgba(255,255,255,.65)",
-                    boxShadow: isListening
-                      ? "0 0 0 4px rgba(240,90,80,.3), 0 8px 16px rgba(40,110,60,.35)"
-                      : "0 8px 16px rgba(40,110,60,.35), inset 0 1.5px 1px rgba(255,255,255,.55)",
-                    animation: isListening ? undefined : "perg-micpulse 2.2s ease-out infinite",
-                    cursor: "pointer",
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-5a3.5 3.5 0 1 0-7 0v5A3.5 3.5 0 0 0 12 15Zm6-4a6 6 0 0 1-12 0m6 6v3.5m-3 0h6" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" /></svg>
-                </motion.button>
-
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submit(input)}
-                  placeholder={isFreeLimitReached ? "Limite atingido" : "Digite ou pergunte…"}
-                  disabled={submitting || isFreeLimitReached}
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    height: 54,
-                    padding: "0 16px",
-                    borderRadius: 18,
-                    border: "1px solid rgba(200,210,180,.55)",
-                    background: "rgba(255,255,255,.82)",
-                    fontFamily: "'Nunito', sans-serif",
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: "#2A3A20",
-                    outline: "none",
-                    boxShadow: "inset 0 1px 4px rgba(40,60,20,.06)",
-                    opacity: isFreeLimitReached ? 0.5 : 1,
-                  }}
-                />
-
-                <motion.button
-                  type="button"
-                  onClick={() => submit(input)}
-                  disabled={!hasQ || submitting || isFreeLimitReached}
-                  whileTap={{ scale: 0.9 }}
-                  aria-label="Enviar pergunta"
-                  style={{
-                    width: 54, height: 54, borderRadius: 999, flex: "none",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    border: "1px solid rgba(255,255,255,.7)",
-                    cursor: hasQ ? "pointer" : "default",
-                    background: hasQ
-                      ? "radial-gradient(130% 130% at 30% 22%, #C7E8A8, #5EA83E 55%, #3A7A26)"
-                      : "rgba(180,190,160,.35)",
-                    boxShadow: hasQ ? "0 8px 16px rgba(40,110,40,.32)" : "none",
-                    opacity: submitting || isFreeLimitReached ? 0.5 : 1,
-                  }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12 20 4l-4 16-4.5-6.5L4 12Zm7.5 1.5L20 4" stroke={hasQ ? "#153A16" : "rgba(60,80,40,.45)"} strokeWidth="1.9" strokeLinecap="round" /></svg>
-                </motion.button>
+            {/* Título + família (topo do card) */}
+            <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "flex-start", gap: 8, minHeight: 108 }}>
+              <div style={{ flex: 1, minWidth: 0, maxWidth: "58%", paddingRight: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4l1.6 4.8L18 10l-4.4 1.2L12 16l-1.6-4.8L6 10l4.4-1.2L12 4Z" fill="#5CB57A" /></svg>
+                  <h2
+                    style={{
+                      margin: 0,
+                      fontFamily: "'Lora', Georgia, serif",
+                      fontWeight: 600,
+                      fontSize: 18,
+                      color: "#1F2E18",
+                    }}
+                  >
+                    Me pergunte qualquer coisa!
+                  </h2>
+                </div>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "rgba(50,70,40,.65)", lineHeight: 1.35 }}>
+                  Descubra respostas e crie conversas incríveis juntos.
+                </p>
               </div>
 
-              <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                <button
-                  type="button"
-                  onClick={openParents}
-                  className="active:scale-95"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    padding: "9px 14px", borderRadius: 999, cursor: "pointer",
-                    background: "rgba(255,255,255,.88)",
-                    border: "1px solid rgba(255,255,255,1)",
-                    fontWeight: 900, fontSize: 12, color: "#2E6B3E",
-                    boxShadow: "0 4px 12px rgba(40,60,20,.1)",
-                  }}
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z" stroke="#2E6B3E" strokeWidth="1.9" strokeLinejoin="round" /></svg>
-                  Pais
-                </button>
-                <button
-                  type="button"
-                  onClick={openPlans}
-                  className="active:scale-95"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    padding: "9px 16px", borderRadius: 999, cursor: "pointer",
-                    border: "1px solid rgba(255,235,150,.7)",
-                    fontWeight: 900, fontSize: 12, color: "#5A3A00",
-                    background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F5C24E 55%, #E0A52E)",
-                    boxShadow: "0 6px 14px rgba(200,140,30,.32)",
-                  }}
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#5A3A00"><path d="M4 18h16l-1.4-8.6-4 3.2L12 5l-2.6 7.6-4-3.2L4 18Z" /></svg>
-                  {isPremium ? "Premium" : "Assinar"}
-                </button>
-              </div>
+              <img
+                src={ASSETS.family}
+                alt="Família lendo juntos"
+                draggable={false}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = ASSETS.familyFallback;
+                }}
+                style={{
+                  position: "absolute",
+                  right: -4,
+                  top: 0,
+                  width: "44%",
+                  maxWidth: 168,
+                  height: 112,
+                  objectFit: "cover",
+                  objectPosition: "center 20%",
+                  borderRadius: "24px 0 0 36%",
+                  maskImage: "radial-gradient(70% 75% at 55% 48%, #000 42%, transparent 78%)",
+                  WebkitMaskImage: "radial-gradient(70% 75% at 55% 48%, #000 42%, transparent 78%)",
+                  pointerEvents: "none",
+                  zIndex: 1,
+                }}
+              />
             </div>
 
-            <img
-              src={ASSETS.family}
-              alt="Família lendo juntos"
-              draggable={false}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = ASSETS.familyFallback;
-              }}
+            {/* Barra de digitar — largura total do card (onde ficavam Pais/Assinar) */}
+            <div
               style={{
-                position: "absolute",
-                right: -4,
-                bottom: 0,
-                width: "46%",
-                maxWidth: 180,
-                height: "88%",
-                objectFit: "cover",
-                objectPosition: "center 20%",
-                borderRadius: "28px 0 0 40%",
-                maskImage: "radial-gradient(70% 75% at 55% 48%, #000 42%, transparent 78%)",
-                WebkitMaskImage: "radial-gradient(70% 75% at 55% 48%, #000 42%, transparent 78%)",
-                pointerEvents: "none",
-                zIndex: 1,
+                position: "relative",
+                zIndex: 3,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginTop: 14,
+                width: "100%",
               }}
-            />
+            >
+              <motion.button
+                type="button"
+                onClick={toggleMic}
+                whileTap={{ scale: 0.9 }}
+                aria-label={isListening ? "Parar de ouvir" : "Falar"}
+                style={{
+                  width: 56, height: 56, borderRadius: 999, flex: "none",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1,
+                  background: "radial-gradient(130% 130% at 30% 22%, #A8E8B8, #4EA35E 55%, #2E7A42)",
+                  border: "1px solid rgba(255,255,255,.65)",
+                  boxShadow: isListening
+                    ? "0 0 0 4px rgba(240,90,80,.3), 0 8px 16px rgba(40,110,60,.35)"
+                    : "0 8px 16px rgba(40,110,60,.35), inset 0 1.5px 1px rgba(255,255,255,.55)",
+                  animation: isListening ? undefined : "perg-micpulse 2.2s ease-out infinite",
+                  cursor: "pointer",
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-5a3.5 3.5 0 1 0-7 0v5A3.5 3.5 0 0 0 12 15Zm6-4a6 6 0 0 1-12 0m6 6v3.5m-3 0h6" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" /></svg>
+              </motion.button>
+
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit(input)}
+                placeholder={isFreeLimitReached ? "Limite atingido" : "Digite ou pergunte…"}
+                disabled={submitting || isFreeLimitReached}
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  height: 56,
+                  padding: "0 18px",
+                  borderRadius: 20,
+                  border: "1.5px solid rgba(200,210,180,.6)",
+                  background: "rgba(255,255,255,.92)",
+                  fontFamily: "'Nunito', sans-serif",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: "#2A3A20",
+                  outline: "none",
+                  boxShadow: "0 4px 14px rgba(40,60,20,.08), inset 0 1px 4px rgba(40,60,20,.05)",
+                  opacity: isFreeLimitReached ? 0.5 : 1,
+                }}
+              />
+
+              <motion.button
+                type="button"
+                onClick={() => submit(input)}
+                disabled={!hasQ || submitting || isFreeLimitReached}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Enviar pergunta"
+                style={{
+                  width: 56, height: 56, borderRadius: 999, flex: "none",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  border: "1px solid rgba(255,255,255,.7)",
+                  cursor: hasQ ? "pointer" : "default",
+                  background: hasQ
+                    ? "radial-gradient(130% 130% at 30% 22%, #C7E8A8, #5EA83E 55%, #3A7A26)"
+                    : "rgba(180,190,160,.35)",
+                  boxShadow: hasQ ? "0 8px 16px rgba(40,110,40,.32)" : "none",
+                  opacity: submitting || isFreeLimitReached ? 0.5 : 1,
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12 20 4l-4 16-4.5-6.5L4 12Zm7.5 1.5L20 4" stroke={hasQ ? "#153A16" : "rgba(60,80,40,.45)"} strokeWidth="1.9" strokeLinecap="round" /></svg>
+              </motion.button>
+            </div>
           </div>
         </section>
 
@@ -1125,47 +1076,21 @@ const HomeScreen = ({
                 ))}
               </div>
             </div>
-            <div
+            <span
               style={{
                 flex: "none",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 8,
+                alignSelf: "center",
+                padding: "10px 16px",
+                borderRadius: 999,
+                background: "radial-gradient(130% 130% at 30% 22%, #FF9E8E, #F0645A 55%, #D23B32)",
+                color: "#fff",
+                fontWeight: 900,
+                fontSize: 12,
+                boxShadow: "0 6px 14px rgba(200,50,40,.35)",
               }}
             >
-              <img
-                src={ASSETS.gui}
-                alt=""
-                onError={(e) => { (e.target as HTMLImageElement).src = ASSETS.guiFallback; }}
-                style={{
-                  width: 64,
-                  height: 64,
-                  objectFit: "contain",
-                  objectPosition: "center",
-                  background: "transparent",
-                  border: "none",
-                  filter: "drop-shadow(0 6px 10px rgba(40,60,20,.2))",
-                  WebkitMaskImage:
-                    "radial-gradient(circle at 50% 48%, #000 42%, rgba(0,0,0,.7) 62%, transparent 88%)",
-                  maskImage:
-                    "radial-gradient(circle at 50% 48%, #000 42%, rgba(0,0,0,.7) 62%, transparent 88%)",
-                }}
-              />
-              <span
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: 999,
-                  background: "radial-gradient(130% 130% at 30% 22%, #FF9E8E, #F0645A 55%, #D23B32)",
-                  color: "#fff",
-                  fontWeight: 900,
-                  fontSize: 12,
-                  boxShadow: "0 6px 14px rgba(200,50,40,.35)",
-                }}
-              >
-                Acessar ›
-              </span>
-            </div>
+              Acessar ›
+            </span>
           </button>
         </section>
 

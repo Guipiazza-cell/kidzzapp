@@ -2,38 +2,112 @@
  * KALM v2 — sub-telas (Relaxar, Ritual, SOS, Vínculo).
  * Cada sub-tela é stateless: recebe onBack e onOpen(activity).
  */
-import { useState } from "react";
-import { ArrowLeft, ChevronRight, Heart, Wind, Sparkles, Shield, Moon, Lock, Crown, Trees, Waves } from "lucide-react";
+import { useState, type CSSProperties } from "react";
+import {
+  ArrowLeft, ChevronRight, Heart, Wind, Sparkles, Shield, Moon, Lock, Crown, Trees, Waves,
+  CircleDot, Leaf, Volume2, Hand, Droplets, Eye, Smile, Coffee, Users, Footprints,
+  MessageCircle, BookOpen, Utensils, Apple, CookingPot, Flower2, Sun, Cloud,
+  type LucideIcon,
+} from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import {
   KID_ACTIVITIES, PARENT_ACTIVITIES, ACTIVITIES,
-  JOURNEYS, MOTOR_TINT, type Activity,
+  JOURNEYS, MOTOR_TINT, type Activity, type Motor,
 } from "./data";
+import { KALM_DOCK_CLEARANCE } from "./layout";
 
-// Paleta escura florestal (mesma da KalmHome)
+// Paleta escura florestal (mesma da KalmHome / Pillars)
 const ink = "#F1EEE4";
-const inkSoft = "rgba(241,238,228,0.68)";
-const cream = "rgba(255,255,255,0.045)"; // card escuro translúcido
-const bgDark = "linear-gradient(180deg,#0E1712 0%,#0B1310 60%,#0A110E 100%)";
+const inkSoft = "rgba(241,238,228,0.72)";
+const inkMuted = "rgba(241,238,228,0.48)";
+const bgDark =
+  "radial-gradient(120% 50% at 50% 0%, rgba(232,185,58,0.07) 0%, transparent 55%)," +
+  "linear-gradient(180deg,#0E1712 0%,#0B1310 60%,#0A110E 100%)";
 
-const glassCard: React.CSSProperties = {
-  background: "linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-  border: "1px solid rgba(255,255,255,0.10)",
-  backdropFilter: "blur(24px) saturate(140%)",
-  WebkitBackdropFilter: "blur(24px) saturate(140%)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
+const glassCard: CSSProperties = {
+  background: "linear-gradient(165deg, #24342A, #101A14)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  boxShadow: "0 12px 28px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.08)",
 };
+
+const shellStyle: CSSProperties = {
+  background: bgDark,
+  backgroundColor: "#0B1310",
+  minHeight: "100%",
+  paddingBottom: KALM_DOCK_CLEARANCE,
+};
+
+const glassChrome: CSSProperties = {
+  background: "linear-gradient(155deg, rgba(28,42,34,0.92), rgba(14,23,18,0.96))",
+  border: "1px solid rgba(255,255,255,0.14)",
+  backdropFilter: "blur(20px) saturate(140%)",
+  WebkitBackdropFilter: "blur(20px) saturate(140%)",
+  boxShadow: "0 8px 28px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.10)",
+};
+
+const ACTIVITY_ICON: Record<string, LucideIcon> = {
+  "pausa-1min": Heart,
+  "sentir-vento": Wind,
+  "nuvem-macia": Cloud,
+  "soltar-balao": CircleDot,
+  "bolhas-magicas": CircleDot,
+  "alongamento-urso": Leaf,
+  "zumbido-camaleao": Volume2,
+  "escuta-coracao": Heart,
+  "aperta-limao": Hand,
+  "frasco-calma": Sparkles,
+  "cinco-sentidos": Eye,
+  "tres-boas": Sun,
+  "missao-bondade": Flower2,
+  "caca-beleza": Sparkles,
+  "festival-risada": Smile,
+  "cafe-sem-culpa": Coffee,
+  "massagem-amor": Hand,
+  "abraco-20s": Heart,
+  "maos-cuidam": Hand,
+  "olhos-nos-olhos": Eye,
+  "caminhada-maos": Footprints,
+  "tres-gratidoes": Sparkles,
+  "elogio-especifico": MessageCircle,
+  "diario-uma-linha": BookOpen,
+  "agua-familia": Droplets,
+  "agua-com-fruta": Droplets,
+  "prato-colorido": Apple,
+  "cores-novas": Apple,
+  "cozinhar-juntos": CookingPot,
+  "refeicao-sem-tela": Utensils,
+  "bacterias-boas": Leaf,
+};
+
+const MOTOR_ICON: Record<Motor, LucideIcon> = {
+  corpo: Leaf,
+  interocepcao: Heart,
+  grounding: Waves,
+  gratidao: Sparkles,
+  bondade: Flower2,
+  saborear: Apple,
+  visualizacao: Cloud,
+  toque: Hand,
+  ocitocina: Heart,
+  conexao: Users,
+  exalacao: Wind,
+  nutricao: Utensils,
+  hidratacao: Droplets,
+};
+
+const activityIcon = (a: Activity): LucideIcon =>
+  ACTIVITY_ICON[a.id] ?? MOTOR_ICON[a.motor] ?? Sparkles;
 
 const TopBar = ({ title, onBack }: { title: string; onBack: () => void }) => (
   <div className="px-4 pt-[max(14px,env(safe-area-inset-top))] pb-3 flex items-center gap-2">
     <button onClick={() => { haptic("light"); onBack(); }} aria-label="Voltar"
       className="w-11 h-11 rounded-full flex items-center justify-center active:scale-95"
-      style={glassCard}>
+      style={glassChrome}>
       <ArrowLeft size={18} style={{ color: ink }} />
     </button>
     <div className="flex-1 h-11 rounded-full flex items-center justify-center px-4 text-[14px] font-bold"
-      style={{ ...glassCard, color: ink }}>
-      🌿 {title}
+      style={{ ...glassChrome, color: ink }}>
+      {title}
     </div>
     <div className="w-11" />
   </div>
@@ -41,39 +115,75 @@ const TopBar = ({ title, onBack }: { title: string; onBack: () => void }) => (
 
 const ActivityCard = ({ a, onOpen, locked }: { a: Activity; onOpen: () => void; locked?: boolean }) => {
   const tint = MOTOR_TINT[a.motor];
+  const Icon = activityIcon(a);
   return (
-    <button onClick={() => { haptic("light"); onOpen(); }}
-      className="text-left rounded-[20px] p-3 flex flex-col gap-2 active:scale-[0.98] transition-transform"
-      style={{
-        background: cream,
-        border: "1px solid rgba(42,37,32,0.06)",
-        boxShadow: "0 4px 16px -6px rgba(42,37,32,0.10)",
-        minHeight: 168,
-      }}>
-      {/* Slot da imagem — fallback gradiente do motor + emoji */}
-      <div className="relative h-[88px] rounded-[14px] overflow-hidden flex items-center justify-center"
-        style={{ background: `linear-gradient(135deg, ${tint}33, ${tint}11)` }}>
-        <span className="absolute top-2 right-2 px-2 h-6 rounded-full text-[10.5px] font-bold flex items-center"
-          style={{ background: "rgba(255,255,255,.85)", color: tint }}>
-          {a.duration}
-        </span>
-        {locked && (
-          <span className="absolute top-2 left-2 px-2 h-6 rounded-full text-[10px] font-bold flex items-center gap-1"
-            style={{ background: "rgba(255,255,255,.85)", color: "#E8821A" }}>
-            <Lock size={10} /> Premium
+    <button
+      type="button"
+      onClick={() => { haptic("light"); onOpen(); }}
+      className="text-left rounded-[22px] p-3.5 flex flex-col gap-2.5 active:scale-[0.98] transition-transform w-full"
+      style={{ ...glassCard, touchAction: "pan-y" }}
+      aria-label={locked ? `${a.title} (Premium)` : a.title}
+    >
+      <div className="relative flex items-start justify-between gap-2">
+        <div
+          className="relative w-[56px] h-[56px] rounded-[16px] flex items-center justify-center shrink-0 overflow-hidden"
+          style={{
+            background: `linear-gradient(145deg, ${tint}55, ${tint}18)`,
+            border: `1px solid ${tint}40`,
+            boxShadow: `0 8px 18px -8px ${tint}66, inset 0 1px 0 rgba(255,255,255,0.18)`,
+          }}
+        >
+          <span
+            aria-hidden
+            className="absolute -top-3 -right-3 w-10 h-10 rounded-full opacity-50"
+            style={{ background: `radial-gradient(circle, ${tint}, transparent 70%)` }}
+          />
+          <Icon size={26} strokeWidth={1.75} style={{ color: "#FFFCF5", position: "relative" }} />
+        </div>
+        <div className="flex flex-col items-end gap-1.5">
+          <span
+            className="px-2 h-6 rounded-full text-[10.5px] font-bold flex items-center"
+            style={{
+              background: "rgba(255,255,255,0.10)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: ink,
+            }}
+          >
+            {a.duration}
           </span>
-        )}
+          {locked && (
+            <span
+              className="px-2 h-6 rounded-full text-[10px] font-bold flex items-center gap-1"
+              style={{ background: "rgba(232,130,26,0.18)", color: "#F0B060" }}
+            >
+              <Lock size={10} /> Premium
+            </span>
+          )}
+        </div>
       </div>
-      <p className="font-semibold leading-tight" style={{
-        color: ink, fontFamily: "'Nunito', system-ui, sans-serif",
-        fontSize: "clamp(13px, 4vw, 15px)",
-      }}>{a.title}</p>
-      <p className="text-[11.5px] leading-snug" style={{ color: inkSoft }}>
-        {a.oneLine}
-      </p>
-      <span className="text-[12px] font-bold mt-auto inline-flex items-center gap-0.5" style={{ color: tint }}>
-        Começar <ChevronRight size={12} />
-      </span>
+      <div className="flex flex-col gap-1 min-h-[72px]">
+        <p
+          className="font-bold leading-tight text-[14px]"
+          style={{ color: ink, fontFamily: "'Nunito', system-ui, sans-serif" }}
+        >
+          {a.title}
+        </p>
+        <p className="text-[12px] leading-snug line-clamp-2" style={{ color: inkSoft }}>
+          {a.oneLine}
+        </p>
+      </div>
+      <div className="mt-auto flex items-center justify-between gap-2 pt-0.5">
+        <span className="text-[10.5px] font-semibold" style={{ color: inkMuted }}>
+          {a.audience === "parent" ? "Fazer junto" : "Para a criança"}
+        </span>
+        <span
+          className="text-[12px] font-bold inline-flex items-center gap-0.5"
+          style={{ color: tint }}
+        >
+          {locked ? "Desbloquear" : "Começar"}
+          <ChevronRight size={13} />
+        </span>
+      </div>
     </button>
   );
 };
@@ -81,7 +191,7 @@ const ActivityCard = ({ a, onOpen, locked }: { a: Activity; onOpen: () => void; 
 /* ─────────────── RELAXAR AGORA ─────────────── */
 export const RelaxarAgora = ({ onBack, onOpen, isPremium }:
   { onBack: () => void; onOpen: (a: Activity) => void; isPremium: boolean }) => (
-  <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
+  <div className="min-h-full" style={shellStyle}>
     <TopBar title="Alívio em minutos" onBack={onBack} />
     <div className="px-5 pt-2">
       <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
@@ -97,8 +207,8 @@ export const RelaxarAgora = ({ onBack, onOpen, isPremium }:
       <div className="mt-3 rounded-[18px] p-3 flex items-start gap-2"
         style={{ background: "rgba(108,92,184,0.10)", border: "1px solid rgba(108,92,184,0.18)" }}>
         <Heart size={16} style={{ color: "#6C5CB8" }} />
-        <p className="text-[12.5px] leading-snug" style={{ color: "#2A2520" }}>
-          <strong>Conectem-se.</strong> Pequenos momentos juntos geram grandes mudanças.
+        <p className="text-[12.5px] leading-snug" style={{ color: inkSoft }}>
+          <strong style={{ color: ink }}>Conectem-se.</strong> Pequenos momentos juntos geram grandes mudanças.
         </p>
       </div>
     </div>
@@ -208,7 +318,7 @@ export const RitualRapido = ({ onBack, onOpen }:
   ];
 
   return (
-    <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
+    <div className="min-h-full" style={shellStyle}>
       <TopBar title="Ritual rápido" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#E8821A" }}>
@@ -269,7 +379,7 @@ export const SosEmocional = ({ onBack, onOpen, onOpenParents }:
   };
 
   return (
-    <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
+    <div className="min-h-full" style={shellStyle}>
       <TopBar title="SOS emocional" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#46703A" }}>
@@ -292,7 +402,7 @@ export const SosEmocional = ({ onBack, onOpen, onOpenParents }:
           "Olhe ao redor: 5 coisas que vê, 4 que toca, 3 que ouve, 2 que cheira, 1 que prova.",
         ].map((s, i) => (
           <div key={i} className="rounded-[18px] p-4 flex items-start gap-3"
-            style={{ background: cream, border: "1px solid rgba(42,37,32,0.08)" }}>
+            style={glassCard}>
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[14px]"
               style={{ background: "linear-gradient(135deg,#7FB069,#46703A)" }}>
               {i + 1}
@@ -389,7 +499,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
   ];
 
   return (
-    <div className="min-h-full" style={{ background: bgDark, paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)" }}>
+    <div className="min-h-full" style={shellStyle}>
       <TopBar title="Vínculo em família" onBack={onBack} />
       <div className="px-5 pt-2">
         <p className="text-[11px] font-bold tracking-[0.2em] uppercase" style={{ color: "#C9A227" }}>
@@ -436,7 +546,7 @@ export const VinculoFamilia = ({ onBack, onOpen, isPremium }:
                   if (locked) window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
                 }}
                 className="rounded-[20px] p-3 flex items-center gap-3 active:scale-[0.98] text-left"
-                style={{ background: cream, border: "1px solid rgba(42,37,32,0.08)" }}>
+                style={glassCard}>
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-[32px]"
                   style={{ background: "linear-gradient(135deg,#C9A22733,#7FB06933)" }}>
                   {j.emoji}

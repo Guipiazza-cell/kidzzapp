@@ -51,7 +51,8 @@ const TABS: Tab[] = APP_TABS_ALL.filter((t) => t.inDock).map((tab) => ({
 
 // Telas de fundo ESCURO — o dock usa vidro escuro; nas demais, vidro claro.
 // Assim a nav "combina" com cada tela em vez de destoar.
-const DARK_SCREENS = new Set<string>(["dreams", "moments", "memories"]);
+// wellness = KALM (florestal escuro) — sem isso o dock claro "lava" os cards.
+const DARK_SCREENS = new Set<string>(["dreams", "moments", "memories", "wellness"]);
 
 /**
  * BottomNav — dock de vidro premium que HARMONIZA com cada tela.
@@ -92,11 +93,14 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
   const dark = DARK_SCREENS.has(activeTab);
 
   // Tema do dock por claridade da tela ativa.
+  // Dark: vidro FLORESTAL opaco (não branco translúcido — evita "lavar" cards escuros).
   const dockStyle: CSSProperties = dark
     ? {
-        background: "linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.06))",
-        border: "1px solid rgba(255,255,255,.3)",
-        boxShadow: "0 18px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -8px 18px rgba(0,0,0,.15)",
+        background: "linear-gradient(165deg, rgba(28,42,34,0.94), rgba(12,20,16,0.97))",
+        border: "1px solid rgba(255,255,255,0.14)",
+        boxShadow: "0 18px 44px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12), inset 0 -8px 18px rgba(0,0,0,.25)",
+        backdropFilter: "blur(20px) saturate(140%)",
+        WebkitBackdropFilter: "blur(20px) saturate(140%)",
       }
     : {
         background: "linear-gradient(160deg, rgba(255,255,255,.82), rgba(255,255,255,.5))",
@@ -141,8 +145,13 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
           position: "relative",
           padding: "8px 4px",
           borderRadius: 26,
-          backdropFilter: "blur(24px) saturate(170%)",
-          WebkitBackdropFilter: "blur(24px) saturate(170%)",
+          // blur default só no tema claro; dark já define no dockStyle (mais opaco)
+          ...(dark
+            ? {}
+            : {
+                backdropFilter: "blur(24px) saturate(170%)",
+                WebkitBackdropFilter: "blur(24px) saturate(170%)",
+              }),
           transition: "background .4s ease, box-shadow .4s ease, border-color .4s ease",
           ...dockStyle,
         }}

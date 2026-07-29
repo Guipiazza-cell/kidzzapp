@@ -71,10 +71,17 @@ const GeneratingScreen = ({ question, ageRange, childName, onComplete, onError, 
           const err = await resp.json().catch(() => ({ error: "Erro" }));
           if (resp.status === 403 && err.error === "LIMIT_REACHED") {
             clearTimeout(timeout);
+            toast.error(err.message || "Limite do dia atingido.");
             if (onLimitReached) { onLimitReached(); } else { onError(); }
             return;
           }
-          throw new Error(err.error || err.message || `Erro ${resp.status}`);
+          if (err.error === "QUOTA_ERROR") {
+            clearTimeout(timeout);
+            toast.error(err.message || "Não foi possível validar seu limite. Tente de novo.");
+            onError();
+            return;
+          }
+          throw new Error(err.message || err.error || `Erro ${resp.status}`);
         }
 
         if (!resp.body) throw new Error("Sem resposta");

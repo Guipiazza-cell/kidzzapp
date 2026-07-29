@@ -154,6 +154,10 @@ serve(async (req) => {
     const rawMessages = Array.isArray(body?.messages) ? body.messages : [];
     const ageRange = typeof body?.ageRange === "string" ? body.ageRange : "3-7";
     const childName = typeof body?.childName === "string" ? body.childName : "";
+    let criancaId =
+      typeof body?.criancaId === "string" && body.criancaId.length > 10
+        ? body.criancaId
+        : null;
 
     // SECURITY: only accept user/assistant messages from client; cap count and content length.
     const safeMessages = rawMessages
@@ -164,18 +168,48 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    // Resolve criança se o cliente não mandou (schema com usage.crianca_id)
+    if (!criancaId) {
+      const { data: childRow } = await supabaseUser
+        .from("criancas")
+        .select("id")
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      criancaId = (childRow as any)?.id ?? null;
+    }
+
     // Defesa em profundidade: incrementa via RPC (fonte única).
+    // Compat: schema novo (tipo + crianca_id) e antigo (só tipo).
     {
-      const { data: quotaData, error: quotaErr } = await (supabaseUser as any).rpc(
-        "increment_usage",
-        { _tipo: "perguntas" }
-      );
-      if (quotaErr) {
-        console.error("[KIDZZ-CHAT] increment_usage error:", quotaErr.message);
-        return new Response(JSON.stringify({ error: "QUOTA_ERROR" }), {
+      const attempts: Record<string, unknown>[] = [];
+      if (criancaId) attempts.push({ _tipo: "perguntas", _crianca_id: criancaId });
+      attempts.push({ _tipo: "perguntas", _crianca_id: null });
+      attempts.push({ _tipo: "perguntas" });
+
+      let quotaData: any = null;
+      let lastErr: string | null = null;
+      for (const args of attempts) {
+        const r = await (supabaseUser as any).rpc("increment_usage", args);
+        if (!r.error) {
+          quotaData = r.data;
+          lastErr = null;
+          break;
+        }
+        lastErr = r.error?.message ?? "rpc error";
+      }
+
+      if (lastErr) {
+        console.error("[KIDZZ-CHAT] increment_usage error:", lastErr);
+        return new Response(JSON.stringify({
+          error: "QUOTA_ERROR",
+          message: "Não foi possível validar seu limite agora. Tente de novo em instantes.",
+          detail: lastErr,
+        }), {
           status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
       const row = Array.isArray(quotaData) ? quotaData[0] : quotaData;
       if (!row?.allowed) {
         const plan = row?.plan ?? "free";

@@ -429,40 +429,77 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
+    // Se getSession/fetchProfile pendurar (rede/SW/token corrompido), a UI
+    // ficava eternamente em loading com a splash "KIDZZAPP" / tela em branco.
+    const withTimeout = <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
+      new Promise<T>((resolve, reject) => {
+        const t = window.setTimeout(() => reject(new Error(`[Auth] ${label} timeout after ${ms}ms`)), ms);
+        promise.then(
+          (v) => { window.clearTimeout(t); resolve(v); },
+          (e) => { window.clearTimeout(t); reject(e); },
+        );
+      });
+
+    const releaseUi = (seedProfile?: Profile | null) => {
+      if (!mounted || initDone.current) return;
+      if (seedProfile) setProfile((prev) => prev ?? seedProfile);
+      else setProfile((prev) => prev ?? getGuestProfile());
+      setLoading(false);
+      setIsReady(true);
+      initDone.current = true;
+    };
+
     const initializeAuth = async () => {
+      // Fail-open duro: nunca trava a splash/Index por mais de 3.5s.
+      const failOpenTimer = window.setTimeout(() => {
+        console.warn("[Auth] init fail-open — liberando UI");
+        releaseUi(getGuestProfile());
+      }, 3500);
+
       try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        const { data: { session: currentSession } } = await withTimeout(
+          supabase.auth.getSession(),
+          3000,
+          "getSession",
+        );
         if (!mounted) return;
 
         if (currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
-          const prof = await fetchProfile(currentSession.user.id);
-          if (!mounted) return;
-          setProfile(prof);
-          // Tier otimista a partir do DB — libera a UI sem esperar o Stripe.
-          setTier(prof.is_premium ? "premium" : "free");
-          // Libera a UI IMEDIATAMENTE. O gate `if (loading) return null` no Index
-          // segurava a tela inteira (~10s) ate o check-subscription do Stripe
-          // responder. Agora o refresh do Stripe roda em background e so ajusta
-          // tier/locks quando chegar.
-          setLoading(false);
-          setIsReady(true);
-          initDone.current = true;
-          checkSubscription(currentSession.access_token, prof, true)
-            .then((subResult) => {
-              if (!mounted) return;
-              setTier(subResult.tier);
-              if (subResult.isPremium !== prof.is_premium) {
-                setProfile((prev) => (prev ? { ...prev, is_premium: subResult.isPremium } : prev));
-              }
-            })
-            .catch((err) => console.warn("[Auth] init subscription check failed", err));
+          // Libera a UI já com seed guest/draft — não espera o fetch do profile.
+          const seed = getGuestProfile();
+          setProfile(seed);
+          setTier(seed.is_premium ? "premium" : "free");
+          releaseUi(seed);
+
+          try {
+            const prof = await withTimeout(
+              fetchProfile(currentSession.user.id),
+              3000,
+              "fetchProfile",
+            );
+            if (!mounted) return;
+            setProfile(prof);
+            setTier(prof.is_premium ? "premium" : "free");
+            checkSubscription(currentSession.access_token, prof, true)
+              .then((subResult) => {
+                if (!mounted) return;
+                setTier(subResult.tier);
+                if (subResult.isPremium !== prof.is_premium) {
+                  setProfile((prev) => (prev ? { ...prev, is_premium: subResult.isPremium } : prev));
+                }
+              })
+              .catch((err) => console.warn("[Auth] init subscription check failed", err));
+          } catch (profileErr) {
+            console.warn("[Auth] profile fetch failed/timed out — keeping seed", profileErr);
+          }
         } else {
           setSession(null);
           setUser(null);
           setProfile(getGuestProfile());
           setTier("free");
+          releaseUi(getGuestProfile());
         }
       } catch (err) {
         console.error("Auth init error:", err);
@@ -470,7 +507,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setProfile(getGuestProfile());
         setTier("free");
+        releaseUi(getGuestProfile());
       } finally {
+        window.clearTimeout(failOpenTimer);
         if (mounted) {
           setLoading(false);
           setIsReady(true);

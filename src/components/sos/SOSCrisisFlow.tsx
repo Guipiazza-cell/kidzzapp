@@ -151,7 +151,6 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
           <ArrowLeft size={16} style={{ color: "hsl(var(--premium-ink))" }} />
         </button>
         <div className="flex items-center gap-1.5 min-w-0 px-2">
-          <span className="text-[18px]" aria-hidden>{situation.emoji}</span>
           <h2
             className="text-[15px] font-black tracking-tight truncate"
             style={{ color: "hsl(var(--premium-ink))" }}
@@ -620,10 +619,10 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { key: "better", emoji: "💚", label: "Melhor" },
-                        { key: "still_hard", emoji: "🫂", label: "Ainda difícil" },
-                        { key: "helped", emoji: "✨", label: "Ajudou bastante" },
-                        { key: "continue", emoji: "🌙", label: "Quero continuar" },
+                        { key: "better", label: "Melhor" },
+                        { key: "still_hard", label: "Ainda difícil" },
+                        { key: "helped", label: "Ajudou bastante" },
+                        { key: "continue", label: "Quero continuar" },
                       ].map((opt) => {
                         const selected = feedback === opt.key;
                         const dimmed = feedback && !selected;
@@ -646,7 +645,6 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                               opacity: dimmed ? 0.5 : 1,
                             }}
                           >
-                            <span aria-hidden>{opt.emoji}</span>
                             <span className="truncate">{opt.label}</span>
                           </motion.button>
                         );
@@ -658,7 +656,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                         className="text-[11px] text-center mt-2.5 font-medium"
                         style={{ color: "hsl(var(--premium-ink-soft))" }}
                       >
-                        Obrigado por compartilhar 💚
+                        Obrigado por compartilhar
                       </motion.p>
                     )}
                   </motion.div>

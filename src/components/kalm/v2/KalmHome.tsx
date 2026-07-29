@@ -9,16 +9,17 @@ import {
   Share2, Sparkles, ChevronRight,
 } from "lucide-react";
 import kalmHeroFamily from "@/assets/kalm-hero-family.webp";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
-import KidzzLogo from "@/components/common/KidzzLogo";
 import { findActivity, type Activity } from "./data";
 import {
-  useMood, useParentMood, useKalmStreak, useWeekStats, useDailySuggestion,
+  useMood, useParentMood, useKalmStreak, useWeekStats, useDailySuggestion, useJar,
   type MoodValue,
 } from "./state";
+import { WEATHER_ICONS } from "./WeatherIcons";
+import jarroGratidao from "@/assets/kidzz/jarro-gratidao.webp";
+import { KALM_DOCK_CLEARANCE } from "./layout";
 
 export type Pillar = "sentir" | "agradecer" | "mover" | "nutrir" | "conectar" | "cuidar";
 
@@ -42,10 +43,8 @@ const glassChrome: React.CSSProperties = {
 };
 
 const glassCard: React.CSSProperties = {
-  background: "linear-gradient(165deg, rgba(36,52,42,0.96), rgba(18,28,22,0.98))",
+  background: "linear-gradient(165deg, #24342A, #121C16)",
   border: "1px solid rgba(255,255,255,0.12)",
-  backdropFilter: "blur(16px) saturate(130%)",
-  WebkitBackdropFilter: "blur(16px) saturate(130%)",
   boxShadow:
     "0 12px 28px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.08)",
 };
@@ -58,12 +57,12 @@ const greetByHour = () => {
 };
 
 // Metáfora do tempo (5 estados). Mapeia para MoodValue existente.
-const WEATHER: { v: MoodValue; emoji: string; label: string; color: string }[] = [
-  { v: "muito_bem", emoji: "☀️", label: "Sol",         color: "#F4CB55" },
-  { v: "bem",       emoji: "🌈", label: "Arco-íris",   color: "#9BD07A" },
-  { v: "medio",     emoji: "⛅", label: "Nuvem",       color: "#BFD4E4" },
-  { v: "mal",       emoji: "🌧️", label: "Chuva",       color: "#7FB2E0" },
-  { v: "muito_mal", emoji: "⛈️", label: "Tempestade",  color: "#A69CE0" },
+const WEATHER: { v: MoodValue; label: string; color: string }[] = [
+  { v: "muito_bem", label: "Sol",         color: "#F4CB55" },
+  { v: "bem",       label: "Arco-íris",   color: "#9BD07A" },
+  { v: "medio",     label: "Nuvem",       color: "#BFD4E4" },
+  { v: "mal",       label: "Chuva",       color: "#7FB2E0" },
+  { v: "muito_mal", label: "Tempestade",  color: "#A69CE0" },
 ];
 
 interface Props {
@@ -81,6 +80,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
   const { streak, markToday } = useKalmStreak();
   const weekStats = useWeekStats();
   const suggestion = useDailySuggestion();
+  const { items: jarItems } = useJar();
   const [who, setWho] = useState<"kid" | "parent">("kid");
 
   const activeMood = who === "kid" ? kidMood : parentMood;
@@ -137,14 +137,15 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
     <div
       className="min-h-full relative"
       style={{
+        backgroundColor: "#0B1310",
         background:
           "radial-gradient(120% 60% at 50% 0%, rgba(232,185,58,0.10) 0%, transparent 55%)," +
           "radial-gradient(120% 80% at 80% 30%, rgba(127,176,105,0.08) 0%, transparent 60%)," +
           "linear-gradient(180deg, #0E1712 0%, #131F18 45%, #0B1310 100%)",
         fontFamily: "'Nunito', system-ui, sans-serif",
         color: ink,
-        /* espaço livre acima do dock (mesmo padrão das outras abas) */
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
+        /* espaço livre acima do dock flutuante */
+        paddingBottom: KALM_DOCK_CLEARANCE,
       }}
     >
       {/* Vinheta florestal decorativa (não interativa) */}
@@ -159,7 +160,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         }}
       />
 
-      {/* ═══ HERO cinematográfico — só arte (texto abaixo, sem cobrir personagens) ═══ */}
+      {/* ═══ HERO cinematográfico — arte 4:3 regenerada (Gui inteiro + nítido) ═══ */}
       <section className="relative" style={{ height: 300 }}>
         <div
           aria-hidden
@@ -167,49 +168,30 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           style={{
             height: 300,
             WebkitMaskImage:
-              "linear-gradient(180deg, #000 62%, rgba(0,0,0,.5) 82%, transparent 100%)",
+              "linear-gradient(180deg, #000 68%, rgba(0,0,0,.5) 86%, transparent 100%)",
             maskImage:
-              "linear-gradient(180deg, #000 62%, rgba(0,0,0,.5) 82%, transparent 100%)",
+              "linear-gradient(180deg, #000 68%, rgba(0,0,0,.5) 86%, transparent 100%)",
           }}
         >
           <img
             src={kalmHeroFamily}
-            alt=""
+            alt="Família e Gui, o camaleão Kidzz"
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: "50% 22%" }}
+            style={{
+              /* 4:3 ≈ proporção do hero no celular; centro leve à direita p/ o Gui */
+              objectPosition: "52% 34%",
+            }}
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(180deg, rgba(8,14,10,.45) 0%, transparent 36%, rgba(14,23,18,.55) 100%)",
+                "linear-gradient(180deg, rgba(8,14,10,.36) 0%, transparent 42%, rgba(14,23,18,.42) 100%)",
             }}
           />
         </div>
 
-        {/* Gui original soft (direita) */}
-        <img
-          src={CAMALEAO.heartSoft}
-          alt="Gui, o camaleão Kidzz"
-          draggable={false}
-          className="pointer-events-none absolute"
-          style={{
-            right: -8,
-            bottom: 4,
-            width: "48%",
-            maxWidth: 210,
-            height: "auto",
-            objectFit: "contain",
-            filter: "drop-shadow(0 14px 22px rgba(0,0,0,.45))",
-            ...CAMALEAO_SCENE_MASK,
-            zIndex: 2,
-          }}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = CAMALEAO.heart;
-          }}
-        />
-
-        {/* Top chrome — só logo / nav */}
+        {/* Top chrome — nav / streak (sem 2º camaleão: já está na arte do hero) */}
         <div className="relative z-10 px-4 pt-[max(14px,env(safe-area-inset-top))] pb-2 flex items-center gap-2">
           <button
             onClick={() => { haptic("light"); onBack(); }}
@@ -219,15 +201,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           >
             <ArrowLeft size={18} style={{ color: ink }} />
           </button>
-          <div className="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 px-1">
-            <KidzzLogo height={28} />
-            <span
-              className="text-[9px] font-bold tracking-[0.14em]"
-              style={{ color: "rgba(241,238,228,0.78)" }}
-            >
-              Desligue a tela, ligue a infância.
-            </span>
-          </div>
+          <div className="flex-1 min-w-0" />
           <div
             className="h-11 px-3 rounded-full flex items-center gap-1 text-[11.5px] font-bold flex-none"
             style={{ ...glassChrome, color: gold, background: "rgba(255,255,255,0.12)" }}
@@ -269,7 +243,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           Pequenos gestos,
           <br />
           grandes{" "}
-          <span style={{ color: green, fontStyle: "italic" }}>conexões</span>.
+          <span style={{ color: green, fontStyle: "italic" }}>conexões</span>
         </h1>
         <p
           className="mt-2 text-[13px] leading-[1.4] font-semibold"
@@ -282,7 +256,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
       {/* Sugestão do dia (dinâmica) */}
       <section className="relative px-5 pt-4">
         <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: gold }}>
-          ✨ Sugestão de hoje
+          Sugestão de hoje
         </p>
         <button
           onClick={() => {
@@ -332,7 +306,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
       <section className="relative px-5 pt-6">
         <div className="flex items-center justify-between">
           <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: green }}>
-            🌦 Tempo de hoje
+            Tempo de hoje
           </p>
           <div
             className="flex rounded-full p-0.5"
@@ -364,6 +338,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           <div className="flex items-stretch justify-between gap-1.5">
             {WEATHER.map((m) => {
               const on = activeMood === m.v;
+              const Icon = WEATHER_ICONS[m.v];
               return (
                 <button
                   key={m.v}
@@ -377,7 +352,9 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
                   aria-label={m.label}
                   aria-pressed={on}
                 >
-                  <span className="text-[26px] leading-none">{m.emoji}</span>
+                  <span className="leading-none flex items-center justify-center h-8">
+                    {Icon ? <Icon active={on} color={m.color} /> : null}
+                  </span>
                   <span
                     className="mt-1 text-[10px] font-bold leading-tight text-center"
                     style={{ color: on ? m.color : inkMuted }}
@@ -404,6 +381,93 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         </div>
       </section>
 
+      {/* Jarro da Gratidão */}
+      <section className="relative px-5 pt-6">
+        <button
+          type="button"
+          onClick={() => {
+            haptic("light");
+            sfx("click");
+            onGoPillar("agradecer");
+          }}
+          className="w-full text-left rounded-[24px] overflow-hidden active:scale-[0.99]"
+          style={{
+            background:
+              "linear-gradient(145deg, rgba(255,252,245,0.98) 0%, rgba(245,236,214,0.96) 55%, rgba(236,224,196,0.96) 100%)",
+            border: "1px solid rgba(255,255,255,0.7)",
+            boxShadow:
+              "0 14px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.85)",
+          }}
+        >
+          <div className="relative flex gap-3 p-4 min-h-[148px]">
+            <div className="relative z-[2] flex-1 min-w-0 pr-2">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span
+                  className="flex h-6 w-6 items-center justify-center rounded-full"
+                  style={{
+                    background: "linear-gradient(145deg, #B8E0A0, #5FA84A)",
+                    boxShadow: "0 3px 8px rgba(70,140,50,0.28)",
+                  }}
+                >
+                  <Leaf size={12} color="#fff" strokeWidth={2.5} />
+                </span>
+                <span
+                  className="text-[10px] font-black tracking-[0.14em] uppercase"
+                  style={{ color: "#3E7A4A" }}
+                >
+                  Jarro da gratidão
+                </span>
+              </div>
+              <h3
+                className="text-[20px] font-semibold leading-tight"
+                style={{
+                  color: "#1F2A18",
+                  fontFamily: "'Fraunces','Nunito',serif",
+                }}
+              >
+                O que foi bom hoje?
+              </h3>
+              <p
+                className="mt-1.5 text-[12.5px] font-semibold leading-snug"
+                style={{ color: "rgba(40,55,30,0.72)", maxWidth: 190 }}
+              >
+                Coloque uma estrelinha no jarro e veja a gratidão crescer em família.
+              </p>
+              {jarItems.length > 0 && (
+                <p className="mt-1.5 text-[11px] font-bold" style={{ color: goldSoft }}>
+                  {jarItems.length} {jarItems.length === 1 ? "estrela" : "estrelas"} no jarro
+                </p>
+              )}
+              <span
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-extrabold"
+                style={{
+                  background: "linear-gradient(135deg, #5FA84A, #3E7A4A)",
+                  color: "#fff",
+                  boxShadow: "0 6px 14px rgba(62,122,74,0.28)",
+                }}
+              >
+                + Guardar momento
+              </span>
+            </div>
+
+            <div
+              className="pointer-events-none absolute right-0 top-0 bottom-0 w-[48%]"
+              aria-hidden
+            >
+              <img
+                src={jarroGratidao}
+                alt=""
+                className="absolute right-[-6%] top-1/2 h-[120%] w-auto max-w-none -translate-y-1/2 object-contain"
+                style={{
+                  filter: "drop-shadow(0 10px 18px rgba(80,50,10,0.18))",
+                }}
+                draggable={false}
+              />
+            </div>
+          </div>
+        </button>
+      </section>
+
       {/* 6 pilares */}
       <section className="relative px-5 pt-7">
         <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: green }}>
@@ -415,13 +479,15 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
             return (
               <button
                 key={p.id}
+                type="button"
                 onClick={() => { haptic("light"); onGoPillar(p.id); }}
                 className="text-left rounded-[20px] p-3.5 active:scale-[0.98]"
                 style={{
                   ...glassCard,
-                  background: `linear-gradient(160deg, ${p.tint}28, rgba(22,34,26,0.98) 62%)`,
+                  background: `linear-gradient(160deg, ${p.tint}40, #16221A 62%)`,
                   border: `1px solid ${p.tint}45`,
                   minHeight: 118,
+                  touchAction: "pan-y",
                 }}
               >
                 <div
