@@ -1,11 +1,11 @@
 /** Padrão visual full-bleed das telas de onboarding com arte de fundo.
- *  Manter IGUAL em Name / Age / Interests / etc.
+ *  Mesmo alinhamento de altura em Name / Age / Interests.
  */
 export const ONBOARDING_HERO_FRAME = {
   objectFit: "cover" as const,
-  objectPosition: "50% 28%",
-  transform: "scale(1.04) translateY(-3%)",
-  transformOrigin: "center center",
+  objectPosition: "50% 4%",
+  transform: "scale(1.12) translateY(-18%)",
+  transformOrigin: "center top",
 };
 
 /** Painel de vidro inferior (form / opções) */
