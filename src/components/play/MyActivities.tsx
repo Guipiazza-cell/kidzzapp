@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, Sparkles, RefreshCw, Lock } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -26,6 +26,47 @@ import {
 interface Props {
   onBack: () => void;
 }
+
+const IC = "/exemplos/assets/brincar-v2/icons";
+
+/** Ícones 3D premium por categoria */
+const CAT_ICON: Record<ActivityCategory, string> = {
+  movimento: `${IC}/cat-movimento.png`,
+  criatividade: `${IC}/cat-criatividade.png`,
+  familia: `${IC}/cat-familia.png`,
+  desafio: `${IC}/cat-desafio.png`,
+};
+
+/** Mapeia emoji do pool → ícone premium (fallback = categoria) */
+const EMOJI_ICON: Record<string, string> = {
+  "💃": `${IC}/act-dance.png`,
+  "🐻": `${IC}/act-bear.png`,
+  "🗺️": `${IC}/act-map.png`,
+  "🏕️": `${IC}/act-fort.png`,
+  "🦸": `${IC}/act-hero.png`,
+  "📖": `${IC}/act-book.png`,
+  "🎤": `${IC}/act-music.png`,
+  "🎁": `${IC}/act-gift.png`,
+  "💧": `${IC}/act-water.png`,
+  "🧸": `${IC}/act-gift.png`,
+  "🎵": `${IC}/act-music.png`,
+  "🎶": `${IC}/act-music.png`,
+};
+
+function activityIconSrc(a: Activity): string {
+  return EMOJI_ICON[a.emoji] ?? CAT_ICON[a.category];
+}
+
+/** Liquid glass igual ao dock */
+const liquidCard: CSSProperties = {
+  background:
+    "linear-gradient(165deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.16) 100%)",
+  border: "0.5px solid rgba(255,255,255,.55)",
+  boxShadow:
+    "0 10px 28px rgba(20,16,30,.12), 0 2px 8px rgba(20,16,30,.06), inset 0 1px 0 rgba(255,255,255,.72)",
+  backdropFilter: "blur(28px) saturate(180%)",
+  WebkitBackdropFilter: "blur(28px) saturate(180%)",
+};
 
 /**
  * Atividades semanais — 10 missões por semana.
@@ -227,7 +268,7 @@ const MyActivities = ({ onBack }: Props) => {
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-4" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)" }}>
         {/* Progresso */}
-        <div className="bg-white/60 backdrop-blur rounded-2xl p-3 border border-white/50 mb-3">
+        <div className="rounded-2xl p-3 mb-3" style={liquidCard}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-extrabold text-gray-700">
               Progresso da semana
@@ -254,11 +295,14 @@ const MyActivities = ({ onBack }: Props) => {
         {/* Atividade do dia (destaque) */}
         {dailyHighlight && (
           <motion.div
-            className="relative mb-4 p-4 rounded-3xl border-2 border-amber-300 overflow-hidden cursor-pointer"
+            className="relative mb-4 p-4 rounded-3xl overflow-hidden cursor-pointer"
             style={{
+              ...liquidCard,
               background:
-                "linear-gradient(135deg, hsl(45 95% 88%) 0%, hsl(45 95% 75%) 100%)",
-              boxShadow: "0 8px 24px hsl(45 90% 55% / 0.25)",
+                "linear-gradient(155deg, rgba(255,248,220,.55) 0%, rgba(255,255,255,.28) 45%, rgba(255,255,255,.18) 100%)",
+              border: "0.5px solid rgba(255,220,140,.65)",
+              boxShadow:
+                "0 12px 32px rgba(180,120,20,.16), inset 0 1px 0 rgba(255,255,255,.75)",
             }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -267,22 +311,39 @@ const MyActivities = ({ onBack }: Props) => {
             role="button"
             aria-label={`Ver detalhes: ${dailyHighlight.title}`}
           >
-            <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md">
+            <div
+              className="absolute top-2 right-2 px-2 py-1 rounded-full text-white text-[10px] font-black flex items-center gap-1 shadow-md"
+              style={{
+                background: "linear-gradient(180deg,#F5C14A,#E0A020)",
+              }}
+            >
               <Sparkles size={10} /> HOJE
             </div>
             <div className="flex items-start gap-3">
-              <div className="text-4xl flex-shrink-0">{dailyHighlight.emoji}</div>
+              <div
+                className="w-14 h-14 rounded-2xl flex-shrink-0 overflow-hidden"
+                style={{
+                  boxShadow: "0 6px 16px rgba(40,60,30,.14)",
+                  border: "0.5px solid rgba(255,255,255,.7)",
+                }}
+              >
+                <img
+                  src={activityIconSrc(dailyHighlight)}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black text-amber-700 uppercase tracking-wide">
+                <p className="text-[10px] font-black text-amber-800/90 uppercase tracking-wide">
                   {getCategoryMeta(dailyHighlight.category).label}
                 </p>
                 <h3 className="text-base font-extrabold text-gray-800 leading-tight">
                   {dailyHighlight.title}
                 </h3>
-                <p className="text-xs text-gray-700 mt-1 leading-snug">
+                <p className="text-xs text-gray-700/90 mt-1 leading-snug">
                   {dailyHighlight.description}
                 </p>
-                <p className="text-[10px] font-bold text-amber-800/80 mt-1.5">
+                <p className="text-[10px] font-bold text-amber-900/70 mt-1.5">
                   Toque para ver como fazer →
                 </p>
               </div>
@@ -304,8 +365,8 @@ const MyActivities = ({ onBack }: Props) => {
           </motion.div>
         )}
 
-        {/* Lista geral */}
-        <div className="space-y-2">
+        {/* Lista geral — liquid glass + ícones premium */}
+        <div className="space-y-2.5">
           {activities.map((a) => {
             const done = completed.has(a.id);
             const locked = isLocked(a);
@@ -329,25 +390,28 @@ const MyActivities = ({ onBack }: Props) => {
                     open();
                   }
                 }}
-                className={`relative flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-sm ${
-                  done
-                    ? "bg-emerald-50/80 border-emerald-200 opacity-70"
-                    : locked
-                    ? "bg-white/55 border-white/50"
-                    : "bg-white/70 border-white/60"
-                }`}
+                className="relative flex items-center gap-3 p-3 rounded-2xl cursor-pointer"
+                style={{
+                  ...liquidCard,
+                  opacity: done ? 0.72 : locked ? 0.88 : 1,
+                }}
                 layout
                 whileTap={{ scale: 0.98 }}
                 aria-label={locked ? `${a.title} — premium` : `Ver detalhes de ${a.title}`}
               >
                 <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
                   style={{
-                    background: `${meta.color.replace(")", " / 0.18)")}`,
-                    filter: locked ? "blur(1.5px) saturate(0.6)" : "none",
+                    border: "0.5px solid rgba(255,255,255,.65)",
+                    boxShadow: "0 4px 12px rgba(30,40,25,.1)",
+                    filter: locked ? "saturate(0.55) brightness(0.95)" : "none",
                   }}
                 >
-                  {a.emoji}
+                  <img
+                    src={activityIconSrc(a)}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
@@ -355,15 +419,15 @@ const MyActivities = ({ onBack }: Props) => {
                       done
                         ? "text-gray-500 line-through"
                         : locked
-                        ? "text-gray-500"
+                        ? "text-gray-600"
                         : "text-gray-800"
                     }`}
                   >
                     {a.title}
                   </p>
-                  <p className="text-[10px] font-bold" style={{ color: meta.color }}>
-                    {meta.emoji} {meta.label} · +{a.xp} XP
-                    {locked && " · 🔒 Premium"}
+                  <p className="text-[10px] font-bold mt-0.5" style={{ color: meta.color }}>
+                    {meta.label} · +{a.xp} XP
+                    {locked && " · Premium"}
                   </p>
                 </div>
                 <motion.button
@@ -373,13 +437,22 @@ const MyActivities = ({ onBack }: Props) => {
                     open();
                   }}
                   disabled={done}
-                  className={`min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all ${
+                  className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all"
+                  style={
                     done
-                      ? "bg-emerald-500 text-white"
+                      ? { background: "#10b981", color: "#fff" }
                       : locked
-                      ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white"
-                      : "bg-gray-100 text-gray-700 active:scale-90"
-                  }`}
+                      ? {
+                          background: "linear-gradient(135deg,#F5C14A,#E8821A)",
+                          color: "#fff",
+                          boxShadow: "0 4px 12px rgba(200,120,20,.3)",
+                        }
+                      : {
+                          ...liquidCard,
+                          color: "#2A3A28",
+                          fontWeight: 900,
+                        }
+                  }
                   whileTap={done ? undefined : { scale: 0.9 }}
                   aria-label={done ? "Concluído" : locked ? "Desbloquear premium" : "Ver atividade"}
                 >
