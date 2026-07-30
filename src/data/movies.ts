@@ -920,9 +920,9 @@ export const EDITORIAL_SECTIONS: EditorialSection[] = [
   },
   {
     id: "divertidos",
-    title: "Sessão divertida",
+    title: "Divertidos",
     icon: "😂",
-    subtitle: "Quando o riso solta o dia",
+    subtitle: "",
     movieIds: ["sing", "madagascar", "minions", "malvado", "hamburguer", "chefinho", "carros", "pets", "leo", "stuart-little"],
   },
 ];

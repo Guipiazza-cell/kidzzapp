@@ -1185,7 +1185,6 @@ const FamilyCinema = ({ onBack }: Props) => {
         <div style={{ marginBottom: GAP }}>
           <div style={{ padding: `0 ${PAD}px` }}>
             <SectionLabel
-              kicker="Curadoria"
               right={
                 <span style={{ fontSize: 11, fontWeight: 800, color: INK2 }}>
                   {sectionMovies.length} filmes
@@ -1219,10 +1218,7 @@ const FamilyCinema = ({ onBack }: Props) => {
             return (
               <div key={sec.id} style={{ marginBottom: GAP }}>
                 <div style={{ padding: `0 ${PAD}px` }}>
-                  <SectionLabel kicker="Curadoria KIDZZ">{sec.title}</SectionLabel>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: INK2, marginTop: -6, marginBottom: 10 }}>
-                    {sec.subtitle}
-                  </div>
+                  <SectionLabel>{sec.title}</SectionLabel>
                 </div>
                 <div
                   className="cine2-hscroll"
@@ -1243,17 +1239,6 @@ const FamilyCinema = ({ onBack }: Props) => {
             );
           })}
 
-        <div
-          style={{
-            padding: `8px ${PAD}px 20px`,
-            textAlign: "center",
-            fontSize: 11.5,
-            fontWeight: 800,
-            color: "rgba(50,80,120,.45)",
-          }}
-        >
-          Curadoria KIDZZ · Selecionada para sua família
-        </div>
       </div>
 
       {active && <DetailSheet movie={active} onClose={() => setActive(null)} onMarcar={marcar} />}
