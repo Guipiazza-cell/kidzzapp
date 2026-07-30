@@ -17,7 +17,6 @@ import {
   type BrincarExperience,
 } from "@/data/brincarExperiences";
 import LockedFeature from "@/components/LockedFeature";
-import KidzzHeader from "@/components/common/KidzzHeader";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
@@ -417,30 +416,18 @@ const KidzzPlay = ({
     setActiveGame(null);
   };
 
-  /** Criar & Imaginar - header padrão (sem logo se hideLogo) */
-  const PlayHeader = (
-    <KidzzHeader
-      onBack={backToHome}
-      hideLogo
-      hideTagline
-      right={
-        <motion.button
-          type="button"
-          onClick={onOpenAchievements}
-          whileTap={{ scale: 0.94 }}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
-        >
-          <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
-          <span className="text-[13px] font-extrabold text-[#2A2520]">
-            {sessionScore}
-          </span>
-        </motion.button>
-      }
-    />
-  );
-
-  /** Jogos & Desafios - header roxo da página, sem logo KIDZZ */
-  const JogosHeader = (
+  /** Header das sub-telas: sem logo, cor estendida da página */
+  const SubHeader = ({
+    bg,
+    border,
+    ink,
+    pillBorder,
+  }: {
+    bg: string;
+    border: string;
+    ink: string;
+    pillBorder: string;
+  }) => (
     <div
       className="sticky top-0 z-30"
       style={{
@@ -448,8 +435,8 @@ const KidzzPlay = ({
         paddingLeft: 14,
         paddingRight: 14,
         paddingBottom: 10,
-        background: "linear-gradient(180deg, #EDE9F8 0%, #F3F1FB 100%)",
-        borderBottom: "1px solid rgba(106,62,192,0.08)",
+        background: bg,
+        borderBottom: border,
       }}
     >
       <div className="flex items-center justify-between gap-3">
@@ -463,14 +450,14 @@ const KidzzPlay = ({
             height: 44,
             borderRadius: 999,
             background: "rgba(255,255,255,0.55)",
-            border: "1px solid rgba(106,62,192,0.12)",
+            border: pillBorder,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(80,50,140,0.08)",
+            boxShadow: "0 4px 12px rgba(40,70,30,0.08)",
           }}
         >
-          <ArrowLeft size={20} color="#4A3480" strokeWidth={2.2} />
+          <ArrowLeft size={20} color={ink} strokeWidth={2.2} />
         </button>
         <div className="flex-1 min-w-0" aria-hidden />
         <motion.button
@@ -480,17 +467,37 @@ const KidzzPlay = ({
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-full min-h-[40px]"
           style={{
             background: "rgba(255,255,255,0.55)",
-            border: "1px solid rgba(106,62,192,0.12)",
-            boxShadow: "0 4px 12px rgba(80,50,140,0.08)",
+            border: pillBorder,
+            boxShadow: "0 4px 12px rgba(40,70,30,0.08)",
           }}
         >
           <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
-          <span className="text-[13px] font-extrabold" style={{ color: "#3A2A70" }}>
+          <span className="text-[13px] font-extrabold" style={{ color: ink }}>
             {sessionScore}
           </span>
         </motion.button>
       </div>
     </div>
+  );
+
+  /** Criar & Imaginar - verde da página, sem logo */
+  const CriarHeader = (
+    <SubHeader
+      bg="linear-gradient(180deg, #EAF6E4 0%, #F0F8EA 100%)"
+      border="1px solid rgba(46,154,99,0.08)"
+      ink="#1E3A28"
+      pillBorder="1px solid rgba(46,154,99,0.12)"
+    />
+  );
+
+  /** Jogos & Desafios - roxo da página, sem logo */
+  const JogosHeader = (
+    <SubHeader
+      bg="linear-gradient(180deg, #EDE9F8 0%, #F3F1FB 100%)"
+      border="1px solid rgba(106,62,192,0.08)"
+      ink="#3A2A70"
+      pillBorder="1px solid rgba(106,62,192,0.12)"
+    />
   );
 
   /* ── Categorias (dados reais → navegação real) ── */
@@ -1216,7 +1223,7 @@ const KidzzPlay = ({
       exit={{ opacity: 0 }}
     >
       <style>{BRIN_KEYFRAMES}</style>
-      {sub === "criar" && PlayHeader}
+      {sub === "criar" && CriarHeader}
       {sub === "jogos" && !activeGame && JogosHeader}
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
