@@ -17,7 +17,8 @@ import {
   WINS, type Activity, type Motor,
 } from "./data";
 import { useJar, useWins } from "./state";
-import jarroGratidao from "@/assets/kidzz/jarro-gratidao.webp";
+import jarroGratidao from "@/assets/kalm/jar-gratitude.png";
+import jarroGratidaoFallback from "@/assets/kalm/jarro-gratidao.png";
 import { KALM_DOCK_CLEARANCE } from "./layout";
 
 /* ── Paleta escura florestal (alinhada à KalmHome) ─────────── */
@@ -362,7 +363,7 @@ export const PilarAgradecer = ({
         >
           <div className="flex items-start gap-3">
             <div
-              className="w-[72px] h-[72px] rounded-[18px] overflow-hidden shrink-0"
+              className="w-[80px] h-[96px] rounded-[18px] overflow-hidden shrink-0 flex items-center justify-center"
               style={{
                 background: "rgba(244,203,85,0.12)",
                 border: "1px solid rgba(244,203,85,0.28)",
@@ -371,8 +372,12 @@ export const PilarAgradecer = ({
               <img
                 src={jarroGratidao}
                 alt="Jarro de gratidão"
-                className="w-full h-full object-cover"
-                style={{ objectPosition: "50% 40%" }}
+                className="w-full h-full object-contain"
+                style={{ objectPosition: "50% 45%" }}
+                onError={(e) => {
+                  const el = e.currentTarget;
+                  if (el.src !== jarroGratidaoFallback) el.src = jarroGratidaoFallback;
+                }}
               />
             </div>
             <div className="flex-1 min-w-0">

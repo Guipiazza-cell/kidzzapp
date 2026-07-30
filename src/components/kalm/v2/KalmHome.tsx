@@ -18,7 +18,8 @@ import {
   type MoodValue,
 } from "./state";
 import { WEATHER_ICONS } from "./WeatherIcons";
-import jarroGratidao from "@/assets/kidzz/jarro-gratidao.webp";
+import jarroGratidao from "@/assets/kalm/jar-gratitude.png";
+import jarroGratidaoFallback from "@/assets/kalm/jarro-gratidao.png";
 import { KALM_DOCK_CLEARANCE } from "./layout";
 
 export type Pillar = "sentir" | "agradecer" | "mover" | "nutrir" | "conectar" | "cuidar";
@@ -451,17 +452,21 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
             </div>
 
             <div
-              className="pointer-events-none absolute right-0 top-0 bottom-0 w-[48%]"
+              className="pointer-events-none absolute right-0 top-0 bottom-0 w-[46%] flex items-center justify-center"
               aria-hidden
             >
               <img
                 src={jarroGratidao}
-                alt=""
-                className="absolute right-[-6%] top-1/2 h-[120%] w-auto max-w-none -translate-y-1/2 object-contain"
+                alt="Jarro da gratidão"
+                className="h-[92%] w-auto max-w-[100%] object-contain"
                 style={{
-                  filter: "drop-shadow(0 10px 18px rgba(80,50,10,0.18))",
+                  filter: "drop-shadow(0 12px 20px rgba(80,50,10,0.22))",
                 }}
                 draggable={false}
+                onError={(e) => {
+                  const el = e.currentTarget;
+                  if (el.src !== jarroGratidaoFallback) el.src = jarroGratidaoFallback;
+                }}
               />
             </div>
           </div>
