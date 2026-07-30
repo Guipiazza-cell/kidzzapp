@@ -60,7 +60,7 @@ const ChatFlow = ({
         key="home"
         onSubmit={onSubmit}
         onOpenStoryFactory={() => onSwitchTab("explore")}
-        onOpenMoments={() => onSwitchTab("moments")}
+        onOpenMoments={() => onSwitchTab("music")}
         onOpenAchievements={() => onSwitchTab("achievements")}
         onOpenLab={onOpenLab}
         onOpenPlay={() => onSwitchTab("play")}

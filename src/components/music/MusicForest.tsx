@@ -9,6 +9,7 @@ import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMissi
 import { showXpGained } from "@/components/flow/XpToast";
 import GuidedActivityPlayer, { type GuidedActivity } from "./GuidedActivityPlayer";
 import { FONT, SERIF, R, PAD, glassLightSoft, pillGlassLight } from "@/lib/premiumUi";
+import AllPlaylistsSection from "./AllPlaylistsSection";
 
 /**
  * MusicForest - Tela "Música" (premium v2 - nível Bora).
@@ -679,6 +680,9 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
             ))}
           </div>
         </div>
+
+        {/* ── TODAS AS PLAYLISTS (de Momentos) ── */}
+        <AllPlaylistsSection />
 
         <div style={{ padding: "8px 20px 16px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#8A7850" }}>
           Curadoria KIDZZ · Música para crescer junto

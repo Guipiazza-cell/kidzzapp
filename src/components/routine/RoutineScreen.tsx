@@ -34,7 +34,7 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/rotina-v2";
-const AV = "v5";
+const AV = "v6";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 const INK = "#3A2418";
@@ -765,28 +765,49 @@ const RoutineScreen = () => {
           </div>
         </div>
 
-        {/* Hero copy + art peek */}
+        {/* Hero: texto + Gui grande inteiro (sem corte) */}
         <div
           style={{
-            padding: `4px ${PAD}px 0`,
-            display: "grid",
-            gridTemplateColumns: "1fr minmax(120px, 42%)",
-            gap: 8,
-            alignItems: "start",
-            minHeight: 200,
+            position: "relative",
+            padding: `4px ${PAD}px 8px`,
+            minHeight: 248,
             animation: "rot2-cascade .55s cubic-bezier(.22,1,.36,1) .04s both",
           }}
         >
-          <div style={{ paddingTop: 8, minWidth: 0 }}>
+          <div
+            ref={heroArtRef}
+            style={{
+              position: "absolute",
+              right: -4,
+              top: 0,
+              width: "52%",
+              height: 240,
+              willChange: "transform, opacity",
+              animation: "rot2-floaty 7s ease-in-out infinite",
+              pointerEvents: "none",
+              overflow: "visible",
+            }}
+          >
+            <img
+              src={asset("hero-gui.png")}
+              alt="Gui, o camaleão, com o calendário da rotina"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center bottom",
+                filter: "drop-shadow(0 14px 26px rgba(80,50,30,.24))",
+              }}
+            />
+          </div>
+
+          <div style={{ position: "relative", zIndex: 3, maxWidth: "54%", paddingTop: 10 }}>
             <div
               style={{
                 fontSize: 12.5,
                 fontWeight: 800,
                 color: INK2,
                 marginBottom: 8,
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
               }}
             >
               {saudacao}, família!
@@ -812,7 +833,7 @@ const RoutineScreen = () => {
                 fontWeight: 700,
                 lineHeight: 1.45,
                 color: INK2,
-                maxWidth: 220,
+                maxWidth: 200,
               }}
             >
               {message || "Pequenas ações diárias constroem lembranças para a vida toda."}
@@ -830,34 +851,6 @@ const RoutineScreen = () => {
                 Tudo bem… hoje é um novo começo 💛
               </p>
             )}
-          </div>
-          <div
-            ref={heroArtRef}
-            style={{
-              position: "relative",
-              height: 210,
-              marginRight: -PAD,
-              marginTop: -8,
-              overflow: "visible",
-              animation: "rot2-floaty 7s ease-in-out infinite",
-              willChange: "transform, opacity",
-            }}
-          >
-            <img
-              src={asset("hero-gui.png")}
-              alt="Gui, o camaleão, com o calendário da rotina"
-              style={{
-                position: "absolute",
-                right: 28,
-                bottom: 0,
-                width: "118%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "center bottom",
-                filter: "drop-shadow(0 12px 28px rgba(80,50,30,.22))",
-                pointerEvents: "none",
-              }}
-            />
           </div>
         </div>
 
