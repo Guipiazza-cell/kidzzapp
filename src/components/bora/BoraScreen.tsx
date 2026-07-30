@@ -41,12 +41,13 @@ interface Props {
 type Energy = "agitada" | "cansada" | "curiosa" | "feliz";
 
 /** Assets Hermes/Codex full-frame (não recortes). Cache-bust ?v2 */
-const BV = "v3";
+const BV = "v4";
 const b = (name: string) => `/exemplos/assets/bora-v2/${name}?${BV}`;
 const ASSETS = {
   heroBg: b("hero-bg.png"),
   heroArt: b("hero-art.png"),
   actArt: b("act-art.png"),
+  surpriseArt: b("surprise-art.png"),
   premiumArt: b("premium-art.png"),
   challengeArt: b("challenge-art.png"),
   cats: {
@@ -920,15 +921,15 @@ const BoraScreen = ({ onBack }: Props) => {
                 }}
               >
                 <img
-                  src={ASSETS.actArt}
-                  alt="Gui explorador — surpresa da IA"
+                  src={ASSETS.surpriseArt}
+                  alt="Gui com a surpresa da IA"
                   style={{
                     position: "absolute",
                     inset: 0,
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    objectPosition: "78% 40%",
+                    objectPosition: "center 35%",
                     borderRadius: R.panel,
                     filter: "saturate(1.08) contrast(1.03)",
                   }}
