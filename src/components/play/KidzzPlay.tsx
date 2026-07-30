@@ -523,8 +523,8 @@ const KidzzPlay = ({
           zIndex: 2,
         }}
       >
-        {/* ── HERO (só fundo full-bleed; sem arte flutuante por cima) ── */}
-        <div style={{ position: "relative", minHeight: 360, paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}>
+        {/* ── Top bar (fundo continua full-bleed atrás) ── */}
+        <div style={{ position: "relative", paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}>
           <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
             <button
               type="button"
@@ -556,25 +556,50 @@ const KidzzPlay = ({
               </button>
             </div>
           </div>
+          {/* Espaço só de fundo (personagens), sem texto por cima */}
+          <div style={{ height: 168 }} aria-hidden />
+        </div>
 
-          <div style={{ position: "relative", zIndex: 5, padding: "16px 20px 8px", maxWidth: "62%", animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "rgba(255,252,240,.95)", textShadow: "0 1px 8px rgba(0,0,0,.35)", marginBottom: 8 }}>
+        {/* ── Card de boas-vindas (acima de Missões / Criar) ── */}
+        <div style={{ padding: "0 16px 10px", position: "relative", zIndex: 5, animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
+          <div
+            style={{
+              borderRadius: 24,
+              padding: "16px 16px 15px",
+              background: "linear-gradient(160deg, rgba(255,255,255,.94) 0%, rgba(255,252,244,.88) 55%, rgba(240,250,232,.9) 100%)",
+              border: "1px solid rgba(255,255,255,1)",
+              boxShadow: "0 14px 32px rgba(40,70,30,.16), inset 0 1.5px 0 rgba(255,255,255,1)",
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
+            }}
+          >
+            <div style={{ fontWeight: 800, fontSize: 13, color: "#2E6B48", marginBottom: 6 }}>
               {greeting}, família!{" "}
               <span style={{ display: "inline-flex", verticalAlign: "middle", animation: "brin-heartbeat 2.4s ease-in-out infinite" }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="#7dffb0"><path d={D.heart} /></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#3FA86A"><path d={D.heart} /></svg>
               </span>
             </div>
-            <h1 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 30, lineHeight: 1.12, color: "#FFFDF6", letterSpacing: "-.4px", textShadow: "0 2px 18px rgba(0,0,0,.4)" }}>
-              Brincar faz parte da <span style={{ color: "#8BE08A" }}>magia</span> de crescer.
+            <h1
+              style={{
+                margin: "0 0 8px",
+                fontFamily: SERIF,
+                fontWeight: 600,
+                fontSize: 24,
+                lineHeight: 1.18,
+                color: "#17301F",
+                letterSpacing: "-.35px",
+              }}
+            >
+              Brincar faz parte da <span style={{ color: "#2E9A63" }}>magia</span> de crescer.
             </h1>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(255,248,230,.9)", textShadow: "0 1px 8px rgba(0,0,0,.3)", maxWidth: 250 }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "#557A5E" }}>
               Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
             </p>
           </div>
         </div>
 
         {/* ── CATEGORIAS (2x2) com ícones gerados ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: "8px 16px 0", position: "relative", zIndex: 5, animation: "brin-rise .6s .1s both" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: "4px 16px 0", position: "relative", zIndex: 5, animation: "brin-rise .6s .1s both" }}>
           {categorias.map((c) => (
             <button key={c.key} type="button" onClick={c.onClick} className="active:scale-[0.96]" style={{ ...categoryCardStyle(c.k), borderRadius: 26, minHeight: 148, padding: "14px 13px 12px" }}>
               <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%)", animation: "brin-shine 5.5s ease-in-out infinite" }} />
