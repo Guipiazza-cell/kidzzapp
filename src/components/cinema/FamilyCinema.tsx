@@ -100,9 +100,23 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
 
 /**
  * Uma capa por filme em cinema-v2/covers/{id}.png
- * (artes HD dedicadas + pôsteres únicos gerados; nunca reutiliza capa de outro título).
+ * (artes HD dedicadas + pôsteres únicos; nunca reutiliza capa de outro título).
  */
 const coverOf = (id: string) => asset(`covers/${id}.png`);
+
+/**
+ * Alias estável: alguns builds/cache antigos ainda referenciam COVER[id].
+ * Proxy evita ReferenceError e devolve a capa correta por id.
+ */
+const COVER: Record<string, string> = new Proxy(
+  {} as Record<string, string>,
+  {
+    get: (_t, prop) => (typeof prop === "string" ? coverOf(prop) : undefined),
+    has: () => true,
+  },
+);
+// evita tree-shake do alias em builds agressivos
+void COVER;
 
 interface Props {
   onBack: () => void;
@@ -236,7 +250,7 @@ const SectionLabel = ({
 
 /* ── Card de filme (print: poster + idade + título + desc) ── */
 const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
-  const cover = coverOf(m.id);
+  const cover = COVER[m.id] || coverOf(m.id);
   return (
     <button
       type="button"
@@ -365,7 +379,7 @@ const DetailSheet = ({
   onClose: () => void;
   onMarcar: () => void;
 }) => {
-  const cover = coverOf(movie.id);
+  const cover = COVER[movie.id] || coverOf(movie.id);
   return (
     <>
       <div
@@ -1142,7 +1156,7 @@ const FamilyCinema = ({ onBack }: Props) => {
                   borderRadius: R.panel,
                   overflow: "hidden",
                   position: "relative",
-                  background: `url("${coverOf(weekly.id)}") center/cover`,
+                  background: `url("${COVER[weekly.id] || coverOf(weekly.id)}") center/cover`,
                   backgroundColor: hexA(weekly.glowColor, 0.4),
                 }}
               >
