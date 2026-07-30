@@ -765,12 +765,13 @@ const RoutineScreen = () => {
           </div>
         </div>
 
-        {/* Hero: texto + Gui grande inteiro (sem corte) */}
+        {/* Hero full-bleed: arte preenche o header, esmaece só embaixo */}
         <div
           style={{
             position: "relative",
-            padding: `4px ${PAD}px 8px`,
-            minHeight: 248,
+            minHeight: 280,
+            padding: `8px ${PAD}px 20px`,
+            overflow: "hidden",
             animation: "rot2-cascade .55s cubic-bezier(.22,1,.36,1) .04s both",
           }}
         >
@@ -778,14 +779,9 @@ const RoutineScreen = () => {
             ref={heroArtRef}
             style={{
               position: "absolute",
-              right: -4,
-              top: 0,
-              width: "52%",
-              height: 240,
+              inset: 0,
               willChange: "transform, opacity",
-              animation: "rot2-floaty 7s ease-in-out infinite",
               pointerEvents: "none",
-              overflow: "visible",
             }}
           >
             <img
@@ -794,20 +790,34 @@ const RoutineScreen = () => {
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "contain",
-                objectPosition: "center bottom",
-                filter: "drop-shadow(0 14px 26px rgba(80,50,30,.24))",
+                objectFit: "cover",
+                objectPosition: "62% 35%",
+              }}
+            />
+            {/* Esmaece só embaixo */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: "48%",
+                background:
+                  "linear-gradient(180deg, transparent 0%, rgba(251,243,235,.55) 42%, #FBF3EB 100%)",
+                pointerEvents: "none",
               }}
             />
           </div>
 
-          <div style={{ position: "relative", zIndex: 3, maxWidth: "54%", paddingTop: 10 }}>
+          <div style={{ position: "relative", zIndex: 3, maxWidth: "58%", paddingTop: 6 }}>
             <div
               style={{
                 fontSize: 12.5,
                 fontWeight: 800,
                 color: INK2,
                 marginBottom: 8,
+                textShadow: "0 1px 0 rgba(255,255,255,.55)",
               }}
             >
               {saudacao}, família!
@@ -821,6 +831,7 @@ const RoutineScreen = () => {
                 lineHeight: 1.12,
                 color: INK,
                 letterSpacing: "-0.4px",
+                textShadow: "0 1px 10px rgba(255,250,245,.75)",
               }}
             >
               Rotina que cria{" "}
@@ -833,7 +844,8 @@ const RoutineScreen = () => {
                 fontWeight: 700,
                 lineHeight: 1.45,
                 color: INK2,
-                maxWidth: 200,
+                maxWidth: 210,
+                textShadow: "0 1px 0 rgba(255,255,255,.5)",
               }}
             >
               {message || "Pequenas ações diárias constroem lembranças para a vida toda."}
