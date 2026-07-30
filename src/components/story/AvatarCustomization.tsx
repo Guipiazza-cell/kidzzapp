@@ -1,46 +1,62 @@
-import { useState } from "react";
+/**
+ * AvatarCustomization — passo 1 da Fábrica de Histórias.
+ * Visual cream/gold premium (mesmo mundo da StoryFactory).
+ */
+import { useMemo, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { ChildAvatar } from "@/types/story";
+import { haptic } from "@/lib/haptics";
 
 interface AvatarCustomizationProps {
   childName: string;
   onComplete: (avatar: ChildAvatar) => void;
 }
 
+const FONT = "'Nunito', system-ui, sans-serif";
+const SERIF = "'Lora', Georgia, serif";
+
 const skinTones = [
-  { id: "clara", label: "Clara", color: "hsl(30 50% 90%)" },
-  { id: "media-clara", label: "Média Clara", color: "hsl(30 45% 75%)" },
-  { id: "media", label: "Média", color: "hsl(30 40% 60%)" },
-  { id: "media-escura", label: "Média Escura", color: "hsl(30 35% 45%)" },
-  { id: "escura", label: "Escura", color: "hsl(30 30% 30%)" },
+  { id: "clara", label: "Clara", color: "#F5E0C8" },
+  { id: "media-clara", label: "Média clara", color: "#E8C4A0" },
+  { id: "media", label: "Média", color: "#C9966A" },
+  { id: "media-escura", label: "Média escura", color: "#8B5E3C" },
+  { id: "escura", label: "Escura", color: "#5C3A24" },
 ];
 
 const hairColors = [
-  { id: "loiro-claro", label: "Loiro Claro", color: "hsl(50 70% 80%)" },
-  { id: "loiro", label: "Loiro", color: "hsl(45 60% 60%)" },
-  { id: "castanho-claro", label: "Castanho Claro", color: "hsl(30 40% 50%)" },
-  { id: "castanho", label: "Castanho", color: "hsl(25 35% 35%)" },
-  { id: "preto", label: "Preto", color: "hsl(0 0% 15%)" },
-  { id: "ruivo", label: "Ruivo", color: "hsl(15 70% 45%)" },
+  { id: "loiro-claro", label: "Loiro claro", color: "#F5E6A8" },
+  { id: "loiro", label: "Loiro", color: "#D4B05A" },
+  { id: "castanho-claro", label: "Castanho claro", color: "#A67C52" },
+  { id: "castanho", label: "Castanho", color: "#6B4423" },
+  { id: "preto", label: "Preto", color: "#1F1A17" },
+  { id: "ruivo", label: "Ruivo", color: "#C45A28" },
 ];
 
 const eyeColors = [
-  { id: "castanho", label: "Castanho", color: "hsl(25 50% 30%)" },
-  { id: "azul", label: "Azul", color: "hsl(210 70% 50%)" },
-  { id: "verde", label: "Verde", color: "hsl(140 60% 40%)" },
-  { id: "mel", label: "Mel", color: "hsl(35 60% 45%)" },
+  { id: "castanho", label: "Castanho", color: "#5C3A1E" },
+  { id: "azul", label: "Azul", color: "#4A8FD4" },
+  { id: "verde", label: "Verde", color: "#3D9B6A" },
+  { id: "mel", label: "Mel", color: "#C9923A" },
 ];
 
 const clothingStyles = [
-  { id: "casual", label: "Casual Colorido", desc: "Roupas vibrantes e confortáveis", emoji: "👕" },
-  { id: "esportivo", label: "Esportivo", desc: "Roupa esportiva e ativa", emoji: "⚽" },
-  { id: "princesa", label: "Princesa/Príncipe", desc: "Roupas elegantes e mágicas", emoji: "👑" },
-  { id: "super-heroi", label: "Super-herói", desc: "Com capa e máscara", emoji: "🦸" },
-  { id: "aventureiro", label: "Aventureiro", desc: "Roupa de explorador", emoji: "🧭" },
+  { id: "casual", label: "Casual", desc: "Confortável e colorido", tint: "#F0A24C" },
+  { id: "esportivo", label: "Esportivo", desc: "Ativo e leve", tint: "#5CB57A" },
+  { id: "princesa", label: "Princesa", desc: "Elegante e mágico", tint: "#C07AD8" },
+  { id: "super-heroi", label: "Herói", desc: "Capa e coragem", tint: "#E85A4A" },
+  { id: "aventureiro", label: "Aventureiro", desc: "Explorador", tint: "#5A8FBF" },
 ];
 
-const ColorPicker = ({
+const sectionCard: CSSProperties = {
+  borderRadius: 22,
+  padding: "16px 14px",
+  background: "linear-gradient(160deg, rgba(255,253,247,.95) 0%, rgba(250,240,222,.78) 100%)",
+  border: "1px solid rgba(255,255,255,1)",
+  boxShadow: "0 10px 28px rgba(150,95,20,.10), inset 0 1.5px 0 rgba(255,255,255,1)",
+};
+
+const ColorRow = ({
   label,
   options,
   selected,
@@ -50,94 +66,311 @@ const ColorPicker = ({
   options: { id: string; label: string; color: string }[];
   selected: string;
   onChange: (id: string) => void;
-}) => (
-  <div>
-    <p className="text-sm font-extrabold text-white mb-2">{label}</p>
-    <div className="flex flex-wrap gap-2">
-      {options.map((opt) => (
-        <button
-          key={opt.id}
-          onClick={() => onChange(opt.id)}
-          className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${
-            selected === opt.id
-              ? "ring-2 ring-kid-orange scale-105 bg-white/10"
-              : "hover:bg-white/5"
-          }`}
-        >
-          <div
-            className="w-10 h-10 rounded-full border-2 border-white/20 shadow-inner"
-            style={{ background: opt.color }}
-          />
-          <span className="text-[10px] text-white/70 font-bold">{opt.label}</span>
-        </button>
-      ))}
+}) => {
+  const active = options.find((o) => o.id === selected);
+  return (
+    <div style={{ marginBottom: 4 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: "#3A2410", fontFamily: FONT }}>
+          {label}
+        </p>
+        <span style={{ fontSize: 11, fontWeight: 800, color: "#A88E5E" }}>{active?.label}</span>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+        {options.map((opt) => {
+          const isOn = selected === opt.id;
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => {
+                haptic("light");
+                onChange(opt.id);
+              }}
+              aria-label={opt.label}
+              aria-pressed={isOn}
+              className="active:scale-95"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 999,
+                padding: 0,
+                cursor: "pointer",
+                background: opt.color,
+                border: isOn ? "2.5px solid #E8821A" : "2px solid rgba(255,255,255,.95)",
+                boxShadow: isOn
+                  ? "0 0 0 3px rgba(232,130,26,.28), 0 6px 14px rgba(120,70,20,.22)"
+                  : "0 4px 10px rgba(80,50,20,.12), inset 0 1px 0 rgba(255,255,255,.35)",
+                position: "relative",
+                transition: "transform .15s, box-shadow .2s, border-color .2s",
+              }}
+            >
+              {isOn && (
+                <span
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 999,
+                    background: "rgba(0,0,0,.12)",
+                  }}
+                >
+                  <Check size={16} color="#fff" strokeWidth={3} />
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AvatarCustomization = ({ childName, onComplete }: AvatarCustomizationProps) => {
-  const [skinTone, setSkinTone] = useState(skinTones[0].id);
-  const [hairColor, setHairColor] = useState(hairColors[0].id);
+  const [skinTone, setSkinTone] = useState(skinTones[1].id);
+  const [hairColor, setHairColor] = useState(hairColors[3].id);
   const [eyeColor, setEyeColor] = useState(eyeColors[0].id);
   const [clothingStyle, setClothingStyle] = useState(clothingStyles[0].id);
 
+  const skin = useMemo(() => skinTones.find((s) => s.id === skinTone)!, [skinTone]);
+  const hair = useMemo(() => hairColors.find((h) => h.id === hairColor)!, [hairColor]);
+  const eyes = useMemo(() => eyeColors.find((e) => e.id === eyeColor)!, [eyeColor]);
+  const clothes = useMemo(() => clothingStyles.find((c) => c.id === clothingStyle)!, [clothingStyle]);
+
   const handleSubmit = () => {
+    haptic("medium");
     onComplete({
-      skinTone: skinTones.find((s) => s.id === skinTone)?.label || "",
-      hairColor: hairColors.find((h) => h.id === hairColor)?.label || "",
-      eyeColor: eyeColors.find((e) => e.id === eyeColor)?.label || "",
-      clothingStyle: clothingStyles.find((c) => c.id === clothingStyle)?.desc || "",
+      skinTone: skin.label,
+      hairColor: hair.label,
+      eyeColor: eyes.label,
+      clothingStyle: clothes.desc,
     });
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-5"
+      transition={{ duration: 0.35 }}
+      style={{ fontFamily: FONT, paddingBottom: 8 }}
     >
-      <div className="text-center">
-        <h2 className="text-xl font-extrabold text-white drop-shadow-lg">
-          Vamos criar o {childName}! 🎨
+      {/* Título */}
+      <div style={{ textAlign: "center", marginBottom: 18, paddingTop: 4 }}>
+        <p
+          style={{
+            margin: "0 0 6px",
+            fontSize: 11,
+            fontWeight: 900,
+            letterSpacing: "1.4px",
+            textTransform: "uppercase",
+            color: "#D97A1E",
+          }}
+        >
+          Passo 1 · Avatar
+        </p>
+        <h2
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontWeight: 600,
+            fontSize: 24,
+            lineHeight: 1.2,
+            color: "#3A2410",
+            letterSpacing: "-0.3px",
+          }}
+        >
+          Como é o {childName}?
         </h2>
-        <p className="text-white/60 text-xs mt-1">
-          Personalize o avatar para as histórias
+        <p style={{ margin: "8px 0 0", fontSize: 13, fontWeight: 700, color: "#8A6E42", lineHeight: 1.4 }}>
+          Escolha as cores — a história ganha o rostinho dele.
         </p>
       </div>
 
-      <div className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 space-y-4">
-        <ColorPicker label="Tom de Pele" options={skinTones} selected={skinTone} onChange={setSkinTone} />
-        <ColorPicker label="Cor do Cabelo" options={hairColors} selected={hairColor} onChange={setHairColor} />
-        <ColorPicker label="Cor dos Olhos" options={eyeColors} selected={eyeColor} onChange={setEyeColor} />
-
-        <div>
-          <p className="text-sm font-extrabold text-white mb-2">Estilo de Roupa</p>
-          <div className="grid grid-cols-2 gap-2">
-            {clothingStyles.map((style) => (
-              <button
-                key={style.id}
-                onClick={() => setClothingStyle(style.id)}
-                className={`p-3 rounded-2xl text-left transition-all ${
-                  clothingStyle === style.id
-                    ? "bg-kid-orange/20 border-2 border-kid-orange"
-                    : "bg-white/5 border-2 border-transparent hover:border-white/20"
-                }`}
-              >
-                <span className="text-lg">{style.emoji}</span>
-                <p className="text-xs font-bold text-white mt-1">{style.label}</p>
-              </button>
+      {/* Preview do avatar (abstrato premium) */}
+      <div
+        style={{
+          ...sectionCard,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 14,
+          padding: "20px 16px 16px",
+        }}
+      >
+        <div
+          aria-hidden
+          style={{
+            width: 108,
+            height: 108,
+            borderRadius: 999,
+            position: "relative",
+            background: `radial-gradient(circle at 35% 30%, #fff 0%, ${skin.color} 42%, ${skin.color} 100%)`,
+            boxShadow: `0 12px 28px ${skin.color}55, inset 0 2px 4px rgba(255,255,255,.45)`,
+            border: "3px solid rgba(255,255,255,.9)",
+          }}
+        >
+          {/* cabelo (topo) */}
+          <div
+            style={{
+              position: "absolute",
+              top: -4,
+              left: "12%",
+              right: "12%",
+              height: 36,
+              borderRadius: "40px 40px 18px 18px",
+              background: `linear-gradient(180deg, ${hair.color} 0%, ${hair.color}cc 100%)`,
+              boxShadow: "0 4px 10px rgba(0,0,0,.15)",
+            }}
+          />
+          {/* olhos */}
+          <div
+            style={{
+              position: "absolute",
+              top: 48,
+              left: 0,
+              right: 0,
+              display: "flex",
+              justifyContent: "center",
+              gap: 18,
+            }}
+          >
+            {[0, 1].map((i) => (
+              <div
+                key={i}
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: 999,
+                  background: `radial-gradient(circle at 35% 30%, #fff 0%, ${eyes.color} 55%, ${eyes.color} 100%)`,
+                  boxShadow: "inset 0 1px 2px rgba(0,0,0,.2)",
+                  border: "1.5px solid rgba(255,255,255,.5)",
+                }}
+              />
             ))}
           </div>
+          {/* sorriso */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 28,
+              left: "50%",
+              width: 22,
+              height: 10,
+              marginLeft: -11,
+              borderRadius: "0 0 14px 14px",
+              border: "2px solid rgba(80,40,20,.28)",
+              borderTop: "none",
+            }}
+          />
+          {/* roupa (base) */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: -6,
+              left: "18%",
+              right: "18%",
+              height: 22,
+              borderRadius: "0 0 40px 40px",
+              background: `linear-gradient(180deg, ${clothes.tint} 0%, ${clothes.tint}cc 100%)`,
+              boxShadow: "0 4px 10px rgba(0,0,0,.12)",
+            }}
+          />
+        </div>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: "#6B5535" }}>
+          {childName}
+        </p>
+      </div>
+
+      {/* Cores */}
+      <div style={{ ...sectionCard, display: "flex", flexDirection: "column", gap: 18, marginBottom: 14 }}>
+        <ColorRow label="Tom de pele" options={skinTones} selected={skinTone} onChange={setSkinTone} />
+        <div style={{ height: 1, background: "rgba(120,90,40,.1)" }} />
+        <ColorRow label="Cor do cabelo" options={hairColors} selected={hairColor} onChange={setHairColor} />
+        <div style={{ height: 1, background: "rgba(120,90,40,.1)" }} />
+        <ColorRow label="Cor dos olhos" options={eyeColors} selected={eyeColor} onChange={setEyeColor} />
+      </div>
+
+      {/* Roupa */}
+      <div style={{ ...sectionCard, marginBottom: 18 }}>
+        <p style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 900, color: "#3A2410" }}>
+          Estilo de roupa
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {clothingStyles.map((style) => {
+            const isOn = clothingStyle === style.id;
+            return (
+              <button
+                key={style.id}
+                type="button"
+                onClick={() => {
+                  haptic("light");
+                  setClothingStyle(style.id);
+                }}
+                className="active:scale-[0.98]"
+                style={{
+                  textAlign: "left",
+                  padding: "12px 12px 11px",
+                  borderRadius: 16,
+                  cursor: "pointer",
+                  background: isOn
+                    ? `linear-gradient(160deg, ${style.tint}22 0%, ${style.tint}12 100%)`
+                    : "rgba(255,255,255,.55)",
+                  border: isOn ? `1.5px solid ${style.tint}` : "1px solid rgba(120,90,40,.12)",
+                  boxShadow: isOn ? `0 6px 16px ${style.tint}33` : "none",
+                  transition: "all .2s",
+                }}
+              >
+                <div
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 999,
+                    background: style.tint,
+                    marginBottom: 8,
+                    boxShadow: `0 0 0 3px ${style.tint}33`,
+                  }}
+                />
+                <div style={{ fontSize: 13, fontWeight: 900, color: "#3A2410", lineHeight: 1.15 }}>
+                  {style.label}
+                </div>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8A6E42", marginTop: 3, lineHeight: 1.25 }}>
+                  {style.desc}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <motion.button
+        type="button"
         onClick={handleSubmit}
-        className="w-full py-4 rounded-2xl kid-gradient-orange text-white font-extrabold text-base shadow-2xl flex items-center justify-center gap-2 active:scale-95"
         whileTap={{ scale: 0.97 }}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          padding: 15,
+          borderRadius: 999,
+          cursor: "pointer",
+          border: "1px solid rgba(255,255,255,.7)",
+          background: "radial-gradient(130% 130% at 30% 22%,#FFD98A 0%,#F2A62B 52%,#D97A1E 100%)",
+          boxShadow:
+            "0 10px 24px rgba(180,110,20,.4), inset 0 1.5px 1px rgba(255,255,255,.7), inset 0 -5px 10px rgba(150,80,0,.28)",
+          fontFamily: FONT,
+          fontSize: 15,
+          fontWeight: 900,
+          letterSpacing: "0.3px",
+          color: "#FFF6E6",
+        }}
       >
-        Continuar para a História
-        <ArrowRight size={20} />
+        Continuar
+        <ArrowRight size={18} strokeWidth={2.4} />
       </motion.button>
     </motion.div>
   );
