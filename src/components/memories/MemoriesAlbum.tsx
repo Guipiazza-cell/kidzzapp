@@ -11,12 +11,12 @@ import {
   type Activity,
 } from "@/lib/weeklyActivities";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
-import { CAMALEAO } from "@/lib/camaleaoOficial";
+import guiCutoutUrl from "@/assets/memorias/gui-cutout.png";
 
 /**
  * MemoriesAlbum - redesign premium v2
  * Ref: public/telas/memorias/
- * Hero: card com texto + Gui cutout (sem fundo gerado)
+ * Hero: card com texto + Gui cutout (sem fundo)
  *
  * Histórico de uso do app (tudo que a família faz fica aqui):
  *  - Momentos guardados  → memories (perguntas, histórias, música, cinema, rotina, jogos…)
@@ -27,7 +27,7 @@ import { CAMALEAO } from "@/lib/camaleaoOficial";
 
 const AS = "/exemplos/assets/memorias-v2";
 /** bump ao regenerar assets (cache bust no browser) */
-const AV = "v5";
+const AV = "v6";
 const asset = (name: string) => `${AS}/${name}?${AV}`;
 
 interface MemoriesAlbumProps {
@@ -757,30 +757,18 @@ const MemoriesAlbum = ({
                 pointerEvents: "none",
               }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                  inset: "12% 8% 8% 8%",
-                  borderRadius: "50%",
-                  background: "radial-gradient(circle, rgba(255,210,140,.28), transparent 68%)",
-                  filter: "blur(8px)",
-                }}
-              />
               <img
-                src={CAMALEAO.heartSoft}
+                src={guiCutoutUrl}
                 alt=""
                 style={{
                   position: "absolute",
-                  right: -4,
-                  bottom: -6,
-                  width: "108%",
-                  height: "108%",
+                  right: -2,
+                  bottom: -4,
+                  width: "104%",
+                  height: "104%",
                   objectFit: "contain",
                   objectPosition: "center bottom",
-                  filter: "drop-shadow(0 10px 18px rgba(0,0,0,.32))",
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = CAMALEAO.heart;
+                  filter: "drop-shadow(0 10px 18px rgba(0,0,0,.28))",
                 }}
               />
             </div>
