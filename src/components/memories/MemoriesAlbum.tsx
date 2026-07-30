@@ -766,6 +766,7 @@ const MemoriesAlbum = ({
                 position: "relative",
                 minHeight: 168,
                 pointerEvents: "none",
+                overflow: "visible",
               }}
             >
               <img
@@ -773,13 +774,14 @@ const MemoriesAlbum = ({
                 alt=""
                 style={{
                   position: "absolute",
-                  right: -2,
-                  bottom: -4,
-                  width: "104%",
-                  height: "104%",
+                  right: -6,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: "112%",
+                  height: "118%",
                   objectFit: "contain",
-                  objectPosition: "center bottom",
-                  filter: "drop-shadow(0 10px 18px rgba(0,0,0,.28))",
+                  objectPosition: "center center",
+                  filter: "drop-shadow(0 10px 18px rgba(0,0,0,.22))",
                 }}
               />
             </div>
