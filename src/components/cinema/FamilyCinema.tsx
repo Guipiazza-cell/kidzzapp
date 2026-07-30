@@ -47,8 +47,54 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v4";
+const AV = "v5";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
+
+/** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
+const CinemaBackdrop = ({ src }: { src: string }) => (
+  <div
+    className="absolute inset-0 pointer-events-none overflow-hidden"
+    aria-hidden
+  >
+    <img
+      src={src}
+      alt=""
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        objectPosition: "center 28%",
+        filter: "saturate(1.08) brightness(0.94)",
+        transform: "scale(1.06)",
+      }}
+    />
+    {/* Vinheta + creme inferior (conteúdo legível, como Música) */}
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background:
+          "radial-gradient(55% 38% at 78% 12%, rgba(255,210,120,.35) 0%, transparent 62%)," +
+          "linear-gradient(180deg, rgba(20,28,40,.22) 0%, rgba(234,243,251,.12) 26%, rgba(234,243,251,.72) 56%, #EAF3FB 78%, #E4EEF8 100%)",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        top: -40,
+        right: -20,
+        width: 220,
+        height: 220,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,220,140,.45), transparent 68%)",
+        filter: "blur(10px)",
+        animation: "cine2-drift 14s ease-in-out infinite",
+      }}
+    />
+  </div>
+);
 
 /**
  * Capas premium (cinema-v2 Hermes). Sem emoji-pôster.
@@ -628,7 +674,6 @@ const FamilyCinema = ({ onBack }: Props) => {
   const [toast, setToast] = useState("");
   const toastT = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const heroArtRef = useRef<HTMLDivElement>(null);
 
   const weekly = useMemo(() => getWeeklyMovie(), []);
   const pontos = profile?.points ?? 0;
@@ -641,19 +686,6 @@ const FamilyCinema = ({ onBack }: Props) => {
   }, [chip]);
 
   const sectionTitle = CHIPS.find((c) => c.id === chip)?.title ?? "Curadoria";
-
-  useEffect(() => {
-    const sc = scrollRef.current;
-    const hero = heroArtRef.current;
-    if (!sc || !hero) return;
-    const onScroll = () => {
-      const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.22}px) scale(${1 + y * 0.00025})`;
-      hero.style.opacity = String(Math.max(0.4, 1 - y / 300));
-    };
-    sc.addEventListener("scroll", onScroll, { passive: true });
-    return () => sc.removeEventListener("scroll", onScroll);
-  }, []);
 
   const open = useCallback((m: Movie) => {
     haptic("light");
@@ -688,75 +720,8 @@ const FamilyCinema = ({ onBack }: Props) => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Fundo sólido do sistema - sem imagem do hero desfocada como parede */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(180deg, #EAF3FB 0%, #DCE8F4 40%, #CDDCEB 72%, #C0D2E4 100%)",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(50% 32% at 78% 12%, rgba(255,220,120,.22), transparent 70%), radial-gradient(40% 28% at 12% 40%, rgba(140,180,240,.14), transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(50% 32% at 78% 12%, rgba(255,220,120,.28), transparent 70%), radial-gradient(40% 28% at 12% 40%, rgba(140,180,240,.18), transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: -70,
-          right: -40,
-          width: 280,
-          height: 280,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,210,120,.32), transparent 65%)",
-          filter: "blur(30px)",
-          animation: "cine2-drift 14s ease-in-out infinite",
-          pointerEvents: "none",
-        }}
-      />
-      {[
-        { t: 90, l: "18%", d: "0s" },
-        { t: 160, l: "70%", d: "1.1s" },
-        { t: 240, l: "42%", d: "2s" },
-        { t: 320, l: "82%", d: ".5s" },
-      ].map((p, i) => (
-        <div
-          key={i}
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: p.t,
-            left: p.l,
-            width: 4,
-            height: 4,
-            borderRadius: 99,
-            background: "#FFE9A8",
-            boxShadow: "0 0 10px 3px rgba(255,200,100,.7)",
-            animation: `cine2-twinkle ${3 + i * 0.4}s ease-in-out ${p.d} infinite`,
-            pointerEvents: "none",
-            zIndex: 1,
-          }}
-        />
-      ))}
+      {/* Fundo imagem full-bleed (padrão Música) — Gui óculos 3D + sala cinema */}
+      <CinemaBackdrop src={asset("hero-bg.png")} />
 
       <div
         ref={scrollRef}
@@ -859,49 +824,8 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Hero: Gui com óculos 3D (cinema-v2) */}
+        {/* Hero: texto sobre o fundo full-bleed (Gui já está no CinemaBackdrop) */}
         <div style={{ position: "relative", padding: `4px ${PAD}px 12px`, minHeight: 248 }}>
-          <div
-            ref={heroArtRef}
-            style={{
-              position: "absolute",
-              right: -8,
-              top: 0,
-              width: "58%",
-              height: 228,
-              willChange: "transform",
-              animation: "cine2-heroIn .75s cubic-bezier(.22,1,.36,1) both",
-              pointerEvents: "none",
-              overflow: "visible",
-            }}
-          >
-            <img
-              src={asset("hero-gui.png")}
-              alt="Gui com óculos 3D e pipoca pronto para o cinema"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "right center",
-                filter: "drop-shadow(0 14px 24px rgba(40,30,20,.26))",
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                right: "18%",
-                bottom: 28,
-                width: 60,
-                height: 60,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(255,210,120,.4), transparent 70%)",
-                filter: "blur(8px)",
-                animation: "cine2-floaty 6s ease-in-out infinite",
-              }}
-            />
-          </div>
-
           <div
             style={{
               position: "relative",
