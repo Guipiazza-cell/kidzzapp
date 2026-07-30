@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import { supabase } from "@/integrations/supabase/client";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { addXp } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
 import ActivityDetailModal from "./ActivityDetailModal";
@@ -396,20 +395,6 @@ const MyActivities = ({ onBack }: Props) => {
             ✨ 1 atividade grátis em cada categoria · Premium libera todas
           </p>
         )}
-
-        <p className="mt-4 text-center text-[10px] text-gray-400 font-semibold">
-          As atividades mudam toda segunda-feira ✨
-        </p>
-        {/* KIDZZ flutuante motivador */}
-        <div className="mt-4 flex justify-center">
-          <KidzzChameleon
-            state="play"
-            mood={allDone ? "happy" : "curious"}
-            size="md"
-            interactive={false}
-            showParticles={false}
-          />
-        </div>
       </div>
 
       {/* Modal de detalhe — explica como fazer + exemplo prático */}
