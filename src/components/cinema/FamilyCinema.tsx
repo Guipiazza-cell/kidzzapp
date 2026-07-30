@@ -54,7 +54,7 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v10";
+const AV = "v12";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 /** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
@@ -106,12 +106,12 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
 );
 
 /**
- * Uma capa por filme em cinema-v2/covers/{id}.png
- * (6 artes HD + pôsteres premium gerados; sem emoji, sem reuso entre títulos).
+ * Capas na RAIZ de cinema-v2 (cover-{id}.png).
+ * A pasta covers/ NÃO sobe no deploy do kidzz.app (404) — por isso fica flat.
  */
-const coverOf = (id: string) => asset(`covers/${id}.png`);
+const coverOf = (id: string) => asset(`cover-${id}.png`);
 
-/** Poster real com <img> + fallback premium (sem emoji). */
+/** Poster: CSS background + <img> (deploy-safe). Sem emoji. */
 const MoviePoster = ({
   id,
   glow,
@@ -127,80 +127,39 @@ const MoviePoster = ({
   style?: CSSProperties;
   children?: ReactNode;
 }) => {
-  const [broken, setBroken] = useState(false);
   const src = coverOf(id);
   return (
     <div
       style={{
         position: "relative",
         overflow: "hidden",
-        background: `linear-gradient(160deg, ${hexA(glow, 0.85)}, ${hexA(glow, 0.35)} 50%, #141820)`,
+        flexShrink: 0,
+        backgroundColor: glow || "#2a3548",
+        backgroundImage: `url("${src}")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         ...style,
       }}
     >
-      {!broken && (
-        <img
-          key={src}
-          src={src}
-          alt={alt || title}
-          loading="eager"
-          decoding="async"
-          draggable={false}
-          onError={() => setBroken(true)}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-            display: "block",
-          }}
-        />
-      )}
-      {broken && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 10,
-            padding: 12,
-            background: `linear-gradient(160deg, ${hexA(glow, 0.95)}, #141820)`,
-          }}
-        >
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 18,
-              display: "grid",
-              placeItems: "center",
-              background: "rgba(255,255,255,.18)",
-              border: "1px solid rgba(255,255,255,.35)",
-            }}
-          >
-            <Play size={22} fill="#fff" color="#fff" />
-          </div>
-          {title ? (
-            <span
-              style={{
-                fontFamily: SERIF,
-                fontWeight: 600,
-                fontSize: 13,
-                color: "#FFF8EA",
-                textAlign: "center",
-                lineHeight: 1.2,
-              }}
-            >
-              {title}
-            </span>
-          ) : null}
-        </div>
-      )}
+      {/* img garante paint em browsers que falham só com background */}
+      <img
+        src={src}
+        alt={alt || title || ""}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center",
+          display: "block",
+          pointerEvents: "none",
+        }}
+      />
       {children}
     </div>
   );
