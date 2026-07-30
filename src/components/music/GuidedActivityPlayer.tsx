@@ -27,6 +27,10 @@ export interface GuidedActivity {
 const activityCover = (id: string) =>
   `/exemplos/assets/musica-v2/act-icons/${id}.png`;
 
+/** Ícones 3D premium dos bichinhos */
+const ANIMAL_ICON = (id: string) =>
+  `/exemplos/assets/musica-v2/animal-icons/${id}.png`;
+
 interface Props {
   activity: GuidedActivity;
   childName: string;
@@ -53,11 +57,11 @@ const CLAP_BEATS = [
 ] as const;
 
 const DANCE_MOVES = [
-  { emoji: "🐸", label: "Sapo", tip: "Pula como sapo!" },
-  { emoji: "🐦", label: "Pássaro", tip: "Abre os braços e voa!" },
+  { emoji: "🐸", label: "Sapo", tip: "Pula como sapo!", icon: ANIMAL_ICON("sapo") },
+  { emoji: "🐦", label: "Pássaro", tip: "Abre os braços e voa!", icon: ANIMAL_ICON("pato") },
   { emoji: "🐍", label: "Cobrinha", tip: "Rasteja devagar no chão!" },
-  { emoji: "🐻", label: "Urso", tip: "Anda pesado, pesado!" },
-  { emoji: "🐰", label: "Coelho", tip: "Pula rapidinho!" },
+  { emoji: "🐻", label: "Urso", tip: "Anda pesado, pesado!", icon: ANIMAL_ICON("leao") },
+  { emoji: "🐰", label: "Coelho", tip: "Pula rapidinho!", icon: ANIMAL_ICON("ovelha") },
 ] as const;
 
 const INSTRUMENTS = [
@@ -67,12 +71,20 @@ const INSTRUMENTS = [
   { emoji: "🎹", label: "Piano", tip: "Dedos dançando no ar!" },
 ] as const;
 
-type StepCard = { emoji: string; label: string; tip: string; sound?: string };
+type StepCard = {
+  emoji: string;
+  /** Ícone 3D premium — se existir, substitui o emoji na UI */
+  icon?: string;
+  label: string;
+  tip: string;
+  sound?: string;
+};
 
 function stepsForActivity(id: string, kind: GuidedActivity["kind"]): StepCard[] {
   if (id === "cancoes-animais" || id === "danca-bichos") {
     return ANIMALS.map((a) => ({
       emoji: a.emoji,
+      icon: ANIMAL_ICON(a.id),
       label: a.name,
       tip: a.tip,
       sound: a.sound,
@@ -288,8 +300,8 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
                   >
                     <div
                       style={{
-                        width: phase === "playing" ? 148 : 112,
-                        height: phase === "playing" ? 148 : 112,
+                        width: phase === "playing" ? 156 : 112,
+                        height: phase === "playing" ? 156 : 112,
                         borderRadius: 36,
                         display: "grid",
                         placeItems: "center",
@@ -303,7 +315,23 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
                       }}
                     >
                       {phase === "playing" ? (
-                        current.emoji
+                        current.icon ? (
+                          <img
+                            src={current.icon}
+                            alt={current.label}
+                            width={156}
+                            height={156}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              display: "block",
+                            }}
+                            draggable={false}
+                          />
+                        ) : (
+                          current.emoji
+                        )
                       ) : (
                         <img
                           src={cover}
