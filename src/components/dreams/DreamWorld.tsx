@@ -533,52 +533,39 @@ const DreamWorld = ({ onBack }: Props) => {
       <DreamBackdrop sleepy={sleepyMode} />
 
       <div className="relative z-10">
-        {/* ── HERO full-bleed (mesmo padrão Descobrir/Perguntas: cover, sem máscara) ── */}
-        <div style={{ position: "relative", margin: "0 14px 0", paddingTop: "calc(env(safe-area-inset-top, 0px) + 58px)" }}>
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              minHeight: 280,
-              height: 300,
-              borderRadius: 28,
-              overflow: "hidden",
-              boxShadow: "0 16px 36px rgba(20,8,40,.42)",
-              animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+        {/* ── HERO topo full-bleed (borda a borda, sem card/divisão) ── */}
+        <div style={{ position: "relative", width: "100%", height: 420, animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both" }}>
+          <img
+            src={ASSETS.hero}
+            alt="Gui, o camaleão, pronto para dormir"
+            draggable={false}
+            onError={(e) => {
+              const el = e.target as HTMLImageElement;
+              if (!el.src.includes("hero-oficial")) el.src = ASSETS.heroPublic;
+              else el.src = ASSETS.heroFallback;
             }}
-          >
-            <img
-              src={ASSETS.hero}
-              alt="Gui, o camaleão, pronto para dormir"
-              draggable={false}
-              onError={(e) => {
-                const el = e.target as HTMLImageElement;
-                if (!el.src.includes("hero-oficial")) el.src = ASSETS.heroPublic;
-                else el.src = ASSETS.heroFallback;
-              }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "50% 28%",
-              }}
-            />
-            {/* Fade inferior para fundir com o fundo roxo da aba */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(180deg,rgba(30,16,55,.12) 0%,rgba(30,16,55,0) 40%,rgba(30,16,55,.45) 78%,rgba(22,12,42,.92) 100%)",
-                pointerEvents: "none",
-              }}
-            />
-          </div>
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "50% 22%",
+            }}
+          />
+          {/* Fade inferior só para fundir com o resto da tela */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(180deg,rgba(20,10,40,.22) 0%,rgba(20,10,40,0) 32%,rgba(30,16,55,.35) 72%,rgba(22,12,42,.96) 100%)",
+              pointerEvents: "none",
+            }}
+          />
 
-          {/* Header padrão: voltar · Sonhos · troféu · modo soninho (lua, não sol) */}
+          {/* Header sobre a arte */}
           <div
             style={{
               position: "absolute",
@@ -589,7 +576,7 @@ const DreamWorld = ({ onBack }: Props) => {
               display: "flex",
               alignItems: "center",
               gap: 8,
-              padding: "calc(env(safe-area-inset-top, 0px) + 10px) 0 0",
+              padding: "calc(env(safe-area-inset-top, 0px) + 10px) 14px 0",
             }}
           >
             <button
@@ -638,16 +625,16 @@ const DreamWorld = ({ onBack }: Props) => {
               {sleepyMode ? "Ativo" : "Soninho"}
             </motion.button>
           </div>
+        </div>
 
-          {/* título */}
-          <div style={{ padding: "2px 24px", textAlign: "center", position: "relative", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both" }}>
-            <h1 style={{ margin: "0 auto 9px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 28, lineHeight: 1.18, color: "#F6EEFC", letterSpacing: "-.35px", maxWidth: 300, textShadow: "0 2px 18px rgba(0,0,0,.45)" }}>
-              Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia.
-            </h1>
-            <p style={{ margin: "0 auto", fontSize: 13, fontWeight: 700, lineHeight: 1.5, color: "rgba(224,210,242,.84)", maxWidth: 280 }}>
-              Histórias, sons e momentos para acalmar e conectar a família antes de dormir.
-            </p>
-          </div>
+        {/* título abaixo da arte full-bleed */}
+        <div style={{ padding: "6px 24px 0", textAlign: "center", position: "relative", marginTop: -28, zIndex: 2, animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both" }}>
+          <h1 style={{ margin: "0 auto 9px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 28, lineHeight: 1.18, color: "#F6EEFC", letterSpacing: "-.35px", maxWidth: 300, textShadow: "0 2px 18px rgba(0,0,0,.45)" }}>
+            Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia.
+          </h1>
+          <p style={{ margin: "0 auto", fontSize: 13, fontWeight: 700, lineHeight: 1.5, color: "rgba(224,210,242,.84)", maxWidth: 280 }}>
+            Histórias, sons e momentos para acalmar e conectar a família antes de dormir.
+          </p>
         </div>
 
         {/* ── CTA principal (dourado, mockup) ── */}
