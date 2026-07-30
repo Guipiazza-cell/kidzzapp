@@ -17,7 +17,7 @@ import { haptic } from "@/lib/haptics";
 import StoryFactory from "./StoryFactory";
 import ReadingMode from "./ReadingMode";
 import { LIBRARY_STORIES } from "./storyLibrary";
-import { FONT, SERIF, R, PAD, glassLight, glassLightSoft, pillGlassLight, goldBtn } from "@/lib/premiumUi";
+import { FONT, SERIF, R, PAD, glassLight, pillGlassLight, goldBtn } from "@/lib/premiumUi";
 import PremiumSeal from "@/components/common/PremiumSeal";
 
 const HI = "/exemplos/assets/historias-v2";
@@ -485,31 +485,6 @@ const StoriesHome = ({ onBack }: Props) => {
             >
               Em breve
             </span>
-          </div>
-        </section>
-
-        {/* trust strip */}
-        <section
-          style={{
-            margin: `12px ${PAD}px 8px`,
-            padding: 14,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            ...glassLightSoft,
-            borderRadius: 22,
-          }}
-        >
-          <img
-            src={`${HI}/feat-familia.png`}
-            alt=""
-            style={{ width: 56, height: 56, borderRadius: 16, objectFit: "cover", flexShrink: 0 }}
-          />
-          <div className="min-w-0">
-            <div style={{ fontSize: 13.5, fontWeight: 900, color: "#2A2520" }}>Para toda a família</div>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.35 }}>
-              Momentos que aproximam e ficam guardados para sempre.
-            </div>
           </div>
         </section>
       </div>
