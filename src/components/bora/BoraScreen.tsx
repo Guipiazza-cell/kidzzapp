@@ -4,8 +4,6 @@ import {
   Bell,
   Clock,
   Crown,
-  Gift,
-  Heart,
   Menu,
   Sparkles,
   Tent,
@@ -16,7 +14,6 @@ import { useCriancas } from "@/hooks/useCriancas";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
 import { useBoraStats } from "@/hooks/useBoraStats";
 import { useDesafioSemana } from "@/hooks/useDesafioSemana";
-import { useIndicacao } from "@/hooks/useIndicacao";
 import { usePaywall } from "@/components/paywall/PaywallProvider";
 import { CriancaOnboarding } from "./CriancaOnboarding";
 import { SurpresaModal } from "./SurpresaModal";
@@ -52,7 +49,6 @@ const ASSETS = {
   actArt: b("act-art.png"),
   premiumArt: b("premium-art.png"),
   challengeArt: b("challenge-art.png"),
-  referralArt: b("referral-art.png"),
   cats: {
     ciencia: b("cat-ciencia.png"),
     sensorial: b("cat-sensorial.png"),
@@ -140,7 +136,6 @@ const BoraScreen = ({ onBack }: Props) => {
   const { criancas, loading: loadingCriancas } = useCriancas();
   const { open: openPaywall } = usePaywall();
   const { desafio } = useDesafioSemana();
-  const { link: indicacaoLink, loading: indicacaoLoading } = useIndicacao();
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   useEffect(() => {
@@ -301,25 +296,6 @@ const BoraScreen = ({ onBack }: Props) => {
       } catch {}
       return next;
     });
-  };
-
-  const shareRef = async () => {
-    if (!indicacaoLink) return;
-    const text =
-      "Você precisa conhecer o Kidzz. A gente tá num movimento de menos tela e mais brincadeira. Entra com meu link e ganhamos 1 mês de Premium juntos 🌿";
-    if (typeof navigator !== "undefined" && (navigator as unknown as { share?: unknown }).share) {
-      try {
-        await (navigator as unknown as { share: (d: unknown) => Promise<void> }).share({
-          title: "Movimento Menos Tela",
-          text,
-          url: indicacaoLink,
-        });
-        return;
-      } catch {}
-    }
-    try {
-      await navigator.clipboard.writeText(indicacaoLink);
-    } catch {}
   };
 
   const shareDesafio = async () => {
@@ -1311,172 +1287,6 @@ const BoraScreen = ({ onBack }: Props) => {
               <ArrowRight size={15} color="#FFE8C0" strokeWidth={2.3} />
             </div>
           </button>
-        </div>
-
-        {/* ── INDICAÇÃO (layout flex: texto + arte + CTA, sem sobreposição) ── */}
-        <div style={sectionWrap}>
-          <div
-            style={{
-              position: "relative",
-              overflow: "hidden",
-              borderRadius: R.card,
-              ...glass,
-              padding: 0,
-            }}
-          >
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "radial-gradient(80% 100% at 92% 50%, rgba(255,180,80,.14), transparent 55%)",
-                pointerEvents: "none",
-              }}
-            />
-            <div
-              style={{
-                display: "flex",
-                alignItems: "stretch",
-                position: "relative",
-                zIndex: 2,
-                minHeight: 148,
-              }}
-            >
-              {/* Texto + CTA */}
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  padding: "14px 10px 14px 14px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 0,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <div
-                    style={{
-                      flex: "none",
-                      width: 42,
-                      height: 42,
-                      borderRadius: R.chip,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background:
-                        "radial-gradient(130% 130% at 30% 22%, #FFD9A8, #F2823E 55%, #D9542E)",
-                      border: "0.5px solid rgba(255,255,255,.4)",
-                      boxShadow:
-                        "0 6px 16px rgba(200,90,40,.35), 0 1px 0 rgba(255,255,255,.45) inset",
-                    }}
-                  >
-                    <Gift size={20} color="#fff" strokeWidth={1.9} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: "1.1px",
-                        color: "#F0B050",
-                      }}
-                    >
-                      CONVIDE UM PAI OU MÃE
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: SERIF,
-                        fontWeight: 600,
-                        fontSize: 16,
-                        color: "#FFF4E8",
-                        lineHeight: 1.2,
-                        marginTop: 3,
-                        letterSpacing: "-0.2px",
-                      }}
-                    >
-                      Vocês dois ganham{" "}
-                      <span style={{ color: "#F0C060" }}>1 mês de Premium</span>
-                    </div>
-                  </div>
-                </div>
-                <p
-                  style={{
-                    margin: "8px 0 0",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "rgba(255,230,200,.68)",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  Quanto mais família no Movimento Menos Tela, mais leve e incrível fica o mundo.
-                </p>
-                <div style={{ marginTop: "auto", paddingTop: 12 }}>
-                  <button
-                    type="button"
-                    onClick={shareRef}
-                    disabled={!indicacaoLink && !indicacaoLoading}
-                    className="active:scale-[0.97]"
-                    style={{
-                      ...goldBtn,
-                      opacity: indicacaoLink || indicacaoLoading ? 1 : 0.55,
-                      padding: "10px 16px",
-                      fontSize: 12.5,
-                      minHeight: 42,
-                      animation: indicacaoLoading
-                        ? "bora2-pulse 1.4s ease-in-out infinite"
-                        : "none",
-                    }}
-                  >
-                    <Heart size={13} fill="currentColor" />
-                    {indicacaoLoading ? "Gerando..." : "Convidar agora"}
-                    <ArrowRight size={13} strokeWidth={2.4} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Arte full Hermes - coluna própria, sem sobrepor texto/CTA */}
-              <div
-                style={{
-                  flex: "none",
-                  width: "38%",
-                  maxWidth: 148,
-                  minWidth: 112,
-                  position: "relative",
-                  margin: 6,
-                  marginLeft: 0,
-                  borderRadius: R.panel,
-                  overflow: "hidden",
-                  background:
-                    "linear-gradient(160deg, rgba(255,200,120,.12), rgba(40,24,12,.2))",
-                }}
-              >
-                <img
-                  src={ASSETS.referralArt}
-                  alt="Gui convidando amigos"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center 40%",
-                    filter: "saturate(1.08) contrast(1.02)",
-                  }}
-                />
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "linear-gradient(90deg, rgba(28,18,10,.35) 0%, transparent 40%)",
-                    pointerEvents: "none",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Surpresa da IA */}
