@@ -992,15 +992,7 @@ const FamilyCinema = ({ onBack }: Props) => {
           return (
             <div key={sec.id} style={{ marginBottom: GAP, position: "relative", zIndex: 4 }}>
               <div style={{ padding: `0 ${PAD}px` }}>
-                <SectionLabel
-                  right={
-                    <span style={{ fontSize: 11, fontWeight: 800, color: INK2 }}>
-                      {movies.length} filmes
-                    </span>
-                  }
-                >
-                  {sec.title}
-                </SectionLabel>
+                <SectionLabel>{sec.title}</SectionLabel>
               </div>
               <div
                 className="cine2-hscroll"
