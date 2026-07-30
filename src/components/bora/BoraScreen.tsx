@@ -1551,18 +1551,7 @@ const BoraScreen = ({ onBack }: Props) => {
           </button>
         </div>
 
-        <div
-          style={{
-            padding: `4px ${PAD}px 24px`,
-            textAlign: "center",
-            fontSize: 11,
-            fontWeight: 700,
-            color: "rgba(255,210,160,.38)",
-            letterSpacing: "0.2px",
-          }}
-        >
-          Menos tela, mais memórias · Uma aventura por dia
-        </div>
+        <div style={{ paddingBottom: 24 }} />
       </div>
     </div>
   );
