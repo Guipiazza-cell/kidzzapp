@@ -794,7 +794,7 @@ const RoutineScreen = () => {
                 objectPosition: "62% 35%",
               }}
             />
-            {/* Esmaece só embaixo */}
+            {/* Esmaece só embaixo — mais forte no fim */}
             <div
               aria-hidden
               style={{
@@ -802,9 +802,21 @@ const RoutineScreen = () => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                height: "48%",
+                height: "62%",
                 background:
-                  "linear-gradient(180deg, transparent 0%, rgba(251,243,235,.55) 42%, #FBF3EB 100%)",
+                  "linear-gradient(180deg, transparent 0%, rgba(251,243,235,.15) 28%, rgba(251,243,235,.55) 52%, rgba(246,226,214,.88) 78%, #F6E2D6 100%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 56,
+                background: "linear-gradient(180deg, transparent, #F6E2D6)",
                 pointerEvents: "none",
               }}
             />
