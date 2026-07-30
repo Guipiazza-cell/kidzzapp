@@ -41,7 +41,7 @@ interface Props {
 type Energy = "agitada" | "cansada" | "curiosa" | "feliz";
 
 /** Assets Hermes/Codex full-frame (não recortes). Cache-bust ?v2 */
-const BV = "v2";
+const BV = "v3";
 const b = (name: string) => `/exemplos/assets/bora-v2/${name}?${BV}`;
 const ASSETS = {
   heroBg: b("hero-bg.png"),
@@ -669,11 +669,11 @@ const BoraScreen = ({ onBack }: Props) => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                objectPosition: "58% 40%",
+                objectPosition: "62% 42%",
                 maskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                  "linear-gradient(100deg, transparent 0%, #000 18%, #000 88%, transparent 100%), linear-gradient(180deg, #000 62%, transparent 100%)",
                 WebkitMaskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                  "linear-gradient(100deg, transparent 0%, #000 18%, #000 88%, transparent 100%), linear-gradient(180deg, #000 62%, transparent 100%)",
                 WebkitMaskComposite: "source-in",
                 maskComposite: "intersect",
                 filter: "saturate(1.1) contrast(1.03)",
@@ -920,15 +920,15 @@ const BoraScreen = ({ onBack }: Props) => {
                 }}
               >
                 <img
-                  src={ASSETS.heroArt}
-                  alt=""
+                  src={ASSETS.actArt}
+                  alt="Gui explorador — surpresa da IA"
                   style={{
                     position: "absolute",
                     inset: 0,
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    objectPosition: "center 30%",
+                    objectPosition: "78% 40%",
                     borderRadius: R.panel,
                     filter: "saturate(1.08) contrast(1.03)",
                   }}
@@ -1113,14 +1113,14 @@ const BoraScreen = ({ onBack }: Props) => {
               >
                 <img
                   src={ASSETS.actArt}
-                  alt=""
+                  alt="Gui explorador na caça ao tesouro das cores"
                   style={{
                     position: "absolute",
                     inset: 0,
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    objectPosition: "center",
+                    objectPosition: "72% 45%",
                     borderRadius: R.panel,
                   }}
                 />
@@ -1354,8 +1354,15 @@ const BoraScreen = ({ onBack }: Props) => {
             >
               <img
                 src={ASSETS.premiumArt}
-                alt=""
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                alt="Cozinha em família"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "50% 55%",
+                }}
               />
             </div>
             <div style={{ flex: 1, minWidth: 0, padding: "14px 12px 14px 12px", position: "relative", zIndex: 2 }}>
@@ -1430,12 +1437,12 @@ const BoraScreen = ({ onBack }: Props) => {
             >
               <img
                 src={ASSETS.challengeArt}
-                alt=""
+                alt="Família e Gui na cabaninha de lençol"
                 style={{
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
-                  objectPosition: "center",
+                  objectPosition: "55% 40%",
                 }}
               />
             </div>
