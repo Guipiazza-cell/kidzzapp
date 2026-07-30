@@ -70,11 +70,11 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         width: "100%",
         height: "100%",
         objectFit: "cover",
-        /* Gui bem alto, ao lado do título (não no meio da tela) */
-        objectPosition: "86% 0%",
+        /* Gui bem no topo, ao lado do título */
+        objectPosition: "88% 0%",
         filter: "saturate(1.1) brightness(0.96)",
-        transform: "scale(1.58) translateY(-14%)",
-        transformOrigin: "86% 0%",
+        transform: "scale(1.85) translateY(-32%)",
+        transformOrigin: "88% 0%",
       }}
     />
     {/* Escurece só a esquerda p/ texto; direita limpa p/ Gui; creme bem mais baixo */}
