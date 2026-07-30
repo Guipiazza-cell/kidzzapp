@@ -747,6 +747,225 @@ const BoraScreen = ({ onBack }: Props) => {
           </div>
         </div>
 
+        {/* ── SURPRESA DA IA (card principal da aba) ── */}
+        <div style={sectionWrap}>
+          <button
+            type="button"
+            onClick={handleSurprise}
+            disabled={surprising}
+            data-tilt="1"
+            className="active:scale-[0.985]"
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              textAlign: "left",
+              cursor: surprising ? "wait" : "pointer",
+              borderRadius: R.card,
+              padding: 0,
+              ...glass,
+              minHeight: 188,
+              animation:
+                "bora2-cascade .55s cubic-bezier(.22,1,.36,1) both, bora2-glow 3.5s ease-in-out infinite",
+              transition: "transform .28s cubic-bezier(.34,1.4,.64,1)",
+              boxShadow:
+                "0 16px 48px rgba(0,0,0,.42), 0 0 0 0.5px rgba(240,192,96,.28), 0 1px 0 rgba(255,245,220,.3) inset, 0 0 32px rgba(240,160,60,.18)",
+            }}
+          >
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(95% 110% at 88% 40%, rgba(255,190,90,.22), transparent 55%), radial-gradient(60% 80% at 12% 90%, rgba(240,160,60,.12), transparent 50%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "55%",
+                height: "100%",
+                background:
+                  "linear-gradient(100deg, transparent 0%, rgba(255,230,160,.14) 48%, transparent 100%)",
+                animation: "bora2-shine 6s ease-in-out infinite",
+                pointerEvents: "none",
+              }}
+            />
+
+            <div style={{ display: "flex", minHeight: 188, position: "relative", zIndex: 2 }}>
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  padding: "16px 10px 14px 16px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      fontSize: 10,
+                      fontWeight: 800,
+                      letterSpacing: "1.1px",
+                      color: "#F0C060",
+                    }}
+                  >
+                    <Sparkles size={12} color="#F0C060" />
+                    SURPRESA DA IA
+                  </span>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "4px 10px",
+                      borderRadius: R.btn,
+                      ...glassSoft,
+                      fontSize: 11,
+                      fontWeight: 800,
+                      color: "rgba(255,232,205,.9)",
+                    }}
+                  >
+                    só pra vocês
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    fontFamily: SERIF,
+                    fontWeight: 600,
+                    fontSize: 21,
+                    color: "#FFF6E8",
+                    lineHeight: 1.15,
+                    marginTop: 8,
+                    letterSpacing: "-0.3px",
+                  }}
+                >
+                  Surpresa da IA
+                  {firstName ? (
+                    <>
+                      <br />
+                      <span style={{ color: "#F0C060" }}>pra {firstName}</span>
+                    </>
+                  ) : null}
+                </div>
+                <p
+                  style={{
+                    margin: "7px 0 0",
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                    color: "rgba(255,230,200,.72)",
+                    maxWidth: 200,
+                  }}
+                >
+                  Uma aventura única, gerada agora pro humor e a idade de vocês.
+                </p>
+
+                <div style={{ marginTop: "auto", paddingTop: 12 }}>
+                  <span
+                    style={{
+                      ...goldBtn,
+                      minHeight: 42,
+                      padding: "11px 18px",
+                      opacity: surprising ? 0.75 : 1,
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "radial-gradient(120% 130% at 20% 10%, rgba(255,255,255,.32), transparent 55%)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                    <span
+                      style={{
+                        position: "relative",
+                        zIndex: 1,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <Sparkles size={14} strokeWidth={2.3} />
+                      {surprising ? "Gerando..." : "Receber surpresa"}
+                      {!surprising && <ArrowRight size={14} strokeWidth={2.5} />}
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  position: "relative",
+                  width: "42%",
+                  flex: "none",
+                  minHeight: 188,
+                  borderRadius: `0 ${R.card - 2}px ${R.card - 2}px 0`,
+                  overflow: "hidden",
+                  margin: 5,
+                  marginLeft: 0,
+                }}
+              >
+                <img
+                  src={ASSETS.heroArt}
+                  alt=""
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center 30%",
+                    borderRadius: R.panel,
+                    filter: "saturate(1.08) contrast(1.03)",
+                  }}
+                />
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(90deg, rgba(28,18,10,.5) 0%, transparent 32%), radial-gradient(80% 70% at 70% 40%, rgba(255,180,80,.18), transparent 60%)",
+                    borderRadius: R.panel,
+                    pointerEvents: "none",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 10,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 38,
+                    height: 38,
+                    borderRadius: R.btn,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    ...pillGlass,
+                  }}
+                >
+                  <Sparkles size={16} color="#F0C060" strokeWidth={2.2} />
+                </div>
+              </div>
+            </div>
+          </button>
+        </div>
+
         {/* ── ATIVIDADE DE HOJE ── */}
         <div style={sectionWrap}>
           <button
@@ -1286,28 +1505,6 @@ const BoraScreen = ({ onBack }: Props) => {
             >
               <ArrowRight size={15} color="#FFE8C0" strokeWidth={2.3} />
             </div>
-          </button>
-        </div>
-
-        {/* Surpresa da IA */}
-        <div style={{ ...sectionWrap, marginBottom: 8 }}>
-          <button
-            type="button"
-            onClick={handleSurprise}
-            className="active:scale-[0.98]"
-            style={{
-              width: "100%",
-              ...outlineGoldBtn,
-              justifyContent: "center",
-              padding: "14px 16px",
-              fontSize: 14,
-              minHeight: 48,
-              borderRadius: R.panel,
-              animation: "bora2-glow 3.5s ease-in-out infinite",
-            }}
-          >
-            <Sparkles size={16} color="#F0C060" />
-            Surpresa da IA{firstName ? ` pra ${firstName}` : ""}
           </button>
         </div>
 
