@@ -53,10 +53,10 @@ const NameOnboarding = () => {
 
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-w-[100vw] overflow-hidden bg-[#0B1A12]">
-      {/* Mesma arte, asset já em 1080×2340 nítido — preenche sem blur/quadro */}
+      {/* Mesma arte, asset já em 1080×2340 nítido - preenche sem blur/quadro */}
       <img
         src={nameHero}
-        alt="Kidzz — Qual o seu nome?"
+        alt="Kidzz - Qual o seu nome?"
         className="absolute inset-0 block h-full w-full select-none pointer-events-none"
         style={ONBOARDING_HERO_FRAME}
         draggable={false}

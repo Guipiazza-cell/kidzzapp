@@ -188,7 +188,7 @@ const SevenDayChallenge = ({ onClose }: Props) => {
             </div>
 
             <p className="text-xs text-gray-500 text-center font-semibold">
-              Dia {Math.max(challengerDays, 1)}/7 — Continue fazendo perguntas! 🔥
+              Dia {Math.max(challengerDays, 1)}/7 - Continue fazendo perguntas! 🔥
             </p>
           </div>
         )}

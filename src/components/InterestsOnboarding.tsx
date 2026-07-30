@@ -67,7 +67,7 @@ const InterestsOnboarding = () => {
     <div className="fixed inset-0 w-full h-[100dvh] max-w-[100vw] overflow-hidden bg-[#0B1A12]">
       <img
         src={interestsHero}
-        alt="Kidzz — O que você gosta?"
+        alt="Kidzz - O que você gosta?"
         className="absolute inset-0 block h-full w-full select-none pointer-events-none"
         style={ONBOARDING_HERO_FRAME}
         draggable={false}

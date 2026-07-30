@@ -4,7 +4,7 @@
  * - One page per scene with scene image (if available, JPG/PNG)
  * - Footer "Criado com KIDZZAPP ❤️" + page number
  *
- * Uses jsPDF's standard fonts (Helvetica) — no external font loading.
+ * Uses jsPDF's standard fonts (Helvetica) - no external font loading.
  */
 import jsPDF from "jspdf";
 

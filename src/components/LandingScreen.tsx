@@ -127,7 +127,7 @@ const LandingScreen = forwardRef<HTMLDivElement, LandingScreenProps>(({ onStart,
           <span className="text-primary-foreground/50 text-xs font-bold ml-2">+5.000 perguntas</span>
         </div>
         <p className="text-primary-foreground/40 text-xs text-center italic max-w-[260px]">
-          "Salvou minhas noites antes de dormir." — Ana, mãe do Pedro
+          "Salvou minhas noites antes de dormir." - Ana, mãe do Pedro
         </p>
       </motion.div>
 

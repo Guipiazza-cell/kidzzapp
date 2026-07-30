@@ -1,4 +1,4 @@
-/* ── KIDZZ Music Engine — Web Audio sintetizado ──
+/* ── KIDZZ Music Engine - Web Audio sintetizado ──
    Notas, drums, melodias procedurais, karaokê com sílabas timed.
 */
 
@@ -45,7 +45,7 @@ export class MusicEngine {
       this.masterGain.gain.value = 0.5;
       this.masterGain.connect(this.ctx.destination);
     }
-    // iOS Safari precisa de resume() dentro do gesto. Chamamos sem await — o navegador
+    // iOS Safari precisa de resume() dentro do gesto. Chamamos sem await - o navegador
     // libera no próximo tick se vier de evento de toque.
     if (this.ctx.state === "suspended") {
       try { this.ctx.resume().catch(() => {}); } catch { /* noop */ }

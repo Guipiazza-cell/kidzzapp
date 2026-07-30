@@ -89,8 +89,8 @@ export const GuardaCelularScreen = ({ open, minutes, childName = "", onDone, onC
               style={{ fontSize: 15, color: "rgba(255,255,255,.85)", lineHeight: 1.5 }}
             >
               {childName
-                ? `Agora é com ${childName}. A gente espera aqui — sem pressa.`
-                : "Agora é com vocês. A gente espera aqui — sem pressa."}
+                ? `Agora é com ${childName}. A gente espera aqui - sem pressa.`
+                : "Agora é com vocês. A gente espera aqui - sem pressa."}
             </p>
 
             {/* Cronômetro */}

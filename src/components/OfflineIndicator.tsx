@@ -4,7 +4,7 @@ import { WifiOff } from "lucide-react";
 
 /**
  * Lightweight offline indicator. Shows a friendly KIDZZ banner when the
- * device loses connection. Doesn't block the UI — the cached SW shell
+ * device loses connection. Doesn't block the UI - the cached SW shell
  * keeps working, and offline-capable games (Memória, Forca, Desafio)
  * remain accessible from the existing Brincar tab.
  */

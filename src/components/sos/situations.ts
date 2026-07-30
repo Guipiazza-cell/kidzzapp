@@ -55,7 +55,7 @@ export type SosSituation = {
     parentNote: string;  // mini bilhete pros pais no final
     closeCta: string;
   };
-  /** Etapa "Continuidade" — mini experiências embutidas */
+  /** Etapa "Continuidade" - mini experiências embutidas */
   continuity?: {
     eyebrow: string;
     title: string;     // ex: "Vamos passar por isso juntos"
@@ -66,7 +66,7 @@ export type SosSituation = {
       desc: string;
     }>;
   };
-  /** Etapa "Fechamento emocional" — desaceleração + memória */
+  /** Etapa "Fechamento emocional" - desaceleração + memória */
   closing?: {
     eyebrow: string;     // ex: "Momentos difíceis passam"
     title: string;       // frase principal (1 linha emocional)
@@ -106,7 +106,7 @@ export const SOS_SITUATIONS: SosSituation[] = [
     support: {
       eyebrow: "Apoio contínuo",
       title: "Sons que acalmam",
-      intro: "Playlist curada para o que veio agora — e o que vem depois.",
+      intro: "Playlist curada para o que veio agora - e o que vem depois.",
       playlist: {
         label: "Acalmar crise", tracks: 6,
         desc: "chuva suave · canto de pássaros · piano lento",
@@ -150,7 +150,7 @@ export const SOS_SITUATIONS: SosSituation[] = [
         desc: "música suave · histórias curtas · respiros lentos",
         from: "22 45% 94%", to: "18 40% 88%", accent: "18 75% 55%",
       },
-      parentNote: "Você não falhou. Birras fazem parte do cérebro em construção. Você manteve a presença — isso é o que ensina regulação.",
+      parentNote: "Você não falhou. Birras fazem parte do cérebro em construção. Você manteve a presença - isso é o que ensina regulação.",
       closeCta: "Estamos bem agora",
     },
   },
@@ -385,7 +385,7 @@ export const SOS_SITUATIONS: SosSituation[] = [
 ];
 
 /* ──────────────────────────────────────────────────────────────────
-   Continuidade + Fechamento — preenchidos para todas as situações.
+   Continuidade + Fechamento - preenchidos para todas as situações.
    Visual mantido; o conteúdo aparece nas novas etapas do SOS Flow.
    ─────────────────────────────────────────────────────────────── */
 
@@ -470,7 +470,7 @@ const SOS_EXTRAS: Record<string, ContinuityClosing> = {
     closing: {
       eyebrow: "O medo passou",
       title: "Você foi o lugar seguro.",
-      subtitle: "É assim que a coragem nasce — perto de quem fica.",
+      subtitle: "É assim que a coragem nasce - perto de quem fica.",
       shareable: "O medo das crianças cabe nos braços de quem fica.",
       recap: ["nomearam o medo", "ficaram juntos", "viraram coragem"],
       saveCta: "Guardar essa coragem",
@@ -525,7 +525,7 @@ const SOS_EXTRAS: Record<string, ContinuityClosing> = {
       subtitle: "Uma experiência curta, simples, sem decisão.",
       options: [
         { iconKey: "music", title: "Foco gentil",      desc: "trilha que organiza" },
-        { iconKey: "hug",   title: "Movimento curto",  desc: "sala–cozinha, sem pressa" },
+        { iconKey: "hug",   title: "Movimento curto",  desc: "sala-cozinha, sem pressa" },
         { iconKey: "book",  title: "Uma coisa só",     desc: "escolher a menor ação" },
         { iconKey: "moon",  title: "Encerrar juntos",  desc: "fechar com calma" },
       ],

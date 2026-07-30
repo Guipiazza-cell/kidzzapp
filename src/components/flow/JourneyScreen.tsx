@@ -24,7 +24,7 @@ const tierGradient: Record<LevelInfo["tier"], string> = {
 };
 
 /**
- * Sua Jornada — visão completa de progresso, recompensa atual,
+ * Sua Jornada - visão completa de progresso, recompensa atual,
  * próxima recompensa, XP por categoria. Otimizado para mobile.
  */
 const JourneyScreen = ({ onBack, childName = "amigo" }: Props) => {
@@ -215,7 +215,7 @@ const JourneyScreen = ({ onBack, childName = "amigo" }: Props) => {
         )}
 
         <p className="text-center text-[11px] font-bold text-gray-500 pt-2">
-          Continue brincando, {childName} — toda ação conta! 💚
+          Continue brincando, {childName} - toda ação conta! 💚
         </p>
       </div>
     </motion.div>

@@ -4,12 +4,12 @@ import { X, ArrowRight } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 
 /**
- * Sistema de Nudges Contextuais — sussurros no Home na hora certa.
+ * Sistema de Nudges Contextuais - sussurros no Home na hora certa.
  *
  * Regras (todas baseadas em hora + localStorage, zero backend):
- *  - 06–10h  · Se ritual da manhã ainda não feito hoje  → "Bom dia. 3 minutos pra começar bem."
- *  - 16–20h  · Se nenhum decompressão hoje              → "Antes de entrar em casa, respire."
- *  - 20–23h  · Se ritual da noite ainda não feito        → "Hora de desacelerar juntos."
+ *  - 06-10h  · Se ritual da manhã ainda não feito hoje  → "Bom dia. 3 minutos pra começar bem."
+ *  - 16-20h  · Se nenhum decompressão hoje              → "Antes de entrar em casa, respire."
+ *  - 20-23h  · Se ritual da noite ainda não feito        → "Hora de desacelerar juntos."
  *  - Qualquer hora · Se SOS usado hoje + sem momento     → "Guarde o que aconteceu antes que vire poeira."
  *
  * O usuário pode dispensar; volta no próximo gatilho relevante.
@@ -109,7 +109,7 @@ const pickNudge = (): NudgeDef | null => {
     };
   }
 
-  // 4) Noite — ritual de sono
+  // 4) Noite - ritual de sono
   if (h >= 20 && h < 23 && !wasDoneToday("ritual") && dismissed["night"] !== t) {
     return {
       id: "night",
@@ -151,7 +151,7 @@ const ContextualNudge = ({ onAction }: Props) => {
     if (!nudge) return;
     haptic("medium");
     onAction(nudge.action);
-    // Não dispensa permanentemente — a ação em si vai marcar como concluída
+    // Não dispensa permanentemente - a ação em si vai marcar como concluída
     setNudge(null);
   };
 

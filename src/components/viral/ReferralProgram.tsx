@@ -61,7 +61,7 @@ const ReferralProgram = ({ onBack }: Props) => {
   };
 
   const shareEmail = () => {
-    const subject = encodeURIComponent("Conheça o KIDZZ — o app que mudou nossas conversas em família 💛");
+    const subject = encodeURIComponent("Conheça o KIDZZ - o app que mudou nossas conversas em família 💛");
     const body = encodeURIComponent(shareText);
     window.open(`mailto:?subject=${subject}&body=${body}`);
   };
@@ -79,12 +79,12 @@ const ReferralProgram = ({ onBack }: Props) => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 30 }}
       style={{
-        // Cream forest gradient — quente, acolhedor, anti-fundo-branco
+        // Cream forest gradient - quente, acolhedor, anti-fundo-branco
         background: "linear-gradient(170deg, #FBF6EC 0%, #F5E9D6 35%, #E8D9BC 70%, #D9C29A 100%)",
         touchAction: "pan-y",
       }}
     >
-      {/* Decorative organic shapes — leaves & glow */}
+      {/* Decorative organic shapes - leaves & glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           className="absolute -top-20 -right-20 w-72 h-72 rounded-full"
@@ -136,7 +136,7 @@ const ReferralProgram = ({ onBack }: Props) => {
       </header>
 
       <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-5 pb-8">
-        {/* Hero — KIDZZ explorer waving */}
+        {/* Hero - KIDZZ explorer waving */}
         <div className="text-center mt-2 mb-5">
           <motion.div
             initial={{ scale: 0, rotate: -15 }}

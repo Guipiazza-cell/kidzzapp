@@ -1,5 +1,5 @@
 /**
- * KALM v2 — root. Home diurna + 6 pilares + SOS.
+ * KALM v2 - root. Home diurna + 6 pilares + SOS.
  * Nada de conteúdo noturno aqui (isso vive em Sonhos).
  *
  * Scroll: container próprio com fundo opaco (bloqueia MagicalBackground claro).
@@ -18,7 +18,7 @@ import { findActivity, type Activity } from "./data";
 
 type View = "home" | "sos" | Pillar;
 
-/** Fundo opaco — nunca deixar o MagicalBackground (claro) vazar. */
+/** Fundo opaco - nunca deixar o MagicalBackground (claro) vazar. */
 const KALM_BG = "#0B1310";
 
 interface Props {
@@ -74,7 +74,7 @@ const KalmV2 = ({ onBack, onGoDreams, onOpenParents, initialExperienceId, onCons
       className="flex-1 h-full min-h-0 flex flex-col relative overflow-hidden w-full"
       style={{ background: KALM_BG }}
     >
-      {/* Único scroller da aba — fundo opaco em toda a altura rolável */}
+      {/* Único scroller da aba - fundo opaco em toda a altura rolável */}
       <div
         ref={scrollerRef}
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"

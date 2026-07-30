@@ -76,7 +76,7 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
       await addMemory({
         kind: "music" as any,
         title: activity.title,
-        content: `${childName} viveu "${activity.title}" — ${activity.subtitle}`,
+        content: `${childName} viveu "${activity.title}" - ${activity.subtitle}`,
         emoji: KIND_EMOJI[activity.kind],
       } as any);
       setSaved(true);
@@ -126,7 +126,7 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
             paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
           }}
         >
-          {/* Hero — mesmo degradê */}
+          {/* Hero - mesmo degradê */}
           <div
             className="relative w-full aspect-[16/10] rounded-[28px] overflow-hidden border border-white/50 shadow-xl mb-4"
             style={{ background: gradient }}

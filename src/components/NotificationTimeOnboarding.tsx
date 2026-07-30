@@ -59,7 +59,7 @@ const NotificationTimeOnboarding = ({ childName, onComplete }: Props) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Vamos lembrar você todo dia — sem app fechado, {childName} esperando 💛
+          Vamos lembrar você todo dia - sem app fechado, {childName} esperando 💛
         </motion.p>
 
         <div className="w-full max-w-sm mt-6 space-y-3 relative z-20">

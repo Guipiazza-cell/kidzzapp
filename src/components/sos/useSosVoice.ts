@@ -52,7 +52,7 @@ export function useSosVoice() {
         dataUri = `data:audio/mpeg;base64,${audioContent}`;
         audioCache.set(text, dataUri);
       } catch (e) {
-        // Falha silenciosa — narração é enhancement, não bloqueia o fluxo.
+        // Falha silenciosa - narração é enhancement, não bloqueia o fluxo.
         console.warn("[sos-voice] falling back to silence:", e);
         if (myGen === genRef.current) setLoading(false);
         return;

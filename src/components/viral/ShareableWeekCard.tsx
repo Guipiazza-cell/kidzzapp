@@ -11,7 +11,7 @@ interface Props {
 }
 
 /**
- * 4:5 weekly summary card (400x500) — golden theme for "Conquistas da Semana".
+ * 4:5 weekly summary card (400x500) - golden theme for "Conquistas da Semana".
  */
 const ShareableWeekCard = forwardRef<HTMLDivElement, Props>(
   ({ childName, weekLabel, questions, stories, streak, minutes, topThemes }, ref) => {

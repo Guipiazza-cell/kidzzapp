@@ -1,5 +1,5 @@
 /**
- * KALM v2 — Home DIURNA da família (tema escuro florestal · premium).
+ * KALM v2 - Home DIURNA da família (tema escuro florestal · premium).
  * Bem-estar da família acordada: emoção, gratidão, corpo, alimentação, conexão, autocuidado.
  * Nada de conteúdo noturno aqui (vive em Sonhos).
  */
@@ -103,7 +103,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
 
   const [shareMsg, setShareMsg] = useState<string>("");
   const handleShare = async () => {
-    const txt = `Esta semana nossa família guardou ${weekStats.tarefas} vitórias e ${weekStats.momentos} momentos felizes 💚 — KALM by Kidzz`;
+    const txt = `Esta semana nossa família guardou ${weekStats.tarefas} vitórias e ${weekStats.momentos} momentos felizes 💚 - KALM by Kidzz`;
     const url = typeof window !== "undefined" ? window.location.origin : undefined;
     try {
       if (typeof navigator !== "undefined" && (navigator as any).share) {
@@ -160,7 +160,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         }}
       />
 
-      {/* ═══ HERO cinematográfico — arte 4:3 regenerada (Gui inteiro + nítido) ═══ */}
+      {/* ═══ HERO cinematográfico - arte 4:3 regenerada (Gui inteiro + nítido) ═══ */}
       <section className="relative" style={{ height: 300 }}>
         <div
           aria-hidden
@@ -191,7 +191,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           />
         </div>
 
-        {/* Top chrome — nav / streak (sem 2º camaleão: já está na arte do hero) */}
+        {/* Top chrome - nav / streak (sem 2º camaleão: já está na arte do hero) */}
         <div className="relative z-10 px-4 pt-[max(14px,env(safe-area-inset-top))] pb-2 flex items-center gap-2">
           <button
             onClick={() => { haptic("light"); onBack(); }}
@@ -211,7 +211,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         </div>
       </section>
 
-      {/* Corpo escuro — texto do hero + cards (texto na faixa do quadrado) */}
+      {/* Corpo escuro - texto do hero + cards (texto na faixa do quadrado) */}
       <div
         className="relative z-[3]"
         style={{
@@ -222,7 +222,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           boxShadow: "0 -12px 40px rgba(0,0,0,.35)",
         }}
       >
-      {/* Copy do mockup — abaixo dos personagens, sem sobrepor */}
+      {/* Copy do mockup - abaixo dos personagens, sem sobrepor */}
       <section className="relative px-5 pt-4 pb-1">
         <p
           className="text-[12px] font-extrabold"
@@ -302,7 +302,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
         </button>
       </section>
 
-      {/* Check-in emocional — Tempo de hoje */}
+      {/* Check-in emocional - Tempo de hoje */}
       <section className="relative px-5 pt-6">
         <div className="flex items-center justify-between">
           <p className="text-[11px] font-bold tracking-[0.22em] uppercase" style={{ color: green }}>

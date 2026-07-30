@@ -56,7 +56,7 @@ export function getPaywallCopy(
       return {
         emoji: "🎵",
         headline: `${name} merece dormir embalado por sons mágicos`,
-        subheadline: "Chuva, floresta, fogueira — escolha a trilha perfeita para a noite.",
+        subheadline: "Chuva, floresta, fogueira - escolha a trilha perfeita para a noite.",
         cta: "🎧 Ativar sons mágicos",
         highlight: "Áudios premium",
       };

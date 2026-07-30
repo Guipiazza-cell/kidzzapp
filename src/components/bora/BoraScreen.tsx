@@ -1571,7 +1571,7 @@ const BoraScreen = ({ onBack }: Props) => {
                 </div>
               </div>
 
-              {/* Arte full Hermes — coluna própria, sem sobrepor texto/CTA */}
+              {/* Arte full Hermes - coluna própria, sem sobrepor texto/CTA */}
               <div
                 style={{
                   flex: "none",

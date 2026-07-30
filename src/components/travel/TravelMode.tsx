@@ -80,10 +80,10 @@ const TravelMode = ({ onBack }: Props) => {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Narração via ElevenLabs (voz Amanda) com fallback Web Speech — fonte única.
+  // Narração via ElevenLabs (voz Amanda) com fallback Web Speech - fonte única.
   const { speak, stop: stopSpeak } = useTTS();
 
-  // Preview de pergunta no setup — rotaciona a cada 4s
+  // Preview de pergunta no setup - rotaciona a cada 4s
   useEffect(() => {
     if (phase !== "setup") return;
     const id = setInterval(() => {
@@ -174,7 +174,7 @@ const TravelMode = ({ onBack }: Props) => {
 
       addMemory({
         type: "question",
-        title: `Sessão Viagem 🚗 — ${questions.length} perguntas`,
+        title: `Sessão Viagem 🚗 - ${questions.length} perguntas`,
         content: questions.map(q => q.text).join(" | "),
         is_special: false,
         image_url: null,
@@ -231,7 +231,7 @@ const TravelMode = ({ onBack }: Props) => {
           </header>
 
           <div className="relative flex-1 min-h-0 flex flex-col items-center px-6 gap-4 overflow-y-auto overflow-x-hidden overscroll-contain pb-10 pt-2">
-            {/* Preview de pergunta — alto-falante (PRIMEIRO: coração da experiência) */}
+            {/* Preview de pergunta - alto-falante (PRIMEIRO: coração da experiência) */}
             <motion.button
               onClick={speakPreview}
               className="w-full max-w-xs rounded-2xl px-4 py-3 backdrop-blur-md border border-amber-300/30 flex items-start gap-3 text-left active:scale-[0.98] transition-transform"
@@ -270,7 +270,7 @@ const TravelMode = ({ onBack }: Props) => {
               </div>
             </motion.button>
 
-            {/* KIDZZ Explorer — logo abaixo do box de perguntas */}
+            {/* KIDZZ Explorer - logo abaixo do box de perguntas */}
             <KidzzChameleon
               state="cosmic"
               mood="guide"
@@ -279,7 +279,7 @@ const TravelMode = ({ onBack }: Props) => {
               interactive
             />
 
-            {/* Theme selector — coerência com o assunto da pergunta */}
+            {/* Theme selector - coerência com o assunto da pergunta */}
             <div className="w-full max-w-xs">
               <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-2 text-center">
                 Assunto

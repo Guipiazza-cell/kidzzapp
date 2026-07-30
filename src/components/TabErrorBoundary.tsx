@@ -2,7 +2,7 @@ import { Component, type ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
-  /** Tab id — when it changes, boundary auto-resets (so switching away + back recovers). */
+  /** Tab id - when it changes, boundary auto-resets (so switching away + back recovers). */
   resetKey?: string;
   /** Called when user taps "voltar". Should send them to the safe Home tab. */
   onBack?: () => void;
@@ -16,7 +16,7 @@ interface State {
 
 /**
  * Lightweight per-tab error boundary. A crash in one tab (e.g. lazy chunk fails,
- * WellnessHub throws) shows a friendly inline fallback INSIDE the tab area —
+ * WellnessHub throws) shows a friendly inline fallback INSIDE the tab area  - 
  * the rest of the app (BottomNav, other tabs, auth) stays alive.
  */
 class TabErrorBoundary extends Component<Props, State> {
@@ -45,7 +45,7 @@ class TabErrorBoundary extends Component<Props, State> {
         <div>
           <h2 className="text-lg font-extrabold text-foreground">Essa seção tropeçou</h2>
           <p className="text-sm text-muted-foreground mt-1 max-w-xs">
-            Sem stress — o resto do app continua funcionando.
+            Sem stress - o resto do app continua funcionando.
           </p>
         </div>
         <div className="flex gap-2">

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useMemo } from "react";
 
 /**
- * Estrada cósmica infantil — fundo vivo com:
+ * Estrada cósmica infantil - fundo vivo com:
  * - gradiente espacial (índigo → roxo → magenta)
  * - estrelas passando (parallax 3 camadas)
  * - linhas de "estrada" cósmica fugindo no horizonte
@@ -64,7 +64,7 @@ const CosmicRoad = ({ children }: { children?: React.ReactNode }) => {
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Estrelas distantes — pulsam */}
+      {/* Estrelas distantes - pulsam */}
       {farStars.map((s) => (
         <motion.div
           key={`f${s.id}`}
@@ -81,7 +81,7 @@ const CosmicRoad = ({ children }: { children?: React.ReactNode }) => {
         />
       ))}
 
-      {/* Estrelas médias — caem (parallax meio) */}
+      {/* Estrelas médias - caem (parallax meio) */}
       {midStars.map((s) => (
         <motion.div
           key={`m${s.id}`}
@@ -103,7 +103,7 @@ const CosmicRoad = ({ children }: { children?: React.ReactNode }) => {
         />
       ))}
 
-      {/* Estrelas próximas — riscam rápido (parallax frente) */}
+      {/* Estrelas próximas - riscam rápido (parallax frente) */}
       {closeStars.map((s) => (
         <motion.div
           key={`c${s.id}`}
@@ -127,7 +127,7 @@ const CosmicRoad = ({ children }: { children?: React.ReactNode }) => {
         />
       ))}
 
-      {/* Estrada cósmica — linhas fugindo no horizonte */}
+      {/* Estrada cósmica - linhas fugindo no horizonte */}
       <svg
         className="absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none"
         width="120%"

@@ -1,5 +1,5 @@
 /**
- * Kidzz Premium UI — liquid glass iOS (referência: aba Bora).
+ * Kidzz Premium UI - liquid glass iOS (referência: aba Bora).
  *
  * Regras de ouro:
  * - Blur ≥ 28px (cards ≥ 36, dock ≥ 40)

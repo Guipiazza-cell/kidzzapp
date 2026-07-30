@@ -1,5 +1,5 @@
 /**
- * Validação manual automatizada — MEU KIDZZ
+ * Validação manual automatizada - MEU KIDZZ
  *
  * Garante que:
  *  1. A configuração do camaleão é persistida em `localStorage` (chave `mascotConfig`).
@@ -14,7 +14,7 @@ import { loadMascotConfig, type MascotConfig } from "@/components/lab/KidzzLab";
 
 const KEY = "mascotConfig";
 
-describe("MyKidzz — persistência da personalização", () => {
+describe("MyKidzz - persistência da personalização", () => {
   beforeEach(() => {
     localStorage.clear();
   });

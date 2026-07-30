@@ -11,7 +11,7 @@ import GuidedActivityPlayer, { type GuidedActivity } from "./GuidedActivityPlaye
 import { FONT, SERIF, R, PAD, glassLightSoft, pillGlassLight } from "@/lib/premiumUi";
 
 /**
- * MusicForest — Tela "Música" (premium v2 — nível Bora).
+ * MusicForest - Tela "Música" (premium v2 - nível Bora).
  * Ref: public/telas/MUSICA/* · Assets: musica-v2 (Hermes/Codex)
  * Floresta + liquid glass + família (sem lagarto).
  */
@@ -122,7 +122,7 @@ const CATEGORIES: Category[] = [
   { id: "travel", label: "Modo Viagem", subtitle: "Trilhas sonoras para qualquer lugar", gradient: "linear-gradient(135deg, hsl(190 65% 55%) 0%, hsl(200 60% 42%) 100%)", dk: "teal", cover: `${MU}/cat-travel.png`, novo: true, tags: ["travel"] },
 ];
 
-/* Sons ambiente — descrição humana (nunca expor id interno de slot) */
+/* Sons ambiente - descrição humana (nunca expor id interno de slot) */
 const AMBIENT_SOUNDS: { id: string; label: string; desc: string; url?: string; free: boolean }[] = [
   { id: "forest", label: "Floresta calma", desc: "Sons da natureza", url: "/audio/forest-calm.mp3", free: true },
   { id: "rain", label: "Chuva no telhado", desc: "Para relaxar juntos", url: "/audio/rain-soft.mp3", free: true },
@@ -130,7 +130,7 @@ const AMBIENT_SOUNDS: { id: string; label: string; desc: string; url?: string; f
   { id: "piano", label: "Piano do soninho", desc: "Para dormir", free: false },
 ];
 
-/** Selo PREMIUM padrão (dourado + cadeado) — referência do relatório de design */
+/** Selo PREMIUM padrão (dourado + cadeado) - referência do relatório de design */
 const premiumSeal: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
@@ -147,15 +147,15 @@ const premiumSeal: CSSProperties = {
 
 /* ── Dados: atividades guiadas reais ── */
 const ACTIVITIES: GuidedActivity[] = [
-  { id: "cancoes-animais", title: "Canções dos Animais", subtitle: "Aprenda e cante com os bichinhos!", minutes: 8, ageRange: "2–6 anos", tags: ["featured", "adventure"], kind: "sing", instruction: "Imita a voz de cada bichinho quando ele aparecer!", slotImg: "imgAtiv_cancoes_animais", slotAudio: "exec_cancoes_animais", accent: "38 95% 62%" },
-  { id: "palmas-ritmos", title: "Palmas e Ritmos", subtitle: "Siga o ritmo e divirta-se batendo palmas!", minutes: 6, ageRange: "3–6 anos", tags: ["featured", "movement"], kind: "clap", instruction: "Bata palma junto no tempo da música. Prontos?", slotImg: "imgAtiv_palmas", slotAudio: "exec_palmas", accent: "275 65% 62%" },
-  { id: "instrumentos-mundo", title: "Instrumentos do Mundo", subtitle: "Descubra sons incríveis de vários lugares!", minutes: 10, ageRange: "4–8 anos", tags: ["adventure"], kind: "listen", instruction: "Feche os olhos e adivinha que instrumento é este!", slotImg: "imgAtiv_instrumentos", slotAudio: "exec_instrumentos", accent: "190 65% 55%" },
-  { id: "cancoes-ninar", title: "Canções de Ninar", subtitle: "Melodias para acalmar e embalar o sono.", minutes: 12, ageRange: "0–4 anos", tags: ["calm", "sleep"], kind: "listen", instruction: "Diminua as luzes, respire fundo, e deixe a música embalar.", slotImg: "imgAtiv_ninar", slotAudio: "exec_ninar", accent: "220 60% 62%", parentMark: true },
-  { id: "danca-congela", title: "Dança Congela", subtitle: "Dance e pare quando a música congelar!", minutes: 5, ageRange: "3–8 anos", tags: ["featured", "movement", "adventure"], kind: "dance", instruction: "Dance! Quando a música PARAR — congela como estátua!", slotImg: "imgAtiv_congela", slotAudio: "exec_congela", accent: "38 95% 62%" },
-  { id: "orquestra-cozinha", title: "Orquestra da Cozinha", subtitle: "Fazer banda com panela e colher!", minutes: 7, ageRange: "3–7 anos", tags: ["adventure", "movement"], kind: "play", instruction: "Pegue uma panela e uma colher. Vamos formar uma banda!", slotImg: "imgAtiv_cozinha", slotAudio: "exec_cozinha", accent: "275 65% 62%" },
-  { id: "batuque-corpo", title: "Batuque do Corpo", subtitle: "Peito, perna, palma — o corpo vira instrumento!", minutes: 5, ageRange: "4–8 anos", tags: ["movement", "featured"], kind: "clap", instruction: "Peito, perna, palma. Vai seguindo o padrão comigo!", slotImg: "imgAtiv_batuque", slotAudio: "exec_batuque", accent: "150 55% 55%" },
-  { id: "musica-nome", title: "A Música do Seu Nome", subtitle: "Invente uma cançãozinha com o nome de quem você ama.", minutes: 6, ageRange: "3–8 anos", tags: ["emotion", "bond"], kind: "sing", instruction: "Diga um nome. A gente inventa uma canção com ele!", slotImg: "imgAtiv_nome", slotAudio: "exec_nome", accent: "150 55% 55%" },
-  { id: "danca-bichos", title: "Dança dos Bichos", subtitle: "Mexa como cada animal — pula, rasteja, voa!", minutes: 6, ageRange: "2–6 anos", tags: ["movement", "adventure"], kind: "dance", instruction: "Salta como sapo, voa como pássaro, rasteja como cobrinha!", slotImg: "imgAtiv_bichos", slotAudio: "exec_bichos", accent: "275 65% 62%" },
+  { id: "cancoes-animais", title: "Canções dos Animais", subtitle: "Aprenda e cante com os bichinhos!", minutes: 8, ageRange: "2-6 anos", tags: ["featured", "adventure"], kind: "sing", instruction: "Imita a voz de cada bichinho quando ele aparecer!", slotImg: "imgAtiv_cancoes_animais", slotAudio: "exec_cancoes_animais", accent: "38 95% 62%" },
+  { id: "palmas-ritmos", title: "Palmas e Ritmos", subtitle: "Siga o ritmo e divirta-se batendo palmas!", minutes: 6, ageRange: "3-6 anos", tags: ["featured", "movement"], kind: "clap", instruction: "Bata palma junto no tempo da música. Prontos?", slotImg: "imgAtiv_palmas", slotAudio: "exec_palmas", accent: "275 65% 62%" },
+  { id: "instrumentos-mundo", title: "Instrumentos do Mundo", subtitle: "Descubra sons incríveis de vários lugares!", minutes: 10, ageRange: "4-8 anos", tags: ["adventure"], kind: "listen", instruction: "Feche os olhos e adivinha que instrumento é este!", slotImg: "imgAtiv_instrumentos", slotAudio: "exec_instrumentos", accent: "190 65% 55%" },
+  { id: "cancoes-ninar", title: "Canções de Ninar", subtitle: "Melodias para acalmar e embalar o sono.", minutes: 12, ageRange: "0-4 anos", tags: ["calm", "sleep"], kind: "listen", instruction: "Diminua as luzes, respire fundo, e deixe a música embalar.", slotImg: "imgAtiv_ninar", slotAudio: "exec_ninar", accent: "220 60% 62%", parentMark: true },
+  { id: "danca-congela", title: "Dança Congela", subtitle: "Dance e pare quando a música congelar!", minutes: 5, ageRange: "3-8 anos", tags: ["featured", "movement", "adventure"], kind: "dance", instruction: "Dance! Quando a música PARAR - congela como estátua!", slotImg: "imgAtiv_congela", slotAudio: "exec_congela", accent: "38 95% 62%" },
+  { id: "orquestra-cozinha", title: "Orquestra da Cozinha", subtitle: "Fazer banda com panela e colher!", minutes: 7, ageRange: "3-7 anos", tags: ["adventure", "movement"], kind: "play", instruction: "Pegue uma panela e uma colher. Vamos formar uma banda!", slotImg: "imgAtiv_cozinha", slotAudio: "exec_cozinha", accent: "275 65% 62%" },
+  { id: "batuque-corpo", title: "Batuque do Corpo", subtitle: "Peito, perna, palma - o corpo vira instrumento!", minutes: 5, ageRange: "4-8 anos", tags: ["movement", "featured"], kind: "clap", instruction: "Peito, perna, palma. Vai seguindo o padrão comigo!", slotImg: "imgAtiv_batuque", slotAudio: "exec_batuque", accent: "150 55% 55%" },
+  { id: "musica-nome", title: "A Música do Seu Nome", subtitle: "Invente uma cançãozinha com o nome de quem você ama.", minutes: 6, ageRange: "3-8 anos", tags: ["emotion", "bond"], kind: "sing", instruction: "Diga um nome. A gente inventa uma canção com ele!", slotImg: "imgAtiv_nome", slotAudio: "exec_nome", accent: "150 55% 55%" },
+  { id: "danca-bichos", title: "Dança dos Bichos", subtitle: "Mexa como cada animal - pula, rasteja, voa!", minutes: 6, ageRange: "2-6 anos", tags: ["movement", "adventure"], kind: "dance", instruction: "Salta como sapo, voa como pássaro, rasteja como cobrinha!", slotImg: "imgAtiv_bichos", slotAudio: "exec_bichos", accent: "275 65% 62%" },
 ];
 
 const greetingWord = () => {
@@ -265,7 +265,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
   const { profile, tier } = useAuth();
   const childName = profile?.child_name || "amigo";
   const isPremium = tier === "premium";
-  // Troféu global da família (mesmo valor das outras abas) — não o XP só de música
+  // Troféu global da família (mesmo valor das outras abas) - não o XP só de música
   const pontosFamilia = profile?.points ?? 0;
 
   const [activePillar, setActivePillar] = useState<Pillar | null>(null);
@@ -386,10 +386,10 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 
   /* ── Modos (pilares reais) ── */
   const modos = [
-    { pillar: "morning" as Pillar, title: "Karaokê do Dia", sub: "Grátis — cante com o Kidzz", d: D.mic, k: "ouro", t: [240, 180, 70] as [number, number, number], badge: "NOVO", requiresPremium: false, cover: `${MU}/modo-mic.png` },
+    { pillar: "morning" as Pillar, title: "Karaokê do Dia", sub: "Grátis - cante com o Kidzz", d: D.mic, k: "ouro", t: [240, 180, 70] as [number, number, number], badge: "NOVO", requiresPremium: false, cover: `${MU}/modo-mic.png` },
     { pillar: "dance" as Pillar, title: "Dance com Kidzz", sub: "Mini-game de palmas e movimento", d: D.dance, k: "rosa", t: [240, 130, 170] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-dance.png` },
     { pillar: "stories" as Pillar, title: "Histórias Cantadas", sub: "4 livros mágicos narrados em canção", d: D.book, k: "azul", t: [130, 175, 240] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-book.png` },
-    { pillar: "create" as Pillar, title: "Crie Sua Música", sub: "Laboratório sonoro — monte a sua", d: D.lab, k: "verde", t: [140, 200, 110] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-create.png` },
+    { pillar: "create" as Pillar, title: "Crie Sua Música", sub: "Laboratório sonoro - monte a sua", d: D.lab, k: "verde", t: [140, 200, 110] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-create.png` },
   ];
 
   const destaques = ACTIVITIES.filter((a) => a.tags.includes("featured") || a.tags.includes("movement"));
@@ -700,7 +700,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 const ActivityCard = ({
   activity, index, favorite, onFav, onOpen, full = false,
 }: { activity: GuidedActivity; index: number; favorite: boolean; onFav: () => void; onOpen: () => void; full?: boolean }) => {
-  // Fundo de card unificado (sem arco-íris por item) — padrão do relatório
+  // Fundo de card unificado (sem arco-íris por item) - padrão do relatório
   const foot: [string, string] = ["#3A3220", "#2A2418"];
   return (
     <div style={{ flex: "none", width: full ? "100%" : 168, borderRadius: 22, position: "relative", overflow: "hidden", boxShadow: "0 14px 30px rgba(110,85,30,.26),inset 0 1px 0 rgba(255,255,255,.4)", border: "1px solid rgba(255,255,255,.55)", animation: "mus-rise .45s both" }}>

@@ -4,7 +4,7 @@ import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 
 /**
- * Card SOS na HOME — ponto emocional principal.
+ * Card SOS na HOME - ponto emocional principal.
  * Botão redondo metálico vermelho (estilo Apple Wellness).
  * Visual respira lentamente para sugerir "presença viva".
  */
@@ -48,12 +48,12 @@ const SOSCard = ({ onOpen }: Props) => {
           }}
         />
 
-        {/* BOTÃO METÁLICO VERMELHO — ponto emocional */}
+        {/* BOTÃO METÁLICO VERMELHO - ponto emocional */}
         <motion.button
           type="button"
           onClick={handleOpen}
           whileTap={{ scale: 0.94 }}
-          aria-label="Abrir SOS Kidzz — apoio emocional em 1 toque"
+          aria-label="Abrir SOS Kidzz - apoio emocional em 1 toque"
           className="sos-btn-metallic sos-breath relative flex-shrink-0 rounded-full flex items-center justify-center"
           style={{ width: 82, height: 82 }}
         >

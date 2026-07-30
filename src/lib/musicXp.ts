@@ -1,4 +1,4 @@
-/* XP musical e streak musical separados — persistidos em localStorage */
+/* XP musical e streak musical separados - persistidos em localStorage */
 
 const XP_KEY = "kidzz_music_xp";
 const STREAK_KEY = "kidzz_music_streak";
@@ -43,7 +43,7 @@ export function addMusicXp(action: MusicAction): { xp: number; gained: number } 
   const xp = getMusicXp() + gained;
   window.localStorage.setItem(XP_KEY, String(xp));
   bumpStreak();
-  // Bridge to global Level System (Bloco 1) — every musical action also
+  // Bridge to global Level System (Bloco 1) - every musical action also
   // contributes to the universal XP/Level so progress is unified.
   try {
     import("./dailyMission").then(({ addXp }) => {

@@ -52,7 +52,7 @@ const InstallBanner = () => {
     };
     window.addEventListener("beforeinstallprompt", handler);
 
-    // iOS doesn't fire beforeinstallprompt — show iOS instructions directly
+    // iOS doesn't fire beforeinstallprompt - show iOS instructions directly
     if (isIOS) {
       const t = setTimeout(() => {
         setIosMode(true);

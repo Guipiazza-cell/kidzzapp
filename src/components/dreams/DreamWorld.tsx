@@ -1,7 +1,7 @@
-/* ── KIDZZ — Sessão Sonhos (premium v2)
+/* ── KIDZZ - Sessão Sonhos (premium v2)
    Referência: public/telas/ABA SONHOS/*
    Assets: public/exemplos/assets/sonhos-v2/* (gerados Hermes/Codex gpt-image)
-   Pessoas/família — sem lagarto nos assets novos.
+   Pessoas/família - sem lagarto nos assets novos.
    Lógica real preservada (sons, histórias, timer, playlists, paywall).
 */
 import {
@@ -76,7 +76,7 @@ const goldCta: CSSProperties = {
   cursor: "pointer",
 };
 
-/* Botão de ícone "gloss" (brilho radial) — helper do design */
+/* Botão de ícone "gloss" (brilho radial) - helper do design */
 const gloss = (
   light: string, mid: string, deep: string, size = 40, radius = 13,
 ): CSSProperties => ({
@@ -651,7 +651,7 @@ const DreamWorld = ({ onBack }: Props) => {
             </motion.button>
           </div>
 
-          {/* Título na zona esmaecida — sem “corte” da imagem atrás do texto */}
+          {/* Título na zona esmaecida - sem “corte” da imagem atrás do texto */}
           <div
             style={{
               position: "relative",

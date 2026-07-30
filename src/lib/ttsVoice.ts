@@ -1,5 +1,5 @@
 /**
- * ttsVoice — Ponto ÚNICO de seleção de voz para toda a narração Web Speech do app.
+ * ttsVoice - Ponto ÚNICO de seleção de voz para toda a narração Web Speech do app.
  *
  * Objetivo: voz FEMININA, mansa e serena, em pt-BR, consistente em todas as telas
  * (Perguntas, Histórias, Música, Sonhos, Viagem, Meditação/KALM…).
@@ -8,14 +8,14 @@
  * o tom padrão. Sempre defina também `utterance.lang = "pt-BR"`.
  */
 
-/** Ritmo/tom padrão suave — "tia que conta história". */
+/** Ritmo/tom padrão suave - "tia que conta história". */
 export const SOFT_RATE = 0.88;
 export const SOFT_PITCH = 1.02;
 export const SOFT_VOLUME = 0.95;
 
 /**
  * Voz feminina do ElevenLabs (usada nas narrações via edge `elevenlabs-tts`).
- * "Amanda Kelly" — feminina, mansa e serena. Forçada pelo cliente para não
+ * "Amanda Kelly" - feminina, mansa e serena. Forçada pelo cliente para não
  * depender do redeploy do edge function.
  */
 export const ELEVEN_FEMALE_VOICE_ID = "oi8rgjIfLgJRsQ6rbZh3";
@@ -38,7 +38,7 @@ export const FEMALE_PT_VOICE_NAMES = [
   "Microsoft Francisca",
 ];
 
-/** Nomes claramente MASCULINOS — nunca usar, mesmo no fallback. */
+/** Nomes claramente MASCULINOS - nunca usar, mesmo no fallback. */
 const MALE_VOICE_MARKERS = [
   "daniel", "antonio", "antónio", "felipe", "fábio", "fabio",
   "ricardo", "joão", "joao", "carlos", "male", "masculino", "homem",
@@ -49,7 +49,7 @@ const isMaleVoice = (name: string): boolean => {
   return MALE_VOICE_MARKERS.some((m) => n.includes(m));
 };
 
-/** Carrega vozes — em alguns browsers só ficam prontas após `onvoiceschanged`. */
+/** Carrega vozes - em alguns browsers só ficam prontas após `onvoiceschanged`. */
 export const loadVoices = (): Promise<SpeechSynthesisVoice[]> =>
   new Promise((resolve) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return resolve([]);
@@ -85,7 +85,7 @@ export const pickFemaleVoice = (
   // 3. Qualquer pt que NÃO seja masculina
   const ptFemale = voices.find((v) => v.lang.startsWith("pt") && !isMaleVoice(v.name));
   if (ptFemale) return ptFemale;
-  // 4. Último recurso: qualquer pt-BR (mesmo que masculina — melhor que idioma errado)
+  // 4. Último recurso: qualquer pt-BR (mesmo que masculina - melhor que idioma errado)
   const ptBR = voices.find((v) => v.lang === "pt-BR");
   if (ptBR) return ptBR;
   const ptAny = voices.find((v) => v.lang.startsWith("pt"));

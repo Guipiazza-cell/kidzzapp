@@ -9,9 +9,9 @@ import { haptic } from "@/lib/haptics";
 import ageHero from "@/assets/kidzz/age-onboarding-hero.webp";
 
 const AGE_OPTIONS = [
-  { range: "0-3", label: "2 – 5 anos" },
-  { range: "3-7", label: "6 – 8 anos" },
-  { range: "7-10", label: "9 – 12 anos" },
+  { range: "0-3", label: "2 - 5 anos" },
+  { range: "3-7", label: "6 - 8 anos" },
+  { range: "7-10", label: "9 - 12 anos" },
 ];
 
 const AgeSelection = () => {
@@ -36,7 +36,7 @@ const AgeSelection = () => {
     <div className="fixed inset-0 w-full h-[100dvh] max-w-[100vw] overflow-hidden bg-[#0B1A12]">
       <img
         src={ageHero}
-        alt="Kidzz — Qual a sua idade?"
+        alt="Kidzz - Qual a sua idade?"
         className="absolute inset-0 block h-full w-full select-none pointer-events-none"
         style={ONBOARDING_HERO_FRAME}
         draggable={false}

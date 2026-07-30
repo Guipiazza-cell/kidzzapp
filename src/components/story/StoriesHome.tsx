@@ -1,8 +1,8 @@
 /**
- * Histórias — HOME premium v2
+ * Histórias - HOME premium v2
  * Ref: public/telas/historia/*
  * Assets: public/exemplos/assets/historias-v2/* (Hermes/Codex gpt-image)
- * Pessoas/família — sem lagarto. Lógica real: fábrica, coleções, continue lendo, chips.
+ * Pessoas/família - sem lagarto. Lógica real: fábrica, coleções, continue lendo, chips.
  */
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,7 +22,7 @@ import PremiumSeal from "@/components/common/PremiumSeal";
 
 const HI = "/exemplos/assets/historias-v2";
 
-/** Coleções especiais — cards “Em breve” (ainda não liberadas). */
+/** Coleções especiais - cards “Em breve” (ainda não liberadas). */
 const COLLECTIONS = [
   { key: "aventura", label: "Aventuras", desc: "Coragem e descoberta", img: `${HI}/tile-temas.png` },
   { key: "amizade", label: "Amizade", desc: "Cuidar e compartilhar", img: `${HI}/tile-personagens.png` },
@@ -30,7 +30,7 @@ const COLLECTIONS = [
   { key: "familia", label: "Família", desc: "Fortalece os laços", img: `${HI}/feat-familia.png` },
 ];
 
-/** Passos da fábrica — na home (antes de “Criar minha história”). */
+/** Passos da fábrica - na home (antes de “Criar minha história”). */
 const HOW_IT_WORKS: {
   title: string;
   sub: string;
@@ -318,7 +318,7 @@ const StoriesHome = ({ onBack }: Props) => {
                   padding: 0,
                   opacity: 0.88,
                 }}
-                aria-label={`${col.label} — em breve`}
+                aria-label={`${col.label} - em breve`}
               >
                 <div style={{ position: "relative" }}>
                   <img
@@ -432,7 +432,7 @@ const StoriesHome = ({ onBack }: Props) => {
           </section>
         )}
 
-        {/* ── Favoritas (Em breve) — card único horizontal ── */}
+        {/* ── Favoritas (Em breve) - card único horizontal ── */}
         <section style={{ padding: `18px ${PAD}px 8px` }}>
           <div
             className="relative overflow-hidden"
@@ -446,7 +446,7 @@ const StoriesHome = ({ onBack }: Props) => {
               gap: 14,
               opacity: 0.92,
             }}
-            aria-label="Favoritas — em breve"
+            aria-label="Favoritas - em breve"
           >
             <div
               style={{

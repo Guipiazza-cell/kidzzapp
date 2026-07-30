@@ -1,11 +1,11 @@
 /**
- * PersonalizationPanel — painel voltado ao ADULTO (atrás do Portão dos Pais).
+ * PersonalizationPanel - painel voltado ao ADULTO (atrás do Portão dos Pais).
  * Camada 1: palavras-chave (chips) sobre o mundo do filho.
  * Camada 2: intenção do dia (acalmar / ensinar / coragem / divertir).
- * Camada 3: voz — ritmo da narração (normal / mais devagar para dormir).
+ * Camada 3: voz - ritmo da narração (normal / mais devagar para dormir).
  *
  * Reusa o gerador existente: emite onGenerate(age, interests, keywords, intent, voiceRate).
- * Não recria paywall — só leva ao upgrade quando bloqueado.
+ * Não recria paywall - só leva ao upgrade quando bloqueado.
  */
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -134,7 +134,7 @@ const PersonalizationPanel = ({
       animate={{ opacity: 1, y: 0 }}
       className="space-y-5 pb-4"
     >
-      {/* Cabeçalho — fala com o adulto */}
+      {/* Cabeçalho - fala com o adulto */}
       <div className="text-center">
         <span className="inline-block text-[10.5px] font-extrabold tracking-[0.18em] uppercase mb-2" style={{ color: "#E8821A" }}>
           Painel dos Pais
@@ -147,7 +147,7 @@ const PersonalizationPanel = ({
         </p>
       </div>
 
-      {/* Idade — compacto */}
+      {/* Idade - compacto */}
       <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
         <label className="text-[12px] font-extrabold tracking-wider uppercase" style={{ color: "rgba(42,37,32,0.55)" }}>
           Idade do(a) {childName}
@@ -170,7 +170,7 @@ const PersonalizationPanel = ({
         </div>
       </div>
 
-      {/* CAMADA 1 — palavras-chave */}
+      {/* CAMADA 1 - palavras-chave */}
       <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
         <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           O que faz os olhos do(a) {childName} brilharem?
@@ -243,7 +243,7 @@ const PersonalizationPanel = ({
         )}
       </div>
 
-      {/* CAMADA 2 — intenção */}
+      {/* CAMADA 2 - intenção */}
       <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
         <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Qual o presente de hoje?
@@ -305,7 +305,7 @@ const PersonalizationPanel = ({
         )}
       </div>
 
-      {/* CAMADA 3 — voz */}
+      {/* CAMADA 3 - voz */}
       <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
         <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Voz da narração

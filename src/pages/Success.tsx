@@ -180,7 +180,7 @@ const Success = () => {
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pt-[max(env(safe-area-inset-top),16px)] pb-8">
         <AnimatePresence mode="wait">
           {confirming && !confirmed ? (
-            // CONFIRMING STATE — graceful, warm
+            // CONFIRMING STATE - graceful, warm
             <motion.div
               key="confirming"
               initial={{ opacity: 0, y: 20 }}
@@ -222,7 +222,7 @@ const Success = () => {
               </p>
             </motion.div>
           ) : !confirmed ? (
-            // TIMEOUT FALLBACK — calm, reassuring
+            // TIMEOUT FALLBACK - calm, reassuring
             <motion.div
               key="timeout"
               initial={{ opacity: 0, y: 20 }}
@@ -241,7 +241,7 @@ const Success = () => {
                 Quase lá!
               </h2>
               <p className="text-gray-600 text-sm font-bold mt-2 leading-relaxed">
-                O pagamento foi recebido com sucesso 💛 Estamos só ativando sua conta — pode levar alguns segundos.
+                O pagamento foi recebido com sucesso 💛 Estamos só ativando sua conta - pode levar alguns segundos.
               </p>
               <motion.button
                 onClick={async () => {
@@ -262,7 +262,7 @@ const Success = () => {
               </button>
             </motion.div>
           ) : (
-            // CONFIRMED — cinematic celebration
+            // CONFIRMED - cinematic celebration
             <motion.div
               key="confirmed"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -388,7 +388,7 @@ const Success = () => {
               </motion.div>
 
 
-              {/* Unlocks list — staggered with checkmark burst */}
+              {/* Unlocks list - staggered with checkmark burst */}
               <motion.div
                 className="mt-4 w-full space-y-2"
                 initial={{ opacity: 0 }}

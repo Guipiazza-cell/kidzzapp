@@ -1,5 +1,5 @@
 /**
- * MomentsPlaylists — redesign premium
+ * MomentsPlaylists - redesign premium
  * Craft: Bora (camadas, sticky glass, coloredGlass, sheen, cascade)
  * Layout: print public/telas/momentos/ (tema claro dourado)
  * Dados: PLAYLISTS + Spotify embed real
@@ -320,7 +320,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Fundo sólido do sistema — sem imagem do hero desfocada como parede */}
+      {/* Fundo sólido do sistema - sem imagem do hero desfocada como parede */}
       <div
         aria-hidden
         style={{
@@ -686,7 +686,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Em destaque / lista filtrada — cards horizontais */}
+        {/* Em destaque / lista filtrada - cards horizontais */}
         <div style={{ marginBottom: GAP + 2 }}>
           <div style={{ padding: `0 ${PAD}px` }}>
             <SectionLabel
@@ -831,7 +831,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Todas as playlists — lista */}
+        {/* Todas as playlists - lista */}
         <div style={sectionWrap}>
           <SectionLabel>Todas as playlists</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

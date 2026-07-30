@@ -1,4 +1,4 @@
-/** Ícones premium animados do seletor SOS — estilo 3D glossy (sem emoji). */
+/** Ícones premium animados do seletor SOS - estilo 3D glossy (sem emoji). */
 
 import type { ReactElement, ReactNode } from "react";
 

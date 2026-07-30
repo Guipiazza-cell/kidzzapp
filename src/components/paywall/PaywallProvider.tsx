@@ -16,7 +16,7 @@ export const usePaywall = () => {
   return ctx;
 };
 
-/** Provider único do paywall — todo upgrade do app chama isso. */
+/** Provider único do paywall - todo upgrade do app chama isso. */
 export const PaywallProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [ctx, setCtx] = useState<PaywallContextKind>("default");
@@ -28,7 +28,7 @@ export const PaywallProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   const close = useCallback(() => setIsOpen(false), []);
 
-  // Suporte a ?paywall=1 — qualquer link/CTA legado abre o paywall canônico
+  // Suporte a ?paywall=1 - qualquer link/CTA legado abre o paywall canônico
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);

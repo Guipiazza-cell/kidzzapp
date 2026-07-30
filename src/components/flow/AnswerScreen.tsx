@@ -49,11 +49,11 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
       });
     } catch { /* noop */ }
 
-    // GeneratingScreen already incremented questions — only check badges here
+    // GeneratingScreen already incremented questions - only check badges here
     if (!trackedRef.current) {
       trackedRef.current = true;
       trackEvent("question-checkonly");
-      toast.success("+1 ponto — sabedoria desbloqueada! ✨", { duration: 2500 });
+      toast.success("+1 ponto - sabedoria desbloqueada! ✨", { duration: 2500 });
     }
 
     // Persist Q&A to parent log (one row per answer rendered).
@@ -250,7 +250,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </span>
         </motion.button>
 
-        {/* Reward actions: Save to Memories + Share — primary CTAs */}
+        {/* Reward actions: Save to Memories + Share - primary CTAs */}
         <motion.div
           className="mt-3 grid grid-cols-2 gap-2"
           initial={{ opacity: 0, y: 10 }}

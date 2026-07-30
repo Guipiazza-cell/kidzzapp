@@ -203,7 +203,7 @@ const StoryDisplay = ({ story, images, onReset, onSpeak, isPremium = false }: St
         </motion.button>
       </div>
 
-      {/* Continuidade emocional — paywall após momento positivo */}
+      {/* Continuidade emocional - paywall após momento positivo */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -225,7 +225,7 @@ const StoryDisplay = ({ story, images, onReset, onSpeak, isPremium = false }: St
         <p className="text-xs text-white/85 font-medium mt-1.5 leading-relaxed">
           {isPremium
             ? "Volte para escrever o próximo capítulo dessa história."
-            : "Transforme isso em ritual — capítulos contínuos esperam vocês 🌿"}
+            : "Transforme isso em ritual - capítulos contínuos esperam vocês 🌿"}
         </p>
         {!isPremium && (
           <motion.button

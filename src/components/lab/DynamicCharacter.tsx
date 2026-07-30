@@ -94,7 +94,7 @@ const DynamicCharacter = ({ state }: Props) => {
           transition={{ duration: eConf.breathDur * 2, repeat: Infinity }}
         />
 
-        {/* Eyes — left */}
+        {/* Eyes - left */}
         <g transform="translate(40, 48)">
           <motion.ellipse
             cx="0" cy="0" rx="6" ry="7"
@@ -111,7 +111,7 @@ const DynamicCharacter = ({ state }: Props) => {
           <circle cx="-1" cy={xConf.pupilY - 1.5} r="1" fill="white" opacity="0.8" />
         </g>
 
-        {/* Eyes — right */}
+        {/* Eyes - right */}
         <g transform="translate(60, 48)">
           <motion.ellipse
             cx="0" cy="0" rx="6" ry="7"

@@ -24,7 +24,7 @@ import MemoriesAlbum from "@/components/memories/MemoriesAlbum";
 import ChatFlow from "@/components/flow/ChatFlow";
 import BoraScreen from "@/components/bora/BoraScreen";
 import DiscoverScreen from "@/components/discover/DiscoverScreen";
-// Heavy/secondary screens are lazy-loaded — only the chat home ships in the initial bundle.
+// Heavy/secondary screens are lazy-loaded - only the chat home ships in the initial bundle.
 const lazyRetry = (importFn: () => Promise<any>) =>
   lazy(() =>
     importFn()
@@ -88,7 +88,7 @@ const getCachedAgeRange = () => typeof window !== "undefined" ? window.localStor
 const persistActiveTab = (tab: AppTab) => {
   if (typeof window === "undefined") return;
   // Só sessionStorage: resume a aba ao recarregar DENTRO da mesma sessão.
-  // Não grava em localStorage nem na URL — antes isso fazia o app REABRIR na
+  // Não grava em localStorage nem na URL - antes isso fazia o app REABRIR na
   // última aba (ex: KALM, a mais pesada) em vez da home a cada novo acesso.
   try { window.sessionStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab); } catch { /* noop */ }
 };
@@ -142,7 +142,7 @@ const Index = () => {
   // Keep-alive: abas visitadas ficam montadas (toggle display). A 1ª visita
   // monta (chunk pré-carregado = rápido); re-visitas são instantâneas, sem o
   // frame branco do remount (que causava o "piscar" na troca). Só monta o que
-  // foi visitado — não as 12 de cara.
+  // foi visitado - não as 12 de cara.
   const [mountedTabs, setMountedTabs] = useState<AppTab[]>(() => [getInitialTab()]);
   const [showLab, setShowLab] = useState(false);
   const [showTravel, setShowTravel] = useState(false);
@@ -182,7 +182,7 @@ const Index = () => {
   useEffect(() => {
     persistActiveTab(activeTab);
     // Limpa ?tab obsoleto da URL (versões antigas gravavam a aba na URL, o que
-    // fazia o app reabrir na última aba — ex: KALM — em vez da home).
+    // fazia o app reabrir na última aba - ex: KALM - em vez da home).
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.has("tab")) {
@@ -222,7 +222,7 @@ const Index = () => {
     setStep("home");
   }, [switchTab]);
 
-  // Pré-carrega as abas para troca instantânea — mas DEPOIS da home ficar
+  // Pré-carrega as abas para troca instantânea - mas DEPOIS da home ficar
   // pronta (requestIdleCallback / fallback). Antes disparava no mount e
   // competia banda com a carga inicial, deixando a home lenta em conexão fraca.
   useEffect(() => {
@@ -274,7 +274,7 @@ const Index = () => {
     return () => clearInterval(iv);
   }, [profile?.is_premium]);
 
-  // Global paywall opener — any feature can dispatch `kidzz:open-paywall`
+  // Global paywall opener - any feature can dispatch `kidzz:open-paywall`
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail || {};
@@ -285,7 +285,7 @@ const Index = () => {
     return () => window.removeEventListener("kidzz:open-paywall", handler);
   }, []);
 
-  // Global plans-screen opener — shows the FULL Paywall screen (plan picker)
+  // Global plans-screen opener - shows the FULL Paywall screen (plan picker)
   useEffect(() => {
     const openPlans = () => {
       setContextualPaywall((p) => ({ ...p, open: false }));
@@ -518,7 +518,7 @@ const Index = () => {
 
   return (
     <div className="min-h-[100dvh] flex flex-col overflow-hidden max-w-[100vw]" style={{ height: "auto", overflowX: "hidden" }}>
-      {/* MagicalBackground vive no AppShell — persistente, nunca remontado */}
+      {/* MagicalBackground vive no AppShell - persistente, nunca remontado */}
       <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
           <div className="absolute inset-0 flex flex-col min-h-0">
@@ -591,7 +591,7 @@ const Index = () => {
         streakDays={profile.streak_days ?? 0}
       />
 
-      {/* Contextual notification prompt — appears after first answer */}
+      {/* Contextual notification prompt - appears after first answer */}
       <AnimatePresence>
         {showNotifPrompt && (
           <motion.div
@@ -623,7 +623,7 @@ const Index = () => {
         onLogin={() => { setContextualPaywall((p) => ({ ...p, open: false })); navigate("/auth"); }}
       />
 
-      {/* Sua Jornada — overlay com nível, próxima recompensa e jornada XP */}
+      {/* Sua Jornada - overlay com nível, próxima recompensa e jornada XP */}
       <AnimatePresence>
         {showJourney && (
           <motion.div
@@ -655,7 +655,7 @@ const Index = () => {
       {/* Floating XP gain toasts */}
       <XpToast />
 
-      {/* Parent conversion nudge — appears after 2-3 child actions */}
+      {/* Parent conversion nudge - appears after 2-3 child actions */}
       <ConversionNudgeCard
         open={showConversionNudge && !profile?.is_premium}
         childName={childName}

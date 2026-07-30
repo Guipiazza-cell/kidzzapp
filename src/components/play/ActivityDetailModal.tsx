@@ -4,8 +4,8 @@
  * Mostra:
  *  - emoji grande + título + categoria + XP
  *  - descrição curta (vinda do pool / IA)
- *  - "Como fazer" — passo a passo prático (3 passos)
- *  - "Exemplo" — exemplo concreto baseado na categoria
+ *  - "Como fazer" - passo a passo prático (3 passos)
+ *  - "Exemplo" - exemplo concreto baseado na categoria
  *  - botão "Concluir + XP" (ou "Já concluída" se done)
  *
  * Os passos e exemplos são gerados a partir da categoria + título,
@@ -36,7 +36,7 @@ const HOW_TO_BY_CATEGORY: Record<ActivityCategory, string[]> = {
   ],
   criatividade: [
     "Junte os materiais simples que você tem em casa (papel, lápis, caixas).",
-    "Comece sem se preocupar em ficar perfeito — o legal é inventar.",
+    "Comece sem se preocupar em ficar perfeito - o legal é inventar.",
     "Mostre o resultado pra alguém da família e conte como criou.",
   ],
   familia: [
@@ -46,7 +46,7 @@ const HOW_TO_BY_CATEGORY: Record<ActivityCategory, string[]> = {
   ],
   desafio: [
     "Decida quando vai fazer (agora ou em um momento do dia).",
-    "Faça com calma e atenção — não precisa ter pressa.",
+    "Faça com calma e atenção - não precisa ter pressa.",
     "Conte pra alguém que conseguiu, pra comemorar a conquista.",
   ],
 };
@@ -64,7 +64,7 @@ function getExample(activity: Activity, childName: string): string {
     return `Junte 2 cadeiras, jogue um lençol grande por cima e coloque almofadas dentro. Pronto: a cabana secreta de ${childName} ✨`;
   }
   if (t.includes("história") || t.includes("conte")) {
-    return `Comece com "Era uma vez ${childName} e um(a)..." e use as 3 palavras dadas em qualquer ordem. Não precisa fazer sentido — quanto mais doido, mais divertido!`;
+    return `Comece com "Era uma vez ${childName} e um(a)..." e use as 3 palavras dadas em qualquer ordem. Não precisa fazer sentido - quanto mais doido, mais divertido!`;
   }
   if (t.includes("respiração") || t.includes("silêncio")) {
     return `Sente no chão, feche os olhos e inspire contando "1-2-3-4". Segure 1 segundo. Solte o ar bem devagar contando "1-2-3-4-5". Repita.`;
@@ -73,7 +73,7 @@ function getExample(activity: Activity, childName: string): string {
     return `Vá até quem ${childName} ama, dê um abraço bem apertado e diga: "Te amo porque você é..." e complete com uma coisa boa.`;
   }
   if (t.includes("desenh")) {
-    return `Pegue uma folha em branco, lápis coloridos e desenhe o que vier na cabeça — mesmo se for um monstro de 10 olhos!`;
+    return `Pegue uma folha em branco, lápis coloridos e desenhe o que vier na cabeça - mesmo se for um monstro de 10 olhos!`;
   }
   if (t.includes("pul")) {
     return `Conte alto enquanto pula: "1, 2, 3..." Se cansar, descanse e continue. O importante é se mexer!`;

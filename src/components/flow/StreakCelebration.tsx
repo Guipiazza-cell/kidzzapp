@@ -14,7 +14,7 @@ interface StreakEventDetail {
 }
 
 interface Props {
-  /** Initial streak (from profile) — overlay also listens for live updates. */
+  /** Initial streak (from profile) - overlay also listens for live updates. */
   streakDays: number;
   childName: string;
   previousRecord: number;

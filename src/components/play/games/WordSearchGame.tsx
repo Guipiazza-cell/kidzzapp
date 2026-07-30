@@ -150,7 +150,7 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
     [grid, wordSet.words, found, onScore, onReaction]
   );
 
-  // Drag selection — collinear cells only (h/v) for clean lines
+  // Drag selection - collinear cells only (h/v) for clean lines
   const startSelection = (r: number, c: number) => {
     if (completed) return;
     dragging.current = true;
@@ -254,7 +254,7 @@ const WordSearchGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Pro
         })}
       </div>
 
-      {/* Grid — pointer drag */}
+      {/* Grid - pointer drag */}
       <div
         className="grid p-3 rounded-2xl border border-white/60 shadow-xl mx-auto select-none"
         style={{

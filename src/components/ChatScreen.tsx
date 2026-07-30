@@ -335,7 +335,7 @@ const ChatScreen = ({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              Pode falar ou digitar — eu adoro responder
+              Pode falar ou digitar - eu adoro responder
             </motion.p>
 
             {/* Big mic button */}

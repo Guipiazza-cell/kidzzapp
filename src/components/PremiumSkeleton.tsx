@@ -1,5 +1,5 @@
 /**
- * PremiumSkeleton — elegant shimmering placeholder for loading states.
+ * PremiumSkeleton - elegant shimmering placeholder for loading states.
  * Pure CSS, GPU-friendly, matches the app's glass aesthetic.
  *
  * Usage:

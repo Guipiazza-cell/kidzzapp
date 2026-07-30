@@ -1,4 +1,4 @@
-/** Ícones premium do “Tempo de hoje” (KALM) — sem emoji. */
+/** Ícones premium do “Tempo de hoje” (KALM) - sem emoji. */
 
 import type { ReactElement } from "react";
 

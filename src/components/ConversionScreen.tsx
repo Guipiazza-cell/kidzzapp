@@ -1,4 +1,4 @@
-// Wrapper legado — toda lógica/visual vive em PaywallScreen.
+// Wrapper legado - toda lógica/visual vive em PaywallScreen.
 import PaywallScreen from "@/components/paywall/PaywallScreen";
 
 interface ConversionScreenProps {

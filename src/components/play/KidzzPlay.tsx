@@ -22,7 +22,7 @@ import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 
-/** Assets gerados Hermes/Codex — public/telas/brincar */
+/** Assets gerados Hermes/Codex - public/telas/brincar */
 const BR = "/exemplos/assets/brincar-v2";
 
 const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
@@ -66,7 +66,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Monte um esconderijo incrível e conte histórias!",
     img: `${BR}/act-cabana.png`,
     tempo: "5 min",
-    idade: "3–6 anos",
+    idade: "3-6 anos",
     energia: "leve",
     tint: "rgba(232,130,26,0.55)",
     scrim:
@@ -78,7 +78,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Encontre os objetos escondidos pela casa.",
     img: `${BR}/act-caca.png`,
     tempo: "10 min",
-    idade: "4–8 anos",
+    idade: "4-8 anos",
     energia: "média",
     premium: true,
     tint: "rgba(70,112,58,0.55)",
@@ -91,7 +91,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Liberte a criatividade com tinta e imaginação.",
     img: `${BR}/act-arte.png`,
     tempo: "15 min",
-    idade: "3–10 anos",
+    idade: "3-10 anos",
     energia: "leve",
     tint: "rgba(193,115,166,0.55)",
     scrim:
@@ -103,7 +103,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Quem faz o avião que voa mais longe?",
     img: `${BR}/act-aviao.png`,
     tempo: "7 min",
-    idade: "5–9 anos",
+    idade: "5-9 anos",
     energia: "leve",
     premium: true,
     tint: "rgba(79,143,201,0.55)",
@@ -131,7 +131,7 @@ const GAMES: {
   { id: "daily", label: "Desafio", emoji: "🎯", sub: "Missão especial", bgColor: "linear-gradient(135deg, hsl(340 75% 65%), hsl(0 75% 60%))", premium: true },
 ];
 
-/* ───────── Design tokens (Brincar.dc.html — light glass) ───────── */
+/* ───────── Design tokens (Brincar.dc.html - light glass) ───────── */
 const TINT: Record<string, [number, number, number]> = {
   laranja: [245, 150, 60],
   verde: [90, 190, 110],
@@ -411,29 +411,86 @@ const KidzzPlay = ({
     setSelectedFeatured(f);
   };
 
-  /* ───────── HEADER PADRÃO (sub-telas criar/jogos) ───────── */
+  /* ───────── HEADER sub-telas ───────── */
+  const backToHome = () => {
+    setSub("home");
+    setActiveGame(null);
+  };
+
+  /** Criar & Imaginar - header padrão (sem logo se hideLogo) */
   const PlayHeader = (
     <KidzzHeader
-      onBack={() => {
-        setSub("home");
-        setActiveGame(null);
-      }}
+      onBack={backToHome}
+      hideLogo
+      hideTagline
       right={
-        <>
-          <motion.button
-            type="button"
-            onClick={onOpenAchievements}
-            whileTap={{ scale: 0.94 }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
-          >
-            <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
-            <span className="text-[13px] font-extrabold text-[#2A2520]">
-              {sessionScore}
-            </span>
-          </motion.button>
-        </>
+        <motion.button
+          type="button"
+          onClick={onOpenAchievements}
+          whileTap={{ scale: 0.94 }}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
+        >
+          <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
+          <span className="text-[13px] font-extrabold text-[#2A2520]">
+            {sessionScore}
+          </span>
+        </motion.button>
       }
     />
+  );
+
+  /** Jogos & Desafios - header roxo da página, sem logo KIDZZ */
+  const JogosHeader = (
+    <div
+      className="sticky top-0 z-30"
+      style={{
+        paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+        paddingLeft: 14,
+        paddingRight: 14,
+        paddingBottom: 10,
+        background: "linear-gradient(180deg, #EDE9F8 0%, #F3F1FB 100%)",
+        borderBottom: "1px solid rgba(106,62,192,0.08)",
+      }}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={backToHome}
+          aria-label="Voltar"
+          className="active:scale-95"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.55)",
+            border: "1px solid rgba(106,62,192,0.12)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(80,50,140,0.08)",
+          }}
+        >
+          <ArrowLeft size={20} color="#4A3480" strokeWidth={2.2} />
+        </button>
+        <div className="flex-1 min-w-0" aria-hidden />
+        <motion.button
+          type="button"
+          onClick={onOpenAchievements}
+          whileTap={{ scale: 0.94 }}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full min-h-[40px]"
+          style={{
+            background: "rgba(255,255,255,0.55)",
+            border: "1px solid rgba(106,62,192,0.12)",
+            boxShadow: "0 4px 12px rgba(80,50,140,0.08)",
+          }}
+        >
+          <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
+          <span className="text-[13px] font-extrabold" style={{ color: "#3A2A70" }}>
+            {sessionScore}
+          </span>
+        </motion.button>
+      </div>
+    </div>
   );
 
   /* ── Categorias (dados reais → navegação real) ── */
@@ -455,7 +512,7 @@ const KidzzPlay = ({
 
   const heroImg = `${BR}/hero-kids.png`;
 
-  /* Anel de progresso do desafio (2/3 — igual ao design) */
+  /* Anel de progresso do desafio (2/3 - igual ao design) */
   const RING_CIRC = 207.3;
   const ringOffset = mounted ? RING_CIRC * (1 - 2 / 3) : RING_CIRC;
 
@@ -890,7 +947,7 @@ const KidzzPlay = ({
                 <span style={{ color: "#6A3EC0" }}>para todos</span>
               </h1>
               <p style={subLead("#5E5680")}>
-                Memória, palavras, desafios — escolha o jogo do dia.
+                Memória, palavras, desafios: escolha o jogo do dia.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 px-4 mt-5">
@@ -1159,7 +1216,8 @@ const KidzzPlay = ({
       exit={{ opacity: 0 }}
     >
       <style>{BRIN_KEYFRAMES}</style>
-      {sub !== "missoes" && sub !== "home" && PlayHeader}
+      {sub === "criar" && PlayHeader}
+      {sub === "jogos" && !activeGame && JogosHeader}
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
@@ -1343,7 +1401,7 @@ const KidzzPlay = ({
                     ⏱ {selectedExp.tempo}
                   </span>
                   <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
-                    🎯 {selectedExp.idadeMin}–{selectedExp.idadeMax} anos
+                    🎯 {selectedExp.idadeMin}-{selectedExp.idadeMax} anos
                   </span>
                 </div>
               </div>

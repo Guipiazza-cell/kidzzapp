@@ -189,7 +189,7 @@ const EmotionsGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
           >
             {feedback === "ok"
               ? `Boa, ${childName}! 💚`
-              : "Tudo bem sentir diferente — vamos de novo!"}
+              : "Tudo bem sentir diferente - vamos de novo!"}
           </motion.div>
         )}
       </AnimatePresence>

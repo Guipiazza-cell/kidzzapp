@@ -1,5 +1,5 @@
 /**
- * KIDZZ — micro-sound feedback system.
+ * KIDZZ - micro-sound feedback system.
  *
  * Generates light, premium UI sounds via WebAudio (no assets, no bundle bloat).
  * Respects a global mute toggle persisted in localStorage.

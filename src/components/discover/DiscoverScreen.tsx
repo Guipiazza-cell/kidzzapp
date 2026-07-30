@@ -9,7 +9,7 @@ import { CAMALEAO } from "@/lib/camaleaoOficial";
 import heroDescobrir from "@/assets/descobrir-hero.webp";
 
 // ============================================================
-// DiscoverScreen — premium v2 (ref: public/telas/DESCOBRIR)
+// DiscoverScreen - premium v2 (ref: public/telas/DESCOBRIR)
 // Assets: hero floresta + Gui original · temas descobrir-v2
 // Lógica real preservada: temas, atividades, premium, selo, share.
 // ============================================================
@@ -109,7 +109,7 @@ const arrowStyle = (l: string, m: string, d: string): CSSProperties => ({
 });
 
 // ------------------------------------------------------------
-// Imagem com fallback elegante (gradiente + emoji) — usado no detalhe
+// Imagem com fallback elegante (gradiente + emoji) - usado no detalhe
 // ------------------------------------------------------------
 function SmartImage({
   src, alt, fallbackBg, fallbackEmoji, className, style,
@@ -222,7 +222,7 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
 }
 
 // ------------------------------------------------------------
-// Tela de detalhe do tema (preservada 1:1 — fora do mockup)
+// Tela de detalhe do tema (preservada 1:1 - fora do mockup)
 // ------------------------------------------------------------
 function ThemeDetail({
   theme, childName, isPremium, onBack, onShareBadge,
@@ -407,7 +407,7 @@ function ThemeDetail({
 }
 
 // ------------------------------------------------------------
-// Card de atividade premium (4 camadas) — preservado 1:1
+// Card de atividade premium (4 camadas) - preservado 1:1
 // ------------------------------------------------------------
 function ActivityCard({
   activity, accent, accentInk, childName, locked, open, onToggle, onUpgrade, onShare,
@@ -1008,7 +1008,7 @@ const DiscoverScreen = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* dica (sem camaleão quadrado — só tipografia + ícone) */}
+        {/* dica (sem camaleão quadrado - só tipografia + ícone) */}
         <div
           style={{
             margin: `18px ${PAD}px 8px`,

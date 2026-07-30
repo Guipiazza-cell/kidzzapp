@@ -9,7 +9,7 @@ import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 
 /**
- * SOS picker premium — grid colorido sem emojis, estilo “Estamos com você”.
+ * SOS picker premium - grid colorido sem emojis, estilo “Estamos com você”.
  */
 interface Props {
   open: boolean;

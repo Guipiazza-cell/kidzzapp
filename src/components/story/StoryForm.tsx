@@ -160,7 +160,7 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
           onClick={onUpgrade}
           className="w-full text-center text-[11px] font-bold text-kid-purple underline-offset-2 hover:underline"
         >
-          💛 Quero histórias ilimitadas — ver planos
+          💛 Quero histórias ilimitadas - ver planos
         </button>
       )}
     </motion.div>

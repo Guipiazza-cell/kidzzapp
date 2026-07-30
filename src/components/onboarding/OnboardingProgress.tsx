@@ -10,7 +10,7 @@ interface Props {
 }
 
 /**
- * Premium onboarding progress — single sleek bar with shimmer and glow.
+ * Premium onboarding progress - single sleek bar with shimmer and glow.
  * Replaces the old dot indicator for a more cinematic, app-store feel.
  */
 const OnboardingProgress = ({

@@ -1,5 +1,5 @@
 /**
- * RoutineScreen — redesign premium
+ * RoutineScreen - redesign premium
  * Craft: Bora (camadas, glass, sheen, cascade, sticky)
  * Layout: print public/telas/Rotina/
  * Dados reais: getToday / completeTask / streak / mission / paywall / memória
@@ -293,7 +293,7 @@ const TaskRow = ({
             borderRadius: 999,
             border: "none",
             cursor: "pointer",
-            /* Sólido por período — sem degradê bugado dourado→verde (relatório r2) */
+            /* Sólido por período - sem degradê bugado dourado→verde (relatório r2) */
             background: meta.btn,
             color: "#fff",
             fontFamily: FONT,
@@ -619,7 +619,7 @@ const RoutineScreen = () => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Camadas fundo — print cream + hero */}
+      {/* Camadas fundo - print cream + hero */}
       <div
         aria-hidden
         ref={heroArtRef}
@@ -964,7 +964,7 @@ const RoutineScreen = () => {
               }}
             >
               {missionDone
-                ? "“Missão de hoje concluída — que dia lindo!”"
+                ? "“Missão de hoje concluída - que dia lindo!”"
                 : "“Ouça uma música, faça uma pergunta e viva uma história.”"}
             </div>
             <div

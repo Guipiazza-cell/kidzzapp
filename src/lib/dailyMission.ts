@@ -1,5 +1,5 @@
 /**
- * Daily Mission Loop — Encourages 3 daily actions to drive retention.
+ * Daily Mission Loop - Encourages 3 daily actions to drive retention.
  * Tracks: listen 1 song, answer 1 question, see 1 story.
  * Plus: total wisdom XP and per-day completion state.
  *

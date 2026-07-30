@@ -166,7 +166,7 @@ const liquidCard: CSSProperties = {
 };
 
 /**
- * Atividades semanais — 10 missões por semana.
+ * Atividades semanais - 10 missões por semana.
  * - Sorteio do pool curado é instantâneo (sempre algo na tela).
  * - Em background, tenta enriquecer com IA (`generate-activities`).
  * - 1 atividade destacada por dia.
@@ -462,7 +462,7 @@ const MyActivities = ({ onBack }: Props) => {
           </motion.div>
         )}
 
-        {/* Lista geral — liquid glass + ícones premium */}
+        {/* Lista geral - liquid glass + ícones premium */}
         <div className="space-y-2.5">
           {activities.map((a) => {
             const done = completed.has(a.id);
@@ -494,7 +494,7 @@ const MyActivities = ({ onBack }: Props) => {
                 }}
                 layout
                 whileTap={{ scale: 0.98 }}
-                aria-label={locked ? `${a.title} — premium` : `Ver detalhes de ${a.title}`}
+                aria-label={locked ? `${a.title} - premium` : `Ver detalhes de ${a.title}`}
               >
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
@@ -567,7 +567,7 @@ const MyActivities = ({ onBack }: Props) => {
         )}
       </div>
 
-      {/* Modal de detalhe — explica como fazer + exemplo prático */}
+      {/* Modal de detalhe - explica como fazer + exemplo prático */}
       <ActivityDetailModal
         activity={selected}
         childName={childName}

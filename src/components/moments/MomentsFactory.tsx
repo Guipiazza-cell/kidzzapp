@@ -82,7 +82,7 @@ const MomentsFactory = ({ onBack }: Props) => {
       </header>
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-6 relative z-10">
-        {/* Coração emocional — Álbum afetivo da família */}
+        {/* Coração emocional - Álbum afetivo da família */}
         <MomentsAlbum />
 
         {/* Hero */}
@@ -107,10 +107,10 @@ const MomentsFactory = ({ onBack }: Props) => {
           </p>
           <div className="flex items-center justify-center gap-4 mt-3">
             <div className="flex items-center gap-1 text-gray-400 text-xs font-bold">
-              <Clock size={12} /> 5–15 min
+              <Clock size={12} /> 5-15 min
             </div>
             <div className="flex items-center gap-1 text-gray-400 text-xs font-bold">
-              <Users size={12} /> 3–8 anos
+              <Users size={12} /> 3-8 anos
             </div>
             <div className="flex items-center gap-1 text-gray-400 text-xs font-bold">
               <Heart size={12} /> Conexão
@@ -199,7 +199,7 @@ const MomentsFactory = ({ onBack }: Props) => {
           })}
         </div>
 
-        {/* Mission Packs — transactional one-off purchases */}
+        {/* Mission Packs - transactional one-off purchases */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-2 px-1">
             <h3 className="text-gray-800 font-black text-sm">🎁 Packs Especiais</h3>
@@ -255,7 +255,7 @@ const MomentsFactory = ({ onBack }: Props) => {
                       whileTap={{ scale: 0.97 }}
                       className={`mt-3 w-full py-3 rounded-xl bg-gradient-to-r ${pack.color} text-white font-extrabold text-sm shadow-md disabled:opacity-60`}
                     >
-                      {isLoading ? "Processando..." : `✨ Desbloquear — ${pack.priceLabel}`}
+                      {isLoading ? "Processando..." : `✨ Desbloquear - ${pack.priceLabel}`}
                     </motion.button>
                   )}
                 </motion.div>

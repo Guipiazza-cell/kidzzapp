@@ -85,7 +85,7 @@ const DanceWithAne = ({ onBack, childName, onAchievement }: Props) => {
     setPhase("play");
     setFeedback(null);
     setMoveStartTime(Date.now());
-    // 2.5s window — if no tap, count as miss
+    // 2.5s window - if no tap, count as miss
     if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
     moveTimeoutRef.current = window.setTimeout(() => {
       handleTap(true);

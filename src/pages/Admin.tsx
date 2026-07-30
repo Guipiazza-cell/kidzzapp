@@ -188,7 +188,7 @@ const Admin = () => {
           <div key={user.id} className="rounded-xl border border-border bg-card p-4 space-y-3">
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-foreground truncate">{user.email || "—"}</p>
+                <p className="font-medium text-foreground truncate">{user.email || " - "}</p>
                 <p className="text-sm text-muted-foreground truncate">
                   {user.child_name || "Sem nome"} · Desde {new Date(user.created_at).toLocaleDateString("pt-BR")}
                 </p>

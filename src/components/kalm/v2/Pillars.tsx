@@ -1,7 +1,7 @@
 /**
- * KALM v2 — Sub-telas dos 6 pilares DIURNOS.
+ * KALM v2 - Sub-telas dos 6 pilares DIURNOS.
  * Nada de conteúdo noturno aqui (isso vive em Sonhos).
- * Cada pilar tem uma "cara" diferente — variedade real, não repete tipo.
+ * Cada pilar tem uma "cara" diferente - variedade real, não repete tipo.
  */
 import {
   ArrowLeft, ChevronRight, Lock, ExternalLink, Plus,
@@ -37,7 +37,7 @@ const glassChrome: CSSProperties = {
 };
 
 const glassCard: CSSProperties = {
-  // 100% opaco — evita o MagicalBackground claro "vazar" pelos cards
+  // 100% opaco - evita o MagicalBackground claro "vazar" pelos cards
   background: "linear-gradient(165deg, #24342A, #101A14)",
   border: "1px solid rgba(255,255,255,0.12)",
   boxShadow: "0 12px 28px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.08)",
@@ -150,7 +150,7 @@ const PillarHero = ({
   </div>
 );
 
-/** Card de atividade — visual sólido com ícone, sem caixa de imagem vazia */
+/** Card de atividade - visual sólido com ícone, sem caixa de imagem vazia */
 const ActivityCard = ({
   a, onOpen, locked, isPremium,
 }: {
@@ -302,7 +302,7 @@ export const PilarSentir = ({
       <section className="px-5 pt-8">
         <h2 className="text-[17px] font-bold" style={{ color: ink }}>Respirar</h2>
         <p className="text-[12.5px] mt-0.5" style={{ color: inkSoft }}>
-          Quando a emoção sobe forte — 1 a 3 min.
+          Quando a emoção sobe forte - 1 a 3 min.
         </p>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {respirar.map((a) => (
@@ -314,7 +314,7 @@ export const PilarSentir = ({
       <section className="px-5 pt-8">
         <h2 className="text-[17px] font-bold" style={{ color: ink }}>Sentir o corpo</h2>
         <p className="text-[12.5px] mt-0.5" style={{ color: inkSoft }}>
-          Interocepção — a emoção deixa rastro no corpo.
+          Interocepção - a emoção deixa rastro no corpo.
         </p>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {nomear.map((a) => (
@@ -551,7 +551,7 @@ export const PilarMover = ({
             <Users size={18} style={{ color: tint }} />
           </div>
           <p className="text-[12.5px] leading-snug" style={{ color: inkSoft }}>
-            <strong style={{ color: ink }}>Fazer junto</strong> — pai e filho se movem lado a lado.
+            <strong style={{ color: ink }}>Fazer junto</strong> - pai e filho se movem lado a lado.
             O corpo aprende com o corpo do outro.
           </p>
         </div>

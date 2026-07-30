@@ -1,4 +1,4 @@
-// Wrapper legado — toda lógica/visual vive em PaywallScreen.
+// Wrapper legado - toda lógica/visual vive em PaywallScreen.
 // Mantém a assinatura antiga (open/context/meta/onClose/onLogin) para compatibilidade.
 import { AnimatePresence, motion } from "framer-motion";
 import PaywallScreen from "@/components/paywall/PaywallScreen";

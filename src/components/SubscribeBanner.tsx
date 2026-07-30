@@ -37,7 +37,7 @@ const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: 
 
   return (
     <div className="flex items-center justify-between px-4 py-2 pointer-events-none">
-      {/* Ilha esquerda — status de perguntas */}
+      {/* Ilha esquerda - status de perguntas */}
       <motion.div
         className="glass-island flex items-center gap-2 px-3 py-1.5 pointer-events-auto font-ui"
         initial={{ y: -30, opacity: 0 }}
@@ -54,7 +54,7 @@ const SubscribeBanner = ({ onOpenParentalGate, questionsRemaining, isPremium }: 
         </span>
       </motion.div>
 
-      {/* Ilha direita — CTA dourado */}
+      {/* Ilha direita - CTA dourado */}
       <motion.button
         onClick={openPlans}
         className="flex items-center gap-1 px-3 py-1.5 rounded-full shadow-sm pointer-events-auto font-ui"

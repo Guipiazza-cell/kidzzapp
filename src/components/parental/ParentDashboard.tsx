@@ -76,7 +76,7 @@ function startOfWeek(d = new Date()) {
 
 function fmtDateRange(start: Date, end: Date) {
   const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
-  return `${start.toLocaleDateString("pt-BR", opts)} – ${end.toLocaleDateString("pt-BR", opts)}`;
+  return `${start.toLocaleDateString("pt-BR", opts)} - ${end.toLocaleDateString("pt-BR", opts)}`;
 }
 
 function dayName(d: Date) {
@@ -158,7 +158,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k]) => k);
   }, [weekQs]);
 
-  // Top moments — 3 most interesting (longest = often most curious)
+  // Top moments - 3 most interesting (longest = often most curious)
   const topMoments = useMemo(() => {
     return [...weekQs]
       .sort((a, b) => b.question.length - a.question.length)
@@ -312,7 +312,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
             </div>
           </Section>
 
-          {/* Acompanhe o [NOME] — assinatura */}
+          {/* Acompanhe o [NOME] - assinatura */}
           <Section title={`Acompanhe ${childName}`} emoji="👨‍👩‍👧">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">

@@ -34,10 +34,10 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
       setStepIndex(-1);
       return;
     }
-    // Destrava AudioContext (iOS) — chamada dentro do gesto de toque
+    // Destrava AudioContext (iOS) - chamada dentro do gesto de toque
     const ok = await engineRef.current.unlock();
     if (!ok) {
-      // Fallback silencioso — sem quebrar
+      // Fallback silencioso - sem quebrar
       console.warn("Áudio bloqueado pelo navegador");
       return;
     }
@@ -120,7 +120,7 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
           </div>
         </div>
 
-        {/* Lyrics — current syllable highlighted */}
+        {/* Lyrics - current syllable highlighted */}
         <div className="w-full max-w-md my-6">
           <div className="rounded-3xl p-6 backdrop-blur-md border border-white/15 min-h-[140px] flex items-center justify-center"
             style={{ background: "linear-gradient(180deg, hsl(220 40% 18% / 0.5), hsl(220 50% 8% / 0.6))" }}>

@@ -1,9 +1,9 @@
-/* ── KIDZZ Avatar — Sistema de camadas reais (v3 — ancoragem premium) ──
+/* ── KIDZZ Avatar - Sistema de camadas reais (v3 - ancoragem premium) ──
    Layer system: base PNG + overlays SVG ancorados anatomicamente.
    - viewBox 100×150 alinhado ao PNG 1024×1536 (proporção 2:3)
    - Anchors verificados por inspeção do PNG real:
-     • Ane: olhos em (36,19) e (64,16) — boca/sorriso em (48,28)
-     • Pixel: olhos em (38,26) e (61,27) — boca em (48,35) — já tem óculos próprios!
+     • Ane: olhos em (36,19) e (64,16) - boca/sorriso em (48,28)
+     • Pixel: olhos em (38,26) e (61,27) - boca em (48,35) - já tem óculos próprios!
    - Drop-shadow em overlays para integração visual ("não-colado")
    - Fade suave 200ms entre trocas, idle breathing + auto-blink
    - Sem emojis, sem placeholders, sem círculos genéricos
@@ -77,7 +77,7 @@ interface Props {
   onTap?: () => void;
 }
 
-/* ─── Anchors anatômicos (viewBox 100×150) — verificados por inspeção do PNG ─── */
+/* ─── Anchors anatômicos (viewBox 100×150) - verificados por inspeção do PNG ─── */
 type Anchors = {
   leftEye: { cx: number; cy: number };
   rightEye: { cx: number; cy: number };
@@ -108,7 +108,7 @@ const ANCHORS: Record<AvatarBase, Anchors> = {
     skin: "#f5b3cc",
   },
   pixel: {
-    // Pixel JÁ tem óculos no PNG — overlays devem evitar a área dos óculos
+    // Pixel JÁ tem óculos no PNG - overlays devem evitar a área dos óculos
     leftEye: { cx: 38, cy: 26 },
     rightEye: { cx: 61, cy: 27 },
     eyeRx: 5.5,
@@ -153,7 +153,7 @@ const Eyes = ({ expression, anchors }: { expression: AvatarExpression; anchors: 
   if (expression === "dormindo") {
     return (
       <svg viewBox="0 0 100 150" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid meet" style={{ filter: SOFT_SHADOW }}>
-        {/* Pálpebras fechadas — cobrem inteiramente os olhos do PNG */}
+        {/* Pálpebras fechadas - cobrem inteiramente os olhos do PNG */}
         <ellipse cx={L.cx} cy={L.cy} rx={eyeRx + 1.4} ry={eyeRy + 1.4} fill={skin} />
         <ellipse cx={R.cx} cy={R.cy} rx={eyeRx + 1.4} ry={eyeRy + 1.4} fill={skin} />
         <path d={`M ${L.cx - eyeRx} ${L.cy + 0.5} Q ${L.cx} ${L.cy + 2.5} ${L.cx + eyeRx} ${L.cy + 0.5}`} stroke="#1a1a2e" strokeWidth="1.3" fill="none" strokeLinecap="round" />
@@ -226,7 +226,7 @@ const Eyes = ({ expression, anchors }: { expression: AvatarExpression; anchors: 
 
 /* ─────────────────────────── MOUTH ─────────────────────────── */
 /* Estratégia: cobrir boca neutra do PNG com um patch de pele com gradiente
-   radial (bordas suaves — não-oval duro) e desenhar a expressão por cima. */
+   radial (bordas suaves - não-oval duro) e desenhar a expressão por cima. */
 const Mouth = ({ expression, anchors, base }: { expression: AvatarExpression; anchors: Anchors; base: AvatarBase }) => {
   const { mouth: M, mouthW: w, skin } = anchors;
   const gradId = `mouth-cover-${base}`;
@@ -299,7 +299,7 @@ const Mouth = ({ expression, anchors, base }: { expression: AvatarExpression; an
 const Outfit = ({ outfit, anchors, base }: { outfit: AvatarOutfit; anchors: Anchors; base: AvatarBase }) => {
   if (outfit === "nenhum") return null;
   const { headTop: HT, headCenter: HC, collar: C, faceWidth: FW, leftEye: L, rightEye: R, eyeRx, eyeRy } = anchors;
-  // Lentes do cientista — escala ancorada ao tamanho real dos olhos
+  // Lentes do cientista - escala ancorada ao tamanho real dos olhos
   const lensR = eyeRx + 2.2;
 
   const outfits: Record<Exclude<AvatarOutfit, "nenhum">, JSX.Element> = {
@@ -392,7 +392,7 @@ const Outfit = ({ outfit, anchors, base }: { outfit: AvatarOutfit; anchors: Anch
         {/* Hastes laterais */}
         <path d={`M ${L.cx - lensR} ${L.cy + 0.8} L ${L.cx - lensR - 5.5} ${L.cy + 1.8}`} stroke="#1a1a2e" strokeWidth="1.6" strokeLinecap="round" />
         <path d={`M ${R.cx + lensR} ${R.cy + 0.8} L ${R.cx + lensR + 5.5} ${R.cy + 1.8}`} stroke="#1a1a2e" strokeWidth="1.6" strokeLinecap="round" />
-        {/* Jaleco no colarinho — segue contorno do pescoço */}
+        {/* Jaleco no colarinho - segue contorno do pescoço */}
         <path d={`M ${C.cx - 16} ${C.cy - 1} Q ${C.cx - 18} ${C.cy + 8} ${C.cx - 17} ${C.cy + 18} L ${C.cx + 17} ${C.cy + 18} Q ${C.cx + 18} ${C.cy + 8} ${C.cx + 16} ${C.cy - 1} Z`} fill="white" opacity="0.93" />
         <path d={`M ${C.cx - 16} ${C.cy - 1} L ${C.cx} ${C.cy + 7} L ${C.cx + 16} ${C.cy - 1} Z`} fill="white" />
         {/* Sombra sob a gola */}
@@ -447,7 +447,7 @@ const KidzzAvatar = forwardRef<HTMLDivElement, Props>(
       onTap?.();
     };
 
-    // Decisão de Z-order: capacete e máscara ficam ATRÁS dos olhos? Não — devem ficar
+    // Decisão de Z-order: capacete e máscara ficam ATRÁS dos olhos? Não - devem ficar
     // por cima do PNG mas com aberturas para os olhos. Cientista também por cima.
     // Apenas a CAPA do super-herói ficaria atrás idealmente, mas como vem no mesmo
     // SVG do herói, fica ok renderizar tudo por cima.
@@ -478,7 +478,7 @@ const KidzzAvatar = forwardRef<HTMLDivElement, Props>(
           }}
         />
 
-        {/* BASE — corpo PNG */}
+        {/* BASE - corpo PNG */}
         <img
           src={baseSrc}
           alt="KIDZZ avatar"

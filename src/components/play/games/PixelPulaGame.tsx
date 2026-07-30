@@ -189,7 +189,7 @@ const PixelPulaGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Prop
         groundedRef.current = true;
         lastGroundedAtRef.current = performance.now();
         rotationRef.current = 0;
-        // jump buffer — auto-fire if user tapped right before landing
+        // jump buffer - auto-fire if user tapped right before landing
         if (performance.now() - jumpBufferAtRef.current < JUMP_BUFFER_MS) {
           jumpBufferAtRef.current = 0;
           performJump();

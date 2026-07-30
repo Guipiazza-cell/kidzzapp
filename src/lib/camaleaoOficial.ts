@@ -1,6 +1,6 @@
 /**
  * Camaleões oficiais (originais do cliente em public/camaleao).
- * Sempre com borda esmaecida (PNG soft) — nunca “foto quadrada”.
+ * Sempre com borda esmaecida (PNG soft) - nunca “foto quadrada”.
  *
  * Poses:
  *  - heart     → Perguntas / default

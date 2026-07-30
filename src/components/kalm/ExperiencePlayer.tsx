@@ -422,7 +422,7 @@ const ExperiencePlayer = ({ exp, onClose }: Props) => {
                 </>
               )}
 
-              {/* ───────── GRAND FINALE — fechamento emocional + feedback ───────── */}
+              {/* ───────── GRAND FINALE - fechamento emocional + feedback ───────── */}
               {completed && finale && (
                 <motion.div
                   key="finale"

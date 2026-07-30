@@ -1,5 +1,5 @@
 /**
- * KALM v2 — estado persistido por perfil de criança.
+ * KALM v2 - estado persistido por perfil de criança.
  * Tudo em localStorage, escopado por activeChildId quando existir.
  */
 import { useCallback, useEffect, useState } from "react";

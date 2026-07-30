@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 export type SubscriptionTier = "free" | "kidzz" | "premium";
 
-// Aliases legados — UI/back-compat. "super_premium" velho → novo "premium".
+// Aliases legados - UI/back-compat. "super_premium" velho → novo "premium".
 export type LegacyTier = "free" | "premium" | "super_premium";
 export type CheckoutPlan = "kidzz" | "kidzz_annual" | "premium" | "premium_annual";
 
@@ -131,7 +131,7 @@ const submitCheckoutRedirectForm = (plan: CheckoutPlan, accessToken: string, ref
   window.setTimeout(() => form.remove(), 5000);
 };
 
-// Data no fuso de Brasília — o servidor reseta o uso em America/Sao_Paulo
+// Data no fuso de Brasília - o servidor reseta o uso em America/Sao_Paulo
 // (meia-noite de Brasília). Antes o cliente usava UTC, desalinhando o "dia"
 // do cliente vs servidor (reset em horário errado / contagem divergente).
 const todayStr = () => {
@@ -405,9 +405,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return result;
       }
 
-      // Backend says free but DB says premium — trust DB
+      // Backend says free but DB says premium - trust DB
       if (currentProfile.is_premium && !data.subscribed) {
-        console.warn("[Auth] Backend says free but DB profile is premium — trusting DB");
+        console.warn("[Auth] Backend says free but DB profile is premium - trusting DB");
         const result = { tier: "premium" as SubscriptionTier, isPremium: true };
         setSubCache(result.tier, result.isPremium);
         return result;
@@ -452,7 +452,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const initializeAuth = async () => {
       // Fail-open duro: nunca trava a splash/Index por mais de 3.5s.
       const failOpenTimer = window.setTimeout(() => {
-        console.warn("[Auth] init fail-open — liberando UI");
+        console.warn("[Auth] init fail-open - liberando UI");
         releaseUi(getGuestProfile());
       }, 3500);
 
@@ -467,7 +467,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
-          // Libera a UI já com seed guest/draft — não espera o fetch do profile.
+          // Libera a UI já com seed guest/draft - não espera o fetch do profile.
           const seed = getGuestProfile();
           setProfile(seed);
           setTier(seed.is_premium ? "premium" : "free");
@@ -492,7 +492,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               })
               .catch((err) => console.warn("[Auth] init subscription check failed", err));
           } catch (profileErr) {
-            console.warn("[Auth] profile fetch failed/timed out — keeping seed", profileErr);
+            console.warn("[Auth] profile fetch failed/timed out - keeping seed", profileErr);
           }
         } else {
           setSession(null);
@@ -574,7 +574,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [session, profile, checkSubscription]);
 
-  // No periodic refresh — only on login and manual refresh (cost optimization)
+  // No periodic refresh - only on login and manual refresh (cost optimization)
 
   const handleCheckout = useCallback(async (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
     const checkoutPlan = normalizeCheckoutPlan(plan);
@@ -604,7 +604,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { toast } = await import("sonner");
       console.error("[Checkout] Failed to submit redirect form", err);
       toast.error("Erro ao iniciar pagamento", {
-        description: "Tente novamente em instantes — nada foi cobrado.",
+        description: "Tente novamente em instantes - nada foi cobrado.",
       });
     }
   }, [navigate, session]);

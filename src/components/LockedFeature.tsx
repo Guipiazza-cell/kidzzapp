@@ -26,7 +26,7 @@ const PRESETS: Record<LockedFeatureType, { icon: string; title: string; descript
   music: {
     icon: "🎵",
     title: "Floresta Musical",
-    description: "Karaokê, dança e histórias cantadas — desbloqueie agora.",
+    description: "Karaokê, dança e histórias cantadas - desbloqueie agora.",
     tier: "premium",
   },
   stories: {

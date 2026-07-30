@@ -22,7 +22,7 @@ export class DreamNarrator {
 
   private pickVoice() {
     if (typeof window === "undefined") return;
-    // Voz feminina pt-BR padronizada (fonte única) — usada no fallback.
+    // Voz feminina pt-BR padronizada (fonte única) - usada no fallback.
     this.voice = pickFemaleVoice(window.speechSynthesis.getVoices());
   }
 

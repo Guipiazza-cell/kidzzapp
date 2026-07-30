@@ -72,7 +72,7 @@ const AneMusical = ({ mood = "idle", size = "lg", onTap }: Props) => {
         {/* Head */}
         <ellipse cx="125" cy="80" rx="42" ry="38" fill="url(#aneBody)" />
 
-        {/* Leaf crown — 3 leaves */}
+        {/* Leaf crown - 3 leaves */}
         <g>
           <path d="M 125 38 Q 122 28, 130 30 Q 132 38, 128 42 Z" fill="hsl(140 60% 50%)" />
           <path d="M 110 42 Q 105 33, 113 33 Q 117 40, 113 45 Z" fill="hsl(140 55% 55%)" />

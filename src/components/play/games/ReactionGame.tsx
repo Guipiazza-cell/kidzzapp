@@ -151,7 +151,7 @@ const ReactionGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props
         <div className="flex items-center gap-1.5 bg-white/70 px-2.5 py-1 rounded-xl border border-white/50">
           <Zap size={12} className="text-amber-500" />
           <span className="text-[11px] font-extrabold text-gray-700">
-            {times.length > 0 ? `${Math.min(...times)}ms` : "—"}
+            {times.length > 0 ? `${Math.min(...times)}ms` : " - "}
           </span>
         </div>
       </div>

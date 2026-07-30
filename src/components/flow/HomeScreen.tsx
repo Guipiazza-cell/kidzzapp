@@ -13,7 +13,7 @@ import SOSModal from "@/components/sos/SOSModal";
 import RitualFlow from "@/components/rituals/RitualFlow";
 import { getCurrentRitual } from "@/components/rituals/rituals";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
-/** Capas no bundle Vite (hash) — não dependem de /public após publish */
+/** Capas no bundle Vite (hash) - não dependem de /public após publish */
 import coverPeixes from "@/assets/perguntas-covers/sug-peixes.png";
 import coverChuva from "@/assets/perguntas-covers/sug-chuva.png";
 import coverArco from "@/assets/perguntas-covers/sug-arcoiris.png";
@@ -26,7 +26,7 @@ import coverCores from "@/assets/perguntas-covers/sug-cores.png";
 import coverFilosofia from "@/assets/perguntas-covers/sug-filosofia.png";
 import heroPerguntas from "@/assets/perguntas-hero.webp";
 
-/* ───────────── KIDZZ HOME • PERGUNTAS — mockup premium 1:1 ─────────────
+/* ───────────── KIDZZ HOME • PERGUNTAS - mockup premium 1:1 ─────────────
    Ref visual: mockup floresta clara dourada + Gui + cards glass claros.
    Lógica real: mic, submit, sugestões, SOS, ritual, paywall, parental.
    ───────────────────────────────────────────────────────────────────── */
@@ -39,7 +39,7 @@ const ASSETS = {
   /** Hero premium: floresta dourada + Gui original (bundle) */
   hero: heroPerguntas,
   heroPublic: `${PQ}/hero-oficial.png`,
-  /** Original do cliente (mão no coração) com borda esmaecida — parte do cenário */
+  /** Original do cliente (mão no coração) com borda esmaecida - parte do cenário */
   gui: CAMALEAO.heartSoft,
   guiFallback: CAMALEAO.heart,
   guiFallback2: `${PQ}/gui-original-heart.jpg`,
@@ -82,7 +82,7 @@ const SUG_COVER_KEYWORD: Record<string, string> = {
   natureza: ASSETS.natureza,
 };
 
-/** Capas por categoria do catálogo — nunca deixa card sem arte */
+/** Capas por categoria do catálogo - nunca deixa card sem arte */
 const SUG_COVER_CATEGORY: Record<string, string> = {
   Natureza: ASSETS.natureza,
   Animais: ASSETS.animais,
@@ -118,7 +118,7 @@ function suggestionBg(category?: string): string {
   return "linear-gradient(160deg,#E8F5E0,#D0E8F8)";
 }
 
-/** Catálogo completo por idade — NÃO reduzir itens, só redesign visual */
+/** Catálogo completo por idade - NÃO reduzir itens, só redesign visual */
 const CATEGORIZED_QUESTIONS: Record<string, { text: string; category: string }[]> = {
   "0-3": [
     { text: "Por que o céu é azul?", category: "Natureza" },
@@ -509,7 +509,7 @@ const HomeScreen = ({
           </div>
         </div>
 
-        {/* ── HERO premium: floresta dourada + Gui original (1 só — sem overlay fantasma) ── */}
+        {/* ── HERO premium: floresta dourada + Gui original (1 só - sem overlay fantasma) ── */}
         <section
           style={{
             position: "relative",
@@ -540,7 +540,7 @@ const HomeScreen = ({
               objectPosition: "68% 30%",
             }}
           />
-          {/* Véu legível à esquerda (texto) + fade inferior — sem segundo Gui */}
+          {/* Véu legível à esquerda (texto) + fade inferior - sem segundo Gui */}
           <div
             aria-hidden
             style={{
@@ -749,7 +749,7 @@ const HomeScreen = ({
               />
             </div>
 
-            {/* Barra de digitar — largura total do card (onde ficavam Pais/Assinar) */}
+            {/* Barra de digitar - largura total do card (onde ficavam Pais/Assinar) */}
             <div
               style={{
                 position: "relative",
@@ -831,7 +831,7 @@ const HomeScreen = ({
           </div>
         </section>
 
-        {/* ── HOJE PARA VOCÊ — catálogo completo (design mock, itens reais) ── */}
+        {/* ── HOJE PARA VOCÊ - catálogo completo (design mock, itens reais) ── */}
         <section style={{ padding: "18px 16px 0" }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 10 }}>
             <h2
@@ -865,7 +865,7 @@ const HomeScreen = ({
             </button>
           </div>
 
-          {/* Chips de categoria — só filtram, não removem do catálogo */}
+          {/* Chips de categoria - só filtram, não removem do catálogo */}
           <div
             style={{
               display: "flex",
@@ -905,7 +905,7 @@ const HomeScreen = ({
 
           {visibleSuggestions.length === 0 ? (
             <p style={{ margin: "8px 0", fontSize: 13, fontWeight: 700, color: "rgba(50,70,40,.6)" }}>
-              Nenhuma pergunta nesta categoria — escolha “Todas” ou outra faixa.
+              Nenhuma pergunta nesta categoria - escolha “Todas” ou outra faixa.
             </p>
           ) : (
             <div
@@ -961,7 +961,7 @@ const HomeScreen = ({
                           objectFit: "cover",
                         }}
                         onError={(e) => {
-                          /* esconde img quebrada — fica o gradiente da categoria */
+                          /* esconde img quebrada - fica o gradiente da categoria */
                           (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />
@@ -1094,7 +1094,7 @@ const HomeScreen = ({
           </button>
         </section>
 
-        {/* ── HORA DO REENCONTRO (ritual) — item real, só redesenho ── */}
+        {/* ── HORA DO REENCONTRO (ritual) - item real, só redesenho ── */}
         <section style={{ padding: "10px 16px 4px" }}>
           <button
             type="button"

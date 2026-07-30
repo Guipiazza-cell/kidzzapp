@@ -14,7 +14,7 @@ import { FONT, SERIF, R } from "@/lib/premiumUi";
 import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 
 /**
- * MemoriesAlbum — redesign premium v2
+ * MemoriesAlbum - redesign premium v2
  * Ref: public/telas/memorias/
  * Assets: camaleão original soft · mix Gui + família
  *
@@ -247,7 +247,7 @@ const MemoriesAlbum = ({
 
   const handleShare = useCallback(
     async (m: Memory) => {
-      const shareText = `${m.title}\n\n${m.content || ""}\n\n💛 Criado com KIDZZ — kidzzapp.lovable.app`;
+      const shareText = `${m.title}\n\n${m.content || ""}\n\n💛 Criado com KIDZZ - kidzzapp.lovable.app`;
       if (navigator.share) {
         try {
           await navigator.share({ title: `Memória de ${childName}`, text: shareText });
@@ -273,7 +273,7 @@ const MemoriesAlbum = ({
   );
   const albumCount = allMemories.length;
 
-  /** Conquistas da família — só desbloqueiam com consumo real */
+  /** Conquistas da família - só desbloqueiam com consumo real */
   const familyBadges: FamilyBadge[] = useMemo(
     () => [
       {
@@ -330,7 +330,7 @@ const MemoriesAlbum = ({
     [questionsUsed, storiesUsed, missionCount, albumCount, streakDays]
   );
 
-  /** Em andamento — só o que a família realmente começou / consumiu */
+  /** Em andamento - só o que a família realmente começou / consumiu */
   const inProgress: InProgressItem[] = useMemo(() => {
     const items: InProgressItem[] = [];
 
@@ -382,7 +382,7 @@ const MemoriesAlbum = ({
       /* localStorage indisponível */
     }
 
-    // 3) Progresso de perguntas rumo ao próximo marco — usa última pergunta consumida no título
+    // 3) Progresso de perguntas rumo ao próximo marco - usa última pergunta consumida no título
     const qMark = nextQuestionMilestone(questionsUsed);
     if (qMark && qMark.total > 1) {
       const lastQ = allMemories.find((m) => m.type === "question");
@@ -971,7 +971,7 @@ const MemoriesAlbum = ({
                     margin: "0 0 20px",
                   }}
                 >
-                  Cada pergunta respondida, cada história criada, cada missão em família — tudo guardado para sempre.
+                  Cada pergunta respondida, cada história criada, cada missão em família - tudo guardado para sempre.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 280, margin: "0 auto" }}>
                   <button

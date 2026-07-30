@@ -1,5 +1,5 @@
 /**
- * Cinema Background v2.0 — 3 camadas fixed em z-[-10..-3]
+ * Cinema Background v2.0 - 3 camadas fixed em z-[-10..-3]
  *  1) Base: gradient creme/branco (135deg)
  *  2) Atmosfera: blur + respiração (8s)
  *  3) Glow: radial verde sutil (8% opacity)
@@ -19,7 +19,7 @@ const CinemaBackground = () => {
         }}
       />
 
-      {/* Camada atmosférica — respiração */}
+      {/* Camada atmosférica - respiração */}
       <div
         aria-hidden
         className="fixed inset-0 pointer-events-none -z-[8] animate-cinema-breath"

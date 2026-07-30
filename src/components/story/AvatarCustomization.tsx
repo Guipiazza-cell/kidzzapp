@@ -1,5 +1,5 @@
 /**
- * AvatarCustomization — passo 1 da Fábrica de Histórias.
+ * AvatarCustomization - passo 1 da Fábrica de Histórias.
  * Visual cream/gold premium (mesmo mundo da StoryFactory).
  */
 import { useMemo, useState, type CSSProperties } from "react";
@@ -184,7 +184,7 @@ const AvatarCustomization = ({ childName, onComplete }: AvatarCustomizationProps
           Como é o {childName}?
         </h2>
         <p style={{ margin: "8px 0 0", fontSize: 13, fontWeight: 700, color: "#8A6E42", lineHeight: 1.4 }}>
-          Escolha as cores — a história ganha o rostinho dele.
+          Escolha as cores - a história ganha o rostinho dele.
         </p>
       </div>
 

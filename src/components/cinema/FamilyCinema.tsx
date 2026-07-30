@@ -1,5 +1,5 @@
 /**
- * FamilyCinema — redesign premium
+ * FamilyCinema - redesign premium
  * Craft: Bora (camadas, sticky glass, coloredGlass, sheen, cascade)
  * Layout: print public/telas/cinema/
  * Dados reais: movies.ts + featuredRotation
@@ -64,7 +64,7 @@ const COVER: Record<string, string> = {
   red: asset("cover-red.png"),
   luca: asset("cover-luca.png"),
   coco: asset("cover-coco.png"),
-  // mapeamento sem arte dedicada — só assets HD existentes
+  // mapeamento sem arte dedicada - só assets HD existentes
   narnia: asset("cover-up.png"),
   "rei-leao": asset("cover-up.png"),
   madagascar: asset("cover-luca.png"),
@@ -177,7 +177,7 @@ const Gloss = ({
 );
 
 const idadeLabel = (m: Movie) =>
-  m.faixaEtaria === "familia" ? "Família" : `${m.faixaEtaria.replace("-", "–")} anos`;
+  m.faixaEtaria === "familia" ? "Família" : `${m.faixaEtaria.replace("-", "-")} anos`;
 
 const SectionLabel = ({
   children,
@@ -695,7 +695,7 @@ const FamilyCinema = ({ onBack }: Props) => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Fundo sólido do sistema — sem imagem do hero desfocada como parede */}
+      {/* Fundo sólido do sistema - sem imagem do hero desfocada como parede */}
       <div
         aria-hidden
         style={{
@@ -984,7 +984,7 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Chips de categoria — horizontal scroll premium */}
+        {/* Chips de categoria - horizontal scroll premium */}
         <div style={{ marginBottom: GAP + 2 }}>
           <div
             className="cine2-hscroll"
@@ -1058,7 +1058,7 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Filme da semana — card featured */}
+        {/* Filme da semana - card featured */}
         <div style={sectionWrap}>
           <button
             type="button"

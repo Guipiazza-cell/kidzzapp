@@ -639,7 +639,7 @@ export default function LandingPremium() {
   const heroBlur = useTransform(scrollYProgress, [0, 1], ["blur(0px)", "blur(10px)"]);
 
   useEffect(() => {
-    document.title = "KIDZZ — Desligue a tela. Ligue a infância.";
+    document.title = "KIDZZ - Desligue a tela. Ligue a infância.";
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(

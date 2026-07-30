@@ -1,6 +1,6 @@
 import { checkForNewAppVersion, clearAppCaches } from "@/lib/appUpdate";
 
-/** Service Worker registration — atualização automática com limpeza de cache. */
+/** Service Worker registration - atualização automática com limpeza de cache. */
 
 const isInIframe = (() => {
   try {
@@ -22,7 +22,7 @@ const isProdBuild = import.meta.env.PROD;
 export async function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
 
-  // Cleanup agressivo em preview/iframe/dev — nunca deixar SW preso aqui.
+  // Cleanup agressivo em preview/iframe/dev - nunca deixar SW preso aqui.
   if (isPreviewHost || isInIframe || !isProdBuild) {
     await clearAppCaches({ unregisterServiceWorkers: true });
     return;
@@ -44,7 +44,7 @@ export async function registerServiceWorker() {
     const updateSW = registerSW({
       immediate: true,
       onNeedRefresh() {
-        // Nova versão pronta — aplicar imediatamente.
+        // Nova versão pronta - aplicar imediatamente.
         forceReload();
       },
       onRegisteredSW(_swUrl, registration) {
@@ -55,7 +55,7 @@ export async function registerServiceWorker() {
           void checkForNewAppVersion();
         };
 
-        // Checagem periódica curta (20s) — pega novas versões rapidamente.
+        // Checagem periódica curta (20s) - pega novas versões rapidamente.
         setInterval(checkForUpdate, 20 * 1000);
 
         // Triggers extras de update.
@@ -77,7 +77,7 @@ export async function registerServiceWorker() {
       onOfflineReady() { /* noop */ },
     });
 
-    // Quando o controller muda (novo SW assumiu) — reload garantido.
+    // Quando o controller muda (novo SW assumiu) - reload garantido.
     let refreshed = false;
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (refreshed) return;

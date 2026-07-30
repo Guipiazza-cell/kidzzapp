@@ -1,7 +1,7 @@
 /* ── ShareableMemoryCard ──
    Branded memory share card. Two formats:
-   - "square" 1:1 (1080×1080) — Instagram / WhatsApp post
-   - "story"  9:16 (1080×1920) — Stories / Reels / Status
+   - "square" 1:1 (1080×1080) - Instagram / WhatsApp post
+   - "story"  9:16 (1080×1920) - Stories / Reels / Status
 
    Uses inline styles to render reliably off-screen via html2canvas.
 */

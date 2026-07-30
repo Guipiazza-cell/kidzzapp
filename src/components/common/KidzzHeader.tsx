@@ -4,7 +4,7 @@ import { haptic } from "@/lib/haptics";
 import KidzzLogo from "./KidzzLogo";
 
 /**
- * KidzzHeader — header padrão do app.
+ * KidzzHeader - header padrão do app.
  * Barra glass sticky com botão voltar, logo KIDZZ oficial centralizado
  * e, à direita, um slot opcional (Pais/galeria) ou spacer.
  */

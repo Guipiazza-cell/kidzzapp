@@ -21,7 +21,7 @@ const LOCK_UNTIL_KEY = "kidzz_parental_lock_until";
 const MAX_ATTEMPTS = 3;
 const LOCK_DURATION_MS = 60 * 1000;
 
-// SHA-256 hex digest — never store/transmit raw PIN.
+// SHA-256 hex digest - never store/transmit raw PIN.
 async function sha256Hex(input: string): Promise<string> {
   const buf = new TextEncoder().encode(input);
   const hash = await crypto.subtle.digest("SHA-256", buf);
@@ -30,7 +30,7 @@ async function sha256Hex(input: string): Promise<string> {
     .join("");
 }
 
-// Default (unset) hash — for a clean install we accept "1234" once, but immediately
+// Default (unset) hash - for a clean install we accept "1234" once, but immediately
 // prompt the parent to set a custom PIN after success.
 const DEFAULT_PIN_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4"; // sha256("1234")
 

@@ -9,7 +9,7 @@ import {
 } from "@/lib/habitLoop";
 
 interface Props {
-  /** Streak from server profile — used as fallback when localStorage is empty. */
+  /** Streak from server profile - used as fallback when localStorage is empty. */
   streakDays: number;
   childName: string;
   onSubmit?: (text: string) => void;
@@ -101,7 +101,7 @@ const StreakCard = ({ streakDays: serverStreak, childName, onSubmit }: Props) =>
               </span>
             </div>
             <p className="text-[10px] text-amber-700/80 font-bold mt-0.5">
-              → "{next.title}" {next.emoji} — Faltam {daysToNext} {daysToNext === 1 ? "dia" : "dias"}!
+              → "{next.title}" {next.emoji} - Faltam {daysToNext} {daysToNext === 1 ? "dia" : "dias"}!
             </p>
           </div>
         </div>

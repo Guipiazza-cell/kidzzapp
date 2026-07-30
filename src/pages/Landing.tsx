@@ -49,7 +49,7 @@ const Landing = () => {
             <span className="text-xs font-extrabold text-foreground">+5.000 famílias usando hoje</span>
           </motion.div>
 
-          {/* KIDZZ Hero character — full body, no crop */}
+          {/* KIDZZ Hero character - full body, no crop */}
           <motion.div custom={1} variants={fadeUp} className="mb-6 relative">
             <div className="absolute inset-0 bg-kid-yellow/30 blur-3xl rounded-full" />
             <motion.img
@@ -75,7 +75,7 @@ const Landing = () => {
           </motion.h1>
 
           <motion.p custom={3} variants={fadeUp} className="text-base md:text-lg text-foreground/80 mb-8 max-w-lg mx-auto leading-relaxed font-semibold">
-            O <span className="font-extrabold text-kid-orange">KIDZZ</span> transforma o tempo de tela em música, histórias e aprendizado — leve, divertido e seguro.
+            O <span className="font-extrabold text-kid-orange">KIDZZ</span> transforma o tempo de tela em música, histórias e aprendizado - leve, divertido e seguro.
           </motion.p>
 
           <motion.div custom={4} variants={fadeUp}>
@@ -87,7 +87,7 @@ const Landing = () => {
             {[...Array(5)].map((_, i) => (
               <Star key={i} size={14} className="text-kid-yellow fill-kid-yellow" />
             ))}
-            <span className="text-xs font-bold text-foreground/70 ml-2">4,9/5 — pais reais</span>
+            <span className="text-xs font-bold text-foreground/70 ml-2">4,9/5 - pais reais</span>
           </motion.div>
         </motion.div>
       </section>
@@ -320,7 +320,7 @@ const Landing = () => {
                   ))}
                 </div>
                 <p className="text-sm text-foreground/90 font-medium italic mb-2">"{t.quote}"</p>
-                <p className="text-xs text-foreground/60 font-bold">— {t.name}</p>
+                <p className="text-xs text-foreground/60 font-bold"> -  {t.name}</p>
               </div>
             ))}
           </motion.div>

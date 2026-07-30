@@ -59,7 +59,7 @@ const LivingForest = ({ children, variant = "light" }: { children?: React.ReactN
         ? "radial-gradient(ellipse at 50% 40%, hsl(150 35% 22%), hsl(220 40% 8%) 75%)"
         : "transparent",
     }}>
-      {/* BACK LAYER — distant trees silhouette */}
+      {/* BACK LAYER - distant trees silhouette */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         animate={{ x: mouse.x * -8, y: mouse.y * -4 }}
@@ -76,7 +76,7 @@ const LivingForest = ({ children, variant = "light" }: { children?: React.ReactN
         }}
       />
 
-      {/* MID LAYER — fireflies (always present, low density) */}
+      {/* MID LAYER - fireflies (always present, low density) */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         animate={{ x: mouse.x * -18, y: mouse.y * -10 }}
@@ -110,7 +110,7 @@ const LivingForest = ({ children, variant = "light" }: { children?: React.ReactN
         })}
       </motion.div>
 
-      {/* FRONT LAYER — leaves passing (subtle blur for DoF) */}
+      {/* FRONT LAYER - leaves passing (subtle blur for DoF) */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         animate={{ x: mouse.x * -28, y: mouse.y * -16 }}

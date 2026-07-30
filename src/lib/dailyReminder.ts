@@ -1,5 +1,5 @@
 // Lembrete diário gentil. Web Notifications API (local, sem servidor).
-// O setTimeout só sobrevive enquanto a aba estiver aberta — usamos também
+// O setTimeout só sobrevive enquanto a aba estiver aberta - usamos também
 // uma checagem on-load pra disparar caso o horário escolhido já tenha passado.
 
 const TIME_KEY = "bora_reminder_hour";
@@ -48,7 +48,7 @@ function fire(name: string) {
 
 /**
  * Agenda o lembrete pro horário escolhido pelo pai (uma vez por dia).
- * Idempotente — chama a cada mount; cancela timers anteriores.
+ * Idempotente - chama a cada mount; cancela timers anteriores.
  */
 let _timer: ReturnType<typeof setTimeout> | null = null;
 export function scheduleDailyReminder(childName: string = "") {

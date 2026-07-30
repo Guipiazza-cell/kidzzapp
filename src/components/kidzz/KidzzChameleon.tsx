@@ -1,4 +1,4 @@
-/* ── KIDZZ Chameleon — Personagem único, 4 estados, morph vivo ──
+/* ── KIDZZ Chameleon - Personagem único, 4 estados, morph vivo ──
    Cosmic (Perguntas) | Moon (Sonhos) | Explorer (Histórias/Viagem) | Music (futuro)
    - Crossfade morph 600ms entre estados
    - Micro animações: idle breathing, blink, tail curl, particles, heart pulse
@@ -158,7 +158,7 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
         onPointerDown={handleTap}
         style={{ touchAction: "manipulation" }}
       >
-        {/* Ambient glow — single layer, gentle pulse */}
+        {/* Ambient glow - single layer, gentle pulse */}
         <motion.div
           className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${glowMap[size]} rounded-full pointer-events-none -z-10`}
           style={{ background: stateGlow[state] }}
@@ -166,7 +166,7 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Character image — sem fade-in de mount (evita flicker ao trocar de aba).
+        {/* Character image - sem fade-in de mount (evita flicker ao trocar de aba).
             A imagem é pré-decodificada em preloadAssets, então aparece estável já no 1º frame. */}
         <motion.div
           className="absolute inset-0"
@@ -194,7 +194,7 @@ const KidzzChameleon = forwardRef<HTMLDivElement, KidzzChameleonProps>(
           transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Floating particles — reduced count + memoized for mobile perf */}
+        {/* Floating particles - reduced count + memoized for mobile perf */}
         {showParticles && (
           <>
             {[...Array(3)].map((_, i) => (

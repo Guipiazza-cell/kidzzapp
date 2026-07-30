@@ -50,7 +50,7 @@ const TABS: Tab[] = APP_TABS_ALL.filter((t) => t.inDock).map((tab) => ({
 }));
 
 /**
- * BottomNav — liquid glass ÚNICO em todas as abas.
+ * BottomNav - liquid glass ÚNICO em todas as abas.
  * Não muda de cor ao trocar tela (claro/escuro): sempre o mesmo vidro translúcido.
  */
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
@@ -81,7 +81,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     scrollerRef.current?.scrollBy({ left: dx, behavior: "smooth" });
   }, []);
 
-  // Liquid glass translúcido — igual em tela branca, creme ou preta.
+  // Liquid glass translúcido - igual em tela branca, creme ou preta.
   const dockStyle: CSSProperties = {
     background:
       "linear-gradient(165deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.16) 100%)",
@@ -123,7 +123,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       {/* Pais/Assinar flutuante REMOVIDO (relatório design): cobria conteúdo.
           Pais fica no header de cada aba; Assinar via paywall / header / planos. */}
 
-      {/* Dock liquid glass — mesmo em todas as telas */}
+      {/* Dock liquid glass - mesmo em todas as telas */}
       <div
         style={{
           position: "relative",

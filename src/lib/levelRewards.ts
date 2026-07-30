@@ -1,5 +1,5 @@
 /**
- * Recompensas por nível — desbloqueia roupas/cores/expressões do Lab.
+ * Recompensas por nível - desbloqueia roupas/cores/expressões do Lab.
  *
  * Sistema 100% local: usa o nível do levelSystem para determinar quais
  * itens estão liberados, sem mexer no Stripe/premium. Itens premium
@@ -21,7 +21,7 @@ export interface LevelReward {
 }
 
 /**
- * Tabela de recompensas. Inclui todos os marcos visuais — desbloqueio
+ * Tabela de recompensas. Inclui todos os marcos visuais - desbloqueio
  * é informativo (a UI do Lab continua lendo `LOCKED_*`); aqui ditamos
  * a narrativa da jornada.
  */
@@ -40,7 +40,7 @@ export const LEVEL_REWARDS: LevelReward[] = [
   { level: 35, kind: "color", itemId: "lilas-estrelado", emoji: "💜", label: "Lilás Estrelado", description: "Cor de quem sonha grande" },
   { level: 40, kind: "outfit", itemId: "explorer", emoji: "🎒", label: "Explorador", description: "Mochila pronta pra aventura" },
   { level: 45, kind: "title", emoji: "🌿", label: "Guardião da Floresta", description: "Você cuida do mundo KIDZZ" },
-  { level: 50, kind: "color", itemId: "dourado-magico", emoji: "🌟", label: "Dourado Mágico", description: "Cor lendária — só quem chega aqui" },
+  { level: 50, kind: "color", itemId: "dourado-magico", emoji: "🌟", label: "Dourado Mágico", description: "Cor lendária - só quem chega aqui" },
   { level: 60, kind: "title", emoji: "🧙", label: "Sábio Explorador", description: "Aura pulsante de energia" },
   { level: 70, kind: "expression", itemId: "loving", emoji: "🥰", label: "Apaixonado", description: "Coração transbordando" },
   { level: 75, kind: "title", emoji: "👑", label: "Mestre KIDZZ", description: "Você é referência" },

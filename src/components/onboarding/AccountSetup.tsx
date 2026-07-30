@@ -34,7 +34,7 @@ const translateAuthError = (msg: string): string => {
   const m = (msg || "").toLowerCase();
   if (m.includes("invalid login")) return "Email ou senha incorretos.";
   if (m.includes("already registered") || m.includes("already exists"))
-    return "Esse email já tem conta — toque em Entrar.";
+    return "Esse email já tem conta - toque em Entrar.";
   if (m.includes("password")) return "A senha precisa ter pelo menos 6 caracteres.";
   if (m.includes("email")) return "Confira o email digitado.";
   if (m.includes("rate")) return "Muitas tentativas. Espere um instante e tente de novo.";
@@ -308,7 +308,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           className="w-full max-w-md mb-3 text-center text-sm font-semibold rounded-2xl px-4 py-3"
           style={{ background: "#FDECE2", color: "#C0673E" }}
         >
-          Conexão com a nuvem indisponível — você pode continuar sem conta.
+          Conexão com a nuvem indisponível - você pode continuar sem conta.
         </div>
       )}
 
@@ -544,7 +544,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
             style={{ color: "#5A8F4E" }}
           >
             {mode === "signup"
-              ? "Já tenho conta — Entrar"
+              ? "Já tenho conta - Entrar"
               : "Criar conta nova"}
           </button>
         )}
@@ -555,7 +555,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         className="mt-auto pt-6 font-semibold"
         style={{ color: "#9BB0A0", fontSize: 13 }}
       >
-        Agora não — continuar sem conta
+        Agora não - continuar sem conta
       </button>
     </div>
   );

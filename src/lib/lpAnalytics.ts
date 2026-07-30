@@ -1,4 +1,4 @@
-// Landing Page analytics — paid traffic funnel
+// Landing Page analytics - paid traffic funnel
 // Captures UTM/click IDs once per session and forwards events to any
 // installed pixels (GTM dataLayer, GA4 gtag, Meta fbq, TikTok ttq).
 // Also logs to console in production for observability and dispatches a
@@ -126,7 +126,7 @@ export function track(event: string, params: Params = {}): void {
     // ignore
   }
 
-  // Meta Pixel — map known funnel steps to standard events
+  // Meta Pixel - map known funnel steps to standard events
   try {
     const fbMap: Record<string, string> = {
       lp_view: "ViewContent",
@@ -149,7 +149,7 @@ export function track(event: string, params: Params = {}): void {
     // ignore
   }
 
-  // Production observability — keep visible so it shows up in any log relay
+  // Production observability - keep visible so it shows up in any log relay
   if (import.meta.env.PROD) {
     // eslint-disable-next-line no-console
     console.info("[lp-analytics]", event, payload);

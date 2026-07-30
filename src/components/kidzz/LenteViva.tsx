@@ -11,7 +11,7 @@ interface Props {
 }
 
 /**
- * Lente Viva — disco de "vidro vivo" usado no topo das 4 abas
+ * Lente Viva - disco de "vidro vivo" usado no topo das 4 abas
  * (Histórias / Brincar / Música / Cinema). Substitui o mascote camaleão
  * por uma assinatura visual consistente e premium.
  *

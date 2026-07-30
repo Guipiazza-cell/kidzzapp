@@ -1,5 +1,5 @@
 /**
- * KALM v2 — sub-telas (Relaxar, Ritual, SOS, Vínculo).
+ * KALM v2 - sub-telas (Relaxar, Ritual, SOS, Vínculo).
  * Cada sub-tela é stateless: recebe onBack e onOpen(activity).
  */
 import { useState, type CSSProperties } from "react";

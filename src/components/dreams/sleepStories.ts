@@ -3,7 +3,7 @@
 export interface SleepStory {
   id: string;
   title: string;
-  /** @deprecated prefer icon — legado de emoji genérico */
+  /** @deprecated prefer icon - legado de emoji genérico */
   emoji?: string;
   /** Ícone premium 3D (sonhos-v2/icons) */
   icon: string;
@@ -148,7 +148,7 @@ Agora respire fundo. E durma sabendo que hoje foi um bom dia.`,
     free: false,
     duration: "5 min",
     ageRange: "5-10",
-    verse: "“Não temas, porque eu sou contigo.” — Isaías 41:10",
+    verse: "“Não temas, porque eu sou contigo.” - Isaías 41:10",
     text: `Há muito tempo, vivia um menino chamado Davi.
 Ele era pequeno, mas tinha um coração enorme e cheio de coragem.
 
@@ -171,7 +171,7 @@ E essa força sempre te acompanha, mesmo no escuro da noite.`,
     free: false,
     duration: "5 min",
     ageRange: "3-7",
-    verse: "“Porei o meu arco nas nuvens.” — Gênesis 9:13",
+    verse: "“Porei o meu arco nas nuvens.” - Gênesis 9:13",
     text: `Noé construiu um barco enorme, chamado arca.
 Para dentro entraram bichinhos de toda parte do mundo.
 Leões, coelhos, girafas, formiguinhas. Todos juntos, dois a dois.
@@ -194,7 +194,7 @@ seu quarto é a sua arca. Aqui, você está seguro.`,
     free: false,
     duration: "4 min",
     ageRange: "3-10",
-    verse: "“Deixai vir a mim as criancinhas.” — Mateus 19:14",
+    verse: "“Deixai vir a mim as criancinhas.” - Mateus 19:14",
     text: `Um dia, muitas crianças correram para ver Jesus.
 Os adultos quiseram afastar. "Ele está cansado", disseram.
 
@@ -216,7 +216,7 @@ E enquanto dorme, esse amor continua te cuidando.`,
     free: false,
     duration: "4 min",
     ageRange: "3-7",
-    verse: "“E viu Deus que era bom.” — Gênesis 1:31",
+    verse: "“E viu Deus que era bom.” - Gênesis 1:31",
     text: `No começo de tudo, só havia silêncio e escuridão.
 Então Deus disse: "Haja luz." E o sol nasceu pela primeira vez.
 
@@ -294,7 +294,7 @@ export interface SleepPlaylist {
   spotifyId: string;
   glow: string;
   gradient: string;
-  /** Capa gerada via Hermes/Codex (gpt-image) — padrão premium da ABA SONHOS */
+  /** Capa gerada via Hermes/Codex (gpt-image) - padrão premium da ABA SONHOS */
   cover: string;
 }
 
@@ -363,7 +363,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
   },
 ];
 
-/* ── Momentos em família — perguntas noturnas ── */
+/* ── Momentos em família - perguntas noturnas ── */
 export const FAMILY_MOMENTS: { id: string; icon: string; title: string; prompt: string }[] = [
   { id: "best", icon: `${IC}/star.png`, title: "O melhor de hoje", prompt: "Qual foi o melhor momento do seu dia?" },
   { id: "brave", icon: `${IC}/shield.png`, title: "Coragem", prompt: "Hoje você foi corajoso quando…?" },

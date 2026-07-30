@@ -65,7 +65,7 @@ export const IndicacaoCard = () => {
           className="flex-1 truncate font-mono"
           style={{ fontSize: 12.5, color: "#3a2f23" }}
         >
-          {loading ? "gerando seu link..." : link || "—"}
+          {loading ? "gerando seu link..." : link || " - "}
         </span>
         <button
           type="button"

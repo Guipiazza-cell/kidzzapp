@@ -186,7 +186,7 @@ export const KALM_SECTIONS: KalmSection[] = [
         tint: emerald,
         steps: [
           "Sente-se na altura dele. Diga: 'eu te vejo'.",
-          "Pergunte: 'o que você sentiu agora?' — sem corrigir.",
+          "Pergunte: 'o que você sentiu agora?' - sem corrigir.",
           "Um abraço silencioso. Sem palavras por 20 segundos.",
         ],
       },
@@ -211,7 +211,7 @@ export const KALM_SECTIONS: KalmSection[] = [
         tier: "premium",
         tint: moss,
         steps: [
-          "Sentem-se em roda — pode ser na cama.",
+          "Sentem-se em roda - pode ser na cama.",
           "Cada um diz uma coisa boa que aconteceu hoje.",
           "Encerrem com um 'obrigado por estar aqui'.",
         ],

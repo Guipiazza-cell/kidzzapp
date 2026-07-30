@@ -120,7 +120,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             </p>
           </div>
 
-          {/* Plans — CTA unificado para a tela canônica */}
+          {/* Plans - CTA unificado para a tela canônica */}
           {!isPremium && (
             <div>
               <label className="font-bold text-foreground text-sm block mb-2">

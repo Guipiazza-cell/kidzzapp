@@ -6,7 +6,7 @@
 
 export const ICONS3D = "/exemplos/assets/icons-3d";
 
-/** Paths canônicos — fallback em cascata nos packs já existentes */
+/** Paths canônicos - fallback em cascata nos packs já existentes */
 export const KIDZZ_ICON = {
   rain: `${ICONS3D}/rain.png`,
   forest: `${ICONS3D}/forest.png`,

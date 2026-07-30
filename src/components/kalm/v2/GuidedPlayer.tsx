@@ -1,5 +1,5 @@
 /**
- * KALM v2 — tela cheia de execução guiada.
+ * KALM v2 - tela cheia de execução guiada.
  * Suporta breath, hum, glitter, heart, scan, steps.
  * `prefers-reduced-motion` → fallback texto + timer.
  */

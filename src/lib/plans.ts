@@ -1,7 +1,7 @@
 /**
- * KIDZZ — Configuração central de planos e permissões.
+ * KIDZZ - Configuração central de planos e permissões.
  * Esta é a ÚNICA fonte de regras de acesso e limites do app.
- * Nenhuma tela deve decidir acesso por conta própria — consultar useEntitlement().
+ * Nenhuma tela deve decidir acesso por conta própria - consultar useEntitlement().
  */
 
 export type Plan = "free" | "kidzz" | "premium";

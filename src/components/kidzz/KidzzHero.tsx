@@ -1,4 +1,4 @@
-/* ── KIDZZ Hero — personagem central da Home ──
+/* ── KIDZZ Hero - personagem central da Home ──
    Mostra greeting contextual via memória + speech bubble live.
 */
 import { useEffect, useState } from "react";

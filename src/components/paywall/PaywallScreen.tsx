@@ -14,7 +14,7 @@ interface PaywallScreenProps {
 
 type Cycle = "monthly" | "annual";
 
-// Brand palette (visual only — no logic changes)
+// Brand palette (visual only - no logic changes)
 const AMBER = "#E8821A";
 const AMBER_DEEP = "#C96B0E";
 const SAGE = "#7FB069";
@@ -79,7 +79,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
 
   const nome = childName?.trim() || "seu filho";
 
-  // Diário Sem Tela — emotional anchor for the headline (read-only).
+  // Diário Sem Tela - emotional anchor for the headline (read-only).
   const diary = useMemo(() => {
     if (typeof window === "undefined") return { minutes: 0, streak: 0, completions: 0 };
     try {
@@ -107,7 +107,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
         return {
           tag: "Mais uma surpresa?",
           headline: `A surpresa grátis do dia já saiu. Quer outra agora?`,
-          sub: `No Premium o ${nome.split(" ")[0]} recebe surpresas ilimitadas — feitas só pra ele.`,
+          sub: `No Premium o ${nome.split(" ")[0]} recebe surpresas ilimitadas - feitas só pra ele.`,
         };
       case "streak_milestone":
         return {
@@ -128,7 +128,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           tag: "",
           headline: `Escolha como o Kidzz vai cuidar do ${nome}`,
           sub: hasMinutes
-            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado — e o ${nome.split(" ")[0]} ganha atividades feitas só pra ele.`
+            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado - e o ${nome.split(" ")[0]} ganha atividades feitas só pra ele.`
             : `Comece grátis. Cancele quando quiser. Sem letras miúdas.`,
         };
     }
@@ -158,7 +158,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           </button>
         )}
 
-        {/* Header — contextual + emotional */}
+        {/* Header - contextual + emotional */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -186,7 +186,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
             {ctx.sub}
           </p>
 
-          {/* Mini stats strip — only if there's something to celebrate */}
+          {/* Mini stats strip - only if there's something to celebrate */}
           {(diary.minutes > 0 || diary.streak > 0) && (
             <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
               {diary.minutes > 0 && (
@@ -208,7 +208,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
             </div>
           )}
 
-          {/* Prova social — Movimento Menos Tela */}
+          {/* Prova social - Movimento Menos Tela */}
           <div
             className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold"
             style={{ color: INK_SOFT }}
@@ -270,7 +270,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
             accent={SAGE}
           />
 
-          {/* Premium — hero */}
+          {/* Premium - hero */}
           <PlanCard
             label="A EXPERIÊNCIA COMPLETA"
             name="Premium"
