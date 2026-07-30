@@ -835,9 +835,9 @@ const RoutineScreen = () => {
             ref={heroArtRef}
             style={{
               position: "relative",
-              height: 228,
-              marginRight: 0,
-              marginTop: -12,
+              height: 210,
+              marginRight: -PAD,
+              marginTop: -8,
               overflow: "visible",
               animation: "rot2-floaty 7s ease-in-out infinite",
               willChange: "transform, opacity",
@@ -848,12 +848,12 @@ const RoutineScreen = () => {
               alt="Gui, o camaleão, com o calendário da rotina"
               style={{
                 position: "absolute",
-                right: 4,
-                bottom: -4,
-                width: "112%",
-                height: "108%",
+                right: 28,
+                bottom: 0,
+                width: "118%",
+                height: "100%",
                 objectFit: "contain",
-                objectPosition: "right bottom",
+                objectPosition: "center bottom",
                 filter: "drop-shadow(0 12px 28px rgba(80,50,30,.22))",
                 pointerEvents: "none",
               }}
