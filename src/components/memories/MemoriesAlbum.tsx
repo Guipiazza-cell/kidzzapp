@@ -733,7 +733,7 @@ const MemoriesAlbum = ({
               </div>
               <h1
                 style={{
-                  margin: "0 0 8px",
+                  margin: 0,
                   fontFamily: SERIF,
                   fontWeight: 600,
                   fontSize: 22,
@@ -744,18 +744,6 @@ const MemoriesAlbum = ({
               >
                 Aqui guardamos <span style={{ color: "#C93A72" }}>memórias</span> que viram histórias.
               </h1>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  lineHeight: 1.4,
-                  color: MEM_INK2,
-                  maxWidth: 200,
-                }}
-              >
-                Cada momento juntos merece ser lembrado para sempre.
-              </p>
             </div>
 
             <div
