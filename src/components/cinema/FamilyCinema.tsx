@@ -19,7 +19,6 @@ import {
   ArrowRight,
   Shield,
   Trophy,
-  Clapperboard,
   Heart,
   Rocket,
   Moon,
@@ -55,9 +54,8 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v9";
+const AV = "v10";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
-const q = (path: string) => `${path}${path.includes("?") ? "&" : "?"}v=${AV}`;
 
 /** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
 const CinemaBackdrop = ({ src }: { src: string }) => (
@@ -108,68 +106,23 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
 );
 
 /**
- * Capas por filme — mapa real (sem Proxy).
- * Prefere artes HD dedicadas; fallback em covers/{id}.png.
- * Nunca reutiliza capa de outro título.
+ * Uma capa por filme em cinema-v2/covers/{id}.png
+ * (6 artes HD + pôsteres premium gerados; sem emoji, sem reuso entre títulos).
  */
-const COVER: Record<string, string> = {
-  // HD cinema-v2 raiz
-  "wall-e": asset("cover-walle.png"),
-  up: asset("cover-up.png"),
-  "polar-express": asset("cover-polar.png"),
-  red: asset("cover-red.png"),
-  luca: asset("cover-luca.png"),
-  coco: asset("cover-coco.png"),
-  // artes dedicadas cin-*
-  narnia: q("/exemplos/assets/cin-narnia.png"),
-  madagascar: q("/exemplos/assets/cin-mada.png"),
-  minions: q("/exemplos/assets/cin-minions.png"),
-  sing: q("/exemplos/assets/cin-sing.png"),
-  "familia-futuro": q("/exemplos/assets/cin-futuro.png"),
-  // acervo covers/{id}
-  soul: asset("covers/soul.png"),
-  encanto: asset("covers/encanto.png"),
-  dumbo: asset("covers/dumbo.png"),
-  "peter-pan": asset("covers/peter-pan.png"),
-  "bernardo-bianca": asset("covers/bernardo-bianca.png"),
-  bolt: asset("covers/bolt.png"),
-  "rei-leao": asset("covers/rei-leao.png"),
-  nemo: asset("covers/nemo.png"),
-  divertidamente: asset("covers/divertidamente.png"),
-  "toy-story": asset("covers/toy-story.png"),
-  "lilo-stitch": asset("covers/lilo-stitch.png"),
-  marley: asset("covers/marley.png"),
-  "4-vidas": asset("covers/4-vidas.png"),
-  matilda: asset("covers/matilda.png"),
-  alice: asset("covers/alice.png"),
-  oz: asset("covers/oz.png"),
-  enrolados: asset("covers/enrolados.png"),
-  zootopia: asset("covers/zootopia.png"),
-  "pequenos-espioes": asset("covers/pequenos-espioes.png"),
-  robos: asset("covers/robos.png"),
-  horton: asset("covers/horton.png"),
-  wish: asset("covers/wish.png"),
-  malvado: asset("covers/malvado.png"),
-  hamburguer: asset("covers/hamburguer.png"),
-  chefinho: asset("covers/chefinho.png"),
-  carros: asset("covers/carros.png"),
-  pets: asset("covers/pets.png"),
-  leo: asset("covers/leo.png"),
-  "stuart-little": asset("covers/stuart-little.png"),
-};
+const coverOf = (id: string) => asset(`covers/${id}.png`);
 
-const coverOf = (id: string) => COVER[id] || asset(`covers/${id}.png`);
-
-/** Poster real com <img> (CSS background falhava em alguns builds) + fallback premium sem emoji. */
+/** Poster real com <img> + fallback premium (sem emoji). */
 const MoviePoster = ({
   id,
   glow,
+  title = "",
   alt = "",
   style,
   children,
 }: {
   id: string;
   glow: string;
+  title?: string;
   alt?: string;
   style?: CSSProperties;
   children?: ReactNode;
@@ -181,15 +134,16 @@ const MoviePoster = ({
       style={{
         position: "relative",
         overflow: "hidden",
-        background: `linear-gradient(160deg, ${hexA(glow, 0.75)}, ${hexA(glow, 0.25)} 55%, #1a2030)`,
+        background: `linear-gradient(160deg, ${hexA(glow, 0.85)}, ${hexA(glow, 0.35)} 50%, #141820)`,
         ...style,
       }}
     >
       {!broken && (
         <img
+          key={src}
           src={src}
-          alt={alt}
-          loading="lazy"
+          alt={alt || title}
+          loading="eager"
           decoding="async"
           draggable={false}
           onError={() => setBroken(true)}
@@ -209,12 +163,42 @@ const MoviePoster = ({
           style={{
             position: "absolute",
             inset: 0,
-            display: "grid",
-            placeItems: "center",
-            background: `linear-gradient(160deg, ${hexA(glow, 0.9)}, #1a2030)`,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            padding: 12,
+            background: `linear-gradient(160deg, ${hexA(glow, 0.95)}, #141820)`,
           }}
         >
-          <Clapperboard size={36} color="rgba(255,255,255,.85)" strokeWidth={1.6} />
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 18,
+              display: "grid",
+              placeItems: "center",
+              background: "rgba(255,255,255,.18)",
+              border: "1px solid rgba(255,255,255,.35)",
+            }}
+          >
+            <Play size={22} fill="#fff" color="#fff" />
+          </div>
+          {title ? (
+            <span
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 600,
+                fontSize: 13,
+                color: "#FFF8EA",
+                textAlign: "center",
+                lineHeight: 1.2,
+              }}
+            >
+              {title}
+            </span>
+          ) : null}
         </div>
       )}
       {children}
@@ -374,7 +358,7 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
         boxShadow: "0 12px 28px rgba(40,60,100,.14), 0 1px 0 rgba(255,255,255,.9) inset",
       }}
     >
-      <MoviePoster id={m.id} glow={m.glowColor} alt={m.titulo} style={{ height: 132 }}>
+      <MoviePoster id={m.id} glow={m.glowColor} title={m.titulo} alt={m.titulo} style={{ height: 132 }}>
         <div
           style={{
             position: "absolute",
@@ -513,6 +497,7 @@ const DetailSheet = ({
           <MoviePoster
             id={movie.id}
             glow={movie.glowColor}
+            title={movie.titulo}
             alt={movie.titulo}
             style={{ width: "42%", flex: "none", minHeight: 150 }}
           >
@@ -1163,6 +1148,7 @@ const FamilyCinema = ({ onBack }: Props) => {
               <MoviePoster
                 id={weekly.id}
                 glow={weekly.glowColor}
+                title={weekly.titulo}
                 alt={weekly.titulo}
                 style={{
                   width: "40%",
