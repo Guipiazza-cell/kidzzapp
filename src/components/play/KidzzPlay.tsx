@@ -560,23 +560,33 @@ const KidzzPlay = ({
           <div style={{ height: 168 }} aria-hidden />
         </div>
 
-        {/* ── Card de boas-vindas (acima de Missões / Criar) ── */}
+        {/* ── Card de boas-vindas liquid glass (translúcido, não tapa o fundo) ── */}
         <div style={{ padding: "0 16px 10px", position: "relative", zIndex: 5, animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
           <div
             style={{
               borderRadius: 24,
               padding: "16px 16px 15px",
-              background: "linear-gradient(160deg, rgba(255,255,255,.94) 0%, rgba(255,252,244,.88) 55%, rgba(240,250,232,.9) 100%)",
-              border: "1px solid rgba(255,255,255,1)",
-              boxShadow: "0 14px 32px rgba(40,70,30,.16), inset 0 1.5px 0 rgba(255,255,255,1)",
-              backdropFilter: "blur(20px) saturate(160%)",
-              WebkitBackdropFilter: "blur(20px) saturate(160%)",
+              background:
+                "linear-gradient(160deg, rgba(255,255,255,.38) 0%, rgba(255,252,244,.22) 50%, rgba(240,250,232,.28) 100%)",
+              border: "0.5px solid rgba(255,255,255,.55)",
+              boxShadow:
+                "0 12px 28px rgba(40,70,30,.12), inset 0 1px 0 rgba(255,255,255,.55)",
+              backdropFilter: "blur(28px) saturate(180%)",
+              WebkitBackdropFilter: "blur(28px) saturate(180%)",
             }}
           >
-            <div style={{ fontWeight: 800, fontSize: 13, color: "#2E6B48", marginBottom: 6 }}>
+            <div
+              style={{
+                fontWeight: 800,
+                fontSize: 13,
+                color: "#17301F",
+                marginBottom: 6,
+                textShadow: "0 1px 8px rgba(255,255,255,.55)",
+              }}
+            >
               {greeting}, família!{" "}
               <span style={{ display: "inline-flex", verticalAlign: "middle", animation: "brin-heartbeat 2.4s ease-in-out infinite" }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="#3FA86A"><path d={D.heart} /></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#2E9A63"><path d={D.heart} /></svg>
               </span>
             </div>
             <h1
@@ -586,13 +596,23 @@ const KidzzPlay = ({
                 fontWeight: 600,
                 fontSize: 24,
                 lineHeight: 1.18,
-                color: "#17301F",
+                color: "#0F2418",
                 letterSpacing: "-.35px",
+                textShadow: "0 1px 10px rgba(255,255,255,.45)",
               }}
             >
-              Brincar faz parte da <span style={{ color: "#2E9A63" }}>magia</span> de crescer.
+              Brincar faz parte da <span style={{ color: "#1F8A52" }}>magia</span> de crescer.
             </h1>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "#557A5E" }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 13,
+                fontWeight: 700,
+                lineHeight: 1.45,
+                color: "rgba(23,48,31,.82)",
+                textShadow: "0 1px 8px rgba(255,255,255,.4)",
+              }}
+            >
               Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
             </p>
           </div>
