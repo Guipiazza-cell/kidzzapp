@@ -141,11 +141,17 @@ const BoraScreen = ({ onBack }: Props) => {
   const { addMemory } = useMemories();
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+  /** Se o pai fechou o modal sem cadastrar, não reabre na mesma visita à aba. */
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   useEffect(() => {
     if (!user) return;
     if (loadingCriancas) return;
-    if (criancas.length === 0) setShowOnboarding(true);
-  }, [user, loadingCriancas, criancas.length]);
+    if (criancas.length === 0 && !onboardingDismissed) setShowOnboarding(true);
+    if (criancas.length > 0) {
+      setShowOnboarding(false);
+      setOnboardingDismissed(false);
+    }
+  }, [user, loadingCriancas, criancas.length, onboardingDismissed]);
 
   const firstCrianca = criancas[0];
   const childName = (firstCrianca?.nome || profile?.child_name || "").trim();
@@ -421,7 +427,15 @@ const BoraScreen = ({ onBack }: Props) => {
         }
       `}</style>
 
-      <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <CriancaOnboarding
+        open={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onDismiss={() => {
+          setShowOnboarding(false);
+          setOnboardingDismissed(true);
+          onBack();
+        }}
+      />
       <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />
       <GuardaCelularScreen
         open={guardaOpen}
