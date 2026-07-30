@@ -47,7 +47,7 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v6";
+const AV = "v7";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 /** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
@@ -97,25 +97,10 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
 );
 
 /**
- * Capas por filme — SOMENTE arte correta do próprio título.
- * Nunca reutilizar capa de outro filme (causava repetição / póster errado).
- * Sem arte dedicada → fallback de gradiente + emoji no card.
+ * Uma capa por filme em cinema-v2/covers/{id}.png
+ * (artes HD dedicadas + pôsteres únicos gerados; nunca reutiliza capa de outro título).
  */
-const COVER: Record<string, string> = {
-  // cinema-v2 (HD)
-  "wall-e": asset("cover-walle.png"),
-  up: asset("cover-up.png"),
-  "polar-express": asset("cover-polar.png"),
-  red: asset("cover-red.png"),
-  luca: asset("cover-luca.png"),
-  coco: asset("cover-coco.png"),
-  // cin-* dedicados (public/exemplos/assets)
-  narnia: "/exemplos/assets/cin-narnia.png",
-  madagascar: "/exemplos/assets/cin-mada.png",
-  minions: "/exemplos/assets/cin-minions.png",
-  sing: "/exemplos/assets/cin-sing.png",
-  "familia-futuro": "/exemplos/assets/cin-futuro.png",
-};
+const coverOf = (id: string) => asset(`covers/${id}.png`);
 
 interface Props {
   onBack: () => void;
@@ -249,7 +234,7 @@ const SectionLabel = ({
 
 /* ── Card de filme (print: poster + idade + título + desc) ── */
 const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
-  const cover = COVER[m.id];
+  const cover = coverOf(m.id);
   return (
     <button
       type="button"
@@ -274,26 +259,10 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
         style={{
           height: 112,
           position: "relative",
-          background: cover
-            ? `url("${cover}") center/cover no-repeat`
-            : `linear-gradient(160deg, ${hexA(m.glowColor, 0.55)}, ${hexA(m.glowColor, 0.2)} 50%, #1a2030)`,
+          background: `url("${cover}") center/cover no-repeat`,
+          backgroundColor: hexA(m.glowColor, 0.35),
         }}
       >
-        {!cover && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "grid",
-              placeItems: "center",
-              background: `linear-gradient(160deg, ${hexA(m.glowColor, 0.85)}, #1a2030)`,
-            }}
-          >
-            <span style={{ fontSize: 42, lineHeight: 1, filter: "drop-shadow(0 4px 12px rgba(0,0,0,.35))" }}>
-              {m.emoji || "🎬"}
-            </span>
-          </div>
-        )}
         <div
           style={{
             position: "absolute",
@@ -394,7 +363,7 @@ const DetailSheet = ({
   onClose: () => void;
   onMarcar: () => void;
 }) => {
-  const cover = COVER[movie.id];
+  const cover = coverOf(movie.id);
   return (
     <>
       <div
@@ -433,16 +402,10 @@ const DetailSheet = ({
               width: "42%",
               flex: "none",
               position: "relative",
-              background: cover
-                ? `url("${cover}") center/cover`
-                : `linear-gradient(160deg, ${hexA(movie.glowColor, 0.6)}, #1a1520)`,
+              background: `url("${cover}") center/cover`,
+              backgroundColor: hexA(movie.glowColor, 0.4),
             }}
           >
-            {!cover && (
-              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: `linear-gradient(160deg, ${hexA(movie.glowColor, 0.75)}, #1a1520)` }}>
-                <span style={{ fontSize: 48, lineHeight: 1 }}>{movie.emoji || "🎬"}</span>
-              </div>
-            )}
             <div
               style={{
                 position: "absolute",
@@ -1177,16 +1140,10 @@ const FamilyCinema = ({ onBack }: Props) => {
                   borderRadius: R.panel,
                   overflow: "hidden",
                   position: "relative",
-                  background: COVER[weekly.id]
-                    ? `url("${COVER[weekly.id]}") center/cover`
-                    : `linear-gradient(160deg, ${hexA(weekly.glowColor, 0.7)}, #1a2030)`,
+                  background: `url("${coverOf(weekly.id)}") center/cover`,
+                  backgroundColor: hexA(weekly.glowColor, 0.4),
                 }}
               >
-                {!COVER[weekly.id] && (
-                  <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "linear-gradient(160deg, rgba(46,122,204,.55), #1a2030)" }}>
-                    <Clapperboard size={40} color="rgba(255,255,255,.9)" strokeWidth={1.5} />
-                  </div>
-                )}
                 <div
                   style={{
                     position: "absolute",
