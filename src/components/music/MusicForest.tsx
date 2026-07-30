@@ -167,7 +167,8 @@ const greetingWord = () => {
   return "Boa noite";
 };
 
-const activityAsset = (i: number) => `/exemplos/assets/mu-a${(i % 4) + 1}.png`;
+/** Capa premium única por atividade (sem genéricos mu-a1..4) */
+const activityCover = (id: string) => `${MU}/act-icons/${id}.png`;
 
 /* ── Icone SVG genérico ── */
 const Icon = ({ d, stroke = "#fff", size = 20, sw = 1.8 }: { d: string; stroke?: string; size?: number; sw?: number }) => (
@@ -686,14 +687,15 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 /* ============ CARD DE ATIVIDADE ============ */
 
 const ActivityCard = ({
-  activity, index, favorite, onFav, onOpen, full = false,
-}: { activity: GuidedActivity; index: number; favorite: boolean; onFav: () => void; onOpen: () => void; full?: boolean }) => {
+  activity, favorite, onFav, onOpen, full = false,
+}: { activity: GuidedActivity; favorite: boolean; onFav: () => void; onOpen: () => void; full?: boolean }) => {
   // Fundo de card unificado (sem arco-íris por item) - padrão do relatório
   const foot: [string, string] = ["#3A3220", "#2A2418"];
+  const cover = activityCover(activity.id);
   return (
     <div style={{ flex: "none", width: full ? "100%" : 168, borderRadius: 22, position: "relative", overflow: "hidden", boxShadow: "0 14px 30px rgba(110,85,30,.26),inset 0 1px 0 rgba(255,255,255,.4)", border: "1px solid rgba(255,255,255,.55)", animation: "mus-rise .45s both" }}>
       <div style={{ position: "relative", height: 140, overflow: "hidden" }}>
-        <button onClick={onOpen} aria-label={activity.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", padding: 0, border: "none", cursor: "pointer", backgroundImage: `url("${activityAsset(index)}")`, backgroundSize: "cover", backgroundPosition: "center" }} />
+        <button onClick={onOpen} aria-label={activity.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", padding: 0, border: "none", cursor: "pointer", backgroundImage: `url("${cover}")`, backgroundSize: "cover", backgroundPosition: "center" }} />
         <div style={{ position: "absolute", top: 8, left: 8, padding: "4px 11px", borderRadius: 999, background: "rgba(255,253,246,.88)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 3px 8px rgba(0,0,0,.18)", color: "#3A2E14", fontSize: 10, fontWeight: 900, pointerEvents: "none" }}>{activity.minutes} min</div>
         {/* UM play dourado (sem duplicar círculo translúcido no centro) */}
         <button
@@ -789,11 +791,10 @@ const CategoryScreen = ({
         )}
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
-          {activities.map((a, i) => (
+          {activities.map((a) => (
             <ActivityCard
               key={a.id}
               activity={a}
-              index={i}
               full
               favorite={favorites.includes(a.id)}
               onFav={() => onToggleFav(a.id)}

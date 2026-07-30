@@ -23,6 +23,10 @@ export interface GuidedActivity {
   parentMark?: boolean;
 }
 
+/** Capa premium 3D por atividade (public/exemplos/assets/musica-v2/act-icons) */
+const activityCover = (id: string) =>
+  `/exemplos/assets/musica-v2/act-icons/${id}.png`;
+
 interface Props {
   activity: GuidedActivity;
   childName: string;
@@ -105,6 +109,7 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
 
   const gradient = `linear-gradient(145deg, hsl(${activity.accent} / 0.98), hsl(${activity.accent} / 0.55))`;
   const current = steps[stepIdx] ?? steps[0];
+  const cover = activityCover(activity.id);
 
   const clearTimer = () => {
     if (timerRef.current) {
@@ -283,8 +288,8 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
                   >
                     <div
                       style={{
-                        width: phase === "playing" ? 148 : 96,
-                        height: phase === "playing" ? 148 : 96,
+                        width: phase === "playing" ? 148 : 112,
+                        height: phase === "playing" ? 148 : 112,
                         borderRadius: 36,
                         display: "grid",
                         placeItems: "center",
@@ -294,9 +299,21 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
                         border: "1.5px solid rgba(255,255,255,.55)",
                         boxShadow: "0 16px 36px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.5) inset",
                         backdropFilter: "blur(8px)",
+                        overflow: "hidden",
                       }}
                     >
-                      {phase === "playing" ? current.emoji : isAnimals ? "🐾" : "🎵"}
+                      {phase === "playing" ? (
+                        current.emoji
+                      ) : (
+                        <img
+                          src={cover}
+                          alt=""
+                          width={112}
+                          height={112}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                          draggable={false}
+                        />
+                      )}
                     </div>
                     {phase === "playing" && (
                       <>
