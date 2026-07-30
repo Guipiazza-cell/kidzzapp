@@ -675,10 +675,7 @@ const KidzzPlay = ({
                 textShadow: "0 1px 8px rgba(255,255,255,.55)",
               }}
             >
-              {greeting}, família!{" "}
-              <span style={{ display: "inline-flex", verticalAlign: "middle", animation: "brin-heartbeat 2.4s ease-in-out infinite" }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="#2E9A63"><path d={D.heart} /></svg>
-              </span>
+              {greeting}, família!
             </div>
             <h1
               style={{
