@@ -19,10 +19,6 @@ import {
   ArrowRight,
   Shield,
   Trophy,
-  Heart,
-  Rocket,
-  Moon,
-  Briefcase,
   Play,
   Bookmark,
   Share2,
@@ -50,7 +46,6 @@ import {
   glassLight as glass,
   glassLightSoft as glassSoft,
   pillGlassLight as pillGlass,
-  coloredGlass,
   goldBtn,
   sectionWrap,
 } from "@/lib/premiumUi";
@@ -60,7 +55,7 @@ const AS = "/exemplos/assets/cinema-v2";
 const AV = "v14";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
-/** Fundo full-bleed com Gui da sala (sem camada extra sobreposta). */
+/** Fundo full-bleed — Gui grande e alto à direita, ao lado do texto do hero. */
 const CinemaBackdrop = ({ src }: { src: string }) => (
   <div
     className="absolute inset-0 pointer-events-none overflow-hidden"
@@ -75,33 +70,33 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         width: "100%",
         height: "100%",
         objectFit: "cover",
-        /* Foco no Gui da direita, nítido, sem blur */
-        objectPosition: "72% 28%",
-        filter: "saturate(1.08) brightness(0.94)",
-        transform: "scale(1.08)",
-        transformOrigin: "75% 25%",
+        /* Sobe e amplia o Gui no canto superior direito (ao lado do título) */
+        objectPosition: "88% 6%",
+        filter: "saturate(1.1) brightness(0.96)",
+        transform: "scale(1.42)",
+        transformOrigin: "88% 4%",
       }}
     />
-    {/* Vinheta + creme inferior (texto legível; Gui visível à direita) */}
+    {/* Escurece só a esquerda p/ texto; direita limpa p/ Gui; creme bem mais baixo */}
     <div
       style={{
         position: "absolute",
         inset: 0,
         background:
-          "radial-gradient(48% 36% at 78% 16%, rgba(255,210,120,.22) 0%, transparent 58%)," +
-          "linear-gradient(105deg, rgba(12,20,32,.42) 0%, rgba(12,20,32,.12) 42%, transparent 62%)," +
-          "linear-gradient(180deg, rgba(20,28,40,.18) 0%, rgba(234,243,251,.06) 30%, rgba(234,243,251,.62) 62%, #EAF3FB 80%, #E4EEF8 100%)",
+          "radial-gradient(42% 34% at 86% 12%, rgba(255,210,120,.2) 0%, transparent 62%)," +
+          "linear-gradient(100deg, rgba(10,16,28,.55) 0%, rgba(10,16,28,.22) 36%, rgba(10,16,28,.04) 52%, transparent 64%)," +
+          "linear-gradient(180deg, rgba(16,22,34,.12) 0%, transparent 28%, rgba(234,243,251,.18) 52%, rgba(234,243,251,.78) 72%, #EAF3FB 86%, #E4EEF8 100%)",
       }}
     />
     <div
       style={{
         position: "absolute",
-        top: -24,
-        right: -12,
-        width: 240,
-        height: 240,
+        top: -20,
+        right: -8,
+        width: 220,
+        height: 220,
         borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,220,140,.38), transparent 68%)",
+        background: "radial-gradient(circle, rgba(255,220,140,.32), transparent 70%)",
         filter: "blur(10px)",
         animation: "cine2-drift 14s ease-in-out infinite",
       }}
@@ -232,33 +227,6 @@ const Shine = () => (
       borderRadius: "inherit",
     }}
   />
-);
-
-const Gloss = ({
-  colors,
-  children,
-  size = 38,
-}: {
-  colors: [string, string, string];
-  children: ReactNode;
-  size?: number;
-}) => (
-  <div
-    style={{
-      width: size,
-      height: size,
-      borderRadius: 13,
-      flex: "none",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: `radial-gradient(130% 130% at 30% 22%, #fff 0%, ${colors[0]} 16%, ${colors[1]} 55%, ${colors[2]} 100%)`,
-      boxShadow:
-        "0 6px 14px rgba(40,60,100,.28), inset 0 2px 3px rgba(255,255,255,.72), inset 0 -5px 10px rgba(0,0,0,.18)",
-    }}
-  >
-    {children}
-  </div>
 );
 
 const idadeLabel = (m: Movie) =>
@@ -657,62 +625,10 @@ const DetailSheet = ({
   );
 };
 
-type ChipId = "emocionar" | "aventura" | "acalmar" | "viagem";
-
-const CHIPS: {
-  id: ChipId;
-  title: string;
-  sub: string;
-  Icon: typeof Heart;
-  tint: [number, number, number];
-  g: [string, string, string];
-}[] = [
-  {
-    id: "emocionar",
-    title: "Para emocionar",
-    sub: "Toca o coração",
-    Icon: Heart,
-    tint: [140, 200, 140],
-    g: ["#C0EDA0", "#6FBE4F", "#3F8A32"],
-  },
-  {
-    id: "aventura",
-    title: "Aventura",
-    sub: "Sonhar e explorar",
-    Icon: Rocket,
-    tint: [160, 140, 220],
-    g: ["#D8C2FF", "#9A6CF0", "#6A3EC0"],
-  },
-  {
-    id: "acalmar",
-    title: "Para acalmar",
-    sub: "Relaxar juntos",
-    Icon: Moon,
-    tint: [120, 160, 220],
-    g: ["#A8D4FF", "#4E9BE8", "#2568B8"],
-  },
-  {
-    id: "viagem",
-    title: "Modo Viagem",
-    sub: "Qualquer lugar",
-    Icon: Briefcase,
-    tint: [100, 180, 200],
-    g: ["#A8E8F0", "#3DBFCE", "#1B7A88"],
-  },
-];
-
-const CHIP_SECTION: Record<ChipId, string> = {
-  emocionar: "vinculo",
-  aventura: "imaginacao",
-  acalmar: "calmar",
-  viagem: "divertidos",
-};
-
 const FamilyCinema = ({ onBack }: Props) => {
   const { profile } = useAuth();
   const { addMemory } = useMemories();
   const [active, setActive] = useState<Movie | null>(null);
-  const [chip, setChip] = useState<ChipId>("emocionar");
   const [toast, setToast] = useState("");
   const toastT = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -723,13 +639,6 @@ const FamilyCinema = ({ onBack }: Props) => {
   const pontos = profile?.points ?? 0;
   const h = new Date().getHours();
   const saudacao = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
-
-  const sectionMovies = useMemo(() => {
-    const sec = EDITORIAL_SECTIONS.find((s) => s.id === CHIP_SECTION[chip]);
-    return sec ? getMoviesBySection(sec).slice(0, 10) : [];
-  }, [chip]);
-
-  const sectionTitle = CHIPS.find((c) => c.id === chip)?.title ?? "Curadoria";
 
   const open = useCallback(
     (m: Movie) => {
@@ -894,17 +803,17 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Hero: só texto — Gui fica no fundo (CinemaBackdrop), sem overlay */}
+        {/* Hero: texto à esquerda; Gui do fundo ocupa o espaço à direita */}
         <div
           style={{
             position: "relative",
             zIndex: 3,
-            padding: `4px ${PAD}px 4px`,
-            minHeight: 248,
+            padding: `4px ${PAD}px 28px`,
+            minHeight: 280,
             animation: "cine2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
           }}
         >
-          <div style={{ maxWidth: "58%", minWidth: 0, paddingTop: 6 }}>
+          <div style={{ maxWidth: "52%", minWidth: 0, paddingTop: 6 }}>
             <div
               style={{
                 fontSize: 12.5,
@@ -941,7 +850,7 @@ const FamilyCinema = ({ onBack }: Props) => {
                 fontWeight: 700,
                 lineHeight: 1.45,
                 color: "rgba(255,248,230,.88)",
-                maxWidth: 220,
+                maxWidth: 200,
                 textShadow: "0 1px 10px rgba(0,0,0,.35)",
               }}
             >
@@ -950,121 +859,8 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Sessões — abaixo do hero (não cobrem o Gui); ícones Gloss premium, sem emoji */}
-        <div
-          style={{
-            marginBottom: GAP + 4,
-            marginTop: 8,
-            position: "relative",
-            zIndex: 4,
-            paddingTop: 14,
-            background:
-              "linear-gradient(180deg, transparent 0%, rgba(234,243,251,.55) 18%, rgba(234,243,251,.92) 42%, #EAF3FB 100%)",
-          }}
-        >
-          <div style={{ padding: `0 ${PAD}px 10px` }}>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 900,
-                letterSpacing: "1.1px",
-                textTransform: "uppercase",
-                color: INK2,
-                marginBottom: 4,
-              }}
-            >
-              Sessões
-            </div>
-            <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 18, color: INK }}>
-              Qual o clima de hoje?
-            </div>
-          </div>
-          <div
-            className="cine2-hscroll"
-            style={{
-              display: "flex",
-              gap: 10,
-              overflowX: "auto",
-              padding: `2px ${PAD}px 14px`,
-              scrollbarWidth: "none",
-              animation: "cine2-cascade .55s cubic-bezier(.22,1,.36,1) .1s both",
-            }}
-          >
-            {CHIPS.map((c) => {
-              const Icon = c.Icon;
-              const on = chip === c.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => {
-                    haptic("light");
-                    setChip(c.id);
-                  }}
-                  className="active:scale-95"
-                  style={{
-                    position: "relative",
-                    overflow: "hidden",
-                    flex: "none",
-                    width: 128,
-                    minHeight: 118,
-                    padding: "12px 10px 10px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                    textAlign: "left",
-                    cursor: "pointer",
-                    fontFamily: FONT,
-                    ...coloredGlass(c.tint[0], c.tint[1], c.tint[2], on ? 0.52 : 0.34, on ? 0.2 : 0.12),
-                    outline: on ? `2px solid rgba(${c.tint[0]},${c.tint[1]},${c.tint[2]},.55)` : "none",
-                    outlineOffset: 1,
-                    boxShadow: on
-                      ? "0 12px 28px rgba(40,60,100,.2), 0 1px 0 rgba(255,255,255,.95) inset"
-                      : undefined,
-                    transform: on ? "translateY(-2px)" : undefined,
-                    transition: "transform .2s, box-shadow .2s",
-                  }}
-                >
-                  <Shine />
-                  <Gloss colors={c.g} size={38}>
-                    <Icon size={17} color="#fff" strokeWidth={2.1} />
-                  </Gloss>
-                  <div
-                    style={{
-                      fontFamily: SERIF,
-                      fontWeight: 600,
-                      fontSize: 13.5,
-                      color: INK,
-                      lineHeight: 1.15,
-                    }}
-                  >
-                    {c.title}
-                  </div>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: INK2, lineHeight: 1.25 }}>
-                    {c.sub}
-                  </div>
-                  <div style={{ marginTop: "auto", alignSelf: "flex-end" }}>
-                    <div
-                      style={{
-                        width: 26,
-                        height: 26,
-                        borderRadius: 999,
-                        ...pillGlass,
-                        display: "grid",
-                        placeItems: "center",
-                      }}
-                    >
-                      <ArrowRight size={12} color={INK} strokeWidth={2.4} />
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Filme da semana - card featured */}
-        <div style={sectionWrap}>
+        <div style={{ ...sectionWrap, position: "relative", zIndex: 4 }}>
           <button
             type="button"
             onClick={() => open(weekly)}
@@ -1189,63 +985,41 @@ const FamilyCinema = ({ onBack }: Props) => {
           </button>
         </div>
 
-        {/* Carrossel da categoria ativa */}
-        <div style={{ marginBottom: GAP }}>
-          <div style={{ padding: `0 ${PAD}px` }}>
-            <SectionLabel
-              right={
-                <span style={{ fontSize: 11, fontWeight: 800, color: INK2 }}>
-                  {sectionMovies.length} filmes
-                </span>
-              }
-            >
-              {sectionTitle}
-            </SectionLabel>
-          </div>
-          <div
-            className="cine2-hscroll"
-            style={{
-              display: "flex",
-              gap: 12,
-              overflowX: "auto",
-              padding: `2px ${PAD}px 8px`,
-              scrollbarWidth: "none",
-              animation: "cine2-cascade .5s cubic-bezier(.22,1,.36,1) .18s both",
-            }}
-          >
-            {sectionMovies.map((m) => (
-              <MovieCard key={m.id} m={m} onOpen={open} />
-            ))}
-          </div>
-        </div>
-
-        {/* Demais seções editoriais (exceto a do chip ativo, já listada acima) */}
-        {EDITORIAL_SECTIONS.filter((sec) => sec.id !== CHIP_SECTION[chip]).map((sec, i) => {
-            const movies = getMoviesBySection(sec).slice(0, 8);
-            if (!movies.length) return null;
-            return (
-              <div key={sec.id} style={{ marginBottom: GAP }}>
-                <div style={{ padding: `0 ${PAD}px` }}>
-                  <SectionLabel>{sec.title}</SectionLabel>
-                </div>
-                <div
-                  className="cine2-hscroll"
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    overflowX: "auto",
-                    padding: `0 ${PAD}px 6px`,
-                    scrollbarWidth: "none",
-                    animation: `cine2-cascade .5s cubic-bezier(.22,1,.36,1) ${0.2 + i * 0.05}s both`,
-                  }}
+        {/* Seções editoriais */}
+        {EDITORIAL_SECTIONS.map((sec, i) => {
+          const movies = getMoviesBySection(sec).slice(0, 8);
+          if (!movies.length) return null;
+          return (
+            <div key={sec.id} style={{ marginBottom: GAP, position: "relative", zIndex: 4 }}>
+              <div style={{ padding: `0 ${PAD}px` }}>
+                <SectionLabel
+                  right={
+                    <span style={{ fontSize: 11, fontWeight: 800, color: INK2 }}>
+                      {movies.length} filmes
+                    </span>
+                  }
                 >
-                  {movies.map((m) => (
-                    <MovieCard key={m.id} m={m} onOpen={open} />
-                  ))}
-                </div>
+                  {sec.title}
+                </SectionLabel>
               </div>
-            );
-          })}
+              <div
+                className="cine2-hscroll"
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  overflowX: "auto",
+                  padding: `0 ${PAD}px 6px`,
+                  scrollbarWidth: "none",
+                  animation: `cine2-cascade .5s cubic-bezier(.22,1,.36,1) ${0.18 + i * 0.05}s both`,
+                }}
+              >
+                {movies.map((m) => (
+                  <MovieCard key={m.id} m={m} onOpen={open} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
 
       </div>
 
