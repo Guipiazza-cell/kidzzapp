@@ -24,7 +24,8 @@ import {
 import PreSleep from "./PreSleep";
 import { haptic } from "@/lib/haptics";
 import PremiumSeal from "@/components/common/PremiumSeal";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import { CAMALEAO } from "@/lib/camaleaoOficial";
+import heroSonhos from "@/assets/sonhos-hero.webp";
 
 /* Spring premium reusável para microinterações */
 const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
@@ -35,16 +36,16 @@ const DREAM_BG =
   "linear-gradient(180deg,#2B1A4A 0%,#1E1238 36%,#160C2A 68%,#1A0E28 100%)";
 
 const ASSETS = {
-  /** Camaleão original sleepy (sem retângulo) */
-  hero: CAMALEAO.sleepySoft,
-  heroFallback: CAMALEAO.sleepy,
+  /** Hero full-bleed: Gui sleepy + noite (object-fit cover, como outras abas) */
+  hero: heroSonhos,
+  heroPublic: "/exemplos/assets/sonhos-v2/hero-oficial.jpg",
+  heroFallback: CAMALEAO.sleepySoft,
   featHeart: "/exemplos/assets/sonhos-v2/feat-heart.png",
   featStar: "/exemplos/assets/sonhos-v2/feat-star.png",
   featMoon: "/exemplos/assets/sonhos-v2/feat-moon.png",
   featPhoto: "/exemplos/assets/sonhos-v2/feat-photo.png",
   kids: "/exemplos/assets/sonhos-v2/kids-gratitude.png",
 } as const;
-const HERO_IMG = ASSETS.hero;
 
 /* Liquid glass roxo (nível Bora, paleta noite) */
 const glassCard: CSSProperties = {
@@ -532,47 +533,47 @@ const DreamWorld = ({ onBack }: Props) => {
       <DreamBackdrop sleepy={sleepyMode} />
 
       <div className="relative z-10">
-        {/* ── HERO ── */}
-        <div style={{ position: "relative" }}>
-          {/* fundo desfocado da mesma cena */}
+        {/* ── HERO full-bleed (mesmo padrão Descobrir/Perguntas: cover, sem máscara) ── */}
+        <div style={{ position: "relative", margin: "0 14px 0", paddingTop: "calc(env(safe-area-inset-top, 0px) + 58px)" }}>
           <div
             style={{
-              position: "absolute", top: 0, left: 0, width: "100%", height: 414,
-              backgroundImage: `url('${HERO_IMG}')`, backgroundSize: "cover", backgroundPosition: "center",
-              filter: "blur(46px) saturate(1.45)", opacity: 0.5, transform: "scale(1.22)", pointerEvents: "none",
-            }}
-          />
-          <div
-            style={{
-              position: "relative", width: "100%", height: 414, willChange: "transform",
-              ...CAMALEAO_SCENE_MASK,
+              position: "relative",
+              width: "100%",
+              minHeight: 280,
+              height: 300,
+              borderRadius: 28,
+              overflow: "hidden",
+              boxShadow: "0 16px 36px rgba(20,8,40,.42)",
               animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both",
             }}
           >
             <img
-              src={HERO_IMG}
+              src={ASSETS.hero}
               alt="Gui, o camaleão, pronto para dormir"
+              draggable={false}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = ASSETS.heroFallback;
+                const el = e.target as HTMLImageElement;
+                if (!el.src.includes("hero-oficial")) el.src = ASSETS.heroPublic;
+                else el.src = ASSETS.heroFallback;
               }}
               style={{
-                position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-                objectFit: "contain", objectPosition: "center 28%",
-                animation: "sonh-floaty 7s ease-in-out infinite",
-                filter: "drop-shadow(0 18px 24px rgba(20,10,40,.35))",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute", top: 30, right: 40, width: 110, height: 110, borderRadius: "50%",
-                background: "radial-gradient(circle,rgba(255,178,90,.55) 0%,rgba(240,129,46,.3) 55%,rgba(230,110,50,0) 72%)",
-                filter: "blur(3px)", animation: "sonh-sunglow 6s ease-in-out infinite", mixBlendMode: "screen",
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "50% 28%",
               }}
             />
+            {/* Fade inferior para fundir com o fundo roxo da aba */}
             <div
+              aria-hidden
               style={{
-                position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-                background: "linear-gradient(180deg,rgba(46,28,76,.18) 0%,rgba(46,28,76,0) 34%,rgba(46,28,76,.5) 78%,rgba(36,22,64,.94) 100%)",
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(180deg,rgba(30,16,55,.12) 0%,rgba(30,16,55,0) 40%,rgba(30,16,55,.45) 78%,rgba(22,12,42,.92) 100%)",
+                pointerEvents: "none",
               }}
             />
           </div>
@@ -588,7 +589,7 @@ const DreamWorld = ({ onBack }: Props) => {
               display: "flex",
               alignItems: "center",
               gap: 8,
-              padding: "calc(env(safe-area-inset-top, 0px) + 10px) 14px 0",
+              padding: "calc(env(safe-area-inset-top, 0px) + 10px) 0 0",
             }}
           >
             <button
