@@ -687,17 +687,6 @@ const KidzzPlay = ({
           </div>
         </div>
 
-        {/* ── IDEIAS RÁPIDAS + Modo Viagem ── */}
-        <div style={{ display: "flex", gap: 10, padding: "16px 16px 8px", alignItems: "stretch" }}>
-          <button type="button" onClick={() => setSub("criar")} className="active:scale-[.97]" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "13px 16px", borderRadius: 999, cursor: "pointer", background: "linear-gradient(155deg,rgba(255,255,255,.9),rgba(255,255,255,.55))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 10px 24px rgba(60,100,50,.16),inset 0 1.5px 0 rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", transition: "transform .2s", textAlign: "left" }}>
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: "#17301F" }}>Ideias rápidas <span style={{ fontWeight: 700, color: "#557A5E" }}>para qualquer lugar</span></span>
-            <Icon d={D.arrow} stroke="#2E9A63" size={15} sw={2.4} />
-          </button>
-          <button type="button" onClick={() => onOpenTravel?.()} className="active:scale-[.97]" style={{ flex: "none", display: "flex", alignItems: "center", gap: 7, padding: "13px 17px", borderRadius: 999, cursor: "pointer", background: "radial-gradient(130% 130% at 30% 22%,#FFE9A8 0%,#F2A62B 55%,#C77E12 100%)", border: "1px solid rgba(255,255,255,.8)", boxShadow: "0 10px 24px rgba(180,110,10,.35),inset 0 1.5px 1px rgba(255,255,255,.75),inset 0 -5px 10px rgba(140,80,0,.35)", fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 900, color: "#4A3300", transition: "transform .2s" }}>
-            <Icon d={D.plane} stroke="#4A3300" size={15} sw={1.8} />
-            Modo Viagem
-          </button>
-        </div>
       </div>
     </motion.div>
   );
