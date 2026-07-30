@@ -127,12 +127,16 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
         clearInterval(timer);
         return;
       }
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      };
+      const anon = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+      if (anon) headers.apikey = anon;
+
       const resp = await fetch(GENERATE_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers,
         body: JSON.stringify({
           childName,
           childAvatar: avatar,
@@ -142,7 +146,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
           intent: params.intent,
           ensinarSub: params.ensinarSub,
           ageRange: profile?.age_range || "3-7",
-        })
+        }),
       });
 
       if (!resp.ok) {
@@ -151,7 +155,19 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
           window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
           throw new Error(err.message || "Você já usou sua história gratuita.");
         }
-        throw new Error(err.error || "A história fugiu, vamos tentar de novo?");
+        if (err.error === "QUOTA_ERROR") {
+          throw new Error(
+            err.message ||
+              "Não foi possível validar seu limite agora. Tente de novo em instantes.",
+          );
+        }
+        // Nunca mostrar código cru (QUOTA_ERROR) pro usuário
+        const raw = String(err.message || err.error || "");
+        const friendly =
+          raw && !/^[A-Z0-9_]+$/.test(raw)
+            ? raw
+            : "A história fugiu, vamos tentar de novo?";
+        throw new Error(friendly);
       }
 
       const data = await resp.json();

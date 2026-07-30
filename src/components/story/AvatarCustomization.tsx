@@ -2,7 +2,7 @@
  * AvatarCustomization - passo 1 da Fábrica de Histórias.
  * Visual cream/gold premium (mesmo mundo da StoryFactory).
  */
-import { useMemo, useState, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import { ChildAvatar } from "@/types/story";
@@ -134,18 +134,42 @@ const AvatarCustomization = ({ childName, onComplete }: AvatarCustomizationProps
   const [eyeColor, setEyeColor] = useState(eyeColors[0].id);
   const [clothingStyle, setClothingStyle] = useState(clothingStyles[0].id);
 
-  const skin = useMemo(() => skinTones.find((s) => s.id === skinTone)!, [skinTone]);
-  const hair = useMemo(() => hairColors.find((h) => h.id === hairColor)!, [hairColor]);
-  const eyes = useMemo(() => eyeColors.find((e) => e.id === eyeColor)!, [eyeColor]);
-  const clothes = useMemo(() => clothingStyles.find((c) => c.id === clothingStyle)!, [clothingStyle]);
-
   const handleSubmit = () => {
     haptic("medium");
+    // Valores compatíveis com o allowlist do generate-story (PT + id)
+    const skinMap: Record<string, string> = {
+      clara: "claro",
+      "media-clara": "claro",
+      media: "moreno",
+      "media-escura": "pardo",
+      escura: "negro",
+    };
+    const hairMap: Record<string, string> = {
+      "loiro-claro": "loiro",
+      loiro: "loiro",
+      "castanho-claro": "castanho",
+      castanho: "castanho",
+      preto: "preto",
+      ruivo: "ruivo",
+    };
+    const eyeMap: Record<string, string> = {
+      castanho: "castanho",
+      azul: "azul",
+      verde: "verde",
+      mel: "mel",
+    };
+    const clothMap: Record<string, string> = {
+      casual: "casual",
+      esportivo: "esportivo",
+      princesa: "princesa",
+      "super-heroi": "fantasia",
+      aventureiro: "aventura",
+    };
     onComplete({
-      skinTone: skin.label,
-      hairColor: hair.label,
-      eyeColor: eyes.label,
-      clothingStyle: clothes.desc,
+      skinTone: skinMap[skinTone] || "moreno",
+      hairColor: hairMap[hairColor] || "castanho",
+      eyeColor: eyeMap[eyeColor] || "castanho",
+      clothingStyle: clothMap[clothingStyle] || "casual",
     });
   };
 
@@ -184,103 +208,7 @@ const AvatarCustomization = ({ childName, onComplete }: AvatarCustomizationProps
           Como é o {childName}?
         </h2>
         <p style={{ margin: "8px 0 0", fontSize: 13, fontWeight: 700, color: "#8A6E42", lineHeight: 1.4 }}>
-          Escolha as cores - a história ganha o rostinho dele.
-        </p>
-      </div>
-
-      {/* Preview do avatar (abstrato premium) */}
-      <div
-        style={{
-          ...sectionCard,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 14,
-          padding: "20px 16px 16px",
-        }}
-      >
-        <div
-          aria-hidden
-          style={{
-            width: 108,
-            height: 108,
-            borderRadius: 999,
-            position: "relative",
-            background: `radial-gradient(circle at 35% 30%, #fff 0%, ${skin.color} 42%, ${skin.color} 100%)`,
-            boxShadow: `0 12px 28px ${skin.color}55, inset 0 2px 4px rgba(255,255,255,.45)`,
-            border: "3px solid rgba(255,255,255,.9)",
-          }}
-        >
-          {/* cabelo (topo) */}
-          <div
-            style={{
-              position: "absolute",
-              top: -4,
-              left: "12%",
-              right: "12%",
-              height: 36,
-              borderRadius: "40px 40px 18px 18px",
-              background: `linear-gradient(180deg, ${hair.color} 0%, ${hair.color}cc 100%)`,
-              boxShadow: "0 4px 10px rgba(0,0,0,.15)",
-            }}
-          />
-          {/* olhos */}
-          <div
-            style={{
-              position: "absolute",
-              top: 48,
-              left: 0,
-              right: 0,
-              display: "flex",
-              justifyContent: "center",
-              gap: 18,
-            }}
-          >
-            {[0, 1].map((i) => (
-              <div
-                key={i}
-                style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: 999,
-                  background: `radial-gradient(circle at 35% 30%, #fff 0%, ${eyes.color} 55%, ${eyes.color} 100%)`,
-                  boxShadow: "inset 0 1px 2px rgba(0,0,0,.2)",
-                  border: "1.5px solid rgba(255,255,255,.5)",
-                }}
-              />
-            ))}
-          </div>
-          {/* sorriso */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: 28,
-              left: "50%",
-              width: 22,
-              height: 10,
-              marginLeft: -11,
-              borderRadius: "0 0 14px 14px",
-              border: "2px solid rgba(80,40,20,.28)",
-              borderTop: "none",
-            }}
-          />
-          {/* roupa (base) */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: -6,
-              left: "18%",
-              right: "18%",
-              height: 22,
-              borderRadius: "0 0 40px 40px",
-              background: `linear-gradient(180deg, ${clothes.tint} 0%, ${clothes.tint}cc 100%)`,
-              boxShadow: "0 4px 10px rgba(0,0,0,.12)",
-            }}
-          />
-        </div>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: "#6B5535" }}>
-          {childName}
+          Escolha as cores — a história usa isso no personagem (sem desenho de preview).
         </p>
       </div>
 

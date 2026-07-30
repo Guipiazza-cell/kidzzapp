@@ -7,7 +7,7 @@
  * Reusa o gerador existente: emite onGenerate(age, interests, keywords, intent, voiceRate).
  * Não recria paywall - só leva ao upgrade quando bloqueado.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Loader2, X, Plus, Crown, Lock, Moon, Heart, Shield, Smile } from "lucide-react";
 import { haptic } from "@/lib/haptics";
@@ -33,12 +33,20 @@ interface Props {
   onUpgrade?: () => void;
 }
 
-const INTENTS: { key: StoryIntent; emoji: string; icon: any; title: string; desc: string; tint: string; ring: string }[] = [
-  { key: "acalmar", emoji: "🌙", icon: Moon, title: "Acalmar antes de dormir", desc: "Ritmo lento, final tranquilo", tint: "#7C6AC7", ring: "rgba(124,106,199,0.16)" },
-  { key: "ensinar", emoji: "💛", icon: Heart, title: "Ensinar algo", desc: "Um valor sem sermão", tint: "#E8821A", ring: "rgba(232,130,26,0.14)" },
-  { key: "coragem", emoji: "🦁", icon: Shield, title: "Dar coragem", desc: "Vencer um medo gentilmente", tint: "#2F7D5B", ring: "rgba(47,125,91,0.16)" },
-  { key: "divertir", emoji: "😄", icon: Smile, title: "Divertir e imaginar", desc: "Aventura leve, humor bobo", tint: "#F59E0B", ring: "rgba(245,158,11,0.18)" },
+const INTENTS: { key: StoryIntent; icon: any; title: string; desc: string; tint: string; soft: string }[] = [
+  { key: "acalmar", icon: Moon, title: "Acalmar antes de dormir", desc: "Ritmo lento, final tranquilo", tint: "#7C6AC7", soft: "rgba(124,106,199,0.14)" },
+  { key: "ensinar", icon: Heart, title: "Ensinar algo", desc: "Um valor sem sermão", tint: "#E8821A", soft: "rgba(232,130,26,0.12)" },
+  { key: "coragem", icon: Shield, title: "Dar coragem", desc: "Vencer um medo gentilmente", tint: "#2F7D5B", soft: "rgba(47,125,91,0.12)" },
+  { key: "divertir", icon: Smile, title: "Divertir e imaginar", desc: "Aventura leve, humor bobo", tint: "#D97706", soft: "rgba(245,158,11,0.12)" },
 ];
+
+const glassCard: CSSProperties = {
+  background: "linear-gradient(160deg, rgba(255,255,255,0.72) 0%, rgba(255,252,245,0.55) 100%)",
+  border: "0.5px solid rgba(255,255,255,0.88)",
+  boxShadow: "0 10px 28px rgba(80,50,20,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
+  backdropFilter: "blur(18px) saturate(160%)",
+  WebkitBackdropFilter: "blur(18px) saturate(160%)",
+};
 
 const ENSINAR_OPTIONS: { key: EnsinarSub; label: string }[] = [
   { key: "dividir", label: "dividir" },
@@ -148,7 +156,7 @@ const PersonalizationPanel = ({
       </div>
 
       {/* Idade - compacto */}
-      <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
+      <div className="rounded-2xl p-4" style={glassCard}>
         <label className="text-[12px] font-extrabold tracking-wider uppercase" style={{ color: "rgba(42,37,32,0.55)" }}>
           Idade do(a) {childName}
         </label>
@@ -171,7 +179,7 @@ const PersonalizationPanel = ({
       </div>
 
       {/* CAMADA 1 - palavras-chave */}
-      <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
+      <div className="rounded-2xl p-4" style={glassCard}>
         <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           O que faz os olhos do(a) {childName} brilharem?
         </h3>
@@ -244,7 +252,7 @@ const PersonalizationPanel = ({
       </div>
 
       {/* CAMADA 2 - intenção */}
-      <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
+      <div className="rounded-2xl p-4" style={glassCard}>
         <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Qual o presente de hoje?
         </h3>
@@ -258,17 +266,23 @@ const PersonalizationPanel = ({
                 onClick={() => { setIntent(it.key); haptic("light"); }}
                 className="text-left rounded-2xl p-3 transition-all"
                 style={{
-                  background: active ? it.ring : "#FAF6EC",
-                  border: active ? `1.5px solid ${it.tint}` : "1px solid rgba(42,37,32,0.06)",
+                  background: active
+                    ? `linear-gradient(160deg, ${it.soft}, rgba(255,255,255,0.55))`
+                    : "rgba(255,255,255,0.42)",
+                  border: active ? `1.5px solid ${it.tint}` : "0.5px solid rgba(255,255,255,0.75)",
                   minHeight: 92,
+                  boxShadow: active ? `0 8px 18px ${it.soft}` : "inset 0 1px 0 rgba(255,255,255,0.7)",
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-full flex items-center justify-center text-[16px]" style={{ background: "#fff", color: it.tint }}>
-                    {it.emoji}
-                  </span>
-                  <Icon size={14} style={{ color: it.tint }} />
-                </div>
+                <span
+                  className="w-9 h-9 rounded-[12px] flex items-center justify-center"
+                  style={{
+                    background: `radial-gradient(130% 130% at 30% 22%, #fff 0%, ${it.soft} 40%, ${it.tint} 100%)`,
+                    boxShadow: `0 4px 10px ${it.soft}`,
+                  }}
+                >
+                  <Icon size={17} color="#fff" strokeWidth={2.2} />
+                </span>
                 <p className="mt-2 text-[12.5px] font-extrabold leading-tight" style={{ color: "#2A2520" }}>{it.title}</p>
                 <p className="text-[10.5px] mt-0.5 leading-snug" style={{ color: "rgba(42,37,32,0.6)" }}>{it.desc}</p>
               </button>
@@ -306,7 +320,7 @@ const PersonalizationPanel = ({
       </div>
 
       {/* CAMADA 3 - voz */}
-      <div className="rounded-2xl p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(42,37,32,0.06)", boxShadow: "0 6px 18px -12px rgba(42,37,32,0.18)" }}>
+      <div className="rounded-2xl p-4" style={glassCard}>
         <h3 className="font-display text-[17px] font-semibold leading-tight" style={{ color: "#1F3A2A", fontFamily: "'Nunito', system-ui, sans-serif" }}>
           Voz da narração
         </h3>
@@ -325,8 +339,9 @@ const PersonalizationPanel = ({
                 onClick={() => { setVoiceRate(v.key); haptic("light"); }}
                 className="text-left rounded-2xl p-3"
                 style={{
-                  background: active ? "rgba(124,106,199,0.14)" : "#FAF6EC",
-                  border: active ? "1.5px solid #7C6AC7" : "1px solid rgba(42,37,32,0.06)",
+                  background: active ? "rgba(124,106,199,0.16)" : "rgba(255,255,255,0.42)",
+                  border: active ? "1.5px solid #7C6AC7" : "0.5px solid rgba(255,255,255,0.75)",
+                  boxShadow: active ? "0 6px 14px rgba(124,106,199,0.15)" : "inset 0 1px 0 rgba(255,255,255,0.7)",
                 }}
               >
                 <p className="text-[13px] font-extrabold" style={{ color: "#2A2520" }}>{v.label}</p>

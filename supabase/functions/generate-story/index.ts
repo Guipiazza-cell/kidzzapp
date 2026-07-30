@@ -136,27 +136,23 @@ serve(async (req) => {
       }
 
       if (lastErr) {
-        console.error("[GENERATE-STORY] increment_usage error:", lastErr);
-        return new Response(JSON.stringify({
-          error: "QUOTA_ERROR",
-          message: "Não foi possível validar seu limite agora. Tente de novo em instantes.",
-          detail: lastErr,
-        }), {
-          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const row = Array.isArray(quotaData) ? quotaData[0] : quotaData;
-      if (!row?.allowed) {
-        const plan = row?.plan ?? "free";
-        return new Response(JSON.stringify({
-          error: "LIMIT_REACHED",
-          plan,
-          message: plan === "free"
-            ? "Você já usou sua história gratuita de hoje. Assine para criar mais."
-            : "Kidzz está sonolento. Volte amanhã!",
-        }), {
-          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        // RPC de cota falhou por erro técnico (não é falta de crédito de IA).
+        // Não bloqueia a geração: loga e segue (evita tela “QUOTA_ERROR” por migração/schema).
+        console.error("[GENERATE-STORY] increment_usage soft-fail:", lastErr);
+      } else {
+        const row = Array.isArray(quotaData) ? quotaData[0] : quotaData;
+        if (row && row.allowed === false) {
+          const plan = row?.plan ?? "free";
+          return new Response(JSON.stringify({
+            error: "LIMIT_REACHED",
+            plan,
+            message: plan === "free"
+              ? "Você já usou sua história gratuita de hoje. Assine para criar mais."
+              : "Kidzz está sonolento. Volte amanhã!",
+          }), {
+            status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
       }
     }
 
