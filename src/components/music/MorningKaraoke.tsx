@@ -7,6 +7,9 @@ import { useMemories } from "@/hooks/useMemories";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
 import { FONT, SERIF, R, PAD } from "@/lib/premiumUi";
 
+/** Gui novo do karaokê matinal (arte premium 3D) */
+const MORNING_GUI = "/exemplos/assets/musica-v2/morning-gui.png";
+
 interface Props {
   onBack: () => void;
   childName: string;
@@ -61,7 +64,7 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
     addMemory({
       type: "achievement",
       title: `Cantou: ${song.title}`,
-      content: `${childName} concluiu o karaokê Bom Dia com Pixel`,
+      content: `${childName} concluiu o karaokê matinal com o Gui`,
       is_special: false,
       image_url: null,
       metadata: { kind: "karaoke", song_id: song.id, song_title: song.title },
@@ -113,31 +116,7 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
         >
           <ArrowLeft size={20} color="#fff" />
         </button>
-        <div className="flex-1 min-w-0">
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: SERIF,
-              fontWeight: 600,
-              fontSize: 18,
-              color: "#FFFDF6",
-              letterSpacing: "-0.02em",
-              lineHeight: 1.2,
-            }}
-          >
-            Bom Dia com Pixel
-          </h1>
-          <p
-            style={{
-              margin: "2px 0 0",
-              fontSize: 12,
-              fontWeight: 700,
-              color: "rgba(255,248,230,.65)",
-            }}
-          >
-            A música de hoje, {childName}!
-          </p>
-        </div>
+        <div className="flex-1 min-w-0" aria-hidden />
       </div>
 
       <div
@@ -178,8 +157,8 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
             }}
           />
           <img
-            src={CAMALEAO.headphonesSoft}
-            alt="Pixel com fones de ouvido"
+            src={MORNING_GUI}
+            alt="Gui com fones de ouvido"
             style={{
               position: "relative",
               width: "100%",
@@ -189,7 +168,11 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
               filter: "drop-shadow(0 16px 28px rgba(0,0,0,.35))",
             }}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = CAMALEAO.headphones;
+              const el = e.target as HTMLImageElement;
+              el.src = CAMALEAO.headphonesSoft;
+              el.onerror = () => {
+                el.src = CAMALEAO.headphones;
+              };
             }}
           />
         </button>
