@@ -74,6 +74,7 @@ const D = {
   back: "M19 12H5m6-6-6 6 6 6",
   lock: "M7 10V8a5 5 0 0 1 10 0v2m-11 0h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z",
   play: "M7 4.8v14.4c0 .8.9 1.3 1.6.9l11-7.2c.6-.4.6-1.4 0-1.8l-11-7.2c-.7-.4-1.6.1-1.6.9Z",
+  stop: "M7 7h10v10H7z",
   heart: "M12 20.3l-7.1-6.9a4.6 4.6 0 0 1 6.4-6.5l.7.7.7-.7a4.6 4.6 0 0 1 6.4 6.5Z",
   shield: "M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z",
   cap: "M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5",
@@ -124,11 +125,11 @@ const CATEGORIES: Category[] = [
 ];
 
 /* Sons ambiente - descrição humana (nunca expor id interno de slot) */
-const AMBIENT_SOUNDS: { id: string; label: string; desc: string; url?: string; free: boolean }[] = [
-  { id: "forest", label: "Floresta calma", desc: "Sons da natureza", url: "/audio/forest-calm.mp3", free: true },
-  { id: "rain", label: "Chuva no telhado", desc: "Para relaxar juntos", url: "/audio/rain-soft.mp3", free: true },
-  { id: "ocean", label: "Ondas do mar", desc: "Para acalmar", url: "/audio/ocean-waves.mp3", free: false },
-  { id: "piano", label: "Piano do soninho", desc: "Para dormir", free: false },
+const AMBIENT_SOUNDS: { id: string; label: string; desc: string; url?: string; free: boolean; icon: string }[] = [
+  { id: "forest", label: "Floresta calma", desc: "Sons da natureza", url: "/audio/forest-calm.mp3", free: true, icon: `${MU}/ambient-forest.png` },
+  { id: "rain", label: "Chuva no telhado", desc: "Para relaxar juntos", url: "/audio/rain-soft.mp3", free: true, icon: `${MU}/ambient-rain.png` },
+  { id: "ocean", label: "Ondas do mar", desc: "Para acalmar", url: "/audio/ocean-waves.mp3", free: false, icon: `${MU}/ambient-ocean.png` },
+  { id: "piano", label: "Piano do soninho", desc: "Para dormir", free: false, icon: `${MU}/ambient-piano.png` },
 ];
 
 /** Selo PREMIUM padrão (dourado + cadeado) - referência do relatório de design */
@@ -280,6 +281,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingAmbientId, setPlayingAmbientId] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -287,8 +290,19 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   };
 
+  const stopAmbient = () => {
+    const a = ambientAudioRef.current;
+    if (a) {
+      a.pause();
+      a.currentTime = 0;
+      ambientAudioRef.current = null;
+    }
+    setPlayingAmbientId(null);
+  };
+
   useEffect(() => () => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
+    stopAmbient();
   }, []);
 
   const toggleFav = (id: string) => {
@@ -381,6 +395,12 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
   const heroImg = `${MU}/hero-family.png`;
 
   const playAmbient = (s: (typeof AMBIENT_SOUNDS)[number]) => {
+    // Se já está tocando este, para
+    if (playingAmbientId === s.id) {
+      stopAmbient();
+      showToast("Som parado");
+      return;
+    }
     if (!s.free && !isPremium) {
       openPaywall("music_ambient");
       return;
@@ -390,10 +410,14 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
       return;
     }
     try {
+      stopAmbient();
       const a = new Audio(s.url);
       a.loop = true;
       a.volume = 0.45;
+      a.onended = () => setPlayingAmbientId(null);
+      ambientAudioRef.current = a;
       void a.play();
+      setPlayingAmbientId(s.id);
       showToast(`Tocando: ${s.label}`);
     } catch {
       showToast("Não foi possível tocar o som.");
@@ -569,9 +593,11 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {AMBIENT_SOUNDS.map((s) => {
               const locked = !s.free && !isPremium;
+              const isPlaying = playingAmbientId === s.id;
               return (
                 <button
                   key={s.id}
+                  type="button"
                   onClick={() => playAmbient(s)}
                   className="active:scale-[0.99]"
                   style={{
@@ -579,24 +605,39 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                     textAlign: "left", cursor: "pointer",
                     ...glassLightSoft,
                     borderRadius: 22,
-                    background: "linear-gradient(165deg, rgba(255,255,255,.94), rgba(250,246,236,.88))",
+                    background: isPlaying
+                      ? "linear-gradient(165deg, rgba(255,248,230,.98), rgba(255,236,190,.9))"
+                      : "linear-gradient(165deg, rgba(255,255,255,.94), rgba(250,246,236,.88))",
+                    border: isPlaying ? "0.5px solid rgba(232,180,60,.55)" : "0.5px solid rgba(255,255,255,.98)",
+                    boxShadow: isPlaying
+                      ? "0 8px 22px rgba(180,120,20,.18), 0 1px 0 rgba(255,255,255,1) inset"
+                      : undefined,
                   }}
                 >
                   <div
                     style={{
-                      width: 44, height: 44, borderRadius: 16, flex: "none",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "radial-gradient(130% 130% at 30% 22%, #FFF8E8, #E8D8B0 55%, #C8B080)",
-                      boxShadow: "0 4px 12px rgba(40,30,15,.12), 0 1px 0 rgba(255,255,255,1) inset",
+                      width: 48, height: 48, borderRadius: 16, flex: "none",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 12px rgba(40,30,15,.14), 0 1px 0 rgba(255,255,255,1) inset",
+                      border: "0.5px solid rgba(255,255,255,.9)",
                     }}
                   >
-                    <Icon d={D.note} stroke="#6A5430" size={18} sw={1.9} />
+                    <img
+                      src={s.icon}
+                      alt=""
+                      width={48}
+                      height={48}
+                      draggable={false}
+                      style={{ width: 48, height: 48, objectFit: "cover", display: "block" }}
+                    />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: "#2A2008" }}>{s.label}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#8A7850" }}>{s.desc}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#8A7850" }}>
+                      {isPlaying ? "Tocando agora · toque para parar" : s.desc}
+                    </div>
                   </div>
-                  {locked && (
+                  {locked && !isPlaying && (
                     <span style={premiumSeal}>
                       <Icon d={D.lock} stroke="#4A3300" size={9} sw={2.2} />
                       PREMIUM
@@ -606,12 +647,21 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                     style={{
                       width: 40, height: 40, borderRadius: 999, flex: "none",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F2C55C 55%, #C98F1E)",
+                      background: isPlaying
+                        ? "radial-gradient(130% 130% at 30% 22%, #FFD0D0, #E85A5A 55%, #B83030)"
+                        : "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F2C55C 55%, #C98F1E)",
                       border: "1px solid rgba(255,255,255,.7)",
-                      boxShadow: "0 6px 14px rgba(150,100,20,.35), inset 0 1px 0 rgba(255,255,255,.6)",
+                      boxShadow: isPlaying
+                        ? "0 6px 14px rgba(180,40,40,.35), inset 0 1px 0 rgba(255,255,255,.6)"
+                        : "0 6px 14px rgba(150,100,20,.35), inset 0 1px 0 rgba(255,255,255,.6)",
                     }}
+                    aria-label={isPlaying ? "Parar som" : "Tocar som"}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#3A2E14" style={{ marginLeft: 1 }}><path d={D.play} /></svg>
+                    {isPlaying ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d={D.stop} /></svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#3A2E14" style={{ marginLeft: 1 }}><path d={D.play} /></svg>
+                    )}
                   </div>
                 </button>
               );
