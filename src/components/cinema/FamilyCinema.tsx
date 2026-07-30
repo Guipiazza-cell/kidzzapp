@@ -47,7 +47,7 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v7";
+const AV = "v8";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 /** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
@@ -65,9 +65,11 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         width: "100%",
         height: "100%",
         objectFit: "cover",
-        objectPosition: "center 28%",
+        /* Foco no Gui (direita/meio) + sobe o enquadramento p/ preencher o vazio acima da cabeça */
+        objectPosition: "72% 46%",
         filter: "saturate(1.08) brightness(0.94)",
-        transform: "scale(1.06)",
+        transform: "scale(1.22)",
+        transformOrigin: "72% 38%",
       }}
     />
     {/* Vinheta + creme inferior (conteúdo legível, como Música) */}
@@ -76,19 +78,19 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         position: "absolute",
         inset: 0,
         background:
-          "radial-gradient(55% 38% at 78% 12%, rgba(255,210,120,.35) 0%, transparent 62%)," +
-          "linear-gradient(180deg, rgba(20,28,40,.22) 0%, rgba(234,243,251,.12) 26%, rgba(234,243,251,.72) 56%, #EAF3FB 78%, #E4EEF8 100%)",
+          "radial-gradient(55% 42% at 78% 18%, rgba(255,210,120,.32) 0%, transparent 62%)," +
+          "linear-gradient(180deg, rgba(20,28,40,.18) 0%, rgba(234,243,251,.1) 22%, rgba(234,243,251,.68) 54%, #EAF3FB 76%, #E4EEF8 100%)",
       }}
     />
     <div
       style={{
         position: "absolute",
-        top: -40,
-        right: -20,
-        width: 220,
-        height: 220,
+        top: -24,
+        right: -12,
+        width: 240,
+        height: 240,
         borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,220,140,.45), transparent 68%)",
+        background: "radial-gradient(circle, rgba(255,220,140,.42), transparent 68%)",
         filter: "blur(10px)",
         animation: "cine2-drift 14s ease-in-out infinite",
       }}
