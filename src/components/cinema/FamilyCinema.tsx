@@ -55,13 +55,12 @@ import {
   sectionWrap,
 } from "@/lib/premiumUi";
 import heroBgUrl from "@/assets/cinema/hero-bg.png";
-import heroGuiUrl from "@/assets/cinema/hero-gui.png";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v13";
+const AV = "v14";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
-/** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
+/** Fundo full-bleed com Gui da sala (sem camada extra sobreposta). */
 const CinemaBackdrop = ({ src }: { src: string }) => (
   <div
     className="absolute inset-0 pointer-events-none overflow-hidden"
@@ -76,20 +75,22 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         width: "100%",
         height: "100%",
         objectFit: "cover",
-        /* Ambiente desfocado — o Gui principal fica no hero, ao lado do texto */
-        objectPosition: "40% 30%",
-        filter: "saturate(1.05) brightness(0.88) blur(1.5px)",
-        transform: "scale(1.12)",
+        /* Foco no Gui da direita, nítido, sem blur */
+        objectPosition: "72% 28%",
+        filter: "saturate(1.08) brightness(0.94)",
+        transform: "scale(1.08)",
+        transformOrigin: "75% 25%",
       }}
     />
-    {/* Vinheta + creme inferior (conteúdo legível, como Música) */}
+    {/* Vinheta + creme inferior (texto legível; Gui visível à direita) */}
     <div
       style={{
         position: "absolute",
         inset: 0,
         background:
-          "radial-gradient(50% 40% at 82% 18%, rgba(255,210,120,.28) 0%, transparent 60%)," +
-          "linear-gradient(180deg, rgba(20,28,40,.2) 0%, rgba(234,243,251,.08) 28%, rgba(234,243,251,.55) 58%, #EAF3FB 78%, #E4EEF8 100%)",
+          "radial-gradient(48% 36% at 78% 16%, rgba(255,210,120,.22) 0%, transparent 58%)," +
+          "linear-gradient(105deg, rgba(12,20,32,.42) 0%, rgba(12,20,32,.12) 42%, transparent 62%)," +
+          "linear-gradient(180deg, rgba(20,28,40,.18) 0%, rgba(234,243,251,.06) 30%, rgba(234,243,251,.62) 62%, #EAF3FB 80%, #E4EEF8 100%)",
       }}
     />
     <div
@@ -100,7 +101,7 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         width: 240,
         height: 240,
         borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,220,140,.42), transparent 68%)",
+        background: "radial-gradient(circle, rgba(255,220,140,.38), transparent 68%)",
         filter: "blur(10px)",
         animation: "cine2-drift 14s ease-in-out infinite",
       }}
@@ -893,20 +894,17 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Hero: texto à esquerda + Gui à direita (ao lado do texto, bem alto) */}
+        {/* Hero: só texto — Gui fica no fundo (CinemaBackdrop), sem overlay */}
         <div
           style={{
             position: "relative",
             zIndex: 3,
             padding: `4px ${PAD}px 4px`,
             minHeight: 248,
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 4,
             animation: "cine2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
           }}
         >
-          <div style={{ flex: "1 1 52%", maxWidth: "58%", minWidth: 0, paddingTop: 6 }}>
+          <div style={{ maxWidth: "58%", minWidth: 0, paddingTop: 6 }}>
             <div
               style={{
                 fontSize: 12.5,
@@ -949,48 +947,6 @@ const FamilyCinema = ({ onBack }: Props) => {
             >
               Um filme por semana para inspirar conversas, emoções e memórias que ficam.
             </p>
-          </div>
-
-          {/* Gui colado ao texto — enquadramento alto (rosto + óculos 3D) */}
-          <div
-            aria-hidden
-            style={{
-              flex: "0 0 44%",
-              maxWidth: 200,
-              height: 236,
-              marginTop: -4,
-              marginRight: -8,
-              position: "relative",
-              overflow: "hidden",
-              pointerEvents: "none",
-            }}
-          >
-            <img
-              src={heroGuiUrl}
-              alt=""
-              style={{
-                position: "absolute",
-                width: "118%",
-                height: "118%",
-                left: "-2%",
-                top: "-6%",
-                objectFit: "cover",
-                objectPosition: "78% 18%",
-                filter: "saturate(1.08) drop-shadow(0 14px 22px rgba(0,0,0,.3))",
-              }}
-            />
-            {/* fade inferior p/ misturar com a faixa creme */}
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: 48,
-                background: "linear-gradient(180deg, transparent, rgba(234,243,251,.75))",
-                pointerEvents: "none",
-              }}
-            />
           </div>
         </div>
 
