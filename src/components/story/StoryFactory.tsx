@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, type CSSProperties } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Library } from "lucide-react";
 import KidzzHeader from "@/components/common/KidzzHeader";
@@ -36,42 +36,16 @@ const D = {
   sparkle: "M12 4l1.8 5.2L19 11l-5.2 1.8L12 18l-1.8-5.2L5 11l5.2-1.8L12 4Z",
 };
 
-/* ── Helpers de estilo (valores exatos do design) ── */
-const cardBase: CSSProperties = {
-  position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 11,
-  borderRadius: 20, padding: "11px 12px", textAlign: "left", fontFamily: "'Nunito',sans-serif",
-  transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
-  background: "linear-gradient(155deg,rgba(255,253,247,.9),rgba(250,240,222,.62))",
-  backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)",
-  border: "1px solid rgba(255,255,255,1)",
-  boxShadow: "0 10px 22px rgba(150,95,20,.14), inset 0 1.5px 0 rgba(255,255,255,1)",
-};
-const gloss = (l: string, m: string, d: string): CSSProperties => ({
-  flex: "none", width: 42, height: 42, borderRadius: 14,
-  display: "flex", alignItems: "center", justifyContent: "center",
-  background: `radial-gradient(130% 130% at 30% 22%, #FFFFFF 0%, ${l} 18%, ${m} 58%, ${d} 100%)`,
-  boxShadow: "0 6px 14px rgba(150,95,20,.25), inset 0 1.5px 2px rgba(255,255,255,.7), inset 0 -4px 8px rgba(0,0,0,.16)",
-});
-
 const Icon = ({ d, stroke = "#fff", size = 20, sw = 1.9 }: { d: string; stroke?: string; size?: number; sw?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <path d={d} stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
-/* Passos reais da Fábrica (avatar → palavras → objetivo → narração),
-   apresentados com o cartão de vidro + ícone glossy do design. */
-const STEPS: { d: string; g: [string, string, string]; title: string; sub: string }[] = [
-  { d: D.smile, g: ["#FFD9A8", "#F0A24C", "#C77E1E"], title: "Monte o avatar", sub: "O rosto e o jeitinho do seu filho" },
-  { d: D.star, g: ["#FFE9A8", "#F2C24C", "#C98F1E"], title: "Escolha palavras-chave", sub: "O mundo e os interesses dele" },
-  { d: D.compass, g: ["#C0EDC8", "#5CB57A", "#2F7A4E"], title: "Diga o objetivo", sub: "O que a história precisa entregar" },
-  { d: D.note, g: ["#D2CCF0", "#8A7AD8", "#5E4EA8"], title: "Narração suave", sub: "Voz feminina que embala e acalma" },
-];
-
 const HERO_BG = "linear-gradient(180deg,#FAF1DF 0%,#F3E6CC 42%,#EBDABA 75%,#E2CDA4 100%)";
 const DEFAULT_BG = "linear-gradient(180deg,#FDF8EE 0%, #F2EFE6 100%)";
 
-const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
+const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipIntro?: boolean }) => {
   const { session, profile, tier, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
@@ -95,6 +69,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   });
   // Guarda o rate de voz escolhido no painel pra reutilizar na narração
   const voiceRateRef = useRef<number>(0.88);
+  const pendingAfterGate = useRef<(() => void) | null>(null);
+  const skipBooted = useRef(false);
 
   const requireGate = useCallback((cb: () => void) => {
     if (gatePassed) { cb(); return; }
@@ -103,7 +79,12 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
     pendingAfterGate.current = cb;
   }, [gatePassed]);
 
-  const pendingAfterGate = useRef<(() => void) | null>(null);
+  // Vindo da home: “Como funciona” já foi visto — entra no fluxo (gate → avatar).
+  useEffect(() => {
+    if (!skipIntro || skipBooted.current) return;
+    skipBooted.current = true;
+    requireGate(() => setStep("avatar"));
+  }, [skipIntro, requireGate]);
 
   const handleAvatarComplete = useCallback((a: ChildAvatar) => {
     setAvatar(a);
@@ -289,7 +270,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
         }}
       >
-        {step === "intro" &&
+        {step === "intro" && !skipIntro &&
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -347,38 +328,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               </div>
             </div>
 
-            {/* ── COMO FUNCIONA (passos reais da Fábrica) ── */}
-            <div style={{ padding: "22px 4px 12px" }}>
-              <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 22, color: "#3A2410" }}>Como funciona</h2>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
-              {STEPS.map((s, i) => (
-                <div
-                  key={s.title}
-                  style={{ ...cardBase, animation: `hist-cascade .5s ${0.15 + i * 0.08}s both` }}
-                >
-                  <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.3) 50%,transparent 100%)", animation: "hist-shine 6s ease-in-out infinite" }} />
-                  <div style={{ ...gloss(...s.g), position: "relative" }}>
-                    {/* specular sheen no topo do ícone glossy (premium glass) */}
-                    <div aria-hidden style={{ position: "absolute", top: 2, left: 4, right: 4, height: 12, borderRadius: 12, background: "linear-gradient(180deg,rgba(255,255,255,.55),transparent)", pointerEvents: "none" }} />
-                    <Icon d={s.d} size={20} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#3A2410", lineHeight: 1.15 }}>{s.title}</div>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8A6E42", lineHeight: 1.3 }}>{s.sub}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* ── Nota de proteção (Portão dos Pais) — pílula de vidro premium ── */}
-            <div style={{ padding: "18px 8px 8px", display: "flex", justifyContent: "center" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, maxWidth: 320, padding: "9px 15px", borderRadius: 999, background: "linear-gradient(160deg,rgba(255,252,244,.82),rgba(245,232,210,.5))", backdropFilter: "blur(14px) saturate(150%)", WebkitBackdropFilter: "blur(14px) saturate(150%)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 8px 20px rgba(150,95,20,.12), inset 0 1.5px 0 rgba(255,255,255,1)", fontSize: 11, fontWeight: 800, color: "#8A6E42", lineHeight: 1.4, textAlign: "left" }}>
-                <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>🔒</span>
-                <span>A personalização é feita pelos pais. A criança recebe só a história pronta.</span>
-              </div>
-            </div>
-            <div style={{ padding: "10px 20px 4px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#A88E5E", letterSpacing: ".2px" }}>
+            {/* “Como funciona” vive na home de Histórias — aqui só CTA da fábrica */}
+            <div style={{ padding: "16px 20px 8px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#A88E5E", letterSpacing: ".2px" }}>
               Narração em voz feminina suave · Fábrica KIDZZ
             </div>
           </motion.div>

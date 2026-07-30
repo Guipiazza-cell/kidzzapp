@@ -7,7 +7,8 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X,
+  ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X, Gift,
+  UserRound, Tags, Target, AudioLines,
 } from "lucide-react";
 import { useMemories } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,6 +37,19 @@ const COLLECTIONS = [
   { key: "amizade", label: "Amizade", desc: "Cuidar e compartilhar", img: `${HI}/tile-personagens.png` },
   { key: "natureza", label: "Natureza", desc: "Conectar com o mundo", img: `${HI}/tile-ilustracoes.png` },
   { key: "familia", label: "Família", desc: "Fortalece os laços", img: `${HI}/feat-familia.png` },
+];
+
+/** Passos da fábrica — na home (antes de “Criar minha história”). */
+const HOW_IT_WORKS: {
+  title: string;
+  sub: string;
+  Icon: typeof UserRound;
+  glow: [string, string, string];
+}[] = [
+  { title: "Monte o avatar", sub: "O rosto e o jeitinho do seu filho", Icon: UserRound, glow: ["#FFD9A8", "#F0A24C", "#C77E1E"] },
+  { title: "Escolha palavras-chave", sub: "O mundo e os interesses dele", Icon: Tags, glow: ["#FFE9A8", "#F2C24C", "#C98F1E"] },
+  { title: "Diga o objetivo", sub: "O que a história precisa entregar", Icon: Target, glow: ["#C0EDC8", "#5CB57A", "#2F7A4E"] },
+  { title: "Narração suave", sub: "Voz feminina que embala e acalma", Icon: AudioLines, glow: ["#D2CCF0", "#8A7AD8", "#5E4EA8"] },
 ];
 
 interface Props {
@@ -85,7 +99,8 @@ const StoriesHome = ({ onBack }: Props) => {
   };
 
   if (mode === "factory") {
-    return <StoryFactory onBack={() => setMode("home")} />;
+    // Pula o intro da fábrica (já está na home com “Como funciona”).
+    return <StoryFactory onBack={() => setMode("home")} skipIntro />;
   }
 
   return (
@@ -233,6 +248,82 @@ const StoriesHome = ({ onBack }: Props) => {
             Criar minha história
             <ArrowRight size={16} />
           </motion.button>
+        </section>
+
+        {/* ── COMO FUNCIONA (antes na fábrica; agora na home) ── */}
+        <section style={{ padding: `22px ${PAD}px 0` }}>
+          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#F6F1E8" }}>
+            Como funciona
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
+            {HOW_IT_WORKS.map((s) => {
+              const [l, m, d] = s.glow;
+              const StepIcon = s.Icon;
+              return (
+                <div
+                  key={s.title}
+                  style={{
+                    position: "relative",
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 11,
+                    borderRadius: 20,
+                    padding: "11px 12px",
+                    background: "linear-gradient(155deg,rgba(255,253,247,.92),rgba(250,240,222,.72))",
+                    border: "1px solid rgba(255,255,255,1)",
+                    boxShadow: "0 10px 22px rgba(20,12,8,.22), inset 0 1.5px 0 rgba(255,255,255,1)",
+                  }}
+                >
+                  <div
+                    style={{
+                      flex: "none",
+                      width: 42,
+                      height: 42,
+                      borderRadius: 14,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: `radial-gradient(130% 130% at 30% 22%, #FFFFFF 0%, ${l} 18%, ${m} 58%, ${d} 100%)`,
+                      boxShadow: "0 6px 14px rgba(150,95,20,.25), inset 0 1.5px 2px rgba(255,255,255,.7), inset 0 -4px 8px rgba(0,0,0,.16)",
+                    }}
+                  >
+                    <StepIcon size={18} color="#fff" strokeWidth={2} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14.5, color: "#3A2410", lineHeight: 1.15 }}>
+                      {s.title}
+                    </div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8A6E42", lineHeight: 1.3, marginTop: 2 }}>
+                      {s.sub}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 14 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                maxWidth: 340,
+                padding: "9px 15px",
+                borderRadius: 999,
+                background: "linear-gradient(160deg,rgba(255,252,244,.88),rgba(245,232,210,.55))",
+                border: "1px solid rgba(255,255,255,.55)",
+                boxShadow: "0 8px 20px rgba(0,0,0,.18)",
+                fontSize: 11,
+                fontWeight: 800,
+                color: "#8A6E42",
+                lineHeight: 1.4,
+              }}
+            >
+              <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>🔒</span>
+              <span>A personalização é feita pelos pais. A criança recebe só a história pronta.</span>
+            </div>
+          </div>
         </section>
 
         {/* ── COLEÇÕES (Em breve) ── */}
