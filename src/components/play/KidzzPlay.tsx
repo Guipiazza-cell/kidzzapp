@@ -9,7 +9,7 @@ import {
   type CSSProperties,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Trophy, Shield, Heart } from "lucide-react";
+import { ArrowLeft, Lock, Trophy, Shield, Heart, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import {
@@ -18,6 +18,7 @@ import {
 } from "@/data/brincarExperiences";
 import LockedFeature from "@/components/LockedFeature";
 import MyActivities from "./MyActivities";
+import { getExperienceGuide, getFeaturedGuide } from "./playGuides";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
@@ -329,6 +330,7 @@ const BRIN_KEYFRAMES = `
 @keyframes brin-leafdrift{0%{transform:translate(0,-30px) rotate(0deg);opacity:0}12%{opacity:.7}88%{opacity:.6}100%{transform:translate(-46px,105vh) rotate(300deg);opacity:0}}
 @keyframes brin-heartbeat{0%,100%{transform:scale(1)}12%{transform:scale(1.12)}24%{transform:scale(1)}36%{transform:scale(1.08)}48%{transform:scale(1)}}
 @keyframes brin-wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.kidzz-h-scroll::-webkit-scrollbar{display:none}
 `;
 
 interface Props {
@@ -734,12 +736,28 @@ const KidzzPlay = ({
         </div>
 
         {/* ── PARA BRINCAR AGORA ── */}
-        <div>
+        <div style={{ minWidth: 0, width: "100%" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "20px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Para brincar agora ✨</h2>
+            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Para brincar agora</h2>
             <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todas →</button>
           </div>
-          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 12px", scrollbarWidth: "none" }}>
+          <div
+            className="kidzz-h-scroll"
+            style={{
+              display: "flex",
+              gap: 12,
+              overflowX: "auto",
+              overflowY: "hidden",
+              WebkitOverflowScrolling: "touch",
+              touchAction: "pan-x",
+              overscrollBehaviorX: "contain",
+              padding: "2px 16px 16px",
+              width: "100%",
+              maxWidth: "100%",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
             {FEATURED.map((f) => {
               const locked = !!f.premium && !isPremium;
               return (
@@ -748,7 +766,23 @@ const KidzzPlay = ({
                   type="button"
                   onClick={() => openFeatured(f)}
                   className="active:scale-[.97]"
-                  style={{ flex: "none", width: 172, height: 228, borderRadius: 24, position: "relative", overflow: "hidden", cursor: "pointer", padding: 0, textAlign: "left", boxShadow: "0 16px 36px rgba(50,90,40,.26), 0 1px 0 rgba(255,255,255,.55) inset", border: "0.5px solid rgba(255,255,255,.75)", animation: "brin-rise .45s both", transition: "transform .2s" }}
+                  style={{
+                    flex: "0 0 auto",
+                    width: 172,
+                    minWidth: 172,
+                    height: 228,
+                    borderRadius: 24,
+                    position: "relative",
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    padding: 0,
+                    textAlign: "left",
+                    boxShadow: "0 16px 36px rgba(50,90,40,.26), 0 1px 0 rgba(255,255,255,.55) inset",
+                    border: "0.5px solid rgba(255,255,255,.75)",
+                    animation: "brin-rise .45s both",
+                    transition: "transform .2s",
+                    touchAction: "manipulation",
+                  }}
                 >
                   <img src={f.img} alt={f.titulo} loading="lazy" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                   <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: f.scrim }} />
@@ -1333,9 +1367,11 @@ const KidzzPlay = ({
         )}
       </AnimatePresence>
 
-      {/* Featured activity detail */}
+      {/* Featured: guia no padrão Missões (como fazer + exemplo) */}
       <AnimatePresence>
-        {selectedFeatured && (
+        {selectedFeatured && (() => {
+          const guide = getFeaturedGuide(selectedFeatured.id, selectedFeatured.titulo, childName);
+          return (
           <motion.div
             className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
@@ -1344,14 +1380,14 @@ const KidzzPlay = ({
             onClick={() => setSelectedFeatured(null)}
           >
             <motion.div
-              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden bg-white shadow-2xl"
+              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden bg-white shadow-2xl max-h-[90vh] flex flex-col"
               initial={{ y: 80, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 60, opacity: 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative h-48">
+              <div className="relative h-40 flex-none">
                 <img
                   src={selectedFeatured.img}
                   alt={selectedFeatured.titulo}
@@ -1364,10 +1400,10 @@ const KidzzPlay = ({
                   }}
                 />
                 <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/85 backdrop-blur text-[11px] font-extrabold text-[#2A2520]">
-                  ⏱ {selectedFeatured.tempo}
+                  {selectedFeatured.tempo}
                 </div>
                 <div className="absolute bottom-3 left-4 right-4">
-                  <h3 className="font-display text-[22px] font-extrabold text-white drop-shadow-lg">
+                  <h3 className="text-[22px] font-extrabold text-white drop-shadow-lg leading-tight">
                     {selectedFeatured.titulo}
                   </h3>
                   <p className="text-[12px] font-medium text-white/95 leading-snug mt-1">
@@ -1375,36 +1411,74 @@ const KidzzPlay = ({
                   </p>
                 </div>
               </div>
-              <div className="p-4 flex flex-col gap-3">
+              <div className="p-4 flex flex-col gap-3 overflow-y-auto flex-1 min-h-0">
                 <div className="flex items-center gap-2 text-[11px] font-bold text-[#2A2520]/70">
                   <span className="px-2.5 py-1 rounded-full bg-[#F5EFE3] border border-[#E5D9C0]">
-                    🎯 {selectedFeatured.idade}
+                    {selectedFeatured.idade}
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-[#F5EFE3] border border-[#E5D9C0] flex items-center gap-1">
                     <Heart size={11} className="text-rose-400" />
                     {selectedFeatured.energia}
                   </span>
                 </div>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  className="w-full py-3.5 rounded-2xl font-black text-sm"
+
+                <section>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-amber-500" />
+                    Como fazer
+                  </h4>
+                  <ol className="space-y-2.5">
+                    {guide.steps.map((s, i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500 text-white text-[11px] font-black flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <p className="text-sm text-gray-700 leading-snug font-medium">{s}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+
+                <section>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2">
+                    Exemplo prático
+                  </h4>
+                  <div className="rounded-2xl p-3.5 bg-amber-50 border border-amber-200/80">
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium">{guide.example}</p>
+                  </div>
+                </section>
+
+                <button
+                  type="button"
+                  className="w-full py-3.5 rounded-2xl font-black text-sm min-h-[48px] active:scale-[0.98]"
                   style={{
                     color: "#4A3300",
                     background:
                       "radial-gradient(130% 160% at 30% 18%,#FFE9A8 0%,#F2A62B 55%,#C77E12 100%)",
                     border: "1px solid rgba(255,255,255,.8)",
                     boxShadow:
-                      "0 10px 24px rgba(180,110,10,.35), inset 0 1.5px 1px rgba(255,255,255,.75), inset 0 -5px 10px rgba(140,80,0,.35)",
+                      "0 10px 24px rgba(180,110,10,.35), inset 0 1.5px 1px rgba(255,255,255,.75)",
                   }}
                   onClick={() => {
-                    handleScore(5);
+                    handleScore(15);
+                    confetti({
+                      particleCount: 40,
+                      spread: 55,
+                      origin: { y: 0.7 },
+                      colors: ["#FFD86E", "#9EE493", "#fff"],
+                      scalar: 0.9,
+                    });
+                    toast.success(`${selectedFeatured.titulo} começando!`, {
+                      description: "Sigam o passo a passo e divirtam-se.",
+                    });
                     setSelectedFeatured(null);
                   }}
                 >
-                  ✨ Vamos brincar agora
-                </motion.button>
+                  Vamos brincar agora
+                </button>
                 <button
-                  className="text-xs font-bold text-gray-500 mx-auto"
+                  type="button"
+                  className="text-xs font-bold text-gray-500 mx-auto min-h-[44px]"
                   onClick={() => setSelectedFeatured(null)}
                 >
                   Fechar
@@ -1412,12 +1486,15 @@ const KidzzPlay = ({
               </div>
             </motion.div>
           </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
 
-      {/* Generic experience detail (sub-screen Criar) */}
+      {/* Criar & Imaginar: guia no padrão Missões */}
       <AnimatePresence>
-        {selectedExp && (
+        {selectedExp && (() => {
+          const guide = getExperienceGuide(selectedExp, childName);
+          return (
           <motion.div
             className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-6"
             initial={{ opacity: 0 }}
@@ -1426,7 +1503,7 @@ const KidzzPlay = ({
             onClick={() => setSelectedExp(null)}
           >
             <motion.div
-              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden border border-white/30 shadow-2xl"
+              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden border border-white/30 shadow-2xl max-h-[90vh] flex flex-col"
               style={{ background: selectedExp.gradient }}
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1434,7 +1511,7 @@ const KidzzPlay = ({
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-5">
+              <div className="p-5 flex-none">
                 <div className="flex items-center gap-3">
                   <div
                     className="w-16 h-16 rounded-2xl overflow-hidden flex-none border border-white/35"
@@ -1461,7 +1538,7 @@ const KidzzPlay = ({
                 <p className="text-sm font-semibold text-white/95 leading-snug mt-3">
                   {selectedExp.descricao}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-4">
+                <div className="flex flex-wrap gap-2 mt-3">
                   <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
                     {selectedExp.tempo}
                   </span>
@@ -1470,7 +1547,35 @@ const KidzzPlay = ({
                   </span>
                 </div>
               </div>
-              <div className="bg-white/95 backdrop-blur p-4 flex flex-col gap-2 relative z-10">
+
+              <div className="bg-white flex-1 min-h-0 overflow-y-auto px-5 py-4">
+                <section>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-amber-500" />
+                    Como fazer
+                  </h4>
+                  <ol className="space-y-2.5">
+                    {guide.steps.map((s, i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500 text-white text-[11px] font-black flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <p className="text-sm text-gray-700 leading-snug font-medium">{s}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+                <section className="mt-5">
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2">
+                    Exemplo prático
+                  </h4>
+                  <div className="rounded-2xl p-3.5 bg-emerald-50 border border-emerald-200/80">
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium">{guide.example}</p>
+                  </div>
+                </section>
+              </div>
+
+              <div className="bg-white p-4 flex flex-col gap-2 flex-none border-t border-gray-100">
                 <button
                   type="button"
                   className="w-full py-3.5 rounded-2xl font-black text-white text-sm shadow-md min-h-[48px] active:scale-[0.98]"
@@ -1491,7 +1596,7 @@ const KidzzPlay = ({
                       scalar: 0.9,
                     });
                     toast.success(`${exp.titulo} começando!`, {
-                      description: exp.descricao,
+                      description: "Sigam o passo a passo e divirtam-se.",
                     });
                     setSelectedExp(null);
                   }}
@@ -1511,7 +1616,8 @@ const KidzzPlay = ({
               </div>
             </motion.div>
           </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </motion.div>
   );
