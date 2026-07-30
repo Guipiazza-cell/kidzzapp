@@ -211,7 +211,7 @@ export const MORNING_SONGS: Song[] = [
       { note: "A5", dur: 0.6, syllable: "lhar" },
       { note: "G5", dur: 0.45, syllable: "no" },
       { note: "E5", dur: 0.45, syllable: "meu" },
-      { note: "C5", dur: 0.8, syllable: "dia ✨" },
+      { note: "C5", dur: 0.8, syllable: "dia" },
     ],
   },
   {
