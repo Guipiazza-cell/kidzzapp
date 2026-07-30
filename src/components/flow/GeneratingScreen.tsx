@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
+import forestBg from "@/assets/premium-forest-bg.jpg";
 import { FONT, SERIF } from "@/lib/premiumUi";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kidzz-chat`;
@@ -10,10 +11,10 @@ const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undef
 const TIMEOUT_MS = 35_000;
 
 const LOADING_PHRASES = [
-  "Pensando na melhor forma de explicar…",
-  "Adaptando a linguagem para a idade certa…",
-  "Criando uma resposta que conecta vocês…",
-  "Quase pronto — isso pode marcar o dia…",
+  "Pensando na melhor forma de explicar isso para uma criança...",
+  "Adaptando a linguagem para a idade certa...",
+  "Criando uma resposta que conecta vocês...",
+  "Quase pronto! Isso pode marcar a vida do seu filho...",
 ];
 
 interface Props {
@@ -35,28 +36,28 @@ const GeneratingScreen = ({
 }: Props) => {
   const { session, incrementQuestions } = useAuth();
   const [phraseIdx, setPhraseIdx] = useState(0);
-  const [progress, setProgress] = useState(4);
+  const [progress, setProgress] = useState(5);
   const [phase, setPhase] = useState<"loading" | "done" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
   const runIdRef = useRef(0);
 
   useEffect(() => {
     if (phase !== "loading") return;
-    const iv = setInterval(() => setPhraseIdx((i) => (i + 1) % LOADING_PHRASES.length), 2400);
+    const iv = setInterval(() => setPhraseIdx((i) => (i + 1) % LOADING_PHRASES.length), 2500);
     return () => clearInterval(iv);
   }, [phase]);
 
-  // Barra “bonita” que sobe sozinha até ~90% enquanto a API responde
+  // Barra sobe sozinha até ~90% enquanto a API responde
   useEffect(() => {
     if (phase !== "loading") return;
     const t = window.setInterval(() => {
       setProgress((p) => {
         if (p >= 90) return p;
-        if (p < 40) return p + 2.2 + Math.random() * 1.8;
-        if (p < 70) return p + 1.1 + Math.random() * 0.9;
-        return p + 0.35 + Math.random() * 0.4;
+        if (p < 35) return p + 2.4 + Math.random() * 1.6;
+        if (p < 68) return p + 1.0 + Math.random() * 0.8;
+        return p + 0.3 + Math.random() * 0.35;
       });
-    }, 280);
+    }, 300);
     return () => clearInterval(t);
   }, [phase]);
 
@@ -140,7 +141,6 @@ const GeneratingScreen = ({
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               fullText += content;
-              // avança a barra conforme chega conteúdo
               setProgress((p) => Math.min(96, Math.max(p, 55 + fullText.length / 12)));
             }
           } catch {
@@ -159,28 +159,35 @@ const GeneratingScreen = ({
       setPhase("done");
       window.setTimeout(() => {
         if (runId === runIdRef.current) onComplete(fullText);
-      }, 420);
+      }, 450);
     } catch (e: any) {
       window.clearTimeout(timeout);
       if (runId !== runIdRef.current) return;
-      if (e?.name === "AbortError") {
-        setErrorMsg("Demorou demais. Tente novamente.");
-      } else {
-        setErrorMsg(e?.message || "Ops, algo deu errado!");
-      }
+      const msg =
+        e?.name === "AbortError"
+          ? "Demorou demais. Tente novamente."
+          : e?.message || "Ops, algo deu errado!";
+      setErrorMsg(msg);
       setPhase("error");
       setProgress((p) => Math.min(p, 28));
-      toast.error(e?.name === "AbortError" ? "Demorou demais. Tente novamente." : e?.message || "Ops, algo deu errado!");
+      toast.error(msg);
     }
-  }, [session?.access_token, incrementQuestions, question, ageRange, childName, onComplete, onError, onLimitReached]);
+  }, [
+    session?.access_token,
+    incrementQuestions,
+    question,
+    ageRange,
+    childName,
+    onComplete,
+    onError,
+    onLimitReached,
+  ]);
 
   useEffect(() => {
     void runGenerate();
     return () => {
-      // invalida corrida atual sem forçar erro na UI (Strict Mode / unmount)
       runIdRef.current += 1;
     };
-    // só na montagem + troca de pergunta
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question]);
 
@@ -189,67 +196,90 @@ const GeneratingScreen = ({
       className="absolute inset-0 z-30 flex flex-col items-center justify-center px-6 overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      style={{
-        fontFamily: FONT,
-        background:
-          "radial-gradient(ellipse at 50% 18%, #FFE8C8 0%, #F8F0DC 42%, #EFE6C8 100%)",
-      }}
+      style={{ fontFamily: FONT }}
     >
-      {/* brilhos de fundo */}
+      {/* Fundo floresta mágica (visual que o usuário conhece) */}
+      <img
+        src={forestBg}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ filter: "saturate(1.05) brightness(1.08)" }}
+      />
       <div
         aria-hidden
+        className="absolute inset-0"
         style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
           background:
-            "radial-gradient(40% 28% at 78% 22%, rgba(255,200,120,.35), transparent 70%)," +
-            "radial-gradient(36% 24% at 18% 70%, rgba(160,220,140,.2), transparent 70%)",
+            "radial-gradient(ellipse at 50% 38%, rgba(255,252,245,.55) 0%, rgba(255,248,235,.28) 42%, rgba(240,248,240,.45) 100%)," +
+            "linear-gradient(180deg, rgba(255,255,255,.2) 0%, transparent 35%, rgba(255,255,255,.25) 100%)",
         }}
       />
+
+      {/* partículas leves */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <motion.div
+          key={i}
+          aria-hidden
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: 6 + (i % 3) * 3,
+            height: 6 + (i % 3) * 3,
+            left: `${18 + i * 15}%`,
+            top: `${30 + (i % 4) * 12}%`,
+            background: "rgba(255,230,160,.55)",
+            boxShadow: "0 0 12px rgba(255,210,120,.5)",
+          }}
+          animate={{ y: [0, -18, 0], opacity: [0.25, 0.85, 0.25] }}
+          transition={{ duration: 3.2 + i * 0.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+        />
+      ))}
 
       <div className="relative z-10 w-full max-w-sm flex flex-col items-center">
         <motion.div
           className="relative"
-          animate={phase === "loading" ? { y: [0, -8, 0] } : {}}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          animate={phase === "loading" ? { y: [0, -10, 0] } : {}}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
         >
           <div
             aria-hidden
+            className="absolute rounded-full"
             style={{
-              position: "absolute",
-              inset: "-12%",
-              borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(255,200,100,.45), transparent 68%)",
-              filter: "blur(8px)",
+              inset: "-28%",
+              background: "radial-gradient(circle, rgba(255,220,140,.55), transparent 68%)",
+              filter: "blur(10px)",
             }}
           />
           <img
             src={CAMALEAO.heartSoft}
             alt="Gui pensando"
-            className="relative w-28 h-28 object-contain drop-shadow-xl"
+            className="relative w-[7.5rem] h-[7.5rem] object-contain"
+            style={{
+              filter: "drop-shadow(0 14px 24px rgba(40,50,30,.28))",
+              borderRadius: 28,
+            }}
             onError={(e) => {
               (e.target as HTMLImageElement).src = CAMALEAO.heart;
             }}
           />
         </motion.div>
 
-        <div className="h-[4.5rem] flex items-center justify-center mt-5 w-full">
+        <div className="h-[4.75rem] flex items-center justify-center mt-7 w-full px-2">
           <AnimatePresence mode="wait">
             <motion.h2
               key={phase === "error" ? "err" : phase === "done" ? "done" : phraseIdx}
-              className="text-center max-w-xs leading-snug px-2"
+              className="text-center max-w-xs leading-snug"
               style={{
                 margin: 0,
                 fontFamily: SERIF,
-                fontWeight: 600,
-                fontSize: 20,
-                color: "#2A3A20",
+                fontWeight: 700,
+                fontSize: 19,
+                color: "#1F2E18",
+                textShadow: "0 1px 0 rgba(255,255,255,.65)",
               }}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.28 }}
             >
               {phase === "error"
@@ -261,15 +291,16 @@ const GeneratingScreen = ({
           </AnimatePresence>
         </div>
 
-        {/* Barra de progresso premium */}
-        <div className="w-full mt-2 px-1">
+        {/* Barra de progresso (a que “sumiu”) */}
+        <div className="w-full mt-1 px-3">
           <div
             style={{
-              height: 14,
+              height: 16,
               borderRadius: 999,
               background: "rgba(255,255,255,.55)",
-              border: "0.5px solid rgba(255,255,255,.9)",
-              boxShadow: "inset 0 1px 3px rgba(40,60,20,.12), 0 6px 16px rgba(40,60,20,.08)",
+              border: "0.5px solid rgba(255,255,255,.92)",
+              boxShadow:
+                "inset 0 1px 4px rgba(40,60,20,.12), 0 8px 20px rgba(40,60,20,.1)",
               overflow: "hidden",
               position: "relative",
             }}
@@ -280,14 +311,14 @@ const GeneratingScreen = ({
                 borderRadius: 999,
                 background:
                   phase === "error"
-                    ? "linear-gradient(90deg, #E88A8A, #D45A5A)"
-                    : "linear-gradient(90deg, #F2C55C 0%, #F0A83A 45%, #7DC86A 100%)",
-                boxShadow: "0 0 16px rgba(242,180,60,.45)",
+                    ? "linear-gradient(90deg, #E8A0A0, #D06060)"
+                    : "linear-gradient(90deg, #FFD27A 0%, #F2A83A 42%, #7ECF6A 100%)",
+                boxShadow: "0 0 18px rgba(242,180,60,.5)",
                 position: "relative",
               }}
-              initial={{ width: "4%" }}
-              animate={{ width: `${Math.max(4, Math.min(100, progress))}%` }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
+              initial={{ width: "5%" }}
+              animate={{ width: `${Math.max(5, Math.min(100, progress))}%` }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <motion.div
                 aria-hidden
@@ -295,38 +326,70 @@ const GeneratingScreen = ({
                   position: "absolute",
                   inset: 0,
                   background:
-                    "linear-gradient(105deg, transparent 0%, rgba(255,255,255,.45) 48%, transparent 100%)",
+                    "linear-gradient(105deg, transparent 0%, rgba(255,255,255,.5) 50%, transparent 100%)",
                 }}
-                animate={{ x: ["-40%", "140%"] }}
-                transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+                animate={{ x: ["-50%", "160%"] }}
+                transition={{ duration: 1.35, repeat: Infinity, ease: "linear" }}
               />
             </motion.div>
           </div>
           <div
             className="flex justify-between mt-2 px-0.5"
-            style={{ fontSize: 11, fontWeight: 800, color: "rgba(40,55,30,.55)" }}
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: "rgba(30,45,25,.58)",
+              textShadow: "0 1px 0 rgba(255,255,255,.5)",
+            }}
           >
             <span>
-              {phase === "error" ? "Falhou" : phase === "done" ? "Concluído" : "Formulando resposta"}
+              {phase === "error"
+                ? "Falhou"
+                : phase === "done"
+                  ? "Concluído"
+                  : "Formulando resposta"}
             </span>
             <span>{Math.round(progress)}%</span>
           </div>
         </div>
 
-        {/* Card da pergunta */}
+        {/* Dots sutis sob a barra */}
+        {phase === "loading" && (
+          <motion.div className="flex gap-2 mt-5">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: "#F0A040" }}
+                animate={{ scale: [1, 1.35, 1], opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+              />
+            ))}
+          </motion.div>
+        )}
+
         <motion.div
           className="mt-7 w-full rounded-2xl px-5 py-3.5"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+          transition={{ delay: 0.2 }}
           style={{
-            background: "linear-gradient(160deg, rgba(255,255,255,.78), rgba(255,255,255,.5))",
+            background: "rgba(255,255,255,.72)",
             border: "0.5px solid rgba(255,255,255,.95)",
             boxShadow: "0 12px 28px rgba(40,60,20,.1)",
-            backdropFilter: "blur(16px)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
           }}
         >
-          <p style={{ margin: 0, fontSize: 11, fontWeight: 800, color: "rgba(50,70,40,.5)", textAlign: "center" }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 11,
+              fontWeight: 800,
+              color: "rgba(50,70,40,.5)",
+              textAlign: "center",
+            }}
+          >
             Pergunta
           </p>
           <p
@@ -346,7 +409,15 @@ const GeneratingScreen = ({
         {phase === "error" && (
           <div className="mt-6 w-full flex flex-col gap-2.5">
             {errorMsg && (
-              <p style={{ margin: 0, textAlign: "center", fontSize: 13, fontWeight: 700, color: "#8A3A3A" }}>
+              <p
+                style={{
+                  margin: 0,
+                  textAlign: "center",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#8A3A3A",
+                }}
+              >
                 {errorMsg}
               </p>
             )}
@@ -378,13 +449,13 @@ const GeneratingScreen = ({
                 width: "100%",
                 minHeight: 48,
                 borderRadius: 18,
-                border: "0.5px solid rgba(40,60,20,.15)",
+                border: "0.5px solid rgba(40,60,20,.12)",
                 fontFamily: FONT,
                 fontWeight: 800,
                 fontSize: 14,
                 color: "#3A4A2A",
                 cursor: "pointer",
-                background: "rgba(255,255,255,.65)",
+                background: "rgba(255,255,255,.7)",
               }}
             >
               Voltar

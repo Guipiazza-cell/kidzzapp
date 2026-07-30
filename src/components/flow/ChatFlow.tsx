@@ -74,7 +74,7 @@ const ChatFlow = ({
       />
     )}
     {step === "generating" && (
-      <div className="absolute inset-0 z-40 flex flex-col min-h-0 bg-[#F8F0DC]">
+      <div className="absolute inset-0 z-40 flex flex-col min-h-0">
         <GeneratingScreen
           key={`gen-${question}`}
           question={question}
