@@ -33,10 +33,8 @@ import {
   sectionWrap,
 } from "@/lib/premiumUi";
 
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
-
 const AS = "/exemplos/assets/rotina-v2";
-const AV = "v3";
+const AV = "v4";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 const INK = "#3A2418";
@@ -619,29 +617,14 @@ const RoutineScreen = () => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Camadas fundo - print cream + hero */}
-      <div
-        aria-hidden
-        ref={heroArtRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `url(${CAMALEAO.armsSoft})`,
-          backgroundSize: "cover",
-          backgroundPosition: "72% 18%",
-          filter: "brightness(.96) saturate(1.08)",
-          transform: "scale(1.06)",
-          willChange: "transform, opacity",
-          animation: "rot2-heroIn .7s cubic-bezier(.22,1,.36,1) both",
-        }}
-      />
+      {/* Fundo cream premium — sem camaleão no bg (só no hero à direita) */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(251,239,231,.42) 0%, rgba(246,226,214,.55) 22%, rgba(246,226,214,.88) 48%, rgba(239,212,196,.96) 72%, #EFD4C4 100%)",
+            "linear-gradient(180deg, #FBF3EB 0%, #F6E2D6 38%, #F0D4C4 72%, #EBCAB8 100%)",
         }}
       />
       <div
@@ -790,9 +773,6 @@ const RoutineScreen = () => {
               }}
             >
               {saudacao}, família!
-              <span aria-hidden style={{ color: ACCENT }}>
-                ♥
-              </span>
             </div>
             <h1
               style={{
@@ -835,16 +815,18 @@ const RoutineScreen = () => {
             )}
           </div>
           <div
+            ref={heroArtRef}
             style={{
               position: "relative",
               height: 210,
               marginRight: -PAD,
               marginTop: -8,
               animation: "rot2-floaty 7s ease-in-out infinite",
+              willChange: "transform, opacity",
             }}
           >
             <img
-              src={CAMALEAO.armsSoft}
+              src={asset("hero-gui.png")}
               alt="Gui, o camaleão, com o calendário da rotina"
               style={{
                 position: "absolute",
@@ -852,14 +834,17 @@ const RoutineScreen = () => {
                 bottom: 0,
                 width: "118%",
                 height: "100%",
-                objectFit: "contain",
-                objectPosition: "right bottom",
-                ...CAMALEAO_SCENE_MASK,
-                filter: "drop-shadow(0 12px 28px rgba(80,50,30,.28))",
+                objectFit: "cover",
+                objectPosition: "72% 40%",
+                borderRadius: `${R.card}px 0 0 ${R.card}px`,
+                WebkitMaskImage:
+                  "linear-gradient(90deg, transparent 0%, #000 18%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(90deg, transparent 0%, #000 18%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
+                WebkitMaskComposite: "source-in",
+                maskComposite: "intersect",
+                filter: "drop-shadow(0 12px 28px rgba(80,50,30,.22))",
                 pointerEvents: "none",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.arms;
               }}
             />
           </div>
@@ -1095,17 +1080,6 @@ const RoutineScreen = () => {
           </div>
         )}
 
-        <div
-          style={{
-            padding: "8px 20px 20px",
-            textAlign: "center",
-            fontSize: 11,
-            fontWeight: 800,
-            color: "#B79A88",
-          }}
-        >
-          Menos tela. Mais memórias. · KIDZZ
-        </div>
       </div>
 
       {/* Celebração dia completo */}
