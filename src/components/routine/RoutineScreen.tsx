@@ -836,7 +836,7 @@ const RoutineScreen = () => {
             style={{
               position: "relative",
               height: 210,
-              marginRight: -PAD,
+              marginRight: 0,
               marginTop: -8,
               animation: "rot2-floaty 7s ease-in-out infinite",
               willChange: "transform, opacity",
@@ -847,17 +847,17 @@ const RoutineScreen = () => {
               alt="Gui, o camaleão, com o calendário da rotina"
               style={{
                 position: "absolute",
-                right: 0,
+                right: 8,
                 bottom: 0,
-                width: "118%",
+                width: "108%",
                 height: "100%",
                 objectFit: "cover",
-                objectPosition: "72% 40%",
-                borderRadius: `${R.card}px 0 0 ${R.card}px`,
+                objectPosition: "58% 40%",
+                borderRadius: R.card,
                 WebkitMaskImage:
-                  "linear-gradient(90deg, transparent 0%, #000 18%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
+                  "linear-gradient(90deg, transparent 0%, #000 14%, #000 100%), linear-gradient(180deg, #000 72%, transparent 100%)",
                 maskImage:
-                  "linear-gradient(90deg, transparent 0%, #000 18%, #000 100%), linear-gradient(180deg, #000 70%, transparent 100%)",
+                  "linear-gradient(90deg, transparent 0%, #000 14%, #000 100%), linear-gradient(180deg, #000 72%, transparent 100%)",
                 WebkitMaskComposite: "source-in",
                 maskComposite: "intersect",
                 filter: "drop-shadow(0 12px 28px rgba(80,50,30,.22))",
