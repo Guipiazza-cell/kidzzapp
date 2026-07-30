@@ -719,7 +719,9 @@ const BoraScreen = ({ onBack }: Props) => {
             >
               Bora viver
               <br />
-              <span style={{ color: "#F0B050" }}>mais aventuras</span>
+              <span style={{ color: "#F0B050" }}>mais</span>
+              <br />
+              <span style={{ color: "#F0B050" }}>aventuras</span>
               <br />
               de <span style={{ color: "#F0B050" }}>verdade</span>!
             </h1>
@@ -734,7 +736,11 @@ const BoraScreen = ({ onBack }: Props) => {
                 textShadow: "0 1px 8px rgba(0,0,0,.35)",
               }}
             >
-              Atividades em família que criam memórias para a vida.
+              Atividades em família
+              <br />
+              que criam memórias
+              <br />
+              para a vida.
             </p>
             <button
               type="button"
