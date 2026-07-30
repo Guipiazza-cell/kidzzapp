@@ -11,12 +11,12 @@ import {
   type Activity,
 } from "@/lib/weeklyActivities";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import heroBgUrl from "@/assets/memorias/hero-bg.png";
 
 /**
  * MemoriesAlbum - redesign premium v2
  * Ref: public/telas/memorias/
- * Assets: camaleão original soft · mix Gui + família
+ * Hero: cena full-bleed (Gui + polaroids de memórias)
  *
  * Histórico de uso do app (tudo que a família faz fica aqui):
  *  - Momentos guardados  → memories (perguntas, histórias, música, cinema, rotina, jogos…)
@@ -27,8 +27,55 @@ import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
 
 const AS = "/exemplos/assets/memorias-v2";
 /** bump ao regenerar assets (cache bust no browser) */
-const AV = "v3";
+const AV = "v4";
 const asset = (name: string) => `${AS}/${name}?${AV}`;
+
+/** Fundo full-bleed — Gui + polaroids à direita; texto legível à esquerda. */
+const MemoriesBackdrop = ({ src }: { src: string }) => (
+  <div
+    className="absolute inset-0 pointer-events-none overflow-hidden"
+    aria-hidden
+  >
+    <img
+      src={src}
+      alt=""
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        objectPosition: "72% 18%",
+        filter: "saturate(1.08) brightness(0.94)",
+        transform: "scale(1.12)",
+        transformOrigin: "78% 12%",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background:
+          "radial-gradient(46% 36% at 82% 22%, rgba(255,200,120,.22) 0%, transparent 60%)," +
+          "linear-gradient(100deg, rgba(12,18,12,.62) 0%, rgba(12,18,12,.28) 34%, rgba(12,18,12,.06) 52%, transparent 66%)," +
+          "linear-gradient(180deg, rgba(18,24,14,.2) 0%, transparent 26%, rgba(38,52,31,.25) 48%, rgba(38,52,31,.78) 68%, #26341F 86%, #1E2A19 100%)",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        top: -28,
+        right: -16,
+        width: 240,
+        height: 240,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,210,140,.32), transparent 70%)",
+        filter: "blur(12px)",
+        animation: "memv2-drift1 13s ease-in-out infinite",
+      }}
+    />
+  </div>
+);
 
 interface MemoriesAlbumProps {
   onBack: () => void;
@@ -544,46 +591,12 @@ const MemoriesAlbum = ({
         position: "relative",
         fontFamily: FONT,
         background: "linear-gradient(180deg,#26341F 0%,#1E2A19 38%,#161F12 72%,#121A0F 100%)",
+        color: "#F4EFE2",
+        overflow: "hidden",
       }}
     >
       <style>{KEYFRAMES}</style>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(45% 30% at 80% 30%,rgba(255,214,140,.10),transparent 70%),radial-gradient(40% 26% at 12% 55%,rgba(160,220,255,.06),transparent 70%),radial-gradient(50% 30% at 55% 88%,rgba(233,140,180,.07),transparent 70%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: -60,
-          left: -80,
-          width: 340,
-          height: 340,
-          borderRadius: "50%",
-          background: "radial-gradient(circle,rgba(255,214,140,.18),transparent 65%)",
-          filter: "blur(28px)",
-          animation: "memv2-drift1 13s ease-in-out infinite",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "38%",
-          left: -90,
-          width: 300,
-          height: 300,
-          borderRadius: "50%",
-          background: "radial-gradient(circle,rgba(120,180,240,.13),transparent 65%)",
-          filter: "blur(30px)",
-          animation: "memv2-drift2 17s ease-in-out 2s infinite",
-          pointerEvents: "none",
-        }}
-      />
+      <MemoriesBackdrop src={heroBgUrl} />
 
       <div
         style={{
@@ -594,87 +607,45 @@ const MemoriesAlbum = ({
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
           scrollbarWidth: "none",
           position: "relative",
+          zIndex: 2,
         }}
       >
-        {/* ── HERO ── */}
-        <div style={{ position: "relative", height: 352 }}>
-          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 316, overflow: "hidden" }}>
-            <img
-              src={CAMALEAO.heartSoft}
-              alt="Gui, o camaleão, escrevendo memórias no diário"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "center 30%",
-                animation: "memv2-floaty 6s ease-in-out infinite",
-                ...CAMALEAO_SCENE_MASK,
-                filter: "drop-shadow(0 16px 24px rgba(40,30,20,.26))",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.heart;
-              }}
-            />
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "44%",
-              height: 316,
-              pointerEvents: "none",
-              background:
-                "linear-gradient(180deg,rgba(255,226,160,.22) 0%,rgba(255,226,160,.06) 45%,transparent 75%)",
-              filter: "blur(6px)",
-              animation: "memv2-raysway 7s ease-in-out infinite",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: 316,
-              background:
-                "linear-gradient(180deg,rgba(18,24,14,.4) 0%,rgba(18,24,14,0) 20%,rgba(38,52,31,0) 42%,rgba(38,52,31,.4) 70%,rgba(38,52,31,.16) 90%,transparent 100%)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: 316,
-              background:
-                "linear-gradient(97deg,rgba(20,28,16,.82) 0%,rgba(20,28,16,.4) 30%,rgba(20,28,16,0) 58%)",
-            }}
-          />
-
+        {/* ── Header sticky ── */}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingBottom: 10,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background:
+              "linear-gradient(180deg, rgba(20,28,16,.55) 0%, rgba(20,28,16,.18) 70%, transparent 100%)",
+            backdropFilter: "blur(18px) saturate(150%)",
+            WebkitBackdropFilter: "blur(18px) saturate(150%)",
+          }}
+        >
           <button
+            type="button"
             onClick={onBack}
             aria-label="Voltar"
             className="active:scale-90"
             style={{
-              position: "absolute",
-              top: 62,
-              left: 16,
               width: 44,
               height: 44,
+              flex: "none",
               borderRadius: 999,
               cursor: "pointer",
               background: "rgba(255,255,255,.14)",
               backdropFilter: "blur(16px) saturate(150%)",
               border: "0.5px solid rgba(255,255,255,.32)",
               boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: "grid",
+              placeItems: "center",
             }}
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
@@ -687,57 +658,66 @@ const MemoriesAlbum = ({
               />
             </svg>
           </button>
-
-          <div style={{ position: "absolute", top: 62, right: 16, display: "flex", gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => onOpenParent?.()}
-              aria-label="Área dos pais"
-              className="active:scale-95"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                padding: "8px 13px",
-                minHeight: 44,
-                borderRadius: 999,
-                background: "rgba(255,255,255,.14)",
-                backdropFilter: "blur(16px) saturate(150%)",
-                border: "0.5px solid rgba(255,255,255,.3)",
-                boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
-                fontWeight: 900,
-                fontSize: 13,
-                color: "#F4EFE2",
-                cursor: onOpenParent ? "pointer" : "default",
-                fontFamily: FONT,
-              }}
-            >
-              <Icon d={D.shield} stroke="#CFE6FF" size={14} sw={1.9} />
-              Pais
-            </button>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                padding: "8px 13px",
-                minHeight: 44,
-                borderRadius: 999,
-                background: "rgba(255,255,255,.14)",
-                backdropFilter: "blur(16px) saturate(150%)",
-                border: "0.5px solid rgba(255,255,255,.3)",
-                boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
-                fontWeight: 900,
-                fontSize: 13,
-                color: "#F4EFE2",
-              }}
-            >
-              <Icon d={D.trophy} stroke="#F2C55C" size={14} sw={1.9} />
-              {pontos}
-            </div>
+          <div style={{ flex: 1 }} />
+          <button
+            type="button"
+            onClick={() => onOpenParent?.()}
+            aria-label="Área dos pais"
+            className="active:scale-95"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "8px 13px",
+              minHeight: 44,
+              borderRadius: 999,
+              background: "rgba(255,255,255,.14)",
+              backdropFilter: "blur(16px) saturate(150%)",
+              border: "0.5px solid rgba(255,255,255,.3)",
+              boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
+              fontWeight: 900,
+              fontSize: 13,
+              color: "#F4EFE2",
+              cursor: onOpenParent ? "pointer" : "default",
+              fontFamily: FONT,
+            }}
+          >
+            <Icon d={D.shield} stroke="#CFE6FF" size={14} sw={1.9} />
+            Pais
+          </button>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "8px 13px",
+              minHeight: 44,
+              borderRadius: 999,
+              background: "rgba(255,255,255,.14)",
+              backdropFilter: "blur(16px) saturate(150%)",
+              border: "0.5px solid rgba(255,255,255,.3)",
+              boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
+              fontWeight: 900,
+              fontSize: 13,
+              color: "#F4EFE2",
+            }}
+          >
+            <Icon d={D.trophy} stroke="#F2C55C" size={14} sw={1.9} />
+            {pontos}
           </div>
+        </div>
 
-          <div style={{ position: "absolute", left: 20, bottom: 8, width: 252, animation: "memv2-rise .6s both" }}>
+        {/* ── HERO: texto à esquerda; Gui da cena full-bleed à direita ── */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 3,
+            padding: "8px 20px 28px",
+            minHeight: 268,
+            animation: "memv2-rise .6s both",
+          }}
+        >
+          <div style={{ maxWidth: "54%", minWidth: 0 }}>
             <div
               style={{
                 display: "inline-flex",
@@ -765,11 +745,11 @@ const MemoriesAlbum = ({
                 margin: "0 0 9px",
                 fontFamily: SERIF,
                 fontWeight: 600,
-                fontSize: 30,
+                fontSize: 28,
                 lineHeight: 1.14,
-                color: "#F4EDDC",
+                color: "#FFFDF6",
                 letterSpacing: "-.2px",
-                textShadow: "0 2px 14px rgba(0,0,0,.45)",
+                textShadow: "0 2px 16px rgba(0,0,0,.45)",
               }}
             >
               Aqui guardamos <span style={{ color: "#F2A9C4" }}>memórias</span> que viram histórias.
@@ -780,9 +760,9 @@ const MemoriesAlbum = ({
                 fontSize: 13,
                 fontWeight: 700,
                 lineHeight: 1.45,
-                color: "rgba(238,233,222,.78)",
-                maxWidth: 225,
-                textShadow: "0 1px 8px rgba(0,0,0,.4)",
+                color: "rgba(255,248,230,.86)",
+                maxWidth: 210,
+                textShadow: "0 1px 10px rgba(0,0,0,.4)",
               }}
             >
               Cada momento juntos merece ser lembrado para sempre.
