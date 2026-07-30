@@ -243,18 +243,6 @@ export const AllPlaylistsSection = () => {
             </button>
           ))}
         </div>
-        <p
-          style={{
-            margin: "14px 0 0",
-            textAlign: "center",
-            fontSize: 11.5,
-            fontWeight: 800,
-            color: "rgba(60,80,50,.45)",
-            padding: `0 ${PAD}px 4px`,
-          }}
-        >
-          Curadoria KIDZZ · Atualizada direto pelo Spotify
-        </p>
       </div>
       {active && <PlayerSheet playlist={active} onClose={() => setActive(null)} />}
     </>
