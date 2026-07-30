@@ -210,8 +210,10 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
           <div
             style={{
               borderRadius: R.card,
-              padding: "22px 18px",
-              minHeight: 132,
+              padding: "18px 16px",
+              minHeight: 148,
+              maxHeight: 220,
+              overflowY: "auto",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -223,14 +225,15 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
               WebkitBackdropFilter: "blur(28px) saturate(160%)",
             }}
           >
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-1.5">
               {song.steps.map((s, i) => (
                 <motion.span
                   key={i}
                   style={{
-                    fontSize: 22,
+                    fontSize: song.steps.length > 24 ? 17 : 20,
                     fontWeight: 800,
                     fontFamily: FONT,
+                    lineHeight: 1.35,
                   }}
                   animate={{
                     color:
@@ -239,7 +242,7 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
                         : i < stepIndex
                           ? "hsl(0 0% 92%)"
                           : "hsl(0 0% 55%)",
-                    scale: i === stepIndex ? 1.22 : 1,
+                    scale: i === stepIndex ? 1.14 : 1,
                     textShadow: i === stepIndex ? "0 0 18px hsl(50 100% 60%)" : "none",
                   }}
                   transition={{ duration: 0.2 }}
