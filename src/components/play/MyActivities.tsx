@@ -154,15 +154,15 @@ function activityIconSrc(a: Activity): string {
   return ALL_ACT_ICONS[hashStr(key) % ALL_ACT_ICONS.length];
 }
 
-/** Liquid glass igual ao dock */
+/** Liquid glass mais translúcido (cards de atividade) */
 const liquidCard: CSSProperties = {
   background:
-    "linear-gradient(165deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.16) 100%)",
-  border: "0.5px solid rgba(255,255,255,.55)",
+    "linear-gradient(165deg, rgba(255,255,255,.32) 0%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.10) 100%)",
+  border: "0.5px solid rgba(255,255,255,.48)",
   boxShadow:
-    "0 10px 28px rgba(20,16,30,.12), 0 2px 8px rgba(20,16,30,.06), inset 0 1px 0 rgba(255,255,255,.72)",
-  backdropFilter: "blur(28px) saturate(180%)",
-  WebkitBackdropFilter: "blur(28px) saturate(180%)",
+    "0 12px 32px rgba(20,16,30,.10), 0 2px 8px rgba(20,16,30,.05), inset 0 1px 0 rgba(255,255,255,.65), inset 0 -1px 0 rgba(255,255,255,.08)",
+  backdropFilter: "blur(36px) saturate(190%)",
+  WebkitBackdropFilter: "blur(36px) saturate(190%)",
 };
 
 /**
@@ -343,10 +343,10 @@ const MyActivities = ({ onBack }: Props) => {
         </motion.button>
         <div className="text-center flex-1">
           <h1 className="text-base font-extrabold text-gray-800 flex items-center justify-center gap-1.5">
-            🎯 Atividades
+            Atividades
           </h1>
           <p className="text-[11px] text-gray-500 font-semibold">
-            {completedCount}/{totalCount} • {source === "ai" ? "Personalizado ✨" : "Esta semana"}
+            {completedCount}/{totalCount} • {source === "ai" ? "Personalizado" : "Esta semana"}
           </p>
         </div>
         <motion.button
@@ -487,7 +487,7 @@ const MyActivities = ({ onBack }: Props) => {
                     open();
                   }
                 }}
-                className="relative flex items-center gap-3 p-3 rounded-2xl cursor-pointer"
+                className="relative flex items-center gap-3 p-3.5 rounded-[20px] cursor-pointer"
                 style={{
                   ...liquidCard,
                   opacity: done ? 0.72 : locked ? 0.88 : 1,
