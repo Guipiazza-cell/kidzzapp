@@ -113,7 +113,7 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
  */
 const coverOf = (id: string) => cinemaCoverUrl(id);
 
-/** Poster: sempre tenta bundle, se falhar cai no CDN do GitHub. */
+/** Poster do filme — path público /exemplos/.../cover-{id}.png (funciona no localhost). */
 const MoviePoster = ({
   id,
   glow,
@@ -129,40 +129,51 @@ const MoviePoster = ({
   style?: CSSProperties;
   children?: ReactNode;
 }) => {
-  const primary = coverOf(id);
+  const local = coverOf(id);
   const cdn = cinemaCoverCdn(id);
   return (
     <div
       style={{
         position: "relative",
         overflow: "hidden",
-        flexShrink: 0,
+        flex: "none",
         width: "100%",
         height: 176,
-        background: `linear-gradient(160deg, ${glow || "#4a6080"}, #1a2030)`,
+        backgroundColor: glow || "#2a3548",
+        backgroundImage: `url("${local}")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         ...style,
       }}
     >
       <img
-        src={primary || cdn}
-        alt={alt || title || ""}
+        src={local}
+        alt={alt || title || id}
+        width={320}
+        height={176}
         loading="eager"
         decoding="async"
         draggable={false}
         onError={(e) => {
           const el = e.currentTarget;
-          if (el.src !== cdn && !el.src.includes("jsdelivr.net")) {
+          if (!el.dataset.cdn) {
+            el.dataset.cdn = "1";
             el.src = cdn;
+            // também atualiza o background do pai
+            const parent = el.parentElement;
+            if (parent) parent.style.backgroundImage = `url("${cdn}")`;
           }
         }}
         style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          objectPosition: "center center",
+          objectPosition: "center",
           display: "block",
-          position: "absolute",
-          inset: 0,
           zIndex: 0,
           pointerEvents: "none",
         }}
