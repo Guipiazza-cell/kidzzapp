@@ -81,11 +81,11 @@ const CATS: Cat[] = [
   { key: "conversa", label: "Conversa", grad: "linear-gradient(145deg,#4a2a6e 0%,#281040 100%)", glow: "rgba(190,140,255,.3)", energies: ["cansada", "curiosa", "feliz"] },
 ];
 
-const MOOD_PILLS: { key: Energy; label: string; emoji: string; iconBg: string }[] = [
-  { key: "agitada", label: "Agitada", emoji: "🌪️", iconBg: "linear-gradient(145deg,#4a6a9a,#2a3a5a)" },
-  { key: "cansada", label: "Cansada", emoji: "😴", iconBg: "linear-gradient(145deg,#5a6aaa,#2a3458)" },
-  { key: "curiosa", label: "Curiosa", emoji: "🔍", iconBg: "linear-gradient(145deg,#3a7a9a,#1a3a50)" },
-  { key: "feliz", label: "Feliz", emoji: "☀️", iconBg: "linear-gradient(145deg,#d4a030,#8a6010)" },
+const MOOD_PILLS: { key: Energy; label: string; icon: string }[] = [
+  { key: "agitada", label: "Agitada", icon: "/exemplos/assets/bora-v2/moods/mood-agitada.png" },
+  { key: "cansada", label: "Cansada", icon: "/exemplos/assets/bora-v2/moods/mood-cansada.png" },
+  { key: "curiosa", label: "Curiosa", icon: "/exemplos/assets/bora-v2/moods/mood-curiosa.png" },
+  { key: "feliz", label: "Feliz", icon: "/exemplos/assets/bora-v2/moods/mood-feliz.png" },
 ];
 
 const DIARY_KEY = "bora_diary_v1";
@@ -1266,19 +1266,33 @@ const BoraScreen = ({ onBack }: Props) => {
                   >
                     <span
                       style={{
-                        width: 40,
-                        height: 40,
+                        width: 44,
+                        height: 44,
                         borderRadius: 14,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        background: mo.iconBg,
-                        boxShadow:
-                          "0 4px 12px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.25) inset",
-                        fontSize: 18,
+                        overflow: "hidden",
+                        boxShadow: on
+                          ? "0 6px 16px rgba(180,100,20,.35), 0 1px 0 rgba(255,255,255,.35) inset"
+                          : "0 4px 12px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.2) inset",
+                        background: "rgba(255,248,235,.08)",
                       }}
                     >
-                      {mo.emoji}
+                      <img
+                        src={mo.icon}
+                        alt=""
+                        width={44}
+                        height={44}
+                        draggable={false}
+                        style={{
+                          width: 44,
+                          height: 44,
+                          objectFit: "cover",
+                          display: "block",
+                          borderRadius: 14,
+                        }}
+                      />
                     </span>
                     <span
                       style={{
