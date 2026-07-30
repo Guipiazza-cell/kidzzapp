@@ -621,10 +621,6 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 
         {/* ── TODAS AS PLAYLISTS (de Momentos) ── */}
         <AllPlaylistsSection />
-
-        <div style={{ padding: "8px 20px 16px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#8A7850" }}>
-          Curadoria KIDZZ · Música para crescer junto
-        </div>
       </div>
 
       {/* ── TOAST (conquistas dos pilares) ── */}
