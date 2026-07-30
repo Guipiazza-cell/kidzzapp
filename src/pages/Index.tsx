@@ -338,7 +338,7 @@ const Index = () => {
   const childName = profile?.child_name ?? "";
 
   const handleQuestionSubmit = useCallback((q: string) => {
-    // Sem sessão → login claro (antes o GeneratingScreen falhava e “nada acontecia”)
+    // Sem sessão → fica na home com toast (não joga pra /auth e “some” a pergunta)
     if (!user || !session?.access_token) {
       import("sonner").then(({ toast }) =>
         toast.message("Entre na sua conta para fazer perguntas 💬", {
@@ -346,7 +346,6 @@ const Index = () => {
           action: { label: "Entrar", onClick: () => navigate("/auth") },
         })
       );
-      navigate("/auth");
       return;
     }
     if (!canAskQuestion()) {

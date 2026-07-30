@@ -74,15 +74,17 @@ const ChatFlow = ({
       />
     )}
     {step === "generating" && (
-      <GeneratingScreen
-        key="generating"
-        question={question}
-        ageRange={profile.age_range || "3-7"}
-        childName={childName}
-        onComplete={onAnswerReady}
-        onError={onGeneratingError}
-        onLimitReached={() => onOpenPaywall("question_limit", { count: profile.questions_used ?? 0 })}
-      />
+      <div className="absolute inset-0 z-40 flex flex-col min-h-0 bg-[#F8F0DC]">
+        <GeneratingScreen
+          key={`gen-${question}`}
+          question={question}
+          ageRange={profile.age_range || "3-7"}
+          childName={childName}
+          onComplete={onAnswerReady}
+          onError={onGeneratingError}
+          onLimitReached={() => onOpenPaywall("question_limit", { count: profile.questions_used ?? 0 })}
+        />
+      </div>
     )}
     {step === "celebrating" && (
       <CelebrationScreen

@@ -514,7 +514,7 @@ const HomeScreen = ({
           style={{
             position: "relative",
             margin: "8px 12px 10px",
-            minHeight: 272,
+            minHeight: 288,
             borderRadius: 28,
             overflow: "hidden",
             animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) both",
@@ -536,8 +536,10 @@ const HomeScreen = ({
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              // Cover limpo: Gui completo à direita (sem crop quebrado)
-              objectPosition: "68% 30%",
+              /* Gui mais alto à direita; folhas menos cobertas pelo texto */
+              objectPosition: "72% 12%",
+              transform: "scale(1.12)",
+              transformOrigin: "72% 8%",
             }}
           />
           {/* Véu legível à esquerda (texto) + fade inferior - sem segundo Gui */}
@@ -547,8 +549,8 @@ const HomeScreen = ({
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(105deg, rgba(255,250,235,.92) 0%, rgba(255,248,230,.55) 34%, rgba(255,248,230,.1) 56%, transparent 72%)," +
-                "linear-gradient(180deg, transparent 62%, rgba(248,244,234,.78) 90%, #F8F4EA 100%)",
+                "linear-gradient(105deg, rgba(255,250,235,.88) 0%, rgba(255,248,230,.48) 36%, rgba(255,248,230,.08) 58%, transparent 74%)," +
+                "linear-gradient(180deg, transparent 58%, rgba(248,244,234,.72) 88%, #F8F4EA 100%)",
               pointerEvents: "none",
             }}
           />
@@ -558,7 +560,8 @@ const HomeScreen = ({
               position: "relative",
               zIndex: 3,
               maxWidth: "54%",
-              padding: "22px 12px 24px 16px",
+              /* texto mais baixo pra não cobrir as folhas do topo */
+              padding: "48px 12px 22px 16px",
             }}
           >
             <h1
