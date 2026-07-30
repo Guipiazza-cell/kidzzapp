@@ -1,10 +1,21 @@
+/**
+ * LockedFeature - paywall padrão premium (liquid glass)
+ * Usado em Brincar / Jogos e outros recursos bloqueados.
+ */
 import { motion } from "framer-motion";
-import { Lock, Sparkles, Crown } from "lucide-react";
+import { Lock, Sparkles, Crown, Check, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 
-export type LockedFeatureType = "games" | "music" | "stories" | "dreams" | "moments" | "generic";
+export type LockedFeatureType =
+  | "game"
+  | "games"
+  | "music"
+  | "stories"
+  | "dreams"
+  | "moments"
+  | "generic";
 
 interface LockedFeatureProps {
   type?: LockedFeatureType;
@@ -16,42 +27,59 @@ interface LockedFeatureProps {
   className?: string;
 }
 
-const PRESETS: Record<LockedFeatureType, { icon: string; title: string; description: string; tier: "kidzz" | "premium" }> = {
-  games: {
-    icon: "🎮",
+const PRESETS: Record<
+  LockedFeatureType,
+  { title: string; description: string; tier: "kidzz" | "premium"; benefits: string[] }
+> = {
+  game: {
     title: "Jogos KIDZZ Play",
-    description: "Desbloqueie todos os jogos para evoluir o avatar do seu filho.",
+    description: "Desbloqueie todos os jogos e desafie a família com diversão saudável.",
     tier: "kidzz",
+    benefits: [
+      "Todos os jogos liberados",
+      "Desafios novos toda semana",
+      "Progresso e pontos da sessão",
+    ],
+  },
+  games: {
+    title: "Jogos KIDZZ Play",
+    description: "Desbloqueie todos os jogos e desafie a família com diversão saudável.",
+    tier: "kidzz",
+    benefits: [
+      "Todos os jogos liberados",
+      "Desafios novos toda semana",
+      "Progresso e pontos da sessão",
+    ],
   },
   music: {
-    icon: "🎵",
     title: "Floresta Musical",
-    description: "Karaokê, dança e histórias cantadas - desbloqueie agora.",
+    description: "Karaokê, dança e histórias cantadas para a família.",
     tier: "premium",
+    benefits: ["Músicas e trilhas exclusivas", "Modo dança e karaokê", "Atualizações semanais"],
   },
   stories: {
-    icon: "📖",
     title: "Fábrica de Histórias",
-    description: "Crie histórias mágicas personalizadas todos os dias.",
+    description: "Crie histórias mágicas personalizadas com o nome do seu filho.",
     tier: "kidzz",
+    benefits: ["Histórias sob medida", "Narração suave", "Mais criações por dia"],
   },
   dreams: {
-    icon: "🌙",
     title: "Mundo dos Sonhos",
-    description: "Narrações mágicas para uma noite tranquila.",
+    description: "Sons e histórias calmas para uma noite tranquila.",
     tier: "premium",
+    benefits: ["Histórias para dormir", "Sons ambiente", "Rotina de sono leve"],
   },
   moments: {
-    icon: "🌟",
     title: "Momentos Especiais",
-    description: "Missões de conexão exclusivas para sua família.",
+    description: "Missões de conexão exclusivas para a sua família.",
     tier: "premium",
+    benefits: ["Missões em família", "Ideias prontas", "Memórias que ficam"],
   },
   generic: {
-    icon: "✨",
     title: "Recurso Premium",
     description: "Faça upgrade para desbloquear este conteúdo.",
     tier: "kidzz",
+    benefits: ["Conteúdo completo", "Sem anúncios", "Cancele quando quiser"],
   },
 };
 
@@ -65,37 +93,49 @@ const LockedFeature = ({
   className = "",
 }: LockedFeatureProps) => {
   const navigate = useNavigate();
-  const preset = PRESETS[type];
+  const preset = PRESETS[type] ?? PRESETS.generic;
   const finalTitle = title ?? preset.title;
   const finalDesc = description ?? preset.description;
   const finalTier = requiredTier ?? preset.tier;
+  const benefits = preset.benefits;
 
   const handleUpgrade = () => {
     haptic("medium");
     sfx("unlock");
     if (onUpgrade) onUpgrade();
     else {
-      // Open the in-app paywall instead of forcing a navigation
       window.dispatchEvent(new CustomEvent("kidzz:open-plans"));
       if (window.location.pathname !== "/") navigate("/?paywall=1");
     }
   };
 
-  const tierLabel = finalTier === "premium" ? "Premium" : "KIDZZ";
-  const tierGradient =
-    finalTier === "premium"
-      ? "from-amber-400 via-orange-400 to-pink-500"
-      : "from-kid-purple to-kid-pink";
+  const isPremiumTier = finalTier === "premium";
+  const tierLabel = isPremiumTier ? "Premium" : "KIDZZ";
+  const ctaGradient = isPremiumTier
+    ? "linear-gradient(135deg, #F5C14A 0%, #E8821A 55%, #D06A10 100%)"
+    : "linear-gradient(135deg, #A78BFA 0%, #8B5CF6 48%, #EC4899 100%)";
+  const glow = isPremiumTier
+    ? "rgba(232,130,26,0.35)"
+    : "rgba(139,92,246,0.35)";
 
   if (compact) {
     return (
       <motion.button
+        type="button"
         onClick={handleUpgrade}
         whileTap={{ scale: 0.97 }}
-        className={`w-full flex items-center gap-3 rounded-2xl p-3 bg-gradient-to-r ${tierGradient} text-white shadow-lg ${className}`}
+        className={`w-full flex items-center gap-3 rounded-2xl p-3.5 text-white ${className}`}
+        style={{
+          background: ctaGradient,
+          boxShadow: `0 10px 28px ${glow}`,
+          border: "1px solid rgba(255,255,255,0.35)",
+        }}
       >
-        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl">
-          {preset.icon}
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center flex-none"
+          style={{ background: "rgba(255,255,255,0.2)" }}
+        >
+          <Lock size={18} />
         </div>
         <div className="flex-1 text-left min-w-0">
           <p className="text-sm font-extrabold truncate">{finalTitle}</p>
@@ -103,65 +143,148 @@ const LockedFeature = ({
             Desbloqueie com {tierLabel}
           </p>
         </div>
-        <Lock size={18} className="opacity-90 flex-shrink-0" />
+        <Crown size={18} className="opacity-95 flex-shrink-0" />
       </motion.button>
     );
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`relative overflow-hidden rounded-3xl glass-card p-6 text-center ${className}`}
+      initial={{ opacity: 0, y: 14, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 320, damping: 28 }}
+      className={`relative overflow-hidden rounded-[28px] text-center ${className}`}
+      style={{
+        background:
+          "linear-gradient(165deg, rgba(255,255,255,0.92) 0%, rgba(252,248,255,0.88) 45%, rgba(245,240,255,0.9) 100%)",
+        border: "0.5px solid rgba(255,255,255,0.95)",
+        boxShadow:
+          "0 24px 48px rgba(40,20,80,0.22), 0 8px 20px rgba(40,20,80,0.1), inset 0 1.5px 0 rgba(255,255,255,1)",
+        backdropFilter: "blur(28px) saturate(180%)",
+        WebkitBackdropFilter: "blur(28px) saturate(180%)",
+        padding: "28px 22px 22px",
+      }}
     >
-      {/* Soft gradient veil */}
+      {/* véu de cor suave */}
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${tierGradient} opacity-10 pointer-events-none`}
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: isPremiumTier
+            ? "radial-gradient(70% 50% at 50% 0%, rgba(255,200,120,0.28), transparent 70%)"
+            : "radial-gradient(70% 50% at 50% 0%, rgba(180,140,255,0.28), transparent 70%)",
+        }}
       />
 
-      {/* Lock icon with halo */}
-      <motion.div
-        className="relative mx-auto w-20 h-20 mb-4"
-        animate={{ y: [0, -4, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      >
+      {/* ícone central */}
+      <div className="relative mx-auto mb-4" style={{ width: 88, height: 88 }}>
         <div
-          className={`absolute inset-0 rounded-full blur-2xl bg-gradient-to-br ${tierGradient} opacity-40`}
+          aria-hidden
+          className="absolute inset-[-10px] rounded-full"
+          style={{
+            background: isPremiumTier
+              ? "radial-gradient(circle, rgba(245,193,74,0.45), transparent 70%)"
+              : "radial-gradient(circle, rgba(167,139,250,0.5), transparent 70%)",
+            filter: "blur(8px)",
+          }}
         />
         <div
-          className={`relative w-full h-full rounded-full bg-gradient-to-br ${tierGradient} flex items-center justify-center shadow-xl`}
+          className="relative w-full h-full rounded-[26px] flex items-center justify-center"
+          style={{
+            background: ctaGradient,
+            boxShadow: `0 14px 28px ${glow}, inset 0 1.5px 0 rgba(255,255,255,0.55)`,
+            border: "1px solid rgba(255,255,255,0.45)",
+          }}
         >
-          <span className="text-3xl">{preset.icon}</span>
-          <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center">
-            <Lock size={14} className="text-gray-700" />
-          </div>
+          <Lock size={32} color="#fff" strokeWidth={2.2} />
         </div>
-      </motion.div>
+        <div
+          className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center"
+          style={{
+            background: "#fff",
+            boxShadow: "0 4px 12px rgba(40,20,60,0.16)",
+            border: "1px solid rgba(40,20,60,0.06)",
+          }}
+        >
+          <Crown size={14} className="text-amber-500" />
+        </div>
+      </div>
 
-      <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/70 backdrop-blur-sm mb-2">
+      <div
+        className="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-3"
+        style={{
+          background: "rgba(255,255,255,0.75)",
+          border: "0.5px solid rgba(180,140,255,0.25)",
+          boxShadow: "0 2px 8px rgba(80,50,140,0.06)",
+        }}
+      >
         <Crown size={12} className="text-amber-500" />
-        <span className="text-[10px] font-black uppercase tracking-wider text-gray-700">
+        <span
+          className="text-[10px] font-black uppercase tracking-[0.14em]"
+          style={{ color: isPremiumTier ? "#9A5A10" : "#5B3FA0" }}
+        >
           Plano {tierLabel}
         </span>
       </div>
 
-      <h3 className="text-lg font-black text-gray-800 leading-tight">{finalTitle}</h3>
-      <p className="text-sm text-gray-600 font-semibold mt-2 max-w-xs mx-auto leading-relaxed">
+      <h3
+        className="relative text-[20px] font-black leading-tight"
+        style={{ color: "#1F1830", fontFamily: "'Nunito', system-ui, sans-serif" }}
+      >
+        {finalTitle}
+      </h3>
+      <p
+        className="relative text-[13.5px] font-semibold mt-2 max-w-[280px] mx-auto leading-relaxed"
+        style={{ color: "rgba(45,40,70,0.72)" }}
+      >
         {finalDesc}
       </p>
 
+      <ul className="relative mt-4 text-left max-w-[280px] mx-auto space-y-2">
+        {benefits.map((b) => (
+          <li key={b} className="flex items-center gap-2.5">
+            <span
+              className="w-5 h-5 rounded-full flex items-center justify-center flex-none"
+              style={{
+                background: isPremiumTier
+                  ? "rgba(232,130,26,0.14)"
+                  : "rgba(139,92,246,0.14)",
+              }}
+            >
+              <Check
+                size={12}
+                strokeWidth={3}
+                style={{ color: isPremiumTier ? "#E8821A" : "#7C3AED" }}
+              />
+            </span>
+            <span className="text-[12.5px] font-bold" style={{ color: "#2A2540" }}>
+              {b}
+            </span>
+          </li>
+        ))}
+      </ul>
+
       <motion.button
+        type="button"
         onClick={handleUpgrade}
         whileTap={{ scale: 0.97 }}
-        className={`relative overflow-hidden mt-5 w-full max-w-xs mx-auto py-3.5 rounded-2xl bg-gradient-to-r ${tierGradient} text-white font-extrabold text-sm shadow-premium-lg flex items-center justify-center gap-2 animate-premium-glow`}
+        className="relative mt-5 w-full max-w-[280px] mx-auto py-3.5 rounded-full font-extrabold text-[14px] text-white flex items-center justify-center gap-2"
+        style={{
+          background: ctaGradient,
+          boxShadow: `0 12px 28px ${glow}, inset 0 1px 0 rgba(255,255,255,0.4)`,
+          border: "1px solid rgba(255,255,255,0.4)",
+        }}
       >
-        <span className="shine-overlay" aria-hidden />
-        <Sparkles size={16} className="relative z-10" />
-        <span className="relative z-10">Fazer upgrade agora</span>
+        <Sparkles size={16} />
+        Fazer upgrade agora
       </motion.button>
 
-      <p className="text-[10px] text-gray-500 font-bold mt-3">
-        🛡️ 7 dias de garantia · Cancele quando quiser
+      <p
+        className="relative mt-3 text-[11px] font-bold flex items-center justify-center gap-1.5"
+        style={{ color: "rgba(60,50,80,0.5)" }}
+      >
+        <Shield size={12} />
+        7 dias de garantia · Cancele quando quiser
       </p>
     </motion.div>
   );
