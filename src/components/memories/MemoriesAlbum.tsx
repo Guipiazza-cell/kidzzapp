@@ -12,6 +12,9 @@ import {
 } from "@/lib/weeklyActivities";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
 import guiCutoutUrl from "@/assets/memorias/gui-cutout.png";
+import iconPerguntaUrl from "@/assets/memorias/icon-pergunta.png";
+import iconHistoriaUrl from "@/assets/memorias/icon-historia.png";
+import iconMissaoUrl from "@/assets/memorias/icon-missao.png";
 
 /**
  * MemoriesAlbum - redesign premium v2
@@ -27,8 +30,14 @@ import guiCutoutUrl from "@/assets/memorias/gui-cutout.png";
 
 const AS = "/exemplos/assets/memorias-v2";
 /** bump ao regenerar assets (cache bust no browser) */
-const AV = "v6";
+const AV = "v7";
 const asset = (name: string) => `${AS}/${name}?${AV}`;
+
+/** Fundo da aba — mesma família de cor do card rosa (Nova Pergunta) */
+const MEM_BG =
+  "linear-gradient(180deg, #E8B8CC 0%, #DCA8C0 32%, #D098B4 62%, #C488A4 100%)";
+const MEM_INK = "#3A2438";
+const MEM_INK2 = "rgba(58,36,56,.72)";
 
 interface MemoriesAlbumProps {
   onBack: () => void;
@@ -471,7 +480,7 @@ const MemoriesAlbum = ({
       key: "a1",
       title: "Nova Pergunta",
       sub: `Crie perguntas para ${childName}`,
-      d: D.chat,
+      icon: iconPerguntaUrl,
       k: "rosa",
       onClick: () => onNavigateToChat?.(),
     },
@@ -479,7 +488,7 @@ const MemoriesAlbum = ({
       key: "a2",
       title: "Nova História",
       sub: "Escreva uma história juntos",
-      d: D.book,
+      icon: iconHistoriaUrl,
       k: "azul",
       onClick: () => onNavigateToStories?.(),
     },
@@ -487,7 +496,7 @@ const MemoriesAlbum = ({
       key: "a3",
       title: "Nova Missão",
       sub: "Desafios para criar memórias",
-      d: D.target,
+      icon: iconMissaoUrl,
       k: "verde",
       onClick: () => onNavigateToPlay?.() ?? toast("Abra Brincar para missões ✨"),
     },
@@ -543,8 +552,8 @@ const MemoriesAlbum = ({
         height: "100%",
         position: "relative",
         fontFamily: FONT,
-        background: "linear-gradient(180deg,#26341F 0%,#1E2A19 38%,#161F12 72%,#121A0F 100%)",
-        color: "#F4EFE2",
+        background: MEM_BG,
+        color: MEM_INK,
       }}
     >
       <style>{KEYFRAMES}</style>
@@ -554,7 +563,9 @@ const MemoriesAlbum = ({
           inset: 0,
           pointerEvents: "none",
           background:
-            "radial-gradient(45% 30% at 80% 22%,rgba(255,214,140,.12),transparent 70%),radial-gradient(40% 26% at 12% 55%,rgba(160,220,255,.06),transparent 70%),radial-gradient(50% 30% at 55% 88%,rgba(233,140,180,.07),transparent 70%)",
+            "radial-gradient(48% 32% at 82% 18%, rgba(255,230,200,.35), transparent 68%)," +
+            "radial-gradient(42% 28% at 12% 60%, rgba(255,255,255,.22), transparent 70%)," +
+            "radial-gradient(50% 30% at 50% 92%, rgba(200,120,160,.18), transparent 70%)",
         }}
       />
 
@@ -583,7 +594,7 @@ const MemoriesAlbum = ({
             alignItems: "center",
             gap: 10,
             background:
-              "linear-gradient(180deg, rgba(20,28,16,.72) 0%, rgba(20,28,16,.28) 70%, transparent 100%)",
+              "linear-gradient(180deg, rgba(232,184,204,.82) 0%, rgba(232,184,204,.35) 70%, transparent 100%)",
             backdropFilter: "blur(18px) saturate(150%)",
             WebkitBackdropFilter: "blur(18px) saturate(150%)",
           }}
@@ -599,10 +610,10 @@ const MemoriesAlbum = ({
               flex: "none",
               borderRadius: 999,
               cursor: "pointer",
-              background: "rgba(255,255,255,.14)",
+              background: "rgba(255,255,255,.55)",
               backdropFilter: "blur(16px) saturate(150%)",
-              border: "0.5px solid rgba(255,255,255,.32)",
-              boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
+              border: "0.5px solid rgba(255,255,255,.75)",
+              boxShadow: "0 6px 16px rgba(90,40,70,.14),inset 0 1px 0 rgba(255,255,255,.85)",
               display: "grid",
               placeItems: "center",
             }}
@@ -610,7 +621,7 @@ const MemoriesAlbum = ({
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
               <path
                 d="M19 12H5m6-6-6 6 6 6"
-                stroke="#F4EFE2"
+                stroke={MEM_INK}
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -630,18 +641,18 @@ const MemoriesAlbum = ({
               padding: "8px 13px",
               minHeight: 44,
               borderRadius: 999,
-              background: "rgba(255,255,255,.14)",
+              background: "rgba(255,255,255,.55)",
               backdropFilter: "blur(16px) saturate(150%)",
-              border: "0.5px solid rgba(255,255,255,.3)",
-              boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
+              border: "0.5px solid rgba(255,255,255,.75)",
+              boxShadow: "0 6px 16px rgba(90,40,70,.14),inset 0 1px 0 rgba(255,255,255,.85)",
               fontWeight: 900,
               fontSize: 13,
-              color: "#F4EFE2",
+              color: MEM_INK,
               cursor: onOpenParent ? "pointer" : "default",
               fontFamily: FONT,
             }}
           >
-            <Icon d={D.shield} stroke="#CFE6FF" size={14} sw={1.9} />
+            <Icon d={D.shield} stroke="#5A7EB0" size={14} sw={1.9} />
             Pais
           </button>
           <div
@@ -652,16 +663,16 @@ const MemoriesAlbum = ({
               padding: "8px 13px",
               minHeight: 44,
               borderRadius: 999,
-              background: "rgba(255,255,255,.14)",
+              background: "rgba(255,255,255,.55)",
               backdropFilter: "blur(16px) saturate(150%)",
-              border: "0.5px solid rgba(255,255,255,.3)",
-              boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
+              border: "0.5px solid rgba(255,255,255,.75)",
+              boxShadow: "0 6px 16px rgba(90,40,70,.14),inset 0 1px 0 rgba(255,255,255,.85)",
               fontWeight: 900,
               fontSize: 13,
-              color: "#F4EFE2",
+              color: MEM_INK,
             }}
           >
-            <Icon d={D.trophy} stroke="#F2C55C" size={14} sw={1.9} />
+            <Icon d={D.trophy} stroke="#C98F1E" size={14} sw={1.9} />
             {pontos}
           </div>
         </div>
@@ -685,10 +696,10 @@ const MemoriesAlbum = ({
               borderRadius: R.card,
               overflow: "hidden",
               background:
-                "linear-gradient(145deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.06) 48%, rgba(255,200,140,.08) 100%)",
-              border: "0.5px solid rgba(255,255,255,.22)",
+                "linear-gradient(145deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.42) 48%, rgba(255,200,210,.35) 100%)",
+              border: "0.5px solid rgba(255,255,255,.85)",
               boxShadow:
-                "0 14px 36px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.18) inset",
+                "0 14px 36px rgba(90,40,70,.16), 0 1px 0 rgba(255,255,255,.9) inset",
               backdropFilter: "blur(28px) saturate(160%)",
               WebkitBackdropFilter: "blur(28px) saturate(160%)",
             }}
@@ -710,11 +721,11 @@ const MemoriesAlbum = ({
                   alignItems: "center",
                   padding: "5px 11px",
                   borderRadius: 999,
-                  background: "rgba(255,255,255,.12)",
-                  border: "0.5px solid rgba(255,255,255,.22)",
+                  background: "rgba(255,255,255,.55)",
+                  border: "0.5px solid rgba(255,255,255,.8)",
                   fontWeight: 800,
                   fontSize: 12,
-                  color: "rgba(244,239,226,.92)",
+                  color: MEM_INK2,
                   marginBottom: 10,
                 }}
               >
@@ -727,11 +738,11 @@ const MemoriesAlbum = ({
                   fontWeight: 600,
                   fontSize: 22,
                   lineHeight: 1.16,
-                  color: "#FFFDF6",
+                  color: MEM_INK,
                   letterSpacing: "-.2px",
                 }}
               >
-                Aqui guardamos <span style={{ color: "#F2A9C4" }}>memórias</span> que viram histórias.
+                Aqui guardamos <span style={{ color: "#C93A72" }}>memórias</span> que viram histórias.
               </h1>
               <p
                 style={{
@@ -739,7 +750,7 @@ const MemoriesAlbum = ({
                   fontSize: 12.5,
                   fontWeight: 700,
                   lineHeight: 1.4,
-                  color: "rgba(255,248,230,.78)",
+                  color: MEM_INK2,
                   maxWidth: 200,
                 }}
               >
@@ -798,17 +809,26 @@ const MemoriesAlbum = ({
                   height: "100%",
                   pointerEvents: "none",
                   background:
-                    "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%)",
+                    "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.28) 50%,transparent 100%)",
                   animation: "memv2-shine 5.5s ease-in-out infinite",
                 }}
               />
-              <div style={gloss(...GLOSSY[a.k], 40, 999)}>
-                <Icon d={a.d} />
-              </div>
-              <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14, color: "#F6F1E4", lineHeight: 1.15 }}>
+              <img
+                src={a.icon}
+                alt=""
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 14,
+                  objectFit: "cover",
+                  flex: "none",
+                  boxShadow: "0 6px 14px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.7) inset",
+                }}
+              />
+              <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14, color: MEM_INK, lineHeight: 1.15 }}>
                 {a.title}
               </div>
-              <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(240,235,225,.68)", lineHeight: 1.35 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: MEM_INK2, lineHeight: 1.35 }}>
                 {a.sub}
               </div>
               <div style={arrow(a.k)}>
@@ -842,13 +862,13 @@ const MemoriesAlbum = ({
                   background: "linear-gradient(155deg, rgba(255,255,255,.20), rgba(255,255,255,.08))",
                   backdropFilter: "blur(14px)",
                   WebkitBackdropFilter: "blur(14px)",
-                  color: "rgba(240,235,225,.88)",
+                  color: MEM_INK2,
                   border: "0.5px solid rgba(255,255,255,.3)",
                   boxShadow: "inset 0 1px 0 rgba(255,255,255,.35), 0 4px 12px rgba(0,0,0,.25)",
                 };
             return (
               <button key={chip.id} onClick={() => setFilter(chip.id)} className="active:scale-95" style={style}>
-                <Icon d={chip.d} stroke={on ? "#fff" : "rgba(240,235,225,.8)"} size={15} sw={2} />
+                <Icon d={chip.d} stroke={on ? "#fff" : MEM_INK2} size={15} sw={2} />
                 {chip.label}
               </button>
             );
@@ -861,7 +881,7 @@ const MemoriesAlbum = ({
             style={{
               padding: "48px 16px",
               textAlign: "center",
-              color: "rgba(240,235,225,.7)",
+              color: MEM_INK2,
               fontWeight: 800,
               fontSize: 14,
             }}
@@ -881,7 +901,7 @@ const MemoriesAlbum = ({
                     padding: "20px 20px 10px",
                   }}
                 >
-                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
+                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: MEM_INK }}>
                     Em andamento
                   </h2>
                 </div>
@@ -972,7 +992,7 @@ const MemoriesAlbum = ({
                             alignSelf: "flex-end",
                             fontSize: 11,
                             fontWeight: 900,
-                            color: "rgba(240,235,225,.7)",
+                            color: MEM_INK2,
                           }}
                         >
                           {item.current}/{item.total}
@@ -1005,7 +1025,7 @@ const MemoriesAlbum = ({
                     fontFamily: SERIF,
                     fontWeight: 600,
                     fontSize: 19,
-                    color: "#F4EDDC",
+                    color: MEM_INK,
                     lineHeight: 1.3,
                     margin: "0 0 8px",
                   }}
@@ -1086,7 +1106,7 @@ const MemoriesAlbum = ({
                     padding: "20px 20px 10px",
                   }}
                 >
-                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
+                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: MEM_INK }}>
                     Histórico de uso
                   </h2>
                   {filter !== "all" && (
@@ -1267,7 +1287,7 @@ const MemoriesAlbum = ({
                     padding: "20px 20px 10px",
                   }}
                 >
-                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
+                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: MEM_INK }}>
                     Conquistas da família 🌱
                   </h2>
                 </div>
@@ -1358,7 +1378,7 @@ const MemoriesAlbum = ({
                 <p style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#F6F1E4" }}>
                   +{lockedCount} memórias guardadas com carinho 💛
                 </p>
-                <p style={{ margin: "4px 0 12px", fontSize: 12, fontWeight: 700, color: "rgba(240,235,225,.7)" }}>
+                <p style={{ margin: "4px 0 12px", fontSize: 12, fontWeight: 700, color: MEM_INK2 }}>
                   Desbloqueie todas com Premium ✨
                 </p>
                 <button
