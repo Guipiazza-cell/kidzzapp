@@ -6,9 +6,10 @@ import { addMusicXp, bumpCounter, type MusicAchievement } from "@/lib/musicXp";
 import { useMemories } from "@/hooks/useMemories";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
 import { FONT, SERIF, R, PAD } from "@/lib/premiumUi";
+import morningGuiUrl from "@/assets/musica/morning-gui.png";
 
-/** Gui novo do karaokê matinal (arte premium 3D) */
-const MORNING_GUI = "/exemplos/assets/musica-v2/morning-gui.png";
+/** Gui cutout (PNG transparente) no bundle Vite */
+const MORNING_GUI = morningGuiUrl;
 
 interface Props {
   onBack: () => void;
