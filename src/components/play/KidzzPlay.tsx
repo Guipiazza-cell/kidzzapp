@@ -19,6 +19,7 @@ import {
 import LockedFeature from "@/components/LockedFeature";
 import MyActivities from "./MyActivities";
 import confetti from "canvas-confetti";
+import { toast } from "sonner";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 
 /** Assets gerados Hermes/Codex - public/telas/brincar */
@@ -1426,8 +1427,18 @@ const KidzzPlay = ({
             >
               <div className="p-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur flex items-center justify-center text-4xl border border-white/30">
-                    {selectedExp.emoji}
+                  <div
+                    className="w-16 h-16 rounded-2xl overflow-hidden flex-none border border-white/35"
+                    style={{
+                      boxShadow: "0 8px 18px rgba(0,0,0,.18)",
+                      background: "rgba(255,255,255,.22)",
+                    }}
+                  >
+                    <img
+                      src={EXP_ICON[selectedExp.id] ?? `${BR_IC}/exp-caixa.png`}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-wider text-white/90">
@@ -1443,28 +1454,48 @@ const KidzzPlay = ({
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
                   <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
-                    ⏱ {selectedExp.tempo}
+                    {selectedExp.tempo}
                   </span>
                   <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
-                    🎯 {selectedExp.idadeMin}-{selectedExp.idadeMax} anos
+                    {selectedExp.idadeMin}-{selectedExp.idadeMax} anos
                   </span>
                 </div>
               </div>
-              <div className="bg-white/95 backdrop-blur p-4 flex flex-col gap-2">
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  className="w-full py-3 rounded-2xl font-black text-white text-sm shadow-md min-h-[48px]"
-                  style={{ background: selectedExp.gradient }}
-                  onClick={() => {
-                    handleScore(5);
+              <div className="bg-white/95 backdrop-blur p-4 flex flex-col gap-2 relative z-10">
+                <button
+                  type="button"
+                  className="w-full py-3.5 rounded-2xl font-black text-white text-sm shadow-md min-h-[48px] active:scale-[0.98]"
+                  style={{
+                    background: selectedExp.gradient,
+                    border: "1px solid rgba(255,255,255,.45)",
+                    boxShadow: "0 10px 22px rgba(0,0,0,.16)",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const exp = selectedExp;
+                    handleScore(15);
+                    confetti({
+                      particleCount: 40,
+                      spread: 55,
+                      origin: { y: 0.7 },
+                      colors: ["#FFD86E", "#9EE493", "#FF9ECF", "#fff"],
+                      scalar: 0.9,
+                    });
+                    toast.success(`${exp.titulo} começando!`, {
+                      description: exp.descricao,
+                    });
                     setSelectedExp(null);
                   }}
                 >
-                  ✨ Vamos viver agora
-                </motion.button>
+                  Vamos viver agora
+                </button>
                 <button
-                  className="text-xs font-bold text-gray-500 mx-auto"
-                  onClick={() => setSelectedExp(null)}
+                  type="button"
+                  className="text-xs font-bold text-gray-500 mx-auto py-2 min-h-[44px]"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedExp(null);
+                  }}
                 >
                   Fechar
                 </button>
