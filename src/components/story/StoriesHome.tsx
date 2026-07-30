@@ -4,10 +4,10 @@
  * Assets: public/exemplos/assets/historias-v2/* (Hermes/Codex gpt-image)
  * Pessoas/família — sem lagarto. Lógica real: fábrica, coleções, continue lendo, chips.
  */
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X, Gift,
+  ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X,
 } from "lucide-react";
 import { useMemories } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,8 +18,6 @@ import ReadingMode from "./ReadingMode";
 import { LIBRARY_STORIES } from "./storyLibrary";
 import { FONT, SERIF, R, PAD, glassLight, glassLightSoft, pillGlassLight, goldBtn } from "@/lib/premiumUi";
 import PremiumSeal from "@/components/common/PremiumSeal";
-import Icon3D from "@/components/common/Icon3D";
-import { STORY_BENEFIT_ICONS } from "@/lib/kidzzIcons";
 
 const HI = "/exemplos/assets/historias-v2";
 
@@ -32,30 +30,13 @@ const CHIPS: { key: ChipKey; label: string; sub: string; icon: typeof Star; tint
   { key: "divertidas", label: "Divertidas", sub: "Aventuras para rir e imaginar", icon: Smile, tint: "#F59E0B", ring: "rgba(245,158,11,0.18)" },
 ];
 
-const FEATURE_TILES = [
-  { key: "temas", label: "Temas e mundos", sub: "Explore centenas de aventuras.", cover: `${HI}/tile-temas.png`, tint: [160, 120, 230] as const },
-  { key: "personagens", label: "Personagens", sub: "Crie heróis únicos.", cover: `${HI}/tile-personagens.png`, tint: [100, 180, 120] as const },
-  { key: "ilustracoes", label: "Ilustrações", sub: "Cada página ganha vida.", cover: `${HI}/tile-ilustracoes.png`, tint: [110, 160, 230] as const },
-  { key: "narradores", label: "Narradores", sub: "Escolha a voz da história.", cover: `${HI}/tile-narradores.png`, tint: [240, 160, 70] as const },
-];
-
+/** Coleções especiais — cards “Em breve” (ainda não liberadas). */
 const COLLECTIONS = [
-  { key: "aventura", label: "Aventuras", desc: "Coragem e descoberta", img: `${HI}/tile-temas.png`, tag: "aventura" },
-  { key: "amizade", label: "Amizade", desc: "Cuidar e compartilhar", img: `${HI}/tile-personagens.png`, tag: "amizade" },
-  { key: "natureza", label: "Natureza", desc: "Conectar com o mundo", img: `${HI}/tile-ilustracoes.png`, tag: "natureza" },
-  { key: "familia", label: "Família", desc: "Fortalece os laços", img: `${HI}/feat-familia.png`, tag: "familia" },
+  { key: "aventura", label: "Aventuras", desc: "Coragem e descoberta", img: `${HI}/tile-temas.png` },
+  { key: "amizade", label: "Amizade", desc: "Cuidar e compartilhar", img: `${HI}/tile-personagens.png` },
+  { key: "natureza", label: "Natureza", desc: "Conectar com o mundo", img: `${HI}/tile-ilustracoes.png` },
+  { key: "familia", label: "Família", desc: "Fortalece os laços", img: `${HI}/feat-familia.png` },
 ];
-
-const BENEFITS = STORY_BENEFIT_ICONS;
-
-const tileGlass = (r: number, g: number, b: number): CSSProperties => ({
-  background: `linear-gradient(165deg, rgba(255,255,255,.92) 0%, rgba(${r},${g},${b},.38) 50%, rgba(${r},${g},${b},.22) 100%)`,
-  border: "0.5px solid rgba(255,255,255,.96)",
-  borderRadius: 24,
-  boxShadow: `0 14px 36px rgba(40,30,15,.12), 0 0 24px rgba(${r},${g},${b},.18), 0 1.5px 0 rgba(255,255,255,1) inset`,
-  backdropFilter: "blur(36px) saturate(190%)",
-  WebkitBackdropFilter: "blur(36px) saturate(190%)",
-});
 
 interface Props {
   onBack: () => void;
@@ -67,7 +48,6 @@ const StoriesHome = ({ onBack }: Props) => {
   const [mode, setMode] = useState<"home" | "factory">("home");
   const [chip, setChip] = useState<ChipKey | null>(null);
   const [chipOpen, setChipOpen] = useState(false);
-  const [collection, setCollection] = useState<typeof COLLECTIONS[number] | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
   const [reading, setReading] = useState(false);
 
@@ -98,15 +78,6 @@ const StoriesHome = ({ onBack }: Props) => {
       return needle.test(s.title) || needle.test(String(meta));
     });
   }, [chip, stories]);
-
-  const collectionStories = useMemo(() => {
-    if (!collection) return [] as typeof stories;
-    const rx = new RegExp(collection.tag, "i");
-    return stories.filter((s) => {
-      const meta = (s.metadata as any)?.interests || "";
-      return rx.test(String(meta)) || rx.test(s.title);
-    });
-  }, [collection, stories]);
 
   const openFactory = () => {
     haptic("medium");
@@ -264,116 +235,76 @@ const StoriesHome = ({ onBack }: Props) => {
           </motion.button>
         </section>
 
-        {/* ── 4 TILES ── */}
-        <section style={{ padding: `18px ${PAD}px 0` }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {FEATURE_TILES.map((t) => (
-              <motion.button
-                key={t.key}
-                whileTap={{ scale: 0.97 }}
-                onClick={openFactory}
-                className="text-left relative overflow-hidden"
-                style={{ padding: 12, minHeight: 150, ...tileGlass(t.tint[0], t.tint[1], t.tint[2]) }}
-              >
-                <img
-                  src={t.cover}
-                  alt=""
-                  style={{
-                    width: "100%",
-                    height: 88,
-                    objectFit: "cover",
-                    borderRadius: 18,
-                    marginBottom: 10,
-                    boxShadow: "0 8px 18px rgba(40,30,15,.14)",
-                    border: "0.5px solid rgba(255,255,255,.8)",
-                  }}
-                />
-                <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#1F2A22", lineHeight: 1.15 }}>
-                  {t.label}
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(42,37,32,0.58)", marginTop: 3, lineHeight: 1.3 }}>
-                  {t.sub}
-                </div>
-                <div
-                  style={{
-                    position: "absolute",
-                    right: 10,
-                    bottom: 10,
-                    width: 28,
-                    height: 28,
-                    borderRadius: 999,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "rgba(255,255,255,.9)",
-                    boxShadow: "0 4px 10px rgba(40,30,15,.12)",
-                  }}
-                >
-                  <ArrowRight size={13} color="#2A2520" />
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        </section>
-
-        {/* ── BENEFÍCIOS ── */}
-        <section style={{ padding: `18px ${PAD}px 0` }}>
-          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 18, color: "#F6F1E8", textAlign: "center" }}>
-            Histórias que moldam o futuro
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            {BENEFITS.map((b) => (
-              <div
-                key={b.title}
-                style={{
-                  padding: "14px 12px",
-                  textAlign: "center",
-                  borderRadius: 20,
-                  background: "linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.04))",
-                  border: "0.5px solid rgba(255,255,255,.16)",
-                  backdropFilter: "blur(20px)",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
-                  <Icon3D src={b.src} fallback={b.fb} size={48} radius={16} alt={b.title} />
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 900, color: "#F6F1E8" }}>{b.title}</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(246,241,232,0.55)", marginTop: 2 }}>{b.sub}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── COLEÇÕES ── */}
+        {/* ── COLEÇÕES (Em breve) ── */}
         <section style={{ padding: `20px ${PAD}px 0` }}>
           <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#F6F1E8" }}>
             Coleções especiais
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {COLLECTIONS.map((col) => {
-              const count = stories.filter((s) => {
-                const meta = (s.metadata as any)?.interests || "";
-                return new RegExp(col.tag, "i").test(String(meta)) || new RegExp(col.tag, "i").test(s.title);
-              }).length;
-              return (
-                <motion.button
-                  key={col.key}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => { haptic("light"); setCollection(col); }}
-                  className="text-left overflow-hidden"
-                  style={{ ...glassLight, borderRadius: 22, padding: 0 }}
-                >
-                  <img src={col.img} alt="" loading="lazy" style={{ width: "100%", height: 96, objectFit: "cover", display: "block" }} />
-                  <div style={{ padding: "10px 12px 12px" }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: "#2A2520" }}>{col.label}</p>
-                    <p style={{ margin: "3px 0 0", fontSize: 11, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.3 }}>{col.desc}</p>
-                    <p style={{ margin: "6px 0 0", fontSize: 11, fontWeight: 900, color: "#E8821A" }}>
-                      {count} {count === 1 ? "história" : "histórias"}
-                    </p>
-                  </div>
-                </motion.button>
-              );
-            })}
+            {COLLECTIONS.map((col) => (
+              <div
+                key={col.key}
+                className="text-left overflow-hidden relative"
+                style={{
+                  ...glassLight,
+                  borderRadius: 22,
+                  padding: 0,
+                  opacity: 0.88,
+                }}
+                aria-label={`${col.label} — em breve`}
+              >
+                <div style={{ position: "relative" }}>
+                  <img
+                    src={col.img}
+                    alt=""
+                    loading="lazy"
+                    style={{
+                      width: "100%",
+                      height: 96,
+                      objectFit: "cover",
+                      display: "block",
+                      filter: "saturate(0.85) brightness(0.92)",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(180deg, rgba(20,16,12,.12) 0%, rgba(20,16,12,.35) 100%)",
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      padding: "4px 9px",
+                      borderRadius: 999,
+                      fontSize: 10,
+                      fontWeight: 900,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                      color: "#2A1808",
+                      background: "linear-gradient(180deg,#F5D08A 0%,#E8B85A 100%)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,.22)",
+                      border: "0.5px solid rgba(255,255,255,.55)",
+                    }}
+                  >
+                    Em breve
+                  </span>
+                </div>
+                <div style={{ padding: "10px 12px 12px" }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: "#2A2520" }}>{col.label}</p>
+                  <p style={{ margin: "3px 0 0", fontSize: 11, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.3 }}>
+                    {col.desc}
+                  </p>
+                  <p style={{ margin: "6px 0 0", fontSize: 11, fontWeight: 900, color: "rgba(42,37,32,0.42)" }}>
+                    Em breve
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -534,76 +465,6 @@ const StoriesHome = ({ onBack }: Props) => {
                         key={s.id}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => { setChipOpen(false); setSelected(s); }}
-                        className="text-left rounded-2xl p-2.5"
-                        style={{ ...glassLight, borderRadius: 18 }}
-                      >
-                        {s.image_url ? (
-                          <img src={s.image_url} alt="" className="w-full aspect-square object-cover rounded-xl mb-2" loading="lazy" />
-                        ) : (
-                          <div className="w-full aspect-square rounded-xl mb-2 bg-amber-100 flex items-center justify-center text-3xl">📖</div>
-                        )}
-                        <p className="text-[12px] font-extrabold line-clamp-2" style={{ color: "#2A2520" }}>{s.title}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Collection drawer ── */}
-      <AnimatePresence>
-        {collection && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex flex-col"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => setCollection(null)} />
-            <motion.div
-              className="relative mt-auto rounded-t-3xl max-h-[85vh] flex flex-col"
-              style={{ background: "linear-gradient(180deg,#FFF9F0,#F5EFE3)" }}
-              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 240, damping: 26 }}
-            >
-              <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-                <img src={collection.img} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <h3 style={{ margin: 0, fontFamily: SERIF, fontSize: 19, fontWeight: 600, color: "#1F2A22" }}>
-                    {collection.label}
-                  </h3>
-                  <p className="text-[11.5px] leading-snug line-clamp-1" style={{ color: "rgba(42,37,32,0.6)" }}>
-                    {collection.desc}
-                  </p>
-                </div>
-                <button onClick={() => setCollection(null)} className="w-10 h-10 flex items-center justify-center rounded-full shrink-0" style={pillGlassLight} aria-label="Fechar">
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-5 pb-8">
-                {collectionStories.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-[14px] font-bold" style={{ color: "#2A2520" }}>Ainda não há histórias nesta coleção</p>
-                    <p className="text-[12px] mt-1" style={{ color: "rgba(42,37,32,0.6)" }}>
-                      Crie uma nova com {childName} como protagonista.
-                    </p>
-                    <motion.button
-                      onClick={() => { setCollection(null); openFactory(); }}
-                      whileTap={{ scale: 0.97 }}
-                      className="mt-4 px-5 py-2.5 rounded-full text-white text-[13px] font-extrabold"
-                      style={{ background: "#E8821A" }}
-                    >
-                      Criar agora
-                    </motion.button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    {collectionStories.map((s) => (
-                      <motion.button
-                        key={s.id}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => { setCollection(null); setSelected(s); }}
                         className="text-left rounded-2xl p-2.5"
                         style={{ ...glassLight, borderRadius: 18 }}
                       >
