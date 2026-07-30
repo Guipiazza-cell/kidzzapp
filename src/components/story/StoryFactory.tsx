@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Library } from "lucide-react";
 import KidzzHeader from "@/components/common/KidzzHeader";
@@ -7,6 +7,7 @@ import PersonalizationPanel, { StoryIntent, EnsinarSub, VoiceRate } from "./Pers
 import StoryDisplay from "./StoryDisplay";
 import GeneratingOverlay from "./GeneratingOverlay";
 import StoryGallery from "./StoryGallery";
+import ParentalGate from "@/components/ParentalGate";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
@@ -20,6 +21,9 @@ import { haptic } from "@/lib/haptics";
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-story`;
 
 type Step = "intro" | "avatar" | "form" | "display";
+
+/** Portão dos pais: personalização só com código. Válido por sessão. */
+const SESSION_GATE_KEY = "kidzz_story_factory_gate_ok";
 
 /* ── SVG paths (portados do design Historias.dc.html) ── */
 const D = {
@@ -52,16 +56,38 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
     return Math.min(10, Math.max(3, first));
   })();
 
-  // Da home já viu “Como funciona” → entra direto no avatar (sem portão dos pais).
-  const [step, setStep] = useState<Step>(skipIntro ? "avatar" : "intro");
+  // Da home: pula intro visual, mas personalização exige código dos pais.
+  const [step, setStep] = useState<Step>("intro");
   const [avatar, setAvatar] = useState<ChildAvatar | null>(null);
   const [story, setStory] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
+  const [gatePassed, setGatePassed] = useState<boolean>(() => {
+    try { return sessionStorage.getItem(SESSION_GATE_KEY) === "1"; } catch { return false; }
+  });
   // Guarda o rate de voz escolhido no painel pra reutilizar na narração
   const voiceRateRef = useRef<number>(0.88);
+  const pendingAfterGate = useRef<(() => void) | null>(null);
+  const skipBooted = useRef(false);
+
+  const requireGate = useCallback((cb: () => void) => {
+    if (gatePassed) {
+      cb();
+      return;
+    }
+    pendingAfterGate.current = cb;
+    setGateOpen(true);
+  }, [gatePassed]);
+
+  // Home → “Criar minha história”: pede código dos pais e abre avatar.
+  useEffect(() => {
+    if (!skipIntro || skipBooted.current) return;
+    skipBooted.current = true;
+    requireGate(() => setStep("avatar"));
+  }, [skipIntro, requireGate]);
 
   const handleAvatarComplete = useCallback((a: ChildAvatar) => {
     setAvatar(a);
@@ -304,7 +330,10 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
                   Criada com o nome, o rosto e o mundo do seu filho — do jeitinho que só ele merece.
                 </p>
                 <button
-                  onClick={() => { haptic("medium"); setStep("avatar"); }}
+                  onClick={() => {
+                    haptic("medium");
+                    requireGate(() => setStep("avatar"));
+                  }}
                   className="active:scale-[0.97]"
                   style={{ position: "relative", overflow: "hidden", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: 14, borderRadius: 999, cursor: "pointer", background: "radial-gradient(130% 130% at 30% 22%,#FFD98A 0%,#F2A62B 52%,#D97A1E 100%)", border: "1px solid rgba(255,255,255,.7)", boxShadow: "0 10px 24px rgba(180,110,20,.4),inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -5px 10px rgba(150,80,0,.3)", fontFamily: "'Nunito',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: ".6px", color: "#FFF6E6", transition: "transform .2s" }}
                 >
@@ -346,6 +375,28 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
 
       <AnimatePresence>
         {galleryOpen && <StoryGallery onClose={() => setGalleryOpen(false)} />}
+      </AnimatePresence>
+
+      {/* Portão dos pais — personalização só com código */}
+      <AnimatePresence>
+        {gateOpen && (
+          <ParentalGate
+            onSuccess={() => {
+              setGatePassed(true);
+              try { sessionStorage.setItem(SESSION_GATE_KEY, "1"); } catch { /* noop */ }
+              setGateOpen(false);
+              const cb = pendingAfterGate.current;
+              pendingAfterGate.current = null;
+              if (cb) cb();
+            }}
+            onCancel={() => {
+              pendingAfterGate.current = null;
+              setGateOpen(false);
+              // Se veio da home sem intro, cancela e volta
+              if (skipIntro && step === "intro") onBack();
+            }}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
