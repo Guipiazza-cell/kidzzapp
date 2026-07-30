@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Library } from "lucide-react";
 import KidzzHeader from "@/components/common/KidzzHeader";
@@ -7,7 +7,6 @@ import PersonalizationPanel, { StoryIntent, EnsinarSub, VoiceRate } from "./Pers
 import StoryDisplay from "./StoryDisplay";
 import GeneratingOverlay from "./GeneratingOverlay";
 import StoryGallery from "./StoryGallery";
-import ParentalGate from "@/components/ParentalGate";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
@@ -21,9 +20,6 @@ import { haptic } from "@/lib/haptics";
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-story`;
 
 type Step = "intro" | "avatar" | "form" | "display";
-
-// Marca por sessão — pai não precisa digitar PIN toda vez que voltar pra Fábrica.
-const SESSION_GATE_KEY = "kidzz_story_factory_gate_ok";
 
 /* ── SVG paths (portados do design Historias.dc.html) ── */
 const D = {
@@ -56,35 +52,16 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
     return Math.min(10, Math.max(3, first));
   })();
 
-  const [step, setStep] = useState<Step>("intro");
+  // Da home já viu “Como funciona” → entra direto no avatar (sem portão dos pais).
+  const [step, setStep] = useState<Step>(skipIntro ? "avatar" : "intro");
   const [avatar, setAvatar] = useState<ChildAvatar | null>(null);
   const [story, setStory] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const [gateOpen, setGateOpen] = useState(false);
-  const [gatePassed, setGatePassed] = useState<boolean>(() => {
-    try { return sessionStorage.getItem(SESSION_GATE_KEY) === "1"; } catch { return false; }
-  });
   // Guarda o rate de voz escolhido no painel pra reutilizar na narração
   const voiceRateRef = useRef<number>(0.88);
-  const pendingAfterGate = useRef<(() => void) | null>(null);
-  const skipBooted = useRef(false);
-
-  const requireGate = useCallback((cb: () => void) => {
-    if (gatePassed) { cb(); return; }
-    setGateOpen(true);
-    // armazena callback via micro-state — usamos efeito simples: depois do gate, abre próximo step
-    pendingAfterGate.current = cb;
-  }, [gatePassed]);
-
-  // Vindo da home: “Como funciona” já foi visto — entra no fluxo (gate → avatar).
-  useEffect(() => {
-    if (!skipIntro || skipBooted.current) return;
-    skipBooted.current = true;
-    requireGate(() => setStep("avatar"));
-  }, [skipIntro, requireGate]);
 
   const handleAvatarComplete = useCallback((a: ChildAvatar) => {
     setAvatar(a);
@@ -250,6 +227,8 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
 
       <KidzzHeader
         onBack={onBack}
+        hideLogo
+        hideTagline
         right={
           <motion.button
             onClick={() => setGalleryOpen(true)}
@@ -285,11 +264,24 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
                 animation: "hist-heroIn .7s cubic-bezier(.22,1,.36,1) both",
               }}
             >
-              <div style={{ position: "relative", height: 196, overflow: "hidden" }}>
+              <div style={{ position: "relative", height: 228, overflow: "hidden" }}>
                 <img
                   src="/exemplos/assets/cena-historias.png"
-                  alt="Criança lendo um livro mágico"
-                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 34%", animation: "hist-floaty 7s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)" }}
+                  alt="Gui, o camaleão, na fábrica de histórias"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "118%",
+                    objectFit: "cover",
+                    /* Enquadra o Gui (centro-esquerda), mais perto e inteiro */
+                    objectPosition: "38% 42%",
+                    transform: "scale(1.12)",
+                    transformOrigin: "38% 42%",
+                    animation: "hist-floaty 7s ease-in-out infinite",
+                    filter: "saturate(1.08) contrast(1.02)",
+                  }}
                 />
                 {/* fagulhas mágicas */}
                 <div aria-hidden style={{ position: "absolute", top: 26, left: "38%", width: 5, height: 5, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 10px 3px rgba(255,210,120,.85)", animation: "hist-twinkle 3s ease-in-out infinite" }} />
@@ -312,7 +304,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
                   Criada com o nome, o rosto e o mundo do seu filho — do jeitinho que só ele merece.
                 </p>
                 <button
-                  onClick={() => requireGate(() => setStep("avatar"))}
+                  onClick={() => { haptic("medium"); setStep("avatar"); }}
                   className="active:scale-[0.97]"
                   style={{ position: "relative", overflow: "hidden", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: 14, borderRadius: 999, cursor: "pointer", background: "radial-gradient(130% 130% at 30% 22%,#FFD98A 0%,#F2A62B 52%,#D97A1E 100%)", border: "1px solid rgba(255,255,255,.7)", boxShadow: "0 10px 24px rgba(180,110,20,.4),inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -5px 10px rgba(150,80,0,.3)", fontFamily: "'Nunito',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: ".6px", color: "#FFF6E6", transition: "transform .2s" }}
                 >
@@ -354,26 +346,6 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
 
       <AnimatePresence>
         {galleryOpen && <StoryGallery onClose={() => setGalleryOpen(false)} />}
-      </AnimatePresence>
-
-      {/* Portão dos Pais — protege a personalização */}
-      <AnimatePresence>
-        {gateOpen && (
-          <ParentalGate
-            onSuccess={() => {
-              setGatePassed(true);
-              try { sessionStorage.setItem(SESSION_GATE_KEY, "1"); } catch {}
-              setGateOpen(false);
-              const cb = pendingAfterGate.current;
-              pendingAfterGate.current = null;
-              if (cb) cb();
-            }}
-            onCancel={() => {
-              pendingAfterGate.current = null;
-              setGateOpen(false);
-            }}
-          />
-        )}
       </AnimatePresence>
     </div>
   );

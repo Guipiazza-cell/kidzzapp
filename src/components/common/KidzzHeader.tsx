@@ -16,9 +16,11 @@ interface Props {
   right?: ReactNode;
   /** Esconde a tagline abaixo do logo. */
   hideTagline?: boolean;
+  /** Esconde logo + tagline (só voltar + right). */
+  hideLogo?: boolean;
 }
 
-const KidzzHeader = ({ onBack, right, hideTagline }: Props) => {
+const KidzzHeader = ({ onBack, right, hideTagline, hideLogo }: Props) => {
   return (
     <div
       className="sticky top-0 z-30"
@@ -50,23 +52,27 @@ const KidzzHeader = ({ onBack, right, hideTagline }: Props) => {
         >
           <ArrowLeft size={20} color={INK} strokeWidth={2.2} />
         </button>
-        <div className="flex flex-col items-center leading-tight min-w-0">
-          <KidzzLogo height={28} light />
-          {!hideTagline && (
-            <span
-              style={{
-                fontFamily: "'Nunito', system-ui, sans-serif",
-                fontSize: 9.5,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "#7d6e5b",
-                marginTop: 2,
-              }}
-            >
-              Menos tela. Mais memórias.
-            </span>
-          )}
-        </div>
+        {!hideLogo ? (
+          <div className="flex flex-col items-center leading-tight min-w-0">
+            <KidzzLogo height={28} light />
+            {!hideTagline && (
+              <span
+                style={{
+                  fontFamily: "'Nunito', system-ui, sans-serif",
+                  fontSize: 9.5,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "#7d6e5b",
+                  marginTop: 2,
+                }}
+              >
+                Menos tela. Mais memórias.
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="flex-1 min-w-0" aria-hidden />
+        )}
         {/* Ações à direita ou spacer p/ manter a marca centralizada */}
         {right ? (
           <div className="flex items-center justify-end gap-2" style={{ minWidth: 44, minHeight: 44 }}>
