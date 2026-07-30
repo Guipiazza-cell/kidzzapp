@@ -28,7 +28,7 @@ import {
   getMoviesBySection,
   type Movie,
 } from "@/data/movies";
-import { getWeeklyMovie, getDailyHighlights } from "@/lib/featuredRotation";
+import { getWeeklyMovie } from "@/lib/featuredRotation";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
@@ -598,7 +598,7 @@ const DetailSheet = ({
   );
 };
 
-type ChipId = "alta" | "emocionar" | "aventura" | "acalmar" | "viagem";
+type ChipId = "emocionar" | "aventura" | "acalmar" | "viagem";
 
 const CHIPS: {
   id: ChipId;
@@ -608,44 +608,39 @@ const CHIPS: {
   tint: [number, number, number];
   g: [string, string, string];
 }[] = [
-  { id: "alta", title: "Em alta hoje", sub: "Os mais amados", Icon: Clapperboard, tint: [230, 185, 90], g: ["#FFE9A8", "#F2B23B", "#C77E12"] },
   { id: "emocionar", title: "Para emocionar", sub: "Toca o coração", Icon: Heart, tint: [140, 200, 140], g: ["#C0EDA0", "#6FBE4F", "#3F8A32"] },
   { id: "aventura", title: "Aventura", sub: "Sonhar e explorar", Icon: Rocket, tint: [160, 140, 220], g: ["#D8C2FF", "#9A6CF0", "#6A3EC0"] },
   { id: "acalmar", title: "Para acalmar", sub: "Relaxar juntos", Icon: Moon, tint: [120, 160, 220], g: ["#A8D4FF", "#4E9BE8", "#2568B8"] },
   { id: "viagem", title: "Modo Viagem", sub: "Qualquer lugar", Icon: Briefcase, tint: [100, 180, 200], g: ["#A8E8F0", "#3DBFCE", "#1B7A88"] },
 ];
 
+const CHIP_SECTION: Record<ChipId, string> = {
+  emocionar: "vinculo",
+  aventura: "imaginacao",
+  acalmar: "calmar",
+  viagem: "divertidos",
+};
+
 const FamilyCinema = ({ onBack }: Props) => {
   const { profile } = useAuth();
   const [active, setActive] = useState<Movie | null>(null);
-  const [chip, setChip] = useState<ChipId>("alta");
+  const [chip, setChip] = useState<ChipId>("emocionar");
   const [toast, setToast] = useState("");
   const toastT = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const heroArtRef = useRef<HTMLDivElement>(null);
 
   const weekly = useMemo(() => getWeeklyMovie(), []);
-  const daily = useMemo(() => getDailyHighlights(6), []);
   const pontos = profile?.points ?? 0;
   const h = new Date().getHours();
   const saudacao = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
 
   const sectionMovies = useMemo(() => {
-    if (chip === "alta") return daily;
-    const map: Record<Exclude<ChipId, "alta">, string> = {
-      emocionar: "vinculo",
-      aventura: "imaginacao",
-      acalmar: "calmar",
-      viagem: "divertidos",
-    };
-    const sec = EDITORIAL_SECTIONS.find((s) => s.id === map[chip]);
-    return sec ? getMoviesBySection(sec).slice(0, 10) : daily;
-  }, [chip, daily]);
+    const sec = EDITORIAL_SECTIONS.find((s) => s.id === CHIP_SECTION[chip]);
+    return sec ? getMoviesBySection(sec).slice(0, 10) : [];
+  }, [chip]);
 
-  const sectionTitle =
-    chip === "alta"
-      ? "Em alta hoje"
-      : CHIPS.find((c) => c.id === chip)?.title ?? "Curadoria";
+  const sectionTitle = CHIPS.find((c) => c.id === chip)?.title ?? "Curadoria";
 
   useEffect(() => {
     const sc = scrollRef.current;
@@ -1212,9 +1207,8 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Seções editoriais extras (quando chip = alta) */}
-        {chip === "alta" &&
-          EDITORIAL_SECTIONS.map((sec, i) => {
+        {/* Demais seções editoriais (exceto a do chip ativo, já listada acima) */}
+        {EDITORIAL_SECTIONS.filter((sec) => sec.id !== CHIP_SECTION[chip]).map((sec, i) => {
             const movies = getMoviesBySection(sec).slice(0, 8);
             if (!movies.length) return null;
             return (
