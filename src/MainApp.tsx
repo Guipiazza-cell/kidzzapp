@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import SplashScreen from "@/components/SplashScreen";
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import CinemaBackground from "@/components/CinemaBackground";
 import MagicalBackground from "@/components/MagicalBackground";
 import AppUpdateBanner from "./components/AppUpdateBanner";
@@ -30,34 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-let SPLASH_SHOWN = false;
-try {
-  if (
-    typeof window !== "undefined" &&
-    (sessionStorage.getItem("kidzz_splash_shown") === "1" ||
-      localStorage.getItem("kidzz_splash_shown") === "1")
-  ) {
-    SPLASH_SHOWN = true;
-  }
-} catch {
-}
-
 const MainApp = () => {
-  const [splashDone, setSplashDone] = useState(SPLASH_SHOWN);
-
-  const handleSplashFinish = useCallback(() => {
-    SPLASH_SHOWN = true;
-    try { sessionStorage.setItem("kidzz_splash_shown", "1"); } catch { }
-    try { localStorage.setItem("kidzz_splash_shown", "1"); } catch { }
-    setSplashDone(true);
-  }, []);
-
-  useEffect(() => {
-    if (splashDone) return;
-    const t = setTimeout(handleSplashFinish, 1300);
-    return () => clearTimeout(t);
-  }, [handleSplashFinish, splashDone]);
-
   useEffect(() => {
     markSeen();
     const handler = () => markLevelUp();
@@ -77,7 +49,6 @@ const MainApp = () => {
 
   return (
     <>
-      {!splashDone && <SplashScreen onFinish={handleSplashFinish} duration={900} />}
       <CinemaBackground />
       <MagicalBackground />
       <AuthProvider>
