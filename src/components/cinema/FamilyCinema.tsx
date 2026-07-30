@@ -824,71 +824,55 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Hero: texto sobre o fundo full-bleed (Gui já está no CinemaBackdrop) */}
-        <div style={{ position: "relative", padding: `4px ${PAD}px 12px`, minHeight: 248 }}>
-          <div
-            style={{
-              position: "relative",
-              zIndex: 3,
-              maxWidth: "54%",
-              paddingTop: 8,
-              animation: "cine2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
-            }}
-          >
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: -8,
-                top: 0,
-                right: 8,
-                bottom: -8,
-                borderRadius: 20,
-                background:
-                  "linear-gradient(100deg, rgba(234,243,251,.94) 0%, rgba(234,243,251,.72) 55%, transparent 100%)",
-                zIndex: -1,
-              }}
-            />
+        {/* Hero: texto solto (sem card/fundo), legível sobre a arte */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 3,
+            padding: `10px ${PAD}px 18px`,
+            minHeight: 220,
+            animation: "cine2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
+          }}
+        >
+          <div style={{ maxWidth: "56%" }}>
             <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
                 fontSize: 12.5,
                 fontWeight: 800,
-                color: "#2A4060",
+                color: "rgba(255,250,240,.92)",
                 marginBottom: 8,
-                textShadow: "0 1px 0 rgba(255,255,255,.55)",
+                textShadow: "0 1px 10px rgba(0,0,0,.35)",
               }}
             >
               {saudacao}, família!
             </div>
             <h1
               style={{
-                margin: "0 0 8px",
+                margin: "0 0 10px",
                 fontFamily: SERIF,
                 fontWeight: 600,
-                fontSize: 26,
+                fontSize: 28,
                 lineHeight: 1.12,
-                color: INK,
+                color: "#FFFDF6",
                 letterSpacing: "-0.4px",
-                textShadow: "0 1px 12px rgba(255,255,255,.45)",
+                textShadow: "0 2px 16px rgba(0,0,0,.4)",
               }}
             >
               Cinema é mais
               <br />
               que diversão,
               <br />
-              é <span style={{ color: "#3E9A5E" }}>conexão</span>.
+              é <span style={{ color: "#9FE8B0" }}>conexão</span>.
             </h1>
             <p
               style={{
                 margin: 0,
-                fontSize: 12.5,
-                fontWeight: 600,
-                lineHeight: 1.4,
-                color: INK2,
-                maxWidth: 200,
+                fontSize: 13,
+                fontWeight: 700,
+                lineHeight: 1.45,
+                color: "rgba(255,248,230,.88)",
+                maxWidth: 220,
+                textShadow: "0 1px 10px rgba(0,0,0,.35)",
               }}
             >
               Um filme por semana para inspirar conversas, emoções e memórias que ficam.
