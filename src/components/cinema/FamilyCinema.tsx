@@ -47,7 +47,7 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v5";
+const AV = "v6";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 /** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
@@ -97,51 +97,24 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
 );
 
 /**
- * Capas premium (cinema-v2 Hermes). Sem emoji-pôster.
- * Quando não há arte dedicada, reutiliza capa de alta qualidade da mesma “família”
- * visual (melhor que emoji gigante). Novas artes originais = próxima leva.
+ * Capas por filme — SOMENTE arte correta do próprio título.
+ * Nunca reutilizar capa de outro filme (causava repetição / póster errado).
+ * Sem arte dedicada → fallback de gradiente + emoji no card.
  */
 const COVER: Record<string, string> = {
+  // cinema-v2 (HD)
   "wall-e": asset("cover-walle.png"),
   up: asset("cover-up.png"),
   "polar-express": asset("cover-polar.png"),
   red: asset("cover-red.png"),
   luca: asset("cover-luca.png"),
   coco: asset("cover-coco.png"),
-  // mapeamento sem arte dedicada - só assets HD existentes
-  narnia: asset("cover-up.png"),
-  "rei-leao": asset("cover-up.png"),
-  madagascar: asset("cover-luca.png"),
-  minions: asset("cover-red.png"),
-  sing: asset("cover-coco.png"),
-  "familia-futuro": asset("cover-walle.png"),
-  matilda: asset("cover-coco.png"),
-  alice: asset("cover-red.png"),
-  encanto: asset("cover-coco.png"),
-  nemo: asset("cover-luca.png"),
-  divertidamente: asset("cover-red.png"),
-  "toy-story": asset("cover-up.png"),
-  "lilo-stitch": asset("cover-luca.png"),
-  carros: asset("cover-up.png"),
-  malvado: asset("cover-red.png"),
-  pets: asset("cover-luca.png"),
-  zootopia: asset("cover-luca.png"),
-  enrolados: asset("cover-red.png"),
-  wish: asset("cover-coco.png"),
-  soul: asset("cover-walle.png"),
-  bolt: asset("cover-up.png"),
-  dumbo: asset("cover-up.png"),
-  "peter-pan": asset("cover-up.png"),
-  "bernardo-bianca": asset("cover-up.png"),
-  marley: asset("cover-up.png"),
-  "4-vidas": asset("cover-up.png"),
-  oz: asset("cover-red.png"),
-  "pequenos-espioes": asset("cover-walle.png"),
-  robos: asset("cover-walle.png"),
-  horton: asset("cover-luca.png"),
-  hamburguer: asset("cover-red.png"),
-  chefinho: asset("cover-red.png"),
-  leo: asset("cover-luca.png"),
+  // cin-* dedicados (public/exemplos/assets)
+  narnia: "/exemplos/assets/cin-narnia.png",
+  madagascar: "/exemplos/assets/cin-mada.png",
+  minions: "/exemplos/assets/cin-minions.png",
+  sing: "/exemplos/assets/cin-sing.png",
+  "familia-futuro": "/exemplos/assets/cin-futuro.png",
 };
 
 interface Props {
@@ -313,10 +286,12 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
               inset: 0,
               display: "grid",
               placeItems: "center",
-              background: `linear-gradient(160deg, ${hexA(m.glowColor, 0.75)}, #1a2030)`,
+              background: `linear-gradient(160deg, ${hexA(m.glowColor, 0.85)}, #1a2030)`,
             }}
           >
-            <Clapperboard size={36} color="rgba(255,255,255,.85)" strokeWidth={1.6} />
+            <span style={{ fontSize: 42, lineHeight: 1, filter: "drop-shadow(0 4px 12px rgba(0,0,0,.35))" }}>
+              {m.emoji || "🎬"}
+            </span>
           </div>
         )}
         <div
@@ -464,8 +439,8 @@ const DetailSheet = ({
             }}
           >
             {!cover && (
-              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "linear-gradient(160deg, rgba(46,122,204,.5), #1a1520)" }}>
-                <Clapperboard size={40} color="rgba(255,255,255,.9)" strokeWidth={1.5} />
+              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: `linear-gradient(160deg, ${hexA(movie.glowColor, 0.75)}, #1a1520)` }}>
+                <span style={{ fontSize: 48, lineHeight: 1 }}>{movie.emoji || "🎬"}</span>
               </div>
             )}
             <div
