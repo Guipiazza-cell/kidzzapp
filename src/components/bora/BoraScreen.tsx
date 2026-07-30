@@ -15,6 +15,7 @@ import { useSurpresaIA } from "@/hooks/useSurpresaIA";
 import { useBoraStats } from "@/hooks/useBoraStats";
 import { useDesafioSemana } from "@/hooks/useDesafioSemana";
 import { usePaywall } from "@/components/paywall/PaywallProvider";
+import { useMemories } from "@/hooks/useMemories";
 import { CriancaOnboarding } from "./CriancaOnboarding";
 import { SurpresaModal } from "./SurpresaModal";
 import { ComoFoiModal } from "./ComoFoiModal";
@@ -137,6 +138,7 @@ const BoraScreen = ({ onBack }: Props) => {
   const { criancas, loading: loadingCriancas } = useCriancas();
   const { open: openPaywall } = usePaywall();
   const { desafio } = useDesafioSemana();
+  const { addMemory } = useMemories();
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   useEffect(() => {
@@ -296,6 +298,19 @@ const BoraScreen = ({ onBack }: Props) => {
         window.localStorage.setItem(DIARY_KEY, JSON.stringify(next));
       } catch {}
       return next;
+    });
+    const nome = profile?.child_name || "A família";
+    void addMemory({
+      type: "bora",
+      title: `Bora: ${TODAY_ACTIVITY.titulo}`,
+      content: `${nome} concluiu "${TODAY_ACTIVITY.titulo}" (${TODAY_ACTIVITY.tela_min} min sem tela)`,
+      is_special: false,
+      image_url: null,
+      metadata: {
+        area: "bora",
+        activity: TODAY_ACTIVITY.titulo,
+        minutes: TODAY_ACTIVITY.tela_min,
+      },
     });
   };
 

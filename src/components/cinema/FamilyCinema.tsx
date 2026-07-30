@@ -40,6 +40,7 @@ import { cinemaCoverCdn, cinemaCoverUrl } from "@/lib/cinemaCovers";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMemories } from "@/hooks/useMemories";
 import {
   FONT,
   SERIF,
@@ -708,13 +709,16 @@ const CHIP_SECTION: Record<ChipId, string> = {
 
 const FamilyCinema = ({ onBack }: Props) => {
   const { profile } = useAuth();
+  const { addMemory } = useMemories();
   const [active, setActive] = useState<Movie | null>(null);
   const [chip, setChip] = useState<ChipId>("emocionar");
   const [toast, setToast] = useState("");
   const toastT = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const loggedOpen = useRef<Set<string>>(new Set());
 
   const weekly = useMemo(() => getWeeklyMovie(), []);
+  const childName = profile?.child_name || "a família";
   const pontos = profile?.points ?? 0;
   const h = new Date().getHours();
   const saudacao = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
@@ -726,11 +730,26 @@ const FamilyCinema = ({ onBack }: Props) => {
 
   const sectionTitle = CHIPS.find((c) => c.id === chip)?.title ?? "Curadoria";
 
-  const open = useCallback((m: Movie) => {
-    haptic("light");
-    sfx("click");
-    setActive(m);
-  }, []);
+  const open = useCallback(
+    (m: Movie) => {
+      haptic("light");
+      sfx("click");
+      setActive(m);
+      // Registra abertura (1x por filme na sessão)
+      if (!loggedOpen.current.has(m.id)) {
+        loggedOpen.current.add(m.id);
+        void addMemory({
+          type: "cinema",
+          title: `Cinema: ${m.titulo}`,
+          content: `${childName} explorou "${m.titulo}" — ${m.descricao}`,
+          is_special: false,
+          image_url: null,
+          metadata: { area: "cinema", movie_id: m.id, age: m.faixaEtaria },
+        });
+      }
+    },
+    [addMemory, childName],
+  );
 
   const showToast = useCallback((msg: string) => {
     if (toastT.current) clearTimeout(toastT.current);
@@ -740,9 +759,20 @@ const FamilyCinema = ({ onBack }: Props) => {
 
   const marcar = useCallback(() => {
     haptic("light");
+    const movie = active;
     setActive(null);
     showToast("Sessão marcada para a família 🎬");
-  }, [showToast]);
+    if (movie) {
+      void addMemory({
+        type: "cinema",
+        title: `Sessão marcada: ${movie.titulo}`,
+        content: `${childName} marcou "${movie.titulo}" para assistir em família`,
+        is_special: true,
+        image_url: null,
+        metadata: { area: "cinema", movie_id: movie.id, action: "schedule" },
+      });
+    }
+  }, [active, addMemory, childName, showToast]);
 
   return (
     <div

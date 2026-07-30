@@ -63,12 +63,12 @@ const MorningKaraoke = ({ onBack, childName, onAchievement }: Props) => {
     const ach = bumpCounter("karaoke");
     if (ach) onAchievement?.(ach);
     addMemory({
-      type: "achievement",
+      type: "music",
       title: `Cantou: ${song.title}`,
       content: `${childName} concluiu o karaokê matinal com o Gui`,
       is_special: false,
       image_url: null,
-      metadata: { kind: "karaoke", song_id: song.id, song_title: song.title },
+      metadata: { area: "music", kind: "karaoke", song_id: song.id, song_title: song.title },
     });
     setTimeout(() => setShowCelebration(false), 3500);
   };

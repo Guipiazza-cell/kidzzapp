@@ -597,12 +597,13 @@ const RoutineScreen = () => {
           memorySaved.current = true;
           try {
             addMemory({
-              type: "achievement" as never,
+              type: "routine",
               title: "Dia completo na Rotina",
               content: `${childName} completou todas as ${result.total} tarefas de hoje 💛`,
               is_special: true,
               image_url: null,
               metadata: {
+                area: "routine",
                 source: "routine",
                 date: new Date().toISOString().split("T")[0],
                 xp: result.xpGained + result.bonusGained,

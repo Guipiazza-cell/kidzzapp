@@ -187,11 +187,18 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
   const handleSave = async () => {
     try {
       await addMemory({
-        kind: "music" as any,
-        title: activity.title,
+        type: "music",
+        title: `Música: ${activity.title}`,
         content: `${childName} viveu "${activity.title}" — ${activity.subtitle}`,
-        emoji: isAnimals ? "🐾" : "🎶",
-      } as any);
+        is_special: false,
+        image_url: null,
+        metadata: {
+          area: "music",
+          activity_id: activity.id,
+          kind: activity.kind,
+          animals: isAnimals,
+        },
+      });
       setSaved(true);
     } catch {
       setSaved(true);

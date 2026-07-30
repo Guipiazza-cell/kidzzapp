@@ -270,7 +270,12 @@ const MyActivities = ({ onBack }: Props) => {
         content: activity.description,
         is_special: false,
         image_url: null,
-        metadata: { source: "weekly_activity", category: activity.category, emoji: activity.emoji },
+        metadata: {
+          area: "play",
+          source: "weekly_activity",
+          category: activity.category,
+          emoji: activity.emoji,
+        },
       });
       const meta = getCategoryMeta(activity.category);
       const colorHsl = meta.color

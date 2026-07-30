@@ -122,12 +122,12 @@ const DanceWithAne = ({ onBack, childName, onAchievement }: Props) => {
     const ach = bumpCounter("dance");
     if (ach) onAchievement?.(ach);
     addMemory({
-      type: "achievement",
+      type: "music",
       title: `Dançou com Ane`,
       content: `${childName} acertou ${score} pontos dançando!`,
       is_special: false,
       image_url: null,
-      metadata: { kind: "dance", score },
+      metadata: { area: "music", kind: "dance", score },
     });
   };
 

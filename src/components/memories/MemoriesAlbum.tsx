@@ -18,12 +18,10 @@ import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
  * Ref: public/telas/memorias/
  * Assets: camaleão original soft · mix Gui + família
  *
- * Dados reais de consumo (nunca mock fixo de conteúdo):
- *  - Momentos guardados  → memories do usuário (useMemories)
- *  - Em andamento        → histórias com leitura <100% + missões da semana incompletas
- *                          + progresso rumo à próxima conquista de perguntas
- *  - Conquistas          → desbloqueadas por questions_used / stories_used / missions /
- *                          total de memórias / streak_days
+ * Histórico de uso do app (tudo que a família faz fica aqui):
+ *  - Momentos guardados  → memories (perguntas, histórias, música, cinema, rotina, jogos…)
+ *  - Em andamento        → histórias / missões incompletas
+ *  - Conquistas          → badges por consumo real
  *  - Pontos              → profile.points
  */
 
@@ -70,10 +68,9 @@ const D = {
   shield: "M12 3 5 6v5c0 4.5 2.8 7.8 7 9 4.2-1.2 7-4.5 7-9V6l-7-3Z",
 };
 
-const TYPE_META: Record<
-  Memory["type"],
-  { k: string; d: string; tag: string; tagColor: [string, string]; cover: string }
-> = {
+type TypeMeta = { k: string; d: string; tag: string; tagColor: [string, string]; cover: string };
+
+const TYPE_META: Record<string, TypeMeta> = {
   question: {
     k: "rosa",
     d: D.chat,
@@ -102,7 +99,72 @@ const TYPE_META: Record<
     tagColor: ["rgba(242,178,59,.92)", "#4A3210"],
     cover: asset("cover-default.png"),
   },
+  music: {
+    k: "roxo",
+    d: D.heart,
+    tag: "Música",
+    tagColor: ["rgba(200,170,245,.92)", "#3A2060"],
+    cover: asset("cover-default.png"),
+  },
+  cinema: {
+    k: "azul",
+    d: D.photo,
+    tag: "Cinema",
+    tagColor: ["rgba(150,200,245,.92)", "#133A5E"],
+    cover: asset("cover-default.png"),
+  },
+  routine: {
+    k: "verde",
+    d: D.target,
+    tag: "Rotina",
+    tagColor: ["rgba(170,218,140,.92)", "#23431A"],
+    cover: asset("cover-mission.png"),
+  },
+  play: {
+    k: "ambar",
+    d: D.star,
+    tag: "Brincar",
+    tagColor: ["rgba(242,178,59,.92)", "#4A3210"],
+    cover: asset("cover-default.png"),
+  },
+  activity: {
+    k: "rosa",
+    d: D.heart,
+    tag: "Atividade",
+    tagColor: ["rgba(244,168,200,.92)", "#4A1F35"],
+    cover: asset("cover-default.png"),
+  },
+  discover: {
+    k: "azul",
+    d: D.grid,
+    tag: "Descobrir",
+    tagColor: ["rgba(150,200,245,.92)", "#133A5E"],
+    cover: asset("cover-default.png"),
+  },
+  bora: {
+    k: "verde",
+    d: D.target,
+    tag: "Bora",
+    tagColor: ["rgba(170,218,140,.92)", "#23431A"],
+    cover: asset("cover-mission.png"),
+  },
+  diary: {
+    k: "rosa",
+    d: D.book,
+    tag: "Diário",
+    tagColor: ["rgba(244,168,200,.92)", "#4A1F35"],
+    cover: asset("cover-story.png"),
+  },
 };
+
+const typeMetaOf = (type: string): TypeMeta =>
+  TYPE_META[type] || {
+    k: "ambar",
+    d: D.star,
+    tag: "Uso",
+    tagColor: ["rgba(242,178,59,.92)", "#4A3210"],
+    cover: asset("cover-default.png"),
+  };
 
 type InProgressItem = {
   id: string;
@@ -432,10 +494,13 @@ const MemoriesAlbum = ({
   ];
 
   const chips: { id: typeof filter; label: string; d: string }[] = [
-    { id: "all", label: "Todas", d: D.grid },
+    { id: "all", label: "Tudo", d: D.grid },
     { id: "question", label: "Perguntas", d: D.chat },
     { id: "story", label: "Histórias", d: D.book },
+    { id: "music", label: "Música", d: D.heart },
+    { id: "cinema", label: "Cinema", d: D.photo },
     { id: "mission", label: "Missões", d: D.target },
+    { id: "play", label: "Brincar", d: D.star },
     { id: "achievement", label: "Conquistas", d: D.trophy },
   ];
 
@@ -1037,7 +1102,7 @@ const MemoriesAlbum = ({
                   }}
                 >
                   <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
-                    Momentos guardados 🌱
+                    Histórico de uso
                   </h2>
                   {filter !== "all" && (
                     <button onClick={() => setFilter("all")} style={verTodasStyle}>
@@ -1055,7 +1120,7 @@ const MemoriesAlbum = ({
                   }}
                 >
                   {momentos.map((m) => {
-                    const meta = TYPE_META[m.type];
+                    const meta = typeMetaOf(m.type);
                     const cover = m.image_url || meta.cover;
                     return (
                       <div
