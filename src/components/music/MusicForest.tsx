@@ -279,8 +279,6 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
   });
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const heroWrapRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef(0);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showToast = (msg: string) => {
@@ -289,20 +287,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   };
 
-  const onScroll = () => {
-    if (rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      const sc = scrollRef.current, hero = heroWrapRef.current;
-      if (!sc || !hero) return;
-      const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.42}px) scale(${1 + y * 0.0004})`;
-      hero.style.opacity = String(Math.max(0, 1 - y / 240));
-    });
-  };
-
   useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     if (toastTimer.current) clearTimeout(toastTimer.current);
   }, []);
 
@@ -393,7 +378,6 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
     { pillar: "create" as Pillar, title: "Crie Sua Música", sub: "Laboratório sonoro - monte a sua", d: D.lab, k: "verde", t: [140, 200, 110] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-create.png` },
   ];
 
-  const destaques = ACTIVITIES.filter((a) => a.tags.includes("featured") || a.tags.includes("movement"));
   const heroImg = `${MU}/hero-family.png`;
 
   const playAmbient = (s: (typeof AMBIENT_SOUNDS)[number]) => {
@@ -423,7 +407,6 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 
       <div
         ref={scrollRef}
-        onScroll={onScroll}
         style={{
           height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain",
           WebkitOverflowScrolling: "touch",
@@ -431,31 +414,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           scrollbarWidth: "none", position: "relative", zIndex: 2,
         }}
       >
-        {/* ── HERO (layout print: texto esq + arte dir) ── */}
+        {/* ── HERO (só texto + chrome; fundo continua no ForestBackdrop) ── */}
         <div style={{ position: "relative", minHeight: 420, paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)" }}>
-          {/* arte flutuante à direita */}
-          <div
-            ref={heroWrapRef}
-            style={{
-              position: "absolute", top: 48, right: -8, width: "58%", height: 320,
-              pointerEvents: "none", animation: "mus-heroin .75s cubic-bezier(.22,1,.36,1) both",
-            }}
-          >
-            <img
-              src={heroImg}
-              alt="Família tocando música"
-              style={{
-                width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%",
-                borderRadius: "0 0 0 48%",
-                maskImage: "radial-gradient(70% 70% at 60% 40%, #000 35%, transparent 78%)",
-                WebkitMaskImage: "radial-gradient(70% 70% at 60% 40%, #000 35%, transparent 78%)",
-                filter: "saturate(1.12) contrast(1.04)",
-                animation: "mus-floaty 7s ease-in-out infinite",
-                boxShadow: "0 20px 50px rgba(0,0,0,.25)",
-              }}
-            />
-          </div>
-
           {/* chrome */}
           <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
             <button
@@ -484,7 +444,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           {/* copy */}
           <div style={{ position: "relative", zIndex: 5, padding: "18px 20px 8px", maxWidth: "62%", animation: "mus-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
             <div style={{ fontWeight: 800, fontSize: 13, color: "rgba(255,252,240,.92)", textShadow: "0 1px 8px rgba(0,0,0,.35)", marginBottom: 8 }}>
-              {greetingWord()}, família! <span style={{ color: "#7dffb0" }}>♥</span>
+              {greetingWord()}, família!
             </div>
             <h1 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 30, lineHeight: 1.12, color: "#FFFDF6", letterSpacing: "-.4px", textShadow: "0 2px 18px rgba(0,0,0,.4)" }}>
               Música que <span style={{ color: "#FFD36A" }}>conecta</span>, momentos que ficam.
@@ -656,28 +616,6 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                 </button>
               );
             })}
-          </div>
-        </div>
-
-        {/* ── ATIVIDADES ── */}
-        <div style={{ paddingTop: 8 }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "16px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#2A2008" }}>Atividades em destaque</h2>
-            <button onClick={() => openCategory("featured")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: FONT, fontWeight: 900, fontSize: 12.5, color: "#C7841A", padding: 0 }}>
-              Ver todas →
-            </button>
-          </div>
-          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 12px", scrollbarWidth: "none" }}>
-            {destaques.map((a, i) => (
-              <ActivityCard
-                key={a.id}
-                activity={a}
-                index={i}
-                favorite={favorites.includes(a.id)}
-                onFav={() => toggleFav(a.id)}
-                onOpen={() => tryOpenActivity(a)}
-              />
-            ))}
           </div>
         </div>
 
