@@ -556,12 +556,12 @@ const KidzzPlay = ({
               </button>
             </div>
           </div>
-          {/* Espaço só de fundo (personagens), sem texto por cima */}
-          <div style={{ height: 168 }} aria-hidden />
+          {/* Espaço curto de fundo; card sobe para não ficar no meio do rosto */}
+          <div style={{ height: 72 }} aria-hidden />
         </div>
 
         {/* ── Card de boas-vindas liquid glass (translúcido, não tapa o fundo) ── */}
-        <div style={{ padding: "0 16px 10px", position: "relative", zIndex: 5, animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
+        <div style={{ padding: "0 16px 10px", marginTop: -8, position: "relative", zIndex: 5, animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
           <div
             style={{
               borderRadius: 24,
