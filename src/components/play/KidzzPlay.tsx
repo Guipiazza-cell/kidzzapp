@@ -643,9 +643,8 @@ const KidzzPlay = ({
 
         {/* ── DESAFIOS EM FAMÍLIA ── */}
         <div>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "14px 20px 10px" }}>
+          <div style={{ padding: "14px 20px 10px" }}>
             <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Desafios em família ✨</h2>
-            <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todos →</button>
           </div>
           <div style={{ padding: "0 16px" }}>
             <div style={{ position: "relative", overflow: "hidden", borderRadius: 28, padding: "16px 16px 14px", background: "linear-gradient(155deg,rgba(255,255,255,.38) 0%,rgba(139,105,240,.8) 24%,rgba(120,88,220,.7) 60%,rgba(98,70,190,.78) 100%)", backdropFilter: "blur(36px) saturate(190%)", WebkitBackdropFilter: "blur(36px) saturate(190%)", border: "0.5px solid rgba(255,255,255,.7)", boxShadow: "0 18px 40px rgba(90,60,180,.38),0 0 28px rgba(139,105,240,.28),inset 0 1.5px 0 rgba(255,255,255,.75),inset 0 -10px 22px rgba(40,20,100,.25)", animation: "brin-rise .5s .15s both" }}>
