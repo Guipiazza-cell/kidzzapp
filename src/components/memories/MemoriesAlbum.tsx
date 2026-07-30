@@ -11,12 +11,12 @@ import {
   type Activity,
 } from "@/lib/weeklyActivities";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
-import heroBgUrl from "@/assets/memorias/hero-bg.png";
+import { CAMALEAO } from "@/lib/camaleaoOficial";
 
 /**
  * MemoriesAlbum - redesign premium v2
  * Ref: public/telas/memorias/
- * Hero: cena full-bleed (Gui + polaroids de memórias)
+ * Hero: card com texto + Gui cutout (sem fundo gerado)
  *
  * Histórico de uso do app (tudo que a família faz fica aqui):
  *  - Momentos guardados  → memories (perguntas, histórias, música, cinema, rotina, jogos…)
@@ -27,55 +27,8 @@ import heroBgUrl from "@/assets/memorias/hero-bg.png";
 
 const AS = "/exemplos/assets/memorias-v2";
 /** bump ao regenerar assets (cache bust no browser) */
-const AV = "v4";
+const AV = "v5";
 const asset = (name: string) => `${AS}/${name}?${AV}`;
-
-/** Fundo full-bleed — Gui + polaroids à direita; texto legível à esquerda. */
-const MemoriesBackdrop = ({ src }: { src: string }) => (
-  <div
-    className="absolute inset-0 pointer-events-none overflow-hidden"
-    aria-hidden
-  >
-    <img
-      src={src}
-      alt=""
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        objectFit: "cover",
-        objectPosition: "72% 18%",
-        filter: "saturate(1.08) brightness(0.94)",
-        transform: "scale(1.12)",
-        transformOrigin: "78% 12%",
-      }}
-    />
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background:
-          "radial-gradient(46% 36% at 82% 22%, rgba(255,200,120,.22) 0%, transparent 60%)," +
-          "linear-gradient(100deg, rgba(12,18,12,.62) 0%, rgba(12,18,12,.28) 34%, rgba(12,18,12,.06) 52%, transparent 66%)," +
-          "linear-gradient(180deg, rgba(18,24,14,.2) 0%, transparent 26%, rgba(38,52,31,.25) 48%, rgba(38,52,31,.78) 68%, #26341F 86%, #1E2A19 100%)",
-      }}
-    />
-    <div
-      style={{
-        position: "absolute",
-        top: -28,
-        right: -16,
-        width: 240,
-        height: 240,
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,210,140,.32), transparent 70%)",
-        filter: "blur(12px)",
-        animation: "memv2-drift1 13s ease-in-out infinite",
-      }}
-    />
-  </div>
-);
 
 interface MemoriesAlbumProps {
   onBack: () => void;
@@ -592,11 +545,18 @@ const MemoriesAlbum = ({
         fontFamily: FONT,
         background: "linear-gradient(180deg,#26341F 0%,#1E2A19 38%,#161F12 72%,#121A0F 100%)",
         color: "#F4EFE2",
-        overflow: "hidden",
       }}
     >
       <style>{KEYFRAMES}</style>
-      <MemoriesBackdrop src={heroBgUrl} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background:
+            "radial-gradient(45% 30% at 80% 22%,rgba(255,214,140,.12),transparent 70%),radial-gradient(40% 26% at 12% 55%,rgba(160,220,255,.06),transparent 70%),radial-gradient(50% 30% at 55% 88%,rgba(233,140,180,.07),transparent 70%)",
+        }}
+      />
 
       <div
         style={{
@@ -607,7 +567,6 @@ const MemoriesAlbum = ({
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
           scrollbarWidth: "none",
           position: "relative",
-          zIndex: 2,
         }}
       >
         {/* ── Header sticky ── */}
@@ -624,7 +583,7 @@ const MemoriesAlbum = ({
             alignItems: "center",
             gap: 10,
             background:
-              "linear-gradient(180deg, rgba(20,28,16,.55) 0%, rgba(20,28,16,.18) 70%, transparent 100%)",
+              "linear-gradient(180deg, rgba(20,28,16,.72) 0%, rgba(20,28,16,.28) 70%, transparent 100%)",
             backdropFilter: "blur(18px) saturate(150%)",
             WebkitBackdropFilter: "blur(18px) saturate(150%)",
           }}
@@ -707,66 +666,124 @@ const MemoriesAlbum = ({
           </div>
         </div>
 
-        {/* ── HERO: texto à esquerda; Gui da cena full-bleed à direita ── */}
+        {/* ── HERO: card com texto + Gui cutout (sem fundo) ── */}
         <div
           style={{
             position: "relative",
             zIndex: 3,
-            padding: "8px 20px 28px",
-            minHeight: 268,
+            padding: "6px 16px 14px",
             animation: "memv2-rise .6s both",
           }}
         >
-          <div style={{ maxWidth: "54%", minWidth: 0 }}>
+          <div
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "stretch",
+              gap: 4,
+              minHeight: 168,
+              borderRadius: R.card,
+              overflow: "hidden",
+              background:
+                "linear-gradient(145deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.06) 48%, rgba(255,200,140,.08) 100%)",
+              border: "0.5px solid rgba(255,255,255,.22)",
+              boxShadow:
+                "0 14px 36px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.18) inset",
+              backdropFilter: "blur(28px) saturate(160%)",
+              WebkitBackdropFilter: "blur(28px) saturate(160%)",
+            }}
+          >
             <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "6px 12px",
-                borderRadius: 999,
-                background: "rgba(255,255,255,.13)",
-                backdropFilter: "blur(12px)",
-                border: "0.5px solid rgba(255,255,255,.28)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,.3)",
-                fontWeight: 800,
-                fontSize: 12,
-                color: "rgba(244,239,226,.9)",
-                marginBottom: 11,
+                flex: "1 1 56%",
+                minWidth: 0,
+                padding: "16px 8px 16px 16px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
               }}
             >
-              {saudacao}, família!
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="#8FE3CD" style={{ verticalAlign: -2 }}>
-                <path d={D.heart} />
-              </svg>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignSelf: "flex-start",
+                  alignItems: "center",
+                  padding: "5px 11px",
+                  borderRadius: 999,
+                  background: "rgba(255,255,255,.12)",
+                  border: "0.5px solid rgba(255,255,255,.22)",
+                  fontWeight: 800,
+                  fontSize: 12,
+                  color: "rgba(244,239,226,.92)",
+                  marginBottom: 10,
+                }}
+              >
+                {saudacao}, família!
+              </div>
+              <h1
+                style={{
+                  margin: "0 0 8px",
+                  fontFamily: SERIF,
+                  fontWeight: 600,
+                  fontSize: 22,
+                  lineHeight: 1.16,
+                  color: "#FFFDF6",
+                  letterSpacing: "-.2px",
+                }}
+              >
+                Aqui guardamos <span style={{ color: "#F2A9C4" }}>memórias</span> que viram histórias.
+              </h1>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  lineHeight: 1.4,
+                  color: "rgba(255,248,230,.78)",
+                  maxWidth: 200,
+                }}
+              >
+                Cada momento juntos merece ser lembrado para sempre.
+              </p>
             </div>
-            <h1
+
+            <div
+              aria-hidden
               style={{
-                margin: "0 0 9px",
-                fontFamily: SERIF,
-                fontWeight: 600,
-                fontSize: 28,
-                lineHeight: 1.14,
-                color: "#FFFDF6",
-                letterSpacing: "-.2px",
-                textShadow: "0 2px 16px rgba(0,0,0,.45)",
+                flex: "0 0 42%",
+                maxWidth: 168,
+                position: "relative",
+                minHeight: 168,
+                pointerEvents: "none",
               }}
             >
-              Aqui guardamos <span style={{ color: "#F2A9C4" }}>memórias</span> que viram histórias.
-            </h1>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 13,
-                fontWeight: 700,
-                lineHeight: 1.45,
-                color: "rgba(255,248,230,.86)",
-                maxWidth: 210,
-                textShadow: "0 1px 10px rgba(0,0,0,.4)",
-              }}
-            >
-              Cada momento juntos merece ser lembrado para sempre.
-            </p>
+              <div
+                style={{
+                  position: "absolute",
+                  inset: "12% 8% 8% 8%",
+                  borderRadius: "50%",
+                  background: "radial-gradient(circle, rgba(255,210,140,.28), transparent 68%)",
+                  filter: "blur(8px)",
+                }}
+              />
+              <img
+                src={CAMALEAO.heartSoft}
+                alt=""
+                style={{
+                  position: "absolute",
+                  right: -4,
+                  bottom: -6,
+                  width: "108%",
+                  height: "108%",
+                  objectFit: "contain",
+                  objectPosition: "center bottom",
+                  filter: "drop-shadow(0 10px 18px rgba(0,0,0,.32))",
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = CAMALEAO.heart;
+                }}
+              />
+            </div>
           </div>
         </div>
 
