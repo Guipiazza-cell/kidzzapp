@@ -70,11 +70,11 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         width: "100%",
         height: "100%",
         objectFit: "cover",
-        /* Sobe e amplia o Gui no canto superior direito (ao lado do título) */
-        objectPosition: "88% 6%",
+        /* Gui bem alto, ao lado do título (não no meio da tela) */
+        objectPosition: "86% 0%",
         filter: "saturate(1.1) brightness(0.96)",
-        transform: "scale(1.42)",
-        transformOrigin: "88% 4%",
+        transform: "scale(1.58) translateY(-14%)",
+        transformOrigin: "86% 0%",
       }}
     />
     {/* Escurece só a esquerda p/ texto; direita limpa p/ Gui; creme bem mais baixo */}
@@ -83,9 +83,9 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
         position: "absolute",
         inset: 0,
         background:
-          "radial-gradient(42% 34% at 86% 12%, rgba(255,210,120,.2) 0%, transparent 62%)," +
+          "radial-gradient(44% 32% at 86% 8%, rgba(255,210,120,.2) 0%, transparent 62%)," +
           "linear-gradient(100deg, rgba(10,16,28,.55) 0%, rgba(10,16,28,.22) 36%, rgba(10,16,28,.04) 52%, transparent 64%)," +
-          "linear-gradient(180deg, rgba(16,22,34,.12) 0%, transparent 28%, rgba(234,243,251,.18) 52%, rgba(234,243,251,.78) 72%, #EAF3FB 86%, #E4EEF8 100%)",
+          "linear-gradient(180deg, rgba(16,22,34,.1) 0%, transparent 32%, rgba(234,243,251,.12) 58%, rgba(234,243,251,.72) 76%, #EAF3FB 88%, #E4EEF8 100%)",
       }}
     />
     <div
