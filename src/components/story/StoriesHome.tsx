@@ -147,50 +147,39 @@ const StoriesHome = ({ onBack }: Props) => {
         {/* ── HERO ── */}
         <section style={{ padding: `8px ${PAD}px 0`, position: "relative" }}>
           <div style={{ position: "relative", minHeight: 280 }}>
-            {/* Coluna de texto estreita à esquerda — não invade o rosto das crianças */}
-            <div style={{ position: "relative", zIndex: 2, maxWidth: "46%", paddingTop: 8, paddingRight: 4 }}>
+            {/* Só o texto: coluna estreita + quebras fixas (imagem intacta) */}
+            <div style={{ position: "relative", zIndex: 2, maxWidth: "48%", paddingTop: 8 }}>
               <h1
                 style={{
                   margin: 0,
                   fontFamily: SERIF,
                   fontWeight: 600,
-                  fontSize: 28,
-                  lineHeight: 1.14,
+                  fontSize: 30,
+                  lineHeight: 1.12,
                   color: "#F6F1E8",
                   letterSpacing: "-0.4px",
                   textShadow: "0 2px 16px rgba(0,0,0,.45)",
                 }}
               >
-                {/* Quebras fixas: evita “criam/memórias” caindo sobre a arte */}
                 <span style={{ display: "block" }}>Histórias que</span>
                 <span style={{ display: "block", color: "#F0C25A" }}>criam memórias.</span>
               </h1>
-              <p
-                style={{
-                  margin: "10px 0 14px",
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  lineHeight: 1.4,
-                  color: "rgba(246,241,232,0.72)",
-                  maxWidth: "100%",
-                }}
-              >
+              <p style={{ margin: "10px 0 14px", fontSize: 13.5, fontWeight: 700, lineHeight: 1.45, color: "rgba(246,241,232,0.72)" }}>
                 Criamos histórias únicas com o nome, o rosto e o mundo do seu filho.
               </p>
               <div
                 className="inline-flex items-center gap-2 px-3 py-2"
                 style={{
                   borderRadius: 16,
-                  maxWidth: "100%",
                   background: "linear-gradient(160deg, rgba(255,255,255,.9), rgba(255,240,220,.75))",
                   border: "0.5px solid rgba(255,255,255,.95)",
                   boxShadow: "0 6px 18px rgba(40,30,15,.08)",
                 }}
               >
-                <Gift size={16} color="#E8821A" style={{ flexShrink: 0 }} />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 11.5, fontWeight: 900, color: "#2A2520", lineHeight: 1.2 }}>1 história gratuita hoje</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.25 }}>Sem compromisso. Experimente!</div>
+                <Gift size={16} color="#E8821A" />
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 900, color: "#2A2520" }}>1 história gratuita hoje</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(42,37,32,0.55)" }}>Sem compromisso. Experimente!</div>
                 </div>
               </div>
             </div>
@@ -201,14 +190,14 @@ const StoriesHome = ({ onBack }: Props) => {
               style={{
                 position: "absolute",
                 top: -10,
-                right: -28,
-                width: "58%",
+                right: -20,
+                width: "56%",
                 height: 300,
                 objectFit: "cover",
-                objectPosition: "62% 18%",
+                objectPosition: "center 20%",
                 borderRadius: "40% 0 0 50%",
-                maskImage: "radial-gradient(68% 72% at 58% 42%, #000 36%, transparent 78%)",
-                WebkitMaskImage: "radial-gradient(68% 72% at 58% 42%, #000 36%, transparent 78%)",
+                maskImage: "radial-gradient(70% 70% at 55% 45%, #000 40%, transparent 78%)",
+                WebkitMaskImage: "radial-gradient(70% 70% at 55% 45%, #000 40%, transparent 78%)",
                 filter: "saturate(1.08)",
                 pointerEvents: "none",
               }}
