@@ -36,7 +36,7 @@ import {
   type Movie,
 } from "@/data/movies";
 import { getWeeklyMovie } from "@/lib/featuredRotation";
-import { cinemaCoverUrl } from "@/lib/cinemaCovers";
+import { cinemaCoverCdn, cinemaCoverUrl } from "@/lib/cinemaCovers";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
@@ -113,7 +113,7 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
  */
 const coverOf = (id: string) => cinemaCoverUrl(id);
 
-/** Poster: CSS background + <img> no bundle. Sem emoji. */
+/** Poster: sempre tenta bundle, se falhar cai no CDN do GitHub. */
 const MoviePoster = ({
   id,
   glow,
@@ -129,45 +129,44 @@ const MoviePoster = ({
   style?: CSSProperties;
   children?: ReactNode;
 }) => {
-  const src = coverOf(id);
+  const primary = coverOf(id);
+  const cdn = cinemaCoverCdn(id);
   return (
     <div
       style={{
         position: "relative",
         overflow: "hidden",
         flexShrink: 0,
-        minHeight: 1,
-        backgroundColor: glow || "#2a3548",
-        ...(src
-          ? {
-              backgroundImage: `url("${src}")`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }
-          : {}),
+        width: "100%",
+        height: 176,
+        background: `linear-gradient(160deg, ${glow || "#4a6080"}, #1a2030)`,
         ...style,
       }}
     >
-      {src ? (
-        <img
-          src={src}
-          alt={alt || title || ""}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-            display: "block",
-            pointerEvents: "none",
-          }}
-        />
-      ) : null}
+      <img
+        src={primary || cdn}
+        alt={alt || title || ""}
+        loading="eager"
+        decoding="async"
+        draggable={false}
+        onError={(e) => {
+          const el = e.currentTarget;
+          if (el.src !== cdn && !el.src.includes("jsdelivr.net")) {
+            el.src = cdn;
+          }
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center center",
+          display: "block",
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
       {children}
     </div>
   );
@@ -325,7 +324,7 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
         boxShadow: "0 12px 28px rgba(40,60,100,.14), 0 1px 0 rgba(255,255,255,.9) inset",
       }}
     >
-      <MoviePoster id={m.id} glow={m.glowColor} title={m.titulo} alt={m.titulo} style={{ height: 132 }}>
+      <MoviePoster id={m.id} glow={m.glowColor} title={m.titulo} alt={m.titulo}>
         <div
           style={{
             position: "absolute",
@@ -334,7 +333,7 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
             zIndex: 2,
             padding: "3px 8px",
             borderRadius: 999,
-            background: "rgba(255,255,255,.88)",
+            background: "rgba(255,255,255,.9)",
             fontSize: 9.5,
             fontWeight: 900,
             color: INK,
