@@ -36,6 +36,7 @@ import {
   type Movie,
 } from "@/data/movies";
 import { getWeeklyMovie } from "@/lib/featuredRotation";
+import { cinemaCoverUrl } from "@/lib/cinemaCovers";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
@@ -106,12 +107,12 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
 );
 
 /**
- * Capas na RAIZ de cinema-v2 (cover-{id}.png).
- * A pasta covers/ NÃO sobe no deploy do kidzz.app (404) — por isso fica flat.
+ * Capa do filme — URL do bundle Vite (src/assets/cinema-covers).
+ * Não depende de public/ no deploy (kidzz.app 404 em public novo).
  */
-const coverOf = (id: string) => asset(`cover-${id}.png`);
+const coverOf = (id: string) => cinemaCoverUrl(id);
 
-/** Poster: CSS background + <img> (deploy-safe). Sem emoji. */
+/** Poster: CSS background + <img> no bundle. Sem emoji. */
 const MoviePoster = ({
   id,
   glow,
@@ -134,32 +135,38 @@ const MoviePoster = ({
         position: "relative",
         overflow: "hidden",
         flexShrink: 0,
+        minHeight: 1,
         backgroundColor: glow || "#2a3548",
-        backgroundImage: `url("${src}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
+        ...(src
+          ? {
+              backgroundImage: `url("${src}")`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }
+          : {}),
         ...style,
       }}
     >
-      {/* img garante paint em browsers que falham só com background */}
-      <img
-        src={src}
-        alt={alt || title || ""}
-        loading="lazy"
-        decoding="async"
-        draggable={false}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: "center",
-          display: "block",
-          pointerEvents: "none",
-        }}
-      />
+      {src ? (
+        <img
+          src={src}
+          alt={alt || title || ""}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            display: "block",
+            pointerEvents: "none",
+          }}
+        />
+      ) : null}
       {children}
     </div>
   );
