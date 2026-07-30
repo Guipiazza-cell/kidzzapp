@@ -1288,33 +1288,42 @@ const KidzzPlay = ({
       <AnimatePresence>
         {showPremiumCTA && (
           <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-5"
+            style={{
+              background:
+                "radial-gradient(80% 60% at 50% 40%, rgba(90,50,160,0.45), rgba(10,8,20,0.72))",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowPremiumCTA(false)}
           >
             <motion.div
-              className="w-full max-w-sm"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-[340px]"
+              initial={{ scale: 0.92, y: 16, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
             >
               <LockedFeature
-                type="games"
+                type="game"
                 requiredTier="kidzz"
                 onUpgrade={() => {
                   setShowPremiumCTA(false);
                   window.dispatchEvent(
                     new CustomEvent("kidzz:open-paywall", {
-                      detail: { context: "games_locked" },
+                      detail: { context: "game_locked" },
                     }),
                   );
                 }}
               />
               <button
-                className="block mx-auto mt-3 text-xs text-white/80 font-bold underline"
+                type="button"
+                className="block mx-auto mt-4 text-[12.5px] font-extrabold min-h-[44px]"
+                style={{ color: "rgba(255,255,255,0.85)" }}
                 onClick={() => setShowPremiumCTA(false)}
               >
                 Agora não
