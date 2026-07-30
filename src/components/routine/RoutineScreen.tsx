@@ -17,7 +17,7 @@ import {
   getToday, completeTask, getStreak, getKidzzMessage, getCurrentPeriod,
   type RoutineTask, type RoutinePeriod, type TodayView,
 } from "@/lib/routine";
-import { getMissionProgress } from "@/lib/dailyMission";
+import { getMissionProgress, getTotalXp } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
 import { haptic } from "@/lib/haptics";
 import { useAuth } from "@/contexts/AuthContext";
@@ -486,16 +486,17 @@ const PeriodBlock = ({
 };
 
 const RoutineScreen = () => {
-  const { profile } = useAuth();
+  const { profile, updateProfile } = useAuth();
   const { addMemory } = useMemories();
   const { canUse } = useEntitlement();
   const childName = profile?.child_name || "amigo";
-  const pontos = profile?.points ?? 0;
   const isPremium = canUse("rotina");
 
   const [view, setView] = useState<TodayView>(() => getToday());
   const [streak, setStreak] = useState(() => getStreak());
   const [mission, setMission] = useState(() => getMissionProgress());
+  /** Troféu = XP total (completeTask grava em kidzz_total_xp, não em profile.points). */
+  const [pontos, setPontos] = useState(() => getTotalXp());
   const [celebrate, setCelebrate] = useState(false);
 
   const memorySaved = useRef(false);
@@ -508,16 +509,20 @@ const RoutineScreen = () => {
       setView(getToday());
       setStreak(getStreak());
       setMission(getMissionProgress());
+      setPontos(getTotalXp());
     };
     const iv = setInterval(refresh, 60_000);
     const onVis = () => {
       if (!document.hidden) refresh();
     };
+    const onXp = () => setPontos(getTotalXp());
     document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("kidzz:xp-gained", onXp);
     refresh();
     return () => {
       clearInterval(iv);
       document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("kidzz:xp-gained", onXp);
     };
   }, []);
 
@@ -548,6 +553,12 @@ const RoutineScreen = () => {
       setView(getToday());
       setStreak(getStreak());
       setMission(getMissionProgress());
+      const totalXp = getTotalXp();
+      setPontos(totalXp);
+      // Espelha XP total no profile.points (troféu e outras telas)
+      if (result.xpGained + result.bonusGained > 0) {
+        void updateProfile({ points: totalXp });
+      }
       showXpGained(result.xpGained, "XP");
       if (result.bonusGained > 0) {
         setTimeout(() => showXpGained(result.bonusGained, "BÔNUS"), 350);
@@ -604,7 +615,7 @@ const RoutineScreen = () => {
         setTimeout(() => setCelebrate(false), 4200);
       }
     },
-    [addMemory, childName],
+    [addMemory, childName, updateProfile],
   );
 
   return (
