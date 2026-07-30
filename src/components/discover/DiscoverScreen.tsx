@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
-import KidzzLogo from "@/components/common/KidzzLogo";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
 import heroDescobrir from "@/assets/descobrir-hero.webp";
 
@@ -903,7 +902,7 @@ const DiscoverScreen = ({ onBack }: Props) => {
         onScroll={onScroll}
         style={{ height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)", scrollbarWidth: "none", position: "relative", WebkitOverflowScrolling: "touch", zIndex: 2 }}
       >
-        {/* top chrome: voltar · logo · pontos */}
+        {/* top chrome: voltar · pontos (sem logo) */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: `calc(env(safe-area-inset-top, 0px) + 10px) ${PAD}px 0`, gap: 10 }}>
           <button
             type="button"
@@ -914,9 +913,6 @@ const DiscoverScreen = ({ onBack }: Props) => {
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m6-6-6 6 6 6" stroke="#2E3A1E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
-          <div style={{ flex: 1, display: "flex", justifyContent: "center", minWidth: 0 }}>
-            <KidzzLogo height={26} light />
-          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 14px", minHeight: 44, flex: "none", borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#2E3A1E", ...pillGlassLight }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5" stroke="#E0A62B" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
             {pontos}
