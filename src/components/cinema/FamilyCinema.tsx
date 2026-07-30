@@ -5,7 +5,15 @@
  * Dados reais: movies.ts + featuredRotation
  * Assets: cinema-v2 Hermes full-frame (nunca recorte)
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -47,8 +55,9 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v8";
+const AV = "v9";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
+const q = (path: string) => `${path}${path.includes("?") ? "&" : "?"}v=${AV}`;
 
 /** Fundo full-bleed no padrão da aba Música (ForestBackdrop). */
 const CinemaBackdrop = ({ src }: { src: string }) => (
@@ -99,24 +108,119 @@ const CinemaBackdrop = ({ src }: { src: string }) => (
 );
 
 /**
- * Uma capa por filme em cinema-v2/covers/{id}.png
- * (artes HD dedicadas + pôsteres únicos; nunca reutiliza capa de outro título).
+ * Capas por filme — mapa real (sem Proxy).
+ * Prefere artes HD dedicadas; fallback em covers/{id}.png.
+ * Nunca reutiliza capa de outro título.
  */
-const coverOf = (id: string) => asset(`covers/${id}.png`);
+const COVER: Record<string, string> = {
+  // HD cinema-v2 raiz
+  "wall-e": asset("cover-walle.png"),
+  up: asset("cover-up.png"),
+  "polar-express": asset("cover-polar.png"),
+  red: asset("cover-red.png"),
+  luca: asset("cover-luca.png"),
+  coco: asset("cover-coco.png"),
+  // artes dedicadas cin-*
+  narnia: q("/exemplos/assets/cin-narnia.png"),
+  madagascar: q("/exemplos/assets/cin-mada.png"),
+  minions: q("/exemplos/assets/cin-minions.png"),
+  sing: q("/exemplos/assets/cin-sing.png"),
+  "familia-futuro": q("/exemplos/assets/cin-futuro.png"),
+  // acervo covers/{id}
+  soul: asset("covers/soul.png"),
+  encanto: asset("covers/encanto.png"),
+  dumbo: asset("covers/dumbo.png"),
+  "peter-pan": asset("covers/peter-pan.png"),
+  "bernardo-bianca": asset("covers/bernardo-bianca.png"),
+  bolt: asset("covers/bolt.png"),
+  "rei-leao": asset("covers/rei-leao.png"),
+  nemo: asset("covers/nemo.png"),
+  divertidamente: asset("covers/divertidamente.png"),
+  "toy-story": asset("covers/toy-story.png"),
+  "lilo-stitch": asset("covers/lilo-stitch.png"),
+  marley: asset("covers/marley.png"),
+  "4-vidas": asset("covers/4-vidas.png"),
+  matilda: asset("covers/matilda.png"),
+  alice: asset("covers/alice.png"),
+  oz: asset("covers/oz.png"),
+  enrolados: asset("covers/enrolados.png"),
+  zootopia: asset("covers/zootopia.png"),
+  "pequenos-espioes": asset("covers/pequenos-espioes.png"),
+  robos: asset("covers/robos.png"),
+  horton: asset("covers/horton.png"),
+  wish: asset("covers/wish.png"),
+  malvado: asset("covers/malvado.png"),
+  hamburguer: asset("covers/hamburguer.png"),
+  chefinho: asset("covers/chefinho.png"),
+  carros: asset("covers/carros.png"),
+  pets: asset("covers/pets.png"),
+  leo: asset("covers/leo.png"),
+  "stuart-little": asset("covers/stuart-little.png"),
+};
 
-/**
- * Alias estável: alguns builds/cache antigos ainda referenciam COVER[id].
- * Proxy evita ReferenceError e devolve a capa correta por id.
- */
-const COVER: Record<string, string> = new Proxy(
-  {} as Record<string, string>,
-  {
-    get: (_t, prop) => (typeof prop === "string" ? coverOf(prop) : undefined),
-    has: () => true,
-  },
-);
-// evita tree-shake do alias em builds agressivos
-void COVER;
+const coverOf = (id: string) => COVER[id] || asset(`covers/${id}.png`);
+
+/** Poster real com <img> (CSS background falhava em alguns builds) + fallback premium sem emoji. */
+const MoviePoster = ({
+  id,
+  glow,
+  alt = "",
+  style,
+  children,
+}: {
+  id: string;
+  glow: string;
+  alt?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
+}) => {
+  const [broken, setBroken] = useState(false);
+  const src = coverOf(id);
+  return (
+    <div
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        background: `linear-gradient(160deg, ${hexA(glow, 0.75)}, ${hexA(glow, 0.25)} 55%, #1a2030)`,
+        ...style,
+      }}
+    >
+      {!broken && (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          onError={() => setBroken(true)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            display: "block",
+          }}
+        />
+      )}
+      {broken && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "grid",
+            placeItems: "center",
+            background: `linear-gradient(160deg, ${hexA(glow, 0.9)}, #1a2030)`,
+          }}
+        >
+          <Clapperboard size={36} color="rgba(255,255,255,.85)" strokeWidth={1.6} />
+        </div>
+      )}
+      {children}
+    </div>
+  );
+};
 
 interface Props {
   onBack: () => void;
@@ -250,7 +354,6 @@ const SectionLabel = ({
 
 /* ── Card de filme (print: poster + idade + título + desc) ── */
 const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
-  const cover = COVER[m.id] || coverOf(m.id);
   return (
     <button
       type="button"
@@ -271,19 +374,13 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
         boxShadow: "0 12px 28px rgba(40,60,100,.14), 0 1px 0 rgba(255,255,255,.9) inset",
       }}
     >
-      <div
-        style={{
-          height: 112,
-          position: "relative",
-          background: `url("${cover}") center/cover no-repeat`,
-          backgroundColor: hexA(m.glowColor, 0.35),
-        }}
-      >
+      <MoviePoster id={m.id} glow={m.glowColor} alt={m.titulo} style={{ height: 132 }}>
         <div
           style={{
             position: "absolute",
             top: 8,
             left: 8,
+            zIndex: 2,
             padding: "3px 8px",
             borderRadius: 999,
             background: "rgba(255,255,255,.88)",
@@ -300,6 +397,7 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
             position: "absolute",
             top: 8,
             right: 8,
+            zIndex: 2,
             width: 28,
             height: 28,
             borderRadius: 999,
@@ -310,7 +408,7 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
         >
           <Bookmark size={13} color={INK2} />
         </div>
-      </div>
+      </MoviePoster>
       <div style={{ padding: "10px 11px 12px" }}>
         <div
           style={{
@@ -379,7 +477,6 @@ const DetailSheet = ({
   onClose: () => void;
   onMarcar: () => void;
 }) => {
-  const cover = COVER[movie.id] || coverOf(movie.id);
   return (
     <>
       <div
@@ -413,14 +510,11 @@ const DetailSheet = ({
         }}
       >
         <div style={{ display: "flex", minHeight: 150, position: "relative" }}>
-          <div
-            style={{
-              width: "42%",
-              flex: "none",
-              position: "relative",
-              background: `url("${cover}") center/cover`,
-              backgroundColor: hexA(movie.glowColor, 0.4),
-            }}
+          <MoviePoster
+            id={movie.id}
+            glow={movie.glowColor}
+            alt={movie.titulo}
+            style={{ width: "42%", flex: "none", minHeight: 150 }}
           >
             <div
               style={{
@@ -428,6 +522,7 @@ const DetailSheet = ({
                 left: "50%",
                 top: "50%",
                 transform: "translate(-50%,-50%)",
+                zIndex: 2,
                 width: 48,
                 height: 48,
                 borderRadius: 999,
@@ -439,7 +534,7 @@ const DetailSheet = ({
             >
               <Play size={20} fill="#1a1410" color="#1a1410" />
             </div>
-          </div>
+          </MoviePoster>
           <div style={{ flex: 1, minWidth: 0, padding: "16px 14px 12px", position: "relative" }}>
             <button
               type="button"
@@ -604,51 +699,41 @@ const CHIPS: {
   id: ChipId;
   title: string;
   sub: string;
-  emoji: string;
   Icon: typeof Heart;
   tint: [number, number, number];
   g: [string, string, string];
-  band: string;
 }[] = [
   {
     id: "emocionar",
     title: "Para emocionar",
     sub: "Toca o coração",
-    emoji: "💛",
     Icon: Heart,
-    tint: [120, 190, 130],
+    tint: [140, 200, 140],
     g: ["#C0EDA0", "#6FBE4F", "#3F8A32"],
-    band: "linear-gradient(135deg, #5CB57A, #2F7A4E)",
   },
   {
     id: "aventura",
     title: "Aventura",
     sub: "Sonhar e explorar",
-    emoji: "🚀",
     Icon: Rocket,
-    tint: [170, 140, 230],
+    tint: [160, 140, 220],
     g: ["#D8C2FF", "#9A6CF0", "#6A3EC0"],
-    band: "linear-gradient(135deg, #9A6CF0, #5A3AB8)",
   },
   {
     id: "acalmar",
     title: "Para acalmar",
     sub: "Relaxar juntos",
-    emoji: "🌙",
     Icon: Moon,
-    tint: [110, 160, 220],
+    tint: [120, 160, 220],
     g: ["#A8D4FF", "#4E9BE8", "#2568B8"],
-    band: "linear-gradient(135deg, #4E9BE8, #2568B8)",
   },
   {
     id: "viagem",
     title: "Modo Viagem",
     sub: "Qualquer lugar",
-    emoji: "🧳",
     Icon: Briefcase,
-    tint: [90, 190, 200],
+    tint: [100, 180, 200],
     g: ["#A8E8F0", "#3DBFCE", "#1B7A88"],
-    band: "linear-gradient(135deg, #3DBFCE, #1B7A88)",
   },
 ];
 
@@ -872,14 +957,13 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Sessões — abaixo do hero (não cobrem o Gui) */}
+        {/* Sessões — abaixo do hero (não cobrem o Gui); ícones Gloss premium, sem emoji */}
         <div
           style={{
             marginBottom: GAP + 4,
             marginTop: 8,
             position: "relative",
             zIndex: 4,
-            // faixa creme p/ separar do fundo e da arte
             paddingTop: 14,
             background:
               "linear-gradient(180deg, transparent 0%, rgba(234,243,251,.55) 18%, rgba(234,243,251,.92) 42%, #EAF3FB 100%)",
@@ -906,14 +990,15 @@ const FamilyCinema = ({ onBack }: Props) => {
             className="cine2-hscroll"
             style={{
               display: "flex",
-              gap: 12,
+              gap: 10,
               overflowX: "auto",
-              padding: `2px ${PAD}px 12px`,
+              padding: `2px ${PAD}px 14px`,
               scrollbarWidth: "none",
               animation: "cine2-cascade .55s cubic-bezier(.22,1,.36,1) .1s both",
             }}
           >
             {CHIPS.map((c) => {
+              const Icon = c.Icon;
               const on = chip === c.id;
               return (
                 <button
@@ -923,132 +1008,60 @@ const FamilyCinema = ({ onBack }: Props) => {
                     haptic("light");
                     setChip(c.id);
                   }}
-                  className="active:scale-[0.97]"
+                  className="active:scale-95"
                   style={{
                     position: "relative",
                     overflow: "hidden",
                     flex: "none",
-                    width: 152,
-                    minHeight: 128,
-                    padding: 0,
+                    width: 128,
+                    minHeight: 118,
+                    padding: "12px 10px 10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 6,
                     textAlign: "left",
                     cursor: "pointer",
                     fontFamily: FONT,
-                    borderRadius: R.card,
-                    border: on
-                      ? "1.5px solid rgba(255,255,255,.98)"
-                      : "0.5px solid rgba(255,255,255,.92)",
-                    background:
-                      "linear-gradient(165deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.82) 100%)",
+                    ...coloredGlass(c.tint[0], c.tint[1], c.tint[2], on ? 0.52 : 0.34, on ? 0.2 : 0.12),
+                    outline: on ? `2px solid rgba(${c.tint[0]},${c.tint[1]},${c.tint[2]},.55)` : "none",
+                    outlineOffset: 1,
                     boxShadow: on
-                      ? `0 14px 32px rgba(${c.tint[0]},${c.tint[1]},${c.tint[2]},.35), 0 1px 0 rgba(255,255,255,1) inset`
-                      : "0 10px 24px rgba(30,50,80,.12), 0 1px 0 rgba(255,255,255,1) inset",
-                    outline: on ? `2px solid rgba(${c.tint[0]},${c.tint[1]},${c.tint[2]},.45)` : "none",
-                    outlineOffset: 2,
+                      ? "0 12px 28px rgba(40,60,100,.2), 0 1px 0 rgba(255,255,255,.95) inset"
+                      : undefined,
                     transform: on ? "translateY(-2px)" : undefined,
                     transition: "transform .2s, box-shadow .2s",
                   }}
                 >
-                  {/* Faixa de gênero (cinema) */}
+                  <Shine />
+                  <Gloss colors={c.g} size={38}>
+                    <Icon size={17} color="#fff" strokeWidth={2.1} />
+                  </Gloss>
                   <div
                     style={{
-                      height: 52,
-                      background: c.band,
-                      position: "relative",
-                      overflow: "hidden",
+                      fontFamily: SERIF,
+                      fontWeight: 600,
+                      fontSize: 13.5,
+                      color: INK,
+                      lineHeight: 1.15,
                     }}
                   >
-                    <div
-                      aria-hidden
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(120deg, transparent 0%, rgba(255,255,255,.28) 48%, transparent 72%)",
-                      }}
-                    />
+                    {c.title}
+                  </div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: INK2, lineHeight: 1.25 }}>
+                    {c.sub}
+                  </div>
+                  <div style={{ marginTop: "auto", alignSelf: "flex-end" }}>
                     <div
                       style={{
-                        position: "absolute",
-                        left: 12,
-                        bottom: 10,
-                        width: 36,
-                        height: 36,
-                        borderRadius: 14,
+                        width: 26,
+                        height: 26,
+                        borderRadius: 999,
+                        ...pillGlass,
                         display: "grid",
                         placeItems: "center",
-                        fontSize: 20,
-                        background: "rgba(255,255,255,.28)",
-                        border: "1px solid rgba(255,255,255,.5)",
-                        boxShadow: "0 4px 12px rgba(0,0,0,.15)",
-                        backdropFilter: "blur(8px)",
                       }}
                     >
-                      {c.emoji}
-                    </div>
-                    {on && (
-                      <span
-                        style={{
-                          position: "absolute",
-                          top: 8,
-                          right: 8,
-                          fontSize: 9,
-                          fontWeight: 900,
-                          letterSpacing: "0.4px",
-                          color: "#fff",
-                          padding: "3px 8px",
-                          borderRadius: 999,
-                          background: "rgba(0,0,0,.22)",
-                        }}
-                      >
-                        ATIVA
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ padding: "12px 12px 12px" }}>
-                    <div
-                      style={{
-                        fontFamily: SERIF,
-                        fontWeight: 600,
-                        fontSize: 15,
-                        color: INK,
-                        lineHeight: 1.15,
-                      }}
-                    >
-                      {c.title}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11.5,
-                        fontWeight: 700,
-                        color: INK2,
-                        lineHeight: 1.3,
-                        marginTop: 3,
-                      }}
-                    >
-                      {c.sub}
-                    </div>
-                    <div
-                      style={{
-                        marginTop: 10,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: 999,
-                          display: "grid",
-                          placeItems: "center",
-                          background: c.band,
-                          boxShadow: "0 4px 10px rgba(40,60,100,.2)",
-                        }}
-                      >
-                        <ArrowRight size={13} color="#fff" strokeWidth={2.5} />
-                      </div>
+                      <ArrowRight size={12} color={INK} strokeWidth={2.4} />
                     </div>
                   </div>
                 </button>
@@ -1147,17 +1160,17 @@ const FamilyCinema = ({ onBack }: Props) => {
                   </span>
                 </div>
               </div>
-              <div
+              <MoviePoster
+                id={weekly.id}
+                glow={weekly.glowColor}
+                alt={weekly.titulo}
                 style={{
                   width: "40%",
                   flex: "none",
                   margin: 6,
                   marginLeft: 0,
                   borderRadius: R.panel,
-                  overflow: "hidden",
-                  position: "relative",
-                  background: `url("${COVER[weekly.id] || coverOf(weekly.id)}") center/cover`,
-                  backgroundColor: hexA(weekly.glowColor, 0.4),
+                  minHeight: 128,
                 }}
               >
                 <div
@@ -1166,6 +1179,7 @@ const FamilyCinema = ({ onBack }: Props) => {
                     right: 8,
                     top: "50%",
                     transform: "translateY(-50%)",
+                    zIndex: 2,
                     width: 34,
                     height: 34,
                     borderRadius: R.btn,
@@ -1176,7 +1190,7 @@ const FamilyCinema = ({ onBack }: Props) => {
                 >
                   <ArrowRight size={15} color={INK} strokeWidth={2.3} />
                 </div>
-              </div>
+              </MoviePoster>
             </div>
           </button>
         </div>
