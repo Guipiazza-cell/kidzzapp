@@ -3,7 +3,10 @@
 export interface SleepStory {
   id: string;
   title: string;
-  emoji: string;
+  /** @deprecated prefer icon — legado de emoji genérico */
+  emoji?: string;
+  /** Ícone premium 3D (sonhos-v2/icons) */
+  icon: string;
   category: "calma" | "aventura" | "valores" | "biblia" | "gratidao";
   free: boolean;
   duration: string;
@@ -12,11 +15,13 @@ export interface SleepStory {
   text: string;
 }
 
+const STORY_IC = "/exemplos/assets/sonhos-v2/icons";
+
 export const SLEEP_STORIES: SleepStory[] = [
   {
     id: "estrelas",
     title: "A Viagem das Estrelas",
-    emoji: "⭐",
+    icon: `${STORY_IC}/story-star.png`,
     category: "calma",
     free: true,
     duration: "3 min",
@@ -41,7 +46,7 @@ Tudo calmo. Tudo em paz. Tudo dormindo.`,
   {
     id: "floresta-encantada",
     title: "A Floresta que Dormia",
-    emoji: "🌲",
+    icon: `${STORY_IC}/story-tree.png`,
     category: "calma",
     free: false,
     duration: "4 min",
@@ -65,7 +70,7 @@ Tudo ficava quieto. Tudo ficava bom. Tudo ficava leve.`,
   {
     id: "nuvem-magica",
     title: "A Nuvem Mágica",
-    emoji: "☁️",
+    icon: `${STORY_IC}/story-cloud.png`,
     category: "aventura",
     free: false,
     duration: "3 min",
@@ -90,7 +95,7 @@ Devagar. Tranquilo. Protegido.`,
   {
     id: "oceano-calmo",
     title: "O Oceano Calmo",
-    emoji: "🌊",
+    icon: `${STORY_IC}/story-wave.png`,
     category: "calma",
     free: false,
     duration: "4 min",
@@ -113,7 +118,7 @@ para o sono mais gostoso e mais profundo do mundo.`,
   {
     id: "gratidao-do-dia",
     title: "Três Gratidões",
-    emoji: "💛",
+    icon: `${STORY_IC}/story-heart-gold.png`,
     category: "gratidao",
     free: true,
     duration: "2 min",
@@ -138,7 +143,7 @@ Agora respire fundo. E durma sabendo que hoje foi um bom dia.`,
   {
     id: "biblia-davi",
     title: "Davi e Golias",
-    emoji: "🦁",
+    icon: `${STORY_IC}/story-lion.png`,
     category: "biblia",
     free: false,
     duration: "5 min",
@@ -161,7 +166,7 @@ E essa força sempre te acompanha, mesmo no escuro da noite.`,
   {
     id: "biblia-noe",
     title: "A Arca de Noé",
-    emoji: "🌈",
+    icon: `${STORY_IC}/story-rainbow.png`,
     category: "biblia",
     free: false,
     duration: "5 min",
@@ -184,7 +189,7 @@ seu quarto é a sua arca. Aqui, você está seguro.`,
   {
     id: "biblia-jesus-criancas",
     title: "Jesus e as Crianças",
-    emoji: "🤍",
+    icon: `${STORY_IC}/story-heart-soft.png`,
     category: "biblia",
     free: false,
     duration: "4 min",
@@ -206,7 +211,7 @@ E enquanto dorme, esse amor continua te cuidando.`,
   {
     id: "biblia-criacao",
     title: "A Criação do Mundo",
-    emoji: "🌍",
+    icon: `${STORY_IC}/story-earth.png`,
     category: "biblia",
     free: false,
     duration: "4 min",

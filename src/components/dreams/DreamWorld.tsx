@@ -381,7 +381,18 @@ const DreamWorld = ({ onBack }: Props) => {
             ← Voltar
           </button>
           <div className="text-center mb-6 space-y-2">
-            <span className="text-5xl">{story.emoji}</span>
+            <img
+              src={story.icon}
+              alt=""
+              width={72}
+              height={72}
+              style={{
+                width: 72, height: 72, borderRadius: 22, objectFit: "cover",
+                display: "block", margin: "0 auto 4px",
+                boxShadow: "0 10px 24px rgba(20,8,40,.4)",
+                border: "1px solid rgba(220,190,255,.28)",
+              }}
+            />
             <h1 className="text-2xl" style={{ fontFamily: "'Lora',serif", fontWeight: 600, color: "#F6EEFC", textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
               {story.title}
             </h1>
@@ -1037,13 +1048,18 @@ const DreamWorld = ({ onBack }: Props) => {
                 >
                   <div
                     style={{
-                      width: 46, height: 46, borderRadius: 14, display: "flex", alignItems: "center",
-                      justifyContent: "center", fontSize: 24, flex: "none",
-                      background: "rgba(255,255,255,.08)", border: "1px solid rgba(200,175,245,.24)",
-                      boxShadow: isSelected ? "0 0 14px rgba(180,140,255,.3)" : "0 0 12px rgba(255,201,138,.1)",
+                      width: 46, height: 46, borderRadius: 14, flex: "none", overflow: "hidden",
+                      background: "rgba(255,255,255,.06)", border: "1px solid rgba(200,175,245,.28)",
+                      boxShadow: isSelected ? "0 0 14px rgba(180,140,255,.3)" : "0 6px 14px rgba(20,8,40,.28)",
                     }}
                   >
-                    {story.emoji}
+                    <img
+                      src={story.icon}
+                      alt=""
+                      width={46}
+                      height={46}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#F6EEFC", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{story.title}</div>
