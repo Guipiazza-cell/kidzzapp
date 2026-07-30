@@ -23,6 +23,33 @@ import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 
 /** Assets gerados Hermes/Codex - public/telas/brincar */
 const BR = "/exemplos/assets/brincar-v2";
+const BR_IC = `${BR}/icons`;
+
+/** Ícones premium 3D - jogos */
+const GAME_ICON: Record<string, string> = {
+  memory: `${BR_IC}/game-memory.png`,
+  "pixel-pula": `${BR_IC}/game-pula.png`,
+  reaction: `${BR_IC}/game-reaction.png`,
+  emotions: `${BR_IC}/game-emotions.png`,
+  create: `${BR_IC}/game-create.png`,
+  word: `${BR_IC}/game-word.png`,
+  hangman: `${BR_IC}/game-hangman.png`,
+  daily: `${BR_IC}/game-daily.png`,
+};
+
+/** Ícones premium 3D - experiências Criar & Imaginar */
+const EXP_ICON: Record<string, string> = {
+  "criar-caixa": `${BR_IC}/exp-caixa.png`,
+  "criar-personagem": `${BR_IC}/exp-personagem.png`,
+  "criar-planeta": `${BR_IC}/exp-planeta.png`,
+  "criar-animal": `${BR_IC}/exp-dino.png`,
+  "criar-filme": `${BR_IC}/exp-filme.png`,
+  "explorar-cores": `${BR_IC}/exp-rainbow.png`,
+  "explorar-detetive": `${BR_IC}/exp-detective.png`,
+  "explorar-animal": `${BR_IC}/exp-lion.png`,
+  "explorar-nuvens": `${BR_IC}/exp-cloud.png`,
+  "explorar-natureza": `${BR_IC}/exp-cloud.png`,
+};
 
 const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
 const MemoryGame = lazy(() => import("./games/MemoryGame"));
@@ -887,14 +914,19 @@ const KidzzPlay = ({
                   )}
                 </div>
                 <div
-                  className="text-4xl mt-3"
+                  className="mt-3 w-14 h-14 rounded-2xl overflow-hidden"
                   style={{
-                    filter: locked
-                      ? "blur(2px)"
-                      : "drop-shadow(0 3px 5px rgba(0,0,0,.22))",
+                    filter: locked ? "blur(2px) saturate(0.7)" : "none",
+                    boxShadow: "0 6px 14px rgba(0,0,0,.18)",
+                    border: "0.5px solid rgba(255,255,255,.55)",
+                    background: "rgba(255,255,255,.2)",
                   }}
                 >
-                  {e.emoji}
+                  <img
+                    src={EXP_ICON[e.id] ?? `${BR_IC}/exp-caixa.png`}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h4 className="mt-2 text-[14px] font-black text-white leading-tight drop-shadow-sm">
                   {e.titulo}
@@ -1005,14 +1037,23 @@ const KidzzPlay = ({
                       )}
                     </span>
                     <span
-                      className="text-4xl relative"
+                      className="relative w-14 h-14 rounded-2xl overflow-hidden flex-none"
                       style={{
-                        filter: locked
-                          ? "blur(2px)"
-                          : "drop-shadow(0 3px 5px rgba(0,0,0,.22))",
+                        filter: locked ? "blur(2px) saturate(0.65)" : "none",
+                        boxShadow: locked
+                          ? "none"
+                          : "0 6px 14px rgba(0,0,0,.2)",
+                        border: "0.5px solid rgba(255,255,255,.55)",
+                        background: locked
+                          ? "rgba(255,255,255,.5)"
+                          : "rgba(255,255,255,.22)",
                       }}
                     >
-                      {game.emoji}
+                      <img
+                        src={GAME_ICON[game.id] ?? `${BR_IC}/game-memory.png`}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
                     </span>
                     <span
                       className={`relative text-[13px] font-extrabold ${
