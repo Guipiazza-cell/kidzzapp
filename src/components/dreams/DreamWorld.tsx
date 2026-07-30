@@ -529,18 +529,20 @@ const DreamWorld = ({ onBack }: Props) => {
       <DreamBackdrop sleepy={sleepyMode} />
 
       <div className="relative z-10">
-        {/* ── HERO em card (arte full-cover + Gui) ── */}
-        <div style={{ position: "relative", margin: "0 14px 0", paddingTop: "calc(env(safe-area-inset-top, 0px) + 58px)" }}>
+        {/* ── HERO tela toda: borda a borda, base esmaecida (sem corte quadrado) ── */}
+        <div style={{ position: "relative", width: "100%", animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both" }}>
+          {/* Arte full-bleed; máscara dissolve o fim da imagem no fundo da aba */}
           <div
+            aria-hidden
             style={{
               position: "relative",
               width: "100%",
-              minHeight: 280,
-              height: 300,
-              borderRadius: 28,
+              height: 400,
               overflow: "hidden",
-              boxShadow: "0 16px 36px rgba(20,8,40,.42)",
-              animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+              WebkitMaskImage:
+                "linear-gradient(180deg, #000 0%, #000 58%, rgba(0,0,0,.72) 72%, rgba(0,0,0,.28) 86%, transparent 100%)",
+              maskImage:
+                "linear-gradient(180deg, #000 0%, #000 58%, rgba(0,0,0,.72) 72%, rgba(0,0,0,.28) 86%, transparent 100%)",
             }}
           >
             <img
@@ -558,22 +560,26 @@ const DreamWorld = ({ onBack }: Props) => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                objectPosition: "50% 28%",
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(180deg,rgba(30,16,55,.12) 0%,rgba(30,16,55,0) 40%,rgba(30,16,55,.45) 78%,rgba(22,12,42,.92) 100%)",
-                pointerEvents: "none",
+                objectPosition: "50% 22%",
               }}
             />
           </div>
+          {/* Véu suave no fim (mesma cor do fundo) para o texto não “bater” na borda da arte */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 160,
+              pointerEvents: "none",
+              background:
+                "linear-gradient(180deg, transparent 0%, rgba(30,18,56,.35) 40%, rgba(30,18,56,.78) 72%, #1E1238 100%)",
+            }}
+          />
 
-          {/* Header acima do card */}
+          {/* Header sobre a arte */}
           <div
             style={{
               position: "absolute",
@@ -584,7 +590,7 @@ const DreamWorld = ({ onBack }: Props) => {
               display: "flex",
               alignItems: "center",
               gap: 8,
-              padding: "calc(env(safe-area-inset-top, 0px) + 10px) 0 0",
+              padding: "calc(env(safe-area-inset-top, 0px) + 10px) 14px 0",
             }}
           >
             <button
@@ -634,8 +640,17 @@ const DreamWorld = ({ onBack }: Props) => {
             </motion.button>
           </div>
 
-          {/* título */}
-          <div style={{ padding: "12px 10px 0", textAlign: "center", position: "relative", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both" }}>
+          {/* Título na zona esmaecida — sem “corte” da imagem atrás do texto */}
+          <div
+            style={{
+              position: "relative",
+              zIndex: 3,
+              marginTop: -72,
+              padding: "0 24px 4px",
+              textAlign: "center",
+              animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both",
+            }}
+          >
             <h1 style={{ margin: "0 auto 9px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 28, lineHeight: 1.18, color: "#F6EEFC", letterSpacing: "-.35px", maxWidth: 300, textShadow: "0 2px 18px rgba(0,0,0,.45)" }}>
               Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia.
             </h1>
