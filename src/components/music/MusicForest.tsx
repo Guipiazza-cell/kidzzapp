@@ -195,40 +195,55 @@ const MusicKeyframes = () => (
   `}</style>
 );
 
-/* ── Fundo floresta premium (print MUSICA) ── */
+/* ── Fundo floresta premium — foto só no hero (pessoas em foco) ── */
 const ForestBackdrop = ({ heroSrc }: { heroSrc: string }) => (
   <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
-    <img
-      src={heroSrc}
-      alt=""
-      style={{
-        position: "absolute", inset: 0, width: "100%", height: "100%",
-        objectFit: "cover", objectPosition: "center 20%",
-        filter: "saturate(1.15) brightness(0.92)", transform: "scale(1.08)",
-      }}
-    />
-    {/* raios + vinheta creme inferior (como o mockup) */}
+    {/* faixa da foto no topo */}
+    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "42%", overflow: "hidden" }}>
+      <img
+        src={heroSrc}
+        alt=""
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          /* mais pessoas / menos céu */
+          objectPosition: "center 58%",
+          filter: "saturate(1.12) brightness(0.96)",
+          transform: "scale(1.12)",
+          transformOrigin: "center 55%",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(55% 40% at 70% 30%, rgba(255,220,120,.35) 0%, transparent 60%)," +
+            "linear-gradient(180deg, rgba(20,30,15,.12) 0%, transparent 40%, rgba(246,241,223,.55) 78%, #F4EEDF 100%)",
+        }}
+      />
+    </div>
+    {/* creme no resto da tela */}
     <div
       style={{
-        position: "absolute", inset: 0,
-        background:
-          "radial-gradient(60% 40% at 78% 8%, rgba(255,220,120,.55) 0%, transparent 62%)," +
-          "linear-gradient(180deg, rgba(20,40,20,.18) 0%, rgba(246,241,223,.15) 28%, rgba(246,241,223,.78) 58%, #F4EEDF 78%, #F0E9D0 100%)",
+        position: "absolute",
+        top: "38%",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "linear-gradient(180deg, #F4EEDF 0%, #F0E9D0 40%, #E8DFBF 100%)",
       }}
     />
     <div
       style={{
-        position: "absolute", top: -40, right: -20, width: 220, height: 220, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,230,140,.55), transparent 68%)",
+        position: "absolute", top: -40, right: -20, width: 200, height: 200, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,230,140,.4), transparent 68%)",
         filter: "blur(8px)", animation: "mus-raysway 8s ease-in-out infinite",
       }}
     />
-    <div style={{ position: "absolute", top: "48%", left: "10%", animation: "mus-notefloat 10s ease-in-out infinite" }}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#E8B84A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-    </div>
-    <div style={{ position: "absolute", top: "62%", left: "78%", animation: "mus-notefloat 12s ease-in-out 3s infinite" }}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#A98CD8" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-    </div>
   </div>
 );
 
@@ -439,9 +454,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           scrollbarWidth: "none", position: "relative", zIndex: 2,
         }}
       >
-        {/* ── HERO (só texto + chrome; fundo continua no ForestBackdrop) ── */}
-        <div style={{ position: "relative", minHeight: 420, paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)" }}>
-          {/* chrome */}
+        {/* ── HERO: foto no topo + chrome ── */}
+        <div style={{ position: "relative", height: 280, paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)" }}>
           <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
             <button
               onClick={onBack}
@@ -465,32 +479,72 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
               </div>
             </div>
           </div>
+        </div>
 
-          {/* copy */}
-          <div style={{ position: "relative", zIndex: 5, padding: "18px 20px 8px", maxWidth: "62%", animation: "mus-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "rgba(255,252,240,.92)", textShadow: "0 1px 8px rgba(0,0,0,.35)", marginBottom: 8 }}>
-              {greetingWord()}, família!
-            </div>
-            <h1 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 30, lineHeight: 1.12, color: "#FFFDF6", letterSpacing: "-.4px", textShadow: "0 2px 18px rgba(0,0,0,.4)" }}>
-              Música que <span style={{ color: "#FFD36A" }}>conecta</span>, momentos que ficam.
-            </h1>
-            <p style={{ margin: "0 0 16px", fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(255,248,230,.88)", textShadow: "0 1px 8px rgba(0,0,0,.3)", maxWidth: 240 }}>
-              Atividades com música para soltar a voz, dançar e criar memórias inesquecíveis juntos.
-            </p>
-            <button
-              onClick={() => openCategory("featured")}
-              className="active:scale-[0.97]"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 22px", minHeight: 48,
-                borderRadius: R.btn, border: "0.5px solid rgba(255,235,150,.65)", cursor: "pointer",
-                fontWeight: 900, fontSize: 14.5, color: "#4A3300",
-                background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F5C24E 55%, #E0A52E)",
-                boxShadow: "0 12px 28px rgba(180,120,20,.4), 0 1px 0 rgba(255,255,255,.7) inset",
-              }}
-            >
-              Explorar música →
-            </button>
+        {/* ── CARD de texto abaixo do hero ── */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 5,
+            margin: "-28px 16px 10px",
+            padding: "18px 18px 16px",
+            borderRadius: 24,
+            background: "linear-gradient(160deg, rgba(255,255,255,.92) 0%, rgba(255,252,240,.88) 55%, rgba(255,246,220,.9) 100%)",
+            border: "0.5px solid rgba(255,255,255,.98)",
+            boxShadow: "0 16px 36px rgba(40,30,15,.14), 0 1px 0 rgba(255,255,255,1) inset",
+            backdropFilter: "blur(28px) saturate(160%)",
+            WebkitBackdropFilter: "blur(28px) saturate(160%)",
+            animation: "mus-cascade .55s cubic-bezier(.22,1,.36,1) both",
+          }}
+        >
+          <div style={{ fontWeight: 800, fontSize: 12.5, color: "#8A6A28", marginBottom: 6 }}>
+            {greetingWord()}, família!
           </div>
+          <h1
+            style={{
+              margin: "0 0 8px",
+              fontFamily: SERIF,
+              fontWeight: 600,
+              fontSize: 26,
+              lineHeight: 1.15,
+              color: "#2A2008",
+              letterSpacing: "-.35px",
+            }}
+          >
+            Música que <span style={{ color: "#C98A1A" }}>conecta</span>, momentos que ficam.
+          </h1>
+          <p
+            style={{
+              margin: "0 0 14px",
+              fontSize: 13,
+              fontWeight: 700,
+              lineHeight: 1.45,
+              color: "#6B5A38",
+            }}
+          >
+            Atividades com música para soltar a voz, dançar e criar memórias inesquecíveis juntos.
+          </p>
+          <button
+            onClick={() => openCategory("featured")}
+            className="active:scale-[0.97]"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "12px 20px",
+              minHeight: 46,
+              borderRadius: R.btn,
+              border: "0.5px solid rgba(255,235,150,.65)",
+              cursor: "pointer",
+              fontWeight: 900,
+              fontSize: 14,
+              color: "#4A3300",
+              background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F5C24E 55%, #E0A52E)",
+              boxShadow: "0 10px 24px rgba(180,120,20,.32), 0 1px 0 rgba(255,255,255,.7) inset",
+            }}
+          >
+            Explorar música →
+          </button>
         </div>
 
         {/* ── CATEGORIAS ── */}
