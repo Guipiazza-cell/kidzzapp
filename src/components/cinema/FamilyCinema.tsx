@@ -46,10 +46,8 @@ import {
   sectionWrap,
 } from "@/lib/premiumUi";
 
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
-
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v3";
+const AV = "v4";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 /**
@@ -866,36 +864,31 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Hero Bora-style */}
-        <div style={{ position: "relative", padding: `4px ${PAD}px 12px`, minHeight: 236 }}>
+        {/* Hero: Gui com óculos 3D (cinema-v2) */}
+        <div style={{ position: "relative", padding: `4px ${PAD}px 12px`, minHeight: 248 }}>
           <div
             ref={heroArtRef}
             style={{
               position: "absolute",
-              right: 0,
+              right: -8,
               top: 0,
               width: "58%",
-              height: 210,
+              height: 228,
               willChange: "transform",
               animation: "cine2-heroIn .75s cubic-bezier(.22,1,.36,1) both",
               pointerEvents: "none",
-              borderRadius: `0 ${R.card}px ${R.card}px 0`,
-              overflow: "hidden",
+              overflow: "visible",
             }}
           >
             <img
-              src={CAMALEAO.armsSoft}
-              alt="Gui pronto para o cinema"
+              src={asset("hero-gui.png")}
+              alt="Gui com óculos 3D e pipoca pronto para o cinema"
               style={{
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-                objectPosition: "right bottom",
-                ...CAMALEAO_SCENE_MASK,
-                filter: "drop-shadow(0 14px 22px rgba(40,30,20,.28))",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.arms;
+                objectPosition: "right center",
+                filter: "drop-shadow(0 14px 24px rgba(40,30,20,.26))",
               }}
             />
             <div
