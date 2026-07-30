@@ -29,20 +29,20 @@ interface Props {
 
 const IC = "/exemplos/assets/brincar-v2/icons";
 
-/** Ícones 3D premium por categoria (fallback) */
-const CAT_ICON: Record<ActivityCategory, string> = {
-  movimento: `${IC}/cat-movimento.png`,
-  criatividade: `${IC}/cat-criatividade.png`,
-  familia: `${IC}/cat-familia.png`,
-  desafio: `${IC}/cat-desafio.png`,
-};
+/** Pack completo de ícones premium (sem os 4 de categoria genéricos). */
+const ALL_ACT_ICONS = [
+  "act-dance", "act-bear", "act-map", "act-fort", "act-hero", "act-book",
+  "act-music", "act-gift", "act-water",
+  "a-bed", "a-blocks", "a-calendar", "a-compass", "a-dice", "a-dream",
+  "a-flamingo", "a-frog", "a-giraffe", "a-glass", "a-grandma", "a-hide",
+  "a-hug", "a-jumpjack", "a-jumprope", "a-laugh", "a-learn", "a-mask",
+  "a-mirror", "a-name", "a-numbers", "a-pan", "a-plane", "a-potato",
+  "a-robot", "a-silence", "a-sparkle", "a-statue", "a-thanks", "a-tooth",
+  "a-wind", "a-window",
+].map((n) => `${IC}/${n}.png`);
 
-/**
- * Um ícone por atividade do pool (id) — assets distintos.
- * Atividades da IA caem no ícone da categoria.
- */
+/** Preferência por id do pool curado (quando existir). */
 const ID_ICON: Record<string, string> = {
-  // Movimento
   m1: `${IC}/act-dance.png`,
   m2: `${IC}/a-jumprope.png`,
   m3: `${IC}/a-statue.png`,
@@ -53,7 +53,6 @@ const ID_ICON: Record<string, string> = {
   m8: `${IC}/a-frog.png`,
   m9: `${IC}/a-giraffe.png`,
   m10: `${IC}/a-mirror.png`,
-  // Criatividade
   c1: `${IC}/act-fort.png`,
   c2: `${IC}/act-hero.png`,
   c3: `${IC}/a-name.png`,
@@ -64,7 +63,6 @@ const ID_ICON: Record<string, string> = {
   c8: `${IC}/a-dream.png`,
   c9: `${IC}/a-robot.png`,
   c10: `${IC}/a-mask.png`,
-  // Família
   f1: `${IC}/a-dice.png`,
   f2: `${IC}/a-laugh.png`,
   f3: `${IC}/a-hug.png`,
@@ -75,7 +73,6 @@ const ID_ICON: Record<string, string> = {
   f8: `${IC}/a-sparkle.png`,
   f9: `${IC}/a-calendar.png`,
   f10: `${IC}/a-hide.png`,
-  // Desafio
   d1: `${IC}/act-water.png`,
   d2: `${IC}/a-bed.png`,
   d3: `${IC}/a-blocks.png`,
@@ -88,8 +85,73 @@ const ID_ICON: Record<string, string> = {
   d10: `${IC}/a-wind.png`,
 };
 
+/** Preferência por emoji (IA / textos). */
+const EMOJI_ICON: Record<string, string> = {
+  "💃": `${IC}/act-dance.png`,
+  "🪢": `${IC}/a-jumprope.png`,
+  "🗿": `${IC}/a-statue.png`,
+  "🐻": `${IC}/act-bear.png`,
+  "🤸": `${IC}/a-jumpjack.png`,
+  "🦩": `${IC}/a-flamingo.png`,
+  "🗺️": `${IC}/act-map.png`,
+  "🐸": `${IC}/a-frog.png`,
+  "🦒": `${IC}/a-giraffe.png`,
+  "🪞": `${IC}/a-mirror.png`,
+  "🏕️": `${IC}/act-fort.png`,
+  "🦸": `${IC}/act-hero.png`,
+  "🎲": `${IC}/a-dice.png`,
+  "📖": `${IC}/act-book.png`,
+  "🥔": `${IC}/a-potato.png`,
+  "📄": `${IC}/a-plane.png`,
+  "🎤": `${IC}/act-music.png`,
+  "💭": `${IC}/a-dream.png`,
+  "🤖": `${IC}/a-robot.png`,
+  "🎭": `${IC}/a-mask.png`,
+  "🤣": `${IC}/a-laugh.png`,
+  "🤗": `${IC}/a-hug.png`,
+  "🍳": `${IC}/a-pan.png`,
+  "👵": `${IC}/a-grandma.png`,
+  "🎁": `${IC}/act-gift.png`,
+  "🤐": `${IC}/a-silence.png`,
+  "💌": `${IC}/a-sparkle.png`,
+  "📅": `${IC}/a-calendar.png`,
+  "🙈": `${IC}/a-hide.png`,
+  "💧": `${IC}/act-water.png`,
+  "🛏️": `${IC}/a-bed.png`,
+  "🧸": `${IC}/a-blocks.png`,
+  "📚": `${IC}/a-learn.png`,
+  "🤫": `${IC}/a-silence.png`,
+  "🔢": `${IC}/a-numbers.png`,
+  "🦷": `${IC}/a-tooth.png`,
+  "🙏": `${IC}/a-thanks.png`,
+  "🪟": `${IC}/a-window.png`,
+  "🌬️": `${IC}/a-wind.png`,
+  "✨": `${IC}/a-sparkle.png`,
+  "🏃": `${IC}/a-jumpjack.png`,
+  "🎨": `${IC}/a-potato.png`,
+  "💛": `${IC}/a-hug.png`,
+  "⚡": `${IC}/a-sparkle.png`,
+};
+
+function hashStr(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/**
+ * Ícone único e diversificado:
+ * 1) id do pool  2) emoji  3) hash estável em cima do pack completo
+ * Nunca repete só os 4 ícones de categoria.
+ */
 function activityIconSrc(a: Activity): string {
-  return ID_ICON[a.id] ?? CAT_ICON[a.category] ?? CAT_ICON.desafio;
+  if (ID_ICON[a.id]) return ID_ICON[a.id];
+  if (a.emoji && EMOJI_ICON[a.emoji]) return EMOJI_ICON[a.emoji];
+  const key = `${a.id}|${a.title}|${a.emoji}|${a.category}`;
+  return ALL_ACT_ICONS[hashStr(key) % ALL_ACT_ICONS.length];
 }
 
 /** Liquid glass igual ao dock */
