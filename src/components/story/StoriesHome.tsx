@@ -7,7 +7,7 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X, Gift,
+  ArrowRight, BookOpen, Sparkles, Bookmark, Star, X, Gift,
   UserRound, Tags, Target, AudioLines,
 } from "lucide-react";
 import { useMemories } from "@/hooks/useMemories";
@@ -21,15 +21,6 @@ import { FONT, SERIF, R, PAD, glassLight, glassLightSoft, pillGlassLight, goldBt
 import PremiumSeal from "@/components/common/PremiumSeal";
 
 const HI = "/exemplos/assets/historias-v2";
-
-type ChipKey = "favoritas" | "novidades" | "dormir" | "divertidas";
-
-const CHIPS: { key: ChipKey; label: string; sub: string; icon: typeof Star; tint: string; ring: string }[] = [
-  { key: "favoritas", label: "Favoritas", sub: "Suas histórias preferidas", icon: Star, tint: "#FBBF24", ring: "rgba(251,191,36,0.18)" },
-  { key: "novidades", label: "Novidades", sub: "Histórias novas para hoje", icon: Leaf, tint: "#2F7D5B", ring: "rgba(47,125,91,0.16)" },
-  { key: "dormir", label: "Para dormir", sub: "Histórias calmas e relaxantes", icon: Moon, tint: "#7C6AC7", ring: "rgba(124,106,199,0.18)" },
-  { key: "divertidas", label: "Divertidas", sub: "Aventuras para rir e imaginar", icon: Smile, tint: "#F59E0B", ring: "rgba(245,158,11,0.18)" },
-];
 
 /** Coleções especiais — cards “Em breve” (ainda não liberadas). */
 const COLLECTIONS = [
@@ -60,8 +51,6 @@ const StoriesHome = ({ onBack }: Props) => {
   const { allMemories, toggleSpecial } = useMemories();
   const { profile } = useAuth();
   const [mode, setMode] = useState<"home" | "factory">("home");
-  const [chip, setChip] = useState<ChipKey | null>(null);
-  const [chipOpen, setChipOpen] = useState(false);
   const [selected, setSelected] = useState<any | null>(null);
   const [reading, setReading] = useState(false);
 
@@ -78,20 +67,6 @@ const StoriesHome = ({ onBack }: Props) => {
       .sort((a, b) => progress[b.id].updatedAt - progress[a.id].updatedAt)
       .slice(0, 8);
   }, [stories, progress]);
-
-  const filteredByChip = useMemo(() => {
-    if (!chip) return [] as typeof stories;
-    if (chip === "favoritas") return stories.filter((s) => s.is_special);
-    if (chip === "novidades") {
-      const sinceTs = Date.now() - 7 * 86400e3;
-      return stories.filter((s) => new Date(s.created_at).getTime() >= sinceTs);
-    }
-    const needle = chip === "dormir" ? /dorm|sonh|calm|noite/i : /divert|engra|aventur|rir/i;
-    return stories.filter((s) => {
-      const meta = (s.metadata as any)?.interests || "";
-      return needle.test(s.title) || needle.test(String(meta));
-    });
-  }, [chip, stories]);
 
   const openFactory = () => {
     haptic("medium");
@@ -456,33 +431,61 @@ const StoriesHome = ({ onBack }: Props) => {
           </section>
         )}
 
-        {/* ── CHIPS ── */}
-        <section style={{ padding: `18px ${PAD}px 8px`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {CHIPS.map((c) => {
-            const Icon = c.icon;
-            return (
-              <motion.button
-                key={c.key}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => { haptic("light"); setChip(c.key); setChipOpen(true); }}
-                className="text-left relative"
-                style={{ padding: 14, minHeight: 118, ...glassLight, borderRadius: 22 }}
-                aria-label={c.label}
-              >
-                <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center mb-2"
-                  style={{ background: c.ring, color: c.tint }}
-                >
-                  <Icon size={20} />
-                </div>
-                <p style={{ margin: 0, fontSize: 14.5, fontWeight: 900, color: "#2A2520" }}>{c.label}</p>
-                <p style={{ margin: "4px 0 0", fontSize: 11.5, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.3 }}>
-                  {c.sub}
-                </p>
-                <ArrowRight size={14} className="absolute bottom-3 right-3" style={{ color: "rgba(42,37,32,0.35)" }} />
-              </motion.button>
-            );
-          })}
+        {/* ── Favoritas (Em breve) — card único horizontal ── */}
+        <section style={{ padding: `18px ${PAD}px 8px` }}>
+          <div
+            className="relative overflow-hidden"
+            style={{
+              ...glassLight,
+              borderRadius: 22,
+              padding: "16px 16px",
+              minHeight: 88,
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              opacity: 0.92,
+            }}
+            aria-label="Favoritas — em breve"
+          >
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 16,
+                flex: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(251,191,36,0.18)",
+                color: "#E8A010",
+              }}
+            >
+              <Star size={24} fill="currentColor" />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: "#2A2520" }}>Favoritas</p>
+              <p style={{ margin: "4px 0 0", fontSize: 12, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.35 }}>
+                Suas histórias preferidas, num só lugar.
+              </p>
+            </div>
+            <span
+              style={{
+                flex: "none",
+                padding: "5px 10px",
+                borderRadius: 999,
+                fontSize: 10,
+                fontWeight: 900,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                color: "#2A1808",
+                background: "linear-gradient(180deg,#F5D08A 0%,#E8B85A 100%)",
+                boxShadow: "0 4px 12px rgba(0,0,0,.14)",
+                border: "0.5px solid rgba(255,255,255,.55)",
+              }}
+            >
+              Em breve
+            </span>
+          </div>
         </section>
 
         {/* trust strip */}
@@ -510,70 +513,6 @@ const StoriesHome = ({ onBack }: Props) => {
           </div>
         </section>
       </div>
-
-      {/* ── Chip drawer ── */}
-      <AnimatePresence>
-        {chipOpen && chip && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex flex-col"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => setChipOpen(false)} />
-            <motion.div
-              className="relative mt-auto rounded-t-3xl max-h-[80vh] flex flex-col"
-              style={{ background: "linear-gradient(180deg,#FFF9F0,#F5EFE3)" }}
-              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 240, damping: 26 }}
-            >
-              <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <h3 style={{ margin: 0, fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: "#1F2A22" }}>
-                  {CHIPS.find((c) => c.key === chip)?.label}
-                </h3>
-                <button onClick={() => setChipOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-full" style={pillGlassLight} aria-label="Fechar">
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-5 pb-8">
-                {filteredByChip.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-[14px] font-bold" style={{ color: "#2A2520" }}>Ainda não há histórias aqui</p>
-                    <p className="text-[12px] mt-1" style={{ color: "rgba(42,37,32,0.6)" }}>
-                      Crie uma nova com {childName} como protagonista.
-                    </p>
-                    <motion.button
-                      onClick={() => { setChipOpen(false); openFactory(); }}
-                      whileTap={{ scale: 0.97 }}
-                      className="mt-4 px-5 py-2.5 rounded-full text-white text-[13px] font-extrabold"
-                      style={{ background: "#E8821A" }}
-                    >
-                      Criar agora
-                    </motion.button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    {filteredByChip.map((s) => (
-                      <motion.button
-                        key={s.id}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => { setChipOpen(false); setSelected(s); }}
-                        className="text-left rounded-2xl p-2.5"
-                        style={{ ...glassLight, borderRadius: 18 }}
-                      >
-                        {s.image_url ? (
-                          <img src={s.image_url} alt="" className="w-full aspect-square object-cover rounded-xl mb-2" loading="lazy" />
-                        ) : (
-                          <div className="w-full aspect-square rounded-xl mb-2 bg-amber-100 flex items-center justify-center text-3xl">📖</div>
-                        )}
-                        <p className="text-[12px] font-extrabold line-clamp-2" style={{ color: "#2A2520" }}>{s.title}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── Detail / reading ── */}
       <AnimatePresence>
