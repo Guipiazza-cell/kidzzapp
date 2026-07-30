@@ -34,7 +34,7 @@ import {
 } from "@/lib/premiumUi";
 
 const AS = "/exemplos/assets/rotina-v2";
-const AV = "v4";
+const AV = "v5";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 const INK = "#3A2418";
@@ -64,7 +64,7 @@ const PERIOD_META: Record<
     label: string;
     sub: string;
     cover: string;
-    Icon: typeof Sun;
+    icon: string;
     btn: string;
     btnDone: string;
     tint: [number, number, number];
@@ -75,7 +75,7 @@ const PERIOD_META: Record<
     label: "Manhã",
     sub: "Comece o dia com energia e intenção.",
     cover: asset("cover-morning.png"),
-    Icon: Sun,
+    icon: asset("icon-morning.png"),
     btn: "#E8A22B",
     btnDone: "#3E9A5E",
     tint: [240, 180, 90],
@@ -85,7 +85,7 @@ const PERIOD_META: Record<
     label: "Tarde",
     sub: "Momentos para aprender, brincar e compartilhar.",
     cover: asset("cover-afternoon.png"),
-    Icon: Sun,
+    icon: asset("icon-afternoon.png"),
     btn: "#4EA35E",
     btnDone: "#2F7A4E",
     tint: [100, 180, 120],
@@ -95,7 +95,7 @@ const PERIOD_META: Record<
     label: "Noite",
     sub: "Desacelere para dormir em paz e sonhar com o amanhã.",
     cover: asset("cover-night.png"),
-    Icon: Moon,
+    icon: asset("icon-night.png"),
     btn: "#7B6BC4",
     btnDone: "#5A4A9E",
     tint: [120, 110, 200],
@@ -326,7 +326,6 @@ const PeriodBlock = ({
   const meta = PERIOD_META[period];
   const doneN = tasks.filter((t) => done.has(t.id)).length;
   if (!tasks.length) return null;
-  const Icon = meta.Icon;
 
   return (
     <div
@@ -392,16 +391,23 @@ const PeriodBlock = ({
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
                 <div
                   style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 10,
-                    display: "grid",
-                    placeItems: "center",
-                    background: "rgba(255,255,255,.88)",
-                    boxShadow: "0 4px 10px rgba(0,0,0,.15)",
+                    width: 34,
+                    height: 34,
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    boxShadow: "0 6px 14px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.55) inset",
+                    border: "0.5px solid rgba(255,255,255,.85)",
+                    background: "rgba(255,255,255,.92)",
                   }}
                 >
-                  <Icon size={15} color={meta.btn} strokeWidth={2.2} />
+                  <img
+                    src={meta.icon}
+                    alt=""
+                    width={34}
+                    height={34}
+                    draggable={false}
+                    style={{ width: 34, height: 34, objectFit: "cover", display: "block" }}
+                  />
                 </div>
                 {isNow && (
                   <span
