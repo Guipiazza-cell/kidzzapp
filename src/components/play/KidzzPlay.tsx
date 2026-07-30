@@ -347,33 +347,12 @@ const KidzzPlay = ({
     [],
   );
 
-  /* ── Parallax do hero (portado do design) ── */
   const scrollRef = useRef<HTMLDivElement>(null);
-  const heroWrapRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 300);
     return () => clearTimeout(t);
-  }, []);
-  useEffect(() => {
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
-  const onHeroScroll = useCallback(() => {
-    if (rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      const sc = scrollRef.current;
-      const hero = heroWrapRef.current;
-      if (!sc || !hero) return;
-      const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.42}px) scale(${1 + y * 0.0004})`;
-      hero.style.opacity = String(Math.max(0, 1 - y / 240));
-    });
   }, []);
 
   const handleScore = useCallback(
@@ -532,7 +511,6 @@ const KidzzPlay = ({
 
       <div
         ref={scrollRef}
-        onScroll={onHeroScroll}
         style={{
           height: "100%",
           overflowY: "auto",
@@ -545,29 +523,8 @@ const KidzzPlay = ({
           zIndex: 2,
         }}
       >
-        {/* ── HERO (texto esq + arte dir, como print) ── */}
+        {/* ── HERO (só fundo full-bleed; sem arte flutuante por cima) ── */}
         <div style={{ position: "relative", minHeight: 360, paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}>
-          <div
-            ref={heroWrapRef}
-            style={{
-              position: "absolute", top: 40, right: -12, width: "56%", height: 300,
-              pointerEvents: "none", animation: "brin-heroIn .7s cubic-bezier(.22,1,.36,1) both",
-            }}
-          >
-            <img
-              src={heroImg}
-              alt="Crianças brincando na floresta"
-              style={{
-                width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%",
-                borderRadius: "0 0 0 48%",
-                maskImage: "radial-gradient(70% 70% at 58% 40%, #000 38%, transparent 78%)",
-                WebkitMaskImage: "radial-gradient(70% 70% at 58% 40%, #000 38%, transparent 78%)",
-                filter: "saturate(1.1)",
-                animation: "brin-floaty 6.5s ease-in-out infinite",
-              }}
-            />
-          </div>
-
           <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
             <button
               type="button"
