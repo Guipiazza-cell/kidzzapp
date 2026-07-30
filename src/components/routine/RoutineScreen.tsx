@@ -769,8 +769,10 @@ const RoutineScreen = () => {
         <div
           style={{
             position: "relative",
-            minHeight: 280,
-            padding: `8px ${PAD}px 20px`,
+            minHeight: 320,
+            padding: `8px ${PAD}px 24px`,
+            display: "flex",
+            flexDirection: "column",
             overflow: "hidden",
             animation: "rot2-cascade .55s cubic-bezier(.22,1,.36,1) .04s both",
           }}
@@ -822,7 +824,16 @@ const RoutineScreen = () => {
             />
           </div>
 
-          <div style={{ position: "relative", zIndex: 3, maxWidth: "58%", paddingTop: 6 }}>
+          <div
+            style={{
+              position: "relative",
+              zIndex: 3,
+              maxWidth: "58%",
+              // Só o texto desce — imagem intocada
+              paddingTop: 118,
+              marginTop: "auto",
+            }}
+          >
             <div
               style={{
                 fontSize: 12.5,
