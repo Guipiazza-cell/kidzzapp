@@ -29,7 +29,7 @@ interface Props {
 
 const IC = "/exemplos/assets/brincar-v2/icons";
 
-/** Ícones 3D premium por categoria */
+/** Ícones 3D premium por categoria (fallback) */
 const CAT_ICON: Record<ActivityCategory, string> = {
   movimento: `${IC}/cat-movimento.png`,
   criatividade: `${IC}/cat-criatividade.png`,
@@ -37,24 +37,59 @@ const CAT_ICON: Record<ActivityCategory, string> = {
   desafio: `${IC}/cat-desafio.png`,
 };
 
-/** Mapeia emoji do pool → ícone premium (fallback = categoria) */
-const EMOJI_ICON: Record<string, string> = {
-  "💃": `${IC}/act-dance.png`,
-  "🐻": `${IC}/act-bear.png`,
-  "🗺️": `${IC}/act-map.png`,
-  "🏕️": `${IC}/act-fort.png`,
-  "🦸": `${IC}/act-hero.png`,
-  "📖": `${IC}/act-book.png`,
-  "🎤": `${IC}/act-music.png`,
-  "🎁": `${IC}/act-gift.png`,
-  "💧": `${IC}/act-water.png`,
-  "🧸": `${IC}/act-gift.png`,
-  "🎵": `${IC}/act-music.png`,
-  "🎶": `${IC}/act-music.png`,
+/**
+ * Um ícone por atividade do pool (id) — assets distintos.
+ * Atividades da IA caem no ícone da categoria.
+ */
+const ID_ICON: Record<string, string> = {
+  // Movimento
+  m1: `${IC}/act-dance.png`,
+  m2: `${IC}/a-jumprope.png`,
+  m3: `${IC}/a-statue.png`,
+  m4: `${IC}/act-bear.png`,
+  m5: `${IC}/a-jumpjack.png`,
+  m6: `${IC}/a-flamingo.png`,
+  m7: `${IC}/act-map.png`,
+  m8: `${IC}/a-frog.png`,
+  m9: `${IC}/a-giraffe.png`,
+  m10: `${IC}/a-mirror.png`,
+  // Criatividade
+  c1: `${IC}/act-fort.png`,
+  c2: `${IC}/act-hero.png`,
+  c3: `${IC}/a-name.png`,
+  c4: `${IC}/act-book.png`,
+  c5: `${IC}/a-potato.png`,
+  c6: `${IC}/a-plane.png`,
+  c7: `${IC}/act-music.png`,
+  c8: `${IC}/a-dream.png`,
+  c9: `${IC}/a-robot.png`,
+  c10: `${IC}/a-mask.png`,
+  // Família
+  f1: `${IC}/a-dice.png`,
+  f2: `${IC}/a-laugh.png`,
+  f3: `${IC}/a-hug.png`,
+  f4: `${IC}/a-pan.png`,
+  f5: `${IC}/a-grandma.png`,
+  f6: `${IC}/act-gift.png`,
+  f7: `${IC}/a-compass.png`,
+  f8: `${IC}/a-sparkle.png`,
+  f9: `${IC}/a-calendar.png`,
+  f10: `${IC}/a-hide.png`,
+  // Desafio
+  d1: `${IC}/act-water.png`,
+  d2: `${IC}/a-bed.png`,
+  d3: `${IC}/a-blocks.png`,
+  d4: `${IC}/a-learn.png`,
+  d5: `${IC}/a-silence.png`,
+  d6: `${IC}/a-numbers.png`,
+  d7: `${IC}/a-tooth.png`,
+  d8: `${IC}/a-thanks.png`,
+  d9: `${IC}/a-window.png`,
+  d10: `${IC}/a-wind.png`,
 };
 
 function activityIconSrc(a: Activity): string {
-  return EMOJI_ICON[a.emoji] ?? CAT_ICON[a.category];
+  return ID_ICON[a.id] ?? CAT_ICON[a.category] ?? CAT_ICON.desafio;
 }
 
 /** Liquid glass igual ao dock */
@@ -465,7 +500,7 @@ const MyActivities = ({ onBack }: Props) => {
 
         {!isPremium && (
           <p className="mt-3 text-center text-[11px] text-gray-600 font-semibold">
-            ✨ 1 atividade grátis em cada categoria · Premium libera todas
+            1 atividade grátis em cada categoria · Premium libera todas
           </p>
         )}
       </div>
