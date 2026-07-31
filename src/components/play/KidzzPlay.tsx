@@ -692,7 +692,7 @@ const KidzzPlay = ({
                 textShadow: "0 1px 10px rgba(255,255,255,.45)",
               }}
             >
-              Brincar faz parte da <span style={{ color: "#1F8A52" }}>magia</span> de crescer.
+              Brincar faz parte da <span style={{ color: "#1F8A52" }}>magia</span> de crescer
             </h1>
             <p
               style={{
@@ -704,7 +704,7 @@ const KidzzPlay = ({
                 textShadow: "0 1px 8px rgba(255,255,255,.4)",
               }}
             >
-              Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
+              Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão
             </p>
           </div>
         </div>
@@ -1018,7 +1018,7 @@ const KidzzPlay = ({
                 <span style={{ color: "#6A3EC0" }}>para todos</span>
               </h1>
               <p style={subLead("#5E5680")}>
-                Memória, palavras, desafios: escolha o jogo do dia.
+                Memória, palavras, desafios: escolha o jogo do dia
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 px-4 mt-5">

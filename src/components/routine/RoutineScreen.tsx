@@ -73,7 +73,7 @@ const PERIOD_META: Record<
 > = {
   morning: {
     label: "Manhã",
-    sub: "Comece o dia com energia e intenção.",
+    sub: "Comece o dia com energia e intenção",
     cover: asset("cover-morning.png"),
     icon: asset("icon-morning.png"),
     btn: "#E8A22B",
@@ -83,7 +83,7 @@ const PERIOD_META: Record<
   },
   afternoon: {
     label: "Tarde",
-    sub: "Momentos para aprender, brincar e compartilhar.",
+    sub: "Momentos para aprender, brincar e compartilhar",
     cover: asset("cover-afternoon.png"),
     icon: asset("icon-afternoon.png"),
     btn: "#4EA35E",
@@ -93,7 +93,7 @@ const PERIOD_META: Record<
   },
   night: {
     label: "Noite",
-    sub: "Desacelere para dormir em paz e sonhar com o amanhã.",
+    sub: "Desacelere para dormir em paz e sonhar com o amanhã",
     cover: asset("cover-night.png"),
     icon: asset("icon-night.png"),
     btn: "#7B6BC4",
@@ -859,7 +859,7 @@ const RoutineScreen = () => {
               }}
             >
               Rotina que cria{" "}
-              <span style={{ color: ACCENT }}>momentos</span> que ficam.
+              <span style={{ color: ACCENT }}>momentos</span> que ficam
             </h1>
             <p
               style={{
@@ -872,7 +872,7 @@ const RoutineScreen = () => {
                 textShadow: "0 1px 0 rgba(255,255,255,.5)",
               }}
             >
-              {message || "Pequenas ações diárias constroem lembranças para a vida toda."}
+              {message || "Pequenas ações diárias constroem lembranças para a vida toda"}
             </p>
             {streak.missedYesterday && streak.current === 0 && (
               <p

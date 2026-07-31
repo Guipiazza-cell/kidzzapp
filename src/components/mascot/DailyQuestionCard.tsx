@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { getDailySpecialQuestion } from "./MascotDialogueSystem";
-import pixelImg from "@/assets/chameleon-main.webp";
+import pixelImg from "@/assets/memorias/gui-cutout.png";
 
 interface DailyQuestionCardProps {
   childName: string;

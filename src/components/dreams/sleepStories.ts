@@ -236,6 +236,8 @@ respirando junto com você, embalando seu sono.`,
 export type SleepCategory = SleepStory["category"];
 
 const IC = "/exemplos/assets/icons-3d";
+/** Ícones premium gerados para chips de som/playlist (Sonhos) */
+const SOUND_IC = "/exemplos/assets/sonhos-v2/icons";
 
 export const STORY_CATEGORIES: { id: SleepCategory; label: string; icon: string }[] = [
   { id: "calma", label: "Calmas", icon: `${IC}/moon.png` },
@@ -259,7 +261,7 @@ export interface SoundPreset {
 /* Apenas sons com URL real são reproduzíveis. Outros aparecem com badge "Em breve". */
 export const SOUND_PRESETS: SoundPreset[] = [
   { id: "rain", label: "Chuva", icon: `${IC}/rain.png`, free: true, url: "/audio/rain-soft.mp3", category: "agua" },
-  { id: "forest", label: "Floresta", icon: `${IC}/forest.png`, free: false, url: "/audio/forest-calm.mp3", category: "natureza" },
+  { id: "forest", label: "Floresta", icon: `${SOUND_IC}/sound-forest.jpg`, free: false, url: "/audio/forest-calm.mp3", category: "natureza" },
   { id: "ocean", label: "Oceano", icon: `${IC}/ocean.png`, free: false, url: "/audio/ocean-waves.mp3", category: "agua" },
   { id: "white", label: "Ruído branco", icon: `${IC}/calm.png`, free: false, url: "/audio/white-noise.mp3", category: "ambiente" },
   { id: "rain-window", label: "Chuva na janela", icon: `${IC}/rain.png`, free: false, category: "agua" },
@@ -319,7 +321,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DX0UrRvztWcAU",
     glow: "#FFD66B",
     gradient: "from-[#3a2a1a] via-[#7a5a2a] to-[#c98a3a]",
-    cover: `${PL}/pl-teddy.png`,
+    cover: `${SOUND_IC}/pl-pequeninos.jpg`,
   },
   {
     id: "kids",

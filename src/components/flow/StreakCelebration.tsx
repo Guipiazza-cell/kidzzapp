@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import pixelImg from "@/assets/chameleon-main.webp";
+import pixelImg from "@/assets/memorias/gui-cutout.png";
 import { getMilestoneProgress } from "@/lib/habitLoop";
 import { triggerKidzzShare } from "@/components/viral/KidzzShareTrigger";
 

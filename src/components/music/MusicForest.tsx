@@ -511,7 +511,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
               letterSpacing: "-.35px",
             }}
           >
-            Música que <span style={{ color: "#C98A1A" }}>conecta</span>, momentos que ficam.
+            Música que <span style={{ color: "#C98A1A" }}>conecta</span>, momentos que ficam
           </h1>
           <p
             style={{
@@ -522,7 +522,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
               color: "#6B5A38",
             }}
           >
-            Atividades com música para soltar a voz, dançar e criar memórias inesquecíveis juntos.
+            Atividades com música para soltar a voz, dançar e criar memórias inesquecíveis juntos
           </p>
           <button
             onClick={() => openCategory("featured")}

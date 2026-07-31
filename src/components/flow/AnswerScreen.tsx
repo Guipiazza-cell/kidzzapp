@@ -10,6 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import ShareCardModal from "@/components/viral/ShareCardModal";
+import { CAMALEAO } from "@/lib/camaleaoOficial";
+import { FONT, SERIF, R, glassLight, glassLightSoft, pillGlassLight } from "@/lib/premiumUi";
+
+const BG = "/exemplos/assets/perguntas-v2/bg-floresta.png";
 
 interface Props {
   question: string;
@@ -130,175 +134,457 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
 
   return (
     <motion.div
-      className="flex-1 flex flex-col overflow-hidden relative"
+      className="flex-1 flex flex-col overflow-hidden relative min-h-0"
+      style={{ fontFamily: FONT }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
     >
-      {/* Header */}
-      <header className="flex items-center gap-3 px-4 pt-4 pb-2">
+      {/* Fundo floresta (mesmo padrão da home Perguntas) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+        <img
+          src={BG}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "center 28%", filter: "saturate(1.06) brightness(1.05)" }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,236,180,.42) 0%, transparent 55%)," +
+              "linear-gradient(180deg, rgba(255,252,245,.55) 0%, rgba(248,244,234,.72) 38%, rgba(240,248,232,.88) 100%)",
+          }}
+        />
+        {/* liquid dust */}
+        <div
+          style={{
+            position: "absolute",
+            top: "18%",
+            left: "12%",
+            width: 6,
+            height: 6,
+            borderRadius: 99,
+            background: "#FFF3CC",
+            boxShadow: "0 0 10px 2px rgba(255,225,150,.65)",
+            animation: "ans-dust 9s linear infinite",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "48%",
+            right: "16%",
+            width: 5,
+            height: 5,
+            borderRadius: 99,
+            background: "#EAFBD0",
+            boxShadow: "0 0 9px 2px rgba(200,240,150,.55)",
+            animation: "ans-dust 11s linear 2s infinite",
+          }}
+        />
+      </div>
+      <style>{`
+        @keyframes ans-dust {
+          0% { transform: translateY(0) translateX(0); opacity: .35 }
+          50% { opacity: .9 }
+          100% { transform: translateY(-40px) translateX(12px); opacity: .2 }
+        }
+        @keyframes ans-shine {
+          0% { transform: translateX(-120%) skewX(-16deg) }
+          60%,100% { transform: translateX(220%) skewX(-16deg) }
+        }
+      `}</style>
+
+      {/* Header glass */}
+      <header
+        className="relative z-20 flex items-center gap-2 px-4"
+        style={{
+          paddingTop: "max(env(safe-area-inset-top, 8px), 12px)",
+          paddingBottom: 10,
+        }}
+      >
         <motion.button
+          type="button"
           onClick={onNewQuestion}
-          className="p-2 rounded-xl glass-card text-gray-600"
-          whileTap={{ scale: 0.9 }}
+          aria-label="Voltar"
+          className="active:scale-95 flex items-center justify-center"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: R.btn,
+            color: "#1F2E18",
+            ...pillGlassLight,
+          }}
+          whileTap={{ scale: 0.92 }}
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={19} strokeWidth={2.2} />
         </motion.button>
-        <div className="flex-1 flex items-center gap-2">
-          <span className="text-lg font-black text-gray-800">Kidzz</span>
+        <div
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 px-3"
+          style={{
+            minHeight: 44,
+            borderRadius: R.btn,
+            ...pillGlassLight,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 600,
+              fontSize: 15,
+              color: "#1F2E18",
+            }}
+          >
+            Resposta
+          </span>
         </div>
         <motion.div
-          className="flex items-center gap-1 glass-card px-3 py-1.5 rounded-full"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.5, type: "spring" }}
+          className="flex items-center gap-1.5 px-3"
+          style={{
+            minHeight: 44,
+            borderRadius: R.btn,
+            ...pillGlassLight,
+          }}
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.35, type: "spring" }}
         >
-          <Heart size={12} className="text-kid-pink" />
-          <span className="text-[10px] text-gray-500 font-bold">+1 conexão</span>
+          <Heart size={13} color="#E07090" fill="#E07090" />
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#5A4A38" }}>+1</span>
         </motion.div>
       </header>
 
       {/* Content */}
       <div
-        className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-5"
+        className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
         style={{
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 128px)",
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {/* Question */}
+        {/* Gui cutout sutil */}
+        <div className="flex justify-center pt-1 pb-2" aria-hidden>
+          <motion.img
+            src={CAMALEAO.cutout}
+            alt=""
+            draggable={false}
+            initial={{ y: 8, opacity: 0 }}
+            animate={{ y: [0, -6, 0], opacity: 1 }}
+            transition={{
+              opacity: { duration: 0.35 },
+              y: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
+            }}
+            style={{
+              width: 88,
+              height: 112,
+              objectFit: "contain",
+              filter: "drop-shadow(0 12px 20px rgba(40,50,30,.22))",
+            }}
+          />
+        </div>
+
+        {/* Pergunta — glass */}
         <motion.div
-          className="mt-4 glass-card px-4 py-3 rounded-2xl"
-          initial={{ opacity: 0, y: 10 }}
+          className="relative overflow-hidden"
+          style={{ ...glassLight, borderRadius: R.card, padding: "14px 16px" }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.08 }}
         >
-          <p className="text-gray-400 text-xs font-bold">Pergunta:</p>
-          <p className="text-gray-800 text-sm font-bold mt-1">{question}</p>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "45%",
+              height: "100%",
+              background:
+                "linear-gradient(105deg, transparent, rgba(255,255,255,.4) 50%, transparent)",
+              animation: "ans-shine 7s ease-in-out infinite",
+              pointerEvents: "none",
+            }}
+          />
+          <p
+            style={{
+              margin: 0,
+              fontSize: 10,
+              fontWeight: 900,
+              letterSpacing: "1.1px",
+              textTransform: "uppercase",
+              color: "rgba(60,80,45,.55)",
+            }}
+          >
+            Pergunta
+          </p>
+          <p
+            style={{
+              margin: "6px 0 0",
+              fontFamily: SERIF,
+              fontWeight: 600,
+              fontSize: 16,
+              lineHeight: 1.35,
+              color: "#1F2E18",
+            }}
+          >
+            {question}
+          </p>
         </motion.div>
 
-        {/* Answer */}
+        {/* Resposta — glass liquid */}
         <motion.div
-          className="mt-4"
-          initial={{ opacity: 0, y: 15 }}
+          className="mt-3 relative overflow-hidden"
+          style={{ ...glassLight, borderRadius: R.card, padding: "16px 16px 18px" }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.18 }}
         >
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">Resposta</span>
-          </div>
-          <div className="glass-card p-5 rounded-2xl border-2 border-kid-green/20">
-            <div className="prose prose-sm max-w-none text-gray-700 [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 [&>h1]:text-gray-800 [&>h2]:text-gray-800 [&>h3]:text-gray-800 [&>p]:text-gray-700 [&>li]:text-gray-700">
-              <ReactMarkdown>{answer}</ReactMarkdown>
-            </div>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "50%",
+              height: "100%",
+              background:
+                "linear-gradient(105deg, transparent, rgba(255,255,255,.38) 50%, transparent)",
+              animation: "ans-shine 8s ease-in-out 1s infinite",
+              pointerEvents: "none",
+            }}
+          />
+          <p
+            style={{
+              margin: "0 0 10px",
+              fontSize: 10,
+              fontWeight: 900,
+              letterSpacing: "1.1px",
+              textTransform: "uppercase",
+              color: "rgba(60,80,45,.55)",
+            }}
+          >
+            Resposta
+          </p>
+          <div
+            className="prose prose-sm max-w-none relative z-[1] [&_p]:my-2 [&_ul]:my-2 [&_ol]:my-2 [&_h1]:text-[#1F2E18] [&_h2]:text-[#1F2E18] [&_h3]:text-[#1F2E18] [&_p]:text-[#2A3A22] [&_li]:text-[#2A3A22] [&_strong]:text-[#1F2E18]"
+            style={{ fontSize: 14.5, lineHeight: 1.55, fontWeight: 600 }}
+          >
+            <ReactMarkdown>{answer}</ReactMarkdown>
           </div>
         </motion.div>
 
-        {/* Audio button */}
+        {/* Ouvir */}
         <motion.button
+          type="button"
           onClick={handleSpeak}
-          className={`w-full mt-4 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-base shadow-lg transition-all active:scale-[0.97] relative overflow-hidden ${
-            playing
-              ? "bg-kid-yellow/80 text-gray-800"
-              : "bg-gradient-to-r from-kid-green to-kid-green/80 text-white"
-          }`}
+          className="relative w-full mt-3 overflow-hidden active:scale-[0.98]"
+          style={{
+            minHeight: 52,
+            borderRadius: R.btn,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            fontWeight: 900,
+            fontSize: 15,
+            color: playing ? "#3A2A10" : "#fff",
+            background: playing
+              ? "linear-gradient(135deg, rgba(255,230,140,.92), rgba(242,190,70,.88))"
+              : "linear-gradient(135deg, #5CB57A 0%, #3E9A52 55%, #2E7A42 100%)",
+            border: playing
+              ? "0.5px solid rgba(255,220,120,.7)"
+              : "0.5px solid rgba(255,255,255,.45)",
+            boxShadow: playing
+              ? "0 10px 24px rgba(200,150,40,.28)"
+              : "0 12px 28px rgba(46,122,66,.32), inset 0 1px 0 rgba(255,255,255,.35)",
+          }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          whileTap={{ scale: 0.95 }}
+          transition={{ delay: 0.28 }}
+          whileTap={{ scale: 0.97 }}
         >
           {playing && (
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-kid-yellow/0 via-kid-yellow/30 to-kid-yellow/0"
-              animate={{ x: ["-100%", "100%"] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(120deg, transparent 30%, rgba(255,255,255,.4) 50%, transparent 70%)",
+              }}
+              animate={{ x: ["-110%", "120%"] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "linear" }}
             />
           )}
           <span className="relative z-10 flex items-center gap-2">
-            {playing ? (<><VolumeX size={22} /> Parar narração</>) : (<><Volume2 size={22} /> Ouvir resposta</>)}
+            {playing ? (
+              <>
+                <VolumeX size={20} /> Parar narração
+              </>
+            ) : (
+              <>
+                <Volume2 size={20} /> Ouvir resposta
+              </>
+            )}
           </span>
         </motion.button>
 
-        {/* Reward actions: Save to Memories + Share - primary CTAs */}
+        {/* Salvar + compartilhar */}
         <motion.div
-          className="mt-3 grid grid-cols-2 gap-2"
+          className="mt-2.5 grid grid-cols-2 gap-2.5"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55 }}
+          transition={{ delay: 0.34 }}
         >
           <motion.button
+            type="button"
             onClick={handleSaveMemory}
             disabled={memorySaved}
-            className={`flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm shadow-md transition-all ${
-              memorySaved
-                ? "bg-kid-green/30 text-kid-green border-2 border-kid-green/40"
-                : "bg-gradient-to-r from-kid-pink to-kid-purple text-white"
-            }`}
-            whileTap={memorySaved ? undefined : { scale: 0.95 }}
+            className="active:scale-[0.98] flex items-center justify-center gap-2"
+            style={{
+              minHeight: 48,
+              borderRadius: R.btn,
+              fontWeight: 800,
+              fontSize: 13,
+              ...(memorySaved
+                ? {
+                    ...glassLightSoft,
+                    color: "#2E7A42",
+                    border: "0.5px solid rgba(62,154,82,.45)",
+                  }
+                : {
+                    color: "#fff",
+                    background: "linear-gradient(135deg, #E882A0, #9A6CF0)",
+                    border: "0.5px solid rgba(255,255,255,.4)",
+                    boxShadow: "0 8px 20px rgba(120,60,160,.28)",
+                  }),
+            }}
+            whileTap={memorySaved ? undefined : { scale: 0.97 }}
           >
-            <Bookmark size={16} fill={memorySaved ? "currentColor" : "none"} />
+            <Bookmark size={15} fill={memorySaved ? "currentColor" : "none"} />
             {memorySaved ? "Salvo" : "Salvar memória"}
           </motion.button>
           <motion.button
+            type="button"
             onClick={() => setShowShare(true)}
-            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/80 backdrop-blur text-gray-700 font-bold text-sm shadow-md border border-white/40"
-            whileTap={{ scale: 0.95 }}
+            className="active:scale-[0.98] flex items-center justify-center gap-2"
+            style={{
+              minHeight: 48,
+              borderRadius: R.btn,
+              fontWeight: 800,
+              fontSize: 13,
+              color: "#2A3A22",
+              ...pillGlassLight,
+            }}
+            whileTap={{ scale: 0.97 }}
           >
-            <Share2 size={16} /> Compartilhar
+            <Share2 size={15} /> Compartilhar
           </motion.button>
         </motion.div>
 
-        {/* Story factory button for super premium */}
         {isSuperPremium && (
           <motion.button
+            type="button"
             onClick={onOpenStoryFactory}
-            className="w-full mt-3 flex items-center justify-center gap-2 py-3 rounded-2xl glass-card text-gray-700 font-bold text-sm"
+            className="w-full mt-2.5 flex items-center justify-center gap-2 active:scale-[0.98]"
+            style={{
+              minHeight: 48,
+              borderRadius: R.btn,
+              fontWeight: 800,
+              fontSize: 13.5,
+              color: "#2A3A22",
+              ...glassLightSoft,
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            whileTap={{ scale: 0.95 }}
+            transition={{ delay: 0.4 }}
+            whileTap={{ scale: 0.97 }}
           >
-            <BookOpen size={18} />
+            <BookOpen size={16} />
             Transformar em história
           </motion.button>
         )}
 
-        {/* New question */}
         <motion.button
+          type="button"
           onClick={onNewQuestion}
-          className="w-full mt-3 py-4 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-pink text-white font-extrabold text-base shadow-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          className="w-full mt-2.5 flex items-center justify-center gap-2 active:scale-[0.98]"
+          style={{
+            minHeight: 52,
+            borderRadius: R.btn,
+            fontWeight: 900,
+            fontSize: 15,
+            color: "#fff",
+            background: "linear-gradient(135deg, #F0A020 0%, #E8821A 50%, #E07090 130%)",
+            border: "0.5px solid rgba(255,220,140,.5)",
+            boxShadow: "0 12px 28px rgba(212,120,26,.32), inset 0 1px 0 rgba(255,255,255,.35)",
+          }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.38 }}
           whileTap={{ scale: 0.97 }}
         >
-          <Sparkles size={18} />
+          <Sparkles size={17} />
           Nova pergunta
         </motion.button>
 
         <motion.p
-          className="text-center text-gray-400 text-xs font-bold mt-4"
+          className="text-center mt-4 mb-2"
+          style={{
+            margin: "16px 0 8px",
+            fontSize: 11.5,
+            fontWeight: 800,
+            color: "rgba(50,70,40,.5)",
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.5 }}
         >
           Isso pode marcar a vida do seu filho
         </motion.p>
 
-        {/* CTA after value delivery */}
         {showCTA && !isPremium && (
           <motion.div
-            className="mt-4 glass-card p-5 rounded-2xl text-center border border-kid-purple/20"
-            initial={{ opacity: 0, y: 15 }}
+            className="mt-2 text-center relative overflow-hidden"
+            style={{ ...glassLight, borderRadius: R.card, padding: "18px 16px" }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="text-gray-800 font-bold text-base leading-relaxed">
+            <p
+              style={{
+                margin: 0,
+                fontFamily: SERIF,
+                fontWeight: 600,
+                fontSize: 16,
+                lineHeight: 1.35,
+                color: "#1F2E18",
+              }}
+            >
               Quer ter respostas assim sempre que seu filho perguntar?
             </p>
-            <p className="text-gray-500 text-xs mt-1">
+            <p
+              style={{
+                margin: "6px 0 0",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "rgba(50,70,40,.55)",
+              }}
+            >
               Nunca mais trave na frente do seu filho
             </p>
             <motion.button
+              type="button"
               onClick={() => handleCheckout("premium")}
-              className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
-              whileTap={{ scale: 0.95 }}
+              className="mt-3.5 w-full active:scale-[0.98]"
+              style={{
+                minHeight: 48,
+                borderRadius: R.btn,
+                fontWeight: 900,
+                fontSize: 14,
+                color: "#fff",
+                background: "linear-gradient(135deg, #9A6CF0, #E07090)",
+                border: "0.5px solid rgba(255,255,255,.4)",
+                boxShadow: "0 10px 24px rgba(120,60,160,.3)",
+              }}
+              whileTap={{ scale: 0.97 }}
             >
               Desbloquear acesso completo
             </motion.button>
@@ -306,7 +592,6 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
         )}
       </div>
 
-      {/* Share modal */}
       <AnimatePresence>
         {showShare && (
           <ShareCardModal

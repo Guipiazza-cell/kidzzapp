@@ -769,7 +769,7 @@ const BoraScreen = ({ onBack }: Props) => {
               <br />
               que criam memórias
               <br />
-              para a vida.
+              para a vida
             </p>
             <button
               type="button"

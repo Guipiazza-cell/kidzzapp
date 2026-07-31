@@ -1,6 +1,7 @@
 import { forwardRef, memo } from "react";
 import { motion } from "framer-motion";
-import chameleonImg from "@/assets/chameleon-main.webp";
+/** Gui cutout (sem fundo) — nunca foto retangular com floresta */
+import chameleonImg from "@/assets/memorias/gui-cutout.png";
 
 type MascotMood = "idle" | "curious" | "happy" | "thinking" | "talking";
 
@@ -12,18 +13,19 @@ interface ChameleonMascotProps {
   interactive?: boolean;
 }
 
+/** Proporção vertical do cutout Gui (sem “foto quadrada”) */
 const sizeMap = {
-  sm: "w-14 h-14",
-  md: "w-28 h-28",
-  lg: "w-44 h-44",
-  xl: "w-56 h-56",
+  sm: "w-14 h-[4.25rem]",
+  md: "w-28 h-36",
+  lg: "w-40 h-52",
+  xl: "w-52 h-64",
 };
 
 const glowSizeMap = {
   sm: "w-20 h-20",
   md: "w-36 h-36",
-  lg: "w-52 h-52",
-  xl: "w-64 h-64",
+  lg: "w-48 h-48",
+  xl: "w-60 h-60",
 };
 
 const ChameleonMascot = forwardRef<HTMLDivElement, ChameleonMascotProps>(

@@ -6,7 +6,7 @@
 import { useMemo, useState } from "react";
 import {
   ArrowLeft, Heart, Leaf, Droplet, Users, Coffee, LifeBuoy,
-  Share2, Sparkles, ChevronRight,
+  Share2, Sparkles, ChevronRight, Smile,
 } from "lucide-react";
 import kalmHeroFamily from "@/assets/kalm-hero-family.webp";
 import { haptic } from "@/lib/haptics";
@@ -250,7 +250,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
           className="mt-2 text-[13px] leading-[1.4] font-semibold"
           style={{ color: inkSoft, maxWidth: 280 }}
         >
-          Cada escolha de hoje transforma o amanhã.
+          Cada escolha de hoje transforma o amanhã
         </p>
       </section>
 
@@ -283,7 +283,11 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
                 border: "1px solid rgba(232,185,58,0.30)",
               }}
             >
-              {suggestion.emoji}
+              {suggestion.activityId === "festival-risada" ? (
+                <Smile size={26} strokeWidth={1.9} color={gold} aria-hidden />
+              ) : (
+                suggestion.emoji
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-semibold leading-snug" style={{ color: ink }}>
@@ -400,8 +404,8 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
               "0 14px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.85)",
           }}
         >
-          <div className="relative flex gap-3 p-4 min-h-[148px]">
-            <div className="relative z-[2] flex-1 min-w-0 pr-2">
+          <div className="relative flex items-stretch gap-2 pl-4 pr-2 py-3 min-h-[168px]">
+            <div className="relative z-[2] flex-1 min-w-0 py-1 pr-1">
               <div className="flex items-center gap-1.5 mb-2">
                 <span
                   className="flex h-6 w-6 items-center justify-center rounded-full"
@@ -432,7 +436,7 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
                 className="mt-1.5 text-[12.5px] font-semibold leading-snug"
                 style={{ color: "rgba(40,55,30,0.72)", maxWidth: 190 }}
               >
-                Coloque uma estrelinha no jarro e veja a gratidão crescer em família.
+                Coloque uma estrelinha no jarro e veja a gratidão crescer em família
               </p>
               {jarItems.length > 0 && (
                 <p className="mt-1.5 text-[11px] font-bold" style={{ color: goldSoft }}>
@@ -451,18 +455,24 @@ const KalmHome = ({ onBack, onGoPillar, onGoSos, onGoDreams, onOpenActivity }: P
               </span>
             </div>
 
+            {/* Slot vertical (arte 3:4) — evita crop quadrado */}
             <div
-              className="pointer-events-none absolute right-0 top-0 bottom-0 w-[46%] flex items-center justify-center"
+              className="pointer-events-none relative z-[1] flex-none self-center"
+              style={{ width: 132, height: 156 }}
               aria-hidden
             >
               <img
                 src={jarroGratidao}
                 alt="Jarro da gratidão"
-                className="h-[92%] w-auto max-w-[100%] object-contain"
+                draggable={false}
                 style={{
+                  display: "block",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  objectPosition: "center center",
                   filter: "drop-shadow(0 12px 20px rgba(80,50,10,0.22))",
                 }}
-                draggable={false}
                 onError={(e) => {
                   const el = e.currentTarget;
                   if (el.src !== jarroGratidaoFallback) el.src = jarroGratidaoFallback;

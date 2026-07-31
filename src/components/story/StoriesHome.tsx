@@ -36,7 +36,7 @@ const HOW_IT_WORKS: {
   Icon: typeof UserRound;
   glow: [string, string, string];
 }[] = [
-  { title: "Monte o avatar", sub: "O rosto e o jeitinho do seu filho", Icon: UserRound, glow: ["#FFD9A8", "#F0A24C", "#C77E1E"] },
+  { title: "Monte o avatar", sub: "Nome, cores e o jeitinho do seu filho", Icon: UserRound, glow: ["#FFD9A8", "#F0A24C", "#C77E1E"] },
   { title: "Escolha palavras-chave", sub: "O mundo e os interesses dele", Icon: Tags, glow: ["#FFE9A8", "#F2C24C", "#C98F1E"] },
   { title: "Diga o objetivo", sub: "O que a história precisa entregar", Icon: Target, glow: ["#C0EDC8", "#5CB57A", "#2F7A4E"] },
   { title: "Narração suave", sub: "Voz feminina que embala e acalma", Icon: AudioLines, glow: ["#D2CCF0", "#8A7AD8", "#5E4EA8"] },
@@ -160,10 +160,10 @@ const StoriesHome = ({ onBack }: Props) => {
                 }}
               >
                 <span style={{ display: "block" }}>Histórias que</span>
-                <span style={{ display: "block", color: "#F0C25A" }}>criam memórias.</span>
+                <span style={{ display: "block", color: "#F0C25A" }}>criam memórias</span>
               </h1>
               <p style={{ margin: "10px 0 14px", fontSize: 13.5, fontWeight: 700, lineHeight: 1.45, color: "rgba(246,241,232,0.72)" }}>
-                Criamos histórias únicas com o nome, o rosto e o mundo do seu filho.
+                Criamos histórias únicas com o nome, as cores e o mundo do seu filho
               </p>
               <div
                 className="inline-flex items-center gap-2 px-3 py-2"

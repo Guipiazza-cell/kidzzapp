@@ -271,8 +271,8 @@ export const PilarSentir = ({
       <TopBar title="Sentir" tint={tint} onBack={onBack} />
       <PillarHero
         kicker="Emoção"
-        title="Nomear é acalmar."
-        subtitle="Reconhecer o que sentimos já é metade do caminho."
+        title="Nomear é acalmar"
+        subtitle="Reconhecer o que sentimos já é metade do caminho"
         tint={tint}
       />
 
@@ -346,8 +346,8 @@ export const PilarAgradecer = ({
       <TopBar title="Agradecer" tint={tint} onBack={onBack} />
       <PillarHero
         kicker="Gratidão & memória"
-        title="Guardar o que foi bom."
-        subtitle="Saborear pequenos brilhos multiplica a alegria."
+        title="Guardar o que foi bom"
+        subtitle="Saborear pequenos brilhos multiplica a alegria"
         tint={tint}
       />
 
@@ -363,17 +363,21 @@ export const PilarAgradecer = ({
         >
           <div className="flex items-start gap-3">
             <div
-              className="w-[80px] h-[96px] rounded-[18px] overflow-hidden shrink-0 flex items-center justify-center"
-              style={{
-                background: "rgba(244,203,85,0.12)",
-                border: "1px solid rgba(244,203,85,0.28)",
-              }}
+              className="shrink-0 flex items-center justify-center"
+              style={{ width: 92, height: 118 }}
             >
               <img
                 src={jarroGratidao}
                 alt="Jarro de gratidão"
-                className="w-full h-full object-contain"
-                style={{ objectPosition: "50% 45%" }}
+                draggable={false}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  objectPosition: "center center",
+                  filter: "drop-shadow(0 10px 16px rgba(0,0,0,0.35))",
+                }}
                 onError={(e) => {
                   const el = e.currentTarget;
                   if (el.src !== jarroGratidaoFallback) el.src = jarroGratidaoFallback;
@@ -540,8 +544,8 @@ export const PilarMover = ({
       <TopBar title="Mover" tint={tint} onBack={onBack} />
       <PillarHero
         kicker="Corpo em movimento"
-        title="Um minuto muda tudo."
-        subtitle="Movimento leve regula a emoção pelo corpo."
+        title="Um minuto muda tudo"
+        subtitle="Movimento leve regula a emoção pelo corpo"
         tint={tint}
       />
       <section className="px-5 pt-5">
@@ -586,8 +590,8 @@ export const PilarNutrir = ({
       <TopBar title="Nutrir" tint={tint} onBack={onBack} />
       <PillarHero
         kicker="Alimentação com consciência"
-        title="Cor, água e presença."
-        subtitle="Nada de dieta, calorias ou peso. Aqui é vínculo e prazer de comer junto."
+        title="Cor, água e presença"
+        subtitle="Nada de dieta, calorias ou peso · Aqui é vínculo e prazer de comer junto"
         tint={tint}
       />
 
@@ -650,8 +654,8 @@ export const PilarConectar = ({
       <TopBar title="Conectar" tint={tint} onBack={onBack} />
       <PillarHero
         kicker="Bondade & vínculo"
-        title="A família é o abrigo."
-        subtitle="Pequenos gestos hoje, memórias que ficam para sempre."
+        title="A família é o abrigo"
+        subtitle="Pequenos gestos hoje, memórias que ficam para sempre"
         tint={tint}
       />
       <section className="px-5 pt-5 grid grid-cols-2 gap-3">
@@ -684,8 +688,8 @@ export const PilarCuidar = ({
       <TopBar title="Cuidar de você" tint={tint} onBack={onBack} />
       <PillarHero
         kicker="Para você, mãe e pai"
-        title="Pausas diurnas, sem culpa."
-        subtitle="Cuidar de si é a base de toda a família."
+        title="Pausas diurnas, sem culpa"
+        subtitle="Cuidar de si é a base de toda a família"
         tint={tint}
       />
 

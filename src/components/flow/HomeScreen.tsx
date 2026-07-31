@@ -639,7 +639,7 @@ const HomeScreen = ({
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: "block", fontWeight: 900, fontSize: 13, color: "#4A3808" }}>Liberar tudo</span>
                 <span style={{ display: "block", fontSize: 10.5, fontWeight: 700, color: "rgba(90,70,20,.65)", marginTop: 2 }}>
-                  Acesso ilimitado para sua família.
+                  Acesso ilimitado para sua família
                 </span>
               </span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="#9A7A30" strokeWidth="2.2" strokeLinecap="round" /></svg>
@@ -684,7 +684,7 @@ const HomeScreen = ({
                   </h2>
                 </div>
                 <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "rgba(50,70,40,.65)", lineHeight: 1.35 }}>
-                  Descubra respostas e crie conversas incríveis juntos.
+                  Descubra respostas e crie conversas incríveis juntos
                 </p>
               </div>
 
@@ -1094,7 +1094,7 @@ const HomeScreen = ({
                 Hora do reencontro
               </div>
               <div style={{ fontSize: 11, fontWeight: 700, color: "#5E4A7A", lineHeight: 1.35 }}>
-                Momentos que acolhem e transformam o fim do dia em conexão.
+                Momentos que acolhem e transformam o fim do dia em conexão
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8, fontSize: 10.5, fontWeight: 900, color: "#6A5490" }}>
                 <span>3 min</span>
@@ -1106,8 +1106,7 @@ const HomeScreen = ({
               style={{
                 position: "absolute",
                 right: 14,
-                top: "50%",
-                transform: "translateY(-50%)",
+                bottom: 12,
                 width: 46,
                 height: 46,
                 borderRadius: 999,
@@ -1123,11 +1122,6 @@ const HomeScreen = ({
           </button>
         </section>
 
-        <div style={{ padding: "10px 20px 8px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "rgba(80,100,60,.5)" }}>
-          {streakDays > 0
-            ? `${streakDays} dias juntos · uma pergunta por dia aproxima a família`
-            : "Uma pergunta por dia aproxima a família"}
-        </div>
       </div>
 
       {/* ── MODAIS ── */}

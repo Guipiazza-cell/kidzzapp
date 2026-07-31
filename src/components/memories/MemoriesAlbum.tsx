@@ -316,7 +316,7 @@ const MemoriesAlbum = ({
 
   const handleShare = useCallback(
     async (m: Memory) => {
-      const shareText = `${m.title}\n\n${m.content || ""}\n\n💛 Criado com KIDZZ - kidzzapp.lovable.app`;
+      const shareText = `${m.title}\n\n${m.content || ""}\n\nCriado com KIDZZ - kidzzapp.lovable.app`;
       if (navigator.share) {
         try {
           await navigator.share({ title: `Memória de ${childName}`, text: shareText });
@@ -325,7 +325,7 @@ const MemoriesAlbum = ({
         }
       } else {
         await navigator.clipboard.writeText(shareText);
-        toast.success("Memória copiada! 💛");
+        toast.success("Memória copiada!");
       }
     },
     [childName]
@@ -496,7 +496,7 @@ const MemoriesAlbum = ({
       sub: "Desafios para criar memórias",
       icon: iconMissaoUrl,
       k: "verde",
-      onClick: () => onNavigateToPlay?.() ?? toast("Abra Brincar para missões ✨"),
+      onClick: () => onNavigateToPlay?.() ?? toast("Abra Brincar para missões"),
     },
   ];
 
@@ -716,7 +716,7 @@ const MemoriesAlbum = ({
               lineHeight: "normal",
             }}
           >
-            Aqui guardamos memórias que viram histórias.
+            Aqui guardamos memórias que viram histórias
           </h1>
         </div>
 
@@ -964,7 +964,7 @@ const MemoriesAlbum = ({
                     margin: "0 0 8px",
                   }}
                 >
-                  Aqui vão ficar as memórias mais preciosas de {childName} 💛
+                  Aqui vão ficar as memórias mais preciosas de {childName}
                 </h3>
                 <p
                   style={{
@@ -1222,7 +1222,7 @@ const MemoriesAlbum = ({
                   }}
                 >
                   <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: MEM_INK }}>
-                    Conquistas da família 🌱
+                    Conquistas da família
                   </h2>
                 </div>
                 <div
@@ -1310,10 +1310,10 @@ const MemoriesAlbum = ({
                 }}
               >
                 <p style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#F6F1E4" }}>
-                  +{lockedCount} memórias guardadas com carinho 💛
+                  +{lockedCount} memórias guardadas com carinho
                 </p>
                 <p style={{ margin: "4px 0 12px", fontSize: 12, fontWeight: 700, color: MEM_INK2 }}>
-                  Desbloqueie todas com Premium ✨
+                  Desbloqueie todas com Premium
                 </p>
                 <button
                   onClick={() => handleCheckout("premium")}
@@ -1333,7 +1333,7 @@ const MemoriesAlbum = ({
                     boxShadow: "0 10px 24px rgba(90,50,150,.4),inset 0 1px 0 rgba(255,255,255,.3)",
                   }}
                 >
-                  🔓 Desbloquear todas as memórias
+                  Desbloquear todas as memórias
                 </button>
               </div>
             )}

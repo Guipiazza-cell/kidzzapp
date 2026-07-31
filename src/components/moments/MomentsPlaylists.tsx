@@ -529,7 +529,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
               border: 0,
             }}
           >
-            Aqui guardamos memórias que viram histórias.
+            Aqui guardamos memórias que viram histórias
           </h1>
         </div>
 

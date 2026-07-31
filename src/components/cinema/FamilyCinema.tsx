@@ -837,7 +837,7 @@ const FamilyCinema = ({ onBack }: Props) => {
               <br />
               que diversão,
               <br />
-              é <span style={{ color: "#9FE8B0" }}>conexão</span>.
+              é <span style={{ color: "#9FE8B0" }}>conexão</span>
             </h1>
             <p
               style={{
@@ -850,7 +850,7 @@ const FamilyCinema = ({ onBack }: Props) => {
                 textShadow: "0 1px 10px rgba(0,0,0,.35)",
               }}
             >
-              Um filme por semana para inspirar conversas, emoções e memórias que ficam.
+              Um filme por semana para inspirar conversas, emoções e memórias que ficam
             </p>
           </div>
         </div>

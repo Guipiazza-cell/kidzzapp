@@ -40,7 +40,9 @@ const NotificationTimeOnboarding = ({ childName, onComplete }: Props) => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 180, damping: 12 }}
+          className="relative flex items-center justify-center"
         >
+          {/* Gui cutout sem retângulo de floresta */}
           <ChameleonMascot size="lg" mood="happy" interactive />
         </motion.div>
 

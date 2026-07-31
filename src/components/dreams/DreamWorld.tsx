@@ -663,7 +663,7 @@ const DreamWorld = ({ onBack }: Props) => {
             }}
           >
             <h1 style={{ margin: "0 auto 9px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 28, lineHeight: 1.18, color: "#F6EEFC", letterSpacing: "-.35px", maxWidth: 300, textShadow: "0 2px 18px rgba(0,0,0,.45)" }}>
-              Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia.
+              Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia
             </h1>
             <p style={{ margin: "0 auto", fontSize: 13, fontWeight: 700, lineHeight: 1.5, color: "rgba(224,210,242,.84)", maxWidth: 280 }}>
               Histórias, sons e momentos para acalmar e conectar a família antes de dormir.
@@ -705,7 +705,7 @@ const DreamWorld = ({ onBack }: Props) => {
               <Eyebrow d={P.wind} color="#fff" size={19} sw={1.8} />
             </div>
             <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#F3ECFA", lineHeight: 1.15 }}>Respiração noturna</div>
-            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Inspira… segura… solta.</div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Inspira… segura… solta</div>
           </motion.button>
           <motion.button
             onClick={() => {
@@ -720,7 +720,7 @@ const DreamWorld = ({ onBack }: Props) => {
               <Eyebrow d={P.heart} color="#fff" size={19} sw={1.8} />
             </div>
             <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#F3ECFA", lineHeight: 1.15 }}>Momento em família</div>
-            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Uma pergunta para a noite.</div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Uma pergunta para a noite</div>
           </motion.button>
         </div>
 
@@ -818,7 +818,20 @@ const DreamWorld = ({ onBack }: Props) => {
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "1.2px", color: "#A9C4A0", marginBottom: 7 }}>SOM IDEAL</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <img src={sound.icon} alt="" width={22} height={22} style={{ width: 22, height: 22, borderRadius: 8, objectFit: "cover" }} />
+                      <img
+                        src={sound.icon}
+                        alt=""
+                        width={28}
+                        height={28}
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 10,
+                          objectFit: "cover",
+                          boxShadow: "0 4px 10px rgba(0,0,0,.28)",
+                          flex: "none",
+                        }}
+                      />
                       <span style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14, color: "#F3ECFA" }}>{sound.label}</span>
                     </div>
                   </motion.button>
@@ -837,7 +850,20 @@ const DreamWorld = ({ onBack }: Props) => {
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "1.2px", color: "#A9B6E8", marginBottom: 7 }}>PLAYLIST DA NOITE</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <img src={playlist.cover} alt="" width={22} height={22} style={{ width: 22, height: 22, borderRadius: 8, objectFit: "cover" }} />
+                      <img
+                        src={playlist.cover}
+                        alt=""
+                        width={28}
+                        height={28}
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 10,
+                          objectFit: "cover",
+                          boxShadow: "0 4px 10px rgba(0,0,0,.28)",
+                          flex: "none",
+                        }}
+                      />
                       <span style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14, color: "#F3ECFA", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{playlist.title}</span>
                     </div>
                   </motion.button>
@@ -872,7 +898,7 @@ const DreamWorld = ({ onBack }: Props) => {
             eyebrow="TIMER DO SONINHO"
             color="#FFC98A"
             title="A lua diminui devagar"
-            subtitle="Escolha quanto dura sua noite."
+            subtitle="Escolha quanto dura sua noite"
           />
           <div style={{ display: "flex", gap: 9, overflowX: "auto", padding: "2px 16px 14px" }} className="scrollbar-none">
             {TIMER_OPTIONS.map((opt) => {
@@ -905,7 +931,7 @@ const DreamWorld = ({ onBack }: Props) => {
             eyebrow="SONS DA NOITE"
             color="#8AD0B0"
             title="Paisagens sonoras"
-            subtitle="Toque para embalar o sono."
+            subtitle="Toque para embalar o sono"
           />
           {audioError && (
             <div style={{ margin: "0 16px 10px", borderRadius: 12, padding: "8px 12px", textAlign: "center", background: "rgba(127,29,29,0.25)", border: "1px solid rgba(248,113,113,0.28)" }}>
@@ -996,7 +1022,7 @@ const DreamWorld = ({ onBack }: Props) => {
             icon={<Eyebrow d={P.book} color="#C9A8F0" />}
             eyebrow="HISTÓRIAS QUE ABRAÇAM"
             color="#C9A8F0"
-            title="Calma para dormir. Memórias para a vida."
+            title="Calma para dormir · Memórias para a vida"
           />
           {/* Categorias */}
           <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "0 16px 12px" }} className="scrollbar-none">
@@ -1095,7 +1121,7 @@ const DreamWorld = ({ onBack }: Props) => {
             eyebrow="PLAYLISTS CALMARIA"
             color="#C9A8F0"
             title="Trilhas para cada idade"
-            subtitle="Atualizadas automaticamente pelo Spotify."
+            subtitle="Atualizadas automaticamente pelo Spotify"
           />
           <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 8px", scrollSnapType: "x mandatory" }} className="scrollbar-none">
             {SLEEP_PLAYLISTS.map((pl) => {
@@ -1195,7 +1221,7 @@ const DreamWorld = ({ onBack }: Props) => {
             icon={<Eyebrow d={P.heart} color="#F0B8D0" />}
             eyebrow="MOMENTOS EM FAMÍLIA"
             color="#F0B8D0"
-            title="Menos correria. Mais presença."
+            title="Menos correria · Mais presença"
           />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, padding: "0 16px" }}>
             {FAMILY_MOMENTS.map((m) => (

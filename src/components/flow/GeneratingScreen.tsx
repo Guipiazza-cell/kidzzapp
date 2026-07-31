@@ -251,15 +251,14 @@ const GeneratingScreen = ({
             }}
           />
           <img
-            src={CAMALEAO.heartSoft}
+            src={CAMALEAO.cutout}
             alt="Gui pensando"
-            className="relative w-[7.5rem] h-[7.5rem] object-contain"
+            className="relative w-[8.5rem] h-[11rem] object-contain"
             style={{
               filter: "drop-shadow(0 14px 24px rgba(40,50,30,.28))",
-              borderRadius: 28,
             }}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = CAMALEAO.heart;
+              (e.target as HTMLImageElement).src = CAMALEAO.cutout;
             }}
           />
         </motion.div>
