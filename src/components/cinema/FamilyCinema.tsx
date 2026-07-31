@@ -232,21 +232,18 @@ const Shine = () => (
 const idadeLabel = (m: Movie) =>
   m.faixaEtaria === "familia" ? "Família" : `${m.faixaEtaria.replace("-", "-")} anos`;
 
+/** Título de seção editorial — sem contagem “N filmes” ao lado. */
 const SectionLabel = ({
   children,
-  right,
   kicker,
 }: {
   children: ReactNode;
-  right?: ReactNode;
   kicker?: string;
 }) => (
   <div
     style={{
       display: "flex",
       alignItems: "flex-end",
-      justifyContent: "space-between",
-      gap: 10,
       marginBottom: 12,
       padding: "0 2px",
     }}
@@ -279,7 +276,6 @@ const SectionLabel = ({
         {children}
       </h2>
     </div>
-    {right}
   </div>
 );
 
