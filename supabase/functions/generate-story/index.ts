@@ -302,13 +302,15 @@ Escreva com profundidade e riqueza de detalhes, sem pressa e sem resumir. Varie 
     // Generate illustrations IN PARALLEL for speed
     const imagePromises = sceneSnippets.slice(0, 4).map(async (snippet, i) => {
       try {
-        const imgPrompt = `Crie uma ilustração infantil estilo cartoon premium (Pixar/DreamWorks) para esta cena de livro infantil:
+        const imgPrompt = `Crie uma ilustração infantil caprichada, de qualidade premium, estilo cinema de animação 3D (Pixar/DreamWorks), para esta cena de livro infantil ilustrado:
 
 "${snippet}"
 
-Personagens: ${childName} (${age} anos ${avatarDesc}) e um camaleão verde mágico chamado Kidzz.
-Cenário relacionado a: ${interests}.
-Estilo: cores vibrantes, iluminação cinematográfica, sem texto na imagem.`;
+Personagens: ${childName} (${age} anos ${avatarDesc}), sempre com expressão doce, acolhedora e feliz, e um camaleão verde mágico chamado Kidzz, carinhoso e simpático, ao lado dela.
+Cenário relacionado a: ${interests}, com muitos detalhes ricos de ambiente, profundidade e elementos mágicos sutis.
+Estilo: cores vibrantes e harmoniosas, iluminação cinematográfica quente, textura suave, composição de página dupla de livro infantil, clima aconchegante e afetuoso.
+Importante: nenhum texto, letra, número, emoji ou marca d'água na imagem. Nada assustador.`;
+
 
         const imgResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
