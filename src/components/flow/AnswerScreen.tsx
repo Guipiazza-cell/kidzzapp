@@ -9,7 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import ShareCardModal from "@/components/viral/ShareCardModal";
 
 interface Props {
@@ -26,7 +25,6 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
   const { trackEvent } = useAchievementSync();
   const [playing, setPlaying] = useState(false);
   const [showCTA, setShowCTA] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(true);
   const [memorySaved, setMemorySaved] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const isPremium = profile?.is_premium ?? false;
@@ -53,7 +51,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
     if (!trackedRef.current) {
       trackedRef.current = true;
       trackEvent("question-checkonly");
-      toast.success("+1 ponto - sabedoria desbloqueada! ✨", { duration: 2500 });
+      toast.success("+1 ponto de sabedoria", { duration: 2500 });
     }
 
     // Persist Q&A to parent log (one row per answer rendered).
@@ -76,12 +74,11 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
         });
     }
 
-    const tCelebration = setTimeout(() => setShowCelebration(false), 2500);
     if (!isPremium) {
       const tCTA = setTimeout(() => setShowCTA(true), 3000);
-      return () => { clearTimeout(tCelebration); clearTimeout(tCTA); };
+      return () => clearTimeout(tCTA);
     }
-    return () => clearTimeout(tCelebration);
+    return;
   }, [isPremium, trackEvent, user, question, answer, profile?.age_range]);
 
   const handleSpeak = useCallback(async () => {
@@ -104,7 +101,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           });
       }
     } catch {
-      toast.error("Erro na narração 🔊");
+      toast.error("Erro na narração");
     } finally {
       setPlaying(false);
     }
@@ -122,12 +119,12 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
     });
     if (saved) {
       setMemorySaved(true);
-      toast.success("💾 Salvo em Memórias!", { duration: 2000 });
+      toast.success("Salvo em Memórias", { duration: 2000 });
       try {
         confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 }, colors: ["#FF6B9D", "#FFD700"] });
       } catch { /* noop */ }
     } else {
-      toast.error("Faça login para salvar memórias 💛");
+      toast.error("Faça login para salvar memórias");
     }
   }, [memorySaved, addMemory, question, answer]);
 
@@ -135,35 +132,6 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
     <motion.div
       className="flex-1 flex flex-col overflow-hidden relative"
     >
-      {/* Celebration overlay (2.5s) */}
-      <AnimatePresence>
-        {showCelebration && (
-          <motion.div
-            className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <motion.div
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: [0, 1.3, 1], rotate: [0, 8, -8, 0] }}
-              transition={{ duration: 0.8, type: "spring" }}
-            >
-              <KidzzChameleon state="cosmic" mood="happy" size="lg" interactive={false} showParticles />
-            </motion.div>
-            <motion.p
-              className="mt-3 text-base font-black text-white drop-shadow-lg bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full"
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              ✨ +5 XP de sabedoria!
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Header */}
       <header className="flex items-center gap-3 px-4 pt-4 pb-2">
         <motion.button
@@ -174,7 +142,6 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           <ArrowLeft size={20} />
         </motion.button>
         <div className="flex-1 flex items-center gap-2">
-          <KidzzChameleon state="cosmic" mood="happy" size="sm" interactive={false} showParticles={false} />
           <span className="text-lg font-black text-gray-800">Kidzz</span>
         </div>
         <motion.div
@@ -215,7 +182,6 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           transition={{ delay: 0.3 }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">🦎</span>
             <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">Resposta</span>
           </div>
           <div className="glass-card p-5 rounded-2xl border-2 border-kid-green/20">
@@ -246,7 +212,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             />
           )}
           <span className="relative z-10 flex items-center gap-2">
-            {playing ? (<><VolumeX size={22} /> Parar narração</>) : (<><Volume2 size={22} /> 🔊 Ouvir resposta</>)}
+            {playing ? (<><VolumeX size={22} /> Parar narração</>) : (<><Volume2 size={22} /> Ouvir resposta</>)}
           </span>
         </motion.button>
 
@@ -268,7 +234,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             whileTap={memorySaved ? undefined : { scale: 0.95 }}
           >
             <Bookmark size={16} fill={memorySaved ? "currentColor" : "none"} />
-            {memorySaved ? "Salvo! ✨" : "Salvar memória"}
+            {memorySaved ? "Salvo" : "Salvar memória"}
           </motion.button>
           <motion.button
             onClick={() => setShowShare(true)}
@@ -313,7 +279,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          💛 Isso pode marcar a vida do seu filho
+          Isso pode marcar a vida do seu filho
         </motion.p>
 
         {/* CTA after value delivery */}
@@ -324,7 +290,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             animate={{ opacity: 1, y: 0 }}
           >
             <p className="text-gray-800 font-bold text-base leading-relaxed">
-              Quer ter respostas assim sempre que seu filho perguntar? ✨
+              Quer ter respostas assim sempre que seu filho perguntar?
             </p>
             <p className="text-gray-500 text-xs mt-1">
               Nunca mais trave na frente do seu filho
@@ -334,7 +300,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
               className="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-kid-purple to-kid-pink text-white font-extrabold text-sm shadow-lg active:scale-[0.97] transition-transform"
               whileTap={{ scale: 0.95 }}
             >
-              🔓 Desbloquear acesso completo
+              Desbloquear acesso completo
             </motion.button>
           </motion.div>
         )}
