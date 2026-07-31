@@ -278,7 +278,14 @@ Escreva com profundidade e riqueza de detalhes, sem pressa e sem resumir. Varie 
     }
 
     const storyData = await storyResp.json();
-    const story = storyData.choices[0].message.content;
+    // Remove emojis/símbolos que atrapalham a narração em voz alta
+    const stripEmojis = (t: string) =>
+      String(t ?? "")
+        .replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{2BFF}\u{FE0F}\u{2600}-\u{27BF}]/gu, "")
+        .replace(/[*#_`]/g, "")
+        .replace(/[ \t]{2,}/g, " ");
+    const story = stripEmojis(storyData.choices[0].message.content);
+
 
     // Extract scenes for illustration
     const sceneParts = story.split(/\[CENA \d+\]/);
