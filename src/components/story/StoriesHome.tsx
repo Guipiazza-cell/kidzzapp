@@ -18,7 +18,6 @@ import StoryFactory from "./StoryFactory";
 import ReadingMode from "./ReadingMode";
 import { LIBRARY_STORIES } from "./storyLibrary";
 import { FONT, SERIF, R, PAD, glassLight, pillGlassLight, goldBtn } from "@/lib/premiumUi";
-import PremiumSeal from "@/components/common/PremiumSeal";
 
 const HI = "/exemplos/assets/historias-v2";
 
@@ -139,7 +138,6 @@ const StoriesHome = ({ onBack }: Props) => {
             >
               <BookOpen size={15} color="#F0C25A" />
               <span style={{ fontWeight: 800, fontSize: 13.5, color: "#F6F1E8" }}>Histórias</span>
-              <PremiumSeal />
             </div>
           </div>
         </div>

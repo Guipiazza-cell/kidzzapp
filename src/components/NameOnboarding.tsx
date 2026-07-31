@@ -5,7 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 import nameHero from "@/assets/kidzz/name-onboarding-hero-v2.webp";
-import { ONBOARDING_HERO_FRAME, ONBOARDING_GLASS_PANEL } from "./onboarding/heroFrame";
+import {
+  ONBOARDING_GLASS_PANEL,
+  ONBOARDING_HERO_CLASS,
+  ONBOARDING_HERO_CSS,
+} from "./onboarding/heroFrame";
 
 const NameOnboarding = () => {
   const { updateProfile } = useAuth();
@@ -52,31 +56,31 @@ const NameOnboarding = () => {
   const filled = !!name.trim();
 
   return (
-    <div className="fixed inset-0 w-full h-[100dvh] max-w-[100vw] overflow-hidden bg-[#0B1A12]">
-      {/* Mesma arte, asset já em 1080×2340 nítido - preenche sem blur/quadro */}
-      <img
-        src={nameHero}
-        alt="Kidzz - Qual o seu nome?"
-        className="absolute inset-0 block h-full w-full select-none pointer-events-none"
-        style={ONBOARDING_HERO_FRAME}
-        draggable={false}
-      />
+    <div className="kidzz-onb-shell fixed inset-0 w-full h-[100dvh] max-w-[100vw] overflow-hidden">
+      <style>{ONBOARDING_HERO_CSS}</style>
+      <div className="kidzz-onb-stage">
+        <img
+          src={nameHero}
+          alt="Kidzz - Qual o seu nome?"
+          className={ONBOARDING_HERO_CLASS}
+          draggable={false}
+        />
 
-      <div className="absolute inset-x-0 top-0 z-10 pt-[max(env(safe-area-inset-top,6px),8px)] px-5">
-        <OnboardingProgress step={1} showLabel={false} showCounter={false} />
-      </div>
+        <div className="absolute inset-x-0 top-0 z-10 pt-[max(env(safe-area-inset-top,6px),8px)] px-5">
+          <OnboardingProgress step={1} showLabel={false} showCounter={false} />
+        </div>
 
-      <motion.div
-        className="absolute inset-x-0 bottom-0 z-20 px-4"
-        style={{ paddingBottom: "max(env(safe-area-inset-bottom, 10px), 14px)" }}
-        initial={{ y: 16, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div
-          className="mx-auto w-full max-w-sm space-y-2 rounded-[26px] px-3 py-3"
-          style={ONBOARDING_GLASS_PANEL}
+        <motion.div
+          className="absolute inset-x-0 bottom-0 z-20 px-4"
+          style={{ paddingBottom: "max(env(safe-area-inset-bottom, 10px), 14px)" }}
+          initial={{ y: 16, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
+          <div
+            className="mx-auto w-full max-w-sm space-y-2 rounded-[26px] px-3 py-3"
+            style={ONBOARDING_GLASS_PANEL}
+          >
           <h1 className="sr-only">Qual o seu nome?</h1>
 
           <input
@@ -160,8 +164,9 @@ const NameOnboarding = () => {
           >
             🔒 Seguro • Sem anúncios • Feito para crianças
           </p>
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };
