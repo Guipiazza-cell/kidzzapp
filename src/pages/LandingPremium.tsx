@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import landBg from "@/assets/lp/land-bg.jpeg.asset.json";
-import landKidzz from "@/assets/lp/land-kidzz.jpeg.asset.json";
+
+const landBg = { url: "/lp/land-bg.jpeg" };
+const landKidzz = { url: "/lp/land-kidzz.jpeg" };
+
 
 /* ── Ícones (paths) ───────────────────────────────────────── */
 const D = {
