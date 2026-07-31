@@ -358,7 +358,8 @@ const Index = () => {
 
   const handleAnswerReady = useCallback((text: string) => {
     setAnswer(text);
-    setStep("celebrating");
+    // Vai direto para a resposta (sem tela intermediária de celebração)
+    setStep("answer");
     evolution.evolve("question");
     kidzzMemory.recordQuestion(question);
     const { newlyMarked } = completeMissionStep("question");
@@ -367,22 +368,24 @@ const Index = () => {
       showXpGained(gained, "pergunta");
     }
     bumpSessionActions();
+    // Salva automaticamente nas memórias da conta
     addMemory({
       type: "question",
       title: question,
-      content: text.slice(0, 500),
+      content: text,
       is_special: false,
       image_url: null,
-      metadata: {},
+      metadata: { auto_saved: true },
     });
-  }, [question, evolution, addMemory]);
-
-  const handleCelebrationDone = useCallback(() => {
-    setStep("answer");
     if (!notifPromptDismissed) {
       setTimeout(() => setShowNotifPrompt(true), 800);
     }
-  }, [notifPromptDismissed]);
+  }, [question, evolution, addMemory, notifPromptDismissed]);
+
+  const handleCelebrationDone = useCallback(() => {
+    setStep("answer");
+  }, []);
+
 
   const handleNewQuestion = useCallback(() => {
     setQuestion(""); setAnswer(""); setStep("home"); switchTab("chat");
