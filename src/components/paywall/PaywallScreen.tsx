@@ -155,7 +155,7 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           headline: `Escolha como o Kidzz vai cuidar do ${first}`,
           sub: hasMinutes
             ? `Vocês já criaram ${diary.minutes} min sem tela. Com o Premium, é ilimitado.`
-            : `Comece grátis. Cancele quando quiser. Sem letras miúdas.`,
+            : `Pagamento seguro. Cancele quando quiser. Sem letras miúdas.`,
         };
     }
   }, [context, diary, first]);
