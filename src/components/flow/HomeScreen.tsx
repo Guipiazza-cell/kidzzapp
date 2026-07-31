@@ -24,7 +24,7 @@ import coverNatureza from "@/assets/perguntas-covers/sug-natureza.png";
 import coverAnimais from "@/assets/perguntas-covers/sug-animais.png";
 import coverCores from "@/assets/perguntas-covers/sug-cores.png";
 import coverFilosofia from "@/assets/perguntas-covers/sug-filosofia.png";
-import heroPerguntas from "@/assets/perguntas-hero.webp";
+import heroPerguntas from "@/assets/perguntas-hero.jpg";
 
 /* ───────────── KIDZZ HOME • PERGUNTAS - mockup premium 1:1 ─────────────
    Ref visual: mockup floresta clara dourada + Gui + cards glass claros.
@@ -509,21 +509,23 @@ const HomeScreen = ({
           </div>
         </div>
 
-        {/* ── HERO premium: floresta dourada + Gui original (1 só - sem overlay fantasma) ── */}
+        {/* ── HERO: arte completa (texto + Gui já na imagem) ── */}
         <section
           style={{
             position: "relative",
             margin: "8px 12px 10px",
-            minHeight: 288,
             borderRadius: 28,
             overflow: "hidden",
             animation: "perg-cascade .55s cubic-bezier(.22,1,.36,1) both",
             boxShadow: "0 16px 36px rgba(40,70,30,.16)",
+            aspectRatio: "1470 / 1070",
+            maxHeight: 320,
+            background: "#F3E9D0",
           }}
         >
           <img
             src={ASSETS.hero}
-            alt="Gui, o camaleão, na floresta dourada"
+            alt="Pergunte e Descubra — Gui na floresta"
             draggable={false}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
@@ -531,70 +533,29 @@ const HomeScreen = ({
               else el.src = ASSETS.gui;
             }}
             style={{
-              position: "absolute",
-              inset: 0,
+              display: "block",
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              /* Gui mais alto à direita; folhas menos cobertas pelo texto */
-              objectPosition: "72% 12%",
-              transform: "scale(1.12)",
-              transformOrigin: "72% 8%",
+              objectPosition: "center center",
             }}
           />
-          {/* Véu legível à esquerda (texto) + fade inferior - sem segundo Gui */}
-          <div
-            aria-hidden
+          {/* acessibilidade: texto da arte também no DOM */}
+          <h1
             style={{
               position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(105deg, rgba(255,250,235,.88) 0%, rgba(255,248,230,.48) 36%, rgba(255,248,230,.08) 58%, transparent 74%)," +
-                "linear-gradient(180deg, transparent 58%, rgba(248,244,234,.72) 88%, #F8F4EA 100%)",
-              pointerEvents: "none",
-            }}
-          />
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 3,
-              maxWidth: "54%",
-              /* texto mais baixo pra não cobrir as folhas do topo */
-              padding: "48px 12px 22px 16px",
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
+              overflow: "hidden",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              border: 0,
             }}
           >
-            <h1
-              style={{
-                margin: 0,
-                fontFamily: "'Lora', Georgia, serif",
-                fontWeight: 700,
-                fontSize: "clamp(28px, 7.6vw, 34px)",
-                lineHeight: 1.12,
-                letterSpacing: "-0.4px",
-                color: "#1F2E18",
-                textShadow: "0 1px 0 rgba(255,255,255,.55)",
-                hyphens: "none",
-                WebkitHyphens: "none",
-                wordBreak: "keep-all",
-                overflowWrap: "normal",
-              }}
-            >
-              Pergunte e Descubra.
-            </h1>
-            <p
-              style={{
-                margin: "12px 0 0",
-                fontSize: 13,
-                fontWeight: 700,
-                lineHeight: 1.4,
-                color: "rgba(40,55,30,.78)",
-                maxWidth: 190,
-              }}
-            >
-              Respostas que acolhem, conversas que transformam momentos em memórias.
-            </p>
-          </div>
+            Pergunte e Descubra.
+          </h1>
         </section>
 
         {/* ── 2 PILLS: grátis + liberar ── */}
