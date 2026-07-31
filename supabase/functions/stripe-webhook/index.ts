@@ -101,14 +101,35 @@ serve(async (req) => {
     return u?.id ?? null;
   };
 
-  const planFromSubscription = (sub: Stripe.Subscription): "kidzz" | "premium" => {
+  /** Produto → plano. Desconhecido = null (não concede). */
+  const productIdFromSub = (sub: Stripe.Subscription): string | null => {
     const item = sub.items.data[0];
     const product =
       typeof item?.price?.product === "string"
         ? item.price.product
         : (item?.price?.product as Stripe.Product | undefined)?.id;
+    return product ?? null;
+  };
+
+  /**
+   * Plano a gravar conforme status Stripe.
+   * - active/trialing/past_due → plano mapeado (past_due mantém para grace no RPC)
+   * - canceled/unpaid/incomplete/… → free (anti re-concessão em subscription.updated)
+   * - produto desconhecido → free (anti-fraude)
+   */
+  const planFromSubscription = (sub: Stripe.Subscription): "free" | "kidzz" | "premium" => {
+    const status = sub.status;
+    if (status === "canceled" || status === "unpaid" || status === "incomplete" ||
+        status === "incomplete_expired" || status === "paused") {
+      return "free";
+    }
+    if (status !== "active" && status !== "trialing" && status !== "past_due") {
+      return "free";
+    }
+    const product = productIdFromSub(sub);
     if (product && PRODUCT_TO_PLAN[product]) return PRODUCT_TO_PLAN[product];
-    return "kidzz";
+    log("unmapped product — denying paid plan", { product, status, subId: sub.id });
+    return "free";
   };
 
   const periodEnd = (sub: Stripe.Subscription): string | null => {

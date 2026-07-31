@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback, useRef, ty
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
+import { applyCheckSubscriptionClient } from "@/lib/subscriptionAccess";
 
 export type SubscriptionTier = "free" | "kidzz" | "premium";
 
@@ -389,36 +390,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
+      // Rede/5xx: mantém DB só como fallback de UX (blip). Anti-fraude real é no server.
       if (!resp.ok) {
-        console.warn("[Auth] check-subscription HTTP error, trusting DB", resp.status);
-        const fallback = { tier: currentProfile.is_premium ? "premium" as SubscriptionTier : "free" as SubscriptionTier, isPremium: currentProfile.is_premium };
+        console.warn("[Auth] check-subscription HTTP error, temporary DB fallback", resp.status);
+        const fallback = applyCheckSubscriptionClient({
+          httpOk: false,
+          dbIsPremium: currentProfile.is_premium,
+          premiumSource: currentProfile.premium_source,
+        });
         setSubCache(fallback.tier, fallback.isPremium);
         return fallback;
       }
 
       const data = await resp.json();
 
-      if (data.subscribed) {
-        const newTier: SubscriptionTier = data.tier === "premium" ? "premium" : "kidzz";
-        const result = { tier: newTier, isPremium: true };
-        setSubCache(result.tier, result.isPremium);
-        return result;
-      }
-
-      // Backend says free but DB says premium — trust DB
-      if (currentProfile.is_premium && !data.subscribed) {
-        console.warn("[Auth] Backend says free but DB profile is premium — trusting DB");
-        const result = { tier: "premium" as SubscriptionTier, isPremium: true };
-        setSubCache(result.tier, result.isPremium);
-        return result;
-      }
-
-      const result = { tier: "free" as SubscriptionTier, isPremium: false };
+      // Autoridade: HTTP 200 do backend. Nunca reabrir premium se veio free (anti-stale).
+      const result = applyCheckSubscriptionClient({
+        httpOk: true,
+        backend: data,
+        dbIsPremium: currentProfile.is_premium,
+        premiumSource: currentProfile.premium_source,
+      });
       setSubCache(result.tier, result.isPremium);
       return result;
     } catch (err) {
-      console.error("[Auth] checkSubscription error, trusting DB:", err);
-      const fallback = { tier: currentProfile.is_premium ? "premium" as SubscriptionTier : "free" as SubscriptionTier, isPremium: currentProfile.is_premium };
+      console.error("[Auth] checkSubscription error, temporary DB fallback:", err);
+      const fallback = applyCheckSubscriptionClient({
+        httpOk: false,
+        dbIsPremium: currentProfile.is_premium,
+        premiumSource: currentProfile.premium_source,
+      });
       setSubCache(fallback.tier, fallback.isPremium);
       return fallback;
     } finally {
