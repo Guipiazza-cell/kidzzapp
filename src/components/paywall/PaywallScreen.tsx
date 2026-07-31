@@ -1,6 +1,6 @@
 import { useMemo, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
-import { Check, Sparkles, Lock, X, Leaf, Flame, Users } from "lucide-react";
+import { Check, Sparkles, Lock, X, Leaf, Flame } from "lucide-react";
 import { useAuth, type CheckoutPlan } from "@/contexts/AuthContext";
 import ParentalGate from "@/components/ParentalGate";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
@@ -289,14 +289,6 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
               )}
             </div>
           )}
-
-          <div
-            className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-semibold"
-            style={{ color: INK_SOFT }}
-          >
-            <Users size={13} />
-            <span>Famílias no movimento Menos Tela</span>
-          </div>
         </motion.div>
 
         {/* Toggle ciclo */}
