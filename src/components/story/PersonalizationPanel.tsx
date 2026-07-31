@@ -364,8 +364,8 @@ const PersonalizationPanel = ({
           {blocked ? <Lock size={18} className="text-rose-600 flex-shrink-0" /> : <Sparkles size={18} className="text-amber-600 flex-shrink-0" />}
           <p className="text-[12.5px] font-extrabold leading-tight" style={{ color: blocked ? "#9F1239" : "#92400E" }}>
             {blocked
-              ? `A primeira foi por nossa conta. 💛 Assine para criar histórias ilimitadas, só do(a) ${childName}.`
-              : `A primeira história personalizada do(a) ${childName} é por nossa conta. ✨`}
+              ? `A primeira foi por nossa conta. Assine para criar histórias ilimitadas, só do(a) ${childName}.`
+              : `A primeira história personalizada do(a) ${childName} é por nossa conta.`}
           </p>
         </div>
       )}
