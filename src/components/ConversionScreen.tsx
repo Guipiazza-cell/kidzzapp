@@ -8,7 +8,11 @@ interface ConversionScreenProps {
 }
 
 const ConversionScreen = ({ childName }: ConversionScreenProps) => {
-  return <PaywallScreen childName={childName} />;
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col overflow-hidden">
+      <PaywallScreen childName={childName} />
+    </div>
+  );
 };
 
 export default ConversionScreen;

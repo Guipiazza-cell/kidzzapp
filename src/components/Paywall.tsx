@@ -10,7 +10,11 @@ interface PaywallProps {
 
 const Paywall = ({ onBack }: PaywallProps) => {
   const { profile } = useAuth();
-  return <PaywallScreen childName={profile?.child_name || undefined} onClose={onBack} />;
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col overflow-hidden">
+      <PaywallScreen childName={profile?.child_name || undefined} onClose={onBack} />
+    </div>
+  );
 };
 
 export default Paywall;
