@@ -6,7 +6,7 @@ import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
-import heroDescobrir from "@/assets/descobrir-hero.webp";
+import heroDescobrir from "@/assets/descobrir-hero.jpg";
 
 // ============================================================
 // DiscoverScreen - premium v2 (ref: public/telas/DESCOBRIR)
@@ -919,22 +919,24 @@ const DiscoverScreen = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* ── HERO premium: floresta dourada + Gui original ── */}
+        {/* ── HERO: card arte completa (texto + Gui na imagem) ── */}
         <div
           ref={heroWrapRef}
           style={{
             position: "relative",
             margin: `12px ${PAD}px 6px`,
-            minHeight: 268,
             borderRadius: 28,
             overflow: "hidden",
             boxShadow: "0 16px 36px rgba(60,70,40,.16)",
             animation: "disc-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+            aspectRatio: "1036 / 1122",
+            maxHeight: 360,
+            background: "#F5F0E4",
           }}
         >
           <img
             src={heroDescobrir}
-            alt="Gui, o camaleão, explorando a floresta"
+            alt="Descobrir — Gui com lupa na floresta"
             draggable={false}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
@@ -942,53 +944,28 @@ const DiscoverScreen = ({ onBack }: Props) => {
               else el.src = CAMALEAO.armsSoft;
             }}
             style={{
-              position: "absolute",
-              inset: 0,
+              display: "block",
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              // Um camaleão só (sem overlay armsSoft); enquadra o Gui da arte
-              objectPosition: "72% 38%",
-              animation: "disc-floaty 7s ease-in-out infinite",
+              objectPosition: "center center",
             }}
           />
-          {/* Véu legível à esquerda + fade inferior */}
-          <div
-            aria-hidden
+          <h1
             style={{
               position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(100deg, rgba(255,252,248,.90) 0%, rgba(255,250,240,.58) 36%, rgba(255,250,240,.12) 58%, transparent 74%)," +
-                "linear-gradient(180deg, transparent 58%, rgba(255,252,248,.72) 88%, #FFFCF8 100%)",
-              pointerEvents: "none",
-            }}
-          />
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 2,
-              maxWidth: "54%",
-              padding: "22px 16px 28px",
-              animation: "disc-cascade .55s cubic-bezier(.22,1,.36,1) both",
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
+              overflow: "hidden",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              border: 0,
             }}
           >
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <span style={{ width: 30, height: 30, borderRadius: 999, background: "rgba(70,112,58,.14)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none", boxShadow: "0 1px 0 rgba(255,255,255,.6)" }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#46703A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </span>
-              <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 30, color: "#1F2A18", letterSpacing: "-.4px", lineHeight: 1.05, textShadow: "0 1px 0 rgba(255,255,255,.55)" }}>
-                Descobrir
-              </h1>
-            </div>
-            <p style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 17, lineHeight: 1.28, color: "#2A3220", textShadow: "0 1px 0 rgba(255,255,255,.4)" }}>
-              Vamos explorar o mundo juntos?
-            </p>
-            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.48, color: "rgba(42,37,32,0.78)", maxWidth: 210 }}>
-              Escolha um tema e mergulhem em descobertas que despertam a curiosidade e criam memórias.
-            </p>
-          </div>
+            Descobrir — Vamos explorar o mundo juntos?
+          </h1>
         </div>
 
         {/* ── EXPLORE POR TEMAS ── */}
