@@ -46,7 +46,7 @@ import {
   sectionWrap,
 } from "@/lib/premiumUi";
 
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import heroMomentos from "@/assets/momentos-hero.jpg";
 
 const AS = "/exemplos/assets/momentos-v2";
 const AV = "v3";
@@ -265,8 +265,6 @@ const MomentsPlaylists = ({ onBack }: Props) => {
   const heroArtRef = useRef<HTMLDivElement>(null);
 
   const weekly = getWeeklyPlaylist();
-  const h = new Date().getHours();
-  const saudacao = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
 
   const destaques = useMemo(() => {
     const others = PLAYLISTS.filter((p) => p.id !== weekly.id);
@@ -490,111 +488,49 @@ const MomentsPlaylists = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Hero Bora-style */}
-        <div style={{ position: "relative", padding: `4px ${PAD}px 12px`, minHeight: 232 }}>
-          <div
-            ref={heroArtRef}
+        {/* Hero: card arte completa (texto + Gui + caixinha de fotos) */}
+        <div
+          ref={heroArtRef}
+          style={{
+            position: "relative",
+            margin: `4px ${PAD}px 14px`,
+            borderRadius: 28,
+            overflow: "hidden",
+            boxShadow: "0 16px 36px rgba(120,60,90,.14)",
+            animation: "mom2-heroIn .75s cubic-bezier(.22,1,.36,1) both",
+            aspectRatio: "1523 / 1033",
+            maxHeight: 300,
+            background: "#F5D0E0",
+            willChange: "transform",
+          }}
+        >
+          <img
+            src={heroMomentos}
+            alt="Aqui guardamos memórias que viram histórias — Gui com caixinha de fotos"
+            draggable={false}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center center",
+            }}
+          />
+          <h1
             style={{
               position: "absolute",
-              right: 0,
-              top: 0,
-              width: "54%",
-              height: 210,
-              willChange: "transform",
-              animation: "mom2-heroIn .75s cubic-bezier(.22,1,.36,1) both",
-              pointerEvents: "none",
-              borderRadius: `0 ${R.card}px ${R.card}px 0`,
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
               overflow: "hidden",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              border: 0,
             }}
           >
-            <img
-              src={CAMALEAO.headphonesSoft}
-              alt="Gui com fones de ouvido"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "right bottom",
-                ...CAMALEAO_SCENE_MASK,
-                filter: "drop-shadow(0 14px 22px rgba(40,30,20,.28))",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.headphones;
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                right: "18%",
-                bottom: 30,
-                width: 56,
-                height: 56,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(255,210,100,.4), transparent 70%)",
-                filter: "blur(8px)",
-                animation: "mom2-floaty 6s ease-in-out infinite",
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 3,
-              maxWidth: "56%",
-              paddingTop: 8,
-              animation: "mom2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
-            }}
-          >
-            {/* Scrim sutil atrás do texto do hero */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: -8,
-                top: 0,
-                right: 8,
-                bottom: -8,
-                borderRadius: 20,
-                background:
-                  "linear-gradient(100deg, rgba(247,242,230,.92) 0%, rgba(247,242,230,.72) 55%, transparent 100%)",
-                zIndex: -1,
-              }}
-            />
-            <div style={{ fontSize: 12.5, fontWeight: 800, color: "#5A4A30", marginBottom: 8, textShadow: "0 1px 0 rgba(255,255,255,.6)" }}>
-              {saudacao}, família!
-            </div>
-            <h1
-              style={{
-                margin: "0 0 8px",
-                fontFamily: SERIF,
-                fontWeight: 600,
-                fontSize: 28,
-                lineHeight: 1.1,
-                color: "#1A2410",
-                letterSpacing: "-0.4px",
-                textShadow: "0 1px 0 rgba(255,255,255,.55)",
-              }}
-            >
-              Momentos que{" "}
-              <span style={{ color: GOLD }}>ficam</span>
-              <br />
-              para sempre.
-            </h1>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 12.5,
-                fontWeight: 600,
-                lineHeight: 1.4,
-                color: "#5A4A30",
-                maxWidth: 200,
-              }}
-            >
-              Playlists para cada fase, cada emoção e cada memória em família.
-            </p>
-          </div>
+            Aqui guardamos memórias que viram histórias.
+          </h1>
         </div>
 
         {/* Chips de categoria */}
