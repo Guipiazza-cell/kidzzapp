@@ -525,7 +525,7 @@ const HomeScreen = ({
         >
           <img
             src={ASSETS.hero}
-            alt="Pergunte e Descubra — Gui na floresta"
+            alt="Pergunte e Descubra, Gui na floresta"
             draggable={false}
             onError={(e) => {
               const el = e.target as HTMLImageElement;

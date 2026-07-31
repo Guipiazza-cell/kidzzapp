@@ -99,6 +99,10 @@ serve(async (req) => {
       "https://19b9dd0d-e5a7-41d9-b197-d4ca9f5cdb0c.lovableproject.com",
       "http://localhost:8080",
       "http://localhost:5173",
+      "http://localhost:5174",
+      "http://127.0.0.1:5173",
+      "http://127.0.0.1:5174",
+      "http://127.0.0.1:8080",
     ]);
     const rawOrigin = req.headers.get("origin") || "";
     const requestedReturnOrigin = typeof body.return_origin === "string" ? body.return_origin : "";

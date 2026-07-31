@@ -102,33 +102,74 @@ const clearPendingCheckoutPlan = () => {
   }
 };
 
-const submitCheckoutRedirectForm = (plan: CheckoutPlan, accessToken: string, ref?: string) => {
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = CHECKOUT_URL;
-  form.target = "_top";
-  form.style.display = "none";
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
-  const fields: Record<string, string> = {
-    checkout_transport: "form_redirect",
-    access_token: accessToken,
+/** Abre o Stripe Checkout: fetch JSON (melhor erro) + fallback form POST. */
+const openStripeCheckout = async (plan: CheckoutPlan, accessToken: string, ref?: string) => {
+  const returnOrigin = window.location.origin;
+  const body: Record<string, string> = {
     plan,
-    return_origin: window.location.origin,
+    return_origin: returnOrigin,
   };
-  if (ref) fields.ref = ref;
+  if (ref) body.ref = ref;
 
-  Object.entries(fields).forEach(([name, value]) => {
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = name;
-    input.value = value;
-    form.appendChild(input);
-  });
+  try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+    if (ANON_KEY) headers.apikey = ANON_KEY;
 
-  document.body.appendChild(form);
-  console.log("[Checkout] Submitting same-tab Stripe redirect form", { plan, hasRef: Boolean(ref) });
-  form.submit();
-  window.setTimeout(() => form.remove(), 5000);
+    const resp = await fetch(CHECKOUT_URL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    const data = await resp.json().catch(() => ({} as { url?: string; error?: string }));
+    if (resp.ok && data.url) {
+      console.log("[Checkout] Redirecting to Stripe", { plan });
+      try {
+        window.dispatchEvent(new CustomEvent("kidzz:close-plans"));
+      } catch {
+        /* noop */
+      }
+      window.location.assign(data.url);
+      return;
+    }
+
+    const msg = data.error || `Erro no checkout (${resp.status})`;
+    console.error("[Checkout] Edge function error", msg, data);
+    throw new Error(msg);
+  } catch (err) {
+    // Fallback: form POST (navegação top-level, útil se fetch/CORS falhar)
+    console.warn("[Checkout] Fetch failed, trying form redirect", err);
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = CHECKOUT_URL;
+    form.target = "_top";
+    form.style.display = "none";
+
+    const fields: Record<string, string> = {
+      checkout_transport: "form_redirect",
+      access_token: accessToken,
+      plan,
+      return_origin: returnOrigin,
+    };
+    if (ref) fields.ref = ref;
+
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    window.setTimeout(() => form.remove(), 5000);
+  }
 };
 
 // Data no fuso de Brasília - o servidor reseta o uso em America/Sao_Paulo
@@ -583,29 +624,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Não logado: guarda o plano e manda pro /auth. Depois do login, retomamos o checkout.
       savePendingCheckoutPlan(checkoutPlan);
       const { toast } = await import("sonner");
-      toast("Crie sua conta pra continuar 💛", {
+      toast("Crie sua conta pra continuar", {
         description: "Em 1 minuto você volta direto pro pagamento.",
       });
+      // Fecha overlays (paywall) antes de ir pro auth
+      try {
+        window.dispatchEvent(new CustomEvent("kidzz:close-plans"));
+      } catch {
+        /* noop */
+      }
       navigate("/auth?checkout=1", { replace: false });
       return;
     }
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       const { toast } = await import("sonner");
-      toast.error("Você está offline 🌐", {
+      toast.error("Você está offline", {
         description: "Conecte-se à internet e tente novamente.",
       });
       return;
     }
-    const ref = sessionStorage.getItem("kidzz_ref") || undefined;
+    const ref =
+      (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("kidzz_ref") : null) ||
+      undefined;
 
     try {
-      submitCheckoutRedirectForm(checkoutPlan, session.access_token, ref);
+      await openStripeCheckout(checkoutPlan, session.access_token, ref);
     } catch (err) {
       const { toast } = await import("sonner");
-      console.error("[Checkout] Failed to submit redirect form", err);
+      console.error("[Checkout] Failed to open Stripe", err);
+      const msg = err instanceof Error ? err.message : "Erro ao iniciar pagamento";
       toast.error("Erro ao iniciar pagamento", {
-        description: "Tente novamente em instantes - nada foi cobrado.",
+        description:
+          msg.includes("STRIPE") || msg.includes("not set")
+            ? "Stripe não configurado neste ambiente. Confira as secrets da function create-checkout."
+            : "Tente novamente em instantes. Nada foi cobrado.",
       });
+      throw err;
     }
   }, [navigate, session]);
 

@@ -14,7 +14,7 @@ import { FONT, SERIF, R } from "@/lib/premiumUi";
 
 const BG = "/exemplos/assets/perguntas-v2/bg-floresta.png";
 
-/** Mesmo liquid glass do dock (BottomNav) — cards leves e translúcidos */
+/** Mesmo liquid glass do dock (BottomNav): cards leves e translúcidos */
 const dockGlass: CSSProperties = {
   background:
     "linear-gradient(165deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.16) 100%)",
@@ -316,7 +316,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </p>
         </motion.div>
 
-        {/* Pergunta — dock glass + barra lateral */}
+        {/* Pergunta: dock glass + barra lateral */}
         <motion.div
           className="relative overflow-hidden"
           style={{ ...dockCard, padding: "14px 16px 14px 18px" }}
@@ -373,7 +373,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </p>
         </motion.div>
 
-        {/* Resposta — dock glass */}
+        {/* Resposta: dock glass */}
         <motion.div
           className="mt-3 relative overflow-hidden"
           style={{ ...dockCard, padding: "16px 16px 18px" }}
@@ -423,7 +423,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </div>
         </motion.div>
 
-        {/* Ações — todas em dock glass / CTA dourado único */}
+        {/* Ações: dock glass + CTA dourado */}
         <motion.button
           type="button"
           onClick={handleSpeak}

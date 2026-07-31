@@ -240,10 +240,14 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
     ? (remaining > 0 ? "Primeira história por nossa conta" : "Assine para criar mais")
     : `${remaining} ${remaining === 1 ? "história" : "histórias"} hoje`;
 
+  const isCreatorStep = step === "avatar" || step === "form" || step === "display";
+
   return (
     <div
       className="flex-1 flex flex-col overflow-hidden relative min-h-0"
-      style={{ background: step === "intro" ? HERO_BG : DEFAULT_BG }}
+      style={{
+        background: step === "intro" ? HERO_BG : isCreatorStep ? "transparent" : DEFAULT_BG,
+      }}
     >
       {/* keyframes locais (prefixo hist- evita colisão global) */}
       <style>{`
@@ -343,7 +347,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
                 </div>
                 <h1 style={{ margin: "0 0 7px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 29, lineHeight: 1.1, color: "#3A2410", letterSpacing: "-.4px" }}>Uma história só sua</h1>
                 <p style={{ margin: "0 0 15px", fontSize: 12.5, fontWeight: 700, lineHeight: 1.45, color: "#7A5E38", maxWidth: 290 }}>
-                  Criada com o nome, as cores e o mundo do seu filho — do jeitinho que só ele merece
+                  Criada com o nome, as cores e o mundo do seu filho, do jeitinho que só ele merece
                 </p>
                 <button
                   onClick={() => {

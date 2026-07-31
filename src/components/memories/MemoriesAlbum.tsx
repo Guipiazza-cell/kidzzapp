@@ -691,7 +691,7 @@ const MemoriesAlbum = ({
         >
           <img
             src={heroMemorias}
-            alt="Aqui guardamos memórias que viram histórias — Gui com caixinha de fotos"
+            alt="Aqui guardamos memórias que viram histórias, Gui com caixinha de fotos"
             draggable={false}
             style={{
               display: "block",

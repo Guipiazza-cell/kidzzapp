@@ -506,7 +506,7 @@ const MomentsPlaylists = ({ onBack }: Props) => {
         >
           <img
             src={heroMomentos}
-            alt="Aqui guardamos memórias que viram histórias — Gui com caixinha de fotos"
+            alt="Aqui guardamos memórias que viram histórias, Gui com caixinha de fotos"
             draggable={false}
             style={{
               display: "block",

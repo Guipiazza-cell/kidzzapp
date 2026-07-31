@@ -299,6 +299,10 @@ const Index = () => {
     };
 
     window.addEventListener("kidzz:open-plans", openPlans);
+    const closePlans = () => {
+      setStep((s) => (s === "paywall" ? "home" : s));
+    };
+    window.addEventListener("kidzz:close-plans", closePlans);
     const openJourney = () => setShowJourney(true);
     window.addEventListener("kidzz:open-journey", openJourney);
     const openKalm = (e: Event) => {
@@ -313,6 +317,7 @@ const Index = () => {
     window.addEventListener("kidzz:open-parents", openParents);
     return () => {
       window.removeEventListener("kidzz:open-plans", openPlans);
+      window.removeEventListener("kidzz:close-plans", closePlans);
       window.removeEventListener("kidzz:open-journey", openJourney);
       window.removeEventListener("kidzz:open-kalm", openKalm);
       window.removeEventListener("kidzz:open-parents", openParents);
