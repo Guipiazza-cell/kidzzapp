@@ -727,15 +727,25 @@ export type Database = {
           status: string
         }[]
       }
-      increment_usage: {
-        Args: { _crianca_id: string; _tipo: string }
-        Returns: {
-          allowed: boolean
-          historias_count: number
-          perguntas_count: number
-          plan: string
-        }[]
-      }
+      increment_usage:
+        | {
+            Args: { _tipo: string }
+            Returns: {
+              allowed: boolean
+              historias_count: number
+              perguntas_count: number
+              plan: string
+            }[]
+          }
+        | {
+            Args: { _crianca_id: string; _tipo: string }
+            Returns: {
+              allowed: boolean
+              historias_count: number
+              perguntas_count: number
+              plan: string
+            }[]
+          }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
