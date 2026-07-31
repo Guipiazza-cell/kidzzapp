@@ -17,7 +17,8 @@ export const APP_TABS_ALL: AppTabConfig[] = [
   { id: "play", label: "Brincar", dataTab: "brincar", color: "#DD6A36", light: "#F08E5E", inDock: true },
   { id: "bora", label: "Bora!", dataTab: "bora", color: "#E8821A", light: "#F4A659", inDock: true },
   { id: "routine", label: "Rotina", dataTab: "rotina", color: "#4F8FC9", light: "#7DB0E0", inDock: true },
-  { id: "moments", label: "Momentos", dataTab: "momentos", color: "#E5912E", light: "#F4B25E", inDock: true },
+  // Momentos saiu do dock — playlists vivem no final da aba Música
+  { id: "moments", label: "Momentos", dataTab: "momentos", color: "#E5912E", light: "#F4B25E", inDock: false },
   { id: "cinema", label: "Cinema", dataTab: "cinema", color: "#D6A634", light: "#ECC766", inDock: true },
   { id: "music", label: "Música", dataTab: "musica", color: "#5FA15A", light: "#86C281", inDock: true },
   { id: "memories", label: "Memórias", dataTab: "memorias", color: "#C2787F", light: "#D89BA0", inDock: true },
@@ -78,10 +79,10 @@ const TAB_ALIASES: Record<string, AppTab> = {
   bora: "bora",
   rotina: "routine",
   routine: "routine",
-  momentos: "moments",
-  moments: "moments",
+  // Momentos redireciona para Música (playlists foram unificadas lá)
+  momentos: "music",
+  moments: "music",
   cinema: "cinema",
-  // Música agora vive dentro de Brincar — qualquer link antigo redireciona
   musica: "music",
   música: "music",
   music: "music",

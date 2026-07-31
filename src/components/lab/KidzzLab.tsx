@@ -191,7 +191,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     downloadCard();
     const waUrl = `https://wa.me/?text=${encodeURIComponent(SHARE_TEXT)}`;
     window.open(waUrl, "_blank", "noopener");
-    toast.success("Imagem baixada — anexe no WhatsApp aberto");
+    toast.success("Imagem baixada - anexe no WhatsApp aberto");
     setShareModalOpen(false);
   }, [shareBlob]);
 
@@ -215,7 +215,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     }
     // Fallback: baixa para postar manualmente
     downloadCard();
-    toast.success("Imagem salva — abra Instagram/Facebook Stories e poste");
+    toast.success("Imagem salva - abra Instagram/Facebook Stories e poste");
     setShareModalOpen(false);
   }, [shareBlob]);
 
@@ -254,7 +254,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
         });
         setShareBlob(blob);
       } catch {
-        /* silencioso — mantém preview anterior */
+        /* silencioso - mantém preview anterior */
       }
     }, 220);
     return () => {

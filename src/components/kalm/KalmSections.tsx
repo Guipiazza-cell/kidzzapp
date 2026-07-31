@@ -45,7 +45,7 @@ const KalmSections = ({ initialExperienceId, onConsumedInitial }: Props) => {
     if (!initialExperienceId) return;
     const exp = findExperience(initialExperienceId);
     if (exp) {
-      // ignora freemium aqui — usuário veio de uma crise, oferecemos a transição.
+      // ignora freemium aqui - usuário veio de uma crise, oferecemos a transição.
       setActive(exp);
     }
     onConsumedInitial?.();

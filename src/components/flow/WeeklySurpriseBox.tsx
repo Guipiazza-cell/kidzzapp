@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gift, X, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
-import pixelImg from "@/assets/chameleon-main.webp";
+import pixelImg from "@/assets/memorias/gui-cutout.png";
 import aneImg from "@/assets/ane-chameleon.webp";
 
 const SURPRISE_STORAGE_KEY = "kidzz_weekly_surprise";
@@ -76,7 +76,7 @@ function getWeeklyReward(): { reward: SurpriseReward; alreadyOpened: boolean } {
     return { reward: REWARDS[state.rewardIdx], alreadyOpened: state.opened };
   }
 
-  // New week — pick a random reward
+  // New week - pick a random reward
   const rewardIdx = Math.floor(Math.random() * REWARDS.length);
   localStorage.setItem(SURPRISE_STORAGE_KEY, JSON.stringify({ week, opened: false, rewardIdx }));
   return { reward: REWARDS[rewardIdx], alreadyOpened: false };

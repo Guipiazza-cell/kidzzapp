@@ -1,6 +1,6 @@
 /**
  * Selo PREMIUM único do app (padrão relatório design).
- * Dourado com cadeado — o único sinal de conteúdo pago.
+ * Dourado com cadeado - o único sinal de conteúdo pago.
  */
 import type { CSSProperties } from "react";
 

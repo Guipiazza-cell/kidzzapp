@@ -118,7 +118,7 @@ function computeEnergyFromUsage(char: CharacterProfile): CharEnergy {
 }
 
 function computeColorShift(char: CharacterProfile): { from: string; to: string } {
-  // Subtle shifts based on dominant trait — only if user hasn't customized
+  // Subtle shifts based on dominant trait - only if user hasn't customized
   const trait = char.dominant_trait;
   const shifts: Record<string, { from: string; to: string }> = {
     calm: { from: "#818CF8", to: "#6366F1" },     // softer indigo

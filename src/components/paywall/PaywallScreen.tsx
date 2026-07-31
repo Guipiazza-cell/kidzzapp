@@ -1,10 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { Check, Sparkles, Lock, X, Leaf, Flame, Users } from "lucide-react";
 import { useAuth, type CheckoutPlan } from "@/contexts/AuthContext";
 import ParentalGate from "@/components/ParentalGate";
+import { FONT, SERIF, R } from "@/lib/premiumUi";
 
-export type PaywallContextKind = "default" | "premium_locked" | "surprise_limit" | "streak_milestone" | "after_completion";
+export type PaywallContextKind =
+  | "default"
+  | "premium_locked"
+  | "surprise_limit"
+  | "streak_milestone"
+  | "after_completion";
 
 interface PaywallScreenProps {
   childName?: string;
@@ -14,27 +20,36 @@ interface PaywallScreenProps {
 
 type Cycle = "monthly" | "annual";
 
-// Brand palette (visual only — no logic changes)
 const AMBER = "#E8821A";
 const AMBER_DEEP = "#C96B0E";
-const SAGE = "#7FB069";
-const GOLD = "#E2B64C";
-const CREAM = "#FFFCF8";
-const INK = "#2A2A2A";
-const INK_SOFT = "#5B5B5B";
+const SAGE = "#5CB57A";
+const INK = "#1A2818";
+const INK_SOFT = "rgba(40,55,35,.58)";
+const BG = "/exemplos/assets/perguntas-v2/bg-floresta.png";
+
+const dockGlass: CSSProperties = {
+  background:
+    "linear-gradient(165deg, rgba(255,255,255,.52) 0%, rgba(255,255,255,.28) 48%, rgba(255,255,255,.2) 100%)",
+  border: "0.5px solid rgba(255,255,255,.65)",
+  boxShadow:
+    "0 14px 40px rgba(20,16,30,.14), 0 2px 8px rgba(20,16,30,.05), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(255,255,255,.1)",
+  backdropFilter: "blur(36px) saturate(200%)",
+  WebkitBackdropFilter: "blur(36px) saturate(200%)",
+};
+
+const dockCard: CSSProperties = {
+  ...dockGlass,
+  borderRadius: 26,
+};
 
 const FEATURES: Array<{ row: string; free: string; kidzz: string; premium: string }> = [
-  { row: "Para quê",          free: "Experimentar",     kidzz: "O dia a dia da curiosidade",  premium: "A experiência completa" },
-  { row: "Perguntas",         free: "Algumas",          kidzz: "À vontade",                   premium: "À vontade" },
-  { row: "Histórias com voz", free: "1 por dia",        kidzz: "À vontade",                   premium: "À vontade" },
-  { row: "Floresta Musical",  free: "🔒",               kidzz: "✅",                          premium: "✅" },
-  { row: "Jogos Kidzz Play",  free: "🔒",               kidzz: "✅",                          premium: "✅" },
-  { row: "Memórias",          free: "🔒",               kidzz: "✅",                          premium: "✅" },
-  { row: "Ritual de Sono 🌙", free: "🔒",               kidzz: "🔒",                          premium: "✅" },
-  { row: "Rotina e Momentos", free: "🔒",               kidzz: "🔒",                          premium: "✅" },
-  { row: "KALM completo",     free: "Amostra",          kidzz: "🔒",                          premium: "✅" },
-  { row: "SOS Emocional 🆘",  free: "🔒",               kidzz: "🔒",                          premium: "✅" },
-  { row: "Cinema",            free: "Amostra",          kidzz: "🔒",                          premium: "✅" },
+  { row: "Perguntas", free: "Algumas", kidzz: "À vontade", premium: "À vontade" },
+  { row: "Histórias com voz", free: "1/dia", kidzz: "À vontade", premium: "À vontade" },
+  { row: "Música e jogos", free: "Não", kidzz: "Sim", premium: "Sim" },
+  { row: "Memórias", free: "Não", kidzz: "Sim", premium: "Sim" },
+  { row: "Sonhos e rotina", free: "Não", kidzz: "Não", premium: "Sim" },
+  { row: "KALM + SOS", free: "Amostra", kidzz: "Não", premium: "Sim" },
+  { row: "Cinema", free: "Amostra", kidzz: "—", premium: "Sim" },
 ];
 
 const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScreenProps) => {
@@ -42,14 +57,16 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
   const [cycle, setCycle] = useState<Cycle>("annual");
   const [selected, setSelected] = useState<"kidzz" | "premium">("premium");
   const [loading, setLoading] = useState(false);
-  // Compra é uma ação de ADULTO: nunca leva a criança direto ao checkout.
-  // Ao tocar em assinar, exige o gate parental antes de abrir o Stripe.
   const [showParentalGate, setShowParentalGate] = useState(false);
 
   const planKey: CheckoutPlan =
     selected === "kidzz"
-      ? cycle === "annual" ? "kidzz_annual" : "kidzz"
-      : cycle === "annual" ? "premium_annual" : "premium";
+      ? cycle === "annual"
+        ? "kidzz_annual"
+        : "kidzz"
+      : cycle === "annual"
+        ? "premium_annual"
+        : "premium";
 
   const priceParts = (plan: "kidzz" | "premium") => {
     if (plan === "kidzz") {
@@ -62,24 +79,31 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
       : { big: "R$ 24,90", small: "/mês", hint: "" };
   };
 
-  // Tocar em assinar → abre o gate parental (não vai direto pro checkout).
-  const onSubscribe = () => setShowParentalGate(true);
+  const onSubscribe = () => {
+    if (loading) return;
+    // Compra de adulto: gate parental antes do Stripe
+    setShowParentalGate(true);
+  };
 
-  // Só roda após o adulto passar no gate parental.
   const runCheckout = async () => {
     setShowParentalGate(false);
     setLoading(true);
     try {
-      if (!user) onClose?.();
+      // handleCheckout abre o Stripe (logado) ou manda pro /auth
       await handleCheckout(planKey);
+      // Se for pro auth, fecha o paywall pra não cobrir a tela
+      if (!user) onClose?.();
+    } catch (e) {
+      console.error("[Paywall] checkout failed", e);
+      // toast já vem do handleCheckout
     } finally {
       setLoading(false);
     }
   };
 
   const nome = childName?.trim() || "seu filho";
+  const first = nome.split(" ")[0] || nome;
 
-  // Diário Sem Tela — emotional anchor for the headline (read-only).
   const diary = useMemo(() => {
     if (typeof window === "undefined") return { minutes: 0, streak: 0, completions: 0 };
     try {
@@ -88,7 +112,9 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
         const d = JSON.parse(raw);
         return { minutes: d.minutes || 0, streak: d.streak || 0, completions: d.completions || 0 };
       }
-    } catch {}
+    } catch {
+      /* noop */
+    }
     return { minutes: 0, streak: 0, completions: 0 };
   }, []);
 
@@ -98,113 +124,156 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
       case "premium_locked":
         return {
           tag: "Conteúdo Premium",
-          headline: `Essa coleção é feita pro ${nome.split(" ")[0]} brilhar`,
+          headline: `Essa coleção é feita pro ${first} brilhar`,
           sub: hasMinutes
-            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado.`
+            ? `Vocês já criaram ${diary.minutes} min sem tela. Com o Premium, é ilimitado.`
             : `Atividades feitas só pra ele, ilimitadas no Premium.`,
         };
       case "surprise_limit":
         return {
           tag: "Mais uma surpresa?",
-          headline: `A surpresa grátis do dia já saiu. Quer outra agora?`,
-          sub: `No Premium o ${nome.split(" ")[0]} recebe surpresas ilimitadas — feitas só pra ele.`,
+          headline: `A surpresa grátis do dia já saiu`,
+          sub: `No Premium o ${first} recebe surpresas ilimitadas, feitas só pra ele.`,
         };
       case "streak_milestone":
         return {
-          tag: `🌿 ${diary.streak} dias sem tela!`,
-          headline: `Vocês tão construindo um hábito raro`,
-          sub: `Continue o ritmo com o Premium: atividades ilimitadas e Diário completo pra não perder nenhum dia.`,
+          tag: `${diary.streak} dias sem tela`,
+          headline: `Vocês estão construindo um hábito raro`,
+          sub: `Continue o ritmo com o Premium: atividades ilimitadas e diário completo.`,
         };
       case "after_completion":
         return {
-          tag: "Curtiu a brincadeira? 🌿",
+          tag: "Curtiu a brincadeira?",
           headline: `Sentiu o valor. Agora destrava o Kidzz inteiro.`,
           sub: hasMinutes
-            ? `${diary.minutes} min sem tela criados com a gente. No Premium, é só o começo.`
-            : `Atividades ilimitadas, personalizadas pro ${nome.split(" ")[0]}.`,
+            ? `${diary.minutes} min sem tela com a gente. No Premium, é só o começo.`
+            : `Atividades ilimitadas, personalizadas pro ${first}.`,
         };
       default:
         return {
           tag: "",
-          headline: `Escolha como o Kidzz vai cuidar do ${nome}`,
+          headline: `Escolha como o Kidzz vai cuidar do ${first}`,
           sub: hasMinutes
-            ? `Vocês já criaram ${diary.minutes} min sem tela com o Kidzz 🌿. Com o Premium, é ilimitado — e o ${nome.split(" ")[0]} ganha atividades feitas só pra ele.`
+            ? `Vocês já criaram ${diary.minutes} min sem tela. Com o Premium, é ilimitado.`
             : `Comece grátis. Cancele quando quiser. Sem letras miúdas.`,
         };
     }
-  }, [context, diary, nome]);
+  }, [context, diary, first]);
 
-
-  const ctaLabel = loading
-    ? "Abrindo checkout..."
-    : user
-      ? "Começar 7 dias grátis"
-      : "Criar conta e começar grátis";
+  const selectedPrice = priceParts(selected);
 
   return (
     <div
-      className="relative flex h-full min-h-[100dvh] w-full flex-col overflow-hidden"
+      className="h-full w-full flex flex-col overflow-hidden relative"
       style={{
-        background: `linear-gradient(180deg, ${CREAM} 0%, #FBF6EE 100%)`,
+        fontFamily: FONT,
         color: INK,
       }}
     >
-      {/* Conteúdo rolável — CTA fica fora, sempre visível no rodapé */}
+      {/* Fundo floresta */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+        <img
+          src={BG}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "center 30%", filter: "saturate(1.05) brightness(1.04)" }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 90% 50% at 50% 0%, rgba(255,236,180,.42) 0%, transparent 55%)," +
+              "linear-gradient(180deg, rgba(255,252,248,.5) 0%, rgba(250,246,236,.72) 40%, rgba(245,242,230,.92) 100%)",
+          }}
+        />
+      </div>
+
+      {/* Header */}
       <div
-        className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
+        className="relative z-20 flex items-center gap-2 px-4"
         style={{
-          WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
-          paddingBottom: 24,
+          paddingTop: "max(env(safe-area-inset-top, 8px), 12px)",
+          paddingBottom: 8,
         }}
       >
-      <div className="mx-auto w-full max-w-md px-5 md:max-w-lg lg:max-w-xl">
+        <div className="flex-1" />
         {onClose && (
           <button
+            type="button"
             onClick={onClose}
-            className="absolute right-4 z-20 w-11 h-11 rounded-full flex items-center justify-center bg-white/80 backdrop-blur shadow-sm border border-black/5"
-            style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+            className="active:scale-95 flex items-center justify-center"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 999,
+              color: INK,
+              ...dockGlass,
+            }}
             aria-label="Fechar"
           >
-            <X size={20} style={{ color: INK }} />
+            <X size={20} />
           </button>
         )}
+      </div>
 
-        {/* Header — contextual + emotional */}
+      {/* Conteúdo scrollável */}
+      <div
+        className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          paddingBottom: 8,
+        }}
+      >
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center pt-8 pb-2"
+          className="text-center pt-1 pb-1 max-w-md mx-auto"
         >
-          {ctx.tag && (
+          {ctx.tag ? (
             <span
-              className="inline-flex items-center gap-1.5 text-[11px] font-black tracking-[0.12em] uppercase px-3 py-1.5 rounded-full mb-4"
+              className="inline-flex items-center gap-1.5 text-[10.5px] font-black tracking-[0.12em] uppercase px-3 py-1.5 rounded-full mb-3"
               style={{
-                background: `linear-gradient(135deg, ${SAGE}1A 0%, ${AMBER}1A 100%)`,
+                ...dockGlass,
+                borderRadius: 999,
                 color: AMBER_DEEP,
-                border: `1px solid ${AMBER}33`,
               }}
             >
               {ctx.tag}
             </span>
-          )}
+          ) : null}
           <h1
-            className="text-[26px] leading-[1.15] font-extrabold px-1"
-            style={{ color: INK, letterSpacing: "-0.01em" }}
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontWeight: 600,
+              fontSize: 24,
+              lineHeight: 1.18,
+              letterSpacing: "-0.3px",
+              color: INK,
+              textShadow: "0 1px 12px rgba(255,255,255,.5)",
+            }}
           >
             {ctx.headline}
           </h1>
-          <p className="text-[14px] mt-3 px-2" style={{ color: INK_SOFT, lineHeight: 1.5 }}>
+          <p
+            style={{
+              margin: "10px auto 0",
+              maxWidth: 320,
+              fontSize: 13.5,
+              fontWeight: 700,
+              lineHeight: 1.45,
+              color: INK_SOFT,
+            }}
+          >
             {ctx.sub}
           </p>
 
-          {/* Mini stats strip — only if there's something to celebrate */}
           {(diary.minutes > 0 || diary.streak > 0) && (
-            <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
+            <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
               {diary.minutes > 0 && (
                 <span
                   className="inline-flex items-center gap-1.5 text-[12px] font-bold px-2.5 py-1 rounded-full"
-                  style={{ background: `${SAGE}1A`, color: "#3F6B30" }}
+                  style={{ ...dockGlass, borderRadius: 999, color: "#3F6B30" }}
                 >
                   <Leaf size={12} strokeWidth={2.6} /> {diary.minutes} min sem tela
                 </span>
@@ -212,17 +281,17 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
               {diary.streak > 0 && (
                 <span
                   className="inline-flex items-center gap-1.5 text-[12px] font-bold px-2.5 py-1 rounded-full"
-                  style={{ background: `${AMBER}1A`, color: AMBER_DEEP }}
+                  style={{ ...dockGlass, borderRadius: 999, color: AMBER_DEEP }}
                 >
-                  <Flame size={12} strokeWidth={2.6} /> {diary.streak} {diary.streak === 1 ? "dia" : "dias"} seguidos
+                  <Flame size={12} strokeWidth={2.6} /> {diary.streak}{" "}
+                  {diary.streak === 1 ? "dia" : "dias"}
                 </span>
               )}
             </div>
           )}
 
-          {/* Prova social — Movimento Menos Tela */}
           <div
-            className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold"
+            className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-semibold"
             style={{ color: INK_SOFT }}
           >
             <Users size={13} />
@@ -230,26 +299,26 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           </div>
         </motion.div>
 
-
-        {/* Cycle toggle */}
+        {/* Toggle ciclo */}
         <div
-          className="mt-7 p-1 rounded-full flex relative"
-          style={{
-            background: "#F1EADC",
-            border: "1px solid rgba(0,0,0,0.04)",
-          }}
+          className="mt-5 p-1 flex relative max-w-md mx-auto"
+          style={{ ...dockCard, borderRadius: 999, padding: 4 }}
         >
           {(["monthly", "annual"] as Cycle[]).map((c) => {
             const active = cycle === c;
             return (
               <button
                 key={c}
+                type="button"
                 onClick={() => setCycle(c)}
-                className="flex-1 min-h-[44px] rounded-full text-[14px] font-bold transition-all flex items-center justify-center gap-2"
+                className="flex-1 min-h-[44px] rounded-full text-[14px] font-bold transition-all flex items-center justify-center gap-1.5"
                 style={{
-                  background: active ? "#FFFFFF" : "transparent",
+                  background: active
+                    ? "linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.8))"
+                    : "transparent",
                   color: active ? INK : INK_SOFT,
-                  boxShadow: active ? "0 2px 10px rgba(42,42,42,0.08)" : "none",
+                  boxShadow: active ? "0 4px 14px rgba(40,30,20,.1)" : "none",
+                  border: active ? "0.5px solid rgba(255,255,255,.9)" : "0.5px solid transparent",
                 }}
               >
                 {c === "monthly" ? "Mensal" : "Anual"}
@@ -257,8 +326,8 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
                   <span
                     className="text-[10px] font-black px-2 py-[2px] rounded-full"
                     style={{
-                      background: active ? `${SAGE}22` : `${SAGE}33`,
-                      color: "#4A7A38",
+                      background: active ? "rgba(92,181,122,.2)" : "rgba(92,181,122,.15)",
+                      color: "#3F7A38",
                     }}
                   >
                     2 meses grátis
@@ -269,25 +338,27 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           })}
         </div>
 
-        {/* Plan cards */}
-        <div className="mt-7 space-y-4">
-          {/* Kidzz */}
+        {/* Planos */}
+        <div className="mt-5 space-y-3 max-w-md mx-auto">
           <PlanCard
             label="O DIA A DIA DA CURIOSIDADE"
             name="Kidzz"
             price={priceParts("kidzz")}
-            description="Perguntas à vontade · Histórias à vontade com voz · Floresta Musical · Todos os jogos Kidzz Play · Memórias"
+            bullets={["Perguntas à vontade", "Histórias com voz", "Música e jogos", "Memórias"]}
             selected={selected === "kidzz"}
             onClick={() => setSelected("kidzz")}
             accent={SAGE}
           />
-
-          {/* Premium — hero */}
           <PlanCard
             label="A EXPERIÊNCIA COMPLETA"
             name="Premium"
             price={priceParts("premium")}
-            description="Tudo do Kidzz + Mundo dos Sonhos · Rotina e Momentos · KALM completo · SOS Emocional · Cinema · Relatório para os pais"
+            bullets={[
+              "Tudo do Kidzz",
+              "Sonhos e rotina",
+              "KALM + SOS",
+              "Cinema e relatório dos pais",
+            ]}
             selected={selected === "premium"}
             onClick={() => setSelected("premium")}
             accent={AMBER}
@@ -295,47 +366,57 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           />
         </div>
 
-        {/* Comparativo */}
+        {/* Comparativo compacto */}
         <div
-          className="mt-8 rounded-3xl p-5"
-          style={{
-            background: "#FFFFFF",
-            border: "1px solid rgba(0,0,0,0.06)",
-            boxShadow: "0 8px 24px -16px rgba(42,42,42,0.18)",
-          }}
+          className="mt-6 max-w-md mx-auto"
+          style={{ ...dockCard, padding: "16px 14px 12px" }}
         >
           <p
-            className="text-[13px] font-extrabold text-center mb-4"
-            style={{ color: INK, letterSpacing: "0.02em" }}
+            style={{
+              margin: "0 0 12px",
+              textAlign: "center",
+              fontSize: 12,
+              fontWeight: 900,
+              letterSpacing: "0.06em",
+              color: INK,
+            }}
           >
             O QUE MUDA EM CADA PLANO
           </p>
-
           <div
-            className="grid gap-2 pb-3 mb-1 text-[11px] font-black uppercase tracking-wider"
-            style={{ gridTemplateColumns: "1.3fr 1fr 1fr 1fr", color: INK_SOFT }}
+            className="grid gap-1 pb-2 text-[10px] font-black uppercase tracking-wider"
+            style={{ gridTemplateColumns: "1.4fr 0.9fr 0.9fr 1fr", color: INK_SOFT }}
           >
-            <div></div>
+            <div />
             <div className="text-center">Grátis</div>
-            <div className="text-center" style={{ color: "#4A7A38" }}>Kidzz</div>
-            <div className="text-center" style={{ color: AMBER_DEEP }}>Premium</div>
+            <div className="text-center" style={{ color: "#3F7A38" }}>
+              Kidzz
+            </div>
+            <div className="text-center" style={{ color: AMBER_DEEP }}>
+              Premium
+            </div>
           </div>
-
           {FEATURES.map((f, i) => (
             <div
               key={f.row}
-              className="grid gap-2 py-3 text-[13px] items-center"
+              className="grid gap-1 py-2.5 text-[12.5px] items-center"
               style={{
-                gridTemplateColumns: "1.3fr 1fr 1fr 1fr",
-                borderTop: i === 0 ? "1px solid rgba(0,0,0,0.06)" : "1px solid rgba(0,0,0,0.04)",
+                gridTemplateColumns: "1.4fr 0.9fr 0.9fr 1fr",
+                borderTop: "0.5px solid rgba(40,40,30,.08)",
               }}
             >
-              <div className="font-semibold" style={{ color: INK }}>{f.row}</div>
-              <div className="text-center" style={{ color: INK_SOFT }}>{f.free}</div>
-              <div className="text-center font-medium" style={{ color: INK }}>{f.kidzz}</div>
+              <div className="font-bold" style={{ color: INK }}>
+                {f.row}
+              </div>
+              <div className="text-center font-semibold" style={{ color: INK_SOFT }}>
+                {f.free}
+              </div>
+              <div className="text-center font-bold" style={{ color: INK }}>
+                {f.kidzz}
+              </div>
               <div
-                className="text-center font-bold"
-                style={{ color: INK, background: `${AMBER}0D`, borderRadius: 8, padding: "4px 2px" }}
+                className="text-center font-extrabold rounded-lg py-0.5"
+                style={{ color: INK, background: "rgba(232,130,26,.1)" }}
               >
                 {f.premium}
               </div>
@@ -344,45 +425,73 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
         </div>
 
         <p
-          className="text-center text-[11px] mt-6 mb-2"
-          style={{ color: INK_SOFT }}
+          className="text-center text-[11px] mt-5 mb-2 max-w-md mx-auto"
+          style={{ color: INK_SOFT, fontWeight: 700 }}
         >
-          Renovação automática · Cancele a qualquer momento nas configurações.
+          Renovação automática. Cancele a qualquer momento nas configurações.
         </p>
-      </div>
+
+        {/* Espaço pro CTA fixo */}
+        <div style={{ height: 120 }} />
       </div>
 
-      {/* CTA sticky — sempre visível no rodapé (mobile, tablet e desktop) */}
+      {/* CTA FIXO - sempre visível e clicável */}
       <div
-        className="relative z-30 shrink-0 border-t border-black/[0.06] bg-[#FFFCF8]/95 backdrop-blur-md"
+        className="relative z-30"
         style={{
-          paddingBottom: "max(12px, env(safe-area-inset-bottom, 0px))",
-          boxShadow: "0 -10px 28px -18px rgba(42,42,42,0.28)",
+          flexShrink: 0,
+          padding: "10px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)",
+          background:
+            "linear-gradient(180deg, transparent 0%, rgba(248,244,230,.85) 22%, rgba(248,244,230,.97) 100%)",
         }}
       >
-        <div className="mx-auto w-full max-w-md px-5 pt-3 md:max-w-lg lg:max-w-xl">
+        <div className="max-w-md mx-auto">
+          <div
+            className="mb-2 flex items-center justify-between px-1"
+            style={{ fontSize: 12, fontWeight: 800, color: INK_SOFT }}
+          >
+            <span>
+              Plano {selected === "premium" ? "Premium" : "Kidzz"} ·{" "}
+              {cycle === "annual" ? "Anual" : "Mensal"}
+            </span>
+            <span style={{ color: INK, fontWeight: 900 }}>
+              {selectedPrice.big}
+              {selectedPrice.small}
+            </span>
+          </div>
           <motion.button
+            type="button"
             onClick={onSubscribe}
             disabled={loading}
-            className="w-full min-h-[56px] rounded-2xl font-extrabold text-[17px] flex items-center justify-center gap-2 disabled:opacity-60 transition-transform"
             whileTap={{ scale: 0.98 }}
+            className="w-full active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60"
             style={{
-              background: `linear-gradient(180deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
-              color: "#FFFFFF",
-              boxShadow: `0 12px 28px -10px ${AMBER}99, inset 0 1px 0 rgba(255,255,255,0.25)`,
-              letterSpacing: "-0.01em",
+              minHeight: 54,
+              borderRadius: R.btn,
+              fontWeight: 900,
+              fontSize: 16,
+              color: "#2A1608",
+              border: "0.5px solid rgba(255,235,190,.75)",
+              background: "linear-gradient(180deg, #FBE09A 0%, #E8A838 48%, #C87818 100%)",
+              boxShadow:
+                "0 12px 28px rgba(180,100,20,.38), 0 1px 0 rgba(255,250,230,.9) inset, 0 -3px 8px rgba(100,50,0,.16) inset",
+              cursor: loading ? "wait" : "pointer",
+              fontFamily: FONT,
             }}
           >
             <Sparkles size={18} />
-            {ctaLabel}
-            <span aria-hidden>✨</span>
+            {loading
+              ? "Abrindo pagamento..."
+              : user
+                ? "Começar 7 dias grátis"
+                : "Criar conta e começar grátis"}
           </motion.button>
           <div
-            className="mt-2 flex items-center justify-center gap-2 text-[12px]"
+            className="mt-2 flex items-center justify-center gap-1.5 text-[11.5px] font-bold"
             style={{ color: INK_SOFT }}
           >
-            <Lock size={13} />
-            <span>7 dias grátis · Cancele a qualquer momento</span>
+            <Lock size={12} />
+            7 dias grátis · Cancele quando quiser
           </div>
         </div>
       </div>
@@ -394,12 +503,11 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
   );
 };
 
-// --- Plan card ---
 interface PlanCardProps {
   label: string;
   name: string;
   price: { big: string; small: string; hint?: string };
-  description: string;
+  bullets: string[];
   selected: boolean;
   onClick: () => void;
   accent: string;
@@ -407,93 +515,113 @@ interface PlanCardProps {
 }
 
 const PlanCard = ({
-  label, name, price, description, selected, onClick, accent, recommended,
+  label,
+  name,
+  price,
+  bullets,
+  selected,
+  onClick,
+  accent,
+  recommended,
 }: PlanCardProps) => {
   return (
     <motion.button
+      type="button"
       onClick={onClick}
       whileTap={{ scale: 0.985 }}
-      className="w-full text-left rounded-3xl relative transition-all"
+      className="w-full text-left relative transition-all"
       style={{
-        padding: recommended ? "22px 20px 20px" : "20px",
-        background: "#FFFFFF",
-        border: selected
-          ? `2px solid ${accent}`
-          : "1.5px solid rgba(0,0,0,0.07)",
-        boxShadow: recommended
-          ? `0 18px 40px -22px ${accent}88, 0 2px 0 rgba(255,255,255,0.6) inset`
-          : selected
-          ? `0 10px 26px -18px ${accent}66`
-          : "0 4px 14px -10px rgba(42,42,42,0.15)",
+        ...dockCard,
+        padding: recommended ? "18px 16px 16px" : "16px",
+        border: selected ? `1.5px solid ${accent}` : dockGlass.border,
+        boxShadow: selected
+          ? `0 14px 36px rgba(20,16,30,.16), 0 0 0 1px ${accent}55, inset 0 1px 0 rgba(255,255,255,.8)`
+          : dockGlass.boxShadow,
       }}
     >
       {recommended && (
         <span
-          className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-black px-3 py-[6px] rounded-full whitespace-nowrap"
+          className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-black px-3 py-1 rounded-full whitespace-nowrap"
           style={{
-            background: `linear-gradient(180deg, ${GOLD} 0%, ${accent} 100%)`,
-            color: "#FFFFFF",
-            letterSpacing: "0.08em",
-            boxShadow: `0 8px 18px -8px ${accent}AA`,
+            background: `linear-gradient(180deg, #F0C24E 0%, ${accent} 100%)`,
+            color: "#fff",
+            letterSpacing: "0.06em",
+            boxShadow: `0 6px 14px ${accent}66`,
           }}
         >
-          ⭐ RECOMENDADO
+          RECOMENDADO
         </span>
       )}
 
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <p
-            className="text-[10px] font-black tracking-[0.1em]"
-            style={{ color: accent }}
-          >
+          <p className="text-[10px] font-black tracking-[0.1em]" style={{ color: accent }}>
             {label}
           </p>
           <p
-            className="text-[22px] font-extrabold mt-1"
-            style={{ color: INK, letterSpacing: "-0.01em" }}
+            className="text-[22px] font-extrabold mt-0.5"
+            style={{ color: INK, letterSpacing: "-0.02em", fontFamily: SERIF, fontWeight: 600 }}
           >
             {name}
           </p>
         </div>
-
         <div
-          className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-1"
+          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-1"
           style={{
-            background: selected ? accent : "#FFFFFF",
-            border: selected ? `2px solid ${accent}` : "1.5px solid rgba(0,0,0,0.18)",
+            background: selected ? accent : "rgba(255,255,255,.5)",
+            border: selected ? `2px solid ${accent}` : "1.5px solid rgba(40,40,30,.18)",
+            boxShadow: selected ? `0 4px 10px ${accent}55` : "none",
           }}
         >
-          {selected && <Check size={14} strokeWidth={3} color="#FFFFFF" />}
+          {selected && <Check size={15} strokeWidth={3} color="#fff" />}
         </div>
       </div>
 
-      <div className="mt-3 flex items-baseline gap-1.5 flex-wrap">
+      <div className="mt-2.5 flex items-baseline gap-1.5 flex-wrap">
         <span
-          className="text-[28px] font-black leading-none"
+          className="text-[26px] font-black leading-none"
           style={{ color: INK, letterSpacing: "-0.02em" }}
         >
           {price.big}
         </span>
-        <span className="text-[14px] font-bold" style={{ color: INK_SOFT }}>
+        <span className="text-[13px] font-bold" style={{ color: INK_SOFT }}>
           {price.small}
         </span>
-        {price.hint && (
+        {price.hint ? (
           <span
-            className="text-[11px] font-bold ml-1 px-2 py-[2px] rounded-full"
-            style={{ background: `${SAGE}22`, color: "#4A7A38" }}
+            className="text-[11px] font-bold ml-0.5 px-2 py-[2px] rounded-full"
+            style={{ background: "rgba(92,181,122,.18)", color: "#3F7A38" }}
           >
             {price.hint}
           </span>
-        )}
+        ) : null}
       </div>
 
-      <p
-        className="text-[13px] mt-3 leading-relaxed"
-        style={{ color: INK_SOFT }}
-      >
-        {description}
-      </p>
+      <ul className="mt-3 space-y-1.5" style={{ margin: "12px 0 0", padding: 0, listStyle: "none" }}>
+        {bullets.map((b) => (
+          <li
+            key={b}
+            className="flex items-center gap-2 text-[12.5px] font-bold"
+            style={{ color: "rgba(26,40,24,.72)" }}
+          >
+            <span
+              style={{
+                width: 16,
+                height: 16,
+                borderRadius: 999,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: `${accent}22`,
+                flexShrink: 0,
+              }}
+            >
+              <Check size={11} strokeWidth={3} color={accent} />
+            </span>
+            {b}
+          </li>
+        ))}
+      </ul>
     </motion.button>
   );
 };

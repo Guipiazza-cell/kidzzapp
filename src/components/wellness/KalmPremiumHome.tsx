@@ -264,7 +264,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
     if (initialExperienceId) onConsumedInitial?.();
   }, [initialExperienceId, onConsumedInitial]);
 
-  // Parallax hero — idêntico Bora
+  // Parallax hero - idêntico Bora
   useEffect(() => {
     const sc = scrollRef.current;
     const hero = heroArtRef.current;
@@ -344,7 +344,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
   }, [mood, streak.count, grat, wins]);
 
   const share = async () => {
-    const txt = `Esta semana: ${wins} vitórias e ${grat} momentos no jarro — KALM by Kidzz`;
+    const txt = `Esta semana: ${wins} vitórias e ${grat} momentos no jarro - KALM by Kidzz`;
     try {
       if (navigator.share) await navigator.share({ title: "KALM", text: txt });
       else await navigator.clipboard.writeText(txt);
@@ -696,7 +696,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
           </div>
         </div>
 
-        {/* ═══ 4 AÇÕES — grid 2×2 glass premium (como categorias Bora, ordem do print) ═══ */}
+        {/* ═══ 4 AÇÕES - grid 2×2 glass premium (como categorias Bora, ordem do print) ═══ */}
         <div style={sectionWrap}>
           <div
             style={{
@@ -1160,7 +1160,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
           </div>
         </div>
 
-        {/* ═══ RITUAIS (horizontal, gloss — craft Bora cats) ═══ */}
+        {/* ═══ RITUAIS (horizontal, gloss - craft Bora cats) ═══ */}
         <div style={{ marginBottom: GAP + 2 }}>
           <div style={{ padding: `0 ${PAD}px` }}>
             <SectionLabel kicker="Pequenos rituais +">Cada toque conta como um dia de calma.</SectionLabel>

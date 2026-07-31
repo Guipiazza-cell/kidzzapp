@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, type CSSProperties } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Library } from "lucide-react";
 import KidzzHeader from "@/components/common/KidzzHeader";
@@ -22,7 +22,7 @@ const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate
 
 type Step = "intro" | "avatar" | "form" | "display";
 
-// Marca por sessão — pai não precisa digitar PIN toda vez que voltar pra Fábrica.
+/** Portão dos pais: personalização só com código. Válido por sessão. */
 const SESSION_GATE_KEY = "kidzz_story_factory_gate_ok";
 
 /* ── SVG paths (portados do design Historias.dc.html) ── */
@@ -36,42 +36,16 @@ const D = {
   sparkle: "M12 4l1.8 5.2L19 11l-5.2 1.8L12 18l-1.8-5.2L5 11l5.2-1.8L12 4Z",
 };
 
-/* ── Helpers de estilo (valores exatos do design) ── */
-const cardBase: CSSProperties = {
-  position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 11,
-  borderRadius: 20, padding: "11px 12px", textAlign: "left", fontFamily: "'Nunito',sans-serif",
-  transition: "transform .3s cubic-bezier(.34,1.4,.64,1)",
-  background: "linear-gradient(155deg,rgba(255,253,247,.9),rgba(250,240,222,.62))",
-  backdropFilter: "blur(16px) saturate(150%)", WebkitBackdropFilter: "blur(16px) saturate(150%)",
-  border: "1px solid rgba(255,255,255,1)",
-  boxShadow: "0 10px 22px rgba(150,95,20,.14), inset 0 1.5px 0 rgba(255,255,255,1)",
-};
-const gloss = (l: string, m: string, d: string): CSSProperties => ({
-  flex: "none", width: 42, height: 42, borderRadius: 14,
-  display: "flex", alignItems: "center", justifyContent: "center",
-  background: `radial-gradient(130% 130% at 30% 22%, #FFFFFF 0%, ${l} 18%, ${m} 58%, ${d} 100%)`,
-  boxShadow: "0 6px 14px rgba(150,95,20,.25), inset 0 1.5px 2px rgba(255,255,255,.7), inset 0 -4px 8px rgba(0,0,0,.16)",
-});
-
 const Icon = ({ d, stroke = "#fff", size = 20, sw = 1.9 }: { d: string; stroke?: string; size?: number; sw?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <path d={d} stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
-/* Passos reais da Fábrica (avatar → palavras → objetivo → narração),
-   apresentados com o cartão de vidro + ícone glossy do design. */
-const STEPS: { d: string; g: [string, string, string]; title: string; sub: string }[] = [
-  { d: D.smile, g: ["#FFD9A8", "#F0A24C", "#C77E1E"], title: "Monte o avatar", sub: "O rosto e o jeitinho do seu filho" },
-  { d: D.star, g: ["#FFE9A8", "#F2C24C", "#C98F1E"], title: "Escolha palavras-chave", sub: "O mundo e os interesses dele" },
-  { d: D.compass, g: ["#C0EDC8", "#5CB57A", "#2F7A4E"], title: "Diga o objetivo", sub: "O que a história precisa entregar" },
-  { d: D.note, g: ["#D2CCF0", "#8A7AD8", "#5E4EA8"], title: "Narração suave", sub: "Voz feminina que embala e acalma" },
-];
-
 const HERO_BG = "linear-gradient(180deg,#FAF1DF 0%,#F3E6CC 42%,#EBDABA 75%,#E2CDA4 100%)";
 const DEFAULT_BG = "linear-gradient(180deg,#FDF8EE 0%, #F2EFE6 100%)";
 
-const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
+const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipIntro?: boolean }) => {
   const { session, profile, tier, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
@@ -82,6 +56,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
     return Math.min(10, Math.max(3, first));
   })();
 
+  // Da home: pula intro visual, mas personalização exige código dos pais.
   const [step, setStep] = useState<Step>("intro");
   const [avatar, setAvatar] = useState<ChildAvatar | null>(null);
   const [story, setStory] = useState("");
@@ -95,15 +70,24 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
   });
   // Guarda o rate de voz escolhido no painel pra reutilizar na narração
   const voiceRateRef = useRef<number>(0.88);
+  const pendingAfterGate = useRef<(() => void) | null>(null);
+  const skipBooted = useRef(false);
 
   const requireGate = useCallback((cb: () => void) => {
-    if (gatePassed) { cb(); return; }
-    setGateOpen(true);
-    // armazena callback via micro-state — usamos efeito simples: depois do gate, abre próximo step
+    if (gatePassed) {
+      cb();
+      return;
+    }
     pendingAfterGate.current = cb;
+    setGateOpen(true);
   }, [gatePassed]);
 
-  const pendingAfterGate = useRef<(() => void) | null>(null);
+  // Home → “Criar minha história”: pede código dos pais e abre avatar.
+  useEffect(() => {
+    if (!skipIntro || skipBooted.current) return;
+    skipBooted.current = true;
+    requireGate(() => setStep("avatar"));
+  }, [skipIntro, requireGate]);
 
   const handleAvatarComplete = useCallback((a: ChildAvatar) => {
     setAvatar(a);
@@ -119,10 +103,10 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
     if (!canGenerateStory()) {
       if (tier === "free") {
-        toast.info(`A primeira foi por nossa conta. 💛 Assine e crie histórias ilimitadas só do(a) ${childName}.`);
+        toast.info(`A primeira foi por nossa conta. Assine e crie histórias ilimitadas só do(a) ${childName}.`);
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       } else {
-        toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
+        toast.info("O Kidzz ficou sonolento por aqui. Volte amanhã para mais histórias.");
       }
       return;
     }
@@ -143,12 +127,16 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         clearInterval(timer);
         return;
       }
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      };
+      const anon = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+      if (anon) headers.apikey = anon;
+
       const resp = await fetch(GENERATE_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers,
         body: JSON.stringify({
           childName,
           childAvatar: avatar,
@@ -158,7 +146,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           intent: params.intent,
           ensinarSub: params.ensinarSub,
           ageRange: profile?.age_range || "3-7",
-        })
+        }),
       });
 
       if (!resp.ok) {
@@ -167,7 +155,19 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
           throw new Error(err.message || "Você já usou sua história gratuita.");
         }
-        throw new Error(err.error || "A história fugiu, vamos tentar de novo?");
+        if (err.error === "QUOTA_ERROR") {
+          throw new Error(
+            err.message ||
+              "Não foi possível validar seu limite agora. Tente de novo em instantes.",
+          );
+        }
+        // Nunca mostrar código cru (QUOTA_ERROR) pro usuário
+        const raw = String(err.message || err.error || "");
+        const friendly =
+          raw && !/^[A-Z0-9_]+$/.test(raw)
+            ? raw
+            : "A história fugiu, vamos tentar de novo?";
+        throw new Error(friendly);
       }
 
       const data = await resp.json();
@@ -207,7 +207,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
       bumpSessionActions();
       sfx("complete");
       haptic("success");
-      toast.success("História pronta! ✨");
+      toast.success("História pronta!");
     } catch (e: any) {
       console.error("Story generation error:", e);
       sfx("error");
@@ -237,13 +237,17 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
   const remaining = storiesRemaining();
   const badgeText = tier === "free"
-    ? (remaining > 0 ? "Primeira história por nossa conta ✨" : "Assine para criar mais")
+    ? (remaining > 0 ? "Primeira história por nossa conta" : "Assine para criar mais")
     : `${remaining} ${remaining === 1 ? "história" : "histórias"} hoje`;
+
+  const isCreatorStep = step === "avatar" || step === "form" || step === "display";
 
   return (
     <div
       className="flex-1 flex flex-col overflow-hidden relative min-h-0"
-      style={{ background: step === "intro" ? HERO_BG : DEFAULT_BG }}
+      style={{
+        background: step === "intro" ? HERO_BG : isCreatorStep ? "transparent" : DEFAULT_BG,
+      }}
     >
       {/* keyframes locais (prefixo hist- evita colisão global) */}
       <style>{`
@@ -258,7 +262,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         @keyframes hist-drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-34px,-18px) scale(1.1)}}
       `}</style>
 
-      {/* Orbes de luz quentes — só na tela inicial (design) */}
+      {/* Orbes de luz quentes - só na tela inicial (design) */}
       {step === "intro" && (
         <>
           <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(45% 28% at 50% 14%,rgba(255,190,90,.18),transparent 70%),radial-gradient(42% 28% at 12% 60%,rgba(255,215,140,.16),transparent 70%),radial-gradient(50% 30% at 82% 90%,rgba(220,150,70,.12),transparent 70%)" }} />
@@ -269,6 +273,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
 
       <KidzzHeader
         onBack={onBack}
+        hideLogo
+        hideTagline
         right={
           <motion.button
             onClick={() => setGalleryOpen(true)}
@@ -289,7 +295,7 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)",
         }}
       >
-        {step === "intro" &&
+        {step === "intro" && !skipIntro &&
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -304,11 +310,24 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
                 animation: "hist-heroIn .7s cubic-bezier(.22,1,.36,1) both",
               }}
             >
-              <div style={{ position: "relative", height: 196, overflow: "hidden" }}>
+              <div style={{ position: "relative", height: 228, overflow: "hidden" }}>
                 <img
                   src="/exemplos/assets/cena-historias.png"
-                  alt="Criança lendo um livro mágico"
-                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 34%", animation: "hist-floaty 7s ease-in-out infinite", filter: "saturate(1.08) contrast(1.02)" }}
+                  alt="Gui, o camaleão, na fábrica de histórias"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "118%",
+                    objectFit: "cover",
+                    /* Enquadra o Gui (centro-esquerda), mais perto e inteiro */
+                    objectPosition: "38% 42%",
+                    transform: "scale(1.12)",
+                    transformOrigin: "38% 42%",
+                    animation: "hist-floaty 7s ease-in-out infinite",
+                    filter: "saturate(1.08) contrast(1.02)",
+                  }}
                 />
                 {/* fagulhas mágicas */}
                 <div aria-hidden style={{ position: "absolute", top: 26, left: "38%", width: 5, height: 5, borderRadius: 99, background: "#FFE9A8", boxShadow: "0 0 10px 3px rgba(255,210,120,.85)", animation: "hist-twinkle 3s ease-in-out infinite" }} />
@@ -328,10 +347,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
                 </div>
                 <h1 style={{ margin: "0 0 7px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 29, lineHeight: 1.1, color: "#3A2410", letterSpacing: "-.4px" }}>Uma história só sua</h1>
                 <p style={{ margin: "0 0 15px", fontSize: 12.5, fontWeight: 700, lineHeight: 1.45, color: "#7A5E38", maxWidth: 290 }}>
-                  Criada com o nome, o rosto e o mundo do seu filho — do jeitinho que só ele merece.
+                  Criada com o nome, as cores e o mundo do seu filho, do jeitinho que só ele merece
                 </p>
                 <button
-                  onClick={() => requireGate(() => setStep("avatar"))}
+                  onClick={() => {
+                    haptic("medium");
+                    requireGate(() => setStep("avatar"));
+                  }}
                   className="active:scale-[0.97]"
                   style={{ position: "relative", overflow: "hidden", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, padding: 14, borderRadius: 999, cursor: "pointer", background: "radial-gradient(130% 130% at 30% 22%,#FFD98A 0%,#F2A62B 52%,#D97A1E 100%)", border: "1px solid rgba(255,255,255,.7)", boxShadow: "0 10px 24px rgba(180,110,20,.4),inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -5px 10px rgba(150,80,0,.3)", fontFamily: "'Nunito',sans-serif", fontSize: 14, fontWeight: 900, letterSpacing: ".6px", color: "#FFF6E6", transition: "transform .2s" }}
                 >
@@ -347,38 +369,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
               </div>
             </div>
 
-            {/* ── COMO FUNCIONA (passos reais da Fábrica) ── */}
-            <div style={{ padding: "22px 4px 12px" }}>
-              <h2 style={{ margin: 0, fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 22, color: "#3A2410" }}>Como funciona</h2>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
-              {STEPS.map((s, i) => (
-                <div
-                  key={s.title}
-                  style={{ ...cardBase, animation: `hist-cascade .5s ${0.15 + i * 0.08}s both` }}
-                >
-                  <div aria-hidden style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.3) 50%,transparent 100%)", animation: "hist-shine 6s ease-in-out infinite" }} />
-                  <div style={{ ...gloss(...s.g), position: "relative" }}>
-                    {/* specular sheen no topo do ícone glossy (premium glass) */}
-                    <div aria-hidden style={{ position: "absolute", top: 2, left: 4, right: 4, height: 12, borderRadius: 12, background: "linear-gradient(180deg,rgba(255,255,255,.55),transparent)", pointerEvents: "none" }} />
-                    <Icon d={s.d} size={20} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#3A2410", lineHeight: 1.15 }}>{s.title}</div>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8A6E42", lineHeight: 1.3 }}>{s.sub}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* ── Nota de proteção (Portão dos Pais) — pílula de vidro premium ── */}
-            <div style={{ padding: "18px 8px 8px", display: "flex", justifyContent: "center" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, maxWidth: 320, padding: "9px 15px", borderRadius: 999, background: "linear-gradient(160deg,rgba(255,252,244,.82),rgba(245,232,210,.5))", backdropFilter: "blur(14px) saturate(150%)", WebkitBackdropFilter: "blur(14px) saturate(150%)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 8px 20px rgba(150,95,20,.12), inset 0 1.5px 0 rgba(255,255,255,1)", fontSize: 11, fontWeight: 800, color: "#8A6E42", lineHeight: 1.4, textAlign: "left" }}>
-                <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>🔒</span>
-                <span>A personalização é feita pelos pais. A criança recebe só a história pronta.</span>
-              </div>
-            </div>
-            <div style={{ padding: "10px 20px 4px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#A88E5E", letterSpacing: ".2px" }}>
+            {/* “Como funciona” vive na home de Histórias - aqui só CTA da fábrica */}
+            <div style={{ padding: "16px 20px 8px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#A88E5E", letterSpacing: ".2px" }}>
               Narração em voz feminina suave · Fábrica KIDZZ
             </div>
           </motion.div>
@@ -405,13 +397,13 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
         {galleryOpen && <StoryGallery onClose={() => setGalleryOpen(false)} />}
       </AnimatePresence>
 
-      {/* Portão dos Pais — protege a personalização */}
+      {/* Portão dos pais - personalização só com código */}
       <AnimatePresence>
         {gateOpen && (
           <ParentalGate
             onSuccess={() => {
               setGatePassed(true);
-              try { sessionStorage.setItem(SESSION_GATE_KEY, "1"); } catch {}
+              try { sessionStorage.setItem(SESSION_GATE_KEY, "1"); } catch { /* noop */ }
               setGateOpen(false);
               const cb = pendingAfterGate.current;
               pendingAfterGate.current = null;
@@ -420,6 +412,8 @@ const StoryFactory = ({ onBack }: {onBack: () => void;}) => {
             onCancel={() => {
               pendingAfterGate.current = null;
               setGateOpen(false);
+              // Se veio da home sem intro, cancela e volta
+              if (skipIntro && step === "intro") onBack();
             }}
           />
         )}

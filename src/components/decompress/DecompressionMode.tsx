@@ -11,7 +11,7 @@ interface Props {
 }
 
 /**
- * Decompression Mode — 60s ritual cinemático para o adulto antes
+ * Decompression Mode - 60s ritual cinemático para o adulto antes
  * de encontrar o filho. Respiração 4-7-8 + narração calma + tela escura.
  *
  * Fases:

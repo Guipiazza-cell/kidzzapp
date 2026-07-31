@@ -10,7 +10,7 @@ interface Props {
 
 /**
  * Discreet, parent-facing nudge that surfaces after 2-3 child actions.
- * NOT a paywall — it's an emotional bridge that opens the paywall on tap.
+ * NOT a paywall - it's an emotional bridge that opens the paywall on tap.
  */
 export default function ConversionNudgeCard({ open, childName, onUpgrade, onClose }: Props) {
   return (

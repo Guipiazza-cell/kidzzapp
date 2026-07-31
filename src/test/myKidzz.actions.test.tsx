@@ -1,12 +1,12 @@
 /**
- * Validação manual automatizada — Botões SALVAR / COMPARTILHAR
+ * Validação manual automatizada - Botões SALVAR / COMPARTILHAR
  *
  * Cobre comportamento real esperado em iOS e Android:
  *  - SALVAR grava `mascotConfig` no localStorage e dá feedback (toast/confetti).
  *  - COMPARTILHAR usa Web Share API quando disponível (iOS Safari / Android Chrome),
  *    e cai em download de PNG quando não há suporte (desktop / iOS antigo).
  *  - Itens bloqueados (premium) NÃO alteram a config quando o usuário é free,
- *    e mostram um aviso (toast.info) — sem quebrar o app.
+ *    e mostram um aviso (toast.info) - sem quebrar o app.
  *
  * Mockamos `html2canvas`, `canvas-confetti`, `sonner` e `useAuth` para isolar a UI.
  */
@@ -36,7 +36,7 @@ const { toastMock } = vi.hoisted(() => ({
 }));
 vi.mock("sonner", () => ({ toast: toastMock, Toaster: () => null }));
 
-// useAuth mock — controlado por variável externa
+// useAuth mock - controlado por variável externa
 let mockProfile: { is_premium: boolean; child_name: string } | null = {
   is_premium: false,
   child_name: "Lia",
@@ -49,7 +49,7 @@ import MyKidzz from "@/components/play/MyKidzz";
 
 const KEY = "mascotConfig";
 
-describe("MyKidzz — botões SALVAR e COMPARTILHAR", () => {
+describe("MyKidzz - botões SALVAR e COMPARTILHAR", () => {
   beforeEach(() => {
     localStorage.clear();
     toastMock.success.mockClear();
@@ -121,20 +121,20 @@ describe("MyKidzz — botões SALVAR e COMPARTILHAR", () => {
     expect(revokeUrl).toHaveBeenCalled();
   });
 
-  it("usuário FREE NÃO consegue selecionar expressão bloqueada — mostra aviso premium", async () => {
+  it("usuário FREE NÃO consegue selecionar expressão bloqueada - mostra aviso premium", async () => {
     mockProfile = { is_premium: false, child_name: "Lia" };
     render(<MyKidzz onBack={() => {}} />);
 
     // Vai para a aba Expressão
     fireEvent.click(screen.getByRole("button", { name: /^Expressão$/ }));
 
-    // "Amoroso" está bloqueado para free — aguarda animação do AnimatePresence
+    // "Amoroso" está bloqueado para free - aguarda animação do AnimatePresence
     const lockedBtn = await screen.findByRole("button", { name: /Amoroso/i }, { timeout: 2000 });
     fireEvent.click(lockedBtn);
 
     expect(toastMock.info).toHaveBeenCalledWith(expect.stringMatching(/Premium/i));
 
-    // Salvar agora — config NÃO deve ter sido alterada para "loving"
+    // Salvar agora - config NÃO deve ter sido alterada para "loving"
     fireEvent.click(screen.getByRole("button", { name: /^Salvar$/ }));
     const saved = JSON.parse(localStorage.getItem(KEY)!);
     expect(saved.expression).not.toBe("loving");

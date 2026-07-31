@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 import { useCriancas } from "@/hooks/useCriancas";
+import { haptic } from "@/lib/haptics";
 
 const INTERESSES = [
   { id: "dinossauros", label: "Dinossauros", emoji: "🦖" },
@@ -15,9 +17,15 @@ const INTERESSES = [
   { id: "esportes", label: "Esportes", emoji: "⚽" },
 ];
 
-type Props = { open: boolean; onClose: () => void };
+type Props = {
+  open: boolean;
+  /** Fecha o modal (ex.: após salvar). */
+  onClose: () => void;
+  /** Fecha e sai da aba Bora (botão X / voltar). */
+  onDismiss?: () => void;
+};
 
-export const CriancaOnboarding = ({ open, onClose }: Props) => {
+export const CriancaOnboarding = ({ open, onClose, onDismiss }: Props) => {
   const { addCrianca } = useCriancas();
   const [nome, setNome] = useState("");
   const [idade, setIdade] = useState<number | "">("");
@@ -60,18 +68,39 @@ export const CriancaOnboarding = ({ open, onClose }: Props) => {
           exit={{ opacity: 0 }}
         >
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Quem vai brincar"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
-            className="w-full max-w-md rounded-3xl p-6 shadow-2xl my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto"
+            className="relative w-full max-w-md rounded-3xl p-6 shadow-2xl my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto"
             style={{
               background: "linear-gradient(180deg, #FFFDF6 0%, #FFF3D9 100%)",
               border: "2px solid rgba(255,255,255,0.85)",
               boxShadow: "0 30px 80px -20px rgba(40,70,30,0.45)",
             }}
           >
-            <div className="text-3xl mb-1">👋</div>
+            <button
+              type="button"
+              onClick={() => {
+                haptic("light");
+                (onDismiss ?? onClose)();
+              }}
+              aria-label="Fechar e voltar"
+              className="absolute top-3.5 right-3.5 z-10 flex h-11 w-11 items-center justify-center rounded-full active:scale-90"
+              style={{
+                background: "rgba(255,255,255,0.9)",
+                border: "1px solid rgba(47,94,31,0.12)",
+                boxShadow: "0 6px 16px rgba(40,70,30,0.12)",
+                color: "#2F5E1F",
+              }}
+            >
+              <X size={20} strokeWidth={2.4} />
+            </button>
+
+            <div className="text-3xl mb-1 pr-10">👋</div>
             <h2 className="font-bora-display" style={{ fontSize: 26, color: "#2F5E1F", lineHeight: 1.1 }}>
               Quem vai brincar?
             </h2>

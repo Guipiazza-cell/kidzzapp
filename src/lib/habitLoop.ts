@@ -1,5 +1,5 @@
 /**
- * Habit Loop — Local persistence for daily streak, XP, and notification time.
+ * Habit Loop - Local persistence for daily streak, XP, and notification time.
  * All keys are namespaced with `kidzz_` and stored in localStorage.
  *
  * Design goals:
@@ -37,7 +37,7 @@ const safeWrite = (key: string, value: string) => {
   try {
     localStorage.setItem(key, value);
   } catch {
-    /* storage full or blocked — ignore */
+    /* storage full or blocked - ignore */
   }
 };
 
@@ -130,7 +130,7 @@ export const setNotificationTime = (time: string) => {
 };
 
 // ---------------------------------------------------------------
-// Milestones — progressive titles unlocked by consecutive days.
+// Milestones - progressive titles unlocked by consecutive days.
 // ---------------------------------------------------------------
 export interface Milestone {
   days: number;
@@ -164,7 +164,7 @@ export const getMilestoneProgress = (streak: number) => {
 };
 
 // ---------------------------------------------------------------
-// Smart notification copy — dynamic, name-aware, streak-aware.
+// Smart notification copy - dynamic, name-aware, streak-aware.
 // Pure function: no side-effects, no scheduling. UI / SW handles delivery.
 // ---------------------------------------------------------------
 export const getNotificationMessage = (

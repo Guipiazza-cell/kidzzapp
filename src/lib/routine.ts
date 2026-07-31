@@ -1,8 +1,8 @@
 /**
- * KIDZZ ROUTINE — Daily habit loop with 15 balanced tasks/day across 3 periods.
+ * KIDZZ ROUTINE - Daily habit loop with 15 balanced tasks/day across 3 periods.
  *
  * Goals:
- *  - Build a daily habit loop (morning/afternoon/night) — 5 tasks per period
+ *  - Build a daily habit loop (morning/afternoon/night) - 5 tasks per period
  *  - 45+ curated tasks across 5 categories (rotina, aprendizado, emoção, energia, vida)
  *  - Deterministic per-day generation (same day = same tasks, no flicker)
  *  - Auto-completes when child uses integrated app features (music/story/question)
@@ -262,7 +262,7 @@ export interface CompleteResult {
 }
 
 /**
- * Mark a task as done. Idempotent — a second call with the same id is a no-op.
+ * Mark a task as done. Idempotent - a second call with the same id is a no-op.
  * Awards +5 XP for plain tasks, +8 for integrated tasks, +20 bonus on day complete.
  */
 export function completeTask(taskId: string): CompleteResult {

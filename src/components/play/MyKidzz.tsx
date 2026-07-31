@@ -1,9 +1,9 @@
 /**
- * MEU KIDZZ — Personalização real e funcional do camaleão único.
+ * MEU KIDZZ - Personalização real e funcional do camaleão único.
  *
  * - Renderiza o KidzzAvatar real (camadas SVG anatômicas: olhos + boca + traje)
  * - Sem emojis no preview do personagem (apenas como ícones nos botões legados)
- * - Mudanças aplicadas IMEDIATAMENTE — cor (hue-rotate), expressão e traje reais
+ * - Mudanças aplicadas IMEDIATAMENTE - cor (hue-rotate), expressão e traje reais
  * - Persiste em localStorage (`mascotConfig` legado + `kidzz_avatar` novo)
  * - Compartilhar gera card via html2canvas e usa Web Share API
  */
@@ -199,7 +199,7 @@ const MyKidzz = ({ onBack }: Props) => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
     >
-      {/* HERO PREVIEW — KidzzAvatar real, muda em tempo real */}
+      {/* HERO PREVIEW - KidzzAvatar real, muda em tempo real */}
       <div
         ref={heroRef}
         className="relative flex-shrink-0 flex flex-col items-center justify-center pt-2 pb-3 px-4"

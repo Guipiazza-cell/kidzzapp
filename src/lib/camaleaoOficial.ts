@@ -1,6 +1,6 @@
 /**
  * Camaleões oficiais (originais do cliente em public/camaleao).
- * Sempre com borda esmaecida (PNG soft) — nunca “foto quadrada”.
+ * Sempre com borda esmaecida (PNG soft) - nunca “foto quadrada”.
  *
  * Poses:
  *  - heart     → Perguntas / default
@@ -20,6 +20,8 @@ export const CAMALEAO = {
   headphonesSoft: `${CAMALEAO_BASE}/headphones-soft.png`,
   sleepy: `${CAMALEAO_BASE}/sleepy.png`,
   sleepySoft: `${CAMALEAO_BASE}/sleepy-soft.png`,
+  /** Cutout puro (sem floresta) — mascote em UI/onboarding */
+  cutout: `${CAMALEAO_BASE}/cutout.png`,
 } as const;
 
 /** Estilo CSS para o Gui “fazer parte do cenário” (sem retângulo). */

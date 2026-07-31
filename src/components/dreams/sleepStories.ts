@@ -3,7 +3,10 @@
 export interface SleepStory {
   id: string;
   title: string;
-  emoji: string;
+  /** @deprecated prefer icon - legado de emoji genérico */
+  emoji?: string;
+  /** Ícone premium 3D (sonhos-v2/icons) */
+  icon: string;
   category: "calma" | "aventura" | "valores" | "biblia" | "gratidao";
   free: boolean;
   duration: string;
@@ -12,11 +15,13 @@ export interface SleepStory {
   text: string;
 }
 
+const STORY_IC = "/exemplos/assets/sonhos-v2/icons";
+
 export const SLEEP_STORIES: SleepStory[] = [
   {
     id: "estrelas",
     title: "A Viagem das Estrelas",
-    emoji: "⭐",
+    icon: `${STORY_IC}/story-star.png`,
     category: "calma",
     free: true,
     duration: "3 min",
@@ -41,7 +46,7 @@ Tudo calmo. Tudo em paz. Tudo dormindo.`,
   {
     id: "floresta-encantada",
     title: "A Floresta que Dormia",
-    emoji: "🌲",
+    icon: `${STORY_IC}/story-tree.png`,
     category: "calma",
     free: false,
     duration: "4 min",
@@ -65,7 +70,7 @@ Tudo ficava quieto. Tudo ficava bom. Tudo ficava leve.`,
   {
     id: "nuvem-magica",
     title: "A Nuvem Mágica",
-    emoji: "☁️",
+    icon: `${STORY_IC}/story-cloud.png`,
     category: "aventura",
     free: false,
     duration: "3 min",
@@ -90,7 +95,7 @@ Devagar. Tranquilo. Protegido.`,
   {
     id: "oceano-calmo",
     title: "O Oceano Calmo",
-    emoji: "🌊",
+    icon: `${STORY_IC}/story-wave.png`,
     category: "calma",
     free: false,
     duration: "4 min",
@@ -113,7 +118,7 @@ para o sono mais gostoso e mais profundo do mundo.`,
   {
     id: "gratidao-do-dia",
     title: "Três Gratidões",
-    emoji: "💛",
+    icon: `${STORY_IC}/story-heart-gold.png`,
     category: "gratidao",
     free: true,
     duration: "2 min",
@@ -138,12 +143,12 @@ Agora respire fundo. E durma sabendo que hoje foi um bom dia.`,
   {
     id: "biblia-davi",
     title: "Davi e Golias",
-    emoji: "🦁",
+    icon: `${STORY_IC}/story-lion.png`,
     category: "biblia",
     free: false,
     duration: "5 min",
     ageRange: "5-10",
-    verse: "“Não temas, porque eu sou contigo.” — Isaías 41:10",
+    verse: "“Não temas, porque eu sou contigo.” - Isaías 41:10",
     text: `Há muito tempo, vivia um menino chamado Davi.
 Ele era pequeno, mas tinha um coração enorme e cheio de coragem.
 
@@ -161,12 +166,12 @@ E essa força sempre te acompanha, mesmo no escuro da noite.`,
   {
     id: "biblia-noe",
     title: "A Arca de Noé",
-    emoji: "🌈",
+    icon: `${STORY_IC}/story-rainbow.png`,
     category: "biblia",
     free: false,
     duration: "5 min",
     ageRange: "3-7",
-    verse: "“Porei o meu arco nas nuvens.” — Gênesis 9:13",
+    verse: "“Porei o meu arco nas nuvens.” - Gênesis 9:13",
     text: `Noé construiu um barco enorme, chamado arca.
 Para dentro entraram bichinhos de toda parte do mundo.
 Leões, coelhos, girafas, formiguinhas. Todos juntos, dois a dois.
@@ -184,12 +189,12 @@ seu quarto é a sua arca. Aqui, você está seguro.`,
   {
     id: "biblia-jesus-criancas",
     title: "Jesus e as Crianças",
-    emoji: "🤍",
+    icon: `${STORY_IC}/story-heart-soft.png`,
     category: "biblia",
     free: false,
     duration: "4 min",
     ageRange: "3-10",
-    verse: "“Deixai vir a mim as criancinhas.” — Mateus 19:14",
+    verse: "“Deixai vir a mim as criancinhas.” - Mateus 19:14",
     text: `Um dia, muitas crianças correram para ver Jesus.
 Os adultos quiseram afastar. "Ele está cansado", disseram.
 
@@ -206,12 +211,12 @@ E enquanto dorme, esse amor continua te cuidando.`,
   {
     id: "biblia-criacao",
     title: "A Criação do Mundo",
-    emoji: "🌍",
+    icon: `${STORY_IC}/story-earth.png`,
     category: "biblia",
     free: false,
     duration: "4 min",
     ageRange: "3-7",
-    verse: "“E viu Deus que era bom.” — Gênesis 1:31",
+    verse: "“E viu Deus que era bom.” - Gênesis 1:31",
     text: `No começo de tudo, só havia silêncio e escuridão.
 Então Deus disse: "Haja luz." E o sol nasceu pela primeira vez.
 
@@ -231,6 +236,8 @@ respirando junto com você, embalando seu sono.`,
 export type SleepCategory = SleepStory["category"];
 
 const IC = "/exemplos/assets/icons-3d";
+/** Ícones premium gerados para chips de som/playlist (Sonhos) */
+const SOUND_IC = "/exemplos/assets/sonhos-v2/icons";
 
 export const STORY_CATEGORIES: { id: SleepCategory; label: string; icon: string }[] = [
   { id: "calma", label: "Calmas", icon: `${IC}/moon.png` },
@@ -254,7 +261,7 @@ export interface SoundPreset {
 /* Apenas sons com URL real são reproduzíveis. Outros aparecem com badge "Em breve". */
 export const SOUND_PRESETS: SoundPreset[] = [
   { id: "rain", label: "Chuva", icon: `${IC}/rain.png`, free: true, url: "/audio/rain-soft.mp3", category: "agua" },
-  { id: "forest", label: "Floresta", icon: `${IC}/forest.png`, free: false, url: "/audio/forest-calm.mp3", category: "natureza" },
+  { id: "forest", label: "Floresta", icon: `${SOUND_IC}/sound-forest.jpg`, free: false, url: "/audio/forest-calm.mp3", category: "natureza" },
   { id: "ocean", label: "Oceano", icon: `${IC}/ocean.png`, free: false, url: "/audio/ocean-waves.mp3", category: "agua" },
   { id: "white", label: "Ruído branco", icon: `${IC}/calm.png`, free: false, url: "/audio/white-noise.mp3", category: "ambiente" },
   { id: "rain-window", label: "Chuva na janela", icon: `${IC}/rain.png`, free: false, category: "agua" },
@@ -289,7 +296,7 @@ export interface SleepPlaylist {
   spotifyId: string;
   glow: string;
   gradient: string;
-  /** Capa gerada via Hermes/Codex (gpt-image) — padrão premium da ABA SONHOS */
+  /** Capa gerada via Hermes/Codex (gpt-image) - padrão premium da ABA SONHOS */
   cover: string;
 }
 
@@ -314,7 +321,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
     spotifyId: "37i9dQZF1DX0UrRvztWcAU",
     glow: "#FFD66B",
     gradient: "from-[#3a2a1a] via-[#7a5a2a] to-[#c98a3a]",
-    cover: `${PL}/pl-teddy.png`,
+    cover: `${SOUND_IC}/pl-pequeninos.jpg`,
   },
   {
     id: "kids",
@@ -358,7 +365,7 @@ export const SLEEP_PLAYLISTS: SleepPlaylist[] = [
   },
 ];
 
-/* ── Momentos em família — perguntas noturnas ── */
+/* ── Momentos em família - perguntas noturnas ── */
 export const FAMILY_MOMENTS: { id: string; icon: string; title: string; prompt: string }[] = [
   { id: "best", icon: `${IC}/star.png`, title: "O melhor de hoje", prompt: "Qual foi o melhor momento do seu dia?" },
   { id: "brave", icon: `${IC}/shield.png`, title: "Coragem", prompt: "Hoje você foi corajoso quando…?" },

@@ -25,7 +25,7 @@ const VARIANTS = {
 } as const;
 
 /**
- * Modal viral — transforma um momento em card compartilhável (canvas → PNG).
+ * Modal viral - transforma um momento em card compartilhável (canvas → PNG).
  * Premium, com gradiente, branding sutil "kidzz.app".
  */
 const ShareMomentCard = ({ open, onClose, text, attribution, emoji = "🤍", variant = "morning" }: Props) => {
@@ -65,7 +65,7 @@ const ShareMomentCard = ({ open, onClose, text, attribution, emoji = "🤍", var
     ctx.textBaseline = "middle";
     ctx.fillText(emoji, W / 2, H * 0.28);
 
-    // Quote text — wrap manually
+    // Quote text - wrap manually
     ctx.fillStyle = palette.ink;
     ctx.font = "bold 72px Nunito, system-ui, sans-serif";
     const maxWidth = W - 200;
@@ -96,7 +96,7 @@ const ShareMomentCard = ({ open, onClose, text, attribution, emoji = "🤍", var
     if (attribution) {
       ctx.font = "500 36px Nunito, system-ui";
       ctx.fillStyle = palette.ink + "B0";
-      ctx.fillText(`— ${attribution}`, W / 2, startY + lines.length * lineHeight + 60);
+      ctx.fillText(` -  ${attribution}`, W / 2, startY + lines.length * lineHeight + 60);
     }
 
     // Branding footer

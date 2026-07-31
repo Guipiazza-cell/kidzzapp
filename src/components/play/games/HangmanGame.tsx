@@ -121,7 +121,7 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
         <p className="text-sm font-extrabold text-gray-800 leading-snug">{current.hint}</p>
       </div>
 
-      {/* Word display — fluid tiles */}
+      {/* Word display - fluid tiles */}
       <div className="flex justify-center flex-wrap" style={{ gap: "clamp(4px, 1.5vw, 8px)" }}>
         {word.split("").map((letter, i) => {
           const revealed = guessed.includes(letter);
@@ -146,7 +146,7 @@ const HangmanGame = ({ onScore, onReaction, onOpenAchievements, onHome }: Props)
         })}
       </div>
 
-      {/* Keyboard — fluid */}
+      {/* Keyboard - fluid */}
       <div
         className="flex flex-wrap justify-center mx-auto"
         style={{

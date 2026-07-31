@@ -3,7 +3,7 @@
  * ─────────────────────────────────
  * Detecta o estado da criança a partir de sinais leves (streak, XP do dia,
  * tempo desde última interação) e expõe um humor sugerido para o mascote +
- * uma fala curta. NÃO faz chamadas externas — tudo local, instantâneo.
+ * uma fala curta. NÃO faz chamadas externas - tudo local, instantâneo.
  *
  * Sinais usados:
  *  - streak (profile.streak_days) → orgulhoso quando >= 3

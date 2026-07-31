@@ -1,5 +1,5 @@
 /**
- * KIDZZ — Curadoria editorial de filmes em família.
+ * KIDZZ - Curadoria editorial de filmes em família.
  * Movies are static, but featured rotation is fully automatic (see featuredRotation.ts).
  */
 
@@ -40,7 +40,7 @@ export type EditorialSection = {
 };
 
 /* ====================================================================== */
-/* CURADORIA — descrições emocionais reais, escritas para os pais         */
+/* CURADORIA - descrições emocionais reais, escritas para os pais         */
 /* ====================================================================== */
 
 export const MOVIES: Movie[] = [
@@ -113,7 +113,7 @@ export const MOVIES: Movie[] = [
     id: "polar-express",
     titulo: "O Expresso Polar",
     tituloOriginal: "The Polar Express",
-    descricao: "Uma viagem mágica sobre acreditar — mesmo quando ninguém mais acredita.",
+    descricao: "Uma viagem mágica sobre acreditar - mesmo quando ninguém mais acredita.",
     motivoRecomendacao: "Noites frias, cobertor e chocolate quente: ritual de inverno em família.",
     faixaEtaria: "5-7",
     categoria: "acolhimento",
@@ -134,7 +134,7 @@ export const MOVIES: Movie[] = [
   {
     id: "wall-e",
     titulo: "Wall-E",
-    descricao: "Um pequeno robô apaixonado pela vida — e pelo cuidado.",
+    descricao: "Um pequeno robô apaixonado pela vida - e pelo cuidado.",
     motivoRecomendacao: "Para conversar sobre o planeta com gentileza e esperança.",
     faixaEtaria: "5-7",
     categoria: "acolhimento",
@@ -155,7 +155,7 @@ export const MOVIES: Movie[] = [
   {
     id: "encanto",
     titulo: "Encanto",
-    descricao: "Uma celebração da família — com toda sua magia e suas dores.",
+    descricao: "Uma celebração da família - com toda sua magia e suas dores.",
     motivoRecomendacao: "Para falar de pertencimento, talentos e o lugar de cada um.",
     faixaEtaria: "5-7",
     categoria: "emocional",
@@ -197,7 +197,7 @@ export const MOVIES: Movie[] = [
   {
     id: "peter-pan",
     titulo: "Peter Pan",
-    descricao: "A infância como um lugar — e a coragem de carregá-la dentro de si.",
+    descricao: "A infância como um lugar - e a coragem de carregá-la dentro de si.",
     motivoRecomendacao: "Para sonhar, voar e lembrar que crescer é só uma das opções.",
     faixaEtaria: "5-7",
     categoria: "aventura",
@@ -219,7 +219,7 @@ export const MOVIES: Movie[] = [
     id: "bernardo-bianca",
     titulo: "Bernardo e Bianca",
     descricao: "Um resgate movido por coragem pequena e coração grande.",
-    motivoRecomendacao: "Para celebrar quem cuida — mesmo sendo o menor da história.",
+    motivoRecomendacao: "Para celebrar quem cuida - mesmo sendo o menor da história.",
     faixaEtaria: "5-7",
     categoria: "acolhimento",
     idioma: "pt",
@@ -239,7 +239,7 @@ export const MOVIES: Movie[] = [
   {
     id: "bolt",
     titulo: "Bolt",
-    descricao: "Um cãozinho que descobre o mundo — e o que é amor de verdade.",
+    descricao: "Um cãozinho que descobre o mundo - e o que é amor de verdade.",
     motivoRecomendacao: "Sessão leve para fechar a semana com calma.",
     faixaEtaria: "5-7",
     categoria: "acolhimento",
@@ -286,7 +286,7 @@ export const MOVIES: Movie[] = [
     titulo: "Red: Crescer é Uma Fera",
     tituloOriginal: "Turning Red",
     descricao: "Um retrato sensível sobre crescer, sentir tudo de uma vez e aprender a aceitar.",
-    motivoRecomendacao: "Para conversas sobre emoções intensas — sem julgamento.",
+    motivoRecomendacao: "Para conversas sobre emoções intensas - sem julgamento.",
     faixaEtaria: "8-10",
     categoria: "emocional",
     idioma: "pt",
@@ -329,7 +329,7 @@ export const MOVIES: Movie[] = [
     id: "nemo",
     titulo: "Procurando Nemo",
     descricao: "O amor de um pai que atravessa o oceano inteiro.",
-    motivoRecomendacao: "Sobre confiar — e deixar crescer.",
+    motivoRecomendacao: "Sobre confiar - e deixar crescer.",
     faixaEtaria: "5-7",
     categoria: "emocional",
     idioma: "pt",
@@ -350,7 +350,7 @@ export const MOVIES: Movie[] = [
     id: "divertidamente",
     titulo: "Divertidamente",
     tituloOriginal: "Inside Out",
-    descricao: "Um mergulho dentro do coração — onde toda emoção tem seu lugar.",
+    descricao: "Um mergulho dentro do coração - onde toda emoção tem seu lugar.",
     motivoRecomendacao: "Ferramenta delicada para conversar sobre sentimentos.",
     faixaEtaria: "5-7",
     categoria: "emocional",
@@ -372,7 +372,7 @@ export const MOVIES: Movie[] = [
     id: "toy-story",
     titulo: "Toy Story",
     descricao: "A amizade que cabe num quarto e dura uma infância inteira.",
-    motivoRecomendacao: "Para os primeiros amigos — e para os pais que se lembram dos seus.",
+    motivoRecomendacao: "Para os primeiros amigos - e para os pais que se lembram dos seus.",
     faixaEtaria: "5-7",
     categoria: "divertido",
     idioma: "pt",
@@ -392,8 +392,8 @@ export const MOVIES: Movie[] = [
   {
     id: "lilo-stitch",
     titulo: "Lilo & Stitch",
-    descricao: "Ohana significa família — e família significa nunca abandonar.",
-    motivoRecomendacao: "Sobre famílias diferentes — e o que as torna inteiras.",
+    descricao: "Ohana significa família - e família significa nunca abandonar.",
+    motivoRecomendacao: "Sobre famílias diferentes - e o que as torna inteiras.",
     faixaEtaria: "5-7",
     categoria: "emocional",
     idioma: "pt",
@@ -414,7 +414,7 @@ export const MOVIES: Movie[] = [
     id: "familia-futuro",
     titulo: "A Família do Futuro",
     tituloOriginal: "Meet the Robinsons",
-    descricao: "Onde quer que você esteja — sua família te encontra.",
+    descricao: "Onde quer que você esteja - sua família te encontra.",
     motivoRecomendacao: "Para crianças adotadas, famílias atípicas e quem pertence pelo coração.",
     faixaEtaria: "5-7",
     categoria: "emocional",
@@ -436,7 +436,7 @@ export const MOVIES: Movie[] = [
     id: "marley",
     titulo: "Marley e Eu",
     descricao: "Um cachorro travesso e a família que aprendeu o que é amor incondicional.",
-    motivoRecomendacao: "Conversa difícil sobre a passagem — feita com ternura.",
+    motivoRecomendacao: "Conversa difícil sobre a passagem - feita com ternura.",
     faixaEtaria: "8-10",
     categoria: "emocional",
     idioma: "pt",
@@ -522,7 +522,7 @@ export const MOVIES: Movie[] = [
     id: "alice",
     titulo: "Alice no País das Maravilhas",
     descricao: "Quando a curiosidade é maior do que o medo, qualquer porta serve.",
-    motivoRecomendacao: "Para imaginar — sem precisar de regras.",
+    motivoRecomendacao: "Para imaginar - sem precisar de regras.",
     faixaEtaria: "5-7",
     categoria: "criativo",
     idioma: "pt",
@@ -566,7 +566,7 @@ export const MOVIES: Movie[] = [
     titulo: "Enrolados",
     tituloOriginal: "Tangled",
     descricao: "Uma torre, um sonho e a coragem de finalmente sair.",
-    motivoRecomendacao: "Sobre escolher seu próprio caminho — com arte e luz.",
+    motivoRecomendacao: "Sobre escolher seu próprio caminho - com arte e luz.",
     faixaEtaria: "5-7",
     categoria: "aventura",
     idioma: "pt",
@@ -607,7 +607,7 @@ export const MOVIES: Movie[] = [
   {
     id: "pequenos-espioes",
     titulo: "Pequenos Espiões",
-    descricao: "Quando a missão é salvar o mundo — e os pais.",
+    descricao: "Quando a missão é salvar o mundo - e os pais.",
     motivoRecomendacao: "Aventura cheia de gadgets para quem ama mistério.",
     faixaEtaria: "8-10",
     categoria: "aventura",
@@ -649,7 +649,7 @@ export const MOVIES: Movie[] = [
     id: "horton",
     titulo: "Horton e o Mundo dos Quem",
     descricao: "Um elefante delicado prova que toda voz importa.",
-    motivoRecomendacao: "Sobre escutar com cuidado — mesmo o que parece pequeno.",
+    motivoRecomendacao: "Sobre escutar com cuidado - mesmo o que parece pequeno.",
     faixaEtaria: "2-4",
     categoria: "criativo",
     idioma: "pt",
@@ -669,7 +669,7 @@ export const MOVIES: Movie[] = [
     id: "wish",
     titulo: "Wish: O Poder dos Desejos",
     descricao: "Um pedido sincero pode acender uma estrela.",
-    motivoRecomendacao: "Para celebrar sonhos — e o coração que ousa sonhar.",
+    motivoRecomendacao: "Para celebrar sonhos - e o coração que ousa sonhar.",
     faixaEtaria: "5-7",
     categoria: "criativo",
     idioma: "pt",
@@ -752,7 +752,7 @@ export const MOVIES: Movie[] = [
     id: "malvado",
     titulo: "Meu Malvado Favorito",
     descricao: "Um vilão e três meninas: a fórmula imbatível do coração derretendo.",
-    motivoRecomendacao: "Sobre paternidade improvável — e amor que aparece de surpresa.",
+    motivoRecomendacao: "Sobre paternidade improvável - e amor que aparece de surpresa.",
     faixaEtaria: "5-7",
     categoria: "divertido",
     idioma: "pt",
@@ -771,7 +771,7 @@ export const MOVIES: Movie[] = [
   {
     id: "hamburguer",
     titulo: "Tá Chovendo Hambúrguer",
-    descricao: "Quando o jantar cai do céu — e a imaginação não para mais.",
+    descricao: "Quando o jantar cai do céu - e a imaginação não para mais.",
     motivoRecomendacao: "Sessão criativa que abre a fome (e a conversa).",
     faixaEtaria: "5-7",
     categoria: "divertido",
@@ -792,7 +792,7 @@ export const MOVIES: Movie[] = [
     id: "chefinho",
     titulo: "O Poderoso Chefinho",
     descricao: "Um bebê de terno e uma rivalidade fraternal pra lá de criativa.",
-    motivoRecomendacao: "Sobre irmãos — com humor e carinho.",
+    motivoRecomendacao: "Sobre irmãos - com humor e carinho.",
     faixaEtaria: "5-7",
     categoria: "divertido",
     idioma: "pt",
@@ -812,7 +812,7 @@ export const MOVIES: Movie[] = [
     id: "carros",
     titulo: "Carros",
     descricao: "Numa estrada pequena, descobre-se o que realmente importa.",
-    motivoRecomendacao: "Para quem ama velocidade — e amizade verdadeira.",
+    motivoRecomendacao: "Para quem ama velocidade - e amizade verdadeira.",
     faixaEtaria: "5-7",
     categoria: "divertido",
     idioma: "pt",
@@ -852,7 +852,7 @@ export const MOVIES: Movie[] = [
   {
     id: "leo",
     titulo: "Leo",
-    descricao: "Um lagarto sábio que ensina sobre vida — e despedidas.",
+    descricao: "Um lagarto sábio que ensina sobre vida - e despedidas.",
     motivoRecomendacao: "Mistura de humor e ternura para fim de tarde.",
     faixaEtaria: "8-10",
     categoria: "emocional",
@@ -873,8 +873,8 @@ export const MOVIES: Movie[] = [
   {
     id: "stuart-little",
     titulo: "Stuart Little",
-    descricao: "O menor membro da família — com o maior dos corações.",
-    motivoRecomendacao: "Para conversar sobre pertencer — em qualquer tamanho.",
+    descricao: "O menor membro da família - com o maior dos corações.",
+    motivoRecomendacao: "Para conversar sobre pertencer - em qualquer tamanho.",
     faixaEtaria: "5-7",
     categoria: "emocional",
     idioma: "pt",
@@ -920,9 +920,9 @@ export const EDITORIAL_SECTIONS: EditorialSection[] = [
   },
   {
     id: "divertidos",
-    title: "Sessão divertida",
+    title: "Divertidos",
     icon: "😂",
-    subtitle: "Quando o riso solta o dia",
+    subtitle: "",
     movieIds: ["sing", "madagascar", "minions", "malvado", "hamburguer", "chefinho", "carros", "pets", "leo", "stuart-little"],
   },
 ];

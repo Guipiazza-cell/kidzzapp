@@ -11,7 +11,7 @@ interface Props {
 }
 
 /**
- * OnboardingWelcome — final emotional screen of the onboarding flow.
+ * OnboardingWelcome - final emotional screen of the onboarding flow.
  * "Entering the KIDZZ universe": bursts of confetti-particles,
  * mascot celebrating, soft chime, and a glowing CTA.
  */

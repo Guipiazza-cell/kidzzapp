@@ -1,5 +1,5 @@
 /**
- * useAudioPlayer — HTML5 Audio controlado por hook.
+ * useAudioPlayer - HTML5 Audio controlado por hook.
  * Padrão único para tocar arquivos .mp3 em /public/audios/.
  *
  * Regras de ouro:

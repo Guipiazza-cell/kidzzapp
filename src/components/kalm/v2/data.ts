@@ -1,5 +1,5 @@
 /**
- * KALM v2 — catálogo único de dados (atividades, motores, jornadas, slots).
+ * KALM v2 - catálogo único de dados (atividades, motores, jornadas, slots).
  * Todos os textos são EXATOS do brief.
  */
 
@@ -352,7 +352,7 @@ const PARENTS: Activity[] = [
   },
 ];
 
-// ─── Nutrir (alimentação/hidratação consciente — SEM linguagem de dieta) ─────
+// ─── Nutrir (alimentação/hidratação consciente - SEM linguagem de dieta) ─────
 // Foco em variedade, cor, energia e prazer de comer junto. Nunca peso/calorias.
 const NUTRIR: Activity[] = [
   { id: "agua-familia", audience: "kid",
@@ -521,7 +521,7 @@ export const BADGES: Badge[] = [
     gradient: "linear-gradient(135deg,#7CD3F2,#3FA89B)", condition: "3-day-streak" },
 ];
 
-// ── Slots nomeados (vazios — usuário pluga depois) ──────────
+// ── Slots nomeados (vazios - usuário pluga depois) ──────────
 export const SLOTS = {
   imgChamMeditando: "",
   fotoFamilia: "",

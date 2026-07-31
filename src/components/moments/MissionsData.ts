@@ -22,7 +22,7 @@ export const MISSIONS: Mission[] = [
     name: "Caça às Emoções",
     description: "Descubra juntos os sentimentos escondidos no dia a dia.",
     time: "10 min",
-    ageRange: "3–8 anos",
+    ageRange: "3-8 anos",
     level: "Fácil",
     materials: ["Papel", "Lápis de cor", "Espelho"],
     steps: [
@@ -48,7 +48,7 @@ export const MISSIONS: Mission[] = [
     name: "Construtor de Mundos",
     description: "Criem juntos um planeta imaginário em 10 minutos.",
     time: "10 min",
-    ageRange: "4–8 anos",
+    ageRange: "4-8 anos",
     level: "Fácil",
     materials: ["Folha grande", "Giz de cera", "Imaginação"],
     steps: [
@@ -74,7 +74,7 @@ export const MISSIONS: Mission[] = [
     name: "Chef Maluco",
     description: "Uma receita inventada que vai virar tradição da família.",
     time: "15 min",
-    ageRange: "3–7 anos",
+    ageRange: "3-7 anos",
     level: "Fácil",
     materials: ["Frutas ou biscoitos", "Prato", "Criatividade"],
     steps: [
@@ -99,7 +99,7 @@ export const MISSIONS: Mission[] = [
     name: "Detetive de Sons",
     description: "Fechem os olhos e descubram o mundo só ouvindo.",
     time: "8 min",
-    ageRange: "3–6 anos",
+    ageRange: "3-6 anos",
     level: "Fácil",
     materials: ["Nenhum material"],
     steps: [
@@ -124,7 +124,7 @@ export const MISSIONS: Mission[] = [
     name: "Máquina do Tempo",
     description: "Viagem no tempo: conte algo de quando você era criança.",
     time: "10 min",
-    ageRange: "4–8 anos",
+    ageRange: "4-8 anos",
     level: "Fácil",
     materials: ["Fotos antigas (opcional)", "Imaginação"],
     steps: [
@@ -149,7 +149,7 @@ export const MISSIONS: Mission[] = [
     name: "Super-Herói Secreto",
     description: "Crie um super-herói baseado nas qualidades do seu filho.",
     time: "12 min",
-    ageRange: "4–8 anos",
+    ageRange: "4-8 anos",
     level: "Médio",
     materials: ["Papel", "Lápis", "Capa improvisada (toalha)"],
     steps: [

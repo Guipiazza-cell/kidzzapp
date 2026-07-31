@@ -1,7 +1,7 @@
-/* ── KIDZZ — Sessão Sonhos (premium v2)
+/* ── KIDZZ - Sessão Sonhos (premium v2)
    Referência: public/telas/ABA SONHOS/*
    Assets: public/exemplos/assets/sonhos-v2/* (gerados Hermes/Codex gpt-image)
-   Pessoas/família — sem lagarto nos assets novos.
+   Pessoas/família - sem lagarto nos assets novos.
    Lógica real preservada (sons, histórias, timer, playlists, paywall).
 */
 import {
@@ -24,7 +24,8 @@ import {
 import PreSleep from "./PreSleep";
 import { haptic } from "@/lib/haptics";
 import PremiumSeal from "@/components/common/PremiumSeal";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import { CAMALEAO } from "@/lib/camaleaoOficial";
+import heroSonhos from "@/assets/sonhos-hero.webp";
 
 /* Spring premium reusável para microinterações */
 const tapSpring = { type: "spring" as const, stiffness: 420, damping: 28, mass: 0.6 };
@@ -35,16 +36,12 @@ const DREAM_BG =
   "linear-gradient(180deg,#2B1A4A 0%,#1E1238 36%,#160C2A 68%,#1A0E28 100%)";
 
 const ASSETS = {
-  /** Camaleão original sleepy (sem retângulo) */
-  hero: CAMALEAO.sleepySoft,
-  heroFallback: CAMALEAO.sleepy,
-  featHeart: "/exemplos/assets/sonhos-v2/feat-heart.png",
-  featStar: "/exemplos/assets/sonhos-v2/feat-star.png",
-  featMoon: "/exemplos/assets/sonhos-v2/feat-moon.png",
-  featPhoto: "/exemplos/assets/sonhos-v2/feat-photo.png",
+  /** Hero full-bleed: Gui sleepy + noite (object-fit cover, como outras abas) */
+  hero: heroSonhos,
+  heroPublic: "/exemplos/assets/sonhos-v2/hero-oficial.jpg",
+  heroFallback: CAMALEAO.sleepySoft,
   kids: "/exemplos/assets/sonhos-v2/kids-gratitude.png",
 } as const;
-const HERO_IMG = ASSETS.hero;
 
 /* Liquid glass roxo (nível Bora, paleta noite) */
 const glassCard: CSSProperties = {
@@ -79,7 +76,7 @@ const goldCta: CSSProperties = {
   cursor: "pointer",
 };
 
-/* Botão de ícone "gloss" (brilho radial) — helper do design */
+/* Botão de ícone "gloss" (brilho radial) - helper do design */
 const gloss = (
   light: string, mid: string, deep: string, size = 40, radius = 13,
 ): CSSProperties => ({
@@ -384,7 +381,18 @@ const DreamWorld = ({ onBack }: Props) => {
             ← Voltar
           </button>
           <div className="text-center mb-6 space-y-2">
-            <span className="text-5xl">{story.emoji}</span>
+            <img
+              src={story.icon}
+              alt=""
+              width={72}
+              height={72}
+              style={{
+                width: 72, height: 72, borderRadius: 22, objectFit: "cover",
+                display: "block", margin: "0 auto 4px",
+                boxShadow: "0 10px 24px rgba(20,8,40,.4)",
+                border: "1px solid rgba(220,190,255,.28)",
+              }}
+            />
             <h1 className="text-2xl" style={{ fontFamily: "'Lora',serif", fontWeight: 600, color: "#F6EEFC", textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
               {story.title}
             </h1>
@@ -532,52 +540,57 @@ const DreamWorld = ({ onBack }: Props) => {
       <DreamBackdrop sleepy={sleepyMode} />
 
       <div className="relative z-10">
-        {/* ── HERO ── */}
-        <div style={{ position: "relative" }}>
-          {/* fundo desfocado da mesma cena */}
+        {/* ── HERO tela toda: borda a borda, base esmaecida (sem corte quadrado) ── */}
+        <div style={{ position: "relative", width: "100%", animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both" }}>
+          {/* Arte full-bleed; máscara dissolve o fim da imagem no fundo da aba */}
           <div
+            aria-hidden
             style={{
-              position: "absolute", top: 0, left: 0, width: "100%", height: 414,
-              backgroundImage: `url('${HERO_IMG}')`, backgroundSize: "cover", backgroundPosition: "center",
-              filter: "blur(46px) saturate(1.45)", opacity: 0.5, transform: "scale(1.22)", pointerEvents: "none",
-            }}
-          />
-          <div
-            style={{
-              position: "relative", width: "100%", height: 414, willChange: "transform",
-              ...CAMALEAO_SCENE_MASK,
-              animation: "sonh-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+              position: "relative",
+              width: "100%",
+              height: 400,
+              overflow: "hidden",
+              WebkitMaskImage:
+                "linear-gradient(180deg, #000 0%, #000 58%, rgba(0,0,0,.72) 72%, rgba(0,0,0,.28) 86%, transparent 100%)",
+              maskImage:
+                "linear-gradient(180deg, #000 0%, #000 58%, rgba(0,0,0,.72) 72%, rgba(0,0,0,.28) 86%, transparent 100%)",
             }}
           >
             <img
-              src={HERO_IMG}
+              src={ASSETS.hero}
               alt="Gui, o camaleão, pronto para dormir"
+              draggable={false}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = ASSETS.heroFallback;
+                const el = e.target as HTMLImageElement;
+                if (!el.src.includes("hero-oficial")) el.src = ASSETS.heroPublic;
+                else el.src = ASSETS.heroFallback;
               }}
               style={{
-                position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-                objectFit: "contain", objectPosition: "center 28%",
-                animation: "sonh-floaty 7s ease-in-out infinite",
-                filter: "drop-shadow(0 18px 24px rgba(20,10,40,.35))",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute", top: 30, right: 40, width: 110, height: 110, borderRadius: "50%",
-                background: "radial-gradient(circle,rgba(255,178,90,.55) 0%,rgba(240,129,46,.3) 55%,rgba(230,110,50,0) 72%)",
-                filter: "blur(3px)", animation: "sonh-sunglow 6s ease-in-out infinite", mixBlendMode: "screen",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-                background: "linear-gradient(180deg,rgba(46,28,76,.18) 0%,rgba(46,28,76,0) 34%,rgba(46,28,76,.5) 78%,rgba(36,22,64,.94) 100%)",
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "50% 22%",
               }}
             />
           </div>
+          {/* Véu suave no fim (mesma cor do fundo) para o texto não “bater” na borda da arte */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 160,
+              pointerEvents: "none",
+              background:
+                "linear-gradient(180deg, transparent 0%, rgba(30,18,56,.35) 40%, rgba(30,18,56,.78) 72%, #1E1238 100%)",
+            }}
+          />
 
-          {/* Header padrão: voltar · Sonhos · troféu · modo soninho (lua, não sol) */}
+          {/* Header sobre a arte */}
           <div
             style={{
               position: "absolute",
@@ -638,10 +651,19 @@ const DreamWorld = ({ onBack }: Props) => {
             </motion.button>
           </div>
 
-          {/* título */}
-          <div style={{ padding: "2px 24px", textAlign: "center", position: "relative", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both" }}>
+          {/* Título na zona esmaecida - sem “corte” da imagem atrás do texto */}
+          <div
+            style={{
+              position: "relative",
+              zIndex: 3,
+              marginTop: -72,
+              padding: "0 24px 4px",
+              textAlign: "center",
+              animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .06s both",
+            }}
+          >
             <h1 style={{ margin: "0 auto 9px", fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 28, lineHeight: 1.18, color: "#F6EEFC", letterSpacing: "-.35px", maxWidth: 300, textShadow: "0 2px 18px rgba(0,0,0,.45)" }}>
-              Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia.
+              Uma nova forma de <span style={{ color: "#FFC98A" }}>terminar</span> o dia
             </h1>
             <p style={{ margin: "0 auto", fontSize: 13, fontWeight: 700, lineHeight: 1.5, color: "rgba(224,210,242,.84)", maxWidth: 280 }}>
               Histórias, sons e momentos para acalmar e conectar a família antes de dormir.
@@ -672,45 +694,6 @@ const DreamWorld = ({ onBack }: Props) => {
           )}
         </div>
 
-        {/* ── Benefícios (ícones 3D gerados) ── */}
-        <div
-          style={{
-            margin: "18px 16px 0",
-            padding: "16px 12px 14px",
-            borderRadius: 24,
-            ...glassCard,
-            animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .16s both",
-          }}
-        >
-          <div style={{ textAlign: "center", marginBottom: 12 }}>
-            <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#F6EEFC" }}>
-              Noites mágicas que transformam dias!
-            </div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            {[
-              { img: ASSETS.featHeart, t: "Mais conexão", d: "Momentos de qualidade em família." },
-              { img: ASSETS.featStar, t: "Mais tranquilidade", d: "Sons e histórias que acalmam." },
-              { img: ASSETS.featMoon, t: "Melhores sonhos", d: "Rotinas leves e descansadas." },
-              { img: ASSETS.featPhoto, t: "Memórias que ficam", d: "Pequenos momentos para sempre." },
-            ].map((f) => (
-              <div key={f.t} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, textAlign: "center", padding: "6px 4px" }}>
-                <img
-                  src={f.img}
-                  alt=""
-                  style={{
-                    width: 56, height: 56, borderRadius: 16, objectFit: "cover",
-                    boxShadow: "0 8px 18px rgba(20,8,40,.35), 0 1px 0 rgba(255,255,255,.25) inset",
-                    border: "0.5px solid rgba(255,230,255,.28)",
-                  }}
-                />
-                <div style={{ fontSize: 12, fontWeight: 900, color: "#F3ECFA", lineHeight: 1.15 }}>{f.t}</div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(220,206,240,.62)", lineHeight: 1.25 }}>{f.d}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* ── AÇÕES DA NOITE ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, padding: "14px 16px 0", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .2s both" }}>
           <motion.button
@@ -722,7 +705,7 @@ const DreamWorld = ({ onBack }: Props) => {
               <Eyebrow d={P.wind} color="#fff" size={19} sw={1.8} />
             </div>
             <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#F3ECFA", lineHeight: 1.15 }}>Respiração noturna</div>
-            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Inspira… segura… solta.</div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Inspira… segura… solta</div>
           </motion.button>
           <motion.button
             onClick={() => {
@@ -737,7 +720,7 @@ const DreamWorld = ({ onBack }: Props) => {
               <Eyebrow d={P.heart} color="#fff" size={19} sw={1.8} />
             </div>
             <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14.5, color: "#F3ECFA", lineHeight: 1.15 }}>Momento em família</div>
-            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Uma pergunta para a noite.</div>
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.7)" }}>Uma pergunta para a noite</div>
           </motion.button>
         </div>
 
@@ -835,7 +818,20 @@ const DreamWorld = ({ onBack }: Props) => {
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "1.2px", color: "#A9C4A0", marginBottom: 7 }}>SOM IDEAL</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <img src={sound.icon} alt="" width={22} height={22} style={{ width: 22, height: 22, borderRadius: 8, objectFit: "cover" }} />
+                      <img
+                        src={sound.icon}
+                        alt=""
+                        width={28}
+                        height={28}
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 10,
+                          objectFit: "cover",
+                          boxShadow: "0 4px 10px rgba(0,0,0,.28)",
+                          flex: "none",
+                        }}
+                      />
                       <span style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14, color: "#F3ECFA" }}>{sound.label}</span>
                     </div>
                   </motion.button>
@@ -854,7 +850,20 @@ const DreamWorld = ({ onBack }: Props) => {
                   >
                     <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "1.2px", color: "#A9B6E8", marginBottom: 7 }}>PLAYLIST DA NOITE</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                      <img src={playlist.cover} alt="" width={22} height={22} style={{ width: 22, height: 22, borderRadius: 8, objectFit: "cover" }} />
+                      <img
+                        src={playlist.cover}
+                        alt=""
+                        width={28}
+                        height={28}
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 10,
+                          objectFit: "cover",
+                          boxShadow: "0 4px 10px rgba(0,0,0,.28)",
+                          flex: "none",
+                        }}
+                      />
                       <span style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 14, color: "#F3ECFA", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{playlist.title}</span>
                     </div>
                   </motion.button>
@@ -889,7 +898,7 @@ const DreamWorld = ({ onBack }: Props) => {
             eyebrow="TIMER DO SONINHO"
             color="#FFC98A"
             title="A lua diminui devagar"
-            subtitle="Escolha quanto dura sua noite."
+            subtitle="Escolha quanto dura sua noite"
           />
           <div style={{ display: "flex", gap: 9, overflowX: "auto", padding: "2px 16px 14px" }} className="scrollbar-none">
             {TIMER_OPTIONS.map((opt) => {
@@ -922,7 +931,7 @@ const DreamWorld = ({ onBack }: Props) => {
             eyebrow="SONS DA NOITE"
             color="#8AD0B0"
             title="Paisagens sonoras"
-            subtitle="Toque para embalar o sono."
+            subtitle="Toque para embalar o sono"
           />
           {audioError && (
             <div style={{ margin: "0 16px 10px", borderRadius: 12, padding: "8px 12px", textAlign: "center", background: "rgba(127,29,29,0.25)", border: "1px solid rgba(248,113,113,0.28)" }}>
@@ -1013,7 +1022,7 @@ const DreamWorld = ({ onBack }: Props) => {
             icon={<Eyebrow d={P.book} color="#C9A8F0" />}
             eyebrow="HISTÓRIAS QUE ABRAÇAM"
             color="#C9A8F0"
-            title="Calma para dormir. Memórias para a vida."
+            title="Calma para dormir · Memórias para a vida"
           />
           {/* Categorias */}
           <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "0 16px 12px" }} className="scrollbar-none">
@@ -1065,13 +1074,18 @@ const DreamWorld = ({ onBack }: Props) => {
                 >
                   <div
                     style={{
-                      width: 46, height: 46, borderRadius: 14, display: "flex", alignItems: "center",
-                      justifyContent: "center", fontSize: 24, flex: "none",
-                      background: "rgba(255,255,255,.08)", border: "1px solid rgba(200,175,245,.24)",
-                      boxShadow: isSelected ? "0 0 14px rgba(180,140,255,.3)" : "0 0 12px rgba(255,201,138,.1)",
+                      width: 46, height: 46, borderRadius: 14, flex: "none", overflow: "hidden",
+                      background: "rgba(255,255,255,.06)", border: "1px solid rgba(200,175,245,.28)",
+                      boxShadow: isSelected ? "0 0 14px rgba(180,140,255,.3)" : "0 6px 14px rgba(20,8,40,.28)",
                     }}
                   >
-                    {story.emoji}
+                    <img
+                      src={story.icon}
+                      alt=""
+                      width={46}
+                      height={46}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: "'Lora',serif", fontWeight: 600, fontSize: 15, color: "#F6EEFC", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{story.title}</div>
@@ -1107,7 +1121,7 @@ const DreamWorld = ({ onBack }: Props) => {
             eyebrow="PLAYLISTS CALMARIA"
             color="#C9A8F0"
             title="Trilhas para cada idade"
-            subtitle="Atualizadas automaticamente pelo Spotify."
+            subtitle="Atualizadas automaticamente pelo Spotify"
           />
           <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 8px", scrollSnapType: "x mandatory" }} className="scrollbar-none">
             {SLEEP_PLAYLISTS.map((pl) => {
@@ -1207,7 +1221,7 @@ const DreamWorld = ({ onBack }: Props) => {
             icon={<Eyebrow d={P.heart} color="#F0B8D0" />}
             eyebrow="MOMENTOS EM FAMÍLIA"
             color="#F0B8D0"
-            title="Menos correria. Mais presença."
+            title="Menos correria · Mais presença"
           />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, padding: "0 16px" }}>
             {FAMILY_MOMENTS.map((m) => (

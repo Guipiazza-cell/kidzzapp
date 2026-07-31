@@ -1,5 +1,5 @@
 /**
- * KIDZZ — Sistema de rotação automática editorial.
+ * KIDZZ - Sistema de rotação automática editorial.
  * Funciona sozinho a longo prazo. Sem necessidade de alterar código.
  *
  * Regras:
@@ -10,7 +10,7 @@
 import { MOVIES, type Movie } from "@/data/movies";
 
 const MS_PER_DAY = 86_400_000;
-// Epoch: 2024-01-01 (segunda-feira) — base estável para semanas.
+// Epoch: 2024-01-01 (segunda-feira) - base estável para semanas.
 const EPOCH_MS = Date.UTC(2024, 0, 1);
 
 const dayIndex = (now = Date.now()) =>
@@ -26,7 +26,7 @@ export const getWeeklyMovie = (now = Date.now()): Movie => {
   return pool[weekIndex(now) % pool.length];
 };
 
-/* Top 3 do dia — ignora o filme da semana p/ não duplicar */
+/* Top 3 do dia - ignora o filme da semana p/ não duplicar */
 export const getDailyHighlights = (count = 3, now = Date.now()): Movie[] => {
   const weekly = getWeeklyMovie(now);
   const pool = MOVIES.filter((m) => m.id !== weekly.id);
@@ -36,7 +36,7 @@ export const getDailyHighlights = (count = 3, now = Date.now()): Movie[] => {
   return out;
 };
 
-/* "Novo na curadoria" — combina flags `novo` + rotação leve */
+/* "Novo na curadoria" - combina flags `novo` + rotação leve */
 export const getNewArrivals = (now = Date.now()): Movie[] => {
   const novos = MOVIES.filter((m) => m.novo);
   if (novos.length === 0) return [];

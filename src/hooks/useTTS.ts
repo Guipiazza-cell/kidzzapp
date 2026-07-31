@@ -3,15 +3,15 @@ import { loadVoices, pickFemaleVoice, SOFT_RATE, SOFT_PITCH, SOFT_VOLUME } from 
 import { cleanNarrationText, chunkText, fetchElevenChunk } from "@/lib/elevenTTS";
 
 /**
- * useTTS — Narração premium via ElevenLabs (voz Amanda, pt-BR).
+ * useTTS - Narração premium via ElevenLabs (voz Amanda, pt-BR).
  *
  * Fluxo:
  *  1. Tenta ElevenLabs (voz Amanda) via edge `elevenlabs-tts`.
  *  2. Se falhar (sem crédito/quota/offline), cai no fallback Web Speech
- *     (voz feminina do navegador) — narração nunca quebra o fluxo.
+ *     (voz feminina do navegador) - narração nunca quebra o fluxo.
  *
- * Interface estável `{ speak, stop }` — todos os consumidores continuam iguais.
- * `speak(text, { rate, pitch })` — rate/pitch só afetam o fallback Web Speech.
+ * Interface estável `{ speak, stop }` - todos os consumidores continuam iguais.
+ * `speak(text, { rate, pitch })` - rate/pitch só afetam o fallback Web Speech.
  * `stop()` cancela a fala em qualquer ponto.
  */
 export const useTTS = () => {

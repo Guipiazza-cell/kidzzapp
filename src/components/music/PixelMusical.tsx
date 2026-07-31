@@ -78,7 +78,7 @@ const PixelMusical = ({ mood = "idle", size = "lg", onTap }: Props) => {
         />
         <circle cx="139" cy="74" r="1.5" fill="white" />
 
-        {/* Mouth — sings (open O) when singing */}
+        {/* Mouth - sings (open O) when singing */}
         {mood === "sing" ? (
           <motion.ellipse cx="148" cy="92" rx="6" ry="8" fill="hsl(340 70% 35%)"
             animate={{ ry: [8, 5, 8] }} transition={{ duration: 0.4, repeat: Infinity }} />

@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { lazy, Suspense, useLayoutEffect } from "react";
 
+const LandingPremium = lazy(() => import("./pages/LandingPremium"));
 const LandingQuiz = lazy(() => import("./pages/LandingQuiz"));
 const MainApp = lazy(() => import("./MainApp"));
 
@@ -28,11 +29,16 @@ const ScrollToTop = () => {
 
 const AppShell = () => {
   const { pathname } = useLocation();
-  const isLandingQuiz = pathname === "/lp";
 
   return (
     <Suspense fallback={null}>
-      {isLandingQuiz ? <LandingQuiz /> : <MainApp />}
+      {pathname === "/lp" ? (
+        <LandingPremium />
+      ) : pathname === "/lp-quiz" ? (
+        <LandingQuiz />
+      ) : (
+        <MainApp />
+      )}
     </Suspense>
   );
 };

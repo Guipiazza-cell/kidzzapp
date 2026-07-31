@@ -10,7 +10,7 @@ interface Props {
 }
 
 /**
- * Card premium de Ritual da Família — aparece no Home conforme a hora.
+ * Card premium de Ritual da Família - aparece no Home conforme a hora.
  * Glossy, com glow respirando e ícone que pulsa suave.
  */
 const RitualCard = ({ onOpen }: Props) => {

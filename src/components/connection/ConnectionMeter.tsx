@@ -4,7 +4,7 @@ import { Flame, Sparkles } from "lucide-react";
 import { getConnection, connectionLabel } from "@/lib/connection";
 
 /**
- * Termômetro de Conexão Familiar — orb vivo com score 0-100.
+ * Termômetro de Conexão Familiar - orb vivo com score 0-100.
  * Liga-se ao evento `kidzz:connection-updated` para refletir incrementos em tempo real.
  */
 const ConnectionMeter = () => {

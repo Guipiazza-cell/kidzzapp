@@ -244,7 +244,7 @@ const Atmosphere = () => (
       className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[90vw] h-[40vh] rounded-full opacity-30"
       style={{ background: `radial-gradient(ellipse, ${lilac}66, transparent 70%)`, filter: "blur(80px)" }}
     />
-    {/* Soft floating particles — pure CSS for perf */}
+    {/* Soft floating particles - pure CSS for perf */}
     {[...Array(6)].map((_, i) => (
       <span
         key={i}
@@ -284,7 +284,7 @@ const TopBar = ({ title, onBack, right }: any) => (
   </div>
 );
 
-/* ────────────── Hero — camaleão respirando + frases rotativas ────────────── */
+/* ────────────── Hero - camaleão respirando + frases rotativas ────────────── */
 const HERO_PHRASES = [
   "Hoje é um bom dia para respirar.",
   "Seu momento de calma começa agora.",
@@ -338,7 +338,7 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
         </AnimatePresence>
       </div>
 
-      {/* 4 ações rápidas — chips premium */}
+      {/* 4 ações rápidas - chips premium */}
       <div className="mt-5 grid grid-cols-2 gap-2.5">
         {[
           { v: "breath" as View, label: "Relaxar agora", icon: Wind, tint: sage },
@@ -380,7 +380,7 @@ const HeroBlock = ({ go }: { go: (v: View) => void }) => {
 };
 
 /* ────────────── HOME ────────────── */
-/* ═════════ KALM redesign — helpers de estilo do design (KALM.dc.html) ═════════ */
+/* ═════════ KALM redesign - helpers de estilo do design (KALM.dc.html) ═════════ */
 type KTint = [number, number, number];
 type KGloss = [string, string, string];
 
@@ -577,7 +577,7 @@ const Home = ({ go, onBack, initialExperienceId, onConsumedInitial }: { go: (v: 
           )}
 
           <div style={{ padding: "2px 20px 8px", textAlign: "left", animation: "kalm-cascade .6s cubic-bezier(.22,1,.36,1) .06s both", position: "relative", maxWidth: 320 }}>
-            {/* Tagline sob a marca — sem coração amarelo (pedido do design) */}
+            {/* Tagline sob a marca - sem coração amarelo (pedido do design) */}
             <div
               style={{
                 fontSize: 13,
@@ -845,7 +845,7 @@ const BreathView = ({ onBack, sos = false }: { onBack: () => void; sos?: boolean
   );
 };
 
-/* ────────────── SOUNDS — 8 atmosferas (4 grátis + 4 premium) ────────────── */
+/* ────────────── SOUNDS - 8 atmosferas (4 grátis + 4 premium) ────────────── */
 type Sound = { id: string; label: string; url: string; icon: string; premium?: boolean; tint: string };
 const SOUND_LIST: Sound[] = [
   { id: "rain",   label: "Chuva suave",    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_1648d7e3cd.mp3",   icon: "🌧",  tint: serenity },
@@ -940,7 +940,7 @@ const SoundsView = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-/* ────────────── SLEEP — área Dormir Melhor (premium feel) ────────────── */
+/* ────────────── SLEEP - área Dormir Melhor (premium feel) ────────────── */
 const SLEEP_ITEMS = [
   { id: "story",   icon: "🌙", title: "Histórias calmas",     sub: "Narração suave para embalar" },
   { id: "rain",    icon: "🌧", title: "Sons noturnos",        sub: "Chuva, oceano, floresta" },
@@ -1329,7 +1329,7 @@ const MeditationView = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-/* ────────────── FAMILY — respirar e agradecer juntos ────────────── */
+/* ────────────── FAMILY - respirar e agradecer juntos ────────────── */
 const GRATITUDE_PROMPTS = [
   "O que fez você sorrir hoje?",
   "Quem foi gentil com você?",

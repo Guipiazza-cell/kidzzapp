@@ -7,7 +7,7 @@ import { sfx } from "@/lib/sfx";
 import { ELEVEN_FEMALE_VOICE_ID } from "@/lib/ttsVoice";
 
 /**
- * Wellness Cinemático — Quick Modes emocionais.
+ * Wellness Cinemático - Quick Modes emocionais.
  * 4 modos curtos (≈90s cada): entrada cinemática → respiração + narração
  * ElevenLabs → encerramento emocional ("você merecia esses 2 minutos").
  *
@@ -200,7 +200,7 @@ const WellnessCinema = ({ open, onClose }: Props) => {
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             role="dialog" aria-modal="true" aria-label="Wellness cinemático"
           >
-            {/* atmosfera — orbe ambiente que pulsa */}
+            {/* atmosfera - orbe ambiente que pulsa */}
             {mode && (
               <>
                 <motion.span

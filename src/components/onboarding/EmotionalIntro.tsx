@@ -8,7 +8,7 @@ interface Props {
 }
 
 /**
- * EmotionalIntro — cinematic 3-scene welcome shown ONCE before NameOnboarding.
+ * EmotionalIntro - cinematic 3-scene welcome shown ONCE before NameOnboarding.
  * Speaks directly to the parent's heart before asking anything.
  *
  *  Scene 0  ~ "Eu sei como é..."   (acolhimento)

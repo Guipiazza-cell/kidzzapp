@@ -1,4 +1,4 @@
-// Rituais da Família — micro-cerimônias diárias (manhã/noite)
+// Rituais da Família - micro-cerimônias diárias (manhã/noite)
 // Cada ritual é uma sequência cinematográfica curta, narrada por voz suave.
 
 export type RitualId = "morning" | "lunch" | "evening" | "night";
@@ -70,7 +70,7 @@ export const RITUALS: Record<RitualId, RitualDef> = {
     closing: {
       title: "Vocês estão prontos.",
       subtitle: "O dia agora pode começar.",
-      voice: "Vocês estão prontos. O dia agora pode começar — com mais leveza.",
+      voice: "Vocês estão prontos. O dia agora pode começar - com mais leveza.",
     },
   },
   lunch: {

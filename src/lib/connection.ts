@@ -1,5 +1,5 @@
 // Termômetro de Conexão Familiar
-// Métrica emocional viva — soma micro-ações da família em um índice 0-100.
+// Métrica emocional viva - soma micro-ações da família em um índice 0-100.
 // Persistência local + decaimento natural (dia sem nada perde pontos).
 
 const KEY = "kidzz_connection_v1";
@@ -25,7 +25,7 @@ const WEIGHTS: Record<ConnectionEvent, number> = {
 };
 
 interface State {
-  score: number;          // 0–100
+  score: number;          // 0-100
   updatedAt: number;      // ms epoch
   lastEvents: Array<{ type: ConnectionEvent; at: number }>;
   streakDays: number;

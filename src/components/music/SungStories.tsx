@@ -63,12 +63,12 @@ const SungStories = ({ onBack, childName, onAchievement }: Props) => {
     const ach = bumpCounter("story");
     if (ach) onAchievement?.(ach);
     addMemory({
-      type: "achievement",
+      type: "music",
       title: `Ouviu: ${book.title}`,
       content: `${childName} escutou todos os capítulos cantados ${book.emoji}`,
       is_special: false,
       image_url: null,
-      metadata: { kind: "sung_story", book_id: book.id },
+      metadata: { area: "music", kind: "sung_story", book_id: book.id },
     });
   };
 

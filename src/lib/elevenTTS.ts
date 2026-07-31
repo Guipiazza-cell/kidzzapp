@@ -1,5 +1,5 @@
 /**
- * elevenTTS — Fonte ÚNICA da narração premium via ElevenLabs (voz Amanda Kelly).
+ * elevenTTS - Fonte ÚNICA da narração premium via ElevenLabs (voz Amanda Kelly).
  *
  * Toda a narração do app passa por aqui: limpa o texto, quebra em pedaços
  * dentro do limite do edge, chama `elevenlabs-tts` e devolve data URIs de áudio.

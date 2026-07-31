@@ -9,7 +9,7 @@ interface Props {
   className?: string;
 }
 
-/** Tiny round toggle for the global sound — persists in localStorage. */
+/** Tiny round toggle for the global sound - persists in localStorage. */
 const SoundToggle = ({ size = 16, className = "" }: Props) => {
   const [muted, setMuted] = useState(false);
 

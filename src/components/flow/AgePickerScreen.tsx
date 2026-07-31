@@ -4,9 +4,9 @@ import { ArrowLeft, Check } from "lucide-react";
 import aneImg from "@/assets/ane-chameleon.webp";
 
 const AGE_OPTIONS = [
-  { range: "0-3", emoji: "🧸", label: "3 – 5 anos", desc: "Respostas simples e carinhosas", accent: "from-emerald-400 to-teal-400" },
-  { range: "3-7", emoji: "🎒", label: "6 – 8 anos", desc: "Histórias e exemplos do dia a dia", accent: "from-sky-400 to-blue-500" },
-  { range: "7-10", emoji: "🧠", label: "9 – 12 anos", desc: "Curiosidades e desafios científicos", accent: "from-violet-400 to-purple-500" },
+  { range: "0-3", emoji: "🧸", label: "3 - 5 anos", desc: "Respostas simples e carinhosas", accent: "from-emerald-400 to-teal-400" },
+  { range: "3-7", emoji: "🎒", label: "6 - 8 anos", desc: "Histórias e exemplos do dia a dia", accent: "from-sky-400 to-blue-500" },
+  { range: "7-10", emoji: "🧠", label: "9 - 12 anos", desc: "Curiosidades e desafios científicos", accent: "from-violet-400 to-purple-500" },
 ];
 
 interface Props {

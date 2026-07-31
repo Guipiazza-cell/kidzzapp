@@ -4,8 +4,6 @@ import {
   Bell,
   Clock,
   Crown,
-  Gift,
-  Heart,
   Menu,
   Sparkles,
   Tent,
@@ -16,8 +14,8 @@ import { useCriancas } from "@/hooks/useCriancas";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
 import { useBoraStats } from "@/hooks/useBoraStats";
 import { useDesafioSemana } from "@/hooks/useDesafioSemana";
-import { useIndicacao } from "@/hooks/useIndicacao";
 import { usePaywall } from "@/components/paywall/PaywallProvider";
+import { useMemories } from "@/hooks/useMemories";
 import { CriancaOnboarding } from "./CriancaOnboarding";
 import { SurpresaModal } from "./SurpresaModal";
 import { ComoFoiModal } from "./ComoFoiModal";
@@ -44,15 +42,15 @@ interface Props {
 type Energy = "agitada" | "cansada" | "curiosa" | "feliz";
 
 /** Assets Hermes/Codex full-frame (não recortes). Cache-bust ?v2 */
-const BV = "v2";
+const BV = "v4";
 const b = (name: string) => `/exemplos/assets/bora-v2/${name}?${BV}`;
 const ASSETS = {
   heroBg: b("hero-bg.png"),
   heroArt: b("hero-art.png"),
   actArt: b("act-art.png"),
+  surpriseArt: b("surprise-art.png"),
   premiumArt: b("premium-art.png"),
   challengeArt: b("challenge-art.png"),
-  referralArt: b("referral-art.png"),
   cats: {
     ciencia: b("cat-ciencia.png"),
     sensorial: b("cat-sensorial.png"),
@@ -85,11 +83,11 @@ const CATS: Cat[] = [
   { key: "conversa", label: "Conversa", grad: "linear-gradient(145deg,#4a2a6e 0%,#281040 100%)", glow: "rgba(190,140,255,.3)", energies: ["cansada", "curiosa", "feliz"] },
 ];
 
-const MOOD_PILLS: { key: Energy; label: string; emoji: string; iconBg: string }[] = [
-  { key: "agitada", label: "Agitada", emoji: "🌪️", iconBg: "linear-gradient(145deg,#4a6a9a,#2a3a5a)" },
-  { key: "cansada", label: "Cansada", emoji: "😴", iconBg: "linear-gradient(145deg,#5a6aaa,#2a3458)" },
-  { key: "curiosa", label: "Curiosa", emoji: "🔍", iconBg: "linear-gradient(145deg,#3a7a9a,#1a3a50)" },
-  { key: "feliz", label: "Feliz", emoji: "☀️", iconBg: "linear-gradient(145deg,#d4a030,#8a6010)" },
+const MOOD_PILLS: { key: Energy; label: string; icon: string }[] = [
+  { key: "agitada", label: "Agitada", icon: "/exemplos/assets/bora-v2/moods/mood-agitada.png" },
+  { key: "cansada", label: "Cansada", icon: "/exemplos/assets/bora-v2/moods/mood-cansada.png" },
+  { key: "curiosa", label: "Curiosa", icon: "/exemplos/assets/bora-v2/moods/mood-curiosa.png" },
+  { key: "feliz", label: "Feliz", icon: "/exemplos/assets/bora-v2/moods/mood-feliz.png" },
 ];
 
 const DIARY_KEY = "bora_diary_v1";
@@ -140,14 +138,20 @@ const BoraScreen = ({ onBack }: Props) => {
   const { criancas, loading: loadingCriancas } = useCriancas();
   const { open: openPaywall } = usePaywall();
   const { desafio } = useDesafioSemana();
-  const { link: indicacaoLink, loading: indicacaoLoading } = useIndicacao();
+  const { addMemory } = useMemories();
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+  /** Se o pai fechou o modal sem cadastrar, não reabre na mesma visita à aba. */
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   useEffect(() => {
     if (!user) return;
     if (loadingCriancas) return;
-    if (criancas.length === 0) setShowOnboarding(true);
-  }, [user, loadingCriancas, criancas.length]);
+    if (criancas.length === 0 && !onboardingDismissed) setShowOnboarding(true);
+    if (criancas.length > 0) {
+      setShowOnboarding(false);
+      setOnboardingDismissed(false);
+    }
+  }, [user, loadingCriancas, criancas.length, onboardingDismissed]);
 
   const firstCrianca = criancas[0];
   const childName = (firstCrianca?.nome || profile?.child_name || "").trim();
@@ -207,10 +211,6 @@ const BoraScreen = ({ onBack }: Props) => {
   }, [diary.streak, isPremium, openPaywall]);
 
   const [mood, setMood] = useState<Energy | null>(null);
-  const filteredCats = useMemo(
-    () => (mood ? CATS.filter((c) => c.energies.includes(mood)) : CATS),
-    [mood],
-  );
 
   const todayISO = () => new Date().toISOString().slice(0, 10);
   const surpriseUsedToday = () => {
@@ -305,25 +305,19 @@ const BoraScreen = ({ onBack }: Props) => {
       } catch {}
       return next;
     });
-  };
-
-  const shareRef = async () => {
-    if (!indicacaoLink) return;
-    const text =
-      "Você precisa conhecer o Kidzz. A gente tá num movimento de menos tela e mais brincadeira. Entra com meu link e ganhamos 1 mês de Premium juntos 🌿";
-    if (typeof navigator !== "undefined" && (navigator as unknown as { share?: unknown }).share) {
-      try {
-        await (navigator as unknown as { share: (d: unknown) => Promise<void> }).share({
-          title: "Movimento Menos Tela",
-          text,
-          url: indicacaoLink,
-        });
-        return;
-      } catch {}
-    }
-    try {
-      await navigator.clipboard.writeText(indicacaoLink);
-    } catch {}
+    const nome = profile?.child_name || "A família";
+    void addMemory({
+      type: "bora",
+      title: `Bora: ${TODAY_ACTIVITY.titulo}`,
+      content: `${nome} concluiu "${TODAY_ACTIVITY.titulo}" (${TODAY_ACTIVITY.tela_min} min sem tela)`,
+      is_special: false,
+      image_url: null,
+      metadata: {
+        area: "bora",
+        activity: TODAY_ACTIVITY.titulo,
+        minutes: TODAY_ACTIVITY.tela_min,
+      },
+    });
   };
 
   const shareDesafio = async () => {
@@ -433,7 +427,15 @@ const BoraScreen = ({ onBack }: Props) => {
         }
       `}</style>
 
-      <CriancaOnboarding open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <CriancaOnboarding
+        open={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onDismiss={() => {
+          setShowOnboarding(false);
+          setOnboardingDismissed(true);
+          onBack();
+        }}
+      />
       <DiarioSemTela open={diaryOpen} onClose={() => setDiaryOpen(false)} childName={firstName} />
       <GuardaCelularScreen
         open={guardaOpen}
@@ -697,11 +699,11 @@ const BoraScreen = ({ onBack }: Props) => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                objectPosition: "58% 40%",
+                objectPosition: "62% 42%",
                 maskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                  "linear-gradient(100deg, transparent 0%, #000 18%, #000 88%, transparent 100%), linear-gradient(180deg, #000 62%, transparent 100%)",
                 WebkitMaskImage:
-                  "linear-gradient(100deg, transparent 0%, #000 26%, #000 80%, transparent 100%), linear-gradient(180deg, #000 58%, transparent 100%)",
+                  "linear-gradient(100deg, transparent 0%, #000 18%, #000 88%, transparent 100%), linear-gradient(180deg, #000 62%, transparent 100%)",
                 WebkitMaskComposite: "source-in",
                 maskComposite: "intersect",
                 filter: "saturate(1.1) contrast(1.03)",
@@ -746,7 +748,9 @@ const BoraScreen = ({ onBack }: Props) => {
             >
               Bora viver
               <br />
-              <span style={{ color: "#F0B050" }}>mais aventuras</span>
+              <span style={{ color: "#F0B050" }}>mais</span>
+              <br />
+              <span style={{ color: "#F0B050" }}>aventuras</span>
               <br />
               de <span style={{ color: "#F0B050" }}>verdade</span>!
             </h1>
@@ -761,7 +765,11 @@ const BoraScreen = ({ onBack }: Props) => {
                 textShadow: "0 1px 8px rgba(0,0,0,.35)",
               }}
             >
-              Atividades em família que criam memórias para a vida.
+              Atividades em família
+              <br />
+              que criam memórias
+              <br />
+              para a vida
             </p>
             <button
               type="button"
@@ -773,6 +781,225 @@ const BoraScreen = ({ onBack }: Props) => {
               <ArrowRight size={15} strokeWidth={2.3} />
             </button>
           </div>
+        </div>
+
+        {/* ── SURPRESA DA IA (card principal da aba) ── */}
+        <div style={sectionWrap}>
+          <button
+            type="button"
+            onClick={handleSurprise}
+            disabled={surprising}
+            data-tilt="1"
+            className="active:scale-[0.985]"
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              textAlign: "left",
+              cursor: surprising ? "wait" : "pointer",
+              borderRadius: R.card,
+              padding: 0,
+              ...glass,
+              minHeight: 188,
+              animation:
+                "bora2-cascade .55s cubic-bezier(.22,1,.36,1) both, bora2-glow 3.5s ease-in-out infinite",
+              transition: "transform .28s cubic-bezier(.34,1.4,.64,1)",
+              boxShadow:
+                "0 16px 48px rgba(0,0,0,.42), 0 0 0 0.5px rgba(240,192,96,.28), 0 1px 0 rgba(255,245,220,.3) inset, 0 0 32px rgba(240,160,60,.18)",
+            }}
+          >
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(95% 110% at 88% 40%, rgba(255,190,90,.22), transparent 55%), radial-gradient(60% 80% at 12% 90%, rgba(240,160,60,.12), transparent 50%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "55%",
+                height: "100%",
+                background:
+                  "linear-gradient(100deg, transparent 0%, rgba(255,230,160,.14) 48%, transparent 100%)",
+                animation: "bora2-shine 6s ease-in-out infinite",
+                pointerEvents: "none",
+              }}
+            />
+
+            <div style={{ display: "flex", minHeight: 188, position: "relative", zIndex: 2 }}>
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  padding: "16px 10px 14px 16px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      fontSize: 10,
+                      fontWeight: 800,
+                      letterSpacing: "1.1px",
+                      color: "#F0C060",
+                    }}
+                  >
+                    <Sparkles size={12} color="#F0C060" />
+                    SURPRESA DA IA
+                  </span>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "4px 10px",
+                      borderRadius: R.btn,
+                      ...glassSoft,
+                      fontSize: 11,
+                      fontWeight: 800,
+                      color: "rgba(255,232,205,.9)",
+                    }}
+                  >
+                    só pra vocês
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    fontFamily: SERIF,
+                    fontWeight: 600,
+                    fontSize: 21,
+                    color: "#FFF6E8",
+                    lineHeight: 1.15,
+                    marginTop: 8,
+                    letterSpacing: "-0.3px",
+                  }}
+                >
+                  Surpresa da IA
+                  {firstName ? (
+                    <>
+                      <br />
+                      <span style={{ color: "#F0C060" }}>pra {firstName}</span>
+                    </>
+                  ) : null}
+                </div>
+                <p
+                  style={{
+                    margin: "7px 0 0",
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                    color: "rgba(255,230,200,.72)",
+                    maxWidth: 200,
+                  }}
+                >
+                  Uma aventura única, gerada agora pro humor e a idade de vocês.
+                </p>
+
+                <div style={{ marginTop: "auto", paddingTop: 12 }}>
+                  <span
+                    style={{
+                      ...goldBtn,
+                      minHeight: 42,
+                      padding: "11px 18px",
+                      opacity: surprising ? 0.75 : 1,
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "radial-gradient(120% 130% at 20% 10%, rgba(255,255,255,.32), transparent 55%)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                    <span
+                      style={{
+                        position: "relative",
+                        zIndex: 1,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <Sparkles size={14} strokeWidth={2.3} />
+                      {surprising ? "Gerando..." : "Receber surpresa"}
+                      {!surprising && <ArrowRight size={14} strokeWidth={2.5} />}
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  position: "relative",
+                  width: "42%",
+                  flex: "none",
+                  minHeight: 188,
+                  borderRadius: `0 ${R.card - 2}px ${R.card - 2}px 0`,
+                  overflow: "hidden",
+                  margin: 5,
+                  marginLeft: 0,
+                }}
+              >
+                <img
+                  src={ASSETS.surpriseArt}
+                  alt="Gui com a surpresa da IA"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center 35%",
+                    borderRadius: R.panel,
+                    filter: "saturate(1.08) contrast(1.03)",
+                  }}
+                />
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(90deg, rgba(28,18,10,.5) 0%, transparent 32%), radial-gradient(80% 70% at 70% 40%, rgba(255,180,80,.18), transparent 60%)",
+                    borderRadius: R.panel,
+                    pointerEvents: "none",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 10,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 38,
+                    height: 38,
+                    borderRadius: R.btn,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    ...pillGlass,
+                  }}
+                >
+                  <Sparkles size={16} color="#F0C060" strokeWidth={2.2} />
+                </div>
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* ── ATIVIDADE DE HOJE ── */}
@@ -922,14 +1149,14 @@ const BoraScreen = ({ onBack }: Props) => {
               >
                 <img
                   src={ASSETS.actArt}
-                  alt=""
+                  alt="Gui explorador na caça ao tesouro das cores"
                   style={{
                     position: "absolute",
                     inset: 0,
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    objectPosition: "center",
+                    objectPosition: "72% 45%",
                     borderRadius: R.panel,
                   }}
                 />
@@ -1075,19 +1302,33 @@ const BoraScreen = ({ onBack }: Props) => {
                   >
                     <span
                       style={{
-                        width: 40,
-                        height: 40,
+                        width: 44,
+                        height: 44,
                         borderRadius: 14,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        background: mo.iconBg,
-                        boxShadow:
-                          "0 4px 12px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.25) inset",
-                        fontSize: 18,
+                        overflow: "hidden",
+                        boxShadow: on
+                          ? "0 6px 16px rgba(180,100,20,.35), 0 1px 0 rgba(255,255,255,.35) inset"
+                          : "0 4px 12px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.2) inset",
+                        background: "rgba(255,248,235,.08)",
                       }}
                     >
-                      {mo.emoji}
+                      <img
+                        src={mo.icon}
+                        alt=""
+                        width={44}
+                        height={44}
+                        draggable={false}
+                        style={{
+                          width: 44,
+                          height: 44,
+                          objectFit: "cover",
+                          display: "block",
+                          borderRadius: 14,
+                        }}
+                      />
                     </span>
                     <span
                       style={{
@@ -1107,138 +1348,6 @@ const BoraScreen = ({ onBack }: Props) => {
         </div>
 
         {/* ── EXPLORAR POR TIPO ── */}
-        <div style={sectionWrap}>
-          <SectionLabel
-            right={
-              mood ? (
-                <button
-                  type="button"
-                  onClick={() => setMood(null)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    fontWeight: 800,
-                    fontSize: 12,
-                    color: "#F0B050",
-                    padding: "8px 4px",
-                    minHeight: 44,
-                  }}
-                >
-                  limpar
-                </button>
-              ) : undefined
-            }
-          >
-            Explorar por tipo
-          </SectionLabel>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            {filteredCats.map((c, idx) => {
-              const locked = !!c.premium && !isPremium;
-              return (
-                <button
-                  key={c.key}
-                  type="button"
-                  onClick={() => handleCategoryTap(c)}
-                  data-tilt="1"
-                  aria-label={locked ? `${c.label} (Premium)` : c.label}
-                  className="active:scale-[0.97]"
-                  style={{
-                    position: "relative",
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    borderRadius: R.panel,
-                    padding: 0,
-                    border: "0.5px solid rgba(255,220,180,.2)",
-                    background: c.grad,
-                    boxShadow: `0 10px 28px rgba(0,0,0,.28), 0 0 16px ${c.glow}, 0 1px 0 rgba(255,255,255,.14) inset`,
-                    transition: "transform .28s cubic-bezier(.34,1.4,.64,1)",
-                    animation: `bora2-cascade .5s cubic-bezier(.22,1,.36,1) ${0.04 * idx}s both`,
-                  }}
-                >
-                  <img
-                    src={ASSETS.cats[c.key]}
-                    alt=""
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      display: "block",
-                      filter: "saturate(1.05) contrast(1.02)",
-                    }}
-                  />
-                  <div
-                    aria-hidden
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      borderRadius: R.panel,
-                      background:
-                        "linear-gradient(145deg, rgba(255,255,255,.12) 0%, transparent 42%, rgba(0,0,0,.12) 100%)",
-                      pointerEvents: "none",
-                    }}
-                  />
-                  <div
-                    aria-hidden
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "60%",
-                      height: "100%",
-                      background:
-                        "linear-gradient(100deg, transparent 0%, rgba(255,255,255,.1) 50%, transparent 100%)",
-                      animation: "bora2-shine 6.5s ease-in-out infinite",
-                      pointerEvents: "none",
-                    }}
-                  />
-                  {locked && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        zIndex: 2,
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 3,
-                        padding: "4px 9px",
-                        borderRadius: R.btn,
-                        background: "linear-gradient(180deg,#FFE9A8,#F0BC40)",
-                        fontSize: 8.5,
-                        fontWeight: 900,
-                        color: "#6A4A10",
-                        letterSpacing: ".4px",
-                        boxShadow: "0 3px 10px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.5) inset",
-                      }}
-                    >
-                      <Crown size={9} />
-                      PREMIUM
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {filteredCats.length === 0 && (
-            <div
-              style={{
-                marginTop: 10,
-                padding: 18,
-                borderRadius: R.panel,
-                textAlign: "center",
-                ...glass,
-                fontSize: 13,
-                fontWeight: 700,
-                color: "rgba(255,230,200,.7)",
-              }}
-            >
-              Nenhum tipo pra essa energia agora. Toque em outro humor.
-            </div>
-          )}
-        </div>
-
         {/* ── PREMIUM COZINHA ── */}
         <div style={sectionWrap}>
           <button
@@ -1281,8 +1390,15 @@ const BoraScreen = ({ onBack }: Props) => {
             >
               <img
                 src={ASSETS.premiumArt}
-                alt=""
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                alt="Cozinha em família"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "50% 55%",
+                }}
               />
             </div>
             <div style={{ flex: 1, minWidth: 0, padding: "14px 12px 14px 12px", position: "relative", zIndex: 2 }}>
@@ -1357,12 +1473,12 @@ const BoraScreen = ({ onBack }: Props) => {
             >
               <img
                 src={ASSETS.challengeArt}
-                alt=""
+                alt="Família e Gui na cabaninha de lençol"
                 style={{
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
-                  objectPosition: "center",
+                  objectPosition: "55% 40%",
                 }}
               />
             </div>
@@ -1449,206 +1565,7 @@ const BoraScreen = ({ onBack }: Props) => {
           </button>
         </div>
 
-        {/* ── INDICAÇÃO (layout flex: texto + arte + CTA, sem sobreposição) ── */}
-        <div style={sectionWrap}>
-          <div
-            style={{
-              position: "relative",
-              overflow: "hidden",
-              borderRadius: R.card,
-              ...glass,
-              padding: 0,
-            }}
-          >
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "radial-gradient(80% 100% at 92% 50%, rgba(255,180,80,.14), transparent 55%)",
-                pointerEvents: "none",
-              }}
-            />
-            <div
-              style={{
-                display: "flex",
-                alignItems: "stretch",
-                position: "relative",
-                zIndex: 2,
-                minHeight: 148,
-              }}
-            >
-              {/* Texto + CTA */}
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  padding: "14px 10px 14px 14px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 0,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <div
-                    style={{
-                      flex: "none",
-                      width: 42,
-                      height: 42,
-                      borderRadius: R.chip,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background:
-                        "radial-gradient(130% 130% at 30% 22%, #FFD9A8, #F2823E 55%, #D9542E)",
-                      border: "0.5px solid rgba(255,255,255,.4)",
-                      boxShadow:
-                        "0 6px 16px rgba(200,90,40,.35), 0 1px 0 rgba(255,255,255,.45) inset",
-                    }}
-                  >
-                    <Gift size={20} color="#fff" strokeWidth={1.9} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: "1.1px",
-                        color: "#F0B050",
-                      }}
-                    >
-                      CONVIDE UM PAI OU MÃE
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: SERIF,
-                        fontWeight: 600,
-                        fontSize: 16,
-                        color: "#FFF4E8",
-                        lineHeight: 1.2,
-                        marginTop: 3,
-                        letterSpacing: "-0.2px",
-                      }}
-                    >
-                      Vocês dois ganham{" "}
-                      <span style={{ color: "#F0C060" }}>1 mês de Premium</span>
-                    </div>
-                  </div>
-                </div>
-                <p
-                  style={{
-                    margin: "8px 0 0",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "rgba(255,230,200,.68)",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  Quanto mais família no Movimento Menos Tela, mais leve e incrível fica o mundo.
-                </p>
-                <div style={{ marginTop: "auto", paddingTop: 12 }}>
-                  <button
-                    type="button"
-                    onClick={shareRef}
-                    disabled={!indicacaoLink && !indicacaoLoading}
-                    className="active:scale-[0.97]"
-                    style={{
-                      ...goldBtn,
-                      opacity: indicacaoLink || indicacaoLoading ? 1 : 0.55,
-                      padding: "10px 16px",
-                      fontSize: 12.5,
-                      minHeight: 42,
-                      animation: indicacaoLoading
-                        ? "bora2-pulse 1.4s ease-in-out infinite"
-                        : "none",
-                    }}
-                  >
-                    <Heart size={13} fill="currentColor" />
-                    {indicacaoLoading ? "Gerando..." : "Convidar agora"}
-                    <ArrowRight size={13} strokeWidth={2.4} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Arte full Hermes — coluna própria, sem sobrepor texto/CTA */}
-              <div
-                style={{
-                  flex: "none",
-                  width: "38%",
-                  maxWidth: 148,
-                  minWidth: 112,
-                  position: "relative",
-                  margin: 6,
-                  marginLeft: 0,
-                  borderRadius: R.panel,
-                  overflow: "hidden",
-                  background:
-                    "linear-gradient(160deg, rgba(255,200,120,.12), rgba(40,24,12,.2))",
-                }}
-              >
-                <img
-                  src={ASSETS.referralArt}
-                  alt="Gui convidando amigos"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center 40%",
-                    filter: "saturate(1.08) contrast(1.02)",
-                  }}
-                />
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "linear-gradient(90deg, rgba(28,18,10,.35) 0%, transparent 40%)",
-                    pointerEvents: "none",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Surpresa da IA */}
-        <div style={{ ...sectionWrap, marginBottom: 8 }}>
-          <button
-            type="button"
-            onClick={handleSurprise}
-            className="active:scale-[0.98]"
-            style={{
-              width: "100%",
-              ...outlineGoldBtn,
-              justifyContent: "center",
-              padding: "14px 16px",
-              fontSize: 14,
-              minHeight: 48,
-              borderRadius: R.panel,
-              animation: "bora2-glow 3.5s ease-in-out infinite",
-            }}
-          >
-            <Sparkles size={16} color="#F0C060" />
-            Surpresa da IA{firstName ? ` pra ${firstName}` : ""}
-          </button>
-        </div>
-
-        <div
-          style={{
-            padding: `4px ${PAD}px 24px`,
-            textAlign: "center",
-            fontSize: 11,
-            fontWeight: 700,
-            color: "rgba(255,210,160,.38)",
-            letterSpacing: "0.2px",
-          }}
-        >
-          Menos tela, mais memórias · Uma aventura por dia
-        </div>
+        <div style={{ paddingBottom: 24 }} />
       </div>
     </div>
   );

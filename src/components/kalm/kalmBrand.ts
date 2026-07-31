@@ -1,5 +1,5 @@
 /**
- * KALM by Kidzz — identidade visual.
+ * KALM by Kidzz - identidade visual.
  * Aditivo ao Wellness existente; não substitui tokens do hub.
  */
 export const KALM_BRAND = {

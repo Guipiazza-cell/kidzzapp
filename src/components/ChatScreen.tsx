@@ -150,7 +150,13 @@ const ChatScreen = ({
     });
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({ error: "Erro desconhecido" }));
-      throw new Error(err.error || `Erro ${resp.status}`);
+      if (err.error === "LIMIT_REACHED") {
+        throw new Error(err.message || "Limite do dia atingido.");
+      }
+      if (err.error === "QUOTA_ERROR") {
+        throw new Error(err.message || "Não foi possível validar seu limite. Tente de novo.");
+      }
+      throw new Error(err.message || err.error || `Erro ${resp.status}`);
     }
     if (!resp.body) throw new Error("Sem resposta");
 
@@ -329,7 +335,7 @@ const ChatScreen = ({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              Pode falar ou digitar — eu adoro responder
+              Pode falar ou digitar - eu adoro responder
             </motion.p>
 
             {/* Big mic button */}

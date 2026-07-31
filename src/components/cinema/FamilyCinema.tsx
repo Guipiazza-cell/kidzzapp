@@ -1,21 +1,24 @@
 /**
- * FamilyCinema — redesign premium
+ * FamilyCinema - redesign premium
  * Craft: Bora (camadas, sticky glass, coloredGlass, sheen, cascade)
  * Layout: print public/telas/cinema/
  * Dados reais: movies.ts + featuredRotation
  * Assets: cinema-v2 Hermes full-frame (nunca recorte)
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import {
   ArrowLeft,
   ArrowRight,
   Shield,
   Trophy,
-  Clapperboard,
-  Heart,
-  Rocket,
-  Moon,
-  Briefcase,
   Play,
   Bookmark,
   Share2,
@@ -28,10 +31,12 @@ import {
   getMoviesBySection,
   type Movie,
 } from "@/data/movies";
-import { getWeeklyMovie, getDailyHighlights } from "@/lib/featuredRotation";
+import { getWeeklyMovie } from "@/lib/featuredRotation";
+import { cinemaCoverCdn, cinemaCoverUrl } from "@/lib/cinemaCovers";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMemories } from "@/hooks/useMemories";
 import {
   FONT,
   SERIF,
@@ -41,63 +46,138 @@ import {
   glassLight as glass,
   glassLightSoft as glassSoft,
   pillGlassLight as pillGlass,
-  coloredGlass,
   goldBtn,
   sectionWrap,
 } from "@/lib/premiumUi";
-
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import heroBgUrl from "@/assets/cinema/hero-bg.png";
 
 const AS = "/exemplos/assets/cinema-v2";
-const AV = "v3";
+const AV = "v14";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
+/** Fundo full-bleed — Gui grande e alto à direita, ao lado do texto do hero. */
+const CinemaBackdrop = ({ src }: { src: string }) => (
+  <div
+    className="absolute inset-0 pointer-events-none overflow-hidden"
+    aria-hidden
+  >
+    <img
+      src={src}
+      alt=""
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        /* Gui bem no topo, ao lado do título */
+        objectPosition: "88% 0%",
+        filter: "saturate(1.1) brightness(0.96)",
+        transform: "scale(1.85) translateY(-32%)",
+        transformOrigin: "88% 0%",
+      }}
+    />
+    {/* Escurece só a esquerda p/ texto; direita limpa p/ Gui; creme bem mais baixo */}
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background:
+          "radial-gradient(44% 32% at 86% 8%, rgba(255,210,120,.2) 0%, transparent 62%)," +
+          "linear-gradient(100deg, rgba(10,16,28,.55) 0%, rgba(10,16,28,.22) 36%, rgba(10,16,28,.04) 52%, transparent 64%)," +
+          "linear-gradient(180deg, rgba(16,22,34,.1) 0%, transparent 32%, rgba(234,243,251,.12) 58%, rgba(234,243,251,.72) 76%, #EAF3FB 88%, #E4EEF8 100%)",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        top: -20,
+        right: -8,
+        width: 220,
+        height: 220,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,220,140,.32), transparent 70%)",
+        filter: "blur(10px)",
+        animation: "cine2-drift 14s ease-in-out infinite",
+      }}
+    />
+  </div>
+);
+
 /**
- * Capas premium (cinema-v2 Hermes). Sem emoji-pôster.
- * Quando não há arte dedicada, reutiliza capa de alta qualidade da mesma “família”
- * visual (melhor que emoji gigante). Novas artes originais = próxima leva.
+ * Capa do filme — URL do bundle Vite (src/assets/cinema-covers).
+ * Não depende de public/ no deploy (kidzz.app 404 em public novo).
  */
-const COVER: Record<string, string> = {
-  "wall-e": asset("cover-walle.png"),
-  up: asset("cover-up.png"),
-  "polar-express": asset("cover-polar.png"),
-  red: asset("cover-red.png"),
-  luca: asset("cover-luca.png"),
-  coco: asset("cover-coco.png"),
-  // mapeamento sem arte dedicada — só assets HD existentes
-  narnia: asset("cover-up.png"),
-  "rei-leao": asset("cover-up.png"),
-  madagascar: asset("cover-luca.png"),
-  minions: asset("cover-red.png"),
-  sing: asset("cover-coco.png"),
-  "familia-futuro": asset("cover-walle.png"),
-  matilda: asset("cover-coco.png"),
-  alice: asset("cover-red.png"),
-  encanto: asset("cover-coco.png"),
-  nemo: asset("cover-luca.png"),
-  divertidamente: asset("cover-red.png"),
-  "toy-story": asset("cover-up.png"),
-  "lilo-stitch": asset("cover-luca.png"),
-  carros: asset("cover-up.png"),
-  malvado: asset("cover-red.png"),
-  pets: asset("cover-luca.png"),
-  zootopia: asset("cover-luca.png"),
-  enrolados: asset("cover-red.png"),
-  wish: asset("cover-coco.png"),
-  soul: asset("cover-walle.png"),
-  bolt: asset("cover-up.png"),
-  dumbo: asset("cover-up.png"),
-  "peter-pan": asset("cover-up.png"),
-  "bernardo-bianca": asset("cover-up.png"),
-  marley: asset("cover-up.png"),
-  "4-vidas": asset("cover-up.png"),
-  oz: asset("cover-red.png"),
-  "pequenos-espioes": asset("cover-walle.png"),
-  robos: asset("cover-walle.png"),
-  horton: asset("cover-luca.png"),
-  hamburguer: asset("cover-red.png"),
-  chefinho: asset("cover-red.png"),
-  leo: asset("cover-luca.png"),
+const coverOf = (id: string) => cinemaCoverUrl(id);
+
+/** Poster do filme — path público /exemplos/.../cover-{id}.png (funciona no localhost). */
+const MoviePoster = ({
+  id,
+  glow,
+  title = "",
+  alt = "",
+  style,
+  children,
+}: {
+  id: string;
+  glow: string;
+  title?: string;
+  alt?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
+}) => {
+  const local = coverOf(id);
+  const cdn = cinemaCoverCdn(id);
+  return (
+    <div
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        flex: "none",
+        width: "100%",
+        height: 176,
+        backgroundColor: glow || "#2a3548",
+        backgroundImage: `url("${local}")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        ...style,
+      }}
+    >
+      <img
+        src={local}
+        alt={alt || title || id}
+        width={320}
+        height={176}
+        loading="eager"
+        decoding="async"
+        draggable={false}
+        onError={(e) => {
+          const el = e.currentTarget;
+          if (!el.dataset.cdn) {
+            el.dataset.cdn = "1";
+            el.src = cdn;
+            // também atualiza o background do pai
+            const parent = el.parentElement;
+            if (parent) parent.style.backgroundImage = `url("${cdn}")`;
+          }
+        }}
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center",
+          display: "block",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+      {children}
+    </div>
+  );
 };
 
 interface Props {
@@ -149,51 +229,21 @@ const Shine = () => (
   />
 );
 
-const Gloss = ({
-  colors,
-  children,
-  size = 38,
-}: {
-  colors: [string, string, string];
-  children: ReactNode;
-  size?: number;
-}) => (
-  <div
-    style={{
-      width: size,
-      height: size,
-      borderRadius: 13,
-      flex: "none",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: `radial-gradient(130% 130% at 30% 22%, #fff 0%, ${colors[0]} 16%, ${colors[1]} 55%, ${colors[2]} 100%)`,
-      boxShadow:
-        "0 6px 14px rgba(40,60,100,.28), inset 0 2px 3px rgba(255,255,255,.72), inset 0 -5px 10px rgba(0,0,0,.18)",
-    }}
-  >
-    {children}
-  </div>
-);
-
 const idadeLabel = (m: Movie) =>
-  m.faixaEtaria === "familia" ? "Família" : `${m.faixaEtaria.replace("-", "–")} anos`;
+  m.faixaEtaria === "familia" ? "Família" : `${m.faixaEtaria.replace("-", "-")} anos`;
 
+/** Título de seção editorial — sem contagem “N filmes” ao lado. */
 const SectionLabel = ({
   children,
-  right,
   kicker,
 }: {
   children: ReactNode;
-  right?: ReactNode;
   kicker?: string;
 }) => (
   <div
     style={{
       display: "flex",
       alignItems: "flex-end",
-      justifyContent: "space-between",
-      gap: 10,
       marginBottom: 12,
       padding: "0 2px",
     }}
@@ -226,13 +276,11 @@ const SectionLabel = ({
         {children}
       </h2>
     </div>
-    {right}
   </div>
 );
 
 /* ── Card de filme (print: poster + idade + título + desc) ── */
 const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
-  const cover = COVER[m.id];
   return (
     <button
       type="button"
@@ -253,36 +301,16 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
         boxShadow: "0 12px 28px rgba(40,60,100,.14), 0 1px 0 rgba(255,255,255,.9) inset",
       }}
     >
-      <div
-        style={{
-          height: 112,
-          position: "relative",
-          background: cover
-            ? `url("${cover}") center/cover no-repeat`
-            : `linear-gradient(160deg, ${hexA(m.glowColor, 0.55)}, ${hexA(m.glowColor, 0.2)} 50%, #1a2030)`,
-        }}
-      >
-        {!cover && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "grid",
-              placeItems: "center",
-              background: `linear-gradient(160deg, ${hexA(m.glowColor, 0.75)}, #1a2030)`,
-            }}
-          >
-            <Clapperboard size={36} color="rgba(255,255,255,.85)" strokeWidth={1.6} />
-          </div>
-        )}
+      <MoviePoster id={m.id} glow={m.glowColor} title={m.titulo} alt={m.titulo}>
         <div
           style={{
             position: "absolute",
             top: 8,
             left: 8,
+            zIndex: 2,
             padding: "3px 8px",
             borderRadius: 999,
-            background: "rgba(255,255,255,.88)",
+            background: "rgba(255,255,255,.9)",
             fontSize: 9.5,
             fontWeight: 900,
             color: INK,
@@ -296,6 +324,7 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
             position: "absolute",
             top: 8,
             right: 8,
+            zIndex: 2,
             width: 28,
             height: 28,
             borderRadius: 999,
@@ -306,7 +335,7 @@ const MovieCard = ({ m, onOpen }: { m: Movie; onOpen: (m: Movie) => void }) => {
         >
           <Bookmark size={13} color={INK2} />
         </div>
-      </div>
+      </MoviePoster>
       <div style={{ padding: "10px 11px 12px" }}>
         <div
           style={{
@@ -375,7 +404,6 @@ const DetailSheet = ({
   onClose: () => void;
   onMarcar: () => void;
 }) => {
-  const cover = COVER[movie.id];
   return (
     <>
       <div
@@ -409,27 +437,20 @@ const DetailSheet = ({
         }}
       >
         <div style={{ display: "flex", minHeight: 150, position: "relative" }}>
-          <div
-            style={{
-              width: "42%",
-              flex: "none",
-              position: "relative",
-              background: cover
-                ? `url("${cover}") center/cover`
-                : `linear-gradient(160deg, ${hexA(movie.glowColor, 0.6)}, #1a1520)`,
-            }}
+          <MoviePoster
+            id={movie.id}
+            glow={movie.glowColor}
+            title={movie.titulo}
+            alt={movie.titulo}
+            style={{ width: "42%", flex: "none", minHeight: 150 }}
           >
-            {!cover && (
-              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "linear-gradient(160deg, rgba(46,122,204,.5), #1a1520)" }}>
-                <Clapperboard size={40} color="rgba(255,255,255,.9)" strokeWidth={1.5} />
-              </div>
-            )}
             <div
               style={{
                 position: "absolute",
                 left: "50%",
                 top: "50%",
                 transform: "translate(-50%,-50%)",
+                zIndex: 2,
                 width: 48,
                 height: 48,
                 borderRadius: 999,
@@ -441,7 +462,7 @@ const DetailSheet = ({
             >
               <Play size={20} fill="#1a1410" color="#1a1410" />
             </div>
-          </div>
+          </MoviePoster>
           <div style={{ flex: 1, minWidth: 0, padding: "16px 14px 12px", position: "relative" }}>
             <button
               type="button"
@@ -600,73 +621,41 @@ const DetailSheet = ({
   );
 };
 
-type ChipId = "alta" | "emocionar" | "aventura" | "acalmar" | "viagem";
-
-const CHIPS: {
-  id: ChipId;
-  title: string;
-  sub: string;
-  Icon: typeof Heart;
-  tint: [number, number, number];
-  g: [string, string, string];
-}[] = [
-  { id: "alta", title: "Em alta hoje", sub: "Os mais amados", Icon: Clapperboard, tint: [230, 185, 90], g: ["#FFE9A8", "#F2B23B", "#C77E12"] },
-  { id: "emocionar", title: "Para emocionar", sub: "Toca o coração", Icon: Heart, tint: [140, 200, 140], g: ["#C0EDA0", "#6FBE4F", "#3F8A32"] },
-  { id: "aventura", title: "Aventura", sub: "Sonhar e explorar", Icon: Rocket, tint: [160, 140, 220], g: ["#D8C2FF", "#9A6CF0", "#6A3EC0"] },
-  { id: "acalmar", title: "Para acalmar", sub: "Relaxar juntos", Icon: Moon, tint: [120, 160, 220], g: ["#A8D4FF", "#4E9BE8", "#2568B8"] },
-  { id: "viagem", title: "Modo Viagem", sub: "Qualquer lugar", Icon: Briefcase, tint: [100, 180, 200], g: ["#A8E8F0", "#3DBFCE", "#1B7A88"] },
-];
-
 const FamilyCinema = ({ onBack }: Props) => {
   const { profile } = useAuth();
+  const { addMemory } = useMemories();
   const [active, setActive] = useState<Movie | null>(null);
-  const [chip, setChip] = useState<ChipId>("alta");
   const [toast, setToast] = useState("");
   const toastT = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const heroArtRef = useRef<HTMLDivElement>(null);
+  const loggedOpen = useRef<Set<string>>(new Set());
 
   const weekly = useMemo(() => getWeeklyMovie(), []);
-  const daily = useMemo(() => getDailyHighlights(6), []);
+  const childName = profile?.child_name || "a família";
   const pontos = profile?.points ?? 0;
   const h = new Date().getHours();
   const saudacao = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
 
-  const sectionMovies = useMemo(() => {
-    if (chip === "alta") return daily;
-    const map: Record<Exclude<ChipId, "alta">, string> = {
-      emocionar: "vinculo",
-      aventura: "imaginacao",
-      acalmar: "calmar",
-      viagem: "divertidos",
-    };
-    const sec = EDITORIAL_SECTIONS.find((s) => s.id === map[chip]);
-    return sec ? getMoviesBySection(sec).slice(0, 10) : daily;
-  }, [chip, daily]);
-
-  const sectionTitle =
-    chip === "alta"
-      ? "Em alta hoje"
-      : CHIPS.find((c) => c.id === chip)?.title ?? "Curadoria";
-
-  useEffect(() => {
-    const sc = scrollRef.current;
-    const hero = heroArtRef.current;
-    if (!sc || !hero) return;
-    const onScroll = () => {
-      const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.22}px) scale(${1 + y * 0.00025})`;
-      hero.style.opacity = String(Math.max(0.4, 1 - y / 300));
-    };
-    sc.addEventListener("scroll", onScroll, { passive: true });
-    return () => sc.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const open = useCallback((m: Movie) => {
-    haptic("light");
-    sfx("click");
-    setActive(m);
-  }, []);
+  const open = useCallback(
+    (m: Movie) => {
+      haptic("light");
+      sfx("click");
+      setActive(m);
+      // Registra abertura (1x por filme na sessão)
+      if (!loggedOpen.current.has(m.id)) {
+        loggedOpen.current.add(m.id);
+        void addMemory({
+          type: "cinema",
+          title: `Cinema: ${m.titulo}`,
+          content: `${childName} explorou "${m.titulo}" — ${m.descricao}`,
+          is_special: false,
+          image_url: null,
+          metadata: { area: "cinema", movie_id: m.id, age: m.faixaEtaria },
+        });
+      }
+    },
+    [addMemory, childName],
+  );
 
   const showToast = useCallback((msg: string) => {
     if (toastT.current) clearTimeout(toastT.current);
@@ -676,9 +665,20 @@ const FamilyCinema = ({ onBack }: Props) => {
 
   const marcar = useCallback(() => {
     haptic("light");
+    const movie = active;
     setActive(null);
     showToast("Sessão marcada para a família 🎬");
-  }, [showToast]);
+    if (movie) {
+      void addMemory({
+        type: "cinema",
+        title: `Sessão marcada: ${movie.titulo}`,
+        content: `${childName} marcou "${movie.titulo}" para assistir em família`,
+        is_special: true,
+        image_url: null,
+        metadata: { area: "cinema", movie_id: movie.id, action: "schedule" },
+      });
+    }
+  }, [active, addMemory, childName, showToast]);
 
   return (
     <div
@@ -695,75 +695,8 @@ const FamilyCinema = ({ onBack }: Props) => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Fundo sólido do sistema — sem imagem do hero desfocada como parede */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(180deg, #EAF3FB 0%, #DCE8F4 40%, #CDDCEB 72%, #C0D2E4 100%)",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(50% 32% at 78% 12%, rgba(255,220,120,.22), transparent 70%), radial-gradient(40% 28% at 12% 40%, rgba(140,180,240,.14), transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background:
-            "radial-gradient(50% 32% at 78% 12%, rgba(255,220,120,.28), transparent 70%), radial-gradient(40% 28% at 12% 40%, rgba(140,180,240,.18), transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: -70,
-          right: -40,
-          width: 280,
-          height: 280,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,210,120,.32), transparent 65%)",
-          filter: "blur(30px)",
-          animation: "cine2-drift 14s ease-in-out infinite",
-          pointerEvents: "none",
-        }}
-      />
-      {[
-        { t: 90, l: "18%", d: "0s" },
-        { t: 160, l: "70%", d: "1.1s" },
-        { t: 240, l: "42%", d: "2s" },
-        { t: 320, l: "82%", d: ".5s" },
-      ].map((p, i) => (
-        <div
-          key={i}
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: p.t,
-            left: p.l,
-            width: 4,
-            height: 4,
-            borderRadius: 99,
-            background: "#FFE9A8",
-            boxShadow: "0 0 10px 3px rgba(255,200,100,.7)",
-            animation: `cine2-twinkle ${3 + i * 0.4}s ease-in-out ${p.d} infinite`,
-            pointerEvents: "none",
-            zIndex: 1,
-          }}
-        />
-      ))}
+      {/* Fundo imagem full-bleed (padrão Música) — Gui óculos 3D + sala cinema */}
+      <CinemaBackdrop src={heroBgUrl} />
 
       <div
         ref={scrollRef}
@@ -866,200 +799,64 @@ const FamilyCinema = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* Hero Bora-style */}
-        <div style={{ position: "relative", padding: `4px ${PAD}px 12px`, minHeight: 236 }}>
-          <div
-            ref={heroArtRef}
-            style={{
-              position: "absolute",
-              right: 0,
-              top: 0,
-              width: "58%",
-              height: 210,
-              willChange: "transform",
-              animation: "cine2-heroIn .75s cubic-bezier(.22,1,.36,1) both",
-              pointerEvents: "none",
-              borderRadius: `0 ${R.card}px ${R.card}px 0`,
-              overflow: "hidden",
-            }}
-          >
-            <img
-              src={CAMALEAO.armsSoft}
-              alt="Gui pronto para o cinema"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "right bottom",
-                ...CAMALEAO_SCENE_MASK,
-                filter: "drop-shadow(0 14px 22px rgba(40,30,20,.28))",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.arms;
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                right: "18%",
-                bottom: 28,
-                width: 60,
-                height: 60,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(255,210,120,.4), transparent 70%)",
-                filter: "blur(8px)",
-                animation: "cine2-floaty 6s ease-in-out infinite",
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 3,
-              maxWidth: "54%",
-              paddingTop: 8,
-              animation: "cine2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
-            }}
-          >
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: -8,
-                top: 0,
-                right: 8,
-                bottom: -8,
-                borderRadius: 20,
-                background:
-                  "linear-gradient(100deg, rgba(234,243,251,.94) 0%, rgba(234,243,251,.72) 55%, transparent 100%)",
-                zIndex: -1,
-              }}
-            />
+        {/* Hero: texto à esquerda; Gui do fundo ocupa o espaço à direita */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 3,
+            padding: `4px ${PAD}px 28px`,
+            minHeight: 280,
+            animation: "cine2-cascade .6s cubic-bezier(.22,1,.36,1) .05s both",
+          }}
+        >
+          <div style={{ maxWidth: "52%", minWidth: 0, paddingTop: 6 }}>
             <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
                 fontSize: 12.5,
                 fontWeight: 800,
-                color: "#2A4060",
+                color: "rgba(255,250,240,.92)",
                 marginBottom: 8,
-                textShadow: "0 1px 0 rgba(255,255,255,.55)",
+                textShadow: "0 1px 10px rgba(0,0,0,.35)",
               }}
             >
               {saudacao}, família!
             </div>
             <h1
               style={{
-                margin: "0 0 8px",
+                margin: "0 0 10px",
                 fontFamily: SERIF,
                 fontWeight: 600,
-                fontSize: 26,
+                fontSize: 28,
                 lineHeight: 1.12,
-                color: INK,
+                color: "#FFFDF6",
                 letterSpacing: "-0.4px",
-                textShadow: "0 1px 12px rgba(255,255,255,.45)",
+                textShadow: "0 2px 16px rgba(0,0,0,.4)",
               }}
             >
               Cinema é mais
               <br />
               que diversão,
               <br />
-              é <span style={{ color: "#3E9A5E" }}>conexão</span>.
+              é <span style={{ color: "#9FE8B0" }}>conexão</span>
             </h1>
             <p
               style={{
                 margin: 0,
-                fontSize: 12.5,
-                fontWeight: 600,
-                lineHeight: 1.4,
-                color: INK2,
+                fontSize: 13,
+                fontWeight: 700,
+                lineHeight: 1.45,
+                color: "rgba(255,248,230,.88)",
                 maxWidth: 200,
+                textShadow: "0 1px 10px rgba(0,0,0,.35)",
               }}
             >
-              Um filme por semana para inspirar conversas, emoções e memórias que ficam.
+              Um filme por semana para inspirar conversas, emoções e memórias que ficam
             </p>
           </div>
         </div>
 
-        {/* Chips de categoria — horizontal scroll premium */}
-        <div style={{ marginBottom: GAP + 2 }}>
-          <div
-            className="cine2-hscroll"
-            style={{
-              display: "flex",
-              gap: 10,
-              overflowX: "auto",
-              padding: `2px ${PAD}px 4px`,
-              scrollbarWidth: "none",
-              animation: "cine2-cascade .55s cubic-bezier(.22,1,.36,1) .1s both",
-            }}
-          >
-            {CHIPS.map((c) => {
-              const Icon = c.Icon;
-              const on = chip === c.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => {
-                    haptic("light");
-                    setChip(c.id);
-                  }}
-                  className="active:scale-95"
-                  style={{
-                    position: "relative",
-                    overflow: "hidden",
-                    flex: "none",
-                    width: 118,
-                    minHeight: 108,
-                    padding: "12px 10px 10px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                    textAlign: "left",
-                    cursor: "pointer",
-                    fontFamily: FONT,
-                    ...coloredGlass(c.tint[0], c.tint[1], c.tint[2], on ? 0.52 : 0.34, on ? 0.2 : 0.12),
-                    outline: on ? `2px solid rgba(${c.tint[0]},${c.tint[1]},${c.tint[2]},.55)` : "none",
-                    outlineOffset: 1,
-                    boxShadow: on
-                      ? "0 12px 28px rgba(40,60,100,.2), 0 1px 0 rgba(255,255,255,.95) inset"
-                      : undefined,
-                  }}
-                >
-                  <Shine />
-                  <Gloss colors={c.g} size={36}>
-                    <Icon size={16} color="#fff" strokeWidth={2} />
-                  </Gloss>
-                  <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 13, color: INK, lineHeight: 1.15 }}>
-                    {c.title}
-                  </div>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, color: INK2, lineHeight: 1.25 }}>{c.sub}</div>
-                  <div style={{ marginTop: "auto", alignSelf: "flex-end" }}>
-                    <div
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 999,
-                        ...pillGlass,
-                        display: "grid",
-                        placeItems: "center",
-                      }}
-                    >
-                      <ArrowRight size={12} color={INK} strokeWidth={2.4} />
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Filme da semana — card featured */}
-        <div style={sectionWrap}>
+        {/* Filme da semana - card featured */}
+        <div style={{ ...sectionWrap, position: "relative", zIndex: 4 }}>
           <button
             type="button"
             onClick={() => open(weekly)}
@@ -1148,31 +945,27 @@ const FamilyCinema = ({ onBack }: Props) => {
                   </span>
                 </div>
               </div>
-              <div
+              <MoviePoster
+                id={weekly.id}
+                glow={weekly.glowColor}
+                title={weekly.titulo}
+                alt={weekly.titulo}
                 style={{
                   width: "40%",
                   flex: "none",
                   margin: 6,
                   marginLeft: 0,
                   borderRadius: R.panel,
-                  overflow: "hidden",
-                  position: "relative",
-                  background: COVER[weekly.id]
-                    ? `url("${COVER[weekly.id]}") center/cover`
-                    : `linear-gradient(160deg, ${hexA(weekly.glowColor, 0.7)}, #1a2030)`,
+                  minHeight: 128,
                 }}
               >
-                {!COVER[weekly.id] && (
-                  <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "linear-gradient(160deg, rgba(46,122,204,.55), #1a2030)" }}>
-                    <Clapperboard size={40} color="rgba(255,255,255,.9)" strokeWidth={1.5} />
-                  </div>
-                )}
                 <div
                   style={{
                     position: "absolute",
                     right: 8,
                     top: "50%",
                     transform: "translateY(-50%)",
+                    zIndex: 2,
                     width: 34,
                     height: 34,
                     borderRadius: R.btn,
@@ -1183,85 +976,39 @@ const FamilyCinema = ({ onBack }: Props) => {
                 >
                   <ArrowRight size={15} color={INK} strokeWidth={2.3} />
                 </div>
-              </div>
+              </MoviePoster>
             </div>
           </button>
         </div>
 
-        {/* Carrossel da categoria ativa */}
-        <div style={{ marginBottom: GAP }}>
-          <div style={{ padding: `0 ${PAD}px` }}>
-            <SectionLabel
-              kicker="Curadoria"
-              right={
-                <span style={{ fontSize: 11, fontWeight: 800, color: INK2 }}>
-                  {sectionMovies.length} filmes
-                </span>
-              }
-            >
-              {sectionTitle}
-            </SectionLabel>
-          </div>
-          <div
-            className="cine2-hscroll"
-            style={{
-              display: "flex",
-              gap: 12,
-              overflowX: "auto",
-              padding: `2px ${PAD}px 8px`,
-              scrollbarWidth: "none",
-              animation: "cine2-cascade .5s cubic-bezier(.22,1,.36,1) .18s both",
-            }}
-          >
-            {sectionMovies.map((m) => (
-              <MovieCard key={m.id} m={m} onOpen={open} />
-            ))}
-          </div>
-        </div>
-
-        {/* Seções editoriais extras (quando chip = alta) */}
-        {chip === "alta" &&
-          EDITORIAL_SECTIONS.map((sec, i) => {
-            const movies = getMoviesBySection(sec).slice(0, 8);
-            if (!movies.length) return null;
-            return (
-              <div key={sec.id} style={{ marginBottom: GAP }}>
-                <div style={{ padding: `0 ${PAD}px` }}>
-                  <SectionLabel kicker="Curadoria KIDZZ">{sec.title}</SectionLabel>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: INK2, marginTop: -6, marginBottom: 10 }}>
-                    {sec.subtitle}
-                  </div>
-                </div>
-                <div
-                  className="cine2-hscroll"
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    overflowX: "auto",
-                    padding: `0 ${PAD}px 6px`,
-                    scrollbarWidth: "none",
-                    animation: `cine2-cascade .5s cubic-bezier(.22,1,.36,1) ${0.2 + i * 0.05}s both`,
-                  }}
-                >
-                  {movies.map((m) => (
-                    <MovieCard key={m.id} m={m} onOpen={open} />
-                  ))}
-                </div>
+        {/* Seções editoriais */}
+        {EDITORIAL_SECTIONS.map((sec, i) => {
+          const movies = getMoviesBySection(sec).slice(0, 8);
+          if (!movies.length) return null;
+          return (
+            <div key={sec.id} style={{ marginBottom: GAP, position: "relative", zIndex: 4 }}>
+              <div style={{ padding: `0 ${PAD}px` }}>
+                <SectionLabel>{sec.title}</SectionLabel>
               </div>
-            );
-          })}
+              <div
+                className="cine2-hscroll"
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  overflowX: "auto",
+                  padding: `0 ${PAD}px 6px`,
+                  scrollbarWidth: "none",
+                  animation: `cine2-cascade .5s cubic-bezier(.22,1,.36,1) ${0.18 + i * 0.05}s both`,
+                }}
+              >
+                {movies.map((m) => (
+                  <MovieCard key={m.id} m={m} onOpen={open} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
 
-        <div
-          style={{
-            padding: `8px ${PAD}px 20px`,
-            textAlign: "center",
-            fontSize: 11.5,
-            fontWeight: 800,
-            color: "rgba(50,80,120,.45)",
-          }}
-        >
-          Curadoria KIDZZ · Selecionada para sua família
-        </div>
       </div>
 
       {active && <DetailSheet movie={active} onClose={() => setActive(null)} onMarcar={marcar} />}

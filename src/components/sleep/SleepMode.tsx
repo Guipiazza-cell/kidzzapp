@@ -14,13 +14,13 @@ interface Props {
 type Phase = "arrive" | "settle" | "drift" | "silence" | "done";
 
 /**
- * SleepMode — global "boa noite" ritual.
+ * SleepMode - global "boa noite" ritual.
  * 4 phases, ~4 min total, ends in soft silence then auto-close.
- *  arrive  (0-10s)  — "Hoje foi um dia..."
- *  settle  (10-60s) — guided slow breath + voice
- *  drift   (60-180s)— ambient hum + occasional whispers
- *  silence (180-240s) — fade to black, no voice
- *  done    — auto-close
+ *  arrive  (0-10s)  - "Hoje foi um dia..."
+ *  settle  (10-60s) - guided slow breath + voice
+ *  drift   (60-180s) -  ambient hum + occasional whispers
+ *  silence (180-240s) - fade to black, no voice
+ *  done    - auto-close
  */
 const SleepMode = ({ open, onClose, childName }: Props) => {
   const [phase, setPhase] = useState<Phase>("arrive");

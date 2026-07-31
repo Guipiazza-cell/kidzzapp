@@ -1,5 +1,5 @@
 /**
- * Validação — Aba MEMÓRIAS (premium v2)
+ * Validação - Aba MEMÓRIAS (premium v2)
  *
  *  1. Empty state acolhedor + CTAs (nunca tela em branco)
  *  2. Momentos = títulos reais das memories (consumo)
@@ -82,7 +82,7 @@ const makeMemory = (id: string, type: Memory["type"], title: string): Memory => 
   created_at: new Date().toISOString(),
 });
 
-describe("Aba Memórias — empty state e exibição de conteúdo", () => {
+describe("Aba Memórias - empty state e exibição de conteúdo", () => {
   beforeEach(() => {
     setFilterMock.mockClear();
     mockState = {

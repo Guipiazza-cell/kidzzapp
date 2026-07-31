@@ -82,7 +82,7 @@ export const SUNG_BOOKS: SungBook[] = [
       },
       {
         title: "A Subida",
-        text: "Ele subiu na árvore mais alta. Cada passo soava como uma nota nova. Tum, tum, tum — o coração batia junto.",
+        text: "Ele subiu na árvore mais alta. Cada passo soava como uma nota nova. Tum, tum, tum - o coração batia junto.",
         music: m("pe-2", [
           { note: "C5", dur: 0.4 }, { note: "D5", dur: 0.4 }, { note: "E5", dur: 0.5 },
           { note: "F5", dur: 0.5 }, { note: "G5", dur: 0.6 }, { note: "A5", dur: 0.6 },
@@ -189,7 +189,7 @@ export const SUNG_BOOKS: SungBook[] = [
       },
       {
         title: "A Festa Final",
-        text: "Eles dançaram até o sol pôr. E levaram um pedacinho da ilha no coração — pra cantar quando quisessem voltar.",
+        text: "Eles dançaram até o sol pôr. E levaram um pedacinho da ilha no coração - pra cantar quando quisessem voltar.",
         music: m("is-4", [
           { note: "G4", dur: 0.5 }, { note: "B4", dur: 0.5 }, { note: "D5", dur: 0.5 },
           { note: "G5", dur: 0.6 }, { note: "D5", dur: 0.5 }, { note: "B4", dur: 0.5 },

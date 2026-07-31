@@ -1,5 +1,5 @@
 /**
- * Logo oficial KIDZZ (wordmark glass) — usar em todo o site.
+ * Logo oficial KIDZZ (wordmark glass) - usar em todo o site.
  * Asset: /exemplos/assets/brand/kidzz-wordmark-alpha.png
  */
 import type { CSSProperties } from "react";

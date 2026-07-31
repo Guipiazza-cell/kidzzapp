@@ -1,6 +1,6 @@
 /**
  * Progresso de leitura por história (memory id).
- * Persistido em localStorage — sem inventar métricas, só registra o que foi lido.
+ * Persistido em localStorage - sem inventar métricas, só registra o que foi lido.
  */
 const KEY = "kidzz_story_progress_v1";
 

@@ -1,8 +1,8 @@
 /**
- * KIDZZ — Playlists Momentos
+ * KIDZZ - Playlists Momentos
  *
  * Curadoria editorial: 6 playlists familiares premium.
- * IDs do Spotify — basta atualizar a playlist no Spotify para refletir aqui.
+ * IDs do Spotify - basta atualizar a playlist no Spotify para refletir aqui.
  */
 
 export type PlaylistMood =
@@ -110,7 +110,7 @@ export const PLAYLISTS: KidzzPlaylist[] = [
   },
 ];
 
-/** Playlist da semana — troque o id quando quiser destacar outra */
+/** Playlist da semana - troque o id quando quiser destacar outra */
 export const WEEKLY_PLAYLIST_ID: string = "morning";
 
 export const getWeeklyPlaylist = () =>

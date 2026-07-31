@@ -184,7 +184,7 @@ export function installAppUpdateGuard() {
 
   // IMPORTANTE: NÃO interceptar history.pushState/replaceState. A troca de
   // abas internas usa replaceState e isso disparava checkForNewAppVersion a
-  // cada clique no dock — causando hard reload / limpeza de cache no meio da
+  // cada clique no dock - causando hard reload / limpeza de cache no meio da
   // navegação. Updates já são detectados pelos gatilhos acima (intervalo,
   // focus, online, pageshow, visibilitychange).
   window.addEventListener("popstate", triggerCheck);

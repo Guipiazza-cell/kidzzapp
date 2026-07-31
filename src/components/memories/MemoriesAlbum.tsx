@@ -11,26 +11,33 @@ import {
   type Activity,
 } from "@/lib/weeklyActivities";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import heroMemorias from "@/assets/memorias-hero.jpg";
+import iconPerguntaUrl from "@/assets/memorias/icon-pergunta.png";
+import iconHistoriaUrl from "@/assets/memorias/icon-historia.png";
+import iconMissaoUrl from "@/assets/memorias/icon-missao.png";
 
 /**
- * MemoriesAlbum — redesign premium v2
+ * MemoriesAlbum - redesign premium v2
  * Ref: public/telas/memorias/
- * Assets: camaleão original soft · mix Gui + família
+ * Hero: card arte completa (Gui + caixinha de fotos + texto)
  *
- * Dados reais de consumo (nunca mock fixo de conteúdo):
- *  - Momentos guardados  → memories do usuário (useMemories)
- *  - Em andamento        → histórias com leitura <100% + missões da semana incompletas
- *                          + progresso rumo à próxima conquista de perguntas
- *  - Conquistas          → desbloqueadas por questions_used / stories_used / missions /
- *                          total de memórias / streak_days
+ * Histórico de uso do app (tudo que a família faz fica aqui):
+ *  - Momentos guardados  → memories (perguntas, histórias, música, cinema, rotina, jogos…)
+ *  - Em andamento        → histórias / missões incompletas
+ *  - Conquistas          → badges por consumo real
  *  - Pontos              → profile.points
  */
 
 const AS = "/exemplos/assets/memorias-v2";
 /** bump ao regenerar assets (cache bust no browser) */
-const AV = "v3";
+const AV = "v7";
 const asset = (name: string) => `${AS}/${name}?${AV}`;
+
+/** Fundo da aba — mesma família de cor do card rosa (Nova Pergunta) */
+const MEM_BG =
+  "linear-gradient(180deg, #E8B8CC 0%, #DCA8C0 32%, #D098B4 62%, #C488A4 100%)";
+const MEM_INK = "#3A2438";
+const MEM_INK2 = "rgba(58,36,56,.72)";
 
 interface MemoriesAlbumProps {
   onBack: () => void;
@@ -70,10 +77,9 @@ const D = {
   shield: "M12 3 5 6v5c0 4.5 2.8 7.8 7 9 4.2-1.2 7-4.5 7-9V6l-7-3Z",
 };
 
-const TYPE_META: Record<
-  Memory["type"],
-  { k: string; d: string; tag: string; tagColor: [string, string]; cover: string }
-> = {
+type TypeMeta = { k: string; d: string; tag: string; tagColor: [string, string]; cover: string };
+
+const TYPE_META: Record<string, TypeMeta> = {
   question: {
     k: "rosa",
     d: D.chat,
@@ -102,7 +108,72 @@ const TYPE_META: Record<
     tagColor: ["rgba(242,178,59,.92)", "#4A3210"],
     cover: asset("cover-default.png"),
   },
+  music: {
+    k: "roxo",
+    d: D.heart,
+    tag: "Música",
+    tagColor: ["rgba(200,170,245,.92)", "#3A2060"],
+    cover: asset("cover-default.png"),
+  },
+  cinema: {
+    k: "azul",
+    d: D.photo,
+    tag: "Cinema",
+    tagColor: ["rgba(150,200,245,.92)", "#133A5E"],
+    cover: asset("cover-default.png"),
+  },
+  routine: {
+    k: "verde",
+    d: D.target,
+    tag: "Rotina",
+    tagColor: ["rgba(170,218,140,.92)", "#23431A"],
+    cover: asset("cover-mission.png"),
+  },
+  play: {
+    k: "ambar",
+    d: D.star,
+    tag: "Brincar",
+    tagColor: ["rgba(242,178,59,.92)", "#4A3210"],
+    cover: asset("cover-default.png"),
+  },
+  activity: {
+    k: "rosa",
+    d: D.heart,
+    tag: "Atividade",
+    tagColor: ["rgba(244,168,200,.92)", "#4A1F35"],
+    cover: asset("cover-default.png"),
+  },
+  discover: {
+    k: "azul",
+    d: D.grid,
+    tag: "Descobrir",
+    tagColor: ["rgba(150,200,245,.92)", "#133A5E"],
+    cover: asset("cover-default.png"),
+  },
+  bora: {
+    k: "verde",
+    d: D.target,
+    tag: "Bora",
+    tagColor: ["rgba(170,218,140,.92)", "#23431A"],
+    cover: asset("cover-mission.png"),
+  },
+  diary: {
+    k: "rosa",
+    d: D.book,
+    tag: "Diário",
+    tagColor: ["rgba(244,168,200,.92)", "#4A1F35"],
+    cover: asset("cover-story.png"),
+  },
 };
+
+const typeMetaOf = (type: string): TypeMeta =>
+  TYPE_META[type] || {
+    k: "ambar",
+    d: D.star,
+    tag: "Uso",
+    tagColor: ["rgba(242,178,59,.92)", "#4A3210"],
+    cover: asset("cover-default.png"),
+  };
 
 type InProgressItem = {
   id: string;
@@ -242,12 +313,10 @@ const MemoriesAlbum = ({
   const questionsUsed = profile?.questions_used ?? 0;
   const storiesUsed = profile?.stories_used ?? 0;
   const streakDays = profile?.streak_days ?? 0;
-  const h = new Date().getHours();
-  const saudacao = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
 
   const handleShare = useCallback(
     async (m: Memory) => {
-      const shareText = `${m.title}\n\n${m.content || ""}\n\n💛 Criado com KIDZZ — kidzzapp.lovable.app`;
+      const shareText = `${m.title}\n\n${m.content || ""}\n\nCriado com KIDZZ - kidzzapp.lovable.app`;
       if (navigator.share) {
         try {
           await navigator.share({ title: `Memória de ${childName}`, text: shareText });
@@ -256,7 +325,7 @@ const MemoriesAlbum = ({
         }
       } else {
         await navigator.clipboard.writeText(shareText);
-        toast.success("Memória copiada! 💛");
+        toast.success("Memória copiada!");
       }
     },
     [childName]
@@ -273,7 +342,7 @@ const MemoriesAlbum = ({
   );
   const albumCount = allMemories.length;
 
-  /** Conquistas da família — só desbloqueiam com consumo real */
+  /** Conquistas da família - só desbloqueiam com consumo real */
   const familyBadges: FamilyBadge[] = useMemo(
     () => [
       {
@@ -330,7 +399,7 @@ const MemoriesAlbum = ({
     [questionsUsed, storiesUsed, missionCount, albumCount, streakDays]
   );
 
-  /** Em andamento — só o que a família realmente começou / consumiu */
+  /** Em andamento - só o que a família realmente começou / consumiu */
   const inProgress: InProgressItem[] = useMemo(() => {
     const items: InProgressItem[] = [];
 
@@ -382,7 +451,7 @@ const MemoriesAlbum = ({
       /* localStorage indisponível */
     }
 
-    // 3) Progresso de perguntas rumo ao próximo marco — usa última pergunta consumida no título
+    // 3) Progresso de perguntas rumo ao próximo marco - usa última pergunta consumida no título
     const qMark = nextQuestionMilestone(questionsUsed);
     if (qMark && qMark.total > 1) {
       const lastQ = allMemories.find((m) => m.type === "question");
@@ -409,7 +478,7 @@ const MemoriesAlbum = ({
       key: "a1",
       title: "Nova Pergunta",
       sub: `Crie perguntas para ${childName}`,
-      d: D.chat,
+      icon: iconPerguntaUrl,
       k: "rosa",
       onClick: () => onNavigateToChat?.(),
     },
@@ -417,7 +486,7 @@ const MemoriesAlbum = ({
       key: "a2",
       title: "Nova História",
       sub: "Escreva uma história juntos",
-      d: D.book,
+      icon: iconHistoriaUrl,
       k: "azul",
       onClick: () => onNavigateToStories?.(),
     },
@@ -425,17 +494,20 @@ const MemoriesAlbum = ({
       key: "a3",
       title: "Nova Missão",
       sub: "Desafios para criar memórias",
-      d: D.target,
+      icon: iconMissaoUrl,
       k: "verde",
-      onClick: () => onNavigateToPlay?.() ?? toast("Abra Brincar para missões ✨"),
+      onClick: () => onNavigateToPlay?.() ?? toast("Abra Brincar para missões"),
     },
   ];
 
   const chips: { id: typeof filter; label: string; d: string }[] = [
-    { id: "all", label: "Todas", d: D.grid },
+    { id: "all", label: "Tudo", d: D.grid },
     { id: "question", label: "Perguntas", d: D.chat },
     { id: "story", label: "Histórias", d: D.book },
+    { id: "music", label: "Música", d: D.heart },
+    { id: "cinema", label: "Cinema", d: D.photo },
     { id: "mission", label: "Missões", d: D.target },
+    { id: "play", label: "Brincar", d: D.star },
     { id: "achievement", label: "Conquistas", d: D.trophy },
   ];
 
@@ -478,7 +550,8 @@ const MemoriesAlbum = ({
         height: "100%",
         position: "relative",
         fontFamily: FONT,
-        background: "linear-gradient(180deg,#26341F 0%,#1E2A19 38%,#161F12 72%,#121A0F 100%)",
+        background: MEM_BG,
+        color: MEM_INK,
       }}
     >
       <style>{KEYFRAMES}</style>
@@ -488,35 +561,9 @@ const MemoriesAlbum = ({
           inset: 0,
           pointerEvents: "none",
           background:
-            "radial-gradient(45% 30% at 80% 30%,rgba(255,214,140,.10),transparent 70%),radial-gradient(40% 26% at 12% 55%,rgba(160,220,255,.06),transparent 70%),radial-gradient(50% 30% at 55% 88%,rgba(233,140,180,.07),transparent 70%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: -60,
-          left: -80,
-          width: 340,
-          height: 340,
-          borderRadius: "50%",
-          background: "radial-gradient(circle,rgba(255,214,140,.18),transparent 65%)",
-          filter: "blur(28px)",
-          animation: "memv2-drift1 13s ease-in-out infinite",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "38%",
-          left: -90,
-          width: 300,
-          height: 300,
-          borderRadius: "50%",
-          background: "radial-gradient(circle,rgba(120,180,240,.13),transparent 65%)",
-          filter: "blur(30px)",
-          animation: "memv2-drift2 17s ease-in-out 2s infinite",
-          pointerEvents: "none",
+            "radial-gradient(48% 32% at 82% 18%, rgba(255,230,200,.35), transparent 68%)," +
+            "radial-gradient(42% 28% at 12% 60%, rgba(255,255,255,.22), transparent 70%)," +
+            "radial-gradient(50% 30% at 50% 92%, rgba(200,120,160,.18), transparent 70%)",
         }}
       />
 
@@ -531,198 +578,146 @@ const MemoriesAlbum = ({
           position: "relative",
         }}
       >
-        {/* ── HERO ── */}
-        <div style={{ position: "relative", height: 352 }}>
-          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 316, overflow: "hidden" }}>
-            <img
-              src={CAMALEAO.heartSoft}
-              alt="Gui, o camaleão, escrevendo memórias no diário"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "center 30%",
-                animation: "memv2-floaty 6s ease-in-out infinite",
-                ...CAMALEAO_SCENE_MASK,
-                filter: "drop-shadow(0 16px 24px rgba(40,30,20,.26))",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.heart;
-              }}
-            />
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "44%",
-              height: 316,
-              pointerEvents: "none",
-              background:
-                "linear-gradient(180deg,rgba(255,226,160,.22) 0%,rgba(255,226,160,.06) 45%,transparent 75%)",
-              filter: "blur(6px)",
-              animation: "memv2-raysway 7s ease-in-out infinite",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: 316,
-              background:
-                "linear-gradient(180deg,rgba(18,24,14,.4) 0%,rgba(18,24,14,0) 20%,rgba(38,52,31,0) 42%,rgba(38,52,31,.4) 70%,rgba(38,52,31,.16) 90%,transparent 100%)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: 316,
-              background:
-                "linear-gradient(97deg,rgba(20,28,16,.82) 0%,rgba(20,28,16,.4) 30%,rgba(20,28,16,0) 58%)",
-            }}
-          />
-
+        {/* ── Header sticky ── */}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingBottom: 10,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background:
+              "linear-gradient(180deg, rgba(232,184,204,.82) 0%, rgba(232,184,204,.35) 70%, transparent 100%)",
+            backdropFilter: "blur(18px) saturate(150%)",
+            WebkitBackdropFilter: "blur(18px) saturate(150%)",
+          }}
+        >
           <button
+            type="button"
             onClick={onBack}
             aria-label="Voltar"
             className="active:scale-90"
             style={{
-              position: "absolute",
-              top: 62,
-              left: 16,
               width: 44,
               height: 44,
+              flex: "none",
               borderRadius: 999,
               cursor: "pointer",
-              background: "rgba(255,255,255,.14)",
+              background: "rgba(255,255,255,.55)",
               backdropFilter: "blur(16px) saturate(150%)",
-              border: "0.5px solid rgba(255,255,255,.32)",
-              boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              border: "0.5px solid rgba(255,255,255,.75)",
+              boxShadow: "0 6px 16px rgba(90,40,70,.14),inset 0 1px 0 rgba(255,255,255,.85)",
+              display: "grid",
+              placeItems: "center",
             }}
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
               <path
                 d="M19 12H5m6-6-6 6 6 6"
-                stroke="#F4EFE2"
+                stroke={MEM_INK}
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
           </button>
-
-          <div style={{ position: "absolute", top: 62, right: 16, display: "flex", gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => onOpenParent?.()}
-              aria-label="Área dos pais"
-              className="active:scale-95"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                padding: "8px 13px",
-                minHeight: 44,
-                borderRadius: 999,
-                background: "rgba(255,255,255,.14)",
-                backdropFilter: "blur(16px) saturate(150%)",
-                border: "0.5px solid rgba(255,255,255,.3)",
-                boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
-                fontWeight: 900,
-                fontSize: 13,
-                color: "#F4EFE2",
-                cursor: onOpenParent ? "pointer" : "default",
-                fontFamily: FONT,
-              }}
-            >
-              <Icon d={D.shield} stroke="#CFE6FF" size={14} sw={1.9} />
-              Pais
-            </button>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-                padding: "8px 13px",
-                minHeight: 44,
-                borderRadius: 999,
-                background: "rgba(255,255,255,.14)",
-                backdropFilter: "blur(16px) saturate(150%)",
-                border: "0.5px solid rgba(255,255,255,.3)",
-                boxShadow: "0 6px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35)",
-                fontWeight: 900,
-                fontSize: 13,
-                color: "#F4EFE2",
-              }}
-            >
-              <Icon d={D.trophy} stroke="#F2C55C" size={14} sw={1.9} />
-              {pontos}
-            </div>
+          <div style={{ flex: 1 }} />
+          <button
+            type="button"
+            onClick={() => onOpenParent?.()}
+            aria-label="Área dos pais"
+            className="active:scale-95"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "8px 13px",
+              minHeight: 44,
+              borderRadius: 999,
+              background: "rgba(255,255,255,.55)",
+              backdropFilter: "blur(16px) saturate(150%)",
+              border: "0.5px solid rgba(255,255,255,.75)",
+              boxShadow: "0 6px 16px rgba(90,40,70,.14),inset 0 1px 0 rgba(255,255,255,.85)",
+              fontWeight: 900,
+              fontSize: 13,
+              color: MEM_INK,
+              cursor: onOpenParent ? "pointer" : "default",
+              fontFamily: FONT,
+            }}
+          >
+            <Icon d={D.shield} stroke="#5A7EB0" size={14} sw={1.9} />
+            Pais
+          </button>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "8px 13px",
+              minHeight: 44,
+              borderRadius: 999,
+              background: "rgba(255,255,255,.55)",
+              backdropFilter: "blur(16px) saturate(150%)",
+              border: "0.5px solid rgba(255,255,255,.75)",
+              boxShadow: "0 6px 16px rgba(90,40,70,.14),inset 0 1px 0 rgba(255,255,255,.85)",
+              fontWeight: 900,
+              fontSize: 13,
+              color: MEM_INK,
+            }}
+          >
+            <Icon d={D.trophy} stroke="#C98F1E" size={14} sw={1.9} />
+            {pontos}
           </div>
+        </div>
 
-          <div style={{ position: "absolute", left: 20, bottom: 8, width: 252, animation: "memv2-rise .6s both" }}>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "6px 12px",
-                borderRadius: 999,
-                background: "rgba(255,255,255,.13)",
-                backdropFilter: "blur(12px)",
-                border: "0.5px solid rgba(255,255,255,.28)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,.3)",
-                fontWeight: 800,
-                fontSize: 12,
-                color: "rgba(244,239,226,.9)",
-                marginBottom: 11,
-              }}
-            >
-              {saudacao}, família!
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="#8FE3CD" style={{ verticalAlign: -2 }}>
-                <path d={D.heart} />
-              </svg>
-            </div>
-            <h1
-              style={{
-                margin: "0 0 9px",
-                fontFamily: SERIF,
-                fontWeight: 600,
-                fontSize: 30,
-                lineHeight: 1.14,
-                color: "#F4EDDC",
-                letterSpacing: "-.2px",
-                textShadow: "0 2px 14px rgba(0,0,0,.45)",
-              }}
-            >
-              Aqui guardamos <span style={{ color: "#F2A9C4" }}>memórias</span> que viram histórias.
-            </h1>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 13,
-                fontWeight: 700,
-                lineHeight: 1.45,
-                color: "rgba(238,233,222,.78)",
-                maxWidth: 225,
-                textShadow: "0 1px 8px rgba(0,0,0,.4)",
-              }}
-            >
-              Cada momento juntos merece ser lembrado para sempre.
-            </p>
-          </div>
+        {/* ── HERO: card arte completa (texto + Gui + caixinha) ── */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 3,
+            margin: "6px 16px 14px",
+            borderRadius: 28,
+            overflow: "hidden",
+            boxShadow: "0 16px 36px rgba(90,40,70,.16)",
+            animation: "memv2-rise .6s both",
+            background: "#F5D0E0",
+            lineHeight: 0,
+          }}
+        >
+          <img
+            src={heroMemorias}
+            alt="Aqui guardamos memórias que viram histórias, Gui com caixinha de fotos"
+            draggable={false}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "auto",
+              objectFit: "contain",
+              objectPosition: "center center",
+              verticalAlign: "top",
+            }}
+          />
+          <h1
+            style={{
+              position: "absolute",
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
+              overflow: "hidden",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              border: 0,
+              lineHeight: "normal",
+            }}
+          >
+            Aqui guardamos memórias que viram histórias
+          </h1>
         </div>
 
         {/* ── AÇÕES RÁPIDAS ── */}
@@ -748,17 +743,26 @@ const MemoriesAlbum = ({
                   height: "100%",
                   pointerEvents: "none",
                   background:
-                    "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%)",
+                    "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.28) 50%,transparent 100%)",
                   animation: "memv2-shine 5.5s ease-in-out infinite",
                 }}
               />
-              <div style={gloss(...GLOSSY[a.k], 40, 999)}>
-                <Icon d={a.d} />
-              </div>
-              <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14, color: "#F6F1E4", lineHeight: 1.15 }}>
+              <img
+                src={a.icon}
+                alt=""
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 14,
+                  objectFit: "cover",
+                  flex: "none",
+                  boxShadow: "0 6px 14px rgba(0,0,0,.18), 0 1px 0 rgba(255,255,255,.7) inset",
+                }}
+              />
+              <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14, color: MEM_INK, lineHeight: 1.15 }}>
                 {a.title}
               </div>
-              <div style={{ fontSize: 10.5, fontWeight: 800, color: "rgba(240,235,225,.68)", lineHeight: 1.35 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: MEM_INK2, lineHeight: 1.35 }}>
                 {a.sub}
               </div>
               <div style={arrow(a.k)}>
@@ -792,13 +796,13 @@ const MemoriesAlbum = ({
                   background: "linear-gradient(155deg, rgba(255,255,255,.20), rgba(255,255,255,.08))",
                   backdropFilter: "blur(14px)",
                   WebkitBackdropFilter: "blur(14px)",
-                  color: "rgba(240,235,225,.88)",
+                  color: MEM_INK2,
                   border: "0.5px solid rgba(255,255,255,.3)",
                   boxShadow: "inset 0 1px 0 rgba(255,255,255,.35), 0 4px 12px rgba(0,0,0,.25)",
                 };
             return (
               <button key={chip.id} onClick={() => setFilter(chip.id)} className="active:scale-95" style={style}>
-                <Icon d={chip.d} stroke={on ? "#fff" : "rgba(240,235,225,.8)"} size={15} sw={2} />
+                <Icon d={chip.d} stroke={on ? "#fff" : MEM_INK2} size={15} sw={2} />
                 {chip.label}
               </button>
             );
@@ -811,7 +815,7 @@ const MemoriesAlbum = ({
             style={{
               padding: "48px 16px",
               textAlign: "center",
-              color: "rgba(240,235,225,.7)",
+              color: MEM_INK2,
               fontWeight: 800,
               fontSize: 14,
             }}
@@ -831,7 +835,7 @@ const MemoriesAlbum = ({
                     padding: "20px 20px 10px",
                   }}
                 >
-                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
+                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: MEM_INK }}>
                     Em andamento
                   </h2>
                 </div>
@@ -922,7 +926,7 @@ const MemoriesAlbum = ({
                             alignSelf: "flex-end",
                             fontSize: 11,
                             fontWeight: 900,
-                            color: "rgba(240,235,225,.7)",
+                            color: MEM_INK2,
                           }}
                         >
                           {item.current}/{item.total}
@@ -955,12 +959,12 @@ const MemoriesAlbum = ({
                     fontFamily: SERIF,
                     fontWeight: 600,
                     fontSize: 19,
-                    color: "#F4EDDC",
+                    color: MEM_INK,
                     lineHeight: 1.3,
                     margin: "0 0 8px",
                   }}
                 >
-                  Aqui vão ficar as memórias mais preciosas de {childName} 💛
+                  Aqui vão ficar as memórias mais preciosas de {childName}
                 </h3>
                 <p
                   style={{
@@ -971,7 +975,7 @@ const MemoriesAlbum = ({
                     margin: "0 0 20px",
                   }}
                 >
-                  Cada pergunta respondida, cada história criada, cada missão em família — tudo guardado para sempre.
+                  Cada pergunta respondida, cada história criada, cada missão em família - tudo guardado para sempre.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 280, margin: "0 auto" }}>
                   <button
@@ -1036,8 +1040,8 @@ const MemoriesAlbum = ({
                     padding: "20px 20px 10px",
                   }}
                 >
-                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
-                    Momentos guardados 🌱
+                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: MEM_INK }}>
+                    Histórico de uso
                   </h2>
                   {filter !== "all" && (
                     <button onClick={() => setFilter("all")} style={verTodasStyle}>
@@ -1055,7 +1059,7 @@ const MemoriesAlbum = ({
                   }}
                 >
                   {momentos.map((m) => {
-                    const meta = TYPE_META[m.type];
+                    const meta = typeMetaOf(m.type);
                     const cover = m.image_url || meta.cover;
                     return (
                       <div
@@ -1217,8 +1221,8 @@ const MemoriesAlbum = ({
                     padding: "20px 20px 10px",
                   }}
                 >
-                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: "#F4EDDC" }}>
-                    Conquistas da família 🌱
+                  <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: MEM_INK }}>
+                    Conquistas da família
                   </h2>
                 </div>
                 <div
@@ -1306,10 +1310,10 @@ const MemoriesAlbum = ({
                 }}
               >
                 <p style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#F6F1E4" }}>
-                  +{lockedCount} memórias guardadas com carinho 💛
+                  +{lockedCount} memórias guardadas com carinho
                 </p>
-                <p style={{ margin: "4px 0 12px", fontSize: 12, fontWeight: 700, color: "rgba(240,235,225,.7)" }}>
-                  Desbloqueie todas com Premium ✨
+                <p style={{ margin: "4px 0 12px", fontSize: 12, fontWeight: 700, color: MEM_INK2 }}>
+                  Desbloqueie todas com Premium
                 </p>
                 <button
                   onClick={() => handleCheckout("premium")}
@@ -1329,7 +1333,7 @@ const MemoriesAlbum = ({
                     boxShadow: "0 10px 24px rgba(90,50,150,.4),inset 0 1px 0 rgba(255,255,255,.3)",
                   }}
                 >
-                  🔓 Desbloquear todas as memórias
+                  Desbloquear todas as memórias
                 </button>
               </div>
             )}

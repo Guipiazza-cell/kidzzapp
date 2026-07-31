@@ -131,18 +131,44 @@ export function useEntitlement() {
    * Retorna { allowed }. Defesa em profundidade: edge function também valida.
    */
   const consumeQuota = useCallback(
-    async (tipo: QuotaTipo): Promise<{ allowed: boolean }> => {
+    async (tipo: QuotaTipo, criancaId?: string | null): Promise<{ allowed: boolean }> => {
       if (!user) return { allowed: false };
       try {
-        const { data, error } = await (supabase as any).rpc("increment_usage", {
-          _tipo: tipo,
-        });
+        // Resolve criança se não veio (schema com usage.crianca_id)
+        let childId = criancaId ?? null;
+        if (!childId) {
+          const { data: child } = await supabase
+            .from("criancas")
+            .select("id")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          childId = (child as any)?.id ?? null;
+        }
+
+        const attempts: Record<string, unknown>[] = [];
+        if (childId) attempts.push({ _tipo: tipo, _crianca_id: childId });
+        attempts.push({ _tipo: tipo, _crianca_id: null });
+        attempts.push({ _tipo: tipo });
+
+        let data: any = null;
+        let error: any = null;
+        for (const args of attempts) {
+          const r = await (supabase as any).rpc("increment_usage", args);
+          if (!r.error) {
+            data = r.data;
+            error = null;
+            break;
+          }
+          error = r.error;
+        }
+
         if (error) {
           console.warn("[useEntitlement] increment_usage error", error);
           return { allowed: false };
         }
         const row = Array.isArray(data) ? data[0] : data;
-        // Atualiza estado local otimisticamente
         await fetchAll();
         return { allowed: !!row?.allowed };
       } catch (err) {

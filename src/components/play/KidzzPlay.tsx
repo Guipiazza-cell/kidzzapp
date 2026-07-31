@@ -9,7 +9,7 @@ import {
   type CSSProperties,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Trophy, Shield, Heart } from "lucide-react";
+import { ArrowLeft, Lock, Trophy, Shield, Heart, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import {
@@ -17,13 +17,41 @@ import {
   type BrincarExperience,
 } from "@/data/brincarExperiences";
 import LockedFeature from "@/components/LockedFeature";
-import KidzzHeader from "@/components/common/KidzzHeader";
 import MyActivities from "./MyActivities";
+import { getExperienceGuide, getFeaturedGuide } from "./playGuides";
 import confetti from "canvas-confetti";
+import { toast } from "sonner";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 
-/** Assets gerados Hermes/Codex — public/telas/brincar */
+/** Assets gerados Hermes/Codex - public/telas/brincar */
 const BR = "/exemplos/assets/brincar-v2";
+const BR_IC = `${BR}/icons`;
+
+/** Ícones premium 3D - jogos */
+const GAME_ICON: Record<string, string> = {
+  memory: `${BR_IC}/game-memory.png`,
+  "pixel-pula": `${BR_IC}/game-pula.png`,
+  reaction: `${BR_IC}/game-reaction.png`,
+  emotions: `${BR_IC}/game-emotions.png`,
+  create: `${BR_IC}/game-create.png`,
+  word: `${BR_IC}/game-word.png`,
+  hangman: `${BR_IC}/game-hangman.png`,
+  daily: `${BR_IC}/game-daily.png`,
+};
+
+/** Ícones premium 3D - experiências Criar & Imaginar */
+const EXP_ICON: Record<string, string> = {
+  "criar-caixa": `${BR_IC}/exp-caixa.png`,
+  "criar-personagem": `${BR_IC}/exp-personagem.png`,
+  "criar-planeta": `${BR_IC}/exp-planeta.png`,
+  "criar-animal": `${BR_IC}/exp-dino.png`,
+  "criar-filme": `${BR_IC}/exp-filme.png`,
+  "explorar-cores": `${BR_IC}/exp-rainbow.png`,
+  "explorar-detetive": `${BR_IC}/exp-detective.png`,
+  "explorar-animal": `${BR_IC}/exp-lion.png`,
+  "explorar-nuvens": `${BR_IC}/exp-cloud.png`,
+  "explorar-natureza": `${BR_IC}/exp-cloud.png`,
+};
 
 const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
 const MemoryGame = lazy(() => import("./games/MemoryGame"));
@@ -66,7 +94,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Monte um esconderijo incrível e conte histórias!",
     img: `${BR}/act-cabana.png`,
     tempo: "5 min",
-    idade: "3–6 anos",
+    idade: "3-6 anos",
     energia: "leve",
     tint: "rgba(232,130,26,0.55)",
     scrim:
@@ -78,7 +106,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Encontre os objetos escondidos pela casa.",
     img: `${BR}/act-caca.png`,
     tempo: "10 min",
-    idade: "4–8 anos",
+    idade: "4-8 anos",
     energia: "média",
     premium: true,
     tint: "rgba(70,112,58,0.55)",
@@ -91,7 +119,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Liberte a criatividade com tinta e imaginação.",
     img: `${BR}/act-arte.png`,
     tempo: "15 min",
-    idade: "3–10 anos",
+    idade: "3-10 anos",
     energia: "leve",
     tint: "rgba(193,115,166,0.55)",
     scrim:
@@ -103,7 +131,7 @@ const FEATURED: FeaturedActivity[] = [
     desc: "Quem faz o avião que voa mais longe?",
     img: `${BR}/act-aviao.png`,
     tempo: "7 min",
-    idade: "5–9 anos",
+    idade: "5-9 anos",
     energia: "leve",
     premium: true,
     tint: "rgba(79,143,201,0.55)",
@@ -131,7 +159,7 @@ const GAMES: {
   { id: "daily", label: "Desafio", emoji: "🎯", sub: "Missão especial", bgColor: "linear-gradient(135deg, hsl(340 75% 65%), hsl(0 75% 60%))", premium: true },
 ];
 
-/* ───────── Design tokens (Brincar.dc.html — light glass) ───────── */
+/* ───────── Design tokens (Brincar.dc.html - light glass) ───────── */
 const TINT: Record<string, [number, number, number]> = {
   laranja: [245, 150, 60],
   verde: [90, 190, 110],
@@ -302,6 +330,7 @@ const BRIN_KEYFRAMES = `
 @keyframes brin-leafdrift{0%{transform:translate(0,-30px) rotate(0deg);opacity:0}12%{opacity:.7}88%{opacity:.6}100%{transform:translate(-46px,105vh) rotate(300deg);opacity:0}}
 @keyframes brin-heartbeat{0%,100%{transform:scale(1)}12%{transform:scale(1.12)}24%{transform:scale(1)}36%{transform:scale(1.08)}48%{transform:scale(1)}}
 @keyframes brin-wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.kidzz-h-scroll::-webkit-scrollbar{display:none}
 `;
 
 interface Props {
@@ -347,33 +376,12 @@ const KidzzPlay = ({
     [],
   );
 
-  /* ── Parallax do hero (portado do design) ── */
   const scrollRef = useRef<HTMLDivElement>(null);
-  const heroWrapRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 300);
     return () => clearTimeout(t);
-  }, []);
-  useEffect(() => {
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
-  const onHeroScroll = useCallback(() => {
-    if (rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      const sc = scrollRef.current;
-      const hero = heroWrapRef.current;
-      if (!sc || !hero) return;
-      const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.42}px) scale(${1 + y * 0.0004})`;
-      hero.style.opacity = String(Math.max(0, 1 - y / 240));
-    });
   }, []);
 
   const handleScore = useCallback(
@@ -432,28 +440,93 @@ const KidzzPlay = ({
     setSelectedFeatured(f);
   };
 
-  /* ───────── HEADER PADRÃO (sub-telas criar/jogos) ───────── */
-  const PlayHeader = (
-    <KidzzHeader
-      onBack={() => {
-        setSub("home");
-        setActiveGame(null);
+  /* ───────── HEADER sub-telas ───────── */
+  const backToHome = () => {
+    setSub("home");
+    setActiveGame(null);
+  };
+
+  /** Header das sub-telas: sem logo, cor estendida da página */
+  const SubHeader = ({
+    bg,
+    border,
+    ink,
+    pillBorder,
+  }: {
+    bg: string;
+    border: string;
+    ink: string;
+    pillBorder: string;
+  }) => (
+    <div
+      className="sticky top-0 z-30"
+      style={{
+        paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)",
+        paddingLeft: 14,
+        paddingRight: 14,
+        paddingBottom: 10,
+        background: bg,
+        borderBottom: border,
       }}
-      right={
-        <>
-          <motion.button
-            type="button"
-            onClick={onOpenAchievements}
-            whileTap={{ scale: 0.94 }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/75 backdrop-blur-md border border-white/70 shadow-sm min-h-[40px]"
-          >
-            <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
-            <span className="text-[13px] font-extrabold text-[#2A2520]">
-              {sessionScore}
-            </span>
-          </motion.button>
-        </>
-      }
+    >
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={backToHome}
+          aria-label="Voltar"
+          className="active:scale-95"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.55)",
+            border: pillBorder,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(40,70,30,0.08)",
+          }}
+        >
+          <ArrowLeft size={20} color={ink} strokeWidth={2.2} />
+        </button>
+        <div className="flex-1 min-w-0" aria-hidden />
+        <motion.button
+          type="button"
+          onClick={onOpenAchievements}
+          whileTap={{ scale: 0.94 }}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full min-h-[40px]"
+          style={{
+            background: "rgba(255,255,255,0.55)",
+            border: pillBorder,
+            boxShadow: "0 4px 12px rgba(40,70,30,0.08)",
+          }}
+        >
+          <Trophy size={14} className="text-amber-500" strokeWidth={2.4} />
+          <span className="text-[13px] font-extrabold" style={{ color: ink }}>
+            {sessionScore}
+          </span>
+        </motion.button>
+      </div>
+    </div>
+  );
+
+  /** Criar & Imaginar - verde da página, sem logo */
+  const CriarHeader = (
+    <SubHeader
+      bg="linear-gradient(180deg, #EAF6E4 0%, #F0F8EA 100%)"
+      border="1px solid rgba(46,154,99,0.08)"
+      ink="#1E3A28"
+      pillBorder="1px solid rgba(46,154,99,0.12)"
+    />
+  );
+
+  /** Jogos & Desafios - roxo da página, sem logo */
+  const JogosHeader = (
+    <SubHeader
+      bg="linear-gradient(180deg, #EDE9F8 0%, #F3F1FB 100%)"
+      border="1px solid rgba(106,62,192,0.08)"
+      ink="#3A2A70"
+      pillBorder="1px solid rgba(106,62,192,0.12)"
     />
   );
 
@@ -476,7 +549,7 @@ const KidzzPlay = ({
 
   const heroImg = `${BR}/hero-kids.png`;
 
-  /* Anel de progresso do desafio (2/3 — igual ao design) */
+  /* Anel de progresso do desafio (2/3 - igual ao design) */
   const RING_CIRC = 207.3;
   const ringOffset = mounted ? RING_CIRC * (1 - 2 / 3) : RING_CIRC;
 
@@ -532,7 +605,6 @@ const KidzzPlay = ({
 
       <div
         ref={scrollRef}
-        onScroll={onHeroScroll}
         style={{
           height: "100%",
           overflowY: "auto",
@@ -545,29 +617,8 @@ const KidzzPlay = ({
           zIndex: 2,
         }}
       >
-        {/* ── HERO (texto esq + arte dir, como print) ── */}
-        <div style={{ position: "relative", minHeight: 360, paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}>
-          <div
-            ref={heroWrapRef}
-            style={{
-              position: "absolute", top: 40, right: -12, width: "56%", height: 300,
-              pointerEvents: "none", animation: "brin-heroIn .7s cubic-bezier(.22,1,.36,1) both",
-            }}
-          >
-            <img
-              src={heroImg}
-              alt="Crianças brincando na floresta"
-              style={{
-                width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%",
-                borderRadius: "0 0 0 48%",
-                maskImage: "radial-gradient(70% 70% at 58% 40%, #000 38%, transparent 78%)",
-                WebkitMaskImage: "radial-gradient(70% 70% at 58% 40%, #000 38%, transparent 78%)",
-                filter: "saturate(1.1)",
-                animation: "brin-floaty 6.5s ease-in-out infinite",
-              }}
-            />
-          </div>
-
+        {/* ── Top bar (fundo continua full-bleed atrás) ── */}
+        <div style={{ position: "relative", paddingTop: "calc(env(safe-area-inset-top, 0px) + 10px)" }}>
           <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
             <button
               type="button"
@@ -599,25 +650,67 @@ const KidzzPlay = ({
               </button>
             </div>
           </div>
+          {/* Espaço curto de fundo; card sobe para não ficar no meio do rosto */}
+          <div style={{ height: 72 }} aria-hidden />
+        </div>
 
-          <div style={{ position: "relative", zIndex: 5, padding: "16px 20px 8px", maxWidth: "62%", animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "rgba(255,252,240,.95)", textShadow: "0 1px 8px rgba(0,0,0,.35)", marginBottom: 8 }}>
-              {greeting}, família!{" "}
-              <span style={{ display: "inline-flex", verticalAlign: "middle", animation: "brin-heartbeat 2.4s ease-in-out infinite" }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="#7dffb0"><path d={D.heart} /></svg>
-              </span>
+        {/* ── Card de boas-vindas liquid glass (translúcido, não tapa o fundo) ── */}
+        <div style={{ padding: "0 16px 10px", marginTop: -8, position: "relative", zIndex: 5, animation: "brin-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
+          <div
+            style={{
+              borderRadius: 24,
+              padding: "16px 16px 15px",
+              background:
+                "linear-gradient(160deg, rgba(255,255,255,.38) 0%, rgba(255,252,244,.22) 50%, rgba(240,250,232,.28) 100%)",
+              border: "0.5px solid rgba(255,255,255,.55)",
+              boxShadow:
+                "0 12px 28px rgba(40,70,30,.12), inset 0 1px 0 rgba(255,255,255,.55)",
+              backdropFilter: "blur(28px) saturate(180%)",
+              WebkitBackdropFilter: "blur(28px) saturate(180%)",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 800,
+                fontSize: 13,
+                color: "#17301F",
+                marginBottom: 6,
+                textShadow: "0 1px 8px rgba(255,255,255,.55)",
+              }}
+            >
+              {greeting}, família!
             </div>
-            <h1 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 30, lineHeight: 1.12, color: "#FFFDF6", letterSpacing: "-.4px", textShadow: "0 2px 18px rgba(0,0,0,.4)" }}>
-              Brincar faz parte da <span style={{ color: "#8BE08A" }}>magia</span> de crescer.
+            <h1
+              style={{
+                margin: "0 0 8px",
+                fontFamily: SERIF,
+                fontWeight: 600,
+                fontSize: 24,
+                lineHeight: 1.18,
+                color: "#0F2418",
+                letterSpacing: "-.35px",
+                textShadow: "0 1px 10px rgba(255,255,255,.45)",
+              }}
+            >
+              Brincar faz parte da <span style={{ color: "#1F8A52" }}>magia</span> de crescer
             </h1>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(255,248,230,.9)", textShadow: "0 1px 8px rgba(0,0,0,.3)", maxWidth: 250 }}>
-              Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão.
+            <p
+              style={{
+                margin: 0,
+                fontSize: 13,
+                fontWeight: 700,
+                lineHeight: 1.45,
+                color: "rgba(23,48,31,.82)",
+                textShadow: "0 1px 8px rgba(255,255,255,.4)",
+              }}
+            >
+              Escolha uma atividade e transforme qualquer momento em diversão, aprendizado e conexão
             </p>
           </div>
         </div>
 
         {/* ── CATEGORIAS (2x2) com ícones gerados ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: "8px 16px 0", position: "relative", zIndex: 5, animation: "brin-rise .6s .1s both" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: "4px 16px 0", position: "relative", zIndex: 5, animation: "brin-rise .6s .1s both" }}>
           {categorias.map((c) => (
             <button key={c.key} type="button" onClick={c.onClick} className="active:scale-[0.96]" style={{ ...categoryCardStyle(c.k), borderRadius: 26, minHeight: 148, padding: "14px 13px 12px" }}>
               <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%)", animation: "brin-shine 5.5s ease-in-out infinite" }} />
@@ -643,12 +736,28 @@ const KidzzPlay = ({
         </div>
 
         {/* ── PARA BRINCAR AGORA ── */}
-        <div>
+        <div style={{ minWidth: 0, width: "100%" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "20px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Para brincar agora ✨</h2>
+            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Para brincar agora</h2>
             <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todas →</button>
           </div>
-          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 12px", scrollbarWidth: "none" }}>
+          <div
+            className="kidzz-h-scroll"
+            style={{
+              display: "flex",
+              gap: 12,
+              overflowX: "auto",
+              overflowY: "hidden",
+              WebkitOverflowScrolling: "touch",
+              touchAction: "pan-x",
+              overscrollBehaviorX: "contain",
+              padding: "2px 16px 16px",
+              width: "100%",
+              maxWidth: "100%",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
             {FEATURED.map((f) => {
               const locked = !!f.premium && !isPremium;
               return (
@@ -657,7 +766,23 @@ const KidzzPlay = ({
                   type="button"
                   onClick={() => openFeatured(f)}
                   className="active:scale-[.97]"
-                  style={{ flex: "none", width: 172, height: 228, borderRadius: 24, position: "relative", overflow: "hidden", cursor: "pointer", padding: 0, textAlign: "left", boxShadow: "0 16px 36px rgba(50,90,40,.26), 0 1px 0 rgba(255,255,255,.55) inset", border: "0.5px solid rgba(255,255,255,.75)", animation: "brin-rise .45s both", transition: "transform .2s" }}
+                  style={{
+                    flex: "0 0 auto",
+                    width: 172,
+                    minWidth: 172,
+                    height: 228,
+                    borderRadius: 24,
+                    position: "relative",
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    padding: 0,
+                    textAlign: "left",
+                    boxShadow: "0 16px 36px rgba(50,90,40,.26), 0 1px 0 rgba(255,255,255,.55) inset",
+                    border: "0.5px solid rgba(255,255,255,.75)",
+                    animation: "brin-rise .45s both",
+                    transition: "transform .2s",
+                    touchAction: "manipulation",
+                  }}
                 >
                   <img src={f.img} alt={f.titulo} loading="lazy" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                   <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: f.scrim }} />
@@ -686,9 +811,8 @@ const KidzzPlay = ({
 
         {/* ── DESAFIOS EM FAMÍLIA ── */}
         <div>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "14px 20px 10px" }}>
+          <div style={{ padding: "14px 20px 10px" }}>
             <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#17301F" }}>Desafios em família ✨</h2>
-            <button type="button" onClick={() => setSub("missoes")} style={verTodasStyle}>Ver todos →</button>
           </div>
           <div style={{ padding: "0 16px" }}>
             <div style={{ position: "relative", overflow: "hidden", borderRadius: 28, padding: "16px 16px 14px", background: "linear-gradient(155deg,rgba(255,255,255,.38) 0%,rgba(139,105,240,.8) 24%,rgba(120,88,220,.7) 60%,rgba(98,70,190,.78) 100%)", backdropFilter: "blur(36px) saturate(190%)", WebkitBackdropFilter: "blur(36px) saturate(190%)", border: "0.5px solid rgba(255,255,255,.7)", boxShadow: "0 18px 40px rgba(90,60,180,.38),0 0 28px rgba(139,105,240,.28),inset 0 1.5px 0 rgba(255,255,255,.75),inset 0 -10px 22px rgba(40,20,100,.25)", animation: "brin-rise .5s .15s both" }}>
@@ -730,17 +854,6 @@ const KidzzPlay = ({
           </div>
         </div>
 
-        {/* ── IDEIAS RÁPIDAS + Modo Viagem ── */}
-        <div style={{ display: "flex", gap: 10, padding: "16px 16px 8px", alignItems: "stretch" }}>
-          <button type="button" onClick={() => setSub("criar")} className="active:scale-[.97]" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "13px 16px", borderRadius: 999, cursor: "pointer", background: "linear-gradient(155deg,rgba(255,255,255,.9),rgba(255,255,255,.55))", backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)", border: "1px solid rgba(255,255,255,1)", boxShadow: "0 10px 24px rgba(60,100,50,.16),inset 0 1.5px 0 rgba(255,255,255,1)", fontFamily: "'Nunito',sans-serif", transition: "transform .2s", textAlign: "left" }}>
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: "#17301F" }}>Ideias rápidas <span style={{ fontWeight: 700, color: "#557A5E" }}>para qualquer lugar</span></span>
-            <Icon d={D.arrow} stroke="#2E9A63" size={15} sw={2.4} />
-          </button>
-          <button type="button" onClick={() => onOpenTravel?.()} className="active:scale-[.97]" style={{ flex: "none", display: "flex", alignItems: "center", gap: 7, padding: "13px 17px", borderRadius: 999, cursor: "pointer", background: "radial-gradient(130% 130% at 30% 22%,#FFE9A8 0%,#F2A62B 55%,#C77E12 100%)", border: "1px solid rgba(255,255,255,.8)", boxShadow: "0 10px 24px rgba(180,110,10,.35),inset 0 1.5px 1px rgba(255,255,255,.75),inset 0 -5px 10px rgba(140,80,0,.35)", fontFamily: "'Nunito',sans-serif", fontSize: 13, fontWeight: 900, color: "#4A3300", transition: "transform .2s" }}>
-            <Icon d={D.plane} stroke="#4A3300" size={15} sw={1.8} />
-            Modo Viagem
-          </button>
-        </div>
       </div>
     </motion.div>
   );
@@ -833,14 +946,19 @@ const KidzzPlay = ({
                   )}
                 </div>
                 <div
-                  className="text-4xl mt-3"
+                  className="mt-3 w-14 h-14 rounded-2xl overflow-hidden"
                   style={{
-                    filter: locked
-                      ? "blur(2px)"
-                      : "drop-shadow(0 3px 5px rgba(0,0,0,.22))",
+                    filter: locked ? "blur(2px) saturate(0.7)" : "none",
+                    boxShadow: "0 6px 14px rgba(0,0,0,.18)",
+                    border: "0.5px solid rgba(255,255,255,.55)",
+                    background: "rgba(255,255,255,.2)",
                   }}
                 >
-                  {e.emoji}
+                  <img
+                    src={EXP_ICON[e.id] ?? `${BR_IC}/exp-caixa.png`}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h4 className="mt-2 text-[14px] font-black text-white leading-tight drop-shadow-sm">
                   {e.titulo}
@@ -900,7 +1018,7 @@ const KidzzPlay = ({
                 <span style={{ color: "#6A3EC0" }}>para todos</span>
               </h1>
               <p style={subLead("#5E5680")}>
-                Memória, palavras, desafios — escolha o jogo do dia.
+                Memória, palavras, desafios: escolha o jogo do dia
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 px-4 mt-5">
@@ -951,14 +1069,23 @@ const KidzzPlay = ({
                       )}
                     </span>
                     <span
-                      className="text-4xl relative"
+                      className="relative w-14 h-14 rounded-2xl overflow-hidden flex-none"
                       style={{
-                        filter: locked
-                          ? "blur(2px)"
-                          : "drop-shadow(0 3px 5px rgba(0,0,0,.22))",
+                        filter: locked ? "blur(2px) saturate(0.65)" : "none",
+                        boxShadow: locked
+                          ? "none"
+                          : "0 6px 14px rgba(0,0,0,.2)",
+                        border: "0.5px solid rgba(255,255,255,.55)",
+                        background: locked
+                          ? "rgba(255,255,255,.5)"
+                          : "rgba(255,255,255,.22)",
                       }}
                     >
-                      {game.emoji}
+                      <img
+                        src={GAME_ICON[game.id] ?? `${BR_IC}/game-memory.png`}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
                     </span>
                     <span
                       className={`relative text-[13px] font-extrabold ${
@@ -1169,7 +1296,8 @@ const KidzzPlay = ({
       exit={{ opacity: 0 }}
     >
       <style>{BRIN_KEYFRAMES}</style>
-      {sub !== "missoes" && sub !== "home" && PlayHeader}
+      {sub === "criar" && CriarHeader}
+      {sub === "jogos" && !activeGame && JogosHeader}
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
@@ -1194,33 +1322,42 @@ const KidzzPlay = ({
       <AnimatePresence>
         {showPremiumCTA && (
           <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-5"
+            style={{
+              background:
+                "radial-gradient(80% 60% at 50% 40%, rgba(90,50,160,0.45), rgba(10,8,20,0.72))",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowPremiumCTA(false)}
           >
             <motion.div
-              className="w-full max-w-sm"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-[340px]"
+              initial={{ scale: 0.92, y: 16, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
             >
               <LockedFeature
-                type="games"
+                type="game"
                 requiredTier="kidzz"
                 onUpgrade={() => {
                   setShowPremiumCTA(false);
                   window.dispatchEvent(
                     new CustomEvent("kidzz:open-paywall", {
-                      detail: { context: "games_locked" },
+                      detail: { context: "game_locked" },
                     }),
                   );
                 }}
               />
               <button
-                className="block mx-auto mt-3 text-xs text-white/80 font-bold underline"
+                type="button"
+                className="block mx-auto mt-4 text-[12.5px] font-extrabold min-h-[44px]"
+                style={{ color: "rgba(255,255,255,0.85)" }}
                 onClick={() => setShowPremiumCTA(false)}
               >
                 Agora não
@@ -1230,9 +1367,11 @@ const KidzzPlay = ({
         )}
       </AnimatePresence>
 
-      {/* Featured activity detail */}
+      {/* Featured: guia no padrão Missões (como fazer + exemplo) */}
       <AnimatePresence>
-        {selectedFeatured && (
+        {selectedFeatured && (() => {
+          const guide = getFeaturedGuide(selectedFeatured.id, selectedFeatured.titulo, childName);
+          return (
           <motion.div
             className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
@@ -1241,14 +1380,14 @@ const KidzzPlay = ({
             onClick={() => setSelectedFeatured(null)}
           >
             <motion.div
-              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden bg-white shadow-2xl"
+              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden bg-white shadow-2xl max-h-[90vh] flex flex-col"
               initial={{ y: 80, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 60, opacity: 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative h-48">
+              <div className="relative h-40 flex-none">
                 <img
                   src={selectedFeatured.img}
                   alt={selectedFeatured.titulo}
@@ -1261,10 +1400,10 @@ const KidzzPlay = ({
                   }}
                 />
                 <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/85 backdrop-blur text-[11px] font-extrabold text-[#2A2520]">
-                  ⏱ {selectedFeatured.tempo}
+                  {selectedFeatured.tempo}
                 </div>
                 <div className="absolute bottom-3 left-4 right-4">
-                  <h3 className="font-display text-[22px] font-extrabold text-white drop-shadow-lg">
+                  <h3 className="text-[22px] font-extrabold text-white drop-shadow-lg leading-tight">
                     {selectedFeatured.titulo}
                   </h3>
                   <p className="text-[12px] font-medium text-white/95 leading-snug mt-1">
@@ -1272,36 +1411,74 @@ const KidzzPlay = ({
                   </p>
                 </div>
               </div>
-              <div className="p-4 flex flex-col gap-3">
+              <div className="p-4 flex flex-col gap-3 overflow-y-auto flex-1 min-h-0">
                 <div className="flex items-center gap-2 text-[11px] font-bold text-[#2A2520]/70">
                   <span className="px-2.5 py-1 rounded-full bg-[#F5EFE3] border border-[#E5D9C0]">
-                    🎯 {selectedFeatured.idade}
+                    {selectedFeatured.idade}
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-[#F5EFE3] border border-[#E5D9C0] flex items-center gap-1">
                     <Heart size={11} className="text-rose-400" />
                     {selectedFeatured.energia}
                   </span>
                 </div>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  className="w-full py-3.5 rounded-2xl font-black text-sm"
+
+                <section>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-amber-500" />
+                    Como fazer
+                  </h4>
+                  <ol className="space-y-2.5">
+                    {guide.steps.map((s, i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500 text-white text-[11px] font-black flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <p className="text-sm text-gray-700 leading-snug font-medium">{s}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+
+                <section>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2">
+                    Exemplo prático
+                  </h4>
+                  <div className="rounded-2xl p-3.5 bg-amber-50 border border-amber-200/80">
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium">{guide.example}</p>
+                  </div>
+                </section>
+
+                <button
+                  type="button"
+                  className="w-full py-3.5 rounded-2xl font-black text-sm min-h-[48px] active:scale-[0.98]"
                   style={{
                     color: "#4A3300",
                     background:
                       "radial-gradient(130% 160% at 30% 18%,#FFE9A8 0%,#F2A62B 55%,#C77E12 100%)",
                     border: "1px solid rgba(255,255,255,.8)",
                     boxShadow:
-                      "0 10px 24px rgba(180,110,10,.35), inset 0 1.5px 1px rgba(255,255,255,.75), inset 0 -5px 10px rgba(140,80,0,.35)",
+                      "0 10px 24px rgba(180,110,10,.35), inset 0 1.5px 1px rgba(255,255,255,.75)",
                   }}
                   onClick={() => {
-                    handleScore(5);
+                    handleScore(15);
+                    confetti({
+                      particleCount: 40,
+                      spread: 55,
+                      origin: { y: 0.7 },
+                      colors: ["#FFD86E", "#9EE493", "#fff"],
+                      scalar: 0.9,
+                    });
+                    toast.success(`${selectedFeatured.titulo} começando!`, {
+                      description: "Sigam o passo a passo e divirtam-se.",
+                    });
                     setSelectedFeatured(null);
                   }}
                 >
-                  ✨ Vamos brincar agora
-                </motion.button>
+                  Vamos brincar agora
+                </button>
                 <button
-                  className="text-xs font-bold text-gray-500 mx-auto"
+                  type="button"
+                  className="text-xs font-bold text-gray-500 mx-auto min-h-[44px]"
                   onClick={() => setSelectedFeatured(null)}
                 >
                   Fechar
@@ -1309,12 +1486,15 @@ const KidzzPlay = ({
               </div>
             </motion.div>
           </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
 
-      {/* Generic experience detail (sub-screen Criar) */}
+      {/* Criar & Imaginar: guia no padrão Missões */}
       <AnimatePresence>
-        {selectedExp && (
+        {selectedExp && (() => {
+          const guide = getExperienceGuide(selectedExp, childName);
+          return (
           <motion.div
             className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-6"
             initial={{ opacity: 0 }}
@@ -1323,7 +1503,7 @@ const KidzzPlay = ({
             onClick={() => setSelectedExp(null)}
           >
             <motion.div
-              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden border border-white/30 shadow-2xl"
+              className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden border border-white/30 shadow-2xl max-h-[90vh] flex flex-col"
               style={{ background: selectedExp.gradient }}
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1331,10 +1511,20 @@ const KidzzPlay = ({
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-5">
+              <div className="p-5 flex-none">
                 <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur flex items-center justify-center text-4xl border border-white/30">
-                    {selectedExp.emoji}
+                  <div
+                    className="w-16 h-16 rounded-2xl overflow-hidden flex-none border border-white/35"
+                    style={{
+                      boxShadow: "0 8px 18px rgba(0,0,0,.18)",
+                      background: "rgba(255,255,255,.22)",
+                    }}
+                  >
+                    <img
+                      src={EXP_ICON[selectedExp.id] ?? `${BR_IC}/exp-caixa.png`}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-wider text-white/90">
@@ -1348,37 +1538,86 @@ const KidzzPlay = ({
                 <p className="text-sm font-semibold text-white/95 leading-snug mt-3">
                   {selectedExp.descricao}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-4">
+                <div className="flex flex-wrap gap-2 mt-3">
                   <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
-                    ⏱ {selectedExp.tempo}
+                    {selectedExp.tempo}
                   </span>
                   <span className="text-[11px] font-extrabold text-white bg-white/20 border border-white/30 rounded-full px-2.5 py-1">
-                    🎯 {selectedExp.idadeMin}–{selectedExp.idadeMax} anos
+                    {selectedExp.idadeMin}-{selectedExp.idadeMax} anos
                   </span>
                 </div>
               </div>
-              <div className="bg-white/95 backdrop-blur p-4 flex flex-col gap-2">
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  className="w-full py-3 rounded-2xl font-black text-white text-sm shadow-md min-h-[48px]"
-                  style={{ background: selectedExp.gradient }}
-                  onClick={() => {
-                    handleScore(5);
+
+              <div className="bg-white flex-1 min-h-0 overflow-y-auto px-5 py-4">
+                <section>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-amber-500" />
+                    Como fazer
+                  </h4>
+                  <ol className="space-y-2.5">
+                    {guide.steps.map((s, i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500 text-white text-[11px] font-black flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <p className="text-sm text-gray-700 leading-snug font-medium">{s}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+                <section className="mt-5">
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-gray-500 mb-2">
+                    Exemplo prático
+                  </h4>
+                  <div className="rounded-2xl p-3.5 bg-emerald-50 border border-emerald-200/80">
+                    <p className="text-sm text-gray-800 leading-relaxed font-medium">{guide.example}</p>
+                  </div>
+                </section>
+              </div>
+
+              <div className="bg-white p-4 flex flex-col gap-2 flex-none border-t border-gray-100">
+                <button
+                  type="button"
+                  className="w-full py-3.5 rounded-2xl font-black text-white text-sm shadow-md min-h-[48px] active:scale-[0.98]"
+                  style={{
+                    background: selectedExp.gradient,
+                    border: "1px solid rgba(255,255,255,.45)",
+                    boxShadow: "0 10px 22px rgba(0,0,0,.16)",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const exp = selectedExp;
+                    handleScore(15);
+                    confetti({
+                      particleCount: 40,
+                      spread: 55,
+                      origin: { y: 0.7 },
+                      colors: ["#FFD86E", "#9EE493", "#FF9ECF", "#fff"],
+                      scalar: 0.9,
+                    });
+                    toast.success(`${exp.titulo} começando!`, {
+                      description: "Sigam o passo a passo e divirtam-se.",
+                    });
                     setSelectedExp(null);
                   }}
                 >
-                  ✨ Vamos viver agora
-                </motion.button>
+                  Vamos viver agora
+                </button>
                 <button
-                  className="text-xs font-bold text-gray-500 mx-auto"
-                  onClick={() => setSelectedExp(null)}
+                  type="button"
+                  className="text-xs font-bold text-gray-500 mx-auto py-2 min-h-[44px]"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedExp(null);
+                  }}
                 >
                   Fechar
                 </button>
               </div>
             </motion.div>
           </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </motion.div>
   );

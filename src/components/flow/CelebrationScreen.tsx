@@ -2,12 +2,12 @@ import { useEffect, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowRight, Bookmark } from "lucide-react";
 import confetti from "canvas-confetti";
-// getMascotDialogue intentionally unused — phrases come from the local pool for variety
+// getMascotDialogue intentionally unused - phrases come from the local pool for variety
 import { addXP, incrementDailyStreak } from "@/lib/habitLoop";
-import pixelImg from "@/assets/chameleon-main.webp";
+import pixelImg from "@/assets/memorias/gui-cutout.png";
 import aneImg from "@/assets/ane-chameleon.webp";
 
-// Emotional, varied phrases — never repeat the same one twice in a row.
+// Emotional, varied phrases - never repeat the same one twice in a row.
 const EMOTIONAL_PHRASES = (name: string) => [
   `Isso foi incrível, ${name} 💛`,
   `Vocês estão criando algo especial ✨`,

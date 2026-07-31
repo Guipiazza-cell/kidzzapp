@@ -7,7 +7,7 @@ import { neon, glow, gameGradient } from "@/lib/gameTheme";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
 
-// Bigger, themed nature sets — animals, plants, ocean
+// Bigger, themed nature sets - animals, plants, ocean
 const EMOJI_SETS: { theme: string; emojis: string[]; gradient: string; glow: string }[] = [
   {
     theme: "🌳 Floresta",

@@ -1,7 +1,7 @@
 /**
  * Haptic feedback utility for mobile.
  * Uses the Vibration API (Android + most mobile browsers). iOS Safari
- * ignores navigator.vibrate, but the same calls are no-ops there — safe
+ * ignores navigator.vibrate, but the same calls are no-ops there - safe
  * to call unconditionally from any component.
  *
  * Usage:

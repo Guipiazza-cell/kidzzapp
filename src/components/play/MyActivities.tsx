@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, Sparkles, RefreshCw, Lock } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import { supabase } from "@/integrations/supabase/client";
-import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
 import { addXp } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
 import ActivityDetailModal from "./ActivityDetailModal";
@@ -28,8 +27,146 @@ interface Props {
   onBack: () => void;
 }
 
+const IC = "/exemplos/assets/brincar-v2/icons";
+
+/** Pack completo de ícones premium (sem os 4 de categoria genéricos). */
+const ALL_ACT_ICONS = [
+  "act-dance", "act-bear", "act-map", "act-fort", "act-hero", "act-book",
+  "act-music", "act-gift", "act-water",
+  "a-bed", "a-blocks", "a-calendar", "a-compass", "a-dice", "a-dream",
+  "a-flamingo", "a-frog", "a-giraffe", "a-glass", "a-grandma", "a-hide",
+  "a-hug", "a-jumpjack", "a-jumprope", "a-laugh", "a-learn", "a-mask",
+  "a-mirror", "a-name", "a-numbers", "a-pan", "a-plane", "a-potato",
+  "a-robot", "a-silence", "a-sparkle", "a-statue", "a-thanks", "a-tooth",
+  "a-wind", "a-window",
+].map((n) => `${IC}/${n}.png`);
+
+/** Preferência por id do pool curado (quando existir). */
+const ID_ICON: Record<string, string> = {
+  m1: `${IC}/act-dance.png`,
+  m2: `${IC}/a-jumprope.png`,
+  m3: `${IC}/a-statue.png`,
+  m4: `${IC}/act-bear.png`,
+  m5: `${IC}/a-jumpjack.png`,
+  m6: `${IC}/a-flamingo.png`,
+  m7: `${IC}/act-map.png`,
+  m8: `${IC}/a-frog.png`,
+  m9: `${IC}/a-giraffe.png`,
+  m10: `${IC}/a-mirror.png`,
+  c1: `${IC}/act-fort.png`,
+  c2: `${IC}/act-hero.png`,
+  c3: `${IC}/a-name.png`,
+  c4: `${IC}/act-book.png`,
+  c5: `${IC}/a-potato.png`,
+  c6: `${IC}/a-plane.png`,
+  c7: `${IC}/act-music.png`,
+  c8: `${IC}/a-dream.png`,
+  c9: `${IC}/a-robot.png`,
+  c10: `${IC}/a-mask.png`,
+  f1: `${IC}/a-dice.png`,
+  f2: `${IC}/a-laugh.png`,
+  f3: `${IC}/a-hug.png`,
+  f4: `${IC}/a-pan.png`,
+  f5: `${IC}/a-grandma.png`,
+  f6: `${IC}/act-gift.png`,
+  f7: `${IC}/a-compass.png`,
+  f8: `${IC}/a-sparkle.png`,
+  f9: `${IC}/a-calendar.png`,
+  f10: `${IC}/a-hide.png`,
+  d1: `${IC}/act-water.png`,
+  d2: `${IC}/a-bed.png`,
+  d3: `${IC}/a-blocks.png`,
+  d4: `${IC}/a-learn.png`,
+  d5: `${IC}/a-silence.png`,
+  d6: `${IC}/a-numbers.png`,
+  d7: `${IC}/a-tooth.png`,
+  d8: `${IC}/a-thanks.png`,
+  d9: `${IC}/a-window.png`,
+  d10: `${IC}/a-wind.png`,
+};
+
+/** Preferência por emoji (IA / textos). */
+const EMOJI_ICON: Record<string, string> = {
+  "💃": `${IC}/act-dance.png`,
+  "🪢": `${IC}/a-jumprope.png`,
+  "🗿": `${IC}/a-statue.png`,
+  "🐻": `${IC}/act-bear.png`,
+  "🤸": `${IC}/a-jumpjack.png`,
+  "🦩": `${IC}/a-flamingo.png`,
+  "🗺️": `${IC}/act-map.png`,
+  "🐸": `${IC}/a-frog.png`,
+  "🦒": `${IC}/a-giraffe.png`,
+  "🪞": `${IC}/a-mirror.png`,
+  "🏕️": `${IC}/act-fort.png`,
+  "🦸": `${IC}/act-hero.png`,
+  "🎲": `${IC}/a-dice.png`,
+  "📖": `${IC}/act-book.png`,
+  "🥔": `${IC}/a-potato.png`,
+  "📄": `${IC}/a-plane.png`,
+  "🎤": `${IC}/act-music.png`,
+  "💭": `${IC}/a-dream.png`,
+  "🤖": `${IC}/a-robot.png`,
+  "🎭": `${IC}/a-mask.png`,
+  "🤣": `${IC}/a-laugh.png`,
+  "🤗": `${IC}/a-hug.png`,
+  "🍳": `${IC}/a-pan.png`,
+  "👵": `${IC}/a-grandma.png`,
+  "🎁": `${IC}/act-gift.png`,
+  "🤐": `${IC}/a-silence.png`,
+  "💌": `${IC}/a-sparkle.png`,
+  "📅": `${IC}/a-calendar.png`,
+  "🙈": `${IC}/a-hide.png`,
+  "💧": `${IC}/act-water.png`,
+  "🛏️": `${IC}/a-bed.png`,
+  "🧸": `${IC}/a-blocks.png`,
+  "📚": `${IC}/a-learn.png`,
+  "🤫": `${IC}/a-silence.png`,
+  "🔢": `${IC}/a-numbers.png`,
+  "🦷": `${IC}/a-tooth.png`,
+  "🙏": `${IC}/a-thanks.png`,
+  "🪟": `${IC}/a-window.png`,
+  "🌬️": `${IC}/a-wind.png`,
+  "✨": `${IC}/a-sparkle.png`,
+  "🏃": `${IC}/a-jumpjack.png`,
+  "🎨": `${IC}/a-potato.png`,
+  "💛": `${IC}/a-hug.png`,
+  "⚡": `${IC}/a-sparkle.png`,
+};
+
+function hashStr(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
 /**
- * Atividades semanais — 10 missões por semana.
+ * Ícone único e diversificado:
+ * 1) id do pool  2) emoji  3) hash estável em cima do pack completo
+ * Nunca repete só os 4 ícones de categoria.
+ */
+function activityIconSrc(a: Activity): string {
+  if (ID_ICON[a.id]) return ID_ICON[a.id];
+  if (a.emoji && EMOJI_ICON[a.emoji]) return EMOJI_ICON[a.emoji];
+  const key = `${a.id}|${a.title}|${a.emoji}|${a.category}`;
+  return ALL_ACT_ICONS[hashStr(key) % ALL_ACT_ICONS.length];
+}
+
+/** Liquid glass mais translúcido (cards de atividade) */
+const liquidCard: CSSProperties = {
+  background:
+    "linear-gradient(165deg, rgba(255,255,255,.32) 0%, rgba(255,255,255,.14) 50%, rgba(255,255,255,.10) 100%)",
+  border: "0.5px solid rgba(255,255,255,.48)",
+  boxShadow:
+    "0 12px 32px rgba(20,16,30,.10), 0 2px 8px rgba(20,16,30,.05), inset 0 1px 0 rgba(255,255,255,.65), inset 0 -1px 0 rgba(255,255,255,.08)",
+  backdropFilter: "blur(36px) saturate(190%)",
+  WebkitBackdropFilter: "blur(36px) saturate(190%)",
+};
+
+/**
+ * Atividades semanais - 10 missões por semana.
  * - Sorteio do pool curado é instantâneo (sempre algo na tela).
  * - Em background, tenta enriquecer com IA (`generate-activities`).
  * - 1 atividade destacada por dia.
@@ -133,7 +270,12 @@ const MyActivities = ({ onBack }: Props) => {
         content: activity.description,
         is_special: false,
         image_url: null,
-        metadata: { source: "weekly_activity", category: activity.category, emoji: activity.emoji },
+        metadata: {
+          area: "play",
+          source: "weekly_activity",
+          category: activity.category,
+          emoji: activity.emoji,
+        },
       });
       const meta = getCategoryMeta(activity.category);
       const colorHsl = meta.color
@@ -206,10 +348,10 @@ const MyActivities = ({ onBack }: Props) => {
         </motion.button>
         <div className="text-center flex-1">
           <h1 className="text-base font-extrabold text-gray-800 flex items-center justify-center gap-1.5">
-            🎯 Atividades
+            Atividades
           </h1>
           <p className="text-[11px] text-gray-500 font-semibold">
-            {completedCount}/{totalCount} • {source === "ai" ? "Personalizado ✨" : "Esta semana"}
+            {completedCount}/{totalCount} • {source === "ai" ? "Personalizado" : "Esta semana"}
           </p>
         </div>
         <motion.button
@@ -228,7 +370,7 @@ const MyActivities = ({ onBack }: Props) => {
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-4" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 120px)" }}>
         {/* Progresso */}
-        <div className="bg-white/60 backdrop-blur rounded-2xl p-3 border border-white/50 mb-3">
+        <div className="rounded-2xl p-3 mb-3" style={liquidCard}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-extrabold text-gray-700">
               Progresso da semana
@@ -255,11 +397,14 @@ const MyActivities = ({ onBack }: Props) => {
         {/* Atividade do dia (destaque) */}
         {dailyHighlight && (
           <motion.div
-            className="relative mb-4 p-4 rounded-3xl border-2 border-amber-300 overflow-hidden cursor-pointer"
+            className="relative mb-4 p-4 rounded-3xl overflow-hidden cursor-pointer"
             style={{
+              ...liquidCard,
               background:
-                "linear-gradient(135deg, hsl(45 95% 88%) 0%, hsl(45 95% 75%) 100%)",
-              boxShadow: "0 8px 24px hsl(45 90% 55% / 0.25)",
+                "linear-gradient(155deg, rgba(255,248,220,.55) 0%, rgba(255,255,255,.28) 45%, rgba(255,255,255,.18) 100%)",
+              border: "0.5px solid rgba(255,220,140,.65)",
+              boxShadow:
+                "0 12px 32px rgba(180,120,20,.16), inset 0 1px 0 rgba(255,255,255,.75)",
             }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -268,22 +413,39 @@ const MyActivities = ({ onBack }: Props) => {
             role="button"
             aria-label={`Ver detalhes: ${dailyHighlight.title}`}
           >
-            <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center gap-1 shadow-md">
+            <div
+              className="absolute top-2 right-2 px-2 py-1 rounded-full text-white text-[10px] font-black flex items-center gap-1 shadow-md"
+              style={{
+                background: "linear-gradient(180deg,#F5C14A,#E0A020)",
+              }}
+            >
               <Sparkles size={10} /> HOJE
             </div>
             <div className="flex items-start gap-3">
-              <div className="text-4xl flex-shrink-0">{dailyHighlight.emoji}</div>
+              <div
+                className="w-14 h-14 rounded-2xl flex-shrink-0 overflow-hidden"
+                style={{
+                  boxShadow: "0 6px 16px rgba(40,60,30,.14)",
+                  border: "0.5px solid rgba(255,255,255,.7)",
+                }}
+              >
+                <img
+                  src={activityIconSrc(dailyHighlight)}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black text-amber-700 uppercase tracking-wide">
+                <p className="text-[10px] font-black text-amber-800/90 uppercase tracking-wide">
                   {getCategoryMeta(dailyHighlight.category).label}
                 </p>
                 <h3 className="text-base font-extrabold text-gray-800 leading-tight">
                   {dailyHighlight.title}
                 </h3>
-                <p className="text-xs text-gray-700 mt-1 leading-snug">
+                <p className="text-xs text-gray-700/90 mt-1 leading-snug">
                   {dailyHighlight.description}
                 </p>
-                <p className="text-[10px] font-bold text-amber-800/80 mt-1.5">
+                <p className="text-[10px] font-bold text-amber-900/70 mt-1.5">
                   Toque para ver como fazer →
                 </p>
               </div>
@@ -305,8 +467,8 @@ const MyActivities = ({ onBack }: Props) => {
           </motion.div>
         )}
 
-        {/* Lista geral */}
-        <div className="space-y-2">
+        {/* Lista geral - liquid glass + ícones premium */}
+        <div className="space-y-2.5">
           {activities.map((a) => {
             const done = completed.has(a.id);
             const locked = isLocked(a);
@@ -330,25 +492,28 @@ const MyActivities = ({ onBack }: Props) => {
                     open();
                   }
                 }}
-                className={`relative flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer hover:shadow-sm ${
-                  done
-                    ? "bg-emerald-50/80 border-emerald-200 opacity-70"
-                    : locked
-                    ? "bg-white/55 border-white/50"
-                    : "bg-white/70 border-white/60"
-                }`}
+                className="relative flex items-center gap-3 p-3.5 rounded-[20px] cursor-pointer"
+                style={{
+                  ...liquidCard,
+                  opacity: done ? 0.72 : locked ? 0.88 : 1,
+                }}
                 layout
                 whileTap={{ scale: 0.98 }}
-                aria-label={locked ? `${a.title} — premium` : `Ver detalhes de ${a.title}`}
+                aria-label={locked ? `${a.title} - premium` : `Ver detalhes de ${a.title}`}
               >
                 <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
                   style={{
-                    background: `${meta.color.replace(")", " / 0.18)")}`,
-                    filter: locked ? "blur(1.5px) saturate(0.6)" : "none",
+                    border: "0.5px solid rgba(255,255,255,.65)",
+                    boxShadow: "0 4px 12px rgba(30,40,25,.1)",
+                    filter: locked ? "saturate(0.55) brightness(0.95)" : "none",
                   }}
                 >
-                  {a.emoji}
+                  <img
+                    src={activityIconSrc(a)}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
@@ -356,15 +521,15 @@ const MyActivities = ({ onBack }: Props) => {
                       done
                         ? "text-gray-500 line-through"
                         : locked
-                        ? "text-gray-500"
+                        ? "text-gray-600"
                         : "text-gray-800"
                     }`}
                   >
                     {a.title}
                   </p>
-                  <p className="text-[10px] font-bold" style={{ color: meta.color }}>
-                    {meta.emoji} {meta.label} · +{a.xp} XP
-                    {locked && " · 🔒 Premium"}
+                  <p className="text-[10px] font-bold mt-0.5" style={{ color: meta.color }}>
+                    {meta.label} · +{a.xp} XP
+                    {locked && " · Premium"}
                   </p>
                 </div>
                 <motion.button
@@ -374,13 +539,22 @@ const MyActivities = ({ onBack }: Props) => {
                     open();
                   }}
                   disabled={done}
-                  className={`min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all ${
+                  className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all"
+                  style={
                     done
-                      ? "bg-emerald-500 text-white"
+                      ? { background: "#10b981", color: "#fff" }
                       : locked
-                      ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white"
-                      : "bg-gray-100 text-gray-700 active:scale-90"
-                  }`}
+                      ? {
+                          background: "linear-gradient(135deg,#F5C14A,#E8821A)",
+                          color: "#fff",
+                          boxShadow: "0 4px 12px rgba(200,120,20,.3)",
+                        }
+                      : {
+                          ...liquidCard,
+                          color: "#2A3A28",
+                          fontWeight: 900,
+                        }
+                  }
                   whileTap={done ? undefined : { scale: 0.9 }}
                   aria-label={done ? "Concluído" : locked ? "Desbloquear premium" : "Ver atividade"}
                 >
@@ -393,26 +567,12 @@ const MyActivities = ({ onBack }: Props) => {
 
         {!isPremium && (
           <p className="mt-3 text-center text-[11px] text-gray-600 font-semibold">
-            ✨ 1 atividade grátis em cada categoria · Premium libera todas
+            1 atividade grátis em cada categoria · Premium libera todas
           </p>
         )}
-
-        <p className="mt-4 text-center text-[10px] text-gray-400 font-semibold">
-          As atividades mudam toda segunda-feira ✨
-        </p>
-        {/* KIDZZ flutuante motivador */}
-        <div className="mt-4 flex justify-center">
-          <KidzzChameleon
-            state="play"
-            mood={allDone ? "happy" : "curious"}
-            size="md"
-            interactive={false}
-            showParticles={false}
-          />
-        </div>
       </div>
 
-      {/* Modal de detalhe — explica como fazer + exemplo prático */}
+      {/* Modal de detalhe - explica como fazer + exemplo prático */}
       <ActivityDetailModal
         activity={selected}
         childName={childName}

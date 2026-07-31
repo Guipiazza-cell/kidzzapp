@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { getLevelInfo, type LevelInfo } from "@/lib/levelSystem";
 
 /**
- * KIDZZ Aura — visual evolution badge that floats behind the hero.
+ * KIDZZ Aura - visual evolution badge that floats behind the hero.
  * Tier upgrades by level (1-100):
  *   1-9 spark   → faint amber glow
  *   10-29 glow  → pink/purple radial

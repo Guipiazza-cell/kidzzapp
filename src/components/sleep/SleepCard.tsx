@@ -8,7 +8,7 @@ interface Props {
 }
 
 /**
- * SleepCard — entry point for the global "Boa noite" ritual.
+ * SleepCard - entry point for the global "Boa noite" ritual.
  * Premium dark glass with living moon glow + gentle breathing.
  */
 const SleepCard = ({ onOpen }: Props) => {

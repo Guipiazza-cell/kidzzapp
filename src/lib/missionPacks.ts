@@ -1,4 +1,4 @@
-// Mission Packs — produtos transacionais avulsos
+// Mission Packs - produtos transacionais avulsos
 export interface MissionPackItem {
   emoji: string;
   name: string;
@@ -96,12 +96,12 @@ export function markPackPurchased(packId: string): void {
   }
 }
 
-// Placeholder checkout — to be wired to Stripe/Pagar.me/Iugu/RevenueCat
+// Placeholder checkout - to be wired to Stripe/Pagar.me/Iugu/RevenueCat
 export function openMissionPackCheckout(packId: string): Promise<{ success: boolean }> {
   return new Promise((resolve) => {
     const pack = MISSION_PACKS.find((p) => p.id === packId);
     if (!pack) return resolve({ success: false });
-    // Simulate async checkout flow — to be replaced by real provider
+    // Simulate async checkout flow - to be replaced by real provider
     setTimeout(() => {
       markPackPurchased(packId);
       resolve({ success: true });

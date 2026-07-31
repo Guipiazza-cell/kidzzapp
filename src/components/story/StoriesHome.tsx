@@ -1,13 +1,14 @@
 /**
- * Histórias — HOME premium v2
+ * Histórias - HOME premium v2
  * Ref: public/telas/historia/*
  * Assets: public/exemplos/assets/historias-v2/* (Hermes/Codex gpt-image)
- * Pessoas/família — sem lagarto. Lógica real: fábrica, coleções, continue lendo, chips.
+ * Pessoas/família - sem lagarto. Lógica real: fábrica, coleções, continue lendo, chips.
  */
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight, BookOpen, Sparkles, Bookmark, Star, Leaf, Moon, Smile, X, Gift,
+  ArrowRight, BookOpen, Sparkles, Bookmark, Star, X, Gift,
+  UserRound, Tags, Target, AudioLines,
 } from "lucide-react";
 import { useMemories } from "@/hooks/useMemories";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,46 +17,30 @@ import { haptic } from "@/lib/haptics";
 import StoryFactory from "./StoryFactory";
 import ReadingMode from "./ReadingMode";
 import { LIBRARY_STORIES } from "./storyLibrary";
-import { FONT, SERIF, R, PAD, glassLight, glassLightSoft, pillGlassLight, goldBtn } from "@/lib/premiumUi";
-import PremiumSeal from "@/components/common/PremiumSeal";
-import Icon3D from "@/components/common/Icon3D";
-import { STORY_BENEFIT_ICONS } from "@/lib/kidzzIcons";
+import { FONT, SERIF, R, PAD, glassLight, pillGlassLight, goldBtn } from "@/lib/premiumUi";
 
 const HI = "/exemplos/assets/historias-v2";
 
-type ChipKey = "favoritas" | "novidades" | "dormir" | "divertidas";
-
-const CHIPS: { key: ChipKey; label: string; sub: string; icon: typeof Star; tint: string; ring: string }[] = [
-  { key: "favoritas", label: "Favoritas", sub: "Suas histórias preferidas", icon: Star, tint: "#FBBF24", ring: "rgba(251,191,36,0.18)" },
-  { key: "novidades", label: "Novidades", sub: "Histórias novas para hoje", icon: Leaf, tint: "#2F7D5B", ring: "rgba(47,125,91,0.16)" },
-  { key: "dormir", label: "Para dormir", sub: "Histórias calmas e relaxantes", icon: Moon, tint: "#7C6AC7", ring: "rgba(124,106,199,0.18)" },
-  { key: "divertidas", label: "Divertidas", sub: "Aventuras para rir e imaginar", icon: Smile, tint: "#F59E0B", ring: "rgba(245,158,11,0.18)" },
-];
-
-const FEATURE_TILES = [
-  { key: "temas", label: "Temas e mundos", sub: "Explore centenas de aventuras.", cover: `${HI}/tile-temas.png`, tint: [160, 120, 230] as const },
-  { key: "personagens", label: "Personagens", sub: "Crie heróis únicos.", cover: `${HI}/tile-personagens.png`, tint: [100, 180, 120] as const },
-  { key: "ilustracoes", label: "Ilustrações", sub: "Cada página ganha vida.", cover: `${HI}/tile-ilustracoes.png`, tint: [110, 160, 230] as const },
-  { key: "narradores", label: "Narradores", sub: "Escolha a voz da história.", cover: `${HI}/tile-narradores.png`, tint: [240, 160, 70] as const },
-];
-
+/** Coleções especiais - cards “Em breve” (ainda não liberadas). */
 const COLLECTIONS = [
-  { key: "aventura", label: "Aventuras", desc: "Coragem e descoberta", img: `${HI}/tile-temas.png`, tag: "aventura" },
-  { key: "amizade", label: "Amizade", desc: "Cuidar e compartilhar", img: `${HI}/tile-personagens.png`, tag: "amizade" },
-  { key: "natureza", label: "Natureza", desc: "Conectar com o mundo", img: `${HI}/tile-ilustracoes.png`, tag: "natureza" },
-  { key: "familia", label: "Família", desc: "Fortalece os laços", img: `${HI}/feat-familia.png`, tag: "familia" },
+  { key: "aventura", label: "Aventuras", desc: "Coragem e descoberta", img: `${HI}/tile-temas.png` },
+  { key: "amizade", label: "Amizade", desc: "Cuidar e compartilhar", img: `${HI}/tile-personagens.png` },
+  { key: "natureza", label: "Natureza", desc: "Conectar com o mundo", img: `${HI}/tile-ilustracoes.png` },
+  { key: "familia", label: "Família", desc: "Fortalece os laços", img: `${HI}/feat-familia.png` },
 ];
 
-const BENEFITS = STORY_BENEFIT_ICONS;
-
-const tileGlass = (r: number, g: number, b: number): CSSProperties => ({
-  background: `linear-gradient(165deg, rgba(255,255,255,.92) 0%, rgba(${r},${g},${b},.38) 50%, rgba(${r},${g},${b},.22) 100%)`,
-  border: "0.5px solid rgba(255,255,255,.96)",
-  borderRadius: 24,
-  boxShadow: `0 14px 36px rgba(40,30,15,.12), 0 0 24px rgba(${r},${g},${b},.18), 0 1.5px 0 rgba(255,255,255,1) inset`,
-  backdropFilter: "blur(36px) saturate(190%)",
-  WebkitBackdropFilter: "blur(36px) saturate(190%)",
-});
+/** Passos da fábrica - na home (antes de “Criar minha história”). */
+const HOW_IT_WORKS: {
+  title: string;
+  sub: string;
+  Icon: typeof UserRound;
+  glow: [string, string, string];
+}[] = [
+  { title: "Monte o avatar", sub: "Nome, cores e o jeitinho do seu filho", Icon: UserRound, glow: ["#FFD9A8", "#F0A24C", "#C77E1E"] },
+  { title: "Escolha palavras-chave", sub: "O mundo e os interesses dele", Icon: Tags, glow: ["#FFE9A8", "#F2C24C", "#C98F1E"] },
+  { title: "Diga o objetivo", sub: "O que a história precisa entregar", Icon: Target, glow: ["#C0EDC8", "#5CB57A", "#2F7A4E"] },
+  { title: "Narração suave", sub: "Voz feminina que embala e acalma", Icon: AudioLines, glow: ["#D2CCF0", "#8A7AD8", "#5E4EA8"] },
+];
 
 interface Props {
   onBack: () => void;
@@ -65,9 +50,6 @@ const StoriesHome = ({ onBack }: Props) => {
   const { allMemories, toggleSpecial } = useMemories();
   const { profile } = useAuth();
   const [mode, setMode] = useState<"home" | "factory">("home");
-  const [chip, setChip] = useState<ChipKey | null>(null);
-  const [chipOpen, setChipOpen] = useState(false);
-  const [collection, setCollection] = useState<typeof COLLECTIONS[number] | null>(null);
   const [selected, setSelected] = useState<any | null>(null);
   const [reading, setReading] = useState(false);
 
@@ -85,36 +67,14 @@ const StoriesHome = ({ onBack }: Props) => {
       .slice(0, 8);
   }, [stories, progress]);
 
-  const filteredByChip = useMemo(() => {
-    if (!chip) return [] as typeof stories;
-    if (chip === "favoritas") return stories.filter((s) => s.is_special);
-    if (chip === "novidades") {
-      const sinceTs = Date.now() - 7 * 86400e3;
-      return stories.filter((s) => new Date(s.created_at).getTime() >= sinceTs);
-    }
-    const needle = chip === "dormir" ? /dorm|sonh|calm|noite/i : /divert|engra|aventur|rir/i;
-    return stories.filter((s) => {
-      const meta = (s.metadata as any)?.interests || "";
-      return needle.test(s.title) || needle.test(String(meta));
-    });
-  }, [chip, stories]);
-
-  const collectionStories = useMemo(() => {
-    if (!collection) return [] as typeof stories;
-    const rx = new RegExp(collection.tag, "i");
-    return stories.filter((s) => {
-      const meta = (s.metadata as any)?.interests || "";
-      return rx.test(String(meta)) || rx.test(s.title);
-    });
-  }, [collection, stories]);
-
   const openFactory = () => {
     haptic("medium");
     setMode("factory");
   };
 
   if (mode === "factory") {
-    return <StoryFactory onBack={() => setMode("home")} />;
+    // Pula o intro da fábrica (já está na home com “Como funciona”).
+    return <StoryFactory onBack={() => setMode("home")} skipIntro />;
   }
 
   return (
@@ -178,7 +138,6 @@ const StoriesHome = ({ onBack }: Props) => {
             >
               <BookOpen size={15} color="#F0C25A" />
               <span style={{ fontWeight: 800, fontSize: 13.5, color: "#F6F1E8" }}>Histórias</span>
-              <PremiumSeal />
             </div>
           </div>
         </div>
@@ -186,7 +145,8 @@ const StoriesHome = ({ onBack }: Props) => {
         {/* ── HERO ── */}
         <section style={{ padding: `8px ${PAD}px 0`, position: "relative" }}>
           <div style={{ position: "relative", minHeight: 280 }}>
-            <div style={{ position: "relative", zIndex: 2, maxWidth: "58%", paddingTop: 8 }}>
+            {/* Só o texto: coluna estreita + quebras fixas (imagem intacta) */}
+            <div style={{ position: "relative", zIndex: 2, maxWidth: "48%", paddingTop: 8 }}>
               <h1
                 style={{
                   margin: 0,
@@ -199,11 +159,11 @@ const StoriesHome = ({ onBack }: Props) => {
                   textShadow: "0 2px 16px rgba(0,0,0,.45)",
                 }}
               >
-                Histórias que{" "}
-                <span style={{ color: "#F0C25A" }}>criam memórias</span>.
+                <span style={{ display: "block" }}>Histórias que</span>
+                <span style={{ display: "block", color: "#F0C25A" }}>criam memórias</span>
               </h1>
               <p style={{ margin: "10px 0 14px", fontSize: 13.5, fontWeight: 700, lineHeight: 1.45, color: "rgba(246,241,232,0.72)" }}>
-                Criamos histórias únicas com o nome, o rosto e o mundo do seu filho.
+                Criamos histórias únicas com o nome, as cores e o mundo do seu filho
               </p>
               <div
                 className="inline-flex items-center gap-2 px-3 py-2"
@@ -264,116 +224,152 @@ const StoriesHome = ({ onBack }: Props) => {
           </motion.button>
         </section>
 
-        {/* ── 4 TILES ── */}
-        <section style={{ padding: `18px ${PAD}px 0` }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {FEATURE_TILES.map((t) => (
-              <motion.button
-                key={t.key}
-                whileTap={{ scale: 0.97 }}
-                onClick={openFactory}
-                className="text-left relative overflow-hidden"
-                style={{ padding: 12, minHeight: 150, ...tileGlass(t.tint[0], t.tint[1], t.tint[2]) }}
-              >
-                <img
-                  src={t.cover}
-                  alt=""
-                  style={{
-                    width: "100%",
-                    height: 88,
-                    objectFit: "cover",
-                    borderRadius: 18,
-                    marginBottom: 10,
-                    boxShadow: "0 8px 18px rgba(40,30,15,.14)",
-                    border: "0.5px solid rgba(255,255,255,.8)",
-                  }}
-                />
-                <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#1F2A22", lineHeight: 1.15 }}>
-                  {t.label}
-                </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(42,37,32,0.58)", marginTop: 3, lineHeight: 1.3 }}>
-                  {t.sub}
-                </div>
+        {/* ── COMO FUNCIONA (antes na fábrica; agora na home) ── */}
+        <section style={{ padding: `22px ${PAD}px 0` }}>
+          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#F6F1E8" }}>
+            Como funciona
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
+            {HOW_IT_WORKS.map((s) => {
+              const [l, m, d] = s.glow;
+              const StepIcon = s.Icon;
+              return (
                 <div
+                  key={s.title}
                   style={{
-                    position: "absolute",
-                    right: 10,
-                    bottom: 10,
-                    width: 28,
-                    height: 28,
-                    borderRadius: 999,
+                    position: "relative",
+                    overflow: "hidden",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    background: "rgba(255,255,255,.9)",
-                    boxShadow: "0 4px 10px rgba(40,30,15,.12)",
+                    gap: 11,
+                    borderRadius: 20,
+                    padding: "11px 12px",
+                    background: "linear-gradient(155deg,rgba(255,253,247,.92),rgba(250,240,222,.72))",
+                    border: "1px solid rgba(255,255,255,1)",
+                    boxShadow: "0 10px 22px rgba(20,12,8,.22), inset 0 1.5px 0 rgba(255,255,255,1)",
                   }}
                 >
-                  <ArrowRight size={13} color="#2A2520" />
+                  <div
+                    style={{
+                      flex: "none",
+                      width: 42,
+                      height: 42,
+                      borderRadius: 14,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: `radial-gradient(130% 130% at 30% 22%, #FFFFFF 0%, ${l} 18%, ${m} 58%, ${d} 100%)`,
+                      boxShadow: "0 6px 14px rgba(150,95,20,.25), inset 0 1.5px 2px rgba(255,255,255,.7), inset 0 -4px 8px rgba(0,0,0,.16)",
+                    }}
+                  >
+                    <StepIcon size={18} color="#fff" strokeWidth={2} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14.5, color: "#3A2410", lineHeight: 1.15 }}>
+                      {s.title}
+                    </div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "#8A6E42", lineHeight: 1.3, marginTop: 2 }}>
+                      {s.sub}
+                    </div>
+                  </div>
                 </div>
-              </motion.button>
-            ))}
+              );
+            })}
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 14 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                maxWidth: 340,
+                padding: "9px 15px",
+                borderRadius: 999,
+                background: "linear-gradient(160deg,rgba(255,252,244,.88),rgba(245,232,210,.55))",
+                border: "1px solid rgba(255,255,255,.55)",
+                boxShadow: "0 8px 20px rgba(0,0,0,.18)",
+                fontSize: 11,
+                fontWeight: 800,
+                color: "#8A6E42",
+                lineHeight: 1.4,
+              }}
+            >
+              <span aria-hidden style={{ fontSize: 13, lineHeight: 1 }}>🔒</span>
+              <span>A personalização é feita pelos pais. A criança recebe só a história pronta.</span>
+            </div>
           </div>
         </section>
 
-        {/* ── BENEFÍCIOS ── */}
-        <section style={{ padding: `18px ${PAD}px 0` }}>
-          <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 18, color: "#F6F1E8", textAlign: "center" }}>
-            Histórias que moldam o futuro
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            {BENEFITS.map((b) => (
-              <div
-                key={b.title}
-                style={{
-                  padding: "14px 12px",
-                  textAlign: "center",
-                  borderRadius: 20,
-                  background: "linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.04))",
-                  border: "0.5px solid rgba(255,255,255,.16)",
-                  backdropFilter: "blur(20px)",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
-                  <Icon3D src={b.src} fallback={b.fb} size={48} radius={16} alt={b.title} />
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 900, color: "#F6F1E8" }}>{b.title}</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(246,241,232,0.55)", marginTop: 2 }}>{b.sub}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── COLEÇÕES ── */}
+        {/* ── COLEÇÕES (Em breve) ── */}
         <section style={{ padding: `20px ${PAD}px 0` }}>
           <h2 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#F6F1E8" }}>
             Coleções especiais
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {COLLECTIONS.map((col) => {
-              const count = stories.filter((s) => {
-                const meta = (s.metadata as any)?.interests || "";
-                return new RegExp(col.tag, "i").test(String(meta)) || new RegExp(col.tag, "i").test(s.title);
-              }).length;
-              return (
-                <motion.button
-                  key={col.key}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => { haptic("light"); setCollection(col); }}
-                  className="text-left overflow-hidden"
-                  style={{ ...glassLight, borderRadius: 22, padding: 0 }}
-                >
-                  <img src={col.img} alt="" loading="lazy" style={{ width: "100%", height: 96, objectFit: "cover", display: "block" }} />
-                  <div style={{ padding: "10px 12px 12px" }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: "#2A2520" }}>{col.label}</p>
-                    <p style={{ margin: "3px 0 0", fontSize: 11, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.3 }}>{col.desc}</p>
-                    <p style={{ margin: "6px 0 0", fontSize: 11, fontWeight: 900, color: "#E8821A" }}>
-                      {count} {count === 1 ? "história" : "histórias"}
-                    </p>
-                  </div>
-                </motion.button>
-              );
-            })}
+            {COLLECTIONS.map((col) => (
+              <div
+                key={col.key}
+                className="text-left overflow-hidden relative"
+                style={{
+                  ...glassLight,
+                  borderRadius: 22,
+                  padding: 0,
+                  opacity: 0.88,
+                }}
+                aria-label={`${col.label} - em breve`}
+              >
+                <div style={{ position: "relative" }}>
+                  <img
+                    src={col.img}
+                    alt=""
+                    loading="lazy"
+                    style={{
+                      width: "100%",
+                      height: 96,
+                      objectFit: "cover",
+                      display: "block",
+                      filter: "saturate(0.85) brightness(0.92)",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(180deg, rgba(20,16,12,.12) 0%, rgba(20,16,12,.35) 100%)",
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      padding: "4px 9px",
+                      borderRadius: 999,
+                      fontSize: 10,
+                      fontWeight: 900,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                      color: "#2A1808",
+                      background: "linear-gradient(180deg,#F5D08A 0%,#E8B85A 100%)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,.22)",
+                      border: "0.5px solid rgba(255,255,255,.55)",
+                    }}
+                  >
+                    Em breve
+                  </span>
+                </div>
+                <div style={{ padding: "10px 12px 12px" }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: "#2A2520" }}>{col.label}</p>
+                  <p style={{ margin: "3px 0 0", fontSize: 11, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.3 }}>
+                    {col.desc}
+                  </p>
+                  <p style={{ margin: "6px 0 0", fontSize: 11, fontWeight: 900, color: "rgba(42,37,32,0.42)" }}>
+                    Em breve
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -434,194 +430,63 @@ const StoriesHome = ({ onBack }: Props) => {
           </section>
         )}
 
-        {/* ── CHIPS ── */}
-        <section style={{ padding: `18px ${PAD}px 8px`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {CHIPS.map((c) => {
-            const Icon = c.icon;
-            return (
-              <motion.button
-                key={c.key}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => { haptic("light"); setChip(c.key); setChipOpen(true); }}
-                className="text-left relative"
-                style={{ padding: 14, minHeight: 118, ...glassLight, borderRadius: 22 }}
-                aria-label={c.label}
-              >
-                <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center mb-2"
-                  style={{ background: c.ring, color: c.tint }}
-                >
-                  <Icon size={20} />
-                </div>
-                <p style={{ margin: 0, fontSize: 14.5, fontWeight: 900, color: "#2A2520" }}>{c.label}</p>
-                <p style={{ margin: "4px 0 0", fontSize: 11.5, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.3 }}>
-                  {c.sub}
-                </p>
-                <ArrowRight size={14} className="absolute bottom-3 right-3" style={{ color: "rgba(42,37,32,0.35)" }} />
-              </motion.button>
-            );
-          })}
-        </section>
-
-        {/* trust strip */}
-        <section
-          style={{
-            margin: `12px ${PAD}px 8px`,
-            padding: 14,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            ...glassLightSoft,
-            borderRadius: 22,
-          }}
-        >
-          <img
-            src={`${HI}/feat-familia.png`}
-            alt=""
-            style={{ width: 56, height: 56, borderRadius: 16, objectFit: "cover", flexShrink: 0 }}
-          />
-          <div className="min-w-0">
-            <div style={{ fontSize: 13.5, fontWeight: 900, color: "#2A2520" }}>Para toda a família</div>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.35 }}>
-              Momentos que aproximam e ficam guardados para sempre.
+        {/* ── Favoritas (Em breve) - card único horizontal ── */}
+        <section style={{ padding: `18px ${PAD}px 8px` }}>
+          <div
+            className="relative overflow-hidden"
+            style={{
+              ...glassLight,
+              borderRadius: 22,
+              padding: "16px 16px",
+              minHeight: 88,
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              opacity: 0.92,
+            }}
+            aria-label="Favoritas - em breve"
+          >
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 16,
+                flex: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(251,191,36,0.18)",
+                color: "#E8A010",
+              }}
+            >
+              <Star size={24} fill="currentColor" />
             </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: "#2A2520" }}>Favoritas</p>
+              <p style={{ margin: "4px 0 0", fontSize: 12, fontWeight: 700, color: "rgba(42,37,32,0.55)", lineHeight: 1.35 }}>
+                Suas histórias preferidas, num só lugar.
+              </p>
+            </div>
+            <span
+              style={{
+                flex: "none",
+                padding: "5px 10px",
+                borderRadius: 999,
+                fontSize: 10,
+                fontWeight: 900,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                color: "#2A1808",
+                background: "linear-gradient(180deg,#F5D08A 0%,#E8B85A 100%)",
+                boxShadow: "0 4px 12px rgba(0,0,0,.14)",
+                border: "0.5px solid rgba(255,255,255,.55)",
+              }}
+            >
+              Em breve
+            </span>
           </div>
         </section>
       </div>
-
-      {/* ── Chip drawer ── */}
-      <AnimatePresence>
-        {chipOpen && chip && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex flex-col"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => setChipOpen(false)} />
-            <motion.div
-              className="relative mt-auto rounded-t-3xl max-h-[80vh] flex flex-col"
-              style={{ background: "linear-gradient(180deg,#FFF9F0,#F5EFE3)" }}
-              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 240, damping: 26 }}
-            >
-              <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <h3 style={{ margin: 0, fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: "#1F2A22" }}>
-                  {CHIPS.find((c) => c.key === chip)?.label}
-                </h3>
-                <button onClick={() => setChipOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-full" style={pillGlassLight} aria-label="Fechar">
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-5 pb-8">
-                {filteredByChip.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-[14px] font-bold" style={{ color: "#2A2520" }}>Ainda não há histórias aqui</p>
-                    <p className="text-[12px] mt-1" style={{ color: "rgba(42,37,32,0.6)" }}>
-                      Crie uma nova com {childName} como protagonista.
-                    </p>
-                    <motion.button
-                      onClick={() => { setChipOpen(false); openFactory(); }}
-                      whileTap={{ scale: 0.97 }}
-                      className="mt-4 px-5 py-2.5 rounded-full text-white text-[13px] font-extrabold"
-                      style={{ background: "#E8821A" }}
-                    >
-                      Criar agora
-                    </motion.button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    {filteredByChip.map((s) => (
-                      <motion.button
-                        key={s.id}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => { setChipOpen(false); setSelected(s); }}
-                        className="text-left rounded-2xl p-2.5"
-                        style={{ ...glassLight, borderRadius: 18 }}
-                      >
-                        {s.image_url ? (
-                          <img src={s.image_url} alt="" className="w-full aspect-square object-cover rounded-xl mb-2" loading="lazy" />
-                        ) : (
-                          <div className="w-full aspect-square rounded-xl mb-2 bg-amber-100 flex items-center justify-center text-3xl">📖</div>
-                        )}
-                        <p className="text-[12px] font-extrabold line-clamp-2" style={{ color: "#2A2520" }}>{s.title}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Collection drawer ── */}
-      <AnimatePresence>
-        {collection && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex flex-col"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={() => setCollection(null)} />
-            <motion.div
-              className="relative mt-auto rounded-t-3xl max-h-[85vh] flex flex-col"
-              style={{ background: "linear-gradient(180deg,#FFF9F0,#F5EFE3)" }}
-              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 240, damping: 26 }}
-            >
-              <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-                <img src={collection.img} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <h3 style={{ margin: 0, fontFamily: SERIF, fontSize: 19, fontWeight: 600, color: "#1F2A22" }}>
-                    {collection.label}
-                  </h3>
-                  <p className="text-[11.5px] leading-snug line-clamp-1" style={{ color: "rgba(42,37,32,0.6)" }}>
-                    {collection.desc}
-                  </p>
-                </div>
-                <button onClick={() => setCollection(null)} className="w-10 h-10 flex items-center justify-center rounded-full shrink-0" style={pillGlassLight} aria-label="Fechar">
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-5 pb-8">
-                {collectionStories.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-[14px] font-bold" style={{ color: "#2A2520" }}>Ainda não há histórias nesta coleção</p>
-                    <p className="text-[12px] mt-1" style={{ color: "rgba(42,37,32,0.6)" }}>
-                      Crie uma nova com {childName} como protagonista.
-                    </p>
-                    <motion.button
-                      onClick={() => { setCollection(null); openFactory(); }}
-                      whileTap={{ scale: 0.97 }}
-                      className="mt-4 px-5 py-2.5 rounded-full text-white text-[13px] font-extrabold"
-                      style={{ background: "#E8821A" }}
-                    >
-                      Criar agora
-                    </motion.button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    {collectionStories.map((s) => (
-                      <motion.button
-                        key={s.id}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => { setCollection(null); setSelected(s); }}
-                        className="text-left rounded-2xl p-2.5"
-                        style={{ ...glassLight, borderRadius: 18 }}
-                      >
-                        {s.image_url ? (
-                          <img src={s.image_url} alt="" className="w-full aspect-square object-cover rounded-xl mb-2" loading="lazy" />
-                        ) : (
-                          <div className="w-full aspect-square rounded-xl mb-2 bg-amber-100 flex items-center justify-center text-3xl">📖</div>
-                        )}
-                        <p className="text-[12px] font-extrabold line-clamp-2" style={{ color: "#2A2520" }}>{s.title}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── Detail / reading ── */}
       <AnimatePresence>

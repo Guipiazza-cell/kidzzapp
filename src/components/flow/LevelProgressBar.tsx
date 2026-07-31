@@ -44,11 +44,11 @@ export default function LevelProgressBar({ compact }: Props) {
       className={`w-full max-w-sm rounded-2xl glass-card px-3 py-2 text-left ${
         compact ? "" : "mb-2"
       }`}
-      aria-label={`Ver sua jornada — nível ${info.level}`}
+      aria-label={`Ver sua jornada - nível ${info.level}`}
     >
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[11px] font-black text-gray-800">
-          Nível {info.level} <span className="text-gray-500">— {info.title}</span>
+          Nível {info.level} <span className="text-gray-500"> -  {info.title}</span>
         </span>
         <span className="text-[10px] font-extrabold text-gray-600">
           {info.xpInLevel}/{info.xpForNext} XP →

@@ -9,9 +9,10 @@ import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMissi
 import { showXpGained } from "@/components/flow/XpToast";
 import GuidedActivityPlayer, { type GuidedActivity } from "./GuidedActivityPlayer";
 import { FONT, SERIF, R, PAD, glassLightSoft, pillGlassLight } from "@/lib/premiumUi";
+import AllPlaylistsSection from "./AllPlaylistsSection";
 
 /**
- * MusicForest — Tela "Música" (premium v2 — nível Bora).
+ * MusicForest - Tela "Música" (premium v2 - nível Bora).
  * Ref: public/telas/MUSICA/* · Assets: musica-v2 (Hermes/Codex)
  * Floresta + liquid glass + família (sem lagarto).
  */
@@ -73,6 +74,7 @@ const D = {
   back: "M19 12H5m6-6-6 6 6 6",
   lock: "M7 10V8a5 5 0 0 1 10 0v2m-11 0h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z",
   play: "M7 4.8v14.4c0 .8.9 1.3 1.6.9l11-7.2c.6-.4.6-1.4 0-1.8l-11-7.2c-.7-.4-1.6.1-1.6.9Z",
+  stop: "M7 7h10v10H7z",
   heart: "M12 20.3l-7.1-6.9a4.6 4.6 0 0 1 6.4-6.5l.7.7.7-.7a4.6 4.6 0 0 1 6.4 6.5Z",
   shield: "M12 3l7 2.5V11c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V5.5Z",
   cap: "M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5",
@@ -122,15 +124,15 @@ const CATEGORIES: Category[] = [
   { id: "travel", label: "Modo Viagem", subtitle: "Trilhas sonoras para qualquer lugar", gradient: "linear-gradient(135deg, hsl(190 65% 55%) 0%, hsl(200 60% 42%) 100%)", dk: "teal", cover: `${MU}/cat-travel.png`, novo: true, tags: ["travel"] },
 ];
 
-/* Sons ambiente — descrição humana (nunca expor id interno de slot) */
-const AMBIENT_SOUNDS: { id: string; label: string; desc: string; url?: string; free: boolean }[] = [
-  { id: "forest", label: "Floresta calma", desc: "Sons da natureza", url: "/audio/forest-calm.mp3", free: true },
-  { id: "rain", label: "Chuva no telhado", desc: "Para relaxar juntos", url: "/audio/rain-soft.mp3", free: true },
-  { id: "ocean", label: "Ondas do mar", desc: "Para acalmar", url: "/audio/ocean-waves.mp3", free: false },
-  { id: "piano", label: "Piano do soninho", desc: "Para dormir", free: false },
+/* Sons ambiente - descrição humana (nunca expor id interno de slot) */
+const AMBIENT_SOUNDS: { id: string; label: string; desc: string; url?: string; free: boolean; icon: string }[] = [
+  { id: "forest", label: "Floresta calma", desc: "Sons da natureza", url: "/audio/forest-calm.mp3", free: true, icon: `${MU}/ambient-forest.png` },
+  { id: "rain", label: "Chuva no telhado", desc: "Para relaxar juntos", url: "/audio/rain-soft.mp3", free: true, icon: `${MU}/ambient-rain.png` },
+  { id: "ocean", label: "Ondas do mar", desc: "Para acalmar", url: "/audio/ocean-waves.mp3", free: false, icon: `${MU}/ambient-ocean.png` },
+  { id: "piano", label: "Piano do soninho", desc: "Para dormir", free: false, icon: `${MU}/ambient-piano.png` },
 ];
 
-/** Selo PREMIUM padrão (dourado + cadeado) — referência do relatório de design */
+/** Selo PREMIUM padrão (dourado + cadeado) - referência do relatório de design */
 const premiumSeal: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
@@ -147,15 +149,15 @@ const premiumSeal: CSSProperties = {
 
 /* ── Dados: atividades guiadas reais ── */
 const ACTIVITIES: GuidedActivity[] = [
-  { id: "cancoes-animais", title: "Canções dos Animais", subtitle: "Aprenda e cante com os bichinhos!", minutes: 8, ageRange: "2–6 anos", tags: ["featured", "adventure"], kind: "sing", instruction: "Imita a voz de cada bichinho quando ele aparecer!", slotImg: "imgAtiv_cancoes_animais", slotAudio: "exec_cancoes_animais", accent: "38 95% 62%" },
-  { id: "palmas-ritmos", title: "Palmas e Ritmos", subtitle: "Siga o ritmo e divirta-se batendo palmas!", minutes: 6, ageRange: "3–6 anos", tags: ["featured", "movement"], kind: "clap", instruction: "Bata palma junto no tempo da música. Prontos?", slotImg: "imgAtiv_palmas", slotAudio: "exec_palmas", accent: "275 65% 62%" },
-  { id: "instrumentos-mundo", title: "Instrumentos do Mundo", subtitle: "Descubra sons incríveis de vários lugares!", minutes: 10, ageRange: "4–8 anos", tags: ["adventure"], kind: "listen", instruction: "Feche os olhos e adivinha que instrumento é este!", slotImg: "imgAtiv_instrumentos", slotAudio: "exec_instrumentos", accent: "190 65% 55%" },
-  { id: "cancoes-ninar", title: "Canções de Ninar", subtitle: "Melodias para acalmar e embalar o sono.", minutes: 12, ageRange: "0–4 anos", tags: ["calm", "sleep"], kind: "listen", instruction: "Diminua as luzes, respire fundo, e deixe a música embalar.", slotImg: "imgAtiv_ninar", slotAudio: "exec_ninar", accent: "220 60% 62%", parentMark: true },
-  { id: "danca-congela", title: "Dança Congela", subtitle: "Dance e pare quando a música congelar!", minutes: 5, ageRange: "3–8 anos", tags: ["featured", "movement", "adventure"], kind: "dance", instruction: "Dance! Quando a música PARAR — congela como estátua!", slotImg: "imgAtiv_congela", slotAudio: "exec_congela", accent: "38 95% 62%" },
-  { id: "orquestra-cozinha", title: "Orquestra da Cozinha", subtitle: "Fazer banda com panela e colher!", minutes: 7, ageRange: "3–7 anos", tags: ["adventure", "movement"], kind: "play", instruction: "Pegue uma panela e uma colher. Vamos formar uma banda!", slotImg: "imgAtiv_cozinha", slotAudio: "exec_cozinha", accent: "275 65% 62%" },
-  { id: "batuque-corpo", title: "Batuque do Corpo", subtitle: "Peito, perna, palma — o corpo vira instrumento!", minutes: 5, ageRange: "4–8 anos", tags: ["movement", "featured"], kind: "clap", instruction: "Peito, perna, palma. Vai seguindo o padrão comigo!", slotImg: "imgAtiv_batuque", slotAudio: "exec_batuque", accent: "150 55% 55%" },
-  { id: "musica-nome", title: "A Música do Seu Nome", subtitle: "Invente uma cançãozinha com o nome de quem você ama.", minutes: 6, ageRange: "3–8 anos", tags: ["emotion", "bond"], kind: "sing", instruction: "Diga um nome. A gente inventa uma canção com ele!", slotImg: "imgAtiv_nome", slotAudio: "exec_nome", accent: "150 55% 55%" },
-  { id: "danca-bichos", title: "Dança dos Bichos", subtitle: "Mexa como cada animal — pula, rasteja, voa!", minutes: 6, ageRange: "2–6 anos", tags: ["movement", "adventure"], kind: "dance", instruction: "Salta como sapo, voa como pássaro, rasteja como cobrinha!", slotImg: "imgAtiv_bichos", slotAudio: "exec_bichos", accent: "275 65% 62%" },
+  { id: "cancoes-animais", title: "Canções dos Animais", subtitle: "Aprenda e cante com os bichinhos!", minutes: 8, ageRange: "2-6 anos", tags: ["featured", "adventure"], kind: "sing", instruction: "Imita a voz de cada bichinho quando ele aparecer!", slotImg: "imgAtiv_cancoes_animais", slotAudio: "exec_cancoes_animais", accent: "38 95% 62%" },
+  { id: "palmas-ritmos", title: "Palmas e Ritmos", subtitle: "Siga o ritmo e divirta-se batendo palmas!", minutes: 6, ageRange: "3-6 anos", tags: ["featured", "movement"], kind: "clap", instruction: "Bata palma junto no tempo da música. Prontos?", slotImg: "imgAtiv_palmas", slotAudio: "exec_palmas", accent: "275 65% 62%" },
+  { id: "instrumentos-mundo", title: "Instrumentos do Mundo", subtitle: "Descubra sons incríveis de vários lugares!", minutes: 10, ageRange: "4-8 anos", tags: ["adventure"], kind: "listen", instruction: "Feche os olhos e adivinha que instrumento é este!", slotImg: "imgAtiv_instrumentos", slotAudio: "exec_instrumentos", accent: "190 65% 55%" },
+  { id: "cancoes-ninar", title: "Canções de Ninar", subtitle: "Melodias para acalmar e embalar o sono.", minutes: 12, ageRange: "0-4 anos", tags: ["calm", "sleep"], kind: "listen", instruction: "Diminua as luzes, respire fundo, e deixe a música embalar.", slotImg: "imgAtiv_ninar", slotAudio: "exec_ninar", accent: "220 60% 62%", parentMark: true },
+  { id: "danca-congela", title: "Dança Congela", subtitle: "Dance e pare quando a música congelar!", minutes: 5, ageRange: "3-8 anos", tags: ["featured", "movement", "adventure"], kind: "dance", instruction: "Dance! Quando a música PARAR - congela como estátua!", slotImg: "imgAtiv_congela", slotAudio: "exec_congela", accent: "38 95% 62%" },
+  { id: "orquestra-cozinha", title: "Orquestra da Cozinha", subtitle: "Fazer banda com panela e colher!", minutes: 7, ageRange: "3-7 anos", tags: ["adventure", "movement"], kind: "play", instruction: "Pegue uma panela e uma colher. Vamos formar uma banda!", slotImg: "imgAtiv_cozinha", slotAudio: "exec_cozinha", accent: "275 65% 62%" },
+  { id: "batuque-corpo", title: "Batuque do Corpo", subtitle: "Peito, perna, palma - o corpo vira instrumento!", minutes: 5, ageRange: "4-8 anos", tags: ["movement", "featured"], kind: "clap", instruction: "Peito, perna, palma. Vai seguindo o padrão comigo!", slotImg: "imgAtiv_batuque", slotAudio: "exec_batuque", accent: "150 55% 55%" },
+  { id: "musica-nome", title: "A Música do Seu Nome", subtitle: "Invente uma cançãozinha com o nome de quem você ama.", minutes: 6, ageRange: "3-8 anos", tags: ["emotion", "bond"], kind: "sing", instruction: "Diga um nome. A gente inventa uma canção com ele!", slotImg: "imgAtiv_nome", slotAudio: "exec_nome", accent: "150 55% 55%" },
+  { id: "danca-bichos", title: "Dança dos Bichos", subtitle: "Mexa como cada animal - pula, rasteja, voa!", minutes: 6, ageRange: "2-6 anos", tags: ["movement", "adventure"], kind: "dance", instruction: "Salta como sapo, voa como pássaro, rasteja como cobrinha!", slotImg: "imgAtiv_bichos", slotAudio: "exec_bichos", accent: "275 65% 62%" },
 ];
 
 const greetingWord = () => {
@@ -165,7 +167,8 @@ const greetingWord = () => {
   return "Boa noite";
 };
 
-const activityAsset = (i: number) => `/exemplos/assets/mu-a${(i % 4) + 1}.png`;
+/** Capa premium única por atividade (sem genéricos mu-a1..4) */
+const activityCover = (id: string) => `${MU}/act-icons/${id}.png`;
 
 /* ── Icone SVG genérico ── */
 const Icon = ({ d, stroke = "#fff", size = 20, sw = 1.8 }: { d: string; stroke?: string; size?: number; sw?: number }) => (
@@ -192,40 +195,55 @@ const MusicKeyframes = () => (
   `}</style>
 );
 
-/* ── Fundo floresta premium (print MUSICA) ── */
+/* ── Fundo floresta premium — foto só no hero (pessoas em foco) ── */
 const ForestBackdrop = ({ heroSrc }: { heroSrc: string }) => (
   <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
-    <img
-      src={heroSrc}
-      alt=""
-      style={{
-        position: "absolute", inset: 0, width: "100%", height: "100%",
-        objectFit: "cover", objectPosition: "center 20%",
-        filter: "saturate(1.15) brightness(0.92)", transform: "scale(1.08)",
-      }}
-    />
-    {/* raios + vinheta creme inferior (como o mockup) */}
+    {/* faixa da foto no topo */}
+    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "42%", overflow: "hidden" }}>
+      <img
+        src={heroSrc}
+        alt=""
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          /* mais pessoas / menos céu */
+          objectPosition: "center 58%",
+          filter: "saturate(1.12) brightness(0.96)",
+          transform: "scale(1.12)",
+          transformOrigin: "center 55%",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(55% 40% at 70% 30%, rgba(255,220,120,.35) 0%, transparent 60%)," +
+            "linear-gradient(180deg, rgba(20,30,15,.12) 0%, transparent 40%, rgba(246,241,223,.55) 78%, #F4EEDF 100%)",
+        }}
+      />
+    </div>
+    {/* creme no resto da tela */}
     <div
       style={{
-        position: "absolute", inset: 0,
-        background:
-          "radial-gradient(60% 40% at 78% 8%, rgba(255,220,120,.55) 0%, transparent 62%)," +
-          "linear-gradient(180deg, rgba(20,40,20,.18) 0%, rgba(246,241,223,.15) 28%, rgba(246,241,223,.78) 58%, #F4EEDF 78%, #F0E9D0 100%)",
+        position: "absolute",
+        top: "38%",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "linear-gradient(180deg, #F4EEDF 0%, #F0E9D0 40%, #E8DFBF 100%)",
       }}
     />
     <div
       style={{
-        position: "absolute", top: -40, right: -20, width: 220, height: 220, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,230,140,.55), transparent 68%)",
+        position: "absolute", top: -40, right: -20, width: 200, height: 200, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,230,140,.4), transparent 68%)",
         filter: "blur(8px)", animation: "mus-raysway 8s ease-in-out infinite",
       }}
     />
-    <div style={{ position: "absolute", top: "48%", left: "10%", animation: "mus-notefloat 10s ease-in-out infinite" }}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#E8B84A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-    </div>
-    <div style={{ position: "absolute", top: "62%", left: "78%", animation: "mus-notefloat 12s ease-in-out 3s infinite" }}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d={D.note} stroke="#A98CD8" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-    </div>
   </div>
 );
 
@@ -265,7 +283,7 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
   const { profile, tier } = useAuth();
   const childName = profile?.child_name || "amigo";
   const isPremium = tier === "premium";
-  // Troféu global da família (mesmo valor das outras abas) — não o XP só de música
+  // Troféu global da família (mesmo valor das outras abas) - não o XP só de música
   const pontosFamilia = profile?.points ?? 0;
 
   const [activePillar, setActivePillar] = useState<Pillar | null>(null);
@@ -278,9 +296,9 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
   });
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const heroWrapRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef(0);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingAmbientId, setPlayingAmbientId] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -288,21 +306,19 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
     toastTimer.current = setTimeout(() => setToast(null), 2400);
   };
 
-  const onScroll = () => {
-    if (rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      const sc = scrollRef.current, hero = heroWrapRef.current;
-      if (!sc || !hero) return;
-      const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.42}px) scale(${1 + y * 0.0004})`;
-      hero.style.opacity = String(Math.max(0, 1 - y / 240));
-    });
+  const stopAmbient = () => {
+    const a = ambientAudioRef.current;
+    if (a) {
+      a.pause();
+      a.currentTime = 0;
+      ambientAudioRef.current = null;
+    }
+    setPlayingAmbientId(null);
   };
 
   useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     if (toastTimer.current) clearTimeout(toastTimer.current);
+    stopAmbient();
   }, []);
 
   const toggleFav = (id: string) => {
@@ -386,16 +402,21 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 
   /* ── Modos (pilares reais) ── */
   const modos = [
-    { pillar: "morning" as Pillar, title: "Karaokê do Dia", sub: "Grátis — cante com o Kidzz", d: D.mic, k: "ouro", t: [240, 180, 70] as [number, number, number], badge: "NOVO", requiresPremium: false, cover: `${MU}/modo-mic.png` },
+    { pillar: "morning" as Pillar, title: "Karaokê do Dia", sub: "Grátis - cante com o Kidzz", d: D.mic, k: "ouro", t: [240, 180, 70] as [number, number, number], badge: "NOVO", requiresPremium: false, cover: `${MU}/modo-mic.png` },
     { pillar: "dance" as Pillar, title: "Dance com Kidzz", sub: "Mini-game de palmas e movimento", d: D.dance, k: "rosa", t: [240, 130, 170] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-dance.png` },
     { pillar: "stories" as Pillar, title: "Histórias Cantadas", sub: "4 livros mágicos narrados em canção", d: D.book, k: "azul", t: [130, 175, 240] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-book.png` },
-    { pillar: "create" as Pillar, title: "Crie Sua Música", sub: "Laboratório sonoro — monte a sua", d: D.lab, k: "verde", t: [140, 200, 110] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-create.png` },
+    { pillar: "create" as Pillar, title: "Crie Sua Música", sub: "Laboratório sonoro - monte a sua", d: D.lab, k: "verde", t: [140, 200, 110] as [number, number, number], badge: "PREMIUM", requiresPremium: true, cover: `${MU}/modo-create.png` },
   ];
 
-  const destaques = ACTIVITIES.filter((a) => a.tags.includes("featured") || a.tags.includes("movement"));
   const heroImg = `${MU}/hero-family.png`;
 
   const playAmbient = (s: (typeof AMBIENT_SOUNDS)[number]) => {
+    // Se já está tocando este, para
+    if (playingAmbientId === s.id) {
+      stopAmbient();
+      showToast("Som parado");
+      return;
+    }
     if (!s.free && !isPremium) {
       openPaywall("music_ambient");
       return;
@@ -405,10 +426,14 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
       return;
     }
     try {
+      stopAmbient();
       const a = new Audio(s.url);
       a.loop = true;
       a.volume = 0.45;
+      a.onended = () => setPlayingAmbientId(null);
+      ambientAudioRef.current = a;
       void a.play();
+      setPlayingAmbientId(s.id);
       showToast(`Tocando: ${s.label}`);
     } catch {
       showToast("Não foi possível tocar o som.");
@@ -422,7 +447,6 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 
       <div
         ref={scrollRef}
-        onScroll={onScroll}
         style={{
           height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain",
           WebkitOverflowScrolling: "touch",
@@ -430,32 +454,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           scrollbarWidth: "none", position: "relative", zIndex: 2,
         }}
       >
-        {/* ── HERO (layout print: texto esq + arte dir) ── */}
-        <div style={{ position: "relative", minHeight: 420, paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)" }}>
-          {/* arte flutuante à direita */}
-          <div
-            ref={heroWrapRef}
-            style={{
-              position: "absolute", top: 48, right: -8, width: "58%", height: 320,
-              pointerEvents: "none", animation: "mus-heroin .75s cubic-bezier(.22,1,.36,1) both",
-            }}
-          >
-            <img
-              src={heroImg}
-              alt="Família tocando música"
-              style={{
-                width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 25%",
-                borderRadius: "0 0 0 48%",
-                maskImage: "radial-gradient(70% 70% at 60% 40%, #000 35%, transparent 78%)",
-                WebkitMaskImage: "radial-gradient(70% 70% at 60% 40%, #000 35%, transparent 78%)",
-                filter: "saturate(1.12) contrast(1.04)",
-                animation: "mus-floaty 7s ease-in-out infinite",
-                boxShadow: "0 20px 50px rgba(0,0,0,.25)",
-              }}
-            />
-          </div>
-
-          {/* chrome */}
+        {/* ── HERO: foto no topo + chrome ── */}
+        <div style={{ position: "relative", height: 280, paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)" }}>
           <div style={{ position: "relative", zIndex: 6, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `8px ${PAD}px 0` }}>
             <button
               onClick={onBack}
@@ -479,32 +479,72 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
               </div>
             </div>
           </div>
+        </div>
 
-          {/* copy */}
-          <div style={{ position: "relative", zIndex: 5, padding: "18px 20px 8px", maxWidth: "62%", animation: "mus-cascade .55s cubic-bezier(.22,1,.36,1) both" }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "rgba(255,252,240,.92)", textShadow: "0 1px 8px rgba(0,0,0,.35)", marginBottom: 8 }}>
-              {greetingWord()}, família! <span style={{ color: "#7dffb0" }}>♥</span>
-            </div>
-            <h1 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 30, lineHeight: 1.12, color: "#FFFDF6", letterSpacing: "-.4px", textShadow: "0 2px 18px rgba(0,0,0,.4)" }}>
-              Música que <span style={{ color: "#FFD36A" }}>conecta</span>, momentos que ficam.
-            </h1>
-            <p style={{ margin: "0 0 16px", fontSize: 13, fontWeight: 700, lineHeight: 1.45, color: "rgba(255,248,230,.88)", textShadow: "0 1px 8px rgba(0,0,0,.3)", maxWidth: 240 }}>
-              Atividades com música para soltar a voz, dançar e criar memórias inesquecíveis juntos.
-            </p>
-            <button
-              onClick={() => openCategory("featured")}
-              className="active:scale-[0.97]"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 22px", minHeight: 48,
-                borderRadius: R.btn, border: "0.5px solid rgba(255,235,150,.65)", cursor: "pointer",
-                fontWeight: 900, fontSize: 14.5, color: "#4A3300",
-                background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F5C24E 55%, #E0A52E)",
-                boxShadow: "0 12px 28px rgba(180,120,20,.4), 0 1px 0 rgba(255,255,255,.7) inset",
-              }}
-            >
-              Explorar música →
-            </button>
+        {/* ── CARD de texto abaixo do hero ── */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 5,
+            margin: "-28px 16px 10px",
+            padding: "18px 18px 16px",
+            borderRadius: 24,
+            background: "linear-gradient(160deg, rgba(255,255,255,.92) 0%, rgba(255,252,240,.88) 55%, rgba(255,246,220,.9) 100%)",
+            border: "0.5px solid rgba(255,255,255,.98)",
+            boxShadow: "0 16px 36px rgba(40,30,15,.14), 0 1px 0 rgba(255,255,255,1) inset",
+            backdropFilter: "blur(28px) saturate(160%)",
+            WebkitBackdropFilter: "blur(28px) saturate(160%)",
+            animation: "mus-cascade .55s cubic-bezier(.22,1,.36,1) both",
+          }}
+        >
+          <div style={{ fontWeight: 800, fontSize: 12.5, color: "#8A6A28", marginBottom: 6 }}>
+            {greetingWord()}, família!
           </div>
+          <h1
+            style={{
+              margin: "0 0 8px",
+              fontFamily: SERIF,
+              fontWeight: 600,
+              fontSize: 26,
+              lineHeight: 1.15,
+              color: "#2A2008",
+              letterSpacing: "-.35px",
+            }}
+          >
+            Música que <span style={{ color: "#C98A1A" }}>conecta</span>, momentos que ficam
+          </h1>
+          <p
+            style={{
+              margin: "0 0 14px",
+              fontSize: 13,
+              fontWeight: 700,
+              lineHeight: 1.45,
+              color: "#6B5A38",
+            }}
+          >
+            Atividades com música para soltar a voz, dançar e criar memórias inesquecíveis juntos
+          </p>
+          <button
+            onClick={() => openCategory("featured")}
+            className="active:scale-[0.97]"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "12px 20px",
+              minHeight: 46,
+              borderRadius: R.btn,
+              border: "0.5px solid rgba(255,235,150,.65)",
+              cursor: "pointer",
+              fontWeight: 900,
+              fontSize: 14,
+              color: "#4A3300",
+              background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F5C24E 55%, #E0A52E)",
+              boxShadow: "0 10px 24px rgba(180,120,20,.32), 0 1px 0 rgba(255,255,255,.7) inset",
+            }}
+          >
+            Explorar música →
+          </button>
         </div>
 
         {/* ── CATEGORIAS ── */}
@@ -608,9 +648,11 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {AMBIENT_SOUNDS.map((s) => {
               const locked = !s.free && !isPremium;
+              const isPlaying = playingAmbientId === s.id;
               return (
                 <button
                   key={s.id}
+                  type="button"
                   onClick={() => playAmbient(s)}
                   className="active:scale-[0.99]"
                   style={{
@@ -618,24 +660,39 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                     textAlign: "left", cursor: "pointer",
                     ...glassLightSoft,
                     borderRadius: 22,
-                    background: "linear-gradient(165deg, rgba(255,255,255,.94), rgba(250,246,236,.88))",
+                    background: isPlaying
+                      ? "linear-gradient(165deg, rgba(255,248,230,.98), rgba(255,236,190,.9))"
+                      : "linear-gradient(165deg, rgba(255,255,255,.94), rgba(250,246,236,.88))",
+                    border: isPlaying ? "0.5px solid rgba(232,180,60,.55)" : "0.5px solid rgba(255,255,255,.98)",
+                    boxShadow: isPlaying
+                      ? "0 8px 22px rgba(180,120,20,.18), 0 1px 0 rgba(255,255,255,1) inset"
+                      : undefined,
                   }}
                 >
                   <div
                     style={{
-                      width: 44, height: 44, borderRadius: 16, flex: "none",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "radial-gradient(130% 130% at 30% 22%, #FFF8E8, #E8D8B0 55%, #C8B080)",
-                      boxShadow: "0 4px 12px rgba(40,30,15,.12), 0 1px 0 rgba(255,255,255,1) inset",
+                      width: 48, height: 48, borderRadius: 16, flex: "none",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 12px rgba(40,30,15,.14), 0 1px 0 rgba(255,255,255,1) inset",
+                      border: "0.5px solid rgba(255,255,255,.9)",
                     }}
                   >
-                    <Icon d={D.note} stroke="#6A5430" size={18} sw={1.9} />
+                    <img
+                      src={s.icon}
+                      alt=""
+                      width={48}
+                      height={48}
+                      draggable={false}
+                      style={{ width: 48, height: 48, objectFit: "cover", display: "block" }}
+                    />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: "#2A2008" }}>{s.label}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#8A7850" }}>{s.desc}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#8A7850" }}>
+                      {isPlaying ? "Tocando agora · toque para parar" : s.desc}
+                    </div>
                   </div>
-                  {locked && (
+                  {locked && !isPlaying && (
                     <span style={premiumSeal}>
                       <Icon d={D.lock} stroke="#4A3300" size={9} sw={2.2} />
                       PREMIUM
@@ -645,12 +702,21 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
                     style={{
                       width: 40, height: 40, borderRadius: 999, flex: "none",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F2C55C 55%, #C98F1E)",
+                      background: isPlaying
+                        ? "radial-gradient(130% 130% at 30% 22%, #FFD0D0, #E85A5A 55%, #B83030)"
+                        : "radial-gradient(130% 130% at 30% 22%, #FFE9A8, #F2C55C 55%, #C98F1E)",
                       border: "1px solid rgba(255,255,255,.7)",
-                      boxShadow: "0 6px 14px rgba(150,100,20,.35), inset 0 1px 0 rgba(255,255,255,.6)",
+                      boxShadow: isPlaying
+                        ? "0 6px 14px rgba(180,40,40,.35), inset 0 1px 0 rgba(255,255,255,.6)"
+                        : "0 6px 14px rgba(150,100,20,.35), inset 0 1px 0 rgba(255,255,255,.6)",
                     }}
+                    aria-label={isPlaying ? "Parar som" : "Tocar som"}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#3A2E14" style={{ marginLeft: 1 }}><path d={D.play} /></svg>
+                    {isPlaying ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d={D.stop} /></svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#3A2E14" style={{ marginLeft: 1 }}><path d={D.play} /></svg>
+                    )}
                   </div>
                 </button>
               );
@@ -658,31 +724,8 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
           </div>
         </div>
 
-        {/* ── ATIVIDADES ── */}
-        <div style={{ paddingTop: 8 }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "16px 20px 10px" }}>
-            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 20, color: "#2A2008" }}>Atividades em destaque</h2>
-            <button onClick={() => openCategory("featured")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: FONT, fontWeight: 900, fontSize: 12.5, color: "#C7841A", padding: 0 }}>
-              Ver todas →
-            </button>
-          </div>
-          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 16px 12px", scrollbarWidth: "none" }}>
-            {destaques.map((a, i) => (
-              <ActivityCard
-                key={a.id}
-                activity={a}
-                index={i}
-                favorite={favorites.includes(a.id)}
-                onFav={() => toggleFav(a.id)}
-                onOpen={() => tryOpenActivity(a)}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div style={{ padding: "8px 20px 16px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#8A7850" }}>
-          Curadoria KIDZZ · Música para crescer junto
-        </div>
+        {/* ── TODAS AS PLAYLISTS (de Momentos) ── */}
+        <AllPlaylistsSection />
       </div>
 
       {/* ── TOAST (conquistas dos pilares) ── */}
@@ -698,14 +741,15 @@ const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, o
 /* ============ CARD DE ATIVIDADE ============ */
 
 const ActivityCard = ({
-  activity, index, favorite, onFav, onOpen, full = false,
-}: { activity: GuidedActivity; index: number; favorite: boolean; onFav: () => void; onOpen: () => void; full?: boolean }) => {
-  // Fundo de card unificado (sem arco-íris por item) — padrão do relatório
+  activity, favorite, onFav, onOpen, full = false,
+}: { activity: GuidedActivity; favorite: boolean; onFav: () => void; onOpen: () => void; full?: boolean }) => {
+  // Fundo de card unificado (sem arco-íris por item) - padrão do relatório
   const foot: [string, string] = ["#3A3220", "#2A2418"];
+  const cover = activityCover(activity.id);
   return (
     <div style={{ flex: "none", width: full ? "100%" : 168, borderRadius: 22, position: "relative", overflow: "hidden", boxShadow: "0 14px 30px rgba(110,85,30,.26),inset 0 1px 0 rgba(255,255,255,.4)", border: "1px solid rgba(255,255,255,.55)", animation: "mus-rise .45s both" }}>
       <div style={{ position: "relative", height: 140, overflow: "hidden" }}>
-        <button onClick={onOpen} aria-label={activity.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", padding: 0, border: "none", cursor: "pointer", backgroundImage: `url("${activityAsset(index)}")`, backgroundSize: "cover", backgroundPosition: "center" }} />
+        <button onClick={onOpen} aria-label={activity.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", padding: 0, border: "none", cursor: "pointer", backgroundImage: `url("${cover}")`, backgroundSize: "cover", backgroundPosition: "center" }} />
         <div style={{ position: "absolute", top: 8, left: 8, padding: "4px 11px", borderRadius: 999, background: "rgba(255,253,246,.88)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.9)", boxShadow: "0 3px 8px rgba(0,0,0,.18)", color: "#3A2E14", fontSize: 10, fontWeight: 900, pointerEvents: "none" }}>{activity.minutes} min</div>
         {/* UM play dourado (sem duplicar círculo translúcido no centro) */}
         <button
@@ -801,11 +845,10 @@ const CategoryScreen = ({
         )}
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
-          {activities.map((a, i) => (
+          {activities.map((a) => (
             <ActivityCard
               key={a.id}
               activity={a}
-              index={i}
               full
               favorite={favorites.includes(a.id)}
               onFav={() => onToggleFav(a.id)}

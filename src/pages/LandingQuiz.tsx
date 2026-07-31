@@ -36,7 +36,7 @@ const lpVars = {
 } as CSSProperties & Record<string, string>;
 
 // ─────────────────────────────────────────────
-// Kidzz — animated mascot with ambient forest backdrop
+// Kidzz - animated mascot with ambient forest backdrop
 // ─────────────────────────────────────────────
 type KidzzMood = "idle" | "happy" | "empathy" | "thinking" | "wave";
 
@@ -262,7 +262,7 @@ const QUESTIONS: Question[] = [
       { key: "a", label: "Corrida, mal tenho tempo de respirar" },
       { key: "b", label: "Tranquila na maioria dos dias" },
       { key: "c", label: "Um caos do acordar ao dormir" },
-      { key: "d", label: "Depende do dia — montanha-russa" },
+      { key: "d", label: "Depende do dia - montanha-russa" },
     ],
   },
   {
@@ -331,7 +331,7 @@ export default function LandingQuiz() {
   useEffect(() => {
     captureAttribution();
     track("lp_view", { variant: "quiz_3d_v2" });
-    document.title = "Kidzz — Transforme telas em conexão";
+    document.title = "Kidzz - Transforme telas em conexão";
   }, []);
 
   // SEO meta
@@ -725,7 +725,7 @@ export default function LandingQuiz() {
                   Seu resultado está pronto! 🎉
                 </motion.h2>
                 <p style={{ color: C.inkSoft, fontSize: 17, marginTop: 14, lineHeight: 1.5 }}>
-                  Vamos te mostrar o retrato da sua família hoje — e o caminho pra transformar telas em conexão. Pra onde
+                  Vamos te mostrar o retrato da sua família hoje - e o caminho pra transformar telas em conexão. Pra onde
                   enviamos?
                 </p>
                 <form
@@ -806,7 +806,7 @@ export default function LandingQuiz() {
               style={{ fontSize: 19, lineHeight: 1.6, color: "rgba(255,248,240,0.85)", marginTop: 22, maxWidth: 680, marginLeft: "auto", marginRight: "auto" }}
             >
               Você ama, mas a rotina cansa. As telas viraram muleta e fonte de culpa. A boa notícia: dá pra mudar o clima
-              da sua casa começando hoje — sem mais uma obrigação na sua lista.
+              da sua casa começando hoje - sem mais uma obrigação na sua lista.
             </motion.p>
             <div style={{ marginTop: 40, display: "flex", justifyContent: "center" }}>
               <Kidzz size={260} mood="happy" reactive={false} />
@@ -845,7 +845,7 @@ export default function LandingQuiz() {
               emoji="📖"
               color={C.sage}
               title="Acolhe"
-              text="Histórias onde seu filho é o herói, narradas com voz real em português — pra imaginar e dormir em paz."
+              text="Histórias onde seu filho é o herói, narradas com voz real em português - pra imaginar e dormir em paz."
             />
             <FeatureCard
               emoji="🌙"
@@ -921,7 +921,7 @@ export default function LandingQuiz() {
               lineHeight: 1.1,
             }}
           >
-            A infância passa rápido. Faça dela uma jornada de descobertas — juntos.
+            A infância passa rápido. Faça dela uma jornada de descobertas - juntos.
           </h2>
           <div style={{ marginTop: 36 }}>
             <PrimaryButton onClick={() => goApp("final_cta")}>Começar agora ✨</PrimaryButton>
@@ -1379,7 +1379,7 @@ function TestimonialsSection() {
             >
               <div style={{ color: C.gold, fontSize: 18 }}>★★★★★</div>
               <p style={{ marginTop: 14, color: C.deep, lineHeight: 1.55, fontSize: 16, fontWeight: 500 }}>"{t.quote}"</p>
-              <p style={{ marginTop: 14, color: C.inkMuted, fontSize: 13, fontWeight: 700 }}>— {t.who}</p>
+              <p style={{ marginTop: 14, color: C.inkMuted, fontSize: 13, fontWeight: 700 }}> -  {t.who}</p>
             </motion.div>
           ))}
         </div>

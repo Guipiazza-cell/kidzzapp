@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemories } from "@/hooks/useMemories";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
@@ -182,7 +181,7 @@ const GameResultScreen = ({
   onOpenAchievements,
   onHome,
 }: Props) => {
-  const { user } = useAuth();
+  const { addMemory } = useMemories();
   const persisted = useRef(false);
 
   const computedPercent =
@@ -204,7 +203,7 @@ const GameResultScreen = ({
     return { text: `Continue tentando, ${childName}! 🦎`, color: "#7C3AED", size: 32 };
   }, [tone, childName]);
 
-  // Sound + persistence (runs once on mount)
+  // Sound + grava no histórico de Memórias (guest ou logado)
   useEffect(() => {
     if (tone === "high") {
       playVictoryTone();
@@ -213,29 +212,30 @@ const GameResultScreen = ({
       playEncouragementTone();
       haptic(tone === "mid" ? "medium" : "light");
     }
-    if (persisted.current || !user) return;
+    if (persisted.current) return;
     persisted.current = true;
     const detail =
-      subtitle ?? (total > 0 ? `${childName} acertou ${correct} de ${total} (${computedPercent}%)` : `${childName} fez ${correct} pontos`);
-    void supabase
-      .from("memories")
-      .insert({
-        user_id: user.id,
-        type: "achievement",
-        title: `${activityLabel} concluído`,
-        content: detail,
-        is_special: tone === "high",
-        metadata: {
-          kind: "game",
-          subtype,
-          correct,
-          total,
-          percent: computedPercent,
-          stars,
-          xp,
-        },
-      } as any)
-      .then(() => { /* fire-and-forget */ });
+      subtitle ??
+      (total > 0
+        ? `${childName} acertou ${correct} de ${total} (${computedPercent}%)`
+        : `${childName} fez ${correct} pontos`);
+    void addMemory({
+      type: "play",
+      title: `${activityLabel} concluído`,
+      content: detail,
+      is_special: tone === "high",
+      image_url: null,
+      metadata: {
+        area: "play",
+        kind: "game",
+        subtype,
+        correct,
+        total,
+        percent: computedPercent,
+        stars,
+        xp,
+      },
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

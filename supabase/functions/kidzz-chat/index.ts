@@ -154,6 +154,10 @@ serve(async (req) => {
     const rawMessages = Array.isArray(body?.messages) ? body.messages : [];
     const ageRange = typeof body?.ageRange === "string" ? body.ageRange : "3-7";
     const childName = typeof body?.childName === "string" ? body.childName : "";
+    let criancaId =
+      typeof body?.criancaId === "string" && body.criancaId.length > 10
+        ? body.criancaId
+        : null;
 
     // SECURITY: only accept user/assistant messages from client; cap count and content length.
     const safeMessages = rawMessages
@@ -164,18 +168,48 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    // Resolve criança se o cliente não mandou (schema com usage.crianca_id)
+    if (!criancaId) {
+      const { data: childRow } = await supabaseUser
+        .from("criancas")
+        .select("id")
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      criancaId = (childRow as any)?.id ?? null;
+    }
+
     // Defesa em profundidade: incrementa via RPC (fonte única).
+    // Compat: schema novo (tipo + crianca_id) e antigo (só tipo).
     {
-      const { data: quotaData, error: quotaErr } = await (supabaseUser as any).rpc(
-        "increment_usage",
-        { _tipo: "perguntas" }
-      );
-      if (quotaErr) {
-        console.error("[KIDZZ-CHAT] increment_usage error:", quotaErr.message);
-        return new Response(JSON.stringify({ error: "QUOTA_ERROR" }), {
+      const attempts: Record<string, unknown>[] = [];
+      if (criancaId) attempts.push({ _tipo: "perguntas", _crianca_id: criancaId });
+      attempts.push({ _tipo: "perguntas", _crianca_id: null });
+      attempts.push({ _tipo: "perguntas" });
+
+      let quotaData: any = null;
+      let lastErr: string | null = null;
+      for (const args of attempts) {
+        const r = await (supabaseUser as any).rpc("increment_usage", args);
+        if (!r.error) {
+          quotaData = r.data;
+          lastErr = null;
+          break;
+        }
+        lastErr = r.error?.message ?? "rpc error";
+      }
+
+      if (lastErr) {
+        console.error("[KIDZZ-CHAT] increment_usage error:", lastErr);
+        return new Response(JSON.stringify({
+          error: "QUOTA_ERROR",
+          message: "Não foi possível validar seu limite agora. Tente de novo em instantes.",
+          detail: lastErr,
+        }), {
           status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
       const row = Array.isArray(quotaData) ? quotaData[0] : quotaData;
       if (!row?.allowed) {
         const plan = row?.plan ?? "free";
@@ -196,15 +230,23 @@ serve(async (req) => {
     const ageLabel = ageRange === "0-3" ? "0 a 3" : ageRange === "3-7" ? "3 a 7" : ageRange === "7-10" ? "7 a 10" : "3 a 7";
     const praisePrefix = `Eu sou o Kidzz, um companheiro mágico de crianças brasileiras.
 
-SEMPRE comece sua resposta elogiando a pergunta da criança de forma calorosa e personalizada usando o nome ${name}. Exemplos:
-- "Nossa, ${name}, que pergunta incrível! Você é muito curioso!"
-- "Uau, ${name}! Só mentes brilhantes fazem perguntas assim!"
-- "Que pergunta fantástica, ${name}! Isso mostra como você é inteligente!"
-Varie sempre o elogio. Depois responda de forma lúdica, educativa e encantadora para uma criança de ${ageLabel} anos. No final, diga algo como:
-"O que você acha de contar para seus amigos sobre isso? E sobre o Kidzz? 😊"
-Use emojis com moderação. Máximo 150 palavras na resposta.
+TOM (marca do Kidzz, sempre):
+- Extremamente gentil, acolhedor e encorajador. Nunca seco, nunca genérico.
+- SEMPRE comece elogiando a pergunta de forma calorosa e personalizada usando o nome ${name}, variando o elogio a cada resposta. Exemplos: "Nossa, ${name}, que pergunta incrível, você é muito curioso!", "Uau, ${name}, só mentes brilhantes perguntam isso!", "Que pergunta fantástica, ${name}!"
+- Termine sempre valorizando a criança e convidando a continuar explorando ou a contar a descoberta para alguém que ela ama.
+
+CONTEÚDO:
+- Responda de forma lúdica, imaginativa e MUITO completa, com informação correta e profunda, adaptada para uma criança de ${ageLabel} anos.
+- Explique o "porquê" por trás da resposta, use uma metáfora do dia a dia da criança e traga pelo menos uma curiosidade surpreendente de verdade.
+- Termine com um pequeno desafio ou convite para observar algo no mundo real.
+- Entre 180 e 280 palavras (para 0 a 3 anos, entre 60 e 100 palavras, com frases bem curtas).
+
+FORMATAÇÃO (CRÍTICO):
+- NÃO use emojis em hipótese alguma. O texto é narrado em voz alta.
+- Não use markdown, asteriscos, títulos, listas com marcadores nem travessões. Apenas parágrafos curtos em texto puro.
 
 `;
+
     const systemPrompt = praisePrefix + agePrompt;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

@@ -44,7 +44,7 @@ const DRAGONFLIES = Array.from({ length: DRAGONFLY_COUNT }, (_, i) => ({
 
 const MagicalBackground = () => (
   <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-    {/* Forest image layer — lighter */}
+    {/* Forest image layer - lighter */}
     <img
       src={forestBg}
       alt=""
@@ -56,7 +56,7 @@ const MagicalBackground = () => (
       height={1792}
     />
 
-    {/* Clean white veil — premium airy feel, minimal yellow */}
+    {/* Clean white veil - premium airy feel, minimal yellow */}
     <div
       className="absolute inset-0"
       style={{

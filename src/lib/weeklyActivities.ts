@@ -1,5 +1,5 @@
 /**
- * Atividades semanais — pool curado + IA refresca
+ * Atividades semanais - pool curado + IA refresca
  * ─────────────────────────────────────────────────
  * O usuário sempre vê 10 atividades por semana. Estratégia:
  *  1. Pool estático com ~40 atividades (4 categorias × 10).
@@ -92,7 +92,7 @@ export const ACTIVITY_POOL: Activity[] = [
 
 /* ── Sorteio determinístico por semana ── */
 
-/** ISO week key: "2025-W17" — muda toda segunda-feira */
+/** ISO week key: "2025-W17" - muda toda segunda-feira */
 export function getWeekKey(d = new Date()): string {
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const dayNum = (date.getUTCDay() + 6) % 7; // segunda = 0
@@ -209,7 +209,7 @@ export function saveCompletedSet(currentWeek: string, ids: Set<string>) {
   }
 }
 
-/** Devolve a "atividade do dia" — 1 destacada por dia entre as não concluídas */
+/** Devolve a "atividade do dia" - 1 destacada por dia entre as não concluídas */
 export function pickDailyHighlight(
   weekly: Activity[],
   completed: Set<string>,

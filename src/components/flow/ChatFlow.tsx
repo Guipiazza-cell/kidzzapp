@@ -60,7 +60,7 @@ const ChatFlow = ({
         key="home"
         onSubmit={onSubmit}
         onOpenStoryFactory={() => onSwitchTab("explore")}
-        onOpenMoments={() => onSwitchTab("moments")}
+        onOpenMoments={() => onSwitchTab("music")}
         onOpenAchievements={() => onSwitchTab("achievements")}
         onOpenLab={onOpenLab}
         onOpenPlay={() => onSwitchTab("play")}
@@ -74,15 +74,17 @@ const ChatFlow = ({
       />
     )}
     {step === "generating" && (
-      <GeneratingScreen
-        key="generating"
-        question={question}
-        ageRange={profile.age_range || "3-7"}
-        childName={childName}
-        onComplete={onAnswerReady}
-        onError={onGeneratingError}
-        onLimitReached={() => onOpenPaywall("question_limit", { count: profile.questions_used ?? 0 })}
-      />
+      <div className="absolute inset-0 z-40 flex flex-col min-h-0">
+        <GeneratingScreen
+          key={`gen-${question}`}
+          question={question}
+          ageRange={profile.age_range || "3-7"}
+          childName={childName}
+          onComplete={onAnswerReady}
+          onError={onGeneratingError}
+          onLimitReached={() => onOpenPaywall("question_limit", { count: profile.questions_used ?? 0 })}
+        />
+      </div>
     )}
     {step === "celebrating" && (
       <CelebrationScreen

@@ -6,7 +6,7 @@ import { applyCheckSubscriptionClient } from "@/lib/subscriptionAccess";
 
 export type SubscriptionTier = "free" | "kidzz" | "premium";
 
-// Aliases legados — UI/back-compat. "super_premium" velho → novo "premium".
+// Aliases legados - UI/back-compat. "super_premium" velho → novo "premium".
 export type LegacyTier = "free" | "premium" | "super_premium";
 export type CheckoutPlan = "kidzz" | "kidzz_annual" | "premium" | "premium_annual";
 
@@ -103,36 +103,77 @@ const clearPendingCheckoutPlan = () => {
   }
 };
 
-const submitCheckoutRedirectForm = (plan: CheckoutPlan, accessToken: string, ref?: string) => {
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = CHECKOUT_URL;
-  form.target = "_top";
-  form.style.display = "none";
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
-  const fields: Record<string, string> = {
-    checkout_transport: "form_redirect",
-    access_token: accessToken,
+/** Abre o Stripe Checkout: fetch JSON (melhor erro) + fallback form POST. */
+const openStripeCheckout = async (plan: CheckoutPlan, accessToken: string, ref?: string) => {
+  const returnOrigin = window.location.origin;
+  const body: Record<string, string> = {
     plan,
-    return_origin: window.location.origin,
+    return_origin: returnOrigin,
   };
-  if (ref) fields.ref = ref;
+  if (ref) body.ref = ref;
 
-  Object.entries(fields).forEach(([name, value]) => {
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = name;
-    input.value = value;
-    form.appendChild(input);
-  });
+  try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+    if (ANON_KEY) headers.apikey = ANON_KEY;
 
-  document.body.appendChild(form);
-  console.log("[Checkout] Submitting same-tab Stripe redirect form", { plan, hasRef: Boolean(ref) });
-  form.submit();
-  window.setTimeout(() => form.remove(), 5000);
+    const resp = await fetch(CHECKOUT_URL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    const data = await resp.json().catch(() => ({} as { url?: string; error?: string }));
+    if (resp.ok && data.url) {
+      console.log("[Checkout] Redirecting to Stripe", { plan });
+      try {
+        window.dispatchEvent(new CustomEvent("kidzz:close-plans"));
+      } catch {
+        /* noop */
+      }
+      window.location.assign(data.url);
+      return;
+    }
+
+    const msg = data.error || `Erro no checkout (${resp.status})`;
+    console.error("[Checkout] Edge function error", msg, data);
+    throw new Error(msg);
+  } catch (err) {
+    // Fallback: form POST (navegação top-level, útil se fetch/CORS falhar)
+    console.warn("[Checkout] Fetch failed, trying form redirect", err);
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = CHECKOUT_URL;
+    form.target = "_top";
+    form.style.display = "none";
+
+    const fields: Record<string, string> = {
+      checkout_transport: "form_redirect",
+      access_token: accessToken,
+      plan,
+      return_origin: returnOrigin,
+    };
+    if (ref) fields.ref = ref;
+
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    window.setTimeout(() => form.remove(), 5000);
+  }
 };
 
-// Data no fuso de Brasília — o servidor reseta o uso em America/Sao_Paulo
+// Data no fuso de Brasília - o servidor reseta o uso em America/Sao_Paulo
 // (meia-noite de Brasília). Antes o cliente usava UTC, desalinhando o "dia"
 // do cliente vs servidor (reset em horário errado / contagem divergente).
 const todayStr = () => {
@@ -430,40 +471,77 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
+    // Se getSession/fetchProfile pendurar (rede/SW/token corrompido), a UI
+    // ficava eternamente em loading com a splash "KIDZZAPP" / tela em branco.
+    const withTimeout = <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> =>
+      new Promise<T>((resolve, reject) => {
+        const t = window.setTimeout(() => reject(new Error(`[Auth] ${label} timeout after ${ms}ms`)), ms);
+        promise.then(
+          (v) => { window.clearTimeout(t); resolve(v); },
+          (e) => { window.clearTimeout(t); reject(e); },
+        );
+      });
+
+    const releaseUi = (seedProfile?: Profile | null) => {
+      if (!mounted || initDone.current) return;
+      if (seedProfile) setProfile((prev) => prev ?? seedProfile);
+      else setProfile((prev) => prev ?? getGuestProfile());
+      setLoading(false);
+      setIsReady(true);
+      initDone.current = true;
+    };
+
     const initializeAuth = async () => {
+      // Fail-open duro: nunca trava a splash/Index por mais de 3.5s.
+      const failOpenTimer = window.setTimeout(() => {
+        console.warn("[Auth] init fail-open - liberando UI");
+        releaseUi(getGuestProfile());
+      }, 3500);
+
       try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        const { data: { session: currentSession } } = await withTimeout(
+          supabase.auth.getSession(),
+          3000,
+          "getSession",
+        );
         if (!mounted) return;
 
         if (currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
-          const prof = await fetchProfile(currentSession.user.id);
-          if (!mounted) return;
-          setProfile(prof);
-          // Tier otimista a partir do DB — libera a UI sem esperar o Stripe.
-          setTier(prof.is_premium ? "premium" : "free");
-          // Libera a UI IMEDIATAMENTE. O gate `if (loading) return null` no Index
-          // segurava a tela inteira (~10s) ate o check-subscription do Stripe
-          // responder. Agora o refresh do Stripe roda em background e so ajusta
-          // tier/locks quando chegar.
-          setLoading(false);
-          setIsReady(true);
-          initDone.current = true;
-          checkSubscription(currentSession.access_token, prof, true)
-            .then((subResult) => {
-              if (!mounted) return;
-              setTier(subResult.tier);
-              if (subResult.isPremium !== prof.is_premium) {
-                setProfile((prev) => (prev ? { ...prev, is_premium: subResult.isPremium } : prev));
-              }
-            })
-            .catch((err) => console.warn("[Auth] init subscription check failed", err));
+          // Libera a UI já com seed guest/draft - não espera o fetch do profile.
+          const seed = getGuestProfile();
+          setProfile(seed);
+          setTier(seed.is_premium ? "premium" : "free");
+          releaseUi(seed);
+
+          try {
+            const prof = await withTimeout(
+              fetchProfile(currentSession.user.id),
+              3000,
+              "fetchProfile",
+            );
+            if (!mounted) return;
+            setProfile(prof);
+            setTier(prof.is_premium ? "premium" : "free");
+            checkSubscription(currentSession.access_token, prof, true)
+              .then((subResult) => {
+                if (!mounted) return;
+                setTier(subResult.tier);
+                if (subResult.isPremium !== prof.is_premium) {
+                  setProfile((prev) => (prev ? { ...prev, is_premium: subResult.isPremium } : prev));
+                }
+              })
+              .catch((err) => console.warn("[Auth] init subscription check failed", err));
+          } catch (profileErr) {
+            console.warn("[Auth] profile fetch failed/timed out - keeping seed", profileErr);
+          }
         } else {
           setSession(null);
           setUser(null);
           setProfile(getGuestProfile());
           setTier("free");
+          releaseUi(getGuestProfile());
         }
       } catch (err) {
         console.error("Auth init error:", err);
@@ -471,7 +549,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setProfile(getGuestProfile());
         setTier("free");
+        releaseUi(getGuestProfile());
       } finally {
+        window.clearTimeout(failOpenTimer);
         if (mounted) {
           setLoading(false);
           setIsReady(true);
@@ -536,7 +616,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [session, profile, checkSubscription]);
 
-  // No periodic refresh — only on login and manual refresh (cost optimization)
+  // No periodic refresh - only on login and manual refresh (cost optimization)
 
   const handleCheckout = useCallback(async (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
     const checkoutPlan = normalizeCheckoutPlan(plan);
@@ -545,29 +625,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Não logado: guarda o plano e manda pro /auth. Depois do login, retomamos o checkout.
       savePendingCheckoutPlan(checkoutPlan);
       const { toast } = await import("sonner");
-      toast("Crie sua conta pra continuar 💛", {
+      toast("Crie sua conta pra continuar", {
         description: "Em 1 minuto você volta direto pro pagamento.",
       });
+      // Fecha overlays (paywall) antes de ir pro auth
+      try {
+        window.dispatchEvent(new CustomEvent("kidzz:close-plans"));
+      } catch {
+        /* noop */
+      }
       navigate("/auth?checkout=1", { replace: false });
       return;
     }
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       const { toast } = await import("sonner");
-      toast.error("Você está offline 🌐", {
+      toast.error("Você está offline", {
         description: "Conecte-se à internet e tente novamente.",
       });
       return;
     }
-    const ref = sessionStorage.getItem("kidzz_ref") || undefined;
+    const ref =
+      (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("kidzz_ref") : null) ||
+      undefined;
 
     try {
-      submitCheckoutRedirectForm(checkoutPlan, session.access_token, ref);
+      await openStripeCheckout(checkoutPlan, session.access_token, ref);
     } catch (err) {
       const { toast } = await import("sonner");
-      console.error("[Checkout] Failed to submit redirect form", err);
+      console.error("[Checkout] Failed to open Stripe", err);
+      const msg = err instanceof Error ? err.message : "Erro ao iniciar pagamento";
       toast.error("Erro ao iniciar pagamento", {
-        description: "Tente novamente em instantes — nada foi cobrado.",
+        description:
+          msg.includes("STRIPE") || msg.includes("not set")
+            ? "Stripe não configurado neste ambiente. Confira as secrets da function create-checkout."
+            : "Tente novamente em instantes. Nada foi cobrado.",
       });
+      throw err;
     }
   }, [navigate, session]);
 

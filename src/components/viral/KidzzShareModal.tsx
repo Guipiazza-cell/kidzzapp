@@ -34,7 +34,7 @@ const KidzzShareModal = ({
 
   const shareUrl = `${APP_URL}/lp?ref=${encodeURIComponent(shareSlug || "share")}`;
   const filename = `kidzz-${shareSlug || "conquista"}-${Date.now()}.png`;
-  const text = `${childName} ${subtitle || `acabou de conquistar "${title}" no Kidzz! ${emoji}`} — vem aprender com a gente 💛`;
+  const text = `${childName} ${subtitle || `acabou de conquistar "${title}" no Kidzz! ${emoji}`} - vem aprender com a gente 💛`;
 
   const renderBlob = async (): Promise<Blob | null> => {
     if (!cardRef.current) return null;
@@ -218,7 +218,7 @@ const KidzzShareModal = ({
         </div>
       </motion.div>
 
-      {/* Off-screen capture target — full size 540x960 */}
+      {/* Off-screen capture target - full size 540x960 */}
       <div
         style={{ position: "fixed", left: "-99999px", top: 0, pointerEvents: "none" }}
         aria-hidden

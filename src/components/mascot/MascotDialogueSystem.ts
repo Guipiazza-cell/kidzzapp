@@ -1,5 +1,5 @@
 /**
- * Mascot Dialogue System — contextual, time-aware, interest-based state machine
+ * Mascot Dialogue System - contextual, time-aware, interest-based state machine
  */
 
 export type MascotState =
@@ -31,7 +31,7 @@ const dialogues: Record<string, DialogueEntry> = {
     pixel: [
       "Sistema inicializado! [Nome], tenho 3 curiosidades novas para você 🔬",
       "Bom dia, [Nome]! Meus sensores detectaram perguntas incríveis hoje! ⚡",
-      "[Nome], análise matinal completa — hoje vai ser épico! 🧠",
+      "[Nome], análise matinal completa - hoje vai ser épico! 🧠",
     ],
   },
   afternoon: {
@@ -54,7 +54,7 @@ const dialogues: Record<string, DialogueEntry> = {
     ],
     pixel: [
       "Hora de explorar antes de dormir, [Nome] 🌙",
-      "[Nome], últimas descobertas do dia — vamos lá! 🔭",
+      "[Nome], últimas descobertas do dia - vamos lá! 🔭",
       "Modo noturno ativado, [Nome]! Curiosidades antes de descansar ✨",
     ],
   },
@@ -221,7 +221,7 @@ export function getMascotDialogue(
     .replace(/\[X\]/g, String(streakDays ?? 0));
 }
 
-// Special Daily Questions — rotate by day of year
+// Special Daily Questions - rotate by day of year
 const specialQuestions = [
   { question: "Se você pudesse conversar com qualquer animal, qual escolheria?", emoji: "🐾", gradient: "from-emerald-400/30 to-teal-500/30" },
   { question: "O que aconteceria se a gravidade sumisse por 1 minuto?", emoji: "🚀", gradient: "from-blue-400/30 to-indigo-500/30" },

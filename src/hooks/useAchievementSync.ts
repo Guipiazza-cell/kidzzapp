@@ -121,7 +121,7 @@ export function useAchievementSync() {
       try {
         // Map events to profile counters
         if (event === "question" || event === "travel" || event === "karaoke" || event === "music") {
-          // these all count as "engagement events" — drive points + streak
+          // these all count as "engagement events" - drive points + streak
           await incrementQuestions();
         } else if (event === "question-checkonly") {
           // GeneratingScreen already incremented; just re-check badges below

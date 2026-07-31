@@ -24,7 +24,7 @@ const GRADIENTS: Record<AchievementCategory, string> = {
 };
 
 /**
- * Vertical 9:16 card (540x960 — captured at 2x = 1080x1920 by html2canvas).
+ * Vertical 9:16 card (540x960 - captured at 2x = 1080x1920 by html2canvas).
  * Used for Instagram Stories + WhatsApp.
  */
 const KidzzShareCard = forwardRef<HTMLDivElement, Props>(
@@ -93,7 +93,7 @@ const KidzzShareCard = forwardRef<HTMLDivElement, Props>(
           }}
         />
 
-        {/* TOP — brand */}
+        {/* TOP - brand */}
         <div
           style={{
             position: "relative",
@@ -141,7 +141,7 @@ const KidzzShareCard = forwardRef<HTMLDivElement, Props>(
           </span>
         </div>
 
-        {/* CENTER — emoji + title */}
+        {/* CENTER - emoji + title */}
         <div
           style={{
             position: "relative",
@@ -205,7 +205,7 @@ const KidzzShareCard = forwardRef<HTMLDivElement, Props>(
           )}
         </div>
 
-        {/* BOTTOM — QR + URL + watermark */}
+        {/* BOTTOM - QR + URL + watermark */}
         <div
           style={{
             position: "relative",

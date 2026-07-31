@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import pixelImg from "@/assets/chameleon-main.webp";
+import pixelImg from "@/assets/memorias/gui-cutout.png";
 import { getMilestoneProgress } from "@/lib/habitLoop";
 import { triggerKidzzShare } from "@/components/viral/KidzzShareTrigger";
 
@@ -14,7 +14,7 @@ interface StreakEventDetail {
 }
 
 interface Props {
-  /** Initial streak (from profile) — overlay also listens for live updates. */
+  /** Initial streak (from profile) - overlay also listens for live updates. */
   streakDays: number;
   childName: string;
   previousRecord: number;

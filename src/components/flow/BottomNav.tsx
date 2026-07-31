@@ -49,16 +49,9 @@ const TABS: Tab[] = APP_TABS_ALL.filter((t) => t.inDock).map((tab) => ({
   featured: tab.featured,
 }));
 
-// Telas de fundo ESCURO — o dock usa vidro escuro; nas demais, vidro claro.
-// Assim a nav "combina" com cada tela em vez de destoar.
-const DARK_SCREENS = new Set<string>(["dreams", "moments", "memories"]);
-
 /**
- * BottomNav — dock de vidro premium que HARMONIZA com cada tela.
- *
- * - Fundo do dock adapta claro/escuro conforme a tela ativa (DARK_SCREENS).
- * - Ícone ativo em cápsula glossy tingida na cor da aba (tab.c/tab.cl) + glow.
- * - Setas prev/next, rolagem horizontal. Fiel aos mockups (design-src/*.dc.html).
+ * BottomNav - liquid glass ÚNICO em todas as abas.
+ * Não muda de cor ao trocar tela (claro/escuro): sempre o mesmo vidro translúcido.
  */
 const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremium = false }: Props) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -88,32 +81,27 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
     scrollerRef.current?.scrollBy({ left: dx, behavior: "smooth" });
   }, []);
 
-  const immersiveTab = activeTab === "dreams" || activeTab === "cinema";
-  const dark = DARK_SCREENS.has(activeTab);
-
-  // Tema do dock por claridade da tela ativa.
-  const dockStyle: CSSProperties = dark
-    ? {
-        background: "linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.06))",
-        border: "1px solid rgba(255,255,255,.3)",
-        boxShadow: "0 18px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -8px 18px rgba(0,0,0,.15)",
-      }
-    : {
-        background: "linear-gradient(160deg, rgba(255,255,255,.82), rgba(255,255,255,.5))",
-        border: "1px solid rgba(255,255,255,.95)",
-        boxShadow: "0 18px 40px -8px rgba(60,50,30,.30), 0 4px 12px rgba(60,50,30,.14), inset 0 1.5px 1px rgba(255,255,255,1), inset 0 -8px 18px rgba(120,110,90,.06)",
-      };
-  const idleIcon = dark ? "rgba(240,235,225,.66)" : "rgba(70,60,45,.6)";
-  const idleLabel = dark ? "rgba(240,235,225,.6)" : "rgba(70,60,45,.62)";
-  const arrowBg = dark ? "rgba(255,255,255,.16)" : "rgba(255,255,255,.7)";
-  const arrowBorder = dark ? "rgba(255,255,255,.3)" : "rgba(255,255,255,1)";
-  const arrowIcon = dark ? "#FBEFE6" : "#6E5E48";
+  // Liquid glass translúcido - igual em tela branca, creme ou preta.
+  const dockStyle: CSSProperties = {
+    background:
+      "linear-gradient(165deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.16) 100%)",
+    border: "0.5px solid rgba(255,255,255,.55)",
+    boxShadow:
+      "0 12px 36px rgba(20,16,30,.18), 0 2px 8px rgba(20,16,30,.08), inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 0 rgba(255,255,255,.12)",
+    backdropFilter: "blur(32px) saturate(190%)",
+    WebkitBackdropFilter: "blur(32px) saturate(190%)",
+  };
+  const idleIcon = "rgba(45,40,55,.62)";
+  const idleLabel = "rgba(45,40,55,.58)";
+  const arrowBg = "rgba(255,255,255,.45)";
+  const arrowBorder = "rgba(255,255,255,.7)";
+  const arrowIcon = "rgba(55,48,62,.78)";
 
   const arrowBtn: CSSProperties = {
     position: "absolute", top: "50%", width: 26, height: 26, borderRadius: 999, cursor: "pointer",
     transform: "translateY(-50%)", background: arrowBg, border: `1px solid ${arrowBorder}`,
-    backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
-    boxShadow: "0 4px 10px rgba(0,0,0,.28), inset 0 1px 1px rgba(255,255,255,.5)",
+    backdropFilter: "blur(12px) saturate(160%)", WebkitBackdropFilter: "blur(12px) saturate(160%)",
+    boxShadow: "0 4px 12px rgba(20,16,30,.16), inset 0 1px 1px rgba(255,255,255,.65)",
     display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2,
   };
 
@@ -135,15 +123,12 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
       {/* Pais/Assinar flutuante REMOVIDO (relatório design): cobria conteúdo.
           Pais fica no header de cada aba; Assinar via paywall / header / planos. */}
 
-      {/* Dock de vidro (premium, harmoniza com a tela) */}
+      {/* Dock liquid glass - mesmo em todas as telas */}
       <div
         style={{
           position: "relative",
           padding: "8px 4px",
           borderRadius: 26,
-          backdropFilter: "blur(24px) saturate(170%)",
-          WebkitBackdropFilter: "blur(24px) saturate(170%)",
-          transition: "background .4s ease, box-shadow .4s ease, border-color .4s ease",
           ...dockStyle,
         }}
       >
@@ -220,7 +205,7 @@ const BottomNav = ({ activeTab, onTabChange, onOpenParents, onOpenPlans, isPremi
                   style={{
                     fontSize: 9,
                     fontWeight: 900,
-                    color: isActive ? (dark ? tab.cl : tab.c) : idleLabel,
+                    color: isActive ? tab.c : idleLabel,
                     whiteSpace: "nowrap",
                     transition: "color .3s",
                   }}

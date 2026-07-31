@@ -115,12 +115,18 @@ const CreateMusic = ({ onBack, childName, onAchievement }: Props) => {
     if (!song || saved) return;
     setSaved(true);
     addMemory({
-      type: "achievement",
+      type: "music",
       title: `Compôs: ${song.title}`,
       content: `${childName} criou uma música com ${seed?.label}, ${mood?.label} e ritmo ${rhythm?.label}!`,
       is_special: true,
       image_url: null,
-      metadata: { kind: "composition", seed: seed?.id, mood: mood?.id, rhythm: rhythm?.id },
+      metadata: {
+        area: "music",
+        kind: "composition",
+        seed: seed?.id,
+        mood: mood?.id,
+        rhythm: rhythm?.id,
+      },
     });
   };
 

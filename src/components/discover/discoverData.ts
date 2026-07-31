@@ -31,7 +31,7 @@ export type Theme = {
   activities: Activity[];
 };
 
-// Assets premium — hero floresta + Gui original (arms / explorador)
+// Assets premium - hero floresta + Gui original (arms / explorador)
 export const DISCOVER_IMAGES = {
   /** Hero premium (public, cache-bust manual se precisar) */
   hero: "/exemplos/assets/descobrir-v2/hero-oficial.png?v=1",

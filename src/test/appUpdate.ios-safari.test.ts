@@ -2,7 +2,7 @@
  * Real-world update tests simulating iOS Safari (PWA + tab) behavior.
  *
  * Validates that when a new build is published, an open Kidzz app on iOS
- * never stays stuck on an old version — it must:
+ * never stays stuck on an old version - it must:
  *   1. Detect the new /version.json
  *   2. Dispatch the in-app update event (banner fallback)
  *   3. Clear CacheStorage and unregister Service Workers
@@ -131,7 +131,7 @@ afterEach(() => {
   }
 });
 
-describe("iOS Safari — auto-update guarantees", () => {
+describe("iOS Safari - auto-update guarantees", () => {
   it("detects a new published build and hard-reloads with cache-busting", async () => {
     const env = setupIOSEnv({ version: "v-next-123", appVersion: "v-current" });
     const mod = await import("@/lib/appUpdate");
@@ -146,7 +146,7 @@ describe("iOS Safari — auto-update guarantees", () => {
     expect(env.cacheDeletes).toEqual(expect.arrayContaining(["kidzz-html-old", "kidzz-assets-old"]));
     expect(env.swUnregisters).toBeGreaterThanOrEqual(1);
 
-    // Hard reload happened with the new version pinned in the URL — iOS Safari
+    // Hard reload happened with the new version pinned in the URL - iOS Safari
     // will refuse to serve a cached HTML shell for a different query string.
     expect(env.reloadCalls.length).toBe(1);
     const target = new URL(env.reloadCalls[0]);
@@ -171,7 +171,7 @@ describe("iOS Safari — auto-update guarantees", () => {
 
     await mod.checkForNewAppVersion(true);
 
-    // Banner event fires BEFORE the hard-reload — if iOS Safari swallows the
+    // Banner event fires BEFORE the hard-reload - if iOS Safari swallows the
     // reload (e.g. PWA in background), the banner stays visible as a fallback.
     expect(env.dispatched.length).toBeGreaterThanOrEqual(1);
     expect(env.reloadCalls.length).toBe(1);

@@ -5,12 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
-import KidzzLogo from "@/components/common/KidzzLogo";
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
-import heroDescobrir from "@/assets/descobrir-hero.webp";
+import { CAMALEAO } from "@/lib/camaleaoOficial";
+import heroDescobrir from "@/assets/descobrir-hero.jpg";
 
 // ============================================================
-// DiscoverScreen — premium v2 (ref: public/telas/DESCOBRIR)
+// DiscoverScreen - premium v2 (ref: public/telas/DESCOBRIR)
 // Assets: hero floresta + Gui original · temas descobrir-v2
 // Lógica real preservada: temas, atividades, premium, selo, share.
 // ============================================================
@@ -77,7 +76,8 @@ const THEME_VISUAL: Record<Theme["id"], ThemeVisual> = {
   espaco: {
     panel: "linear-gradient(150deg,rgba(60,80,120,.5),rgba(20,32,58,.92))",
     titleColor: "#EAF0FA", subColor: "rgba(210,222,240,.82)",
-    chip: ["#C2CBFF", "#6E7FE8", "#4152B8"], arrow: ["#FFFFFF", "#E8ECF4", "#B8C2D2"],
+    // Seta em azul (antes era branca/clara → sumia no fundo claro)
+    chip: ["#C2CBFF", "#6E7FE8", "#4152B8"], arrow: ["#C2CBFF", "#6E7FE8", "#4152B8"],
     pillDark: true, fade: "rgba(20,32,58,.92)", novo: false, d: PATHS.planet,
   },
   natureza: {
@@ -109,7 +109,7 @@ const arrowStyle = (l: string, m: string, d: string): CSSProperties => ({
 });
 
 // ------------------------------------------------------------
-// Imagem com fallback elegante (gradiente + emoji) — usado no detalhe
+// Imagem com fallback elegante (gradiente + emoji) - usado no detalhe
 // ------------------------------------------------------------
 function SmartImage({
   src, alt, fallbackBg, fallbackEmoji, className, style,
@@ -222,7 +222,7 @@ function ThemeCard({ theme, onOpen }: { theme: Theme; onOpen: () => void }) {
 }
 
 // ------------------------------------------------------------
-// Tela de detalhe do tema (preservada 1:1 — fora do mockup)
+// Tela de detalhe do tema (preservada 1:1 - fora do mockup)
 // ------------------------------------------------------------
 function ThemeDetail({
   theme, childName, isPremium, onBack, onShareBadge,
@@ -407,7 +407,7 @@ function ThemeDetail({
 }
 
 // ------------------------------------------------------------
-// Card de atividade premium (4 camadas) — preservado 1:1
+// Card de atividade premium (4 camadas) - preservado 1:1
 // ------------------------------------------------------------
 function ActivityCard({
   activity, accent, accentInk, childName, locked, open, onToggle, onUpgrade, onShare,
@@ -879,8 +879,9 @@ const DiscoverScreen = ({ onBack }: Props) => {
       const sc = scrollRef.current, hero = heroWrapRef.current;
       if (!sc || !hero) return;
       const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.42}px) scale(${1 + y * 0.0004})`;
-      hero.style.opacity = String(Math.max(0, 1 - y / 236));
+      // parallax leve — sem scale (evita cortar o card)
+      hero.style.transform = `translateY(${y * 0.18}px)`;
+      hero.style.opacity = String(Math.max(0.55, 1 - y / 420));
     });
   }, []);
 
@@ -902,7 +903,7 @@ const DiscoverScreen = ({ onBack }: Props) => {
         onScroll={onScroll}
         style={{ height: "100%", overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 168px)", scrollbarWidth: "none", position: "relative", WebkitOverflowScrolling: "touch", zIndex: 2 }}
       >
-        {/* top chrome: voltar · logo · pontos */}
+        {/* top chrome: voltar · pontos (sem logo) */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: `calc(env(safe-area-inset-top, 0px) + 10px) ${PAD}px 0`, gap: 10 }}>
           <button
             type="button"
@@ -913,31 +914,29 @@ const DiscoverScreen = ({ onBack }: Props) => {
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m6-6-6 6 6 6" stroke="#2E3A1E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
-          <div style={{ flex: 1, display: "flex", justifyContent: "center", minWidth: 0 }}>
-            <KidzzLogo height={26} light />
-          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 14px", minHeight: 44, flex: "none", borderRadius: R.btn, fontWeight: 900, fontSize: 13, color: "#2E3A1E", ...pillGlassLight }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm-4 1h4v2a4 4 0 0 1-4-2Zm16 0h-4v2a4 4 0 0 0 4-2Zm-8 6.5V17m-3.5 3h7M9.5 17h5" stroke="#E0A62B" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
             {pontos}
           </div>
         </div>
 
-        {/* ── HERO premium: floresta dourada + Gui original ── */}
+        {/* ── HERO: card arte completa (sem crop — imagem inteira) ── */}
         <div
           ref={heroWrapRef}
           style={{
             position: "relative",
-            margin: `12px ${PAD}px 6px`,
-            minHeight: 268,
+            margin: `12px ${PAD}px 8px`,
             borderRadius: 28,
             overflow: "hidden",
             boxShadow: "0 16px 36px rgba(60,70,40,.16)",
             animation: "disc-heroIn .7s cubic-bezier(.22,1,.36,1) both",
+            background: "#F5F0E4",
+            lineHeight: 0,
           }}
         >
           <img
             src={heroDescobrir}
-            alt="Gui, o camaleão, explorando a floresta"
+            alt="Descobrir — Gui com lupa na floresta"
             draggable={false}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
@@ -945,72 +944,30 @@ const DiscoverScreen = ({ onBack }: Props) => {
               else el.src = CAMALEAO.armsSoft;
             }}
             style={{
-              position: "absolute",
-              inset: 0,
+              display: "block",
               width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "58% 30%",
-              animation: "disc-floaty 7s ease-in-out infinite",
-            }}
-          />
-          {/* Véu legível à esquerda + fade inferior */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(100deg, rgba(255,252,248,.90) 0%, rgba(255,250,240,.58) 36%, rgba(255,250,240,.12) 60%, transparent 78%)," +
-                "linear-gradient(180deg, transparent 58%, rgba(255,252,248,.72) 88%, #FFFCF8 100%)",
-              pointerEvents: "none",
-            }}
-          />
-          {/* Reforço Gui soft */}
-          <img
-            src={CAMALEAO.armsSoft}
-            alt=""
-            aria-hidden
-            draggable={false}
-            style={{
-              position: "absolute",
-              right: -8,
-              bottom: -4,
-              width: "50%",
-              maxWidth: 210,
-              height: "86%",
+              height: "auto",
               objectFit: "contain",
-              objectPosition: "right bottom",
-              pointerEvents: "none",
-              filter: "drop-shadow(0 14px 18px rgba(40,60,20,.26))",
-              ...CAMALEAO_SCENE_MASK,
+              objectPosition: "center center",
+              verticalAlign: "top",
             }}
           />
-
-          <div
+          <h1
             style={{
-              position: "relative",
-              zIndex: 2,
-              maxWidth: "54%",
-              padding: "22px 16px 28px",
-              animation: "disc-cascade .55s cubic-bezier(.22,1,.36,1) both",
+              position: "absolute",
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
+              overflow: "hidden",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              border: 0,
+              lineHeight: "normal",
             }}
           >
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <span style={{ width: 30, height: 30, borderRadius: 999, background: "rgba(70,112,58,.14)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none", boxShadow: "0 1px 0 rgba(255,255,255,.6)" }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 19C5 10 12 5 20 5c0 8-5 15-14 15Zm0 0c3-5 7-9 12-11" stroke="#46703A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </span>
-              <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 30, color: "#1F2A18", letterSpacing: "-.4px", lineHeight: 1.05, textShadow: "0 1px 0 rgba(255,255,255,.55)" }}>
-                Descobrir
-              </h1>
-            </div>
-            <p style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 600, fontSize: 17, lineHeight: 1.28, color: "#2A3220", textShadow: "0 1px 0 rgba(255,255,255,.4)" }}>
-              Vamos explorar o mundo juntos?
-            </p>
-            <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, lineHeight: 1.48, color: "rgba(42,37,32,0.78)", maxWidth: 210 }}>
-              Escolha um tema e mergulhem em descobertas que despertam a curiosidade e criam memórias.
-            </p>
-          </div>
+            Descobrir — Vamos explorar o mundo juntos?
+          </h1>
         </div>
 
         {/* ── EXPLORE POR TEMAS ── */}
@@ -1030,7 +987,7 @@ const DiscoverScreen = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* dica (sem camaleão quadrado — só tipografia + ícone) */}
+        {/* dica (sem camaleão quadrado - só tipografia + ícone) */}
         <div
           style={{
             margin: `18px ${PAD}px 8px`,

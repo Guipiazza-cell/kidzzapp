@@ -82,7 +82,7 @@ function useLS<T>(key: string, initial: T) {
   return [val, set] as const;
 }
 
-/* ═════════════════ BLOCO 1 — Como estamos hoje ═════════════════ */
+/* ═════════════════ BLOCO 1 - Como estamos hoje ═════════════════ */
 type MoodVal = "happy" | "neutral" | "sad" | "angry" | "anxious" | "tired";
 const MOODS: { v: MoodVal; emoji: string; label: string; score: number; color: string }[] = [
   { v: "happy",   emoji: "🙂", label: "Feliz",    score: 5, color: emerald },
@@ -231,7 +231,7 @@ const HowAreWe = () => {
   );
 };
 
-/* ═════════════════ BLOCO 2 — Pequenas vitórias ═════════════════ */
+/* ═════════════════ BLOCO 2 - Pequenas vitórias ═════════════════ */
 const VICTORIES = [
   { id: "thanks", emoji: "🙏", label: "Hoje agradeci alguém" },
   { id: "water",  emoji: "💧", label: "Hoje bebi mais água" },
@@ -326,7 +326,7 @@ const SmallWins = () => {
   );
 };
 
-/* ═════════════════ BLOCO 3 — Jarro da gratidão ═════════════════ */
+/* ═════════════════ BLOCO 3 - Jarro da gratidão ═════════════════ */
 type Grat = { id: string; text: string; ts: number };
 
 const GratitudeJar = () => {
@@ -466,7 +466,7 @@ const GratitudeJar = () => {
   );
 };
 
-/* ═════════════════ BLOCO 4 — Missão do dia ═════════════════ */
+/* ═════════════════ BLOCO 4 - Missão do dia ═════════════════ */
 const MISSIONS = [
   { emoji: "❤️", text: "Dar um abraço demorado." },
   { emoji: "🌳", text: "Observar a natureza por 2 minutos." },
@@ -524,7 +524,7 @@ const DailyMission = () => {
   );
 };
 
-/* ═════════════════ BLOCO 5 — Memória feliz do passado ═════════════════ */
+/* ═════════════════ BLOCO 5 - Memória feliz do passado ═════════════════ */
 const HappyMemory = () => {
   const [items] = useLS<Grat[]>("kidzz_gratitude_v1", []);
   const [wins] = useLS<Record<string, string[]>>("kidzz_wins_v1", {});
@@ -571,7 +571,7 @@ const HappyMemory = () => {
   );
 };
 
-/* ═════════════════ BLOCO 6 — Termômetro da família ═════════════════ */
+/* ═════════════════ BLOCO 6 - Termômetro da família ═════════════════ */
 const FamilyThermometer = () => {
   const [wins] = useLS<Record<string, string[]>>("kidzz_wins_v1", {});
   const [grats] = useLS<Grat[]>("kidzz_gratitude_v1", []);
@@ -634,7 +634,7 @@ const FamilyThermometer = () => {
   );
 };
 
-/* ═════════════════ BLOCO 7 — Frase do dia ═════════════════ */
+/* ═════════════════ BLOCO 7 - Frase do dia ═════════════════ */
 const PHRASES = [
   "Você não precisa ser perfeito para crescer.",
   "Todo abraço conta.",
@@ -676,7 +676,7 @@ const DailyPhrase = () => {
   );
 };
 
-/* ═════════════════ BLOCO 8 — Respirar com o Camaleão ═════════════════ */
+/* ═════════════════ BLOCO 8 - Respirar com o Camaleão ═════════════════ */
 const BreatheChameleon = () => {
   const [duration, setDuration] = useState<30 | 60 | 90 | null>(null);
   const [remain, setRemain] = useState(0);
@@ -750,7 +750,7 @@ const BreatheChameleon = () => {
   );
 };
 
-/* ═════════════════ BLOCO 9 — Coleção de momentos ═════════════════ */
+/* ═════════════════ BLOCO 9 - Coleção de momentos ═════════════════ */
 const COLLECTIBLES = [
   { id: "leaf",      emoji: "🍀", label: "Folha da Calma",      need: 1,  trigger: "breath" },
   { id: "star",      emoji: "⭐", label: "Estrela da Gratidão", need: 3,  trigger: "gratitude" },
@@ -804,7 +804,7 @@ const Collection = () => {
   );
 };
 
-/* ═════════════════ BLOCO 10 — Resumo da semana ═════════════════ */
+/* ═════════════════ BLOCO 10 - Resumo da semana ═════════════════ */
 const WeeklySummary = () => {
   const [wins] = useLS<Record<string, string[]>>("kidzz_wins_v1", {});
   const [grats] = useLS<Grat[]>("kidzz_gratitude_v1", []);

@@ -1,5 +1,5 @@
 /**
- * RoutineScreen — redesign premium
+ * RoutineScreen - redesign premium
  * Craft: Bora (camadas, glass, sheen, cascade, sticky)
  * Layout: print public/telas/Rotina/
  * Dados reais: getToday / completeTask / streak / mission / paywall / memória
@@ -17,7 +17,7 @@ import {
   getToday, completeTask, getStreak, getKidzzMessage, getCurrentPeriod,
   type RoutineTask, type RoutinePeriod, type TodayView,
 } from "@/lib/routine";
-import { getMissionProgress } from "@/lib/dailyMission";
+import { getMissionProgress, getTotalXp } from "@/lib/dailyMission";
 import { showXpGained } from "@/components/flow/XpToast";
 import { haptic } from "@/lib/haptics";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,10 +33,8 @@ import {
   sectionWrap,
 } from "@/lib/premiumUi";
 
-import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
-
 const AS = "/exemplos/assets/rotina-v2";
-const AV = "v3";
+const AV = "v6";
 const asset = (n: string) => `${AS}/${n}?${AV}`;
 
 const INK = "#3A2418";
@@ -66,7 +64,7 @@ const PERIOD_META: Record<
     label: string;
     sub: string;
     cover: string;
-    Icon: typeof Sun;
+    icon: string;
     btn: string;
     btnDone: string;
     tint: [number, number, number];
@@ -75,9 +73,9 @@ const PERIOD_META: Record<
 > = {
   morning: {
     label: "Manhã",
-    sub: "Comece o dia com energia e intenção.",
+    sub: "Comece o dia com energia e intenção",
     cover: asset("cover-morning.png"),
-    Icon: Sun,
+    icon: asset("icon-morning.png"),
     btn: "#E8A22B",
     btnDone: "#3E9A5E",
     tint: [240, 180, 90],
@@ -85,9 +83,9 @@ const PERIOD_META: Record<
   },
   afternoon: {
     label: "Tarde",
-    sub: "Momentos para aprender, brincar e compartilhar.",
+    sub: "Momentos para aprender, brincar e compartilhar",
     cover: asset("cover-afternoon.png"),
-    Icon: Sun,
+    icon: asset("icon-afternoon.png"),
     btn: "#4EA35E",
     btnDone: "#2F7A4E",
     tint: [100, 180, 120],
@@ -95,9 +93,9 @@ const PERIOD_META: Record<
   },
   night: {
     label: "Noite",
-    sub: "Desacelere para dormir em paz e sonhar com o amanhã.",
+    sub: "Desacelere para dormir em paz e sonhar com o amanhã",
     cover: asset("cover-night.png"),
-    Icon: Moon,
+    icon: asset("icon-night.png"),
     btn: "#7B6BC4",
     btnDone: "#5A4A9E",
     tint: [120, 110, 200],
@@ -293,7 +291,7 @@ const TaskRow = ({
             borderRadius: 999,
             border: "none",
             cursor: "pointer",
-            /* Sólido por período — sem degradê bugado dourado→verde (relatório r2) */
+            /* Sólido por período - sem degradê bugado dourado→verde (relatório r2) */
             background: meta.btn,
             color: "#fff",
             fontFamily: FONT,
@@ -328,7 +326,6 @@ const PeriodBlock = ({
   const meta = PERIOD_META[period];
   const doneN = tasks.filter((t) => done.has(t.id)).length;
   if (!tasks.length) return null;
-  const Icon = meta.Icon;
 
   return (
     <div
@@ -394,16 +391,23 @@ const PeriodBlock = ({
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
                 <div
                   style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 10,
-                    display: "grid",
-                    placeItems: "center",
-                    background: "rgba(255,255,255,.88)",
-                    boxShadow: "0 4px 10px rgba(0,0,0,.15)",
+                    width: 34,
+                    height: 34,
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    boxShadow: "0 6px 14px rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.55) inset",
+                    border: "0.5px solid rgba(255,255,255,.85)",
+                    background: "rgba(255,255,255,.92)",
                   }}
                 >
-                  <Icon size={15} color={meta.btn} strokeWidth={2.2} />
+                  <img
+                    src={meta.icon}
+                    alt=""
+                    width={34}
+                    height={34}
+                    draggable={false}
+                    style={{ width: 34, height: 34, objectFit: "cover", display: "block" }}
+                  />
                 </div>
                 {isNow && (
                   <span
@@ -482,16 +486,17 @@ const PeriodBlock = ({
 };
 
 const RoutineScreen = () => {
-  const { profile } = useAuth();
+  const { profile, updateProfile } = useAuth();
   const { addMemory } = useMemories();
   const { canUse } = useEntitlement();
   const childName = profile?.child_name || "amigo";
-  const pontos = profile?.points ?? 0;
   const isPremium = canUse("rotina");
 
   const [view, setView] = useState<TodayView>(() => getToday());
   const [streak, setStreak] = useState(() => getStreak());
   const [mission, setMission] = useState(() => getMissionProgress());
+  /** Troféu = XP total (completeTask grava em kidzz_total_xp, não em profile.points). */
+  const [pontos, setPontos] = useState(() => getTotalXp());
   const [celebrate, setCelebrate] = useState(false);
 
   const memorySaved = useRef(false);
@@ -504,16 +509,20 @@ const RoutineScreen = () => {
       setView(getToday());
       setStreak(getStreak());
       setMission(getMissionProgress());
+      setPontos(getTotalXp());
     };
     const iv = setInterval(refresh, 60_000);
     const onVis = () => {
       if (!document.hidden) refresh();
     };
+    const onXp = () => setPontos(getTotalXp());
     document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("kidzz:xp-gained", onXp);
     refresh();
     return () => {
       clearInterval(iv);
       document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("kidzz:xp-gained", onXp);
     };
   }, []);
 
@@ -544,6 +553,12 @@ const RoutineScreen = () => {
       setView(getToday());
       setStreak(getStreak());
       setMission(getMissionProgress());
+      const totalXp = getTotalXp();
+      setPontos(totalXp);
+      // Espelha XP total no profile.points (troféu e outras telas)
+      if (result.xpGained + result.bonusGained > 0) {
+        void updateProfile({ points: totalXp });
+      }
       showXpGained(result.xpGained, "XP");
       if (result.bonusGained > 0) {
         setTimeout(() => showXpGained(result.bonusGained, "BÔNUS"), 350);
@@ -582,12 +597,13 @@ const RoutineScreen = () => {
           memorySaved.current = true;
           try {
             addMemory({
-              type: "achievement" as never,
+              type: "routine",
               title: "Dia completo na Rotina",
               content: `${childName} completou todas as ${result.total} tarefas de hoje 💛`,
               is_special: true,
               image_url: null,
               metadata: {
+                area: "routine",
                 source: "routine",
                 date: new Date().toISOString().split("T")[0],
                 xp: result.xpGained + result.bonusGained,
@@ -600,7 +616,7 @@ const RoutineScreen = () => {
         setTimeout(() => setCelebrate(false), 4200);
       }
     },
-    [addMemory, childName],
+    [addMemory, childName, updateProfile],
   );
 
   return (
@@ -619,29 +635,14 @@ const RoutineScreen = () => {
     >
       <style>{KEYFRAMES}</style>
 
-      {/* Camadas fundo — print cream + hero */}
-      <div
-        aria-hidden
-        ref={heroArtRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `url(${CAMALEAO.armsSoft})`,
-          backgroundSize: "cover",
-          backgroundPosition: "72% 18%",
-          filter: "brightness(.96) saturate(1.08)",
-          transform: "scale(1.06)",
-          willChange: "transform, opacity",
-          animation: "rot2-heroIn .7s cubic-bezier(.22,1,.36,1) both",
-        }}
-      />
+      {/* Fundo cream premium — sem camaleão no bg (só no hero à direita) */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(251,239,231,.42) 0%, rgba(246,226,214,.55) 22%, rgba(246,226,214,.88) 48%, rgba(239,212,196,.96) 72%, #EFD4C4 100%)",
+            "linear-gradient(180deg, #FBF3EB 0%, #F6E2D6 38%, #F0D4C4 72%, #EBCAB8 100%)",
         }}
       />
       <div
@@ -765,34 +766,85 @@ const RoutineScreen = () => {
           </div>
         </div>
 
-        {/* Hero copy + art peek */}
+        {/* Hero full-bleed: arte preenche o header, esmaece só embaixo */}
         <div
           style={{
-            padding: `4px ${PAD}px 0`,
-            display: "grid",
-            gridTemplateColumns: "1fr minmax(120px, 42%)",
-            gap: 8,
-            alignItems: "start",
-            minHeight: 200,
+            position: "relative",
+            minHeight: 320,
+            padding: `8px ${PAD}px 24px`,
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
             animation: "rot2-cascade .55s cubic-bezier(.22,1,.36,1) .04s both",
           }}
         >
-          <div style={{ paddingTop: 8, minWidth: 0 }}>
+          <div
+            ref={heroArtRef}
+            style={{
+              position: "absolute",
+              inset: 0,
+              willChange: "transform, opacity",
+              pointerEvents: "none",
+            }}
+          >
+            <img
+              src={asset("hero-gui.png")}
+              alt="Gui, o camaleão, com o calendário da rotina"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "62% 35%",
+              }}
+            />
+            {/* Esmaece só embaixo — mais forte no fim */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: "62%",
+                background:
+                  "linear-gradient(180deg, transparent 0%, rgba(251,243,235,.15) 28%, rgba(251,243,235,.55) 52%, rgba(246,226,214,.88) 78%, #F6E2D6 100%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 56,
+                background: "linear-gradient(180deg, transparent, #F6E2D6)",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              position: "relative",
+              zIndex: 3,
+              maxWidth: "58%",
+              // Só o texto desce — imagem intocada
+              paddingTop: 118,
+              marginTop: "auto",
+            }}
+          >
             <div
               style={{
                 fontSize: 12.5,
                 fontWeight: 800,
                 color: INK2,
                 marginBottom: 8,
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
+                textShadow: "0 1px 0 rgba(255,255,255,.55)",
               }}
             >
               {saudacao}, família!
-              <span aria-hidden style={{ color: ACCENT }}>
-                ♥
-              </span>
             </div>
             <h1
               style={{
@@ -803,10 +855,11 @@ const RoutineScreen = () => {
                 lineHeight: 1.12,
                 color: INK,
                 letterSpacing: "-0.4px",
+                textShadow: "0 1px 10px rgba(255,250,245,.75)",
               }}
             >
               Rotina que cria{" "}
-              <span style={{ color: ACCENT }}>momentos</span> que ficam.
+              <span style={{ color: ACCENT }}>momentos</span> que ficam
             </h1>
             <p
               style={{
@@ -815,10 +868,11 @@ const RoutineScreen = () => {
                 fontWeight: 700,
                 lineHeight: 1.45,
                 color: INK2,
-                maxWidth: 220,
+                maxWidth: 210,
+                textShadow: "0 1px 0 rgba(255,255,255,.5)",
               }}
             >
-              {message || "Pequenas ações diárias constroem lembranças para a vida toda."}
+              {message || "Pequenas ações diárias constroem lembranças para a vida toda"}
             </p>
             {streak.missedYesterday && streak.current === 0 && (
               <p
@@ -833,35 +887,6 @@ const RoutineScreen = () => {
                 Tudo bem… hoje é um novo começo 💛
               </p>
             )}
-          </div>
-          <div
-            style={{
-              position: "relative",
-              height: 210,
-              marginRight: -PAD,
-              marginTop: -8,
-              animation: "rot2-floaty 7s ease-in-out infinite",
-            }}
-          >
-            <img
-              src={CAMALEAO.armsSoft}
-              alt="Gui, o camaleão, com o calendário da rotina"
-              style={{
-                position: "absolute",
-                right: 0,
-                bottom: 0,
-                width: "118%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "right bottom",
-                ...CAMALEAO_SCENE_MASK,
-                filter: "drop-shadow(0 12px 28px rgba(80,50,30,.28))",
-                pointerEvents: "none",
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = CAMALEAO.arms;
-              }}
-            />
           </div>
         </div>
 
@@ -964,7 +989,7 @@ const RoutineScreen = () => {
               }}
             >
               {missionDone
-                ? "“Missão de hoje concluída — que dia lindo!”"
+                ? "“Missão de hoje concluída - que dia lindo!”"
                 : "“Ouça uma música, faça uma pergunta e viva uma história.”"}
             </div>
             <div
@@ -1095,17 +1120,6 @@ const RoutineScreen = () => {
           </div>
         )}
 
-        <div
-          style={{
-            padding: "8px 20px 20px",
-            textAlign: "center",
-            fontSize: 11,
-            fontWeight: 800,
-            color: "#B79A88",
-          }}
-        >
-          Menos tela. Mais memórias. · KIDZZ
-        </div>
       </div>
 
       {/* Celebração dia completo */}

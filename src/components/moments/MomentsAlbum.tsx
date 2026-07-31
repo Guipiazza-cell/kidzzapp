@@ -7,9 +7,9 @@ import ShareMomentCard from "./ShareMomentCard";
 import { trackConnection } from "@/lib/connection";
 
 /**
- * Álbum afetivo da família — coração emocional da aba Momentos.
+ * Álbum afetivo da família - coração emocional da aba Momentos.
  * 4 abas: Especiais · Conquistas · Frases · Timeline.
- * Persistência local (kidzz_album_*) — leve e instantâneo.
+ * Persistência local (kidzz_album_*) - leve e instantâneo.
  */
 
 type Tab = "specials" | "wins" | "phrases" | "timeline";

@@ -1,4 +1,4 @@
-/* Galeria de histórias criadas — busca memórias type=story do usuário */
+/* Galeria de histórias criadas - busca memórias type=story do usuário */
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { BookOpen, X, Calendar, Clock } from "lucide-react";

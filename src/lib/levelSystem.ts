@@ -1,5 +1,5 @@
 /**
- * Global Level System — derives Level (1-100) from total XP.
+ * Global Level System - derives Level (1-100) from total XP.
  *
  * Curve: progressive cost per level.
  *   xpForLevel(n) = base xp required to GO FROM (n-1) TO n

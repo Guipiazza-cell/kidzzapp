@@ -1,5 +1,5 @@
 /**
- * KALM v2 — estado persistido por perfil de criança.
+ * KALM v2 - estado persistido por perfil de criança.
  * Tudo em localStorage, escopado por activeChildId quando existir.
  */
 import { useCallback, useEffect, useState } from "react";
@@ -82,7 +82,7 @@ const SUGGESTION_POOL: DailySuggestion[] = [
   { emoji: "☕", title: "5 minutos só seus", desc: "Sem culpa. Cuidar de si é cuidar da família.", pillar: "cuidar", activityId: "cafe-sem-culpa" },
   { emoji: "🌈", title: "Prato colorido", desc: "Contem quantas cores diferentes tem no prato hoje.", pillar: "nutrir", activityId: "prato-colorido" },
   { emoji: "👀", title: "Olhos nos olhos", desc: "Cinco minutos de atenção total, sem tela, sem pressa.", pillar: "conectar", activityId: "olhos-nos-olhos" },
-  { emoji: "🎉", title: "Festival da risada", desc: "Um minuto de riso em família. Cócegas valem.", pillar: "mover", activityId: "festival-risada" },
+  { emoji: "😊", title: "Festival da risada", desc: "Um minuto de riso em família. Cócegas valem.", pillar: "mover", activityId: "festival-risada" },
   { emoji: "🌟", title: "Elogio específico", desc: "Diga uma coisa específica que admirou no seu filho hoje.", pillar: "conectar", activityId: "elogio-especifico" },
   { emoji: "🍋", title: "Aperta e solta o limão", desc: "Aperte forte, depois solte. Alívio na hora.", pillar: "sentir", activityId: "aperta-limao" },
   { emoji: "🙏", title: "Diário de uma linha", desc: "Escreva UMA frase boa sobre o dia.", pillar: "agradecer", activityId: "diario-uma-linha" },

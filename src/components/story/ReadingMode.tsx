@@ -1,5 +1,5 @@
 /**
- * Modo Leitura imersivo — fullscreen com swipe entre páginas (cenas),
+ * Modo Leitura imersivo - fullscreen com swipe entre páginas (cenas),
  * tipografia grande, narração integrada (play/pause), barra de progresso,
  * exportar PDF e fechar.
  *

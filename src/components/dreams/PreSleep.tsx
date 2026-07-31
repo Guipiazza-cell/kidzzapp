@@ -26,7 +26,7 @@ const PreSleep = ({ onBack }: Props) => {
   const stopRef = useRef<(() => void) | null>(null);
   const phase = PHASES[phaseIdx];
 
-  // Cycle through phases — só roda após "started"
+  // Cycle through phases - só roda após "started"
   useEffect(() => {
     if (!started) return;
     const t = setTimeout(() => {
@@ -40,7 +40,7 @@ const PreSleep = ({ onBack }: Props) => {
   }, [phaseIdx, phase.duration, started]);
 
   // Inicia/para a canção. Só monta AudioContext após gesto do usuário (started=true).
-  // Em iOS/Android o AudioContext nasce "suspended" — chamamos resume() de forma síncrona ao toque.
+  // Em iOS/Android o AudioContext nasce "suspended" - chamamos resume() de forma síncrona ao toque.
   const startLullaby = useCallback(async () => {
     if (typeof window === "undefined") return;
     const Ctx: typeof AudioContext =
@@ -67,7 +67,7 @@ const PreSleep = ({ onBack }: Props) => {
         ]);
       }
     } catch {
-      // se resume falhar, segue sem áudio — UI não trava
+      // se resume falhar, segue sem áudio - UI não trava
       try { ctx.close(); } catch { /* noop */ }
       audioCtxRef.current = null;
       setAudioReady(false);
@@ -147,7 +147,7 @@ const PreSleep = ({ onBack }: Props) => {
     };
   }, []);
 
-  // Handler do botão "Começar" — gesto do usuário; inicia áudio se musicOn
+  // Handler do botão "Começar" - gesto do usuário; inicia áudio se musicOn
   const handleStart = async () => {
     setStarted(true);
     if (musicOn) {
@@ -267,7 +267,7 @@ const PreSleep = ({ onBack }: Props) => {
             </p>
             {musicOn && !audioReady && (
               <p className="mt-3 text-indigo-200/50 text-[11px] font-bold">
-                Música indisponível neste navegador — siga só a respiração 🌙
+                Música indisponível neste navegador - siga só a respiração 🌙
               </p>
             )}
           </div>

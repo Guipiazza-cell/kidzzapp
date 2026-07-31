@@ -1,4 +1,4 @@
-// Wrapper legado — toda lógica/visual vive em PaywallScreen.
+// Wrapper legado - toda lógica/visual vive em PaywallScreen.
 // Mantido por compatibilidade com pontos de entrada antigos.
 import PaywallScreen from "@/components/paywall/PaywallScreen";
 import { useAuth } from "@/contexts/AuthContext";

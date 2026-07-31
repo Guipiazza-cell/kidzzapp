@@ -17,7 +17,7 @@ import type { SosSituation } from "./situations";
 import { kalmTargetFor } from "@/components/kalm/sosMap";
 
 /**
- * Fluxo emocional SOS — 6 etapas, sem redirecionamento seco pra Wellness.
+ * Fluxo emocional SOS - 6 etapas, sem redirecionamento seco pra Wellness.
  * acolhimento → respiração → prático → continuidade → fechamento → (memória/share)
  */
 interface Props {
@@ -125,9 +125,9 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
     const text = situation.closing?.shareable ?? situation.support.parentNote;
     try {
       if (typeof navigator !== "undefined" && (navigator as any).share) {
-        await (navigator as any).share({ text: `${text}\n\n— Kidzz` });
+        await (navigator as any).share({ text: `${text}\n\n -  Kidzz` });
       } else if (typeof navigator !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(`${text}\n\n— Kidzz`);
+        await navigator.clipboard.writeText(`${text}\n\n -  Kidzz`);
         toast({ title: "Copiado", description: "Frase pronta pra compartilhar." });
       }
     } catch {
@@ -151,7 +151,6 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
           <ArrowLeft size={16} style={{ color: "hsl(var(--premium-ink))" }} />
         </button>
         <div className="flex items-center gap-1.5 min-w-0 px-2">
-          <span className="text-[18px]" aria-hidden>{situation.emoji}</span>
           <h2
             className="text-[15px] font-black tracking-tight truncate"
             style={{ color: "hsl(var(--premium-ink))" }}
@@ -195,7 +194,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
               transition={{ duration: 0.4 }}
               className="flex flex-col items-center text-center pt-4"
             >
-              {/* Orbe respirando — sem mascote */}
+              {/* Orbe respirando - sem mascote */}
               <div className="relative flex items-center justify-center mb-6" style={{ width: 140, height: 140 }}>
                 <motion.span
                   aria-hidden
@@ -553,7 +552,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                     {situation.closing.subtitle}
                   </motion.p>
 
-                  {/* Memória emocional — "Hoje vocês:" */}
+                  {/* Memória emocional - "Hoje vocês:" */}
                   <motion.div
                     className="w-full p-4 rounded-2xl mb-3 text-left"
                     style={{
@@ -602,7 +601,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                     </p>
                   </motion.div>
 
-                  {/* Feedback emocional — "Como vocês estão agora?" */}
+                  {/* Feedback emocional - "Como vocês estão agora?" */}
                   <motion.div
                     className="w-full p-4 rounded-2xl mb-3"
                     style={{
@@ -620,10 +619,10 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { key: "better", emoji: "💚", label: "Melhor" },
-                        { key: "still_hard", emoji: "🫂", label: "Ainda difícil" },
-                        { key: "helped", emoji: "✨", label: "Ajudou bastante" },
-                        { key: "continue", emoji: "🌙", label: "Quero continuar" },
+                        { key: "better", label: "Melhor" },
+                        { key: "still_hard", label: "Ainda difícil" },
+                        { key: "helped", label: "Ajudou bastante" },
+                        { key: "continue", label: "Quero continuar" },
                       ].map((opt) => {
                         const selected = feedback === opt.key;
                         const dimmed = feedback && !selected;
@@ -646,7 +645,6 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                               opacity: dimmed ? 0.5 : 1,
                             }}
                           >
-                            <span aria-hidden>{opt.emoji}</span>
                             <span className="truncate">{opt.label}</span>
                           </motion.button>
                         );
@@ -658,7 +656,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
                         className="text-[11px] text-center mt-2.5 font-medium"
                         style={{ color: "hsl(var(--premium-ink-soft))" }}
                       >
-                        Obrigado por compartilhar 💚
+                        Obrigado por compartilhar
                       </motion.p>
                     )}
                   </motion.div>
@@ -784,7 +782,7 @@ const SOSCrisisFlow = ({ situation, onBack, onClose, onGoWellness }: Props) => {
   );
 };
 
-/* ── Respiração guiada — padrão dinâmico por situação ── */
+/* ── Respiração guiada - padrão dinâmico por situação ── */
 const BreathingScene = ({
   situation, onSpeak, onDone,
 }: {
@@ -801,7 +799,7 @@ const BreathingScene = ({
     let timer: ReturnType<typeof setTimeout>;
     const tick = (p: "in" | "hold" | "out") => {
       setPhase(p);
-      // feedback respiratório orgânico — apenas no início de in/out
+      // feedback respiratório orgânico - apenas no início de in/out
       if (p === "in") haptic("light");
       else if (p === "out") haptic("light");
       const durMs = (p === "in" ? inSec : p === "hold" ? holdSec : outSec) * 1000;

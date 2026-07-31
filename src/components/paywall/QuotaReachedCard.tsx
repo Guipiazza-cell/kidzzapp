@@ -50,7 +50,7 @@ const QuotaReachedCard = ({ tipo, isFree, onUpgrade, onAck }: QuotaReachedCardPr
     );
   }
 
-  // PAGO — Kidzz sonolento, totalmente invisível quanto a números
+  // PAGO - Kidzz sonolento, totalmente invisível quanto a números
   const titulo =
     tipo === "historias"
       ? "Quantas histórias hoje! 🌙"

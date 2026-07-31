@@ -67,11 +67,11 @@ const ShareCardModal = (props: Props) => {
 
       if (props.template === "memory") {
         title = `${childName} perguntou algo incrível! ✨`;
-        text = `${childName} perguntou: "${props.question}" — uma memória que vale guardar 💛`;
+        text = `${childName} perguntou: "${props.question}" - uma memória que vale guardar 💛`;
         filename = `kidzz-memoria-${Date.now()}.png`;
       } else if (props.template === "story") {
         title = `Nova história para ${childName} 📖`;
-        text = `Acabei de criar "${props.title}" — uma história mágica para ${childName} no KIDZZ ✨`;
+        text = `Acabei de criar "${props.title}" - uma história mágica para ${childName} no KIDZZ ✨`;
         filename = `kidzz-historia-${Date.now()}.png`;
       } else {
         title = `${childName} desbloqueou: ${props.achievementTitle}!`;
