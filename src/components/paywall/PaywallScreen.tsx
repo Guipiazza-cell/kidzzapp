@@ -135,22 +135,34 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
   }, [context, diary, nome]);
 
 
+  const ctaLabel = loading
+    ? "Abrindo checkout..."
+    : user
+      ? "Começar 7 dias grátis"
+      : "Criar conta e começar grátis";
+
   return (
     <div
-      className="min-h-screen w-full overflow-y-auto overflow-x-hidden overscroll-contain"
+      className="relative flex h-full min-h-[100dvh] w-full flex-col overflow-hidden"
       style={{
-        WebkitOverflowScrolling: "touch",
         background: `linear-gradient(180deg, ${CREAM} 0%, #FBF6EE 100%)`,
         color: INK,
-        paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 220px)",
       }}
     >
-      <div className="max-w-md mx-auto px-5">
+      {/* Conteúdo rolável — CTA fica fora, sempre visível no rodapé */}
+      <div
+        className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 16px)",
+          paddingBottom: 24,
+        }}
+      >
+      <div className="mx-auto w-full max-w-md px-5 md:max-w-lg lg:max-w-xl">
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute right-4 w-11 h-11 rounded-full flex items-center justify-center bg-white/80 backdrop-blur shadow-sm border border-black/5"
+            className="absolute right-4 z-20 w-11 h-11 rounded-full flex items-center justify-center bg-white/80 backdrop-blur shadow-sm border border-black/5"
             style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
             aria-label="Fechar"
           >
@@ -283,43 +295,6 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
           />
         </div>
 
-        {/* CTA */}
-        <motion.button
-          onClick={onSubscribe}
-          disabled={loading}
-          className="mt-7 w-full min-h-[58px] rounded-2xl font-extrabold text-[17px] flex items-center justify-center gap-2 disabled:opacity-60 transition-transform"
-          whileTap={{ scale: 0.98 }}
-          style={{
-            background: `linear-gradient(180deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
-            color: "#FFFFFF",
-            boxShadow: `0 12px 28px -10px ${AMBER}99, inset 0 1px 0 rgba(255,255,255,0.25)`,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          <Sparkles size={18} />
-          {loading
-            ? "Abrindo checkout..."
-            : user
-              ? "Começar 7 dias grátis"
-              : "Criar conta e começar grátis"}
-          <span aria-hidden>✨</span>
-        </motion.button>
-
-        <div
-          className="mt-4 flex items-center justify-center gap-2 text-[12px]"
-          style={{ color: INK_SOFT }}
-        >
-          <Lock size={13} />
-          <span>7 dias grátis · Cancele a qualquer momento</span>
-        </div>
-        <p
-          className="text-[12px] text-center mt-1"
-          style={{ color: INK_SOFT }}
-        >
-          Sem cobrança nos primeiros 7 dias. Você decide se continua.
-        </p>
-
-
         {/* Comparativo */}
         <div
           className="mt-8 rounded-3xl p-5"
@@ -369,11 +344,47 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
         </div>
 
         <p
-          className="text-center text-[11px] mt-6"
+          className="text-center text-[11px] mt-6 mb-2"
           style={{ color: INK_SOFT }}
         >
           Renovação automática · Cancele a qualquer momento nas configurações.
         </p>
+      </div>
+      </div>
+
+      {/* CTA sticky — sempre visível no rodapé (mobile, tablet e desktop) */}
+      <div
+        className="relative z-30 shrink-0 border-t border-black/[0.06] bg-[#FFFCF8]/95 backdrop-blur-md"
+        style={{
+          paddingBottom: "max(12px, env(safe-area-inset-bottom, 0px))",
+          boxShadow: "0 -10px 28px -18px rgba(42,42,42,0.28)",
+        }}
+      >
+        <div className="mx-auto w-full max-w-md px-5 pt-3 md:max-w-lg lg:max-w-xl">
+          <motion.button
+            onClick={onSubscribe}
+            disabled={loading}
+            className="w-full min-h-[56px] rounded-2xl font-extrabold text-[17px] flex items-center justify-center gap-2 disabled:opacity-60 transition-transform"
+            whileTap={{ scale: 0.98 }}
+            style={{
+              background: `linear-gradient(180deg, ${AMBER} 0%, ${AMBER_DEEP} 100%)`,
+              color: "#FFFFFF",
+              boxShadow: `0 12px 28px -10px ${AMBER}99, inset 0 1px 0 rgba(255,255,255,0.25)`,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            <Sparkles size={18} />
+            {ctaLabel}
+            <span aria-hidden>✨</span>
+          </motion.button>
+          <div
+            className="mt-2 flex items-center justify-center gap-2 text-[12px]"
+            style={{ color: INK_SOFT }}
+          >
+            <Lock size={13} />
+            <span>7 dias grátis · Cancele a qualquer momento</span>
+          </div>
+        </div>
       </div>
 
       {showParentalGate && (
