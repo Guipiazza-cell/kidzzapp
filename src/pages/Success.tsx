@@ -447,7 +447,7 @@ const Success = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.6 }}
               >
-                🛡️ Garantia 7 dias · Cancele quando quiser
+                🛡️ Pagamento seguro · Cancele quando quiser
               </motion.p>
             </motion.div>
           )}

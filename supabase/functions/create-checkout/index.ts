@@ -113,15 +113,7 @@ serve(async (req) => {
     const metadata: Record<string, string> = { user_id: user.id, plan };
     if (refCode) metadata.ref = refCode;
 
-    // Trial elegibility: only first-time subscribers get the 7-day free trial.
-    let trialEligible = true;
-    if (customerId) {
-      try {
-        const existingSubs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 1 });
-        if (existingSubs.data.length > 0) trialEligible = false;
-      } catch (_) { /* on error, default to eligible */ }
-    }
-
+    // Sem trial de 7 dias: cobrança começa no checkout (Stripe Subscription normal).
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -131,9 +123,8 @@ serve(async (req) => {
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?paywall=1`,
       metadata,
-      subscription_data: trialEligible ? { trial_period_days: 7, metadata } : { metadata },
+      subscription_data: { metadata },
     });
-    logStep("Trial decision", { trialEligible });
     logStep("Stripe checkout session created", { sessionId: session.id, hasUrl: Boolean(session.url), customerId: customerId || "new", origin });
 
     if (refCode && session.id) {

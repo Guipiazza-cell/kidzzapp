@@ -79,7 +79,7 @@ const Landing = () => {
           </motion.p>
 
           <motion.div custom={4} variants={fadeUp}>
-            <CtaButton text="ASSINAR AGORA" subtitle="✓ 7 dias grátis  •  ✓ Cancele quando quiser" />
+            <CtaButton text="ASSINAR AGORA" subtitle="✓ Pagamento seguro  •  ✓ Cancele quando quiser" />
           </motion.div>
 
           {/* Mini trust line */}
@@ -374,7 +374,7 @@ const Landing = () => {
               ))}
             </ul>
 
-            <CtaButton text="DESBLOQUEAR TUDO AGORA" subtitle="✓ 7 dias grátis  •  ✓ Cancele quando quiser" />
+            <CtaButton text="DESBLOQUEAR TUDO AGORA" subtitle="✓ Pagamento seguro  •  ✓ Cancele quando quiser" />
           </motion.div>
         </motion.div>
       </section>
@@ -407,7 +407,7 @@ const Landing = () => {
               ⏳ Cada dia é uma oportunidade perdida de conexão.
             </p>
             <p className="text-xs text-foreground/70 font-medium">
-              Comece hoje. Os primeiros 7 dias são por nossa conta.
+              Comece hoje. Cancele quando quiser, sem letras miúdas.
             </p>
           </motion.div>
         </motion.div>
@@ -442,7 +442,7 @@ const Landing = () => {
           </motion.p>
 
           <motion.div custom={3} variants={fadeUp}>
-            <CtaButton text="ASSINAR AGORA" subtitle="✓ 7 dias grátis  •  ✓ Sem cartão  •  ✓ Cancele quando quiser" className="shadow-[0_0_60px_hsl(var(--kid-orange)/0.4)]" />
+            <CtaButton text="ASSINAR AGORA" subtitle="✓ Pagamento seguro  •  ✓ Cancele quando quiser" className="shadow-[0_0_60px_hsl(var(--kid-orange)/0.4)]" />
           </motion.div>
         </motion.div>
       </section>

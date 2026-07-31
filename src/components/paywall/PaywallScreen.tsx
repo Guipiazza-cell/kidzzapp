@@ -475,15 +475,15 @@ const PaywallScreen = ({ childName, onClose, context = "default" }: PaywallScree
             {loading
               ? "Abrindo pagamento..."
               : user
-                ? "Começar 7 dias grátis"
-                : "Criar conta e começar grátis"}
+                ? "Assinar agora"
+                : "Criar conta e assinar"}
           </motion.button>
           <div
             className="mt-2 flex items-center justify-center gap-1.5 text-[11.5px] font-bold"
             style={{ color: INK_SOFT }}
           >
             <Lock size={12} />
-            7 dias grátis · Cancele quando quiser
+            Pagamento seguro · Cancele quando quiser
           </div>
         </div>
       </div>
