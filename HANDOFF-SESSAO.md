@@ -1,4 +1,4 @@
-# Handoff — sessão 2026-07-31
+# Handoff — sessão 2026-07-30
 
 Documento para **continuar na próxima sessão**. Ler isto primeiro.
 
@@ -9,16 +9,16 @@ Documento para **continuar na próxima sessão**. Ler isto primeiro.
 | Item | Status |
 |------|--------|
 | Branch | `main` |
-| HEAD | `6aca4f3` |
-| Push GitHub | **Sim** — `origin/main` = `6aca4f3` |
+| HEAD | `cb5618a` |
+| Push GitHub | **Sim** — `origin/main` = `cb5618a` |
 | Repo | `https://github.com/Guipiazza-cell/kidzzapp.git` |
 | Conta freela (commit + push) | `samuelfajreldines01 <285205407+samuelfajreldines01@users.noreply.github.com>` |
-| Worktree desta sessão | `/Users/alefsantos/dev/kidzzapp` |
-| Worktree SSD (dev server antigo) | `/Volumes/SSD/Desktop/_Projetos/kidz/kidzzapp-repo` (pode estar desatualizado) |
-| Publish Lovable | **Manual** — sync/pull da `main` + Publish |
-| Deploy edge functions | **PENDENTE** — ver bloco abaixo |
+| Worktree desta sessão | `/Volumes/SSD/Desktop/_Projetos/kidz/kidzzapp-repo` |
+| Publish Lovable | **Manual** — sync/publish no Lovable (kidzz.app) |
+| Redeploy edge `generate-story` | **PENDENTE** (soft-fail de cota no repo, não deployado na edge) |
+| SQL cota `increment_usage` | **Confirmar** se migration `20260729000001_…` já rodou no Supabase |
 
-**Tema da sessão:** robustez de assinatura Stripe (anti-fraude/stale) + paywall CTA/desktop + remoção trial 7 dias + copy paywall.
+**Tema da sessão:** polish freela page-by-page (Cinema, Memórias, Música, Perguntas, KALM jarro, Histórias, Bora) + handoff de pagamento/cadastro/PIN (só diagnóstico).
 
 ---
 
@@ -29,161 +29,181 @@ Documento para **continuar na próxima sessão**. Ler isto primeiro.
 - Repo do cliente: `Guipiazza-cell/kidzzapp`
 
 ```bash
-cd /Users/alefsantos/dev/kidzzapp
+cd /Volumes/SSD/Desktop/_Projetos/kidz/kidzzapp-repo
 gh auth switch -u samuelfajreldines01   # se precisar push
 ```
 
 ---
 
-## Commits no `main` (esta sessão 2026-07-31)
+## Commits no `main` (esta janela 2026-07-30)
 
 | Hash | Mensagem |
 |------|----------|
-| `a922f68` | fix(billing): revoga acesso stale e endurece mapeamento Stripe |
-| `069985f` / `cfd037c` | fix(paywall): CTA fixo no rodapé (desktop/tablet) |
-| `71a02b1` | Merge origin/main: robustez de assinatura + CTA paywall |
-| `140a53e` | fix(paywall): remove “Famílias no movimento Menos Tela” |
-| `9f0e183` | chore: reverte mudança acidental do mcp |
-| `6aca4f3` | **fix(billing): remove trial de 7 dias grátis** ← HEAD |
+| `aa9e53b` | fix(cinema): remove Gui sobreposto no hero, só fundo |
+| `95c81da` | fix(cinema): remove chips Sessões e sobe Gui no hero |
+| `f35a5ff` | feat(memorias): histórico de uso de todas as abas *(antes)* |
+| `909d904` | feat(musica): karaokê matinal mais longo e natural |
+| `7d2337a` … `37f405e` | memorias hero experiments → card + cutout |
+| `3e057bd` / `67ba03f` | fix(cinema): sobe Gui do fundo (agressivo) |
+| `aa2a733` / `de784d1` | fix(memorias): Gui cutout sem fundo (corpo completo) |
+| `2fa96f5` | feat(memorias): fundo rosa e ícones 3D dos atalhos |
+| `5fdfce6` | fix(memorias): remove subtítulo do card do hero |
+| `ccb96ec` / `5d90197` | fix(perguntas): loading + barra + floresta |
+| `75c9b6a` | fix(kalm): restaura imagem do jarro da gratidão (PNG bundle) |
+| `a8f01ec` | fix(historias): UI personalização e QUOTA_ERROR |
+| `31dce7a` | fix(bora): remove rodapé “Menos tela, mais memórias” |
+| `dcf5c5c` | fix(bora): X no modal “Quem vai brincar?” volta da aba |
+| `0a48376` | fix(cinema): remove contagem “N filmes” das seções |
+| `cb5618a` | fix(musica): hero com pessoas em foco e texto em card |
 
 Tudo acima já em `origin/main`.
 
 ---
 
-## O que foi feito (checklist)
+## O que foi feito (checklist por aba)
 
-### 1. Robustez de pagamento / anti-fraude
-- [x] **Problema:** se assinatura acabava e o webhook falhava, o app **mantinha premium** (DB fallback “never downgrade” + Auth “confia no DB”).
-- [x] `check-subscription`: Stripe OK **sem** sub `active`/`trialing` mapeada → **zera** `is_premium`, `tier=free`, `subscriptions.plan=free`.
-- [x] Produto Stripe **desconhecido** → **não concede** pago (antes virava `kidzz`).
-- [x] `stripe-webhook`: status `canceled` / `unpaid` / `incomplete*` / `paused` → plan **free** (não re-concede em `subscription.updated`).
-- [x] `past_due` mantém plano (grace 3 dias no RPC `get_effective_plan`).
-- [x] Manual (`premium_source=manual`) + data de validade intactos.
-- [x] `AuthContext`: HTTP 200 free = free; **não** reabre premium pelo DB.
-- [x] Regras puras + testes: `src/lib/subscriptionAccess.ts` + `src/test/subscriptionAccess.test.ts` (17 testes).
+### Cinema
+- [x] Remove camaleão **sobreposto** (`hero-gui`); só fundo `hero-bg`
+- [x] Gui do fundo **mais alto** (objectPosition + scale + translateY)
+- [x] Remove bloco **Sessões / chips** (“Qual o clima de hoje?”)
+- [x] Remove texto **“N filmes”** de todas as fileiras
 
-### 2. Paywall UI
-- [x] CTA **fixo no rodapé** (layout coluna: scroll + barra sticky) — não some em desktop/tablet.
-- [x] Wrappers full-height: `PaywallProvider`, `ContextualPaywallModal`, `Paywall`, `ConversionScreen`.
-- [x] Merge com polish da main remota (checkout **após PIN parental**, visual floresta/glass do `5ef87bb`).
-- [x] Removido texto **“Famílias no movimento Menos Tela”**.
+### Memórias
+- [x] Hero em **card glass** com Gui cutout (sem full-bleed gerado ruim)
+- [x] Cutout **corpo completo** (sem recorte agressivo)
+- [x] Fundo da aba na família do **rosa** do card “Nova Pergunta”
+- [x] Ícones 3D novos: pergunta / história / missão
+- [x] Remove subtítulo “Cada momento juntos…”
 
-### 3. Remoção do trial de 7 dias grátis
-- [x] `create-checkout`: **sem** `trial_period_days` / `trialEligible`.
-- [x] Paywall CTA: **“Assinar agora”** / “Criar conta e assinar”.
-- [x] Sub: **“Pagamento seguro · Cancele quando quiser”**.
-- [x] Landing + Success: copy sem “7 dias grátis” de trial.
-- [x] Mantido: status Stripe `trialing` (assinantes legados); desconto anual “2 meses grátis”; limites free do app.
+### Música
+- [x] Karaokê “Raio de Sol” e rotação: letras mais longas e naturais
+- [x] Hero: foto **mais pessoas / menos céu**; texto em **card abaixo do hero**
+
+### Perguntas
+- [x] Tela de “formulando” com **floresta + barra de progresso** dourada
+- [x] Erro com “Tentar de novo” (não some sozinho pra home)
+- [x] Guest: toast + Entrar (não joga pra `/auth` e some)
+- [x] Hero: texto mais baixo; Gui mais alto no cover
+
+### KALM
+- [x] Imagem do **jarro da gratidão** restaurada (`src/assets/kalm/jar-gratitude.png` + fallback)
+
+### Histórias
+- [x] Remove **boneco** do passo avatar
+- [x] Cards “presente de hoje” com **ícones Lucide** (sem emoji feio)
+- [x] Cards de personalização com **glass** semi-transparente
+- [x] Toast não mostra `QUOTA_ERROR` cru; mensagem amigável
+- [x] `generate-story`: soft-fail se `increment_usage` quebrar por erro técnico (**precisa redeploy da function**)
+
+### Bora
+- [x] Remove rodapé “Menos tela, mais memórias · …”
+- [x] **X** no modal “Quem vai brincar?” → fecha e `onBack` (sai da aba)
+
+### Pagamento / cadastro / PIN (só diagnóstico — sem commit de fix)
+- [x] Mapeado: Stripe `create-checkout` → webhook → `get_effective_plan` / `AreaGate`
+- [x] PIN pais: localStorage SHA-256, default `1234` em install limpo
+- [x] Cadastro: `/auth` + `AccountSetup` onboarding
+- [ ] **Teste real** de pagamento (cartão teste / staging) — ainda aberto
+- [ ] Allowlist checkout: falta `localhost:5174` / `127.0.0.1:5174` se dev nessa porta
 
 ---
 
-## Deploy PENDENTE (obrigatório para valer em prod)
+## Arquivos-chave tocados (sessão 30/07)
 
-Edge functions **só mudam após deploy** no Supabase do projeto:
+```
+src/components/cinema/FamilyCinema.tsx
+src/components/memories/MemoriesAlbum.tsx
+src/assets/memorias/gui-cutout.png
+src/assets/memorias/icon-*.png
+src/components/music/MusicEngine.ts
+src/components/music/MorningKaraoke.tsx
+src/components/music/MusicForest.tsx
+src/components/flow/GeneratingScreen.tsx
+src/components/flow/HomeScreen.tsx
+src/components/flow/ChatFlow.tsx
+src/pages/Index.tsx
+src/components/kalm/v2/KalmHome.tsx
+src/components/kalm/v2/Pillars.tsx
+src/assets/kalm/jar-gratitude.png
+src/assets/kalm/jarro-gratidao.png
+src/components/story/AvatarCustomization.tsx
+src/components/story/PersonalizationPanel.tsx
+src/components/story/StoryFactory.tsx
+src/components/bora/BoraScreen.tsx
+src/components/bora/CriancaOnboarding.tsx
+supabase/functions/generate-story/index.ts
+```
+
+---
+
+## NÃO commitado (lixo local — ignorar)
+
+- `output/`
+- `supabase/.temp/`
+- `src/assets/kalm-hero-family.prev.webp`
+- JPGs soltos de onboarding (`age-onboarding-hero.jpg`, `name-onboarding-hero*.jpg`, etc.)
+- `src/assets/kidzz/jarro-gratidao-14.webp` (polaroids; **não** é o jarro — app usa `src/assets/kalm/jar-gratitude.png`)
+
+---
+
+## Bugs desta sessão (sintoma → fix)
+
+| Sintoma | Fix |
+|---------|-----|
+| Cinema com 2 camaleões / overlay feio | Só `hero-bg` + crop alto |
+| Memórias cutout “comido” | Cutout full body + card |
+| Loading perguntas sem barra / some pra home | GeneratingScreen floresta + barra + retry |
+| KALM jarro sumiu | PNG bundle `jar-gratitude.png` |
+| Histórias toast `QUOTA_ERROR` | Soft-fail edge + msg amigável (redeploy pendente) |
+| Bora preso no “Quem vai brincar?” | Botão X + onBack |
+| Música hero só céu / texto solto | objectPosition pessoas + card texto |
+
+---
+
+## Pendências / próximos passos
+
+### Obrigatório operacional
+1. **Lovable:** Sync + Publish do `cb5618a` → smoke no kidzz.app  
+2. **Supabase:** redeploy `generate-story` (e idealmente `kidzz-chat` se ainda soft-fail antigo)  
+   ```bash
+   supabase functions deploy generate-story
+   supabase functions deploy kidzz-chat   # se ainda não
+   ```
+3. Confirmar SQL `20260729000001_fix_increment_usage_resilient.sql` no projeto  
+4. Smoke: 1 pergunta + 1 história + jarro KALM + Bora X + Cinema fileiras + Música hero
+
+### Produto ainda aberto
+- Teste ponta a ponta **pagamento Stripe** (checkout → webhook → premium unlock)
+- Teste **cadastro** e **PIN pais** (`1234` limpo → definir PIN)
+- Allowlist `create-checkout` para `http://127.0.0.1:5174` se dev local nessa porta
+- Deploy edge `generate-story` após soft-fail (se ainda der QUOTA_ERROR em prod)
+
+### Não reabrir sem evidência
+- Capas de cinema genéricas (já substituídas em commits anteriores `02a87a6` etc.)
+- Overlay cinema Gui card (removido)
+
+---
+
+## Dev local
 
 ```bash
-supabase functions deploy check-subscription
-supabase functions deploy stripe-webhook
-supabase functions deploy create-checkout
+cd /Volumes/SSD/Desktop/_Projetos/kidz/kidzzapp-repo
+npm run dev -- --host 127.0.0.1 --port 5174
+# http://127.0.0.1:5174/
 ```
 
-| Function | Por quê |
-|----------|---------|
-| `check-subscription` | Revoga stale; anti-fraude |
-| `stripe-webhook` | Status → free; produto mapeado |
-| `create-checkout` | **Sem trial de 7 dias** |
-
-Sem deploy: app client pode mudar textos, mas Stripe/edge antigo ainda cria trial e pode não revogar stale.
-
-Lovable: **Sync main + Publish** do site.
+Env: `.env` local (não commitar secrets).  
+Porta padrão do `vite.config` é 8080; na sessão usamos **5174**.
 
 ---
 
-## Arquivos-chave tocados (sessão 31/07)
+## Como publicar
 
-```
-supabase/functions/check-subscription/index.ts
-supabase/functions/stripe-webhook/index.ts
-supabase/functions/create-checkout/index.ts
-src/contexts/AuthContext.tsx
-src/lib/subscriptionAccess.ts
-src/test/subscriptionAccess.test.ts
-src/components/paywall/PaywallScreen.tsx
-src/components/paywall/PaywallProvider.tsx
-src/components/ContextualPaywallModal.tsx
-src/components/Paywall.tsx
-src/components/ConversionScreen.tsx
-src/pages/Landing.tsx
-src/pages/Success.tsx
-```
+1. GitHub `main` já em `cb5618a`  
+2. Lovable: Sync / Rebuild / Publish  
+3. Supabase: SQL cota (se pendente) + deploy functions  
+4. Hard refresh no kidzz.app e validar checklist operacional  
 
 ---
 
-## Como o pagamento funciona (estado atual no código)
-
-```
-Paywall → PIN parental → create-checkout (sem trial)
-  → Stripe Checkout (price kidzz/premium × mensal/anual)
-  → webhook: subscriptions + profiles.is_premium
-  → check-subscription: autoridade se Stripe OK
-  → useEntitlement / get_effective_plan → áreas
-  → Auth profile.is_premium (boolean) em telas legadas
-```
-
-**Planos:**
-- `kidzz` — base pago
-- `premium` — completo
-- free — limites diários
-
-**Revogação:**
-- Webhook `subscription.deleted` / refund total / dispute → free
-- `check-subscription` sem sub ativa mapeada → free (mesmo se DB stale)
-- Auth **não** reabre free→premium só porque o DB diz premium
-
----
-
-## Aberto / riscos
-
-| Item | Notas |
-|------|--------|
-| Deploy das 3 edge functions | **Fazer** |
-| Lovable sync + publish | Manual |
-| Teste real cartão / cancelamento | Ainda vale validar em staging |
-| Telas com só `is_premium` | Não diferenciam kidzz vs premium (pré-existente) |
-| Outage Stripe | Degradação mantém flag DB (UX); RLS impede self-write de `is_premium` |
-| Worktree SSD | Pode estar atrás da main; preferir `/Users/alefsantos/dev/kidzzapp` |
-
----
-
-## Prompt útil se a Lovable precisar reaplicar (trial)
-
-Já aplicado na main. Se o preview Lovable ainda mostrar “7 dias grátis”:
-
-1. Sync da branch `main` do GitHub.
-2. Redeploy `create-checkout`.
-3. Buscar no repo: `7 dias grátis`, `trial_period`, `Começar 7`, `trialEligible`.
-4. CTA: “Assinar agora” / “Criar conta e assinar”; sem trial no Stripe.
-
----
-
-## Próxima sessão — ordem sugerida
-
-1. Confirmar `origin/main` = `6aca4f3` (ou mais novo).
-2. **Deploy** `check-subscription`, `stripe-webhook`, `create-checkout`.
-3. Lovable: Sync main + Publish.
-4. Teste: assinar (sem trial no Stripe) → cancelar → app vira free.
-5. (Opcional) Unificar gates `is_premium` vs `useEntitlement` nas telas legadas.
-
----
-
-## Não misturar com WIP local
-
-Arquivos untracked / sujos **não** fazem parte deste handoff de entrega:
-
-- `.env.local-backup-temp`, `.grok/`, `CHECKLIST-KIDZZ.txt`, zips em `public/`, `design-src/`, `output/`, etc.
-
-Não commitar isso no freela.
-
----
-
-*Gerado em 2026-07-31 — sessão billing/paywall robustez + remove trial.*
+*Atualizado: 2026-07-30 — sessão polish Cinema/Memórias/Música/Perguntas/KALM/Histórias/Bora.*
