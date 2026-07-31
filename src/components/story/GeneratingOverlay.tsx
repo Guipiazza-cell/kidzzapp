@@ -9,14 +9,14 @@ interface GeneratingOverlayProps {
 }
 
 const MESSAGES = [
-  { text: "Abrindo o livro mágico...", emoji: "📖", color: "from-purple-500 to-indigo-500" },
-  { text: "Imaginando a história...", emoji: "🌈", color: "from-indigo-500 to-blue-500" },
-  { text: "Pintando os cenários...", emoji: "🎨", color: "from-blue-500 to-cyan-500" },
-  { text: "Dando vida aos personagens...", emoji: "✨", color: "from-cyan-500 to-emerald-500" },
-  { text: "Adicionando cores mágicas...", emoji: "🪄", color: "from-emerald-500 to-yellow-500" },
-  { text: "Criando as ilustrações...", emoji: "🖼️", color: "from-yellow-500 to-orange-500" },
-  { text: "Quase pronto...", emoji: "🦎", color: "from-orange-500 to-red-500" },
-  { text: "Finalizando detalhes mágicos...", emoji: "💫", color: "from-red-500 to-pink-500" },
+  { text: "Abrindo o livro mágico...", color: "from-purple-500 to-indigo-500" },
+  { text: "Imaginando a história...", color: "from-indigo-500 to-blue-500" },
+  { text: "Pintando os cenários...", color: "from-blue-500 to-cyan-500" },
+  { text: "Dando vida aos personagens...", color: "from-cyan-500 to-emerald-500" },
+  { text: "Adicionando cores mágicas...", color: "from-emerald-500 to-yellow-500" },
+  { text: "Criando as ilustrações...", color: "from-yellow-500 to-orange-500" },
+  { text: "Quase pronto...", color: "from-orange-500 to-red-500" },
+  { text: "Finalizando detalhes mágicos...", color: "from-red-500 to-pink-500" },
 ];
 
 const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
@@ -25,7 +25,6 @@ const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
   delay: Math.random() * 3,
   duration: 2 + Math.random() * 3,
   size: 4 + Math.random() * 8,
-  emoji: ["✨", "⭐", "🌟", "💫", "🎨", "📖"][Math.floor(Math.random() * 6)],
 }));
 
 const GeneratingOverlay = ({ open, progress }: GeneratingOverlayProps) => {
@@ -56,8 +55,8 @@ const GeneratingOverlay = ({ open, progress }: GeneratingOverlayProps) => {
           {PARTICLES.map((p) => (
             <motion.span
               key={p.id}
-              className="absolute text-lg pointer-events-none select-none"
-              style={{ left: `${p.x}%`, fontSize: p.size }}
+              className="absolute rounded-full pointer-events-none select-none bg-white/40 blur-[1px]"
+              style={{ left: `${p.x}%`, width: p.size, height: p.size }}
               initial={{ y: "100vh", opacity: 0 }}
               animate={{
                 y: "-10vh",
@@ -69,9 +68,7 @@ const GeneratingOverlay = ({ open, progress }: GeneratingOverlayProps) => {
                 repeat: Infinity,
                 ease: "linear",
               }}
-            >
-              {p.emoji}
-            </motion.span>
+            />
           ))}
 
           <motion.div
@@ -136,12 +133,10 @@ const GeneratingOverlay = ({ open, progress }: GeneratingOverlayProps) => {
                 className="flex items-center justify-center gap-2"
               >
                 <motion.span
-                  className="text-2xl"
-                  animate={{ scale: [1, 1.3, 1] }}
+                  className="w-2 h-2 rounded-full bg-white/60"
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  {currentMsg.emoji}
-                </motion.span>
+                />
                 <span className="text-white/70 text-sm font-semibold">
                   {currentMsg.text}
                 </span>
@@ -177,7 +172,7 @@ const GeneratingOverlay = ({ open, progress }: GeneratingOverlayProps) => {
               animate={{ opacity: [0.3, 0.6, 0.3] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              💡 Cada história é única e feita especialmente para você!
+              Cada história é única e feita especialmente para você!
             </motion.p>
           </motion.div>
         </motion.div>
