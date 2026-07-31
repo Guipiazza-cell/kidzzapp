@@ -879,8 +879,9 @@ const DiscoverScreen = ({ onBack }: Props) => {
       const sc = scrollRef.current, hero = heroWrapRef.current;
       if (!sc || !hero) return;
       const y = sc.scrollTop;
-      hero.style.transform = `translateY(${y * 0.42}px) scale(${1 + y * 0.0004})`;
-      hero.style.opacity = String(Math.max(0, 1 - y / 236));
+      // parallax leve — sem scale (evita cortar o card)
+      hero.style.transform = `translateY(${y * 0.18}px)`;
+      hero.style.opacity = String(Math.max(0.55, 1 - y / 420));
     });
   }, []);
 
@@ -919,19 +920,18 @@ const DiscoverScreen = ({ onBack }: Props) => {
           </div>
         </div>
 
-        {/* ── HERO: card arte completa (texto + Gui na imagem) ── */}
+        {/* ── HERO: card arte completa (sem crop — imagem inteira) ── */}
         <div
           ref={heroWrapRef}
           style={{
             position: "relative",
-            margin: `12px ${PAD}px 6px`,
+            margin: `12px ${PAD}px 8px`,
             borderRadius: 28,
             overflow: "hidden",
             boxShadow: "0 16px 36px rgba(60,70,40,.16)",
             animation: "disc-heroIn .7s cubic-bezier(.22,1,.36,1) both",
-            aspectRatio: "1036 / 1122",
-            maxHeight: 360,
             background: "#F5F0E4",
+            lineHeight: 0,
           }}
         >
           <img
@@ -946,9 +946,10 @@ const DiscoverScreen = ({ onBack }: Props) => {
             style={{
               display: "block",
               width: "100%",
-              height: "100%",
-              objectFit: "cover",
+              height: "auto",
+              objectFit: "contain",
               objectPosition: "center center",
+              verticalAlign: "top",
             }}
           />
           <h1
@@ -962,6 +963,7 @@ const DiscoverScreen = ({ onBack }: Props) => {
               clip: "rect(0,0,0,0)",
               whiteSpace: "nowrap",
               border: 0,
+              lineHeight: "normal",
             }}
           >
             Descobrir — Vamos explorar o mundo juntos?
