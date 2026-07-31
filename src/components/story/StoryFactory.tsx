@@ -103,10 +103,10 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
 
     if (!canGenerateStory()) {
       if (tier === "free") {
-        toast.info(`A primeira foi por nossa conta. 💛 Assine e crie histórias ilimitadas só do(a) ${childName}.`);
+        toast.info(`A primeira foi por nossa conta. Assine e crie histórias ilimitadas só do(a) ${childName}.`);
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       } else {
-        toast.info("O Kidzz ficou sonolento por aqui 😴 Volte amanhã para mais histórias 💛");
+        toast.info("O Kidzz ficou sonolento por aqui. Volte amanhã para mais histórias.");
       }
       return;
     }
@@ -207,7 +207,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
       bumpSessionActions();
       sfx("complete");
       haptic("success");
-      toast.success("História pronta! ✨");
+      toast.success("História pronta!");
     } catch (e: any) {
       console.error("Story generation error:", e);
       sfx("error");
@@ -237,7 +237,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
 
   const remaining = storiesRemaining();
   const badgeText = tier === "free"
-    ? (remaining > 0 ? "Primeira história por nossa conta ✨" : "Assine para criar mais")
+    ? (remaining > 0 ? "Primeira história por nossa conta" : "Assine para criar mais")
     : `${remaining} ${remaining === 1 ? "história" : "histórias"} hoje`;
 
   return (

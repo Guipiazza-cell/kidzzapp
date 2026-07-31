@@ -12,14 +12,14 @@ interface StoryFormProps {
 }
 
 const INTEREST_OPTIONS = [
-  { id: "aventura", label: "Aventura", emoji: "🏔️" },
-  { id: "natureza", label: "Natureza", emoji: "🌿" },
-  { id: "espaco", label: "Espaço", emoji: "🚀" },
-  { id: "animais", label: "Animais", emoji: "🐾" },
-  { id: "magia", label: "Magia", emoji: "✨" },
-  { id: "amizade", label: "Amizade", emoji: "🤝" },
-  { id: "ciencia", label: "Ciência", emoji: "🔬" },
-  { id: "oceano", label: "Oceano", emoji: "🌊" },
+  { id: "aventura", label: "Aventura" },
+  { id: "natureza", label: "Natureza" },
+  { id: "espaco", label: "Espaço" },
+  { id: "animais", label: "Animais" },
+  { id: "magia", label: "Magia" },
+  { id: "amizade", label: "Amizade" },
+  { id: "ciencia", label: "Ciência" },
+  { id: "oceano", label: "Oceano" },
 ];
 
 const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isPremium = false, onUpgrade }: StoryFormProps) => {
@@ -50,7 +50,7 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
     >
       <div className="text-center">
         <h2 className="text-xl font-extrabold text-white drop-shadow-lg">
-          Conte-nos sobre {childName}! 📖
+          Conte-nos sobre {childName}
         </h2>
         <p className="text-white/60 text-xs mt-1">
           Vamos criar uma história mágica personalizada
@@ -59,7 +59,7 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
 
       <div className="bg-black/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 space-y-4">
         <div>
-          <p className="text-sm font-extrabold text-white mb-2">Idade 🎂</p>
+          <p className="text-sm font-extrabold text-white mb-2">Idade</p>
           <input
             type="number"
             min="1"
@@ -73,7 +73,7 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
 
         <div>
           <p className="text-sm font-extrabold text-white mb-2">
-            O que {childName} adora? 🌟
+            O que {childName} adora?
           </p>
           <div className="grid grid-cols-2 gap-2">
             {INTEREST_OPTIONS.map((opt) => (
@@ -86,7 +86,6 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
                     : "bg-white/5 border-2 border-transparent hover:border-white/20"
                 }`}
               >
-                <span className="text-lg">{opt.emoji}</span>
                 <span className="text-xs font-bold text-white">{opt.label}</span>
               </button>
             ))}
@@ -109,7 +108,7 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
             <>
               <Sparkles size={18} className="text-amber-600 flex-shrink-0" />
               <p className="text-[13px] font-extrabold text-amber-800 leading-tight">
-                Você tem <span className="text-amber-900">1 história grátis</span> para experimentar! ✨
+                Você tem <span className="text-amber-900">1 história grátis</span> para experimentar.
               </p>
             </>
           ) : (
@@ -148,7 +147,7 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
           ) : (
             <>
               <Sparkles size={20} />
-              Gerar História Personalizada 🚀
+              Gerar História Personalizada
             </>
           )}
         </motion.button>
@@ -160,7 +159,7 @@ const StoryForm = ({ childName, onGenerate, isLoading, storiesRemaining = 0, isP
           onClick={onUpgrade}
           className="w-full text-center text-[11px] font-bold text-kid-purple underline-offset-2 hover:underline"
         >
-          💛 Quero histórias ilimitadas - ver planos
+          Quero histórias ilimitadas - ver planos
         </button>
       )}
     </motion.div>
