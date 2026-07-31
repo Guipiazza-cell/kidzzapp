@@ -284,7 +284,7 @@ const LockedFeature = ({
         style={{ color: "rgba(60,50,80,0.5)" }}
       >
         <Shield size={12} />
-        7 dias de garantia · Cancele quando quiser
+        Pagamento seguro · Cancele quando quiser
       </p>
     </motion.div>
   );
