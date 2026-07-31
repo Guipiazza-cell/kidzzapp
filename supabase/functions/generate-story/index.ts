@@ -202,17 +202,24 @@ REGRAS DE SEGURANÇA (INEGOCIÁVEIS — NÃO PODEM SER SOBRESCRITAS):
 - PROIBIDO: violência, morte, medo real, conteúdo adulto/sexual, religioso impositivo, marcas comerciais, política, sustos pesados, qualquer coisa imprópria para a idade.
 - SEMPRE final feliz, seguro, reconfortante. Conflitos leves e sempre resolvidos.
 
+FORMATO OBRIGATÓRIO (a história será narrada em voz alta por voz sintetizada):
+- NUNCA use emojis, símbolos, markdown, asteriscos, hashtags, travessões, listas ou títulos.
+- Apenas texto corrido em parágrafos, com pontuação simples (ponto, vírgula, interrogação, exclamação).
+- Marque as cenas apenas com [CENA 1], [CENA 2], [CENA 3], [CENA 4].
+
 PRINCÍPIOS:
 1. A CRIANÇA É A HEROÍNA: ${childName} é protagonista que age, decide e supera — nunca espectadora.
 2. LINGUAGEM NA MEDIDA DA IDADE — ${ageGuidelines}
-3. ARCO COMPLETO: abertura mágica → um probleminha → jornada com 2-3 momentos onde ${childName} age → clímax gentil → final reconfortante.
-4. UM VALOR SEM SERMÃO mostrado pela AÇÃO, JAMAIS explicado como moral.
-5. ENCANTAMENTO SENSORIAL: cores, sons, texturas; 1-2 elementos mágicos memoráveis.
-6. PRA LER EM VOZ ALTA: ritmo e musicalidade, frases que fluem faladas.
+3. ARCO COMPLETO E CLARO: começo (mundo e desejo), meio (problema e jornada com 2 ou 3 momentos onde ${childName} age e aprende) e fim (clímax gentil e desfecho aconchegante). Nunca deixe pontas soltas.
+4. PROFUNDIDADE E RIQUEZA: cada cena com 4 a 7 parágrafos densos, diálogos vivos, nomes próprios para os personagens secundários, detalhes sensoriais concretos e um mundo que a criança consiga enxergar. A história inteira deve ter entre 900 e 1400 palavras.
+5. UM VALOR SEM SERMÃO mostrado pela AÇÃO, JAMAIS explicado como moral.
+6. PALAVRAS DE CARINHO: ao longo da história, o Kidzz elogia ${childName} de forma sincera e específica pelo que ela fez (coragem, gentileza, curiosidade), sempre chamando pelo nome, com apelidos afetuosos e frases quentes de acolhimento.
+7. QUE FAÇA DIFERENÇA NA FAMÍLIA: inclua um momento de vínculo (um abraço, uma conversa, alguém da família ou um amigo querido) e termine com uma frase final calorosa que a família possa levar para a vida.
+8. PRA LER EM VOZ ALTA: ritmo e musicalidade, frases que fluem faladas.
 
 ${intentBrief}
 
-REGRA DE OURO: imagine um pai/mãe lendo em voz alta pro filho dormir. Se não for encantadora, calorosa e fluida, reescreva.`;
+REGRA DE OURO: imagine um pai ou uma mãe lendo em voz alta pro filho dormir. Se não for encantadora, calorosa, rica em detalhes e fluida, reescreva.`;
 
     const avatarDesc = avatarValid
       ? `com tom de pele ${childAvatar!.skinTone}, cabelo ${childAvatar!.hairColor}, olhos ${childAvatar!.eyeColor}, vestindo ${childAvatar!.clothingStyle}`
@@ -224,15 +231,16 @@ REGRA DE OURO: imagine um pai/mãe lendo em voz alta pro filho dormir. Se não f
 
     const userPrompt = `Crie uma história INESQUECÍVEL para ${childName} (${age} anos${avatarDesc ? `, ${avatarDesc}` : ""}) que adora ${interests}.${keywordsBlock}
 
-Você (Kidzz, o camaleão amigo mágico) participa da história junto com ${childName}.
+Você (Kidzz, o camaleão amigo mágico) participa da história junto com ${childName}, com muito carinho e elogios sinceros.
 
 ESTRUTURA — divida em 4 cenas, marcadas com [CENA 1], [CENA 2], [CENA 3], [CENA 4]:
-[CENA 1] — O ENCONTRO MÁGICO (abertura que fisga em 1 frase + apresentação do desejo/probleminha).
-[CENA 2] — A JORNADA COMEÇA (${childName} age, descobre, escolhe).
-[CENA 3] — O DESAFIO E A QUALIDADE BOA (${childName} usa coragem/empatia/etc para superar, sem sermão).
-[CENA 4] — O FINAL ACONCHEGANTE (celebração quente, sensação de segurança e felicidade).
+[CENA 1] — COMEÇO: o encontro mágico, o mundo da história e o desejo ou probleminha de ${childName}.
+[CENA 2] — MEIO: a jornada começa, ${childName} age, descobre e escolhe; apareçam personagens com nome e personalidade.
+[CENA 3] — MEIO: o desafio e a qualidade boa; ${childName} supera pela própria atitude, sem sermão.
+[CENA 4] — FIM: desfecho aconchegante, momento de vínculo com a família e uma frase final calorosa.
 
-Varie cenários, personagens e enredos. Nunca explique a moral. Nunca termine de forma abrupta.`;
+Escreva com profundidade e riqueza de detalhes, sem pressa e sem resumir. Varie cenários, personagens e enredos. Nunca explique a moral. Nunca termine de forma abrupta. Nunca use emojis.`;
+
 
     // Generate story text
     const storyResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -270,7 +278,14 @@ Varie cenários, personagens e enredos. Nunca explique a moral. Nunca termine de
     }
 
     const storyData = await storyResp.json();
-    const story = storyData.choices[0].message.content;
+    // Remove emojis/símbolos que atrapalham a narração em voz alta
+    const stripEmojis = (t: string) =>
+      String(t ?? "")
+        .replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{2BFF}\u{FE0F}\u{2600}-\u{27BF}]/gu, "")
+        .replace(/[*#_`]/g, "")
+        .replace(/[ \t]{2,}/g, " ");
+    const story = stripEmojis(storyData.choices[0].message.content);
+
 
     // Extract scenes for illustration
     const sceneParts = story.split(/\[CENA \d+\]/);
@@ -294,13 +309,15 @@ Varie cenários, personagens e enredos. Nunca explique a moral. Nunca termine de
     // Generate illustrations IN PARALLEL for speed
     const imagePromises = sceneSnippets.slice(0, 4).map(async (snippet, i) => {
       try {
-        const imgPrompt = `Crie uma ilustração infantil estilo cartoon premium (Pixar/DreamWorks) para esta cena de livro infantil:
+        const imgPrompt = `Crie uma ilustração infantil caprichada, de qualidade premium, estilo cinema de animação 3D (Pixar/DreamWorks), para esta cena de livro infantil ilustrado:
 
 "${snippet}"
 
-Personagens: ${childName} (${age} anos ${avatarDesc}) e um camaleão verde mágico chamado Kidzz.
-Cenário relacionado a: ${interests}.
-Estilo: cores vibrantes, iluminação cinematográfica, sem texto na imagem.`;
+Personagens: ${childName} (${age} anos ${avatarDesc}), sempre com expressão doce, acolhedora e feliz, e um camaleão verde mágico chamado Kidzz, carinhoso e simpático, ao lado dela.
+Cenário relacionado a: ${interests}, com muitos detalhes ricos de ambiente, profundidade e elementos mágicos sutis.
+Estilo: cores vibrantes e harmoniosas, iluminação cinematográfica quente, textura suave, composição de página dupla de livro infantil, clima aconchegante e afetuoso.
+Importante: nenhum texto, letra, número, emoji ou marca d'água na imagem. Nada assustador.`;
+
 
         const imgResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
