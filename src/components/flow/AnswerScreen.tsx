@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, BookOpen, Bookmark, Share2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -10,10 +10,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import ShareCardModal from "@/components/viral/ShareCardModal";
-import { CAMALEAO } from "@/lib/camaleaoOficial";
-import { FONT, SERIF, R, glassLight, glassLightSoft, pillGlassLight } from "@/lib/premiumUi";
+import { FONT, SERIF, R } from "@/lib/premiumUi";
 
 const BG = "/exemplos/assets/perguntas-v2/bg-floresta.png";
+
+/** Mesmo liquid glass do dock (BottomNav) — cards leves e translúcidos */
+const dockGlass: CSSProperties = {
+  background:
+    "linear-gradient(165deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.22) 48%, rgba(255,255,255,.16) 100%)",
+  border: "0.5px solid rgba(255,255,255,.55)",
+  boxShadow:
+    "0 12px 36px rgba(20,16,30,.16), 0 2px 8px rgba(20,16,30,.06), inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 0 rgba(255,255,255,.12)",
+  backdropFilter: "blur(32px) saturate(190%)",
+  WebkitBackdropFilter: "blur(32px) saturate(190%)",
+};
+
+const dockPill: CSSProperties = {
+  ...dockGlass,
+  borderRadius: R.btn,
+};
+
+const dockCard: CSSProperties = {
+  ...dockGlass,
+  borderRadius: 26,
+};
 
 interface Props {
   question: string;
@@ -139,68 +159,41 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      {/* Fundo floresta (mesmo padrão da home Perguntas) */}
+      {/* Fundo floresta + véu suave (conteúdo “flutua” no vidro do dock) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <img
           src={BG}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center 28%", filter: "saturate(1.06) brightness(1.05)" }}
+          style={{ objectPosition: "center 32%", filter: "saturate(1.08) brightness(1.02)" }}
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,236,180,.42) 0%, transparent 55%)," +
-              "linear-gradient(180deg, rgba(255,252,245,.55) 0%, rgba(248,244,234,.72) 38%, rgba(240,248,232,.88) 100%)",
-          }}
-        />
-        {/* liquid dust */}
-        <div
-          style={{
-            position: "absolute",
-            top: "18%",
-            left: "12%",
-            width: 6,
-            height: 6,
-            borderRadius: 99,
-            background: "#FFF3CC",
-            boxShadow: "0 0 10px 2px rgba(255,225,150,.65)",
-            animation: "ans-dust 9s linear infinite",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: "48%",
-            right: "16%",
-            width: 5,
-            height: 5,
-            borderRadius: 99,
-            background: "#EAFBD0",
-            boxShadow: "0 0 9px 2px rgba(200,240,150,.55)",
-            animation: "ans-dust 11s linear 2s infinite",
+              "radial-gradient(ellipse 90% 55% at 50% 8%, rgba(255,240,200,.38) 0%, transparent 58%)," +
+              "linear-gradient(180deg, rgba(255,252,248,.35) 0%, rgba(245,250,240,.55) 45%, rgba(235,245,230,.78) 100%)",
           }}
         />
       </div>
       <style>{`
-        @keyframes ans-dust {
-          0% { transform: translateY(0) translateX(0); opacity: .35 }
-          50% { opacity: .9 }
-          100% { transform: translateY(-40px) translateX(12px); opacity: .2 }
+        @keyframes ans-ring {
+          0% { transform: scale(.86); opacity: .55 }
+          50% { transform: scale(1.08); opacity: .15 }
+          100% { transform: scale(.86); opacity: .55 }
         }
-        @keyframes ans-shine {
-          0% { transform: translateX(-120%) skewX(-16deg) }
-          60%,100% { transform: translateX(220%) skewX(-16deg) }
+        @keyframes ans-sheen {
+          0% { transform: translateX(-130%) skewX(-14deg) }
+          55%,100% { transform: translateX(210%) skewX(-14deg) }
         }
       `}</style>
 
-      {/* Header glass */}
+      {/* Header dock-style */}
       <header
         className="relative z-20 flex items-center gap-2 px-4"
         style={{
           paddingTop: "max(env(safe-area-inset-top, 8px), 12px)",
-          paddingBottom: 10,
+          paddingBottom: 8,
         }}
       >
         <motion.button
@@ -208,53 +201,31 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           onClick={onNewQuestion}
           aria-label="Voltar"
           className="active:scale-95 flex items-center justify-center"
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: R.btn,
-            color: "#1F2E18",
-            ...pillGlassLight,
-          }}
+          style={{ width: 44, height: 44, color: "#1F2E18", ...dockPill }}
           whileTap={{ scale: 0.92 }}
         >
           <ArrowLeft size={19} strokeWidth={2.2} />
         </motion.button>
         <div
           className="flex-1 min-w-0 flex items-center justify-center gap-2 px-3"
-          style={{
-            minHeight: 44,
-            borderRadius: R.btn,
-            ...pillGlassLight,
-          }}
+          style={{ minHeight: 44, ...dockPill }}
         >
-          <span
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 600,
-              fontSize: 15,
-              color: "#1F2E18",
-            }}
-          >
+          <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: "#1F2E18" }}>
             Resposta
           </span>
         </div>
         <motion.div
           className="flex items-center gap-1.5 px-3"
-          style={{
-            minHeight: 44,
-            borderRadius: R.btn,
-            ...pillGlassLight,
-          }}
-          initial={{ scale: 0.85, opacity: 0 }}
+          style={{ minHeight: 44, ...dockPill }}
+          initial={{ scale: 0.88, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.35, type: "spring" }}
+          transition={{ delay: 0.3, type: "spring", stiffness: 280 }}
         >
           <Heart size={13} color="#E07090" fill="#E07090" />
-          <span style={{ fontSize: 11, fontWeight: 800, color: "#5A4A38" }}>+1</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(45,40,55,.72)" }}>+1</span>
         </motion.div>
       </header>
 
-      {/* Content */}
       <div
         className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4"
         style={{
@@ -262,31 +233,93 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {/* Gui cutout sutil */}
-        <div className="flex justify-center pt-1 pb-2" aria-hidden>
-          <motion.img
-            src={CAMALEAO.cutout}
-            alt=""
-            draggable={false}
-            initial={{ y: 8, opacity: 0 }}
-            animate={{ y: [0, -6, 0], opacity: 1 }}
-            transition={{
-              opacity: { duration: 0.35 },
-              y: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
-            }}
+        {/* Hero inovador: orbe liquid “pronto” (sem mascote) */}
+        <motion.div
+          className="flex flex-col items-center pt-3 pb-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="relative flex items-center justify-center" style={{ width: 72, height: 72 }}>
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: -10,
+                borderRadius: "50%",
+                border: "1.5px solid rgba(92,181,122,.35)",
+                animation: "ans-ring 2.6s ease-in-out infinite",
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: -2,
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(140,210,160,.25) 45%, rgba(92,181,122,.12) 100%)",
+                ...dockGlass,
+                borderRadius: "50%",
+              }}
+            />
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 320, damping: 14, delay: 0.15 }}
+              style={{
+                position: "relative",
+                width: 52,
+                height: 52,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(145deg, #7EC98A 0%, #4EA35E 55%, #2E7A42 100%)",
+                boxShadow:
+                  "0 10px 22px rgba(46,122,66,.35), inset 0 1px 0 rgba(255,255,255,.45)",
+              }}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="#fff"
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.div>
+          </div>
+          <p
             style={{
-              width: 88,
-              height: 112,
-              objectFit: "contain",
-              filter: "drop-shadow(0 12px 20px rgba(40,50,30,.22))",
+              margin: "12px 0 0",
+              fontFamily: SERIF,
+              fontWeight: 600,
+              fontSize: 20,
+              color: "#1F2E18",
+              letterSpacing: "-0.3px",
+              textShadow: "0 1px 12px rgba(255,255,255,.5)",
             }}
-          />
-        </div>
+          >
+            Pronto pra vocês
+          </p>
+          <p
+            style={{
+              margin: "4px 0 0",
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: "rgba(45,55,40,.58)",
+            }}
+          >
+            Uma resposta pensada pra idade certa
+          </p>
+        </motion.div>
 
-        {/* Pergunta — glass */}
+        {/* Pergunta — dock glass + barra lateral */}
         <motion.div
           className="relative overflow-hidden"
-          style={{ ...glassLight, borderRadius: R.card, padding: "14px 16px" }}
+          style={{ ...dockCard, padding: "14px 16px 14px 18px" }}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
@@ -295,13 +328,22 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             aria-hidden
             style={{
               position: "absolute",
-              top: 0,
               left: 0,
-              width: "45%",
-              height: "100%",
+              top: 12,
+              bottom: 12,
+              width: 3.5,
+              borderRadius: 99,
+              background: "linear-gradient(180deg, #A8E8B8, #5CB57A 50%, #3E9A52)",
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
               background:
-                "linear-gradient(105deg, transparent, rgba(255,255,255,.4) 50%, transparent)",
-              animation: "ans-shine 7s ease-in-out infinite",
+                "linear-gradient(105deg, transparent 20%, rgba(255,255,255,.28) 48%, transparent 70%)",
+              animation: "ans-sheen 8s ease-in-out infinite",
               pointerEvents: "none",
             }}
           />
@@ -310,9 +352,9 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
               margin: 0,
               fontSize: 10,
               fontWeight: 900,
-              letterSpacing: "1.1px",
+              letterSpacing: "1.15px",
               textTransform: "uppercase",
-              color: "rgba(60,80,45,.55)",
+              color: "rgba(45,55,40,.5)",
             }}
           >
             Pergunta
@@ -322,85 +364,90 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
               margin: "6px 0 0",
               fontFamily: SERIF,
               fontWeight: 600,
-              fontSize: 16,
-              lineHeight: 1.35,
-              color: "#1F2E18",
+              fontSize: 16.5,
+              lineHeight: 1.38,
+              color: "#1A2818",
             }}
           >
             {question}
           </p>
         </motion.div>
 
-        {/* Resposta — glass liquid */}
+        {/* Resposta — dock glass */}
         <motion.div
           className="mt-3 relative overflow-hidden"
-          style={{ ...glassLight, borderRadius: R.card, padding: "16px 16px 18px" }}
+          style={{ ...dockCard, padding: "16px 16px 18px" }}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.18 }}
+          transition={{ delay: 0.16 }}
         >
           <div
             aria-hidden
             style={{
               position: "absolute",
-              top: 0,
-              left: 0,
-              width: "50%",
-              height: "100%",
+              inset: 0,
               background:
-                "linear-gradient(105deg, transparent, rgba(255,255,255,.38) 50%, transparent)",
-              animation: "ans-shine 8s ease-in-out 1s infinite",
+                "linear-gradient(105deg, transparent 15%, rgba(255,255,255,.26) 50%, transparent 75%)",
+              animation: "ans-sheen 9s ease-in-out 1.2s infinite",
               pointerEvents: "none",
             }}
           />
-          <p
-            style={{
-              margin: "0 0 10px",
-              fontSize: 10,
-              fontWeight: 900,
-              letterSpacing: "1.1px",
-              textTransform: "uppercase",
-              color: "rgba(60,80,45,.55)",
-            }}
-          >
-            Resposta
-          </p>
+          <div className="relative z-[1] flex items-center gap-2 mb-2.5">
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 99,
+                background: "linear-gradient(135deg,#7EC98A,#3E9A52)",
+                boxShadow: "0 0 0 3px rgba(92,181,122,.22)",
+              }}
+            />
+            <p
+              style={{
+                margin: 0,
+                fontSize: 10,
+                fontWeight: 900,
+                letterSpacing: "1.15px",
+                textTransform: "uppercase",
+                color: "rgba(45,55,40,.5)",
+              }}
+            >
+              Resposta
+            </p>
+          </div>
           <div
-            className="prose prose-sm max-w-none relative z-[1] [&_p]:my-2 [&_ul]:my-2 [&_ol]:my-2 [&_h1]:text-[#1F2E18] [&_h2]:text-[#1F2E18] [&_h3]:text-[#1F2E18] [&_p]:text-[#2A3A22] [&_li]:text-[#2A3A22] [&_strong]:text-[#1F2E18]"
-            style={{ fontSize: 14.5, lineHeight: 1.55, fontWeight: 600 }}
+            className="prose prose-sm max-w-none relative z-[1] [&_p]:my-2 [&_ul]:my-2 [&_ol]:my-2 [&_h1]:text-[#1A2818] [&_h2]:text-[#1A2818] [&_h3]:text-[#1A2818] [&_p]:text-[#243222] [&_li]:text-[#243222] [&_strong]:text-[#1A2818]"
+            style={{ fontSize: 14.5, lineHeight: 1.58, fontWeight: 600 }}
           >
             <ReactMarkdown>{answer}</ReactMarkdown>
           </div>
         </motion.div>
 
-        {/* Ouvir */}
+        {/* Ações — todas em dock glass / CTA dourado único */}
         <motion.button
           type="button"
           onClick={handleSpeak}
           className="relative w-full mt-3 overflow-hidden active:scale-[0.98]"
           style={{
             minHeight: 52,
-            borderRadius: R.btn,
+            ...dockPill,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: 10,
             fontWeight: 900,
             fontSize: 15,
-            color: playing ? "#3A2A10" : "#fff",
+            color: playing ? "#2A3A22" : "#1A2818",
             background: playing
-              ? "linear-gradient(135deg, rgba(255,230,140,.92), rgba(242,190,70,.88))"
-              : "linear-gradient(135deg, #5CB57A 0%, #3E9A52 55%, #2E7A42 100%)",
+              ? "linear-gradient(165deg, rgba(255,240,180,.55) 0%, rgba(255,220,120,.35) 100%)"
+              : dockGlass.background,
             border: playing
-              ? "0.5px solid rgba(255,220,120,.7)"
-              : "0.5px solid rgba(255,255,255,.45)",
-            boxShadow: playing
-              ? "0 10px 24px rgba(200,150,40,.28)"
-              : "0 12px 28px rgba(46,122,66,.32), inset 0 1px 0 rgba(255,255,255,.35)",
+              ? "0.5px solid rgba(255,210,100,.55)"
+              : dockGlass.border,
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28 }}
+          transition={{ delay: 0.24 }}
           whileTap={{ scale: 0.97 }}
         >
           {playing && (
@@ -408,7 +455,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(120deg, transparent 30%, rgba(255,255,255,.4) 50%, transparent 70%)",
+                  "linear-gradient(120deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%)",
               }}
               animate={{ x: ["-110%", "120%"] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: "linear" }}
@@ -427,12 +474,11 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </span>
         </motion.button>
 
-        {/* Salvar + compartilhar */}
         <motion.div
           className="mt-2.5 grid grid-cols-2 gap-2.5"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.34 }}
+          transition={{ delay: 0.3 }}
         >
           <motion.button
             type="button"
@@ -441,21 +487,17 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             className="active:scale-[0.98] flex items-center justify-center gap-2"
             style={{
               minHeight: 48,
-              borderRadius: R.btn,
               fontWeight: 800,
               fontSize: 13,
+              color: memorySaved ? "#2E7A42" : "#1A2818",
+              ...dockPill,
               ...(memorySaved
                 ? {
-                    ...glassLightSoft,
-                    color: "#2E7A42",
-                    border: "0.5px solid rgba(62,154,82,.45)",
+                    background:
+                      "linear-gradient(165deg, rgba(160,220,170,.4) 0%, rgba(120,190,140,.22) 100%)",
+                    border: "0.5px solid rgba(92,181,122,.45)",
                   }
-                : {
-                    color: "#fff",
-                    background: "linear-gradient(135deg, #E882A0, #9A6CF0)",
-                    border: "0.5px solid rgba(255,255,255,.4)",
-                    boxShadow: "0 8px 20px rgba(120,60,160,.28)",
-                  }),
+                : {}),
             }}
             whileTap={memorySaved ? undefined : { scale: 0.97 }}
           >
@@ -468,11 +510,10 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             className="active:scale-[0.98] flex items-center justify-center gap-2"
             style={{
               minHeight: 48,
-              borderRadius: R.btn,
               fontWeight: 800,
               fontSize: 13,
-              color: "#2A3A22",
-              ...pillGlassLight,
+              color: "#1A2818",
+              ...dockPill,
             }}
             whileTap={{ scale: 0.97 }}
           >
@@ -487,15 +528,14 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             className="w-full mt-2.5 flex items-center justify-center gap-2 active:scale-[0.98]"
             style={{
               minHeight: 48,
-              borderRadius: R.btn,
               fontWeight: 800,
               fontSize: 13.5,
-              color: "#2A3A22",
-              ...glassLightSoft,
+              color: "#1A2818",
+              ...dockPill,
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.34 }}
             whileTap={{ scale: 0.97 }}
           >
             <BookOpen size={16} />
@@ -512,14 +552,15 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
             borderRadius: R.btn,
             fontWeight: 900,
             fontSize: 15,
-            color: "#fff",
-            background: "linear-gradient(135deg, #F0A020 0%, #E8821A 50%, #E07090 130%)",
-            border: "0.5px solid rgba(255,220,140,.5)",
-            boxShadow: "0 12px 28px rgba(212,120,26,.32), inset 0 1px 0 rgba(255,255,255,.35)",
+            color: "#2A1608",
+            background: "linear-gradient(180deg, #FBE09A 0%, #E8A838 48%, #C87818 100%)",
+            border: "0.5px solid rgba(255,235,190,.65)",
+            boxShadow:
+              "0 8px 24px rgba(180,100,20,.35), 0 1px 0 rgba(255,250,230,.85) inset, 0 -3px 8px rgba(100,50,0,.16) inset",
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.38 }}
+          transition={{ delay: 0.34 }}
           whileTap={{ scale: 0.97 }}
         >
           <Sparkles size={17} />
@@ -527,24 +568,24 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
         </motion.button>
 
         <motion.p
-          className="text-center mt-4 mb-2"
           style={{
-            margin: "16px 0 8px",
+            margin: "18px 0 8px",
+            textAlign: "center",
             fontSize: 11.5,
             fontWeight: 800,
-            color: "rgba(50,70,40,.5)",
+            color: "rgba(45,55,40,.48)",
           }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.45 }}
         >
           Isso pode marcar a vida do seu filho
         </motion.p>
 
         {showCTA && !isPremium && (
           <motion.div
-            className="mt-2 text-center relative overflow-hidden"
-            style={{ ...glassLight, borderRadius: R.card, padding: "18px 16px" }}
+            className="mt-1 text-center relative overflow-hidden"
+            style={{ ...dockCard, padding: "18px 16px" }}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -555,7 +596,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
                 fontWeight: 600,
                 fontSize: 16,
                 lineHeight: 1.35,
-                color: "#1F2E18",
+                color: "#1A2818",
               }}
             >
               Quer ter respostas assim sempre que seu filho perguntar?
@@ -565,7 +606,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
                 margin: "6px 0 0",
                 fontSize: 12,
                 fontWeight: 700,
-                color: "rgba(50,70,40,.55)",
+                color: "rgba(45,55,40,.52)",
               }}
             >
               Nunca mais trave na frente do seu filho
@@ -582,7 +623,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
                 color: "#fff",
                 background: "linear-gradient(135deg, #9A6CF0, #E07090)",
                 border: "0.5px solid rgba(255,255,255,.4)",
-                boxShadow: "0 10px 24px rgba(120,60,160,.3)",
+                boxShadow: "0 10px 24px rgba(120,60,160,.28)",
               }}
               whileTap={{ scale: 0.97 }}
             >
