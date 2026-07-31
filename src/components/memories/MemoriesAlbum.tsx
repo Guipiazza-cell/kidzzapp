@@ -11,7 +11,7 @@ import {
   type Activity,
 } from "@/lib/weeklyActivities";
 import { FONT, SERIF, R } from "@/lib/premiumUi";
-import guiCutoutUrl from "@/assets/memorias/gui-cutout.png";
+import heroMemorias from "@/assets/memorias-hero.jpg";
 import iconPerguntaUrl from "@/assets/memorias/icon-pergunta.png";
 import iconHistoriaUrl from "@/assets/memorias/icon-historia.png";
 import iconMissaoUrl from "@/assets/memorias/icon-missao.png";
@@ -19,7 +19,7 @@ import iconMissaoUrl from "@/assets/memorias/icon-missao.png";
 /**
  * MemoriesAlbum - redesign premium v2
  * Ref: public/telas/memorias/
- * Hero: card com texto + Gui cutout (sem fundo)
+ * Hero: card arte completa (Gui + caixinha de fotos + texto)
  *
  * Histórico de uso do app (tudo que a família faz fica aqui):
  *  - Momentos guardados  → memories (perguntas, histórias, música, cinema, rotina, jogos…)
@@ -313,8 +313,6 @@ const MemoriesAlbum = ({
   const questionsUsed = profile?.questions_used ?? 0;
   const storiesUsed = profile?.stories_used ?? 0;
   const streakDays = profile?.streak_days ?? 0;
-  const h = new Date().getHours();
-  const saudacao = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
 
   const handleShare = useCallback(
     async (m: Memory) => {
@@ -677,103 +675,49 @@ const MemoriesAlbum = ({
           </div>
         </div>
 
-        {/* ── HERO: card com texto + Gui cutout (sem fundo) ── */}
+        {/* ── HERO: card arte completa (texto + Gui + caixinha) ── */}
         <div
           style={{
             position: "relative",
             zIndex: 3,
-            padding: "6px 16px 14px",
+            margin: "6px 16px 14px",
+            borderRadius: 28,
+            overflow: "hidden",
+            boxShadow: "0 16px 36px rgba(90,40,70,.16)",
             animation: "memv2-rise .6s both",
+            background: "#F5D0E0",
+            lineHeight: 0,
           }}
         >
-          <div
+          <img
+            src={heroMemorias}
+            alt="Aqui guardamos memórias que viram histórias — Gui com caixinha de fotos"
+            draggable={false}
             style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "stretch",
-              gap: 4,
-              minHeight: 168,
-              borderRadius: R.card,
+              display: "block",
+              width: "100%",
+              height: "auto",
+              objectFit: "contain",
+              objectPosition: "center center",
+              verticalAlign: "top",
+            }}
+          />
+          <h1
+            style={{
+              position: "absolute",
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
               overflow: "hidden",
-              background:
-                "linear-gradient(145deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.42) 48%, rgba(255,200,210,.35) 100%)",
-              border: "0.5px solid rgba(255,255,255,.85)",
-              boxShadow:
-                "0 14px 36px rgba(90,40,70,.16), 0 1px 0 rgba(255,255,255,.9) inset",
-              backdropFilter: "blur(28px) saturate(160%)",
-              WebkitBackdropFilter: "blur(28px) saturate(160%)",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              border: 0,
+              lineHeight: "normal",
             }}
           >
-            <div
-              style={{
-                flex: "1 1 56%",
-                minWidth: 0,
-                padding: "16px 8px 16px 16px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignSelf: "flex-start",
-                  alignItems: "center",
-                  padding: "5px 11px",
-                  borderRadius: 999,
-                  background: "rgba(255,255,255,.55)",
-                  border: "0.5px solid rgba(255,255,255,.8)",
-                  fontWeight: 800,
-                  fontSize: 12,
-                  color: MEM_INK2,
-                  marginBottom: 10,
-                }}
-              >
-                {saudacao}, família!
-              </div>
-              <h1
-                style={{
-                  margin: 0,
-                  fontFamily: SERIF,
-                  fontWeight: 600,
-                  fontSize: 22,
-                  lineHeight: 1.16,
-                  color: MEM_INK,
-                  letterSpacing: "-.2px",
-                }}
-              >
-                Aqui guardamos <span style={{ color: "#C93A72" }}>memórias</span> que viram histórias.
-              </h1>
-            </div>
-
-            <div
-              aria-hidden
-              style={{
-                flex: "0 0 42%",
-                maxWidth: 168,
-                position: "relative",
-                minHeight: 168,
-                pointerEvents: "none",
-                overflow: "visible",
-              }}
-            >
-              <img
-                src={guiCutoutUrl}
-                alt=""
-                style={{
-                  position: "absolute",
-                  right: -6,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  width: "112%",
-                  height: "118%",
-                  objectFit: "contain",
-                  objectPosition: "center center",
-                  filter: "drop-shadow(0 10px 18px rgba(0,0,0,.22))",
-                }}
-              />
-            </div>
-          </div>
+            Aqui guardamos memórias que viram histórias.
+          </h1>
         </div>
 
         {/* ── AÇÕES RÁPIDAS ── */}
