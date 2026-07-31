@@ -256,7 +256,6 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
               style={{
                 position: "absolute",
                 inset: -2,
-                borderRadius: "50%",
                 background:
                   "radial-gradient(circle at 35% 30%, rgba(255,255,255,.55), rgba(140,210,160,.25) 45%, rgba(92,181,122,.12) 100%)",
                 ...dockGlass,
