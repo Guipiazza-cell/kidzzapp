@@ -864,3 +864,20 @@ body.kidzz-modal-open {
 @keyframes memv3-drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,-22px) scale(1.12)}}
 @keyframes memv3-sparklefloat{0%,100%{opacity:.1;transform:translateY(0) scale(.7)}50%{opacity:.95;transform:translateY(-16px) scale(1.15)}}
 @keyframes memv3-shine{0%{transform:translateX(-130%) skewX(-18deg)}60%,100%{transform:translateX(240%) skewX(-18deg)}}
+
+/* Hide Lovable “Edit with Lovable” badge on published sites */
+#lovable-badge,
+a#lovable-badge,
+[id="lovable-badge"],
+iframe[src*="lovable.dev/badge"],
+iframe[src*="lovable.app/badge"],
+a[href*="lovable.dev"][target="_blank"]:has(img[alt*="Lovable" i]),
+div[style*="z-index: 999999"] a[href*="lovable.dev"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}

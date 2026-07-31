@@ -29,7 +29,41 @@
     <style>
       html, body { overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
       img { content-visibility: auto; }
+      /* Esconde badge “Edit with Lovable” (injetado no publish) */
+      #lovable-badge,
+      a#lovable-badge,
+      [id="lovable-badge"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
     </style>
+    <script>
+      // Remove o badge se a Lovable re-injetar depois do load
+      (function () {
+        function killBadge() {
+          try {
+            document.querySelectorAll('#lovable-badge, a#lovable-badge, [id="lovable-badge"]').forEach(function (el) {
+              el.remove();
+            });
+          } catch (_) {}
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", killBadge);
+        } else {
+          killBadge();
+        }
+        // Observer leve: só enquanto o badge puder aparecer
+        try {
+          var obs = new MutationObserver(function () {
+            killBadge();
+          });
+          obs.observe(document.documentElement, { childList: true, subtree: true });
+          setTimeout(function () { try { obs.disconnect(); } catch (_) {} }, 15000);
+        } catch (_) {}
+      })();
+    </script>
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/favicon.png" type="image/png">
