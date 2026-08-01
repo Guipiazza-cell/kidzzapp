@@ -659,7 +659,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("kidzz_ref") : null) ||
       undefined;
 
+    // Escolha explícita do usuário manda: descarta qualquer plano pendente antigo
+    clearPendingCheckoutPlan();
+
     try {
+      console.log("[Checkout] plan selecionado", { plan: checkoutPlan });
       await openStripeCheckout(checkoutPlan, session.access_token, ref);
     } catch (err) {
       const { toast } = await import("sonner");
@@ -676,18 +680,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [navigate, session]);
 
   // Retoma o checkout automaticamente após o login (se havia plano pendente)
+  const resumedCheckoutRef = useRef(false);
   useEffect(() => {
     if (!session?.access_token) return;
+    if (resumedCheckoutRef.current) return;
     const pending = readPendingCheckoutPlan();
     if (!pending) return;
+    resumedCheckoutRef.current = true;
+    // Consome imediatamente pra nunca reabrir um plano antigo depois
+    clearPendingCheckoutPlan();
     navigate("/auth?checkout=1", { replace: true });
     // pequena espera pra garantir que profile/sub estejam prontos
     const t = setTimeout(() => {
-      clearPendingCheckoutPlan();
       handleCheckout(pending);
     }, 400);
     return () => clearTimeout(t);
   }, [session, handleCheckout, navigate]);
+
 
   const openCustomerPortal = useCallback(async () => {
     if (!session?.access_token) {
