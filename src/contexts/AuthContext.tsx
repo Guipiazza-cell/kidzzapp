@@ -70,13 +70,16 @@ const normalizeCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_pre
   return plan;
 };
 
+const PENDING_PLAN_TTL = 30 * 60 * 1000; // 30 min: evita plano fantasma de sessões antigas
+
 const savePendingCheckoutPlan = (plan: CheckoutPlan | "super_premium" | "super_premium_annual") => {
   if (typeof window === "undefined") return;
   const normalized = normalizeCheckoutPlan(plan);
-  try { window.sessionStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {
+  const payload = JSON.stringify({ plan: normalized, ts: Date.now() });
+  try { window.sessionStorage.setItem(PENDING_PLAN_STORAGE_KEY, payload); } catch {
     // Storage can be unavailable in private browsing.
   }
-  try { window.localStorage.setItem(PENDING_PLAN_STORAGE_KEY, normalized); } catch {
+  try { window.localStorage.setItem(PENDING_PLAN_STORAGE_KEY, payload); } catch {
     // Storage can be unavailable in private browsing.
   }
 };
@@ -87,11 +90,19 @@ const readPendingCheckoutPlan = (): CheckoutPlan | null => {
     const stored = window.sessionStorage.getItem(PENDING_PLAN_STORAGE_KEY)
       || window.localStorage.getItem(PENDING_PLAN_STORAGE_KEY);
     if (!stored) return null;
-    return normalizeCheckoutPlan(stored as CheckoutPlan | "super_premium" | "super_premium_annual");
+    let raw = stored;
+    if (stored.startsWith("{")) {
+      const parsed = JSON.parse(stored) as { plan?: string; ts?: number };
+      if (!parsed.plan) return null;
+      if (typeof parsed.ts === "number" && Date.now() - parsed.ts > PENDING_PLAN_TTL) return null;
+      raw = parsed.plan;
+    }
+    return normalizeCheckoutPlan(raw as CheckoutPlan | "super_premium" | "super_premium_annual");
   } catch {
     return null;
   }
 };
+
 
 const clearPendingCheckoutPlan = () => {
   if (typeof window === "undefined") return;
