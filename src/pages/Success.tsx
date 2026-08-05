@@ -70,11 +70,12 @@ const Success = () => {
   const [confirming, setConfirming] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
 
-  // Poll for subscription confirmation (webhook can take a few seconds)
+  // Poll for subscription confirmation. Quem libera acesso é o webhook —
+  // esta tela só consulta get_effective_plan até virar pago.
   useEffect(() => {
     let cancelled = false;
     let attempts = 0;
-    const maxAttempts = 8;
+    const maxAttempts = 12;
 
     const tick = async () => {
       attempts += 1;
@@ -98,16 +99,17 @@ const Success = () => {
     };
   }, [refreshSubscription, refreshEntitlement]);
 
-  // Detect activation
+  // Detect activation — fonte de verdade: get_effective_plan (useEntitlement)
   useEffect(() => {
-    if (profile?.is_premium && !confirmed) {
+    if (effectivePlan !== "free" && !confirmed) {
       setConfirmed(true);
       setConfirming(false);
       // Premium activation feedback
       import("@/lib/sfx").then(({ sfx }) => sfx("reward"));
       import("@/lib/haptics").then(({ haptic }) => haptic("success"));
     }
-  }, [profile?.is_premium, confirmed]);
+  }, [effectivePlan, confirmed]);
+
 
   const childName = profile?.child_name || "seu filho";
   // Fonte autoritativa: useEntitlement().plan (lê de subscriptions via get_effective_plan).
