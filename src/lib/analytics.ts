@@ -3,6 +3,7 @@
 // criança ou pais (nomes, diários, sonhos, respostas, mensagens, fotos).
 // Somente IDs, contagens, nomes de aba e durações.
 import posthog from "posthog-js";
+import { supabase } from "@/integrations/supabase/client";
 
 export type TabName =
   | "perguntas"
@@ -32,6 +33,32 @@ const capture = (event: string, props?: Record<string, unknown>): void => {
     /* analytics nunca quebra o app */
   }
 };
+
+/**
+ * Grava a conclusão no banco (fonte de verdade). Silencioso para visitantes
+ * não autenticados; nunca quebra o fluxo da UI.
+ */
+const persistConclusao = async (props: {
+  tab: TabName;
+  activity_id: string;
+  duration_seconds: number;
+  title?: string;
+}): Promise<void> => {
+  try {
+    const { data } = await supabase.auth.getUser();
+    const userId = data.user?.id;
+    if (!userId) return;
+    await supabase.from("conclusoes").insert({
+      user_id: userId,
+      titulo_snapshot: props.title ?? `${props.tab}:${props.activity_id}`,
+      tela_min: Math.max(0, Math.round(props.duration_seconds / 60)),
+      feito_em: new Date().toISOString(),
+    });
+  } catch {
+    /* analytics/persistência nunca quebra o app */
+  }
+};
+
 
 export const analytics = {
   identify(userId: string, props?: { email?: string; created_at?: string }): void {
@@ -64,9 +91,27 @@ export const analytics = {
     capture("activity_started", props);
   },
 
-  activityCompleted(props: { tab: TabName; activity_id: string; duration_seconds: number }): void {
-    capture("activity_completed", props);
+  /**
+   * Conclusão de atividade com duração real.
+   * O banco (public.conclusoes) é a fonte de verdade; o PostHog é o complemento.
+   */
+  activityCompleted(props: {
+    tab: TabName;
+    activity_id: string;
+    duration_seconds: number;
+    /** Rótulo curto da atividade (nunca texto escrito por pais/criança). */
+    title?: string;
+  }): void {
+    const { title, ...eventProps } = props;
+    capture("activity_completed", eventProps);
+    void persistConclusao(props);
   },
+
+  /** Marcar/desmarcar tarefa da Rotina (não é atividade com início e fim). */
+  routineTaskChecked(props: { task_id: string; period: string }): void {
+    capture("routine_task_checked", props);
+  },
+
 
   shareClicked(props: { surface: string; content_type: string }): void {
     capture("share_clicked", props);

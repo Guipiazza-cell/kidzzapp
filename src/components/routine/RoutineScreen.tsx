@@ -551,8 +551,14 @@ const RoutineScreen = () => {
       haptic("success");
       const result = completeTask(id);
       if (!result.newlyDone) return;
-      analytics.activityStarted({ tab: "rotina", activity_id: id });
-      analytics.activityCompleted({ tab: "rotina", activity_id: id, duration_seconds: 0 });
+      analytics.routineTaskChecked({
+        task_id: id,
+        period:
+          [...view.morning, ...view.afternoon, ...view.night].find((t) => t.id === id)?.period ??
+          getCurrentPeriod(),
+      });
+
+
       setView(getToday());
       setStreak(getStreak());
       setMission(getMissionProgress());
@@ -619,7 +625,7 @@ const RoutineScreen = () => {
         setTimeout(() => setCelebrate(false), 4200);
       }
     },
-    [addMemory, childName, updateProfile],
+    [addMemory, childName, updateProfile, view],
   );
 
   return (
