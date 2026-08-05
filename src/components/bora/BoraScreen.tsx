@@ -459,10 +459,14 @@ const BoraScreen = ({ onBack }: Props) => {
         error={surpriseError}
         childName={firstName}
         onClose={closeSurprise}
-        onRetry={() =>
-          surprise(mood && mood !== "feliz" ? { energia: mood } : undefined).catch(() => {})
-        }
+        concluido={surpriseSalva}
+        onConcluir={registrarConclusaoIA}
+        onRetry={() => {
+          setSurpriseSalva(false);
+          surprise(mood && mood !== "feliz" ? { energia: mood } : undefined).catch(() => {});
+        }}
       />
+
 
       {/* Fundo florestal escuro + orbes dourados */}
       <div
