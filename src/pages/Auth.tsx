@@ -46,8 +46,8 @@ const Auth = () => {
         return;
       }
 
-      if (!password.trim() || password.length < 8) {
-        toast.error("A senha deve ter pelo menos 8 caracteres");
+      if (!password.trim() || password.length < 6) {
+        toast.error("A senha deve ter pelo menos 6 caracteres");
         setLoading(false);
         return;
       }
@@ -151,7 +151,7 @@ const Auth = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Senha (mínimo 8 caracteres)"
+                placeholder="Senha (mínimo 6 caracteres)"
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 className="w-full py-4 pl-11 pr-12 rounded-2xl bg-white text-[15px] placeholder:text-[#A89C8A] focus:outline-none transition-all"
                 style={{
@@ -160,7 +160,7 @@ const Auth = () => {
                   boxShadow: "0 1px 2px rgba(40,30,15,0.04)",
                 }}
                 required
-                minLength={8}
+                minLength={6}
               />
               <button
                 type="button"
