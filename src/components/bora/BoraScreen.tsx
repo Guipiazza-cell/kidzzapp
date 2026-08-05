@@ -9,6 +9,8 @@ import {
   Tent,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useCriancas } from "@/hooks/useCriancas";
 import { useSurpresaIA } from "@/hooks/useSurpresaIA";
