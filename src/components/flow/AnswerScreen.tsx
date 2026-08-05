@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, BookOpen, Bookmark, Share2 } from "lucide-react";
+import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, Bookmark, Share2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import confetti from "canvas-confetti";
 import { useTTS } from "@/hooks/useTTS";
@@ -44,7 +44,7 @@ interface Props {
 
 const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: Props) => {
   const { speak, stop } = useTTS();
-  const { profile, tier, handleCheckout, user } = useAuth();
+  const { profile, handleCheckout, user } = useAuth();
   const { addMemory } = useMemories();
   const { trackEvent } = useAchievementSync();
   const [playing, setPlaying] = useState(false);
