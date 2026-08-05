@@ -304,19 +304,24 @@ const DreamWorld = ({ onBack }: Props) => {
   }, []);
 
   const handleStart = useCallback(() => {
-    if (Object.keys(activeSounds).length === 0 && !selectedStory) return;
+    // Sem selecao explicita: comeca com a primeira historia (nunca deixa o CTA inerte).
+    const storyId = selectedStory
+      ?? (Object.keys(activeSounds).length === 0 ? SLEEP_STORIES[0]?.id ?? null : null);
+    if (storyId && storyId !== selectedStory) setSelectedStory(storyId);
+
     setView("playing");
     setIsPlaying(true);
     const seconds = timerMinutes === 0 ? 60 * 60 : timerMinutes * 60;
     setTimeLeft(seconds);
 
-    if (selectedStory) {
-      const story = SLEEP_STORIES.find((s) => s.id === selectedStory);
+    if (storyId) {
+      const story = SLEEP_STORIES.find((s) => s.id === storyId);
       if (story) {
         setIsNarrating(true);
         narratorRef.current?.speak(story.text, () => setIsNarrating(false));
       }
     }
+
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -675,12 +680,11 @@ const DreamWorld = ({ onBack }: Props) => {
         <div style={{ padding: "16px 16px 0", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .14s both" }}>
           <motion.button
             onClick={handleStart}
-            disabled={!hasSelection}
             whileTap={{ scale: 0.98 }}
             style={{
               ...goldCta,
-              cursor: hasSelection ? "pointer" : "default",
-              opacity: hasSelection ? 1 : 0.55,
+              cursor: "pointer",
+              opacity: 1,
             }}
           >
             <div style={{ position: "absolute", top: 0, left: 0, width: "55%", height: "100%", pointerEvents: "none", background: "linear-gradient(105deg,transparent 0%,rgba(255,255,255,.35) 50%,transparent 100%)", animation: "sonh-shine 6s ease-in-out infinite" }} />
@@ -689,10 +693,11 @@ const DreamWorld = ({ onBack }: Props) => {
           </motion.button>
           {!hasSelection && (
             <p style={{ margin: "8px 4px 0", fontSize: 10.5, fontWeight: 700, color: "rgba(220,206,240,.55)", textAlign: "center" }}>
-              Escolha uma história ou um som para começar.
+              Escolha uma história ou um som, ou toque para começar com a primeira história.
             </p>
           )}
         </div>
+
 
         {/* ── AÇÕES DA NOITE ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11, padding: "14px 16px 0", animation: "sonh-cascade .6s cubic-bezier(.22,1,.36,1) .2s both" }}>

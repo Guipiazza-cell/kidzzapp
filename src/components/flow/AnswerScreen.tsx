@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, BookOpen, Bookmark, Share2 } from "lucide-react";
+import { Volume2, VolumeX, ArrowLeft, Heart, Sparkles, Bookmark, Share2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import confetti from "canvas-confetti";
 import { useTTS } from "@/hooks/useTTS";
@@ -44,7 +44,7 @@ interface Props {
 
 const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: Props) => {
   const { speak, stop } = useTTS();
-  const { profile, tier, handleCheckout, user } = useAuth();
+  const { profile, handleCheckout, user } = useAuth();
   const { addMemory } = useMemories();
   const { trackEvent } = useAchievementSync();
   const [playing, setPlaying] = useState(false);
@@ -52,7 +52,7 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
   const [memorySaved, setMemorySaved] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const isPremium = profile?.is_premium ?? false;
-  const isSuperPremium = tier === "premium";
+  
   const trackedRef = useRef(false);
   const logIdRef = useRef<string | null>(null);
   const loggedRef = useRef(false);
@@ -520,27 +520,8 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </motion.button>
         </motion.div>
 
-        {isSuperPremium && (
-          <motion.button
-            type="button"
-            onClick={onOpenStoryFactory}
-            className="w-full mt-2.5 flex items-center justify-center gap-2 active:scale-[0.98]"
-            style={{
-              minHeight: 48,
-              fontWeight: 800,
-              fontSize: 13.5,
-              color: "#1A2818",
-              ...dockPill,
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.34 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            <BookOpen size={16} />
-            Transformar em história
-          </motion.button>
-        )}
+
+
 
         <motion.button
           type="button"
