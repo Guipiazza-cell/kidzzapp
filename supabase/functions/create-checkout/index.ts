@@ -84,11 +84,26 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    // Reutiliza SEMPRE o mesmo customer do usuário (nunca duplica cadastro).
     let customerId: string | undefined;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    const { data: subRow } = await supabaseAdmin
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (subRow?.stripe_customer_id) {
+      try {
+        const c = await stripe.customers.retrieve(subRow.stripe_customer_id as string);
+        if (c && !("deleted" in c && c.deleted)) customerId = (c as any).id;
+      } catch (e) {
+        logStep("stored customer invalid", { e: String(e) });
+      }
     }
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length > 0) customerId = customers.data[0].id;
+    }
+
 
     // SECURITY: never trust the Origin header — validate against an allowlist to prevent open-redirect phishing.
     const ALLOWED_ORIGINS = new Set([
