@@ -36,7 +36,8 @@ export function usePlan() {
       return;
     }
     try {
-      const { data } = await (supabase as any).rpc("get_effective_plan", { _user_id: user.id });
+      const { data, error } = await (supabase as any).rpc("get_effective_plan", { _user_id: user.id });
+      if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
       const plan = (row?.plan ?? "free") as PlanName;
       setState({
@@ -47,9 +48,11 @@ export function usePlan() {
         isPaid: plan !== "free",
         loading: false,
       });
-    } catch {
+    } catch (err) {
+      console.warn("[usePlan] get_effective_plan falhou", err);
       setState({ ...EMPTY, loading: false });
     }
+
   }, [user]);
 
   useEffect(() => {
