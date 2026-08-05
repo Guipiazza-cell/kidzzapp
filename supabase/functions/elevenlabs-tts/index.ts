@@ -39,12 +39,49 @@ serve(async (req) => {
     }
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
-    if (!ELEVENLABS_API_KEY) {
-      return new Response(JSON.stringify({ error: "ElevenLabs API key not configured" }), {
-        status: 500,
+    /** Fallback premium: narração via Lovable AI (voz feminina suave, pt-BR). */
+    const speakWithLovableAI = async (): Promise<Response> => {
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: "TTS_UNAVAILABLE", fallback: true }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-4o-mini-tts",
+          input: text,
+          voice: "shimmer",
+          response_format: "mp3",
+          stream_format: "audio",
+          instructions:
+            "Fale em português do Brasil, com voz feminina calma, mansa e acolhedora, ritmo lento, como quem conta história para uma criança dormir.",
+        }),
+      });
+      if (!aiRes.ok) {
+        const errText = await aiRes.text().catch(() => "");
+        console.error("Lovable AI TTS error:", aiRes.status, errText);
+        return new Response(
+          JSON.stringify({ error: "TTS_UNAVAILABLE", fallback: true, status: aiRes.status }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const buf = await aiRes.arrayBuffer();
+      return new Response(JSON.stringify({ audioContent: base64Encode(buf), provider: "lovable-ai" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    };
+
+    if (!ELEVENLABS_API_KEY) {
+      return await speakWithLovableAI();
     }
+
 
     // Voz: aceita override via body.voiceId. Default = "Amanda Kelly"
     // (feminina, mansa e serena).
