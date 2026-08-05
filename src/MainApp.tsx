@@ -75,7 +75,9 @@ const MainApp = () => {
 
             </Routes>
           </Suspense>
+          <GraceBanner />
           <AppUpdateBanner />
+
           <InstallBanner />
           <OfflineIndicator />
           <KidzzShareTrigger />
