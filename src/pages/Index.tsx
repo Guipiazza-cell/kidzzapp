@@ -118,6 +118,8 @@ const markIntroSettled = () => {
   } catch {}
 };
 
+import { analytics } from "@/lib/analytics";
+
 const Index = () => {
   // ============================================================
   // REGRA DE OURO DESTE ARQUIVO (não mover!):
@@ -342,6 +344,8 @@ const Index = () => {
   // Derivação segura: funciona mesmo durante o onboarding (profile parcial)
   const childName = profile?.child_name ?? "";
 
+  const questionStartRef = useRef<number>(0);
+
   const handleQuestionSubmit = useCallback((q: string) => {
     // Sem sessão → fica na home com toast (não joga pra /auth e “some” a pergunta)
     if (!user || !session?.access_token) {
@@ -358,11 +362,20 @@ const Index = () => {
       return;
     }
     setQuestion(q);
+    questionStartRef.current = Date.now();
+    analytics.activityStarted({ tab: "perguntas", activity_id: "question" });
     setStep("generating");
   }, [canAskQuestion, profile?.questions_used, user, session?.access_token, navigate]);
 
   const handleAnswerReady = useCallback((text: string) => {
     setAnswer(text);
+    analytics.activityCompleted({
+      tab: "perguntas",
+      activity_id: "question",
+      duration_seconds: questionStartRef.current
+        ? Math.max(0, Math.round((Date.now() - questionStartRef.current) / 1000))
+        : 0,
+    });
     // Vai direto para a resposta (sem tela intermediária de celebração)
     setStep("answer");
     evolution.evolve("question");
