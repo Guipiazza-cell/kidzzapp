@@ -625,7 +625,7 @@ const RoutineScreen = () => {
         setTimeout(() => setCelebrate(false), 4200);
       }
     },
-    [addMemory, childName, updateProfile],
+    [addMemory, childName, updateProfile, view],
   );
 
   return (
