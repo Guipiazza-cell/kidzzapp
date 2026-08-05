@@ -15,6 +15,7 @@ import heroMemorias from "@/assets/memorias-hero.jpg";
 import iconPerguntaUrl from "@/assets/memorias/icon-pergunta.png";
 import iconHistoriaUrl from "@/assets/memorias/icon-historia.png";
 import iconMissaoUrl from "@/assets/memorias/icon-missao.png";
+import { analytics } from "@/lib/analytics";
 
 /**
  * MemoriesAlbum - redesign premium v2
@@ -317,6 +318,7 @@ const MemoriesAlbum = ({
   const handleShare = useCallback(
     async (m: Memory) => {
       const shareText = `${m.title}\n\n${m.content || ""}\n\nCriado com KIDZZ - kidzzapp.lovable.app`;
+      analytics.shareClicked({ surface: "memorias", content_type: "memory" });
       if (navigator.share) {
         try {
           await navigator.share({ title: `Memória de ${childName}`, text: shareText });

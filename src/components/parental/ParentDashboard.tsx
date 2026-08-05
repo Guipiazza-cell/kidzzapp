@@ -188,6 +188,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
         title: `Semana de ${childName}`,
         text: `${childName} esta semana: ${weekQs.length} perguntas, ${weekStories} histórias, streak ${streak}d 🔥`,
         filename: `kidzz-semana-${childName.toLowerCase()}.png`,
+        surface: "parent_dashboard", contentType: "weekly_recap",
       });
       if (ok) toast.success("Conquistas compartilhadas! ✨");
     } catch {

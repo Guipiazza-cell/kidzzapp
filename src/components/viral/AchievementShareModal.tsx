@@ -31,6 +31,7 @@ const AchievementShareModal = ({
         title: `${childName} desbloqueou: ${achievementTitle}!`,
         text: `${childName} acabou de conquistar "${achievementTitle}" no KIDZZ! ${achievementEmoji} Curiosidade que vira memória 💛`,
         filename: `kidzz-conquista-${achievementTitle.toLowerCase().replace(/\s+/g, "-")}.png`,
+        surface: "achievement_modal", contentType: "achievement",
       });
       if (ok) toast.success("Conquista compartilhada! ✨");
     } catch {

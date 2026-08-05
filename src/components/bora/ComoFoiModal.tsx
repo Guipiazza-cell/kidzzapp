@@ -77,6 +77,7 @@ export const ComoFoiModal = ({ open, onClose, onSaved, activity, criancaId, chil
         title: "Momento Sem Tela 🌿",
         text: `Hoje a gente brincou de verdade. ${activity.tela_min} min sem tela. #MovimentoMenosTela`,
         filename: `kidzz-momento-${Date.now()}.png`,
+        surface: "bora_como_foi", contentType: "moment",
       });
     } finally {
       setSharing(false);

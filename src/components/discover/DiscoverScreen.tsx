@@ -7,6 +7,7 @@ import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./d
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
 import heroDescobrir from "@/assets/descobrir-hero.jpg";
+import { analytics } from "@/lib/analytics";
 
 // ============================================================
 // DiscoverScreen - premium v2 (ref: public/telas/DESCOBRIR)
@@ -796,6 +797,7 @@ async function shareBadge(activity: Activity, childName: string) {
     text: `${text}\n\nDescoberto no Kidzz. Menos tela, mais memórias.`,
   };
   try {
+    analytics.shareClicked({ surface: "descobrir", content_type: "discovery" });
     if (navigator.share) {
       await navigator.share(shareData);
       return;

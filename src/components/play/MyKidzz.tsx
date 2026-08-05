@@ -23,6 +23,7 @@ import { loadMascotConfig, type MascotConfig, type LabExpression, type LabEnergy
 import html2canvas from "html2canvas";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
+import { analytics } from "@/lib/analytics";
 
 // Hue values must match KidzzLab + HomeScreen for consistency across the app
 const COLORS = [
@@ -174,6 +175,7 @@ const MyKidzz = ({ onBack }: Props) => {
       const text = `Olha o KIDZZ d${childName.endsWith("a") ? "a" : "o"} ${childName}! Crie o seu em kidzzapp.lovable.app`;
 
       if (navigator.canShare?.({ files: [file] })) {
+        analytics.shareClicked({ surface: "my_kidzz", content_type: "avatar" });
         await navigator.share({ files: [file], title: "Meu KIDZZ", text });
         toast.success("Compartilhado!");
       } else {

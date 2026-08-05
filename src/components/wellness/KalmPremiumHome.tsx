@@ -49,6 +49,7 @@ import {
 import KidzzLogo from "@/components/common/KidzzLogo";
 
 import { CAMALEAO, CAMALEAO_SCENE_MASK } from "@/lib/camaleaoOficial";
+import { analytics } from "@/lib/analytics";
 
 const AS = "/exemplos/assets/kalm-v2";
 const AV = "v9";
@@ -346,6 +347,7 @@ const KalmPremiumHome = ({ go, onBack, onOpenParent, initialExperienceId, onCons
   const share = async () => {
     const txt = `Esta semana: ${wins} vitórias e ${grat} momentos no jarro - KALM by Kidzz`;
     try {
+      analytics.shareClicked({ surface: "kalm", content_type: "tip" });
       if (navigator.share) await navigator.share({ title: "KALM", text: txt });
       else await navigator.clipboard.writeText(txt);
       haptic("light");
