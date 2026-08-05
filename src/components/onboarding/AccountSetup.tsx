@@ -64,37 +64,61 @@ const toE164 = (raw: string): string => {
 
 import { analytics, consumeOnboardingSeconds } from "@/lib/analytics";
 
+/** Converte "3-7" / "5" / "7-10" numa idade inteira utilizável. */
+export const parseIdade = (value: unknown): number | null => {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.round(value);
+  if (typeof value !== "string") return null;
+  const nums = value.match(/\d+/g)?.map(Number) ?? [];
+  if (nums.length === 0) return null;
+  if (nums.length === 1) return nums[0];
+  return Math.round((nums[0] + nums[1]) / 2);
+};
+
 const syncGuestProfile = async (userId: string) => {
   const guest = readGuestProfile();
   if (!guest) return;
+  const nome = guest.child_name ?? "";
+  const idade = parseIdade(guest.idade ?? guest.age_range ?? null);
+  const interesses: string[] = guest.child_interests ?? [];
+  const materiais: string[] = guest.materiais_em_casa ?? [];
   try {
-    // Single source of truth: idempotent RPC. Locks profile row, sets
-    // onboarding_done=true atomically. Safe under double-tap / re-entry.
-    const { error } = await supabase.rpc("complete_onboarding", {
-      p_child_name: guest.child_name ?? "",
-      p_age_range: guest.age_range ?? null,
-      p_child_interests: guest.child_interests ?? [],
+    // Fonte de verdade: grava profile E cria/atualiza a criança em `criancas`
+    // no mesmo passo, de forma idempotente.
+    const { error } = await (supabase as any).rpc("complete_onboarding_v2", {
+      p_child_name: nome,
+      p_idade: idade,
+      p_interests: interesses,
+      p_materiais: materiais,
     });
     if (error) {
-      console.warn("[AccountSetup] complete_onboarding failed", error);
-      // Fallback: legacy upsert keeps the user moving even if RPC fails.
-      await supabase
-        .from("profiles")
-        .upsert(
-          {
-            id: userId,
-            child_name: guest.child_name ?? "",
-            age_range: guest.age_range ?? null,
-            child_interests: guest.child_interests ?? [],
-            onboarding_done: true,
-          } as any,
-          { onConflict: "id" }
-        );
+      console.warn("[AccountSetup] complete_onboarding_v2 failed", error);
+      // Fallback: RPC antiga + insert direto da criança.
+      await (supabase as any).rpc("complete_onboarding", {
+        p_child_name: nome,
+        p_age_range: guest.age_range ?? null,
+        p_child_interests: interesses,
+      });
+      const { data: existing } = await supabase
+        .from("criancas")
+        .select("id")
+        .eq("user_id", userId)
+        .limit(1)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from("criancas").insert({
+          user_id: userId,
+          nome: nome || "Meu filho",
+          idade,
+          interesses,
+          materiais_em_casa: materiais,
+        });
+      }
     }
   } catch (err) {
     console.warn("[AccountSetup] guest sync failed", err);
   }
 };
+
 
 type Tab = "email" | "phone";
 type Mode = "signup" | "signin";

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X, Clock, Leaf } from "lucide-react";
+import { Sparkles, X, Clock, Leaf, Check } from "lucide-react";
 import type { IaActivity } from "@/hooks/useSurpresaIA";
 
 type Props = {
@@ -10,9 +10,12 @@ type Props = {
   childName?: string;
   onClose: () => void;
   onRetry: () => void;
+  onConcluir?: (activity: IaActivity) => void;
+  concluido?: boolean;
 };
 
-export const SurpresaModal = ({ open, loading, activity, error, childName, onClose, onRetry }: Props) => {
+export const SurpresaModal = ({ open, loading, activity, error, childName, onClose, onRetry, onConcluir, concluido = false }: Props) => {
+
   return (
     <AnimatePresence>
       {open && (
@@ -132,13 +135,26 @@ export const SurpresaModal = ({ open, loading, activity, error, childName, onClo
                   </div>
                 )}
 
+                {onConcluir && (
+                  <button
+                    onClick={() => onConcluir(activity)}
+                    disabled={concluido}
+                    className="mt-5 w-full rounded-full py-3 font-bold text-white text-base min-h-[48px]"
+                    style={{ background: concluido ? "#8A9580" : "linear-gradient(180deg, #6BBF4A 0%, #2F5E1F 100%)", boxShadow: "0 12px 28px -10px rgba(47,94,31,0.6)" }}
+                  >
+                    <Check size={16} className="inline mr-1" />
+                    {concluido ? "Atividade registrada" : "Já fizemos essa"}
+                  </button>
+                )}
+
                 <button
                   onClick={onRetry}
-                  className="mt-5 w-full rounded-full py-3 font-bold text-white text-base"
+                  className="mt-3 w-full rounded-full py-3 font-bold text-white text-base min-h-[48px]"
                   style={{ background: "linear-gradient(180deg, #FF9A4D 0%, #E8772A 100%)", boxShadow: "0 12px 28px -10px rgba(232,119,42,0.6)" }}
                 >
                   <Sparkles size={16} className="inline mr-1" /> Outra surpresa
                 </button>
+
               </div>
             )}
           </motion.div>

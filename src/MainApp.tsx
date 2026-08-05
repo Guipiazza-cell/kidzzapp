@@ -8,6 +8,8 @@ import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
 import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
 import LevelUpOverlay from "./components/flow/LevelUpOverlay";
+import GraceBanner from "./components/subscription/GraceBanner";
+
 import { PaywallProvider } from "@/components/paywall/PaywallProvider";
 import { markSeen, markLevelUp } from "@/lib/emotionalState";
 import { markOnboardingStart } from "@/lib/analytics";
@@ -21,6 +23,9 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Admin = lazy(() => import("./pages/Admin"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
+const MinhaAssinatura = lazy(() => import("./pages/MinhaAssinatura"));
+const MinhasCriancas = lazy(() => import("./pages/MinhasCriancas"));
+
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isReady } = useAuth();
@@ -65,11 +70,16 @@ const MainApp = () => {
               <Route path="/landing" element={<Landing />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="/assinatura" element={<ProtectedRoute><MinhaAssinatura /></ProtectedRoute>} />
+              <Route path="/criancas" element={<ProtectedRoute><MinhasCriancas /></ProtectedRoute>} />
               <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
               <Route path="*" element={<NotFound />} />
+
             </Routes>
           </Suspense>
+          <GraceBanner />
           <AppUpdateBanner />
+
           <InstallBanner />
           <OfflineIndicator />
           <KidzzShareTrigger />

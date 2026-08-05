@@ -608,6 +608,33 @@ export type Database = {
           },
         ]
       }
+      stripe_orphan_events: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          payload: Json | null
+          stripe_customer_id: string | null
+          type: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          payload?: Json | null
+          stripe_customer_id?: string | null
+          type?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          payload?: Json | null
+          stripe_customer_id?: string | null
+          type?: string | null
+        }
+        Relationships: []
+      }
       stripe_processed_events: {
         Row: {
           created_at: string
@@ -713,6 +740,15 @@ export type Database = {
           p_child_name: string
         }
         Returns: undefined
+      }
+      complete_onboarding_v2: {
+        Args: {
+          p_child_name: string
+          p_idade?: number
+          p_interests?: string[]
+          p_materiais?: string[]
+        }
+        Returns: string
       }
       ensure_indicacao_codigo: { Args: never; Returns: string }
       get_bora_stats: {

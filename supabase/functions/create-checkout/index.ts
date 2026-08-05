@@ -84,11 +84,26 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    // Reutiliza SEMPRE o mesmo customer do usuário (nunca duplica cadastro).
     let customerId: string | undefined;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    const { data: subRow } = await supabaseAdmin
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (subRow?.stripe_customer_id) {
+      try {
+        const c = await stripe.customers.retrieve(subRow.stripe_customer_id as string);
+        if (c && !("deleted" in c && c.deleted)) customerId = (c as any).id;
+      } catch (e) {
+        logStep("stored customer invalid", { e: String(e) });
+      }
     }
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length > 0) customerId = customers.data[0].id;
+    }
+
 
     // SECURITY: never trust the Origin header — validate against an allowlist to prevent open-redirect phishing.
     const ALLOWED_ORIGINS = new Set([
@@ -113,18 +128,21 @@ serve(async (req) => {
     const metadata: Record<string, string> = { user_id: user.id, plan };
     if (refCode) metadata.ref = refCode;
 
-    // Sem trial de 7 dias: cobrança começa no checkout (Stripe Subscription normal).
+    // Sem período de teste: o cartão é cobrado no ato do checkout.
     const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
+      client_reference_id: user.id,
       payment_method_types: ['card'],
+      payment_method_collection: "always",
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?paywall=1`,
       metadata,
       subscription_data: { metadata },
     });
+
     logStep("Stripe checkout session created", { sessionId: session.id, hasUrl: Boolean(session.url), customerId: customerId || "new", origin });
 
     if (refCode && session.id) {
