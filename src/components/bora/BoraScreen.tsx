@@ -282,7 +282,27 @@ const BoraScreen = ({ onBack }: Props) => {
     tela_min: 15,
   };
 
+  const [surpriseSalva, setSurpriseSalva] = useState(false);
+  const registrarConclusaoIA = async (act: { id?: string; titulo: string; tela_min?: number }) => {
+    if (!user || surpriseSalva) return;
+    setSurpriseSalva(true);
+    const { error } = await supabase.from("conclusoes").insert({
+      user_id: user.id,
+      crianca_id: firstCrianca?.id || null,
+      activity_id: act.id || null,
+      titulo_snapshot: act.titulo,
+      tela_min: act.tela_min ?? 0,
+    });
+    if (error) {
+      console.warn("[Bora] conclusao insert failed", error);
+      setSurpriseSalva(false);
+      return;
+    }
+    refreshStats();
+  };
+
   const [guardaOpen, setGuardaOpen] = useState(false);
+
   const handleBoraFazer = () => setGuardaOpen(true);
   const handleGuardaDone = () => {
     setGuardaOpen(false);
