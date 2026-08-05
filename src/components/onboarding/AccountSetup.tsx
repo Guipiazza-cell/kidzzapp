@@ -62,6 +62,8 @@ const toE164 = (raw: string): string => {
   return `+55${digits.startsWith("55") ? digits.slice(2) : digits}`;
 };
 
+import { analytics, consumeOnboardingSeconds } from "@/lib/analytics";
+
 const syncGuestProfile = async (userId: string) => {
   const guest = readGuestProfile();
   if (!guest) return;
@@ -132,7 +134,13 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
 
   const finishSuccess = useCallback(
     async (userId?: string) => {
-      if (userId) await syncGuestProfile(userId);
+      if (userId) {
+        await syncGuestProfile(userId);
+        analytics.onboardingDone({
+          child_count: 1,
+          seconds_to_complete: consumeOnboardingSeconds(),
+        });
+      }
       // Refetch profile so Index sees onboarding_done=true and drops into the app.
       try { await refreshProfile(); } catch {}
       setSuccess(true);
