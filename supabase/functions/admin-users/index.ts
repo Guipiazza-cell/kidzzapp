@@ -50,9 +50,10 @@ serve(async (req) => {
 
       // Get premium users
       const { count: premiumUsers } = await supabase
-        .from("profiles")
-        .select("id", { count: "exact", head: true })
-        .eq("is_premium", true);
+        .from("subscriptions")
+        .select("user_id", { count: "exact", head: true })
+        .in("status", ["active", "trialing"])
+        .gt("current_period_end", new Date().toISOString());
 
       // Get total questions asked (sum of questions_used)
       const { data: questionStats } = await supabase
@@ -116,12 +117,18 @@ serve(async (req) => {
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, child_name, is_premium, premium_source, plan_end_date, created_at, points, streak_days, level, questions_used")
+        .select("id, child_name, created_at, points, streak_days, level, questions_used")
         .in("id", userIds);
+
+      const { data: subscriptions } = await supabase
+        .from("subscriptions")
+        .select("user_id, plan, status, current_period_end, is_lifetime")
+        .in("user_id", userIds);
 
       const users = (profiles || []).map((p: any) => {
         const authUser = matchingUsers.find((u: any) => u.id === p.id);
-        return { ...p, email: authUser?.email };
+        const subscription = (subscriptions || []).find((s: any) => s.user_id === p.id);
+        return { ...p, email: authUser?.email, subscription };
       });
 
       return new Response(JSON.stringify({ users }), {
@@ -131,11 +138,11 @@ serve(async (req) => {
 
     if (action === "activate") {
       const { userId, planEndDate } = body;
-      await supabase.from("profiles").update({
-        is_premium: true,
-        premium_source: "manual",
-        plan_end_date: planEndDate || null,
-      }).eq("id", userId);
+      const end = planEndDate || new Date(Date.now() + 30 * 86400000).toISOString();
+      await supabase.from("subscriptions").upsert({
+        user_id: userId, plan: "premium", status: "active",
+        current_period_end: end, updated_at: new Date().toISOString(),
+      }, { onConflict: "user_id" });
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -144,11 +151,10 @@ serve(async (req) => {
 
     if (action === "deactivate") {
       const { userId } = body;
-      await supabase.from("profiles").update({
-        is_premium: false,
-        premium_source: null,
-        plan_end_date: null,
-      }).eq("id", userId);
+      await supabase.from("subscriptions").update({
+        plan: "free", status: "canceled", current_period_end: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }).eq("user_id", userId).eq("is_lifetime", false);
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -158,9 +164,9 @@ serve(async (req) => {
     if (action === "extend") {
       const { userId, planEndDate } = body;
       if (!planEndDate) throw new Error("planEndDate required");
-      await supabase.from("profiles").update({
-        plan_end_date: planEndDate,
-      }).eq("id", userId);
+      await supabase.from("subscriptions").update({
+        current_period_end: planEndDate, updated_at: new Date().toISOString(),
+      }).eq("user_id", userId);
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
