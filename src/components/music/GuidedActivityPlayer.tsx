@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { analytics } from "@/lib/analytics";
 import { ArrowLeft, Share2, RotateCw, Save, Play, Pause } from "lucide-react";
 import LivingForest from "./LivingForest";
 import { useTTS } from "@/hooks/useTTS";
@@ -105,6 +106,7 @@ function stepsForActivity(id: string, kind: GuidedActivity["kind"]): StepCard[] 
 }
 
 const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
+  const startTsRef = useRef<number>(0);
   const [phase, setPhase] = useState<"intro" | "playing" | "finished">("intro");
   const [stepIdx, setStepIdx] = useState(0);
   const [saved, setSaved] = useState(false);
@@ -146,6 +148,8 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
   const start = () => {
     clearTimer();
     stop();
+    startTsRef.current = Date.now();
+    analytics.activityStarted({ tab: "musica", activity_id: activity.id });
     setPhase("playing");
     setStepIdx(0);
     announceStep(0);
@@ -167,6 +171,13 @@ const GuidedActivityPlayer = ({ activity, childName, onClose }: Props) => {
   const finish = () => {
     clearTimer();
     stop();
+    analytics.activityCompleted({
+      tab: "musica",
+      activity_id: activity.id,
+      duration_seconds: startTsRef.current
+        ? Math.max(0, Math.round((Date.now() - startTsRef.current) / 1000))
+        : 0,
+    });
     setPhase("finished");
     try {
       const { gained } = addXp("music");

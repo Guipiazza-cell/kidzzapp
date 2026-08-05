@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import KidzzShareCard, { AchievementCategory } from "./KidzzShareCard";
 import { captureAndShare, getChildName } from "@/lib/viralShare";
 import html2canvas from "html2canvas";
+import { analytics } from "@/lib/analytics";
 
 interface Props {
   title: string;
@@ -73,6 +74,7 @@ const KidzzShareModal = ({
 
   const handleShare = async () => {
     if (loading || !cardRef.current) return;
+    analytics.shareClicked({ surface: "kidzz_share_modal", content_type: category });
     setLoading("share");
     try {
       const ok = await captureAndShare(cardRef.current, { title, text, filename });
@@ -86,6 +88,7 @@ const KidzzShareModal = ({
 
   const handleWhatsApp = async () => {
     if (loading) return;
+    analytics.shareClicked({ surface: "kidzz_share_modal_whatsapp", content_type: category });
     setLoading("wpp");
     try {
       // Try native share with file (works on mobile WhatsApp)

@@ -10,6 +10,7 @@ import { sfx } from "@/lib/sfx";
 import type { Activity } from "./data";
 import { MOTOR_TINT } from "./data";
 import { useBadges, useKalmStreak } from "./state";
+import { analytics } from "@/lib/analytics";
 
 const usePrefersReducedMotion = () => {
   const [reduced, setReduced] = useState(false);
@@ -160,6 +161,7 @@ const GuidedPlayer = ({ activity, onClose, onSaveMoment }: Props) => {
   const [stepIdx, setStepIdx] = useState(0);
   const [done, setDone] = useState(false);
   const startedRef = useRef(false);
+  const startTsRef = useRef<number>(0);
   const { grant } = useBadges();
   const { markToday } = useKalmStreak();
 
@@ -172,6 +174,8 @@ const GuidedPlayer = ({ activity, onClose, onSaveMoment }: Props) => {
   useEffect(() => {
     if (!activity || startedRef.current) return;
     startedRef.current = true;
+    startTsRef.current = Date.now();
+    analytics.activityStarted({ tab: "kalm", activity_id: activity.id });
     markToday();
     grant("folha-calma");
   }, [activity, markToday, grant]);
@@ -184,7 +188,14 @@ const GuidedPlayer = ({ activity, onClose, onSaveMoment }: Props) => {
   const advance = () => {
     haptic("light"); sfx("click");
     if (stepIdx < totalSteps - 1) setStepIdx(stepIdx + 1);
-    else setDone(true);
+    else {
+      setDone(true);
+      analytics.activityCompleted({
+        tab: "kalm",
+        activity_id: activity.id,
+        duration_seconds: Math.max(0, Math.round((Date.now() - startTsRef.current) / 1000)),
+      });
+    }
   };
 
   const renderAnimation = () => {
