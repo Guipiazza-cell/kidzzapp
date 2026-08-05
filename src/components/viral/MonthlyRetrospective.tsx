@@ -50,6 +50,7 @@ const MonthlyRetrospective = ({ onClose, stats }: Props) => {
         title: `Retrospectiva ${monthName} - ${childName}`,
         text: shareText,
         filename: `kidzz-retrospectiva-${monthName.toLowerCase()}.png`,
+        surface: "monthly_retrospective", contentType: "retrospective",
       });
       if (ok) toast.success("Retrospectiva compartilhada! ✨");
     } catch {

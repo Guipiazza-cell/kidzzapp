@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAffiliate } from "@/hooks/useAffiliate";
 import { supabase } from "@/integrations/supabase/client";
 import KidzzChameleon from "@/components/kidzz/KidzzChameleon";
+import { analytics } from "@/lib/analytics";
 
 interface Props {
   onBack: () => void;
@@ -53,6 +54,7 @@ const ReferralProgram = ({ onBack }: Props) => {
   };
 
   const shareWhatsApp = () => {
+    analytics.shareClicked({ surface: "referral", content_type: "referral_link" });
     if (navigator.share) {
       navigator.share({ text: shareText, url: link }).catch(() => {});
     } else {

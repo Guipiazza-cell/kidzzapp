@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Clock, Users, Star, ChevronRight, Heart, Zap, Check } from "lucide-react";
 import MagicalBackground from "../MagicalBackground";
@@ -11,6 +11,7 @@ import { MISSION_PACKS, isPackPurchased, openMissionPackCheckout } from "@/lib/m
 import MomentsAlbum from "./MomentsAlbum";
 import aneImg from "@/assets/ane-chameleon.webp";
 import { toast } from "sonner";
+import { analytics } from "@/lib/analytics";
 
 interface Props {
   onBack: () => void;
@@ -25,6 +26,7 @@ const MomentsFactory = ({ onBack }: Props) => {
   const isPremium = canUse("momentos");
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const missionStartRef = useRef<number | null>(null);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [, setPurchasedTick] = useState(0);
 
@@ -33,11 +35,29 @@ const MomentsFactory = ({ onBack }: Props) => {
   const isMissionUnlocked = (index: number) => isPremium || index < FREE_MISSIONS;
 
   if (selectedMission) {
-    return <MissionDetail mission={selectedMission} onBack={() => setSelectedMission(null)} />;
+    return (
+      <MissionDetail
+        mission={selectedMission}
+        onBack={() => {
+          analytics.activityCompleted({
+            tab: "momentos",
+            activity_id: selectedMission.id,
+            duration_seconds: Math.max(
+              0,
+              Math.round((Date.now() - (missionStartRef.current ?? Date.now())) / 1000),
+            ),
+          });
+          missionStartRef.current = null;
+          setSelectedMission(null);
+        }}
+      />
+    );
   }
 
   const handleMissionClick = (mission: Mission, index: number) => {
     if (isMissionUnlocked(index)) {
+      missionStartRef.current = Date.now();
+      analytics.activityStarted({ tab: "momentos", activity_id: mission.id });
       setSelectedMission(mission);
     } else {
       setShowPaywall(true);

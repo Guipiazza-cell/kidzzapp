@@ -79,7 +79,7 @@ const ShareCardModal = (props: Props) => {
         filename = `kidzz-conquista-${Date.now()}.png`;
       }
 
-      const ok = await captureAndShare(cardRef.current, { title, text, filename });
+      const ok = await captureAndShare(cardRef.current, { title, text, filename, surface: "share_card_modal", contentType: "achievement" });
       if (ok) toast.success("Compartilhado! ✨");
     } catch {
       toast.error("Não foi possível gerar a imagem agora");

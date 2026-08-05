@@ -4,6 +4,7 @@ import { ArrowLeft, Sparkles, Play, Pause, Share2, Save } from "lucide-react";
 import { MusicEngine, type Song, type SongStep } from "./MusicEngine";
 import { addMusicXp, bumpCounter, type MusicAchievement } from "@/lib/musicXp";
 import { useMemories } from "@/hooks/useMemories";
+import { analytics } from "@/lib/analytics";
 
 interface Props {
   onBack: () => void;
@@ -134,6 +135,7 @@ const CreateMusic = ({ onBack, childName, onAchievement }: Props) => {
     if (!song) return;
     const text = `🎼 ${childName} compôs "${song.title}" no KIDZZ! ${seed?.emoji}${mood?.emoji}${rhythm?.emoji}`;
     addMusicXp("share");
+    analytics.shareClicked({ surface: "musica", content_type: "song" });
     if (navigator.share) {
       try { await navigator.share({ title: song.title, text }); } catch { /* cancelled */ }
     } else {

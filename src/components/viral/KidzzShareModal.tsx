@@ -77,7 +77,7 @@ const KidzzShareModal = ({
     analytics.shareClicked({ surface: "kidzz_share_modal", content_type: category });
     setLoading("share");
     try {
-      const ok = await captureAndShare(cardRef.current, { title, text, filename });
+      const ok = await captureAndShare(cardRef.current, { title, text, filename, surface: "kidzz_share_modal", contentType: "achievement" });
       if (ok) toast.success("Compartilhado! ✨");
     } catch {
       toast.error("Não foi possível compartilhar");

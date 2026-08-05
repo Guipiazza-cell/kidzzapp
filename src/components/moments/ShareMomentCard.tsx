@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Download, Share2, Sparkles } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
+import { analytics } from "@/lib/analytics";
 
 interface Props {
   open: boolean;
@@ -130,6 +131,7 @@ const ShareMomentCard = ({ open, onClose, text, attribution, emoji = "🤍", var
       const file = new File([blob], "kidzz-momento.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
         haptic("medium");
+        analytics.shareClicked({ surface: "momentos", content_type: "moment" });
         await navigator.share({ files: [file], title: "Um momento Kidzz" });
       } else {
         handleDownload();

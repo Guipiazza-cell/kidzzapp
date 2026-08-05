@@ -23,6 +23,7 @@ import {
 } from "./sleepStories";
 import PreSleep from "./PreSleep";
 import { haptic } from "@/lib/haptics";
+import { analytics } from "@/lib/analytics";
 import PremiumSeal from "@/components/common/PremiumSeal";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
 import heroSonhos from "@/assets/sonhos-hero.webp";
@@ -303,6 +304,18 @@ const DreamWorld = ({ onBack }: Props) => {
     setActiveSounds((prev) => ({ ...prev, [id]: vol }));
   }, []);
 
+  const nightRef = useRef<{ id: string; at: number } | null>(null);
+  const finishNight = useCallback(() => {
+    const n = nightRef.current;
+    if (!n) return;
+    nightRef.current = null;
+    analytics.activityCompleted({
+      tab: "sonhos",
+      activity_id: n.id,
+      duration_seconds: Math.max(0, Math.round((Date.now() - n.at) / 1000)),
+    });
+  }, []);
+
   const handleStart = useCallback(() => {
     // Sem selecao explicita: comeca com a primeira historia (nunca deixa o CTA inerte).
     const storyId = selectedStory
@@ -311,6 +324,8 @@ const DreamWorld = ({ onBack }: Props) => {
 
     setView("playing");
     setIsPlaying(true);
+    nightRef.current = { id: storyId ?? "sons_ambiente", at: Date.now() };
+    analytics.activityStarted({ tab: "sonhos", activity_id: storyId ?? "sons_ambiente" });
     const seconds = timerMinutes === 0 ? 60 * 60 : timerMinutes * 60;
     setTimeLeft(seconds);
 
@@ -332,6 +347,7 @@ const DreamWorld = ({ onBack }: Props) => {
             setActiveSounds({});
             setIsPlaying(false);
             setView("main");
+            finishNight();
           }, 9000);
           if (timerRef.current) clearInterval(timerRef.current);
           return 0;
@@ -344,6 +360,7 @@ const DreamWorld = ({ onBack }: Props) => {
   }, [timerMinutes, selectedStory, activeSounds]);
 
   const handleStop = useCallback(() => {
+    finishNight();
     if (timerRef.current) clearInterval(timerRef.current);
     engineRef.current?.stopAll();
     narratorRef.current?.stop();

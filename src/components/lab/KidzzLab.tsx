@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import confetti from "canvas-confetti";
 import html2canvas from "html2canvas";
 import { toast } from "sonner";
+import { analytics } from "@/lib/analytics";
 import KidzzAvatar, {
   AvatarBase,
   AvatarExpression,
@@ -162,6 +163,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     const file = new File([shareBlob], "meu-kidzz.png", { type: "image/png" });
     try {
       if (navigator.canShare?.({ files: [file] })) {
+        analytics.shareClicked({ surface: "kidzz_lab", content_type: "avatar" });
         await navigator.share({ files: [file], title: "Meu KIDZZ", text: SHARE_TEXT });
         toast.success("Compartilhado!");
         setShareModalOpen(false);
@@ -179,6 +181,7 @@ const KidzzLab = ({ onBack, evolution }: Props) => {
     // Tenta Web Share com arquivo (WhatsApp aparece como opção nativa)
     if (navigator.canShare?.({ files: [file] }) && navigator.share) {
       try {
+        analytics.shareClicked({ surface: "kidzz_lab", content_type: "avatar" });
         await navigator.share({ files: [file], title: "Meu KIDZZ", text: SHARE_TEXT });
         toast.success("Aberto no WhatsApp!");
         setShareModalOpen(false);

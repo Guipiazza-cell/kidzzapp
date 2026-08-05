@@ -67,6 +67,7 @@ const StoryDisplay = ({ story, images, onReset, onSpeak, isPremium = false }: St
         title: `Uma história mágica para ${childName}`,
         text: `Acabamos de criar "${storyTitle}" para ${childName} no KIDZZ! Histórias personalizadas que viram memória.`,
         filename: `kidzz-historia-${childName.toLowerCase()}.png`,
+        surface: "story_display", contentType: "story",
       });
       if (ok) toast.success("História compartilhada!");
     } catch {

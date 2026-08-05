@@ -25,6 +25,7 @@ import { useEntitlement } from "@/hooks/useEntitlement";
 import { useMemories } from "@/hooks/useMemories";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
+import { analytics } from "@/lib/analytics";
 import {
   FONT, SERIF, R, PAD, GAP,
   glassLight as glass,
@@ -550,6 +551,8 @@ const RoutineScreen = () => {
       haptic("success");
       const result = completeTask(id);
       if (!result.newlyDone) return;
+      analytics.activityStarted({ tab: "rotina", activity_id: id });
+      analytics.activityCompleted({ tab: "rotina", activity_id: id, duration_seconds: 0 });
       setView(getToday());
       setStreak(getStreak());
       setMission(getMissionProgress());

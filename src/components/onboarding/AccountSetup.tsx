@@ -136,8 +136,18 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
     async (userId?: string) => {
       if (userId) {
         await syncGuestProfile(userId);
+        let childCount = 1;
+        try {
+          const { count } = await supabase
+            .from("criancas")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", userId);
+          if (typeof count === "number" && count > 0) childCount = count;
+        } catch {
+          /* mantém 1 */
+        }
         analytics.onboardingDone({
-          child_count: 1,
+          child_count: childCount,
           seconds_to_complete: consumeOnboardingSeconds(),
         });
       }

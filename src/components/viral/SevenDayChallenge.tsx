@@ -9,6 +9,7 @@ import { useChallenges } from "@/hooks/useChallenges";
 import heroImg from "@/assets/desafio-7dias-hero.webp";
 import confetti from "canvas-confetti";
 import { haptic } from "@/lib/haptics";
+import { analytics } from "@/lib/analytics";
 
 interface Props {
   onClose: () => void;
@@ -52,6 +53,7 @@ const SevenDayChallenge = ({ onClose }: Props) => {
 
   const shareWhatsApp = () => {
     const text = `Oi! Estou fazendo o Desafio 7 Dias do KIDZZ com meu filho. Você topa com o seu? Os dois ganham 7 dias premium grátis!\n\nhttps://kidzzapp.lovable.app/?challenge=${challengeCode}`;
+    analytics.shareClicked({ surface: "seven_day_challenge", content_type: "challenge_invite" });
     if (navigator.share) {
       navigator.share({ text, url: `https://kidzzapp.lovable.app/?challenge=${challengeCode}` });
     } else {
