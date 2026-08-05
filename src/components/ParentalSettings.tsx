@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, ShieldCheck, Crown, LogIn, Link2, Copy, Check, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { useAffiliate } from "@/hooks/useAffiliate";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -21,11 +22,11 @@ const AGE_RANGES = [
 ];
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
-  const { user, profile, tier, updateProfile, signOut, openCustomerPortal } = useAuth();
+  const { user, profile, updateProfile, signOut, openCustomerPortal } = useAuth();
+  const { plan, isPaid: isPremium } = usePlan();
   const { affiliateCode, generateCode, loading: affLoading } = useAffiliate();
   const navigate = useNavigate();
   const currentAge = profile?.age_range || "3-7";
-  const isPremium = profile?.is_premium ?? false;
 
   const [affInput, setAffInput] = useState("");
   const [copied, setCopied] = useState(false);
@@ -107,7 +108,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           {/* Current plan highlight */}
           <div className={`rounded-2xl p-4 text-center ${isPremium ? "kid-gradient-premium text-white" : "bg-muted"}`}>
             <p className="font-extrabold text-lg">
-              {tier === "premium"
+              {plan === "premium"
                 ? "⚡ Kidzz Premium Ativo"
                 : isPremium
                 ? "⭐ Plano Kidzz Ativo"

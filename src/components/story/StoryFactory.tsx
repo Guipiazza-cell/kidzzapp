@@ -10,6 +10,7 @@ import StoryGallery from "./StoryGallery";
 import ParentalGate from "@/components/ParentalGate";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { useMemories } from "@/hooks/useMemories";
 import { toast } from "sonner";
 import { ChildAvatar } from "@/types/story";
@@ -47,7 +48,8 @@ const HERO_BG = "linear-gradient(180deg,#FAF1DF 0%,#F3E6CC 42%,#EBDABA 75%,#E2CD
 const DEFAULT_BG = "linear-gradient(180deg,#FDF8EE 0%, #F2EFE6 100%)";
 
 const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipIntro?: boolean }) => {
-  const { session, profile, tier, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
+  const { session, profile, canGenerateStory, storiesRemaining, incrementStories } = useAuth();
+  const { plan } = usePlan();
   const { speak } = useTTS();
   const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
@@ -103,7 +105,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
     voiceRateRef.current = params.voiceRate === "lenta" ? 0.72 : 0.88;
 
     if (!canGenerateStory()) {
-      if (tier === "free") {
+      if (plan === "free") {
         toast.info(`A primeira foi por nossa conta. Assine e crie histórias ilimitadas só do(a) ${childName}.`);
         window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }));
       } else {
@@ -243,7 +245,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
   }, [speak]);
 
   const remaining = storiesRemaining();
-  const badgeText = tier === "free"
+  const badgeText = plan === "free"
     ? (remaining > 0 ? "Primeira história por nossa conta" : "Assine para criar mais")
     : `${remaining} ${remaining === 1 ? "história" : "histórias"} hoje`;
 

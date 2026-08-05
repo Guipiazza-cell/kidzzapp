@@ -65,7 +65,7 @@ const PLAN_INFO: Record<string, PlanInfo> = {
 const Success = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { refreshSubscription, profile, tier } = useAuth();
+  const { refreshSubscription, profile } = useAuth();
   const { plan: effectivePlan, refresh: refreshEntitlement } = useEntitlement();
   const [confirming, setConfirming] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
@@ -119,8 +119,6 @@ const Success = () => {
       ? "premium"
       : effectivePlan === "kidzz"
       ? "kidzz"
-      : tier === "premium"
-      ? "premium"
       : "kidzz";
   const plan = PLAN_INFO[planKey] ?? PLAN_INFO.kidzz;
 
