@@ -113,7 +113,6 @@ const Success = () => {
 
   const childName = profile?.child_name || "seu filho";
   // Fonte autoritativa: useEntitlement().plan (lê de subscriptions via get_effective_plan).
-  // Fallback para tier do AuthContext caso ainda esteja propagando.
   const planKey =
     effectivePlan === "premium"
       ? "premium"

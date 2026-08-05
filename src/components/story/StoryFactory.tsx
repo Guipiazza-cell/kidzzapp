@@ -227,7 +227,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
       setProgress(100);
       setTimeout(() => setIsGenerating(false), 500);
     }
-  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, addMemory, session, tier]);
+  }, [avatar, childName, profile?.age_range, canGenerateStory, incrementStories, addMemory, session, plan]);
 
   const handleReset = useCallback(() => {
     setStep("intro");
@@ -393,11 +393,11 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
             onGenerate={handleGenerate}
             isLoading={isGenerating}
             storiesRemaining={storiesRemaining()}
-            isPremium={tier !== "free"}
+            isPremium={plan !== "free"}
             onUpgrade={() => window.dispatchEvent(new CustomEvent("kidzz:open-paywall", { detail: { context: "story_limit" } }))}
           />
         )}
-        {step === "display" && <StoryDisplay story={story} images={images} onReset={handleReset} onSpeak={handleSpeak} isPremium={tier !== "free"} />}
+        {step === "display" && <StoryDisplay story={story} images={images} onReset={handleReset} onSpeak={handleSpeak} isPremium={plan !== "free"} />}
       </div>
 
       <GeneratingOverlay open={isGenerating} progress={progress} />
