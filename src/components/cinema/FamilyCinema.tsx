@@ -35,6 +35,7 @@ import { getWeeklyMovie } from "@/lib/featuredRotation";
 import { cinemaCoverCdn, cinemaCoverUrl } from "@/lib/cinemaCovers";
 import { haptic } from "@/lib/haptics";
 import { sfx } from "@/lib/sfx";
+import { analytics } from "@/lib/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemories } from "@/hooks/useMemories";
 import {
@@ -629,6 +630,7 @@ const FamilyCinema = ({ onBack }: Props) => {
   const toastT = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const loggedOpen = useRef<Set<string>>(new Set());
+  const openedAt = useRef<number | null>(null);
 
   const weekly = useMemo(() => getWeeklyMovie(), []);
   const childName = profile?.child_name || "a família";
@@ -641,6 +643,8 @@ const FamilyCinema = ({ onBack }: Props) => {
       haptic("light");
       sfx("click");
       setActive(m);
+      openedAt.current = Date.now();
+      analytics.activityStarted({ tab: "cinema", activity_id: m.id });
       // Registra abertura (1x por filme na sessão)
       if (!loggedOpen.current.has(m.id)) {
         loggedOpen.current.add(m.id);
@@ -666,6 +670,14 @@ const FamilyCinema = ({ onBack }: Props) => {
   const marcar = useCallback(() => {
     haptic("light");
     const movie = active;
+    if (movie) {
+      analytics.activityCompleted({
+        tab: "cinema",
+        activity_id: movie.id,
+        duration_seconds: Math.max(0, Math.round((Date.now() - (openedAt.current ?? Date.now())) / 1000)),
+      });
+    }
+    openedAt.current = null;
     setActive(null);
     showToast("Sessão marcada para a família 🎬");
     if (movie) {
