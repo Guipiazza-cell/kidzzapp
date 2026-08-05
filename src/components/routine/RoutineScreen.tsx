@@ -553,8 +553,11 @@ const RoutineScreen = () => {
       if (!result.newlyDone) return;
       analytics.routineTaskChecked({
         task_id: id,
-        period: view.tasks.find((t) => t.id === id)?.period ?? getCurrentPeriod(),
+        period:
+          [...view.morning, ...view.afternoon, ...view.night].find((t) => t.id === id)?.period ??
+          getCurrentPeriod(),
       });
+
 
       setView(getToday());
       setStreak(getStreak());
