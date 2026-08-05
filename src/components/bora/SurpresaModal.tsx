@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X, Clock, Leaf } from "lucide-react";
+import { Sparkles, X, Clock, Leaf, Check } from "lucide-react";
 import type { IaActivity } from "@/hooks/useSurpresaIA";
 
 type Props = {
@@ -10,9 +10,12 @@ type Props = {
   childName?: string;
   onClose: () => void;
   onRetry: () => void;
+  onConcluir?: (activity: IaActivity) => void;
+  concluido?: boolean;
 };
 
-export const SurpresaModal = ({ open, loading, activity, error, childName, onClose, onRetry }: Props) => {
+export const SurpresaModal = ({ open, loading, activity, error, childName, onClose, onRetry, onConcluir, concluido = false }: Props) => {
+
   return (
     <AnimatePresence>
       {open && (
