@@ -4,6 +4,7 @@ import { ArrowLeft, Check, Sparkles, RefreshCw, Lock } from "lucide-react";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { useMemories } from "@/hooks/useMemories";
 import { supabase } from "@/integrations/supabase/client";
 import { addXp } from "@/lib/dailyMission";
@@ -174,9 +175,9 @@ const liquidCard: CSSProperties = {
  */
 const MyActivities = ({ onBack }: Props) => {
   const { profile } = useAuth();
+  const { isPaid: isPremium } = usePlan();
   const { addMemory } = useMemories();
   const childName = profile?.child_name || "amigo";
-  const isPremium = profile?.is_premium ?? false;
   const ageRange = profile?.age_range || "3-7";
   const interests = (profile as any)?.child_interests as string[] | undefined;
   const [showPremiumCTA, setShowPremiumCTA] = useState(false);

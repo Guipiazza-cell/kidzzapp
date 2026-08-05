@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import MorningKaraoke from "./MorningKaraoke";
 import DanceWithAne from "./DanceWithAne";
 import SungStories from "./SungStories";
@@ -280,9 +281,9 @@ const modeTint: Record<string, CSSProperties> = {
 };
 
 const MusicForest = ({ onBack, onNavigateToDreams, onXpEarned, onOpenParental, onOpenTravel }: Props) => {
-  const { profile, tier } = useAuth();
+  const { profile } = useAuth();
+  const { isPaid: isPremium } = usePlan();
   const childName = profile?.child_name || "amigo";
-  const isPremium = tier === "premium";
   // Troféu global da família (mesmo valor das outras abas) - não o XP só de música
   const pontosFamilia = profile?.points ?? 0;
 

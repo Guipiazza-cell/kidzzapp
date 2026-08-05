@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect, type CSSProperties } from "re
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Share2, Sparkles, Clock, Baby, Boxes, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { haptic } from "@/lib/haptics";
 import { DISCOVER_THEMES, DISCOVER_IMAGES, type Theme, type Activity } from "./discoverData";
 import { FONT, SERIF, R, PAD, pillGlassLight } from "@/lib/premiumUi";
@@ -857,8 +858,8 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: num
 // ------------------------------------------------------------
 const DiscoverScreen = ({ onBack }: Props) => {
   const { profile } = useAuth();
+  const { isPaid: isPremium } = usePlan();
   const childName = profile?.child_name ?? "";
-  const isPremium = !!profile?.is_premium;
   const pontos = (profile as { points?: number } | null)?.points ?? 0;
 
   const [openTheme, setOpenTheme] = useState<Theme | null>(null);

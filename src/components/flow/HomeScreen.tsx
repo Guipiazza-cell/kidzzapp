@@ -6,6 +6,7 @@ import ParentalSettings from "../ParentalSettings";
 import ParentDashboard from "../parental/ParentDashboard";
 import CharacterParticles, { useCharacterParticles } from "./CharacterParticles";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { useNavigate } from "react-router-dom";
 import { sfx, isSfxMuted, setSfxMuted } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
@@ -200,6 +201,7 @@ const HomeScreen = ({
   onTabChange,
 }: Props) => {
   const { user, profile, canAskQuestion, questionsRemaining } = useAuth();
+  const { isPaid: isPremium } = usePlan();
   const navigate = useNavigate();
   const { particles } = useCharacterParticles();
   const [input, setInput] = useState("");
@@ -217,7 +219,6 @@ const HomeScreen = ({
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const currentRitual = useMemo(() => getCurrentRitual(), []);
-  const isPremium = profile?.is_premium ?? false;
 
   useEffect(() => { setMuted(isSfxMuted()); }, []);
   useEffect(() => () => { try { recognitionRef.current?.stop(); } catch { /* */ } }, []);

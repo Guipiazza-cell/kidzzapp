@@ -132,6 +132,7 @@ const Index = () => {
   // ============================================================
   const navigate = useNavigate();
   const { profile, loading, updateProfile, canAskQuestion, user, session } = useAuth();
+  const { isPaid } = usePlan();
   const evolution = useCharacterEvolution();
   const { addMemory } = useMemories();
   usePWAUpdate();
@@ -266,7 +267,7 @@ const Index = () => {
 
   // Conversion nudge (parent-facing): poll session actions, surface when threshold met
   useEffect(() => {
-    if (profile?.is_premium) return;
+    if (isPaid) return;
     const check = () => {
       if (shouldShowConversionCard(false)) {
         setShowConversionNudge(true);
@@ -275,7 +276,7 @@ const Index = () => {
     };
     const iv = setInterval(check, 4000);
     return () => clearInterval(iv);
-  }, [profile?.is_premium]);
+  }, [isPaid]);
 
   // Global paywall opener - any feature can dispatch `kidzz:open-paywall`
   useEffect(() => {
@@ -329,7 +330,7 @@ const Index = () => {
 
   // Soft reminder: na 2ª pergunta (última grátis), mostra paywall contextual leve
   useEffect(() => {
-    if (profile?.is_premium) return;
+    if (isPaid) return;
     const used = profile?.questions_used ?? 0;
     if (used > 0 && used === 2) {
       const key = "kidzz_warned_last_free";
@@ -340,7 +341,7 @@ const Index = () => {
         }, 1500);
       }
     }
-  }, [profile?.questions_used, profile?.is_premium]);
+  }, [profile?.questions_used, isPaid]);
 
   // Derivação segura: funciona mesmo durante o onboarding (profile parcial)
   const childName = profile?.child_name ?? "";
@@ -426,7 +427,7 @@ const Index = () => {
         onTabChange={handleTabChange}
         onSwitchTab={switchTab}
         onOpenLab={() => setShowLab(true)}
-        onOpenTravel={() => { if (!profile?.is_premium) { setContextualPaywall({ open: true, context: "travel" }); return; } setShowTravel(true); }}
+        onOpenTravel={() => { if (!isPaid) { setContextualPaywall({ open: true, context: "travel" }); return; } setShowTravel(true); }}
         onOpenChallenge={() => setShowChallenge(true)}
         onOpenReferral={() => setShowReferral(true)}
         onOpenPaywall={(context, meta) => setContextualPaywall({ open: true, context: context as any, meta })}
@@ -446,7 +447,7 @@ const Index = () => {
           onOpenLab={() => setShowLab(true)}
           onOpenParental={() => setShowParentalGateForSettings(true)}
           onOpenTravel={() => {
-            if (!profile?.is_premium) {
+            if (!isPaid) {
               setContextualPaywall({ open: true, context: "travel" });
               return;
             }
@@ -490,11 +491,11 @@ const Index = () => {
           onNavigateToDreams={() => switchTab("dreams")}
           onXpEarned={() => evolution.evolve("game")}
           onOpenParental={() => setShowParentalGateForSettings(true)}
-          onOpenTravel={() => { if (!profile?.is_premium) { setContextualPaywall({ open: true, context: "travel" }); return; } setShowTravel(true); }}
+          onOpenTravel={() => { if (!isPaid) { setContextualPaywall({ open: true, context: "travel" }); return; } setShowTravel(true); }}
         />
       </AreaGate>
     ),
-  }), [step, question, answer, childName, profile, evolution, activeTab, handleQuestionSubmit, handleAnswerReady, handleCelebrationDone, handleNewQuestion, handleTabChange, switchTab, backToHome, kalmInitialExperience, addMemory, navigate]);
+  }), [step, question, answer, childName, profile, evolution, activeTab, handleQuestionSubmit, handleAnswerReady, handleCelebrationDone, handleNewQuestion, handleTabChange, switchTab, backToHome, kalmInitialExperience, addMemory, navigate, isPaid]);
   const activeRenderer = TAB_RENDERERS[activeTab] ?? TAB_RENDERERS.chat;
   const activeTabData = APP_TAB_DATA[activeTab] ?? APP_TAB_DATA.chat;
 
@@ -578,7 +579,7 @@ const Index = () => {
       <BottomNav
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        isPremium={profile?.is_premium ?? false}
+        isPremium={isPaid}
         onOpenParents={() => setShowParentalGateForDashboard(true)}
         onOpenPlans={() => window.dispatchEvent(new CustomEvent("kidzz:open-plans"))}
       />
@@ -678,7 +679,7 @@ const Index = () => {
 
       {/* Parent conversion nudge - appears after 2-3 child actions */}
       <ConversionNudgeCard
-        open={showConversionNudge && !profile?.is_premium}
+        open={showConversionNudge && !isPaid}
         childName={childName}
         onUpgrade={() => {
           setShowConversionNudge(false);
