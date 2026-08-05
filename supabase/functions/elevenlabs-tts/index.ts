@@ -118,13 +118,10 @@ serve(async (req) => {
     if (!response.ok) {
       const errText = await response.text();
       console.error("ElevenLabs error:", response.status, errText);
-      // Return 200 with fallback flag so client gracefully degrades to Web Speech API
-      // (avoids 500s spamming the console when free tier is disabled / quota exceeded)
-      return new Response(
-        JSON.stringify({ error: "TTS_UNAVAILABLE", fallback: true, status: response.status }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      // ElevenLabs indisponível (sem crédito/quota): tenta a narração via Lovable AI.
+      return await speakWithLovableAI();
     }
+
 
     const audioBuffer = await response.arrayBuffer();
     const audioBase64 = base64Encode(audioBuffer);
