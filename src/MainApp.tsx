@@ -10,6 +10,7 @@ import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
 import LevelUpOverlay from "./components/flow/LevelUpOverlay";
 import { PaywallProvider } from "@/components/paywall/PaywallProvider";
 import { markSeen, markLevelUp } from "@/lib/emotionalState";
+import { markOnboardingStart } from "@/lib/analytics";
 
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -32,6 +33,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const MainApp = () => {
   useEffect(() => {
     markSeen();
+    markOnboardingStart();
     const handler = () => markLevelUp();
     window.addEventListener("kidzz:level-up", handler);
 

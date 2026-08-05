@@ -55,6 +55,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 const CHECK_SUB_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-subscription`;
+import { analytics } from "@/lib/analytics";
+
 const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`;
 const PORTAL_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/customer-portal`;
 const GUEST_PROFILE_STORAGE_KEY = "kidzz_guest_profile";
@@ -576,6 +578,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!mounted || !initDone.current) return;
 
+      if (_event === "SIGNED_IN" && nextSession?.user) {
+        analytics.identify(nextSession.user.id, { email: nextSession.user.email });
+      } else if (_event === "SIGNED_OUT") {
+        analytics.reset();
+      }
+
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
 
@@ -664,6 +672,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       console.log("[Checkout] plan selecionado", { plan: checkoutPlan });
+      analytics.checkoutStarted({ plan: checkoutPlan });
       await openStripeCheckout(checkoutPlan, session.access_token, ref);
     } catch (err) {
       const { toast } = await import("sonner");
@@ -763,6 +772,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error: siErr } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
       if (siErr) console.warn("Post-signup signIn fallback:", siErr.message);
     }
+    analytics.signupCompleted({ method: "email" });
     return { error: null };
   };
 

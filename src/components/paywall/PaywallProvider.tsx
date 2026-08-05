@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { AnimatePresence, motion } from "framer-motion";
 import PaywallScreen, { type PaywallContextKind } from "./PaywallScreen";
 import { useAuth } from "@/contexts/AuthContext";
+import { analytics } from "@/lib/analytics";
 
 interface PaywallContextType {
   open: (context?: PaywallContextKind) => void;
@@ -25,6 +26,7 @@ export const PaywallProvider = ({ children }: { children: ReactNode }) => {
   const open = useCallback((context?: PaywallContextKind) => {
     setCtx(context ?? "default");
     setIsOpen(true);
+    analytics.paywallViewed({ trigger: context ?? "default" });
   }, []);
   const close = useCallback(() => setIsOpen(false), []);
 
@@ -35,6 +37,7 @@ export const PaywallProvider = ({ children }: { children: ReactNode }) => {
     if (params.get("paywall") === "1") {
       setCtx("default");
       setIsOpen(true);
+      analytics.paywallViewed({ trigger: "url_param" });
       params.delete("paywall");
       const q = params.toString();
       window.history.replaceState({}, "", window.location.pathname + (q ? `?${q}` : ""));

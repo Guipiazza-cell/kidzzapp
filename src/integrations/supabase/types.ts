@@ -634,6 +634,8 @@ export type Database = {
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
+          trial_end: string | null
+          trial_used: boolean
           updated_at: string
           user_id: string
         }
@@ -644,6 +646,8 @@ export type Database = {
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          trial_end?: string | null
+          trial_used?: boolean
           updated_at?: string
           user_id: string
         }
@@ -654,6 +658,8 @@ export type Database = {
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          trial_end?: string | null
+          trial_used?: boolean
           updated_at?: string
           user_id?: string
         }
