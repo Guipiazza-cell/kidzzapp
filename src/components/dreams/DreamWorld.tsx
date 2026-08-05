@@ -23,6 +23,7 @@ import {
 } from "./sleepStories";
 import PreSleep from "./PreSleep";
 import { haptic } from "@/lib/haptics";
+import { analytics } from "@/lib/analytics";
 import PremiumSeal from "@/components/common/PremiumSeal";
 import { CAMALEAO } from "@/lib/camaleaoOficial";
 import heroSonhos from "@/assets/sonhos-hero.webp";

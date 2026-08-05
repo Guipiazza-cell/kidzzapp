@@ -17,6 +17,7 @@ import { completeMissionStep, addXp, bumpSessionActions } from "@/lib/dailyMissi
 import { showXpGained } from "@/components/flow/XpToast";
 import { sfx } from "@/lib/sfx";
 import { haptic } from "@/lib/haptics";
+import { analytics } from "@/lib/analytics";
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-story`;
 
@@ -112,6 +113,7 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
     }
     setIsGenerating(true);
     setProgress(3);
+    analytics.activityStarted({ tab: "historias", activity_id: params.intent });
 
     const startTime = Date.now();
     const timer = setInterval(() => {
@@ -207,6 +209,11 @@ const StoryFactory = ({ onBack, skipIntro = false }: { onBack: () => void; skipI
       bumpSessionActions();
       sfx("complete");
       haptic("success");
+      analytics.activityCompleted({
+        tab: "historias",
+        activity_id: params.intent,
+        duration_seconds: Math.max(0, Math.round((Date.now() - startTime) / 1000)),
+      });
       toast.success("História pronta!");
     } catch (e: any) {
       console.error("Story generation error:", e);

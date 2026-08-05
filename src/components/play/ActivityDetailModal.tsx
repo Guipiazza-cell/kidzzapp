@@ -11,6 +11,7 @@
  * Os passos e exemplos são gerados a partir da categoria + título,
  * para garantir conteúdo útil mesmo quando a atividade vem do pool curto.
  */
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Sparkles } from "lucide-react";
 import {
@@ -18,6 +19,7 @@ import {
   ActivityCategory,
   getCategoryMeta,
 } from "@/lib/weeklyActivities";
+import { analytics } from "@/lib/analytics";
 
 interface Props {
   activity: Activity | null;
@@ -90,6 +92,25 @@ function getExample(activity: Activity, childName: string): string {
 }
 
 const ActivityDetailModal = ({ activity, childName, done, onComplete, onClose }: Props) => {
+  const startedAt = useRef<number | null>(null);
+  useEffect(() => {
+    if (activity) {
+      startedAt.current = Date.now();
+      analytics.activityStarted({ tab: "brincar", activity_id: activity.id });
+    } else {
+      startedAt.current = null;
+    }
+  }, [activity]);
+
+  const handleComplete = (a: Activity) => {
+    analytics.activityCompleted({
+      tab: "brincar",
+      activity_id: a.id,
+      duration_seconds: Math.max(0, Math.round((Date.now() - (startedAt.current ?? Date.now())) / 1000)),
+    });
+    onComplete(a);
+  };
+
   return (
     <AnimatePresence>
       {activity && (
@@ -214,7 +235,7 @@ const ActivityDetailModal = ({ activity, childName, done, onComplete, onClose }:
                     ) : (
                       <motion.button
                         onClick={() => {
-                          onComplete(activity);
+                          handleComplete(activity);
                           onClose();
                         }}
                         whileTap={{ scale: 0.97 }}
