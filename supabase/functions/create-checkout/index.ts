@@ -128,18 +128,21 @@ serve(async (req) => {
     const metadata: Record<string, string> = { user_id: user.id, plan };
     if (refCode) metadata.ref = refCode;
 
-    // Sem trial de 7 dias: cobrança começa no checkout (Stripe Subscription normal).
+    // Sem período de teste: o cartão é cobrado no ato do checkout.
     const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
+      client_reference_id: user.id,
       payment_method_types: ['card'],
+      payment_method_collection: "always",
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?paywall=1`,
       metadata,
       subscription_data: { metadata },
     });
+
     logStep("Stripe checkout session created", { sessionId: session.id, hasUrl: Boolean(session.url), customerId: customerId || "new", origin });
 
     if (refCode && session.id) {
