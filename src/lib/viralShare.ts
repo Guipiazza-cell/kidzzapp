@@ -1,4 +1,5 @@
 import html2canvas from "html2canvas";
+import { analytics } from "@/lib/analytics";
 
 const APP_URL = "https://kidzzapp.lovable.app";
 
@@ -6,6 +7,10 @@ export interface ShareData {
   title: string;
   text: string;
   filename: string;
+  /** Tela de onde o compartilhamento saiu (sem texto do usuário). */
+  surface?: string;
+  /** Tipo de conteúdo compartilhado (sem texto do usuário). */
+  contentType?: string;
 }
 
 /**
@@ -13,6 +18,10 @@ export interface ShareData {
  * Falls back to download if file sharing is not supported.
  */
 export async function captureAndShare(node: HTMLElement, data: ShareData): Promise<boolean> {
+  analytics.shareClicked({
+    surface: data.surface ?? "share_card",
+    content_type: data.contentType ?? "image_card",
+  });
   try {
     const canvas = await html2canvas(node, {
       scale: 2,
