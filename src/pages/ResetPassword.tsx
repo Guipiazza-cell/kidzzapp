@@ -12,12 +12,42 @@ const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
-      setReady(true);
-    }
+    let cancelled = false;
+
+    const bootstrap = async () => {
+      try {
+        const url = new URL(window.location.href);
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+        const access_token = hash.get("access_token");
+        const refresh_token = hash.get("refresh_token");
+        const code = url.searchParams.get("code");
+        const tokenHash = url.searchParams.get("token_hash") || hash.get("token_hash");
+
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token });
+        } else if (code) {
+          await supabase.auth.exchangeCodeForSession(code);
+        } else if (tokenHash) {
+          await supabase.auth.verifyOtp({ type: "recovery", token_hash: tokenHash });
+        }
+
+        const { data } = await supabase.auth.getSession();
+        if (!cancelled) setReady(!!data.session);
+      } catch {
+        if (!cancelled) setReady(false);
+      } finally {
+        if (!cancelled) setChecking(false);
+      }
+    };
+
+    bootstrap();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,13 +67,30 @@ const ResetPassword = () => {
     setLoading(false);
   };
 
-  if (!ready) {
+  if (checking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
-        <p className="text-gray-500">Link inválido ou expirado.</p>
+        <p className="text-gray-500">Validando seu link...</p>
       </div>
     );
   }
+
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
+        <p className="text-gray-600 text-center">
+          Link invalido ou expirado. Peca um novo email de recuperacao.
+        </p>
+        <button
+          onClick={() => navigate("/auth")}
+          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-kid-orange to-kid-pink text-white font-bold"
+        >
+          Voltar ao login
+        </button>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen flex flex-col overflow-hidden relative bg-gradient-to-b from-[hsl(90,20%,85%)] via-[hsl(90,15%,90%)] to-[hsl(90,20%,85%)]">
