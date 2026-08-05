@@ -65,9 +65,27 @@ export const analytics = {
     capture("activity_started", props);
   },
 
-  activityCompleted(props: { tab: TabName; activity_id: string; duration_seconds: number }): void {
-    capture("activity_completed", props);
+  /**
+   * Conclusão de atividade com duração real.
+   * O banco (public.conclusoes) é a fonte de verdade; o PostHog é o complemento.
+   */
+  activityCompleted(props: {
+    tab: TabName;
+    activity_id: string;
+    duration_seconds: number;
+    /** Rótulo curto da atividade (nunca texto escrito por pais/criança). */
+    title?: string;
+  }): void {
+    const { title, ...eventProps } = props;
+    capture("activity_completed", eventProps);
+    void persistConclusao(props);
   },
+
+  /** Marcar/desmarcar tarefa da Rotina (não é atividade com início e fim). */
+  routineTaskChecked(props: { task_id: string; period: string }): void {
+    capture("routine_task_checked", props);
+  },
+
 
   shareClicked(props: { surface: string; content_type: string }): void {
     capture("share_clicked", props);
