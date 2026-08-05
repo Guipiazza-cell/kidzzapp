@@ -21,6 +21,9 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Admin = lazy(() => import("./pages/Admin"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
+const MinhaAssinatura = lazy(() => import("./pages/MinhaAssinatura"));
+const MinhasCriancas = lazy(() => import("./pages/MinhasCriancas"));
+
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isReady } = useAuth();
