@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCharacterEvolution } from "@/hooks/useCharacterEvolution";
 import { useMemories } from "@/hooks/useMemories";
 import { usePWAUpdate } from "@/hooks/usePWAUpdate";
+import { usePlan } from "@/hooks/usePlan";
 import NameOnboarding from "@/components/NameOnboarding";
 import AgeSelection from "@/components/AgeSelection";
 import InterestsOnboarding from "@/components/InterestsOnboarding";

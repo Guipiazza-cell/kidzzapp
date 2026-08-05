@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import {
   PLAN_ACCESS,
   DAILY_LIMITS,
@@ -44,6 +45,7 @@ const todayBR = () => {
  */
 export function useEntitlement() {
   const { user, session } = useAuth();
+  const effectivePlan = usePlan();
   const [state, setState] = useState<EntitlementState>(DEFAULT_STATE);
   const inFlight = useRef(false);
 
@@ -55,9 +57,7 @@ export function useEntitlement() {
     if (inFlight.current) return;
     inFlight.current = true;
     try {
-      // Plano efetivo (RPC com regra de ciclo + período de graça)
-      const [{ data: planData }, { data: usageData }] = await Promise.all([
-        (supabase as any).rpc("get_effective_plan", { _user_id: user.id }),
+      const [{ data: usageData }] = await Promise.all([
         (supabase as any)
           .from("usage")
           .select("perguntas_count, historias_count")
@@ -66,17 +66,13 @@ export function useEntitlement() {
           .maybeSingle(),
       ]);
 
-      const row = Array.isArray(planData) ? planData[0] : planData;
-      const plan: Plan = (row?.plan ?? "free") as Plan;
-      const status: string = row?.status ?? "inactive";
-      const inGrace: boolean = !!row?.in_grace;
-      const periodEnd = row?.current_period_end ? new Date(row.current_period_end) : null;
+      const plan: Plan = effectivePlan.plan;
 
       setState({
         plan,
-        status,
-        inGracePeriod: inGrace,
-        periodEnd,
+        status: effectivePlan.status,
+        inGracePeriod: effectivePlan.inGrace,
+        periodEnd: effectivePlan.currentPeriodEnd,
         usage: {
           perguntas: usageData?.perguntas_count ?? 0,
           historias: usageData?.historias_count ?? 0,
@@ -89,7 +85,7 @@ export function useEntitlement() {
     } finally {
       inFlight.current = false;
     }
-  }, [user, session]);
+  }, [user, session, effectivePlan.plan, effectivePlan.status, effectivePlan.inGrace, effectivePlan.currentPeriodEnd]);
 
   useEffect(() => {
     fetchAll();
