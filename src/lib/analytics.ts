@@ -34,6 +34,32 @@ const capture = (event: string, props?: Record<string, unknown>): void => {
   }
 };
 
+/**
+ * Grava a conclusão no banco (fonte de verdade). Silencioso para visitantes
+ * não autenticados; nunca quebra o fluxo da UI.
+ */
+const persistConclusao = async (props: {
+  tab: TabName;
+  activity_id: string;
+  duration_seconds: number;
+  title?: string;
+}): Promise<void> => {
+  try {
+    const { data } = await supabase.auth.getUser();
+    const userId = data.user?.id;
+    if (!userId) return;
+    await supabase.from("conclusoes").insert({
+      user_id: userId,
+      titulo_snapshot: props.title ?? `${props.tab}:${props.activity_id}`,
+      tela_min: Math.max(0, Math.round(props.duration_seconds / 60)),
+      feito_em: new Date().toISOString(),
+    });
+  } catch {
+    /* analytics/persistência nunca quebra o app */
+  }
+};
+
+
 export const analytics = {
   identify(userId: string, props?: { email?: string; created_at?: string }): void {
     if (!ready() || !userId) return;
