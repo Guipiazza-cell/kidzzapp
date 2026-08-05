@@ -304,19 +304,24 @@ const DreamWorld = ({ onBack }: Props) => {
   }, []);
 
   const handleStart = useCallback(() => {
-    if (Object.keys(activeSounds).length === 0 && !selectedStory) return;
+    // Sem selecao explicita: comeca com a primeira historia (nunca deixa o CTA inerte).
+    const storyId = selectedStory
+      ?? (Object.keys(activeSounds).length === 0 ? SLEEP_STORIES[0]?.id ?? null : null);
+    if (storyId && storyId !== selectedStory) setSelectedStory(storyId);
+
     setView("playing");
     setIsPlaying(true);
     const seconds = timerMinutes === 0 ? 60 * 60 : timerMinutes * 60;
     setTimeLeft(seconds);
 
-    if (selectedStory) {
-      const story = SLEEP_STORIES.find((s) => s.id === selectedStory);
+    if (storyId) {
+      const story = SLEEP_STORIES.find((s) => s.id === storyId);
       if (story) {
         setIsNarrating(true);
         narratorRef.current?.speak(story.text, () => setIsNarrating(false));
       }
     }
+
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
