@@ -520,27 +520,8 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
           </motion.button>
         </motion.div>
 
-        {isSuperPremium && (
-          <motion.button
-            type="button"
-            onClick={onOpenStoryFactory}
-            className="w-full mt-2.5 flex items-center justify-center gap-2 active:scale-[0.98]"
-            style={{
-              minHeight: 48,
-              fontWeight: 800,
-              fontSize: 13.5,
-              color: "#1A2818",
-              ...dockPill,
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.34 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            <BookOpen size={16} />
-            Transformar em história
-          </motion.button>
-        )}
+
+
 
         <motion.button
           type="button"
