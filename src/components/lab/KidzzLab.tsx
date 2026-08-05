@@ -5,8 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import confetti from "canvas-confetti";
 import html2canvas from "html2canvas";
 import { toast } from "sonner";
-import KidzzAvatar, {
 import { analytics } from "@/lib/analytics";
+import KidzzAvatar, {
   AvatarBase,
   AvatarExpression,
   AvatarOutfit,
