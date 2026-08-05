@@ -8,6 +8,8 @@ import InstallBanner from "./components/InstallBanner";
 import OfflineIndicator from "./components/OfflineIndicator";
 import KidzzShareTrigger from "./components/viral/KidzzShareTrigger";
 import LevelUpOverlay from "./components/flow/LevelUpOverlay";
+import GraceBanner from "./components/subscription/GraceBanner";
+
 import { PaywallProvider } from "@/components/paywall/PaywallProvider";
 import { markSeen, markLevelUp } from "@/lib/emotionalState";
 import { markOnboardingStart } from "@/lib/analytics";
