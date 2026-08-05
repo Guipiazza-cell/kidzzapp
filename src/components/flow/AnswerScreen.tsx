@@ -6,6 +6,7 @@ import confetti from "canvas-confetti";
 import { useTTS } from "@/hooks/useTTS";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
@@ -45,13 +46,13 @@ interface Props {
 const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: Props) => {
   const { speak, stop } = useTTS();
   const { profile, handleCheckout, user } = useAuth();
+  const { isPaid: isPremium } = usePlan();
   const { addMemory } = useMemories();
   const { trackEvent } = useAchievementSync();
   const [playing, setPlaying] = useState(false);
   const [showCTA, setShowCTA] = useState(false);
   const [memorySaved, setMemorySaved] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const isPremium = profile?.is_premium ?? false;
   
   const trackedRef = useRef(false);
   const logIdRef = useRef<string | null>(null);

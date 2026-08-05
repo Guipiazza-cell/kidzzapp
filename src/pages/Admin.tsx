@@ -10,9 +10,7 @@ import { Search, Shield, Crown, X, CalendarPlus, Users, MessageCircle, BookOpen,
 interface UserProfile {
   id: string;
   child_name: string;
-  is_premium: boolean;
-  premium_source: string | null;
-  plan_end_date: string | null;
+  subscription?: { plan: string; status: string; current_period_end: string | null; is_lifetime: boolean } | null;
   created_at: string;
   points?: number;
   streak_days?: number;
@@ -196,14 +194,14 @@ const Admin = () => {
                   {user.questions_used ?? 0} perguntas · {user.points ?? 0} pts · 🔥 {user.streak_days ?? 0} · Nível: {user.level ?? "iniciante"}
                 </p>
               </div>
-              <div className={`shrink-0 px-2 py-1 rounded-full text-xs font-medium ${user.is_premium ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
-                {user.is_premium ? `Premium (${user.premium_source || "?"})` : "Gratuito"}
+              <div className={`shrink-0 px-2 py-1 rounded-full text-xs font-medium ${user.subscription?.plan !== "free" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
+                {user.subscription?.plan !== "free" ? `${user.subscription?.plan}${user.subscription?.is_lifetime ? " vitalício" : ""}` : "Gratuito"}
               </div>
             </div>
 
-            {user.plan_end_date && (
+            {user.subscription?.current_period_end && (
               <p className="text-xs text-muted-foreground">
-                Expira: {new Date(user.plan_end_date).toLocaleDateString("pt-BR")}
+                Expira: {new Date(user.subscription.current_period_end).toLocaleDateString("pt-BR")}
               </p>
             )}
 
@@ -217,7 +215,7 @@ const Admin = () => {
                 />
               </div>
               <div className="flex gap-2 flex-wrap">
-                {!user.is_premium ? (
+                {user.subscription?.plan === "free" || !user.subscription ? (
                   <Button size="sm" onClick={() => handleTogglePremium(user.id, true)} className="gap-1">
                     <Crown className="w-3 h-3" /> Ativar Premium
                   </Button>

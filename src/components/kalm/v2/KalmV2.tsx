@@ -6,8 +6,8 @@
  * touch-action nos cards: pan-y (senão botões travam o scroll no iOS).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { usePlan } from "@/hooks/usePlan";
 import KalmHome, { type Pillar } from "./KalmHome";
 import { SosEmocional } from "./SubScreens";
 import {
@@ -30,9 +30,9 @@ interface Props {
 }
 
 const KalmV2 = ({ onBack, onGoDreams, onOpenParents, initialExperienceId, onConsumedInitial }: Props) => {
-  const { profile } = useAuth();
   const { canUse } = useEntitlement();
-  const isPremium = !!profile?.is_premium || canUse("kalm");
+  const { isPaid } = usePlan();
+  const isPremium = isPaid || canUse("kalm");
 
   const [view, setView] = useState<View>("home");
   const [activity, setActivity] = useState<Activity | null>(null);

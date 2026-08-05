@@ -12,6 +12,7 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Palette, Smile, Shirt, Zap, Check, Share2, Save, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import KidzzAvatar, {
   loadAvatar,
   saveAvatar,
@@ -96,7 +97,7 @@ interface Props {
 
 const MyKidzz = ({ onBack }: Props) => {
   const { profile } = useAuth();
-  const isPremium = profile?.is_premium ?? false;
+  const { isPaid: isPremium } = usePlan();
   const childName = profile?.child_name || "amigo";
 
   const [config, setConfig] = useState<MascotConfig>(loadMascotConfig);

@@ -11,6 +11,7 @@ import SubscribeBanner from "./SubscribeBanner";
 import MagicalBackground from "./MagicalBackground";
 import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -38,9 +39,10 @@ const ChatScreen = ({
   onInitialQuestionConsumed?: () => void;
 }) => {
   const {
-    profile, user, session, tier, updateProfile, incrementQuestions,
+    profile, user, session, updateProfile, incrementQuestions,
     handleCheckout, canAskQuestion, questionsRemaining,
   } = useAuth();
+  const { plan, isPaid: isPremium } = usePlan();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -60,8 +62,7 @@ const ChatScreen = ({
 
   const childName = profile?.child_name || "amigo";
   const ageRange = profile?.age_range || "3-7";
-  const isPremium = profile?.is_premium ?? false;
-  const isSuperPremium = tier === "premium";
+  const isSuperPremium = plan === "premium";
   const isFreeLimitReached = !canAskQuestion();
 
   useEffect(() => {

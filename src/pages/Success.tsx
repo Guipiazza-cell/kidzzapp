@@ -65,7 +65,7 @@ const PLAN_INFO: Record<string, PlanInfo> = {
 const Success = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { refreshSubscription, profile, tier } = useAuth();
+  const { refreshSubscription, profile } = useAuth();
   const { plan: effectivePlan, refresh: refreshEntitlement } = useEntitlement();
   const [confirming, setConfirming] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
@@ -113,14 +113,11 @@ const Success = () => {
 
   const childName = profile?.child_name || "seu filho";
   // Fonte autoritativa: useEntitlement().plan (lê de subscriptions via get_effective_plan).
-  // Fallback para tier do AuthContext caso ainda esteja propagando.
   const planKey =
     effectivePlan === "premium"
       ? "premium"
       : effectivePlan === "kidzz"
       ? "kidzz"
-      : tier === "premium"
-      ? "premium"
       : "kidzz";
   const plan = PLAN_INFO[planKey] ?? PLAN_INFO.kidzz;
 

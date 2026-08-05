@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Trophy, Shield, Heart, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import {
   BRINCAR_EXPERIENCES,
@@ -349,9 +350,9 @@ const KidzzPlay = ({
   onOpenAchievements,
   onOpenParental,
 }: Props) => {
-  const { profile, tier } = useAuth();
+  const { profile } = useAuth();
+  const { isPaid: isPremium } = usePlan();
   const { trackEvent } = useAchievementSync();
-  const isPremium = tier !== "free";
   const childName = profile?.child_name || "amigo";
   const greeting = useMemo(() => {
     const h = new Date().getHours();

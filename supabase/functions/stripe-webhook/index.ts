@@ -73,7 +73,7 @@ serve(async (req) => {
     return new Response("config", { status: 500 });
   }
 
-  const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+  const stripe = new Stripe(stripeKey, { apiVersion: "2026-02-25.clover" as any });
 
   const signature = req.headers.get("stripe-signature");
   const rawBody = await req.text();
@@ -150,6 +150,20 @@ serve(async (req) => {
     log("ORPHAN EVENT — user não resolvido", { id: event.id, type: event.type, customerId });
   };
 
+  const recordSyncError = async (sub: Stripe.Subscription, message: string) => {
+    console.error(`[STRIPE-WEBHOOK] ${message}`, { eventId: event.id, subId: sub.id });
+    try {
+      await admin.from("stripe_orphan_events").insert({
+        event_id: `${event.id}:period-end`,
+        type: "subscription.sync_error",
+        stripe_customer_id: (sub.customer as string) ?? null,
+        payload: { subscription_id: sub.id, stripe_status: sub.status, error: message },
+      });
+    } catch (e) {
+      log("sync error insert fail", { e: String(e), subId: sub.id });
+    }
+  };
+
   const planFromSubscription = (sub: Stripe.Subscription): PlanName => {
     if (!PAID_STATUSES.has(sub.status)) return "free";
     const item = sub.items?.data?.[0];
@@ -189,8 +203,9 @@ serve(async (req) => {
     let plan = planFromSubscription(sub);
 
     if (PAID_STATUSES.has(status) && !periodEndTs) {
-      console.error(
-        `[STRIPE-WEBHOOK] current_period_end ausente para sub ${sub.id} (status ${status}). Gravando incomplete.`
+      await recordSyncError(
+        sub,
+        `current_period_end ausente após retrieve para assinatura paga (status ${status}); acesso bloqueado`,
       );
       status = "incomplete";
       plan = "free";

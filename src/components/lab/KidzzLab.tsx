@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Lock, Sparkles, Palette, Smile, Shirt, Check, Share2, Download, MessageCircle, Camera, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import confetti from "canvas-confetti";
 import html2canvas from "html2canvas";
 import { toast } from "sonner";
@@ -65,7 +66,7 @@ interface Props {
 
 const KidzzLab = ({ onBack, evolution }: Props) => {
   const { profile } = useAuth();
-  const isPremium = profile?.is_premium;
+  const { isPaid: isPremium } = usePlan();
   const childName = profile?.child_name || "amigo";
 
   const [config, setConfig] = useState<KidzzAvatarConfig>(loadAvatar);

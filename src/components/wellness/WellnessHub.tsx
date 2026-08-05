@@ -9,6 +9,7 @@ import {
 import { haptic } from "@/lib/haptics";
 import { AmbientSoundEngine } from "@/components/dreams/AmbientSoundEngine";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePlan } from "@/hooks/usePlan";
 import wellnessMascot from "@/assets/kidzz/wellness.webp";
 import WellnessCinema from "./WellnessCinema";
 import WellnessGrowth from "./WellnessGrowth";
@@ -1650,7 +1651,7 @@ const JourneyView = ({ onBack }: { onBack: () => void }) => {
   const { week } = useMoodWeek();
   const { streak } = useWellnessStreak();
   const { profile } = useAuth();
-  const isPremium = profile?.is_premium ?? false;
+  const { isPaid: isPremium } = usePlan();
   const childName = profile?.child_name || "seu filho";
   const avg = week.filter(w => w.v > 0).reduce((s, w) => s + w.v, 0) / Math.max(week.filter(w => w.v > 0).length, 1);
   return (
