@@ -3,6 +3,7 @@
 // criança ou pais (nomes, diários, sonhos, respostas, mensagens, fotos).
 // Somente IDs, contagens, nomes de aba e durações.
 import posthog from "posthog-js";
+import { supabase } from "@/integrations/supabase/client";
 
 export type TabName =
   | "perguntas"
