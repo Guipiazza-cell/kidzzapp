@@ -753,6 +753,7 @@ export type Database = {
         }
         Returns: string
       }
+      dashboard_snapshot: { Args: { p_token: string }; Returns: Json }
       ensure_indicacao_codigo: { Args: never; Returns: string }
       get_bora_stats: {
         Args: never
@@ -792,6 +793,24 @@ export type Database = {
             }[]
           }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      ops_bug: { Args: { p_dados: Json; p_token: string }; Returns: Json }
+      ops_custos: {
+        Args: { p_acao: string; p_dados: Json; p_token: string }
+        Returns: Json
+      }
+      ops_decisoes: {
+        Args: { p_acao: string; p_dados: Json; p_token: string }
+        Returns: Json
+      }
+      ops_dw: {
+        Args: { p_acao: string; p_dados: Json; p_token: string }
+        Returns: Json
+      }
+      ops_snapshot: { Args: { p_token: string }; Returns: Json }
+      ops_write: {
+        Args: { p_acao: string; p_dados: Json; p_token: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
