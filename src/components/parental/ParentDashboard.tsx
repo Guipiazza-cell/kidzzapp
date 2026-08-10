@@ -12,6 +12,8 @@ import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import PrivacyCenter from "@/components/parental/PrivacyCenter";
+import { AnimatePresence } from "framer-motion";
 
 interface Props {
   onClose: () => void;
@@ -93,6 +95,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
   const shareRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
 
   const openPortal = async () => {
     if (portalLoading) return;
@@ -378,7 +381,18 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
             </button>
           )}
 
+          {/* Privacidade (discreto) */}
+          <button
+            onClick={() => setPrivacyOpen(true)}
+            className="w-full min-h-[44px] flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-muted/40 hover:bg-muted/70 border border-border/60 transition-colors"
+          >
+            <Lock className="w-4 h-4 text-muted-foreground" />
+            <span className="flex-1 text-left text-[13px] font-bold text-foreground">Privacidade</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+
           {/* Share button */}
+
           <button
             onClick={handleShare}
             disabled={sharing}
@@ -408,6 +422,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           topThemes={themes}
         />
       </div>
+          <AnimatePresence>{privacyOpen && <PrivacyCenter onClose={() => setPrivacyOpen(false)} />}</AnimatePresence>
     </Wrapper>
   );
 };
