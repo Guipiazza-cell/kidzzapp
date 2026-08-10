@@ -13,6 +13,8 @@ import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveCriancaId } from "@/hooks/useCriancas";
+
 import { toast } from "sonner";
 
 interface Message {
@@ -78,14 +80,18 @@ const ChatScreen = ({
         const sinceIso = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
-        const { data, error } = await supabase
+        const criancaId = await resolveCriancaId(user.id);
+        let q = supabase
           .from("kidzz_questions_log")
           .select("question, created_at")
           .eq("user_id", user.id)
           .gte("created_at", sinceIso)
-          .lt("created_at", todayStart.toISOString())
+          .lt("created_at", todayStart.toISOString());
+        if (criancaId) q = q.eq("crianca_id", criancaId);
+        const { data, error } = await q
           .order("created_at", { ascending: false })
           .limit(1);
+
         if (cancelled || error || !data?.[0]) {
           if (error) console.warn("[Kidzz] chat memória indisponível:", error.message);
           return;
@@ -220,13 +226,15 @@ const ChatScreen = ({
       await streamChat(allMessages);
       setConnectionCount((c) => c + 1);
 
-      // Persist Q&A in the parent log (RLS protected, only the parent sees it).
+      // Persist Q&A in the parent log (RLS protected, scoped to user + active child).
       const answer = lastAssistantTextRef.current?.trim();
       if (user && answer) {
+        const criancaId = await resolveCriancaId(user.id);
         const { data, error } = await supabase
           .from("kidzz_questions_log")
           .insert({
             user_id: user.id,
+            crianca_id: criancaId,
             question: trimmed,
             answer,
             age_range: ageRange,
@@ -237,6 +245,7 @@ const ChatScreen = ({
         if (error) console.warn("[Kidzz] log insert failed:", error.message);
         else lastLogIdRef.current = data?.id ?? null;
       }
+
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
       setMessages((prev) => [

@@ -372,6 +372,7 @@ export type Database = {
           age_range: string | null
           answer: string
           created_at: string
+          crianca_id: string | null
           id: string
           question: string
           user_id: string
@@ -381,6 +382,7 @@ export type Database = {
           age_range?: string | null
           answer: string
           created_at?: string
+          crianca_id?: string | null
           id?: string
           question: string
           user_id: string
@@ -390,12 +392,21 @@ export type Database = {
           age_range?: string | null
           answer?: string
           created_at?: string
+          crianca_id?: string | null
           id?: string
           question?: string
           user_id?: string
           was_narrated?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "kidzz_questions_log_crianca_id_fkey"
+            columns: ["crianca_id"]
+            isOneToOne: false
+            referencedRelation: "criancas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       memories: {
         Row: {
@@ -811,6 +822,7 @@ export type Database = {
         Args: { p_acao: string; p_dados: Json; p_token: string }
         Returns: Json
       }
+      owns_crianca: { Args: { _crianca_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

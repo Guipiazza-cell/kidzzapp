@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveCriancaId } from "@/hooks/useCriancas";
+
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import ShareCardModal from "@/components/viral/ShareCardModal";
@@ -79,25 +81,28 @@ const AnswerScreen = ({ question, answer, onNewQuestion, onOpenStoryFactory }: P
       toast.success("+1 ponto de sabedoria", { duration: 2500 });
     }
 
-    // Persist Q&A to parent log (one row per answer rendered).
+    // Persist Q&A to parent log (one row per answer rendered), scoped to the active child.
     if (!loggedRef.current && user && question && answer) {
       loggedRef.current = true;
-      supabase
-        .from("kidzz_questions_log")
-        .insert({
-          user_id: user.id,
-          question,
-          answer,
-          age_range: profile?.age_range ?? null,
-          was_narrated: false,
-        })
-        .select("id")
-        .single()
-        .then(({ data, error }) => {
-          if (error) console.warn("[Kidzz] log insert failed:", error.message);
-          else logIdRef.current = data?.id ?? null;
-        });
+      (async () => {
+        const criancaId = await resolveCriancaId(user.id);
+        const { data, error } = await supabase
+          .from("kidzz_questions_log")
+          .insert({
+            user_id: user.id,
+            crianca_id: criancaId,
+            question,
+            answer,
+            age_range: profile?.age_range ?? null,
+            was_narrated: false,
+          })
+          .select("id")
+          .single();
+        if (error) console.warn("[Kidzz] log insert failed:", error.message);
+        else logIdRef.current = data?.id ?? null;
+      })();
     }
+
 
     if (!isPremium) {
       const tCTA = setTimeout(() => setShowCTA(true), 3000);
