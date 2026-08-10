@@ -12,6 +12,8 @@ import { captureAndShare } from "@/lib/viralShare";
 import ShareableWeekCard from "@/components/viral/ShareableWeekCard";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import PrivacyCenter from "@/components/parental/PrivacyCenter";
+import { AnimatePresence } from "framer-motion";
 
 interface Props {
   onClose: () => void;
@@ -93,6 +95,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
   const shareRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
 
   const openPortal = async () => {
     if (portalLoading) return;
@@ -419,6 +422,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           topThemes={themes}
         />
       </div>
+          <AnimatePresence>{privacyOpen && <PrivacyCenter onClose={() => setPrivacyOpen(false)} />}</AnimatePresence>
     </Wrapper>
   );
 };
