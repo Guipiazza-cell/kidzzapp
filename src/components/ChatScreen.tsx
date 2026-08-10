@@ -80,14 +80,18 @@ const ChatScreen = ({
         const sinceIso = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
-        const { data, error } = await supabase
+        const criancaId = await resolveCriancaId(user.id);
+        let q = supabase
           .from("kidzz_questions_log")
           .select("question, created_at")
           .eq("user_id", user.id)
           .gte("created_at", sinceIso)
-          .lt("created_at", todayStart.toISOString())
+          .lt("created_at", todayStart.toISOString());
+        if (criancaId) q = q.eq("crianca_id", criancaId);
+        const { data, error } = await q
           .order("created_at", { ascending: false })
           .limit(1);
+
         if (cancelled || error || !data?.[0]) {
           if (error) console.warn("[Kidzz] chat memória indisponível:", error.message);
           return;
