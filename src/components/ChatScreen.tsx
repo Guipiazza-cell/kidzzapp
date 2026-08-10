@@ -220,13 +220,15 @@ const ChatScreen = ({
       await streamChat(allMessages);
       setConnectionCount((c) => c + 1);
 
-      // Persist Q&A in the parent log (RLS protected, only the parent sees it).
+      // Persist Q&A in the parent log (RLS protected, scoped to user + active child).
       const answer = lastAssistantTextRef.current?.trim();
       if (user && answer) {
+        const criancaId = await resolveCriancaId(user.id);
         const { data, error } = await supabase
           .from("kidzz_questions_log")
           .insert({
             user_id: user.id,
+            crianca_id: criancaId,
             question: trimmed,
             answer,
             age_range: ageRange,
@@ -237,6 +239,7 @@ const ChatScreen = ({
         if (error) console.warn("[Kidzz] log insert failed:", error.message);
         else lastLogIdRef.current = data?.id ?? null;
       }
+
     } catch (e: any) {
       toast.error(e.message || "Ops, algo deu errado!");
       setMessages((prev) => [
