@@ -13,6 +13,8 @@ import { useTTS } from "@/hooks/useTTS";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveCriancaId } from "@/hooks/useCriancas";
+
 import { toast } from "sonner";
 
 interface Message {

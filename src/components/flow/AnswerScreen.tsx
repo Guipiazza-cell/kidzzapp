@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlan } from "@/hooks/usePlan";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveCriancaId } from "@/hooks/useCriancas";
+
 import { useMemories } from "@/hooks/useMemories";
 import { useAchievementSync } from "@/hooks/useAchievementSync";
 import ShareCardModal from "@/components/viral/ShareCardModal";
