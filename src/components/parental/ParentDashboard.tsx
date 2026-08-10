@@ -378,7 +378,18 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
             </button>
           )}
 
+          {/* Privacidade (discreto) */}
+          <button
+            onClick={() => setPrivacyOpen(true)}
+            className="w-full min-h-[44px] flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-muted/40 hover:bg-muted/70 border border-border/60 transition-colors"
+          >
+            <Lock className="w-4 h-4 text-muted-foreground" />
+            <span className="flex-1 text-left text-[13px] font-bold text-foreground">Privacidade</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+
           {/* Share button */}
+
           <button
             onClick={handleShare}
             disabled={sharing}
