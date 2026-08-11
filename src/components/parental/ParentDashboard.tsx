@@ -234,7 +234,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-black text-foreground leading-tight truncate">
-            Semana de {childName} 📊
+            Semana do(a) {childName}&nbsp;
           </h2>
           <p className="text-[11px] text-muted-foreground font-bold capitalize">{weekLabel}</p>
         </div>
@@ -262,7 +262,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </div>
 
           {/* Themes */}
-          <Section title="Temas explorados" emoji="🧭">
+          <Section title="TEMAS EXPLORADOS">
             {themes.length === 0 ? (
               <p className="text-xs text-muted-foreground">Nenhuma pergunta esta semana ainda.</p>
             ) : (
@@ -277,7 +277,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </Section>
 
           {/* Top moments */}
-          <Section title="Momentos da semana" emoji="✨">
+          <Section title="MOMENTOS DA SEMANA">
             {topMoments.length === 0 ? (
               <p className="text-xs text-muted-foreground">As perguntas favoritas vão aparecer aqui.</p>
             ) : (
@@ -296,7 +296,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </Section>
 
           {/* Routine */}
-          <Section title="Rotina" emoji="🎯">
+          <Section title="ROTINA">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-muted-foreground font-semibold">Hoje</span>
               <span className="text-sm font-extrabold text-foreground">{routinePercent}%</span>
@@ -317,7 +317,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </Section>
 
           {/* Acompanhe o [NOME] - assinatura */}
-          <Section title={`Acompanhe ${childName}`} emoji="👨‍👩‍👧">
+          <Section title={`ACOMPANHE ${childName.toUpperCase()}`}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Crown className={`w-4 h-4 ${ent.plan === "premium" ? "text-amber-500" : ent.plan === "kidzz" ? "text-emerald-600" : "text-muted-foreground"}`} />
@@ -337,7 +337,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
             <p className="text-[11px] text-muted-foreground leading-snug mb-3">
               {ent.plan === "free"
                 ? `Você está acompanhando ${childName} no plano gratuito.`
-                : `Obrigado por apoiar o desenvolvimento de ${childName}. ❤️`}
+                : `Obrigado por apoiar o desenvolvimento de ${childName}.&nbsp;`}
             </p>
             {ent.plan === "free" ? (
               <button
@@ -404,7 +404,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </button>
 
           <p className="text-center text-[10px] text-muted-foreground font-bold">
-            ❤️ Mais de 1.000 famílias acompanham assim
+            &nbsp;Mais de 1.000 famílias acompanham assim
           </p>
         </div>
       )}
@@ -477,10 +477,10 @@ const StatCard = ({ icon, value, label, tone }: { icon: React.ReactNode; value: 
   </div>
 );
 
-const Section = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
+const Section = ({ title, children }: { title: string; emoji?: string; children: React.ReactNode }) => (
   <div className="bg-muted/30 rounded-2xl p-3.5">
     <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground mb-2">
-      {emoji} {title}
+      &nbsp;{title}
     </p>
     {children}
   </div>
