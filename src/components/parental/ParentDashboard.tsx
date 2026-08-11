@@ -262,7 +262,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </div>
 
           {/* Themes */}
-          <Section title="Temas explorados" emoji="🧭">
+          <Section title="TEMAS EXPLORADOS">
             {themes.length === 0 ? (
               <p className="text-xs text-muted-foreground">Nenhuma pergunta esta semana ainda.</p>
             ) : (
