@@ -19,6 +19,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const Success = lazy(() => import("./pages/Success"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ResetPin = lazy(() => import("./pages/ResetPin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Admin = lazy(() => import("./pages/Admin"));
