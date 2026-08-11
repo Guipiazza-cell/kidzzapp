@@ -11,6 +11,7 @@ export type TabName =
   | "sonhos"
   | "historias"
   | "brincar"
+  | "bora"
   | "rotina"
   | "momentos"
   | "cinema"
@@ -101,10 +102,12 @@ export const analytics = {
     duration_seconds: number;
     /** Rótulo curto da atividade (nunca texto escrito por pais/criança). */
     title?: string;
+    /** false quando o fluxo já grava em `conclusoes` por conta própria (aba Bora). */
+    persist?: boolean;
   }): void {
-    const { title, ...eventProps } = props;
+    const { title, persist = true, ...eventProps } = props;
     capture("activity_completed", eventProps);
-    void persistConclusao(props);
+    if (persist) void persistConclusao({ ...eventProps, title });
   },
 
   /** Marcar/desmarcar tarefa da Rotina (não é atividade com início e fim). */

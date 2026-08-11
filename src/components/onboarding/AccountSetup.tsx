@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import PinSetupForm from "@/components/parental/PinSetupForm";
+import { hasCustomPin } from "@/lib/parentalPin";
 
 
 interface AccountSetupProps {
@@ -138,6 +140,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
+  const [pinStep, setPinStep] = useState(false);
   const submittingRef = useRef(false);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
@@ -178,6 +181,11 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       // Refetch profile so Index sees onboarding_done=true and drops into the app.
       try { await refreshProfile(); } catch {}
       setSuccess(true);
+      // Passo do adulto: criar o PIN dos pais antes de entrar no app.
+      if (!hasCustomPin()) {
+        setTimeout(() => setPinStep(true), 450);
+        return;
+      }
       setTimeout(() => onDone(), 450);
     },
     [onDone, refreshProfile]
@@ -334,6 +342,22 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
     }),
     []
   );
+
+  if (pinStep) {
+    return (
+      <div className="flex flex-col min-h-full px-6 pt-10 pb-10 items-center justify-center">
+        <div className="w-full max-w-sm">
+          <h2 className="font-black text-foreground text-center" style={{ fontSize: 22 }}>
+            Crie o PIN dos pais
+          </h2>
+          <p className="text-center text-muted-foreground mt-2 mb-5" style={{ fontSize: 14 }}>
+            4 dígitos para proteger a Área dos Pais. Só o adulto precisa saber.
+          </p>
+          <PinSetupForm saveLabel="Salvar e entrar" onSaved={onDone} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

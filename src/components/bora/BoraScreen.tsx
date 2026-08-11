@@ -24,6 +24,7 @@ import { ComoFoiModal } from "./ComoFoiModal";
 import { DiarioSemTela } from "./DiarioSemTela";
 import { GuardaCelularScreen } from "./GuardaCelularScreen";
 import { scheduleDailyReminder } from "@/lib/dailyReminder";
+import { analytics } from "@/lib/analytics";
 import {
   FONT,
   SERIF,
@@ -300,6 +301,13 @@ const BoraScreen = ({ onBack }: Props) => {
       setSurpriseSalva(false);
       return;
     }
+    analytics.activityCompleted({
+      tab: "bora",
+      activity_id: act.id || act.titulo,
+      duration_seconds: (act.tela_min ?? 0) * 60,
+      title: act.titulo,
+      persist: false,
+    });
     refreshStats();
   };
 
@@ -463,6 +471,8 @@ const BoraScreen = ({ onBack }: Props) => {
         open={guardaOpen}
         minutes={TODAY_ACTIVITY.tela_min}
         childName={firstName}
+        activityId={(TODAY_ACTIVITY as { id?: string }).id}
+        activityTitle={TODAY_ACTIVITY.titulo}
         onDone={handleGuardaDone}
         onCancel={() => setGuardaOpen(false)}
       />

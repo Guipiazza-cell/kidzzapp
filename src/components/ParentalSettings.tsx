@@ -7,6 +7,7 @@ import { useAffiliate } from "@/hooks/useAffiliate";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import QuestionHistoryPanel from "@/components/parental/QuestionHistoryPanel";
+import PinSetupForm from "@/components/parental/PinSetupForm";
 
 interface ParentalSettingsProps {
   onClose: () => void;
@@ -260,6 +261,18 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
               Gerenciar / Cancelar assinatura
             </button>
           )}
+
+          {/* Alterar PIN dos pais */}
+          <div className="bg-muted/50 rounded-2xl p-4">
+            <p className="font-bold text-sm text-foreground mb-1">Alterar PIN dos pais</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              4 dígitos. Escolha algo que só você saiba.
+            </p>
+            <PinSetupForm
+              saveLabel="Salvar novo PIN"
+              onSaved={() => toast.success("PIN dos pais atualizado!")}
+            />
+          </div>
 
           {/* Support email */}
           <div className="bg-muted/50 rounded-2xl p-3 text-center">
