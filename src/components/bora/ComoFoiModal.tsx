@@ -4,6 +4,7 @@ import { Camera, X, Share2, Heart, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { captureAndShare } from "@/lib/viralShare";
+import { analytics } from "@/lib/analytics";
 import { ShareMomentCard } from "./ShareMomentCard";
 
 type Props = {
