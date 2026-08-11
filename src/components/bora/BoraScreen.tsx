@@ -24,6 +24,7 @@ import { ComoFoiModal } from "./ComoFoiModal";
 import { DiarioSemTela } from "./DiarioSemTela";
 import { GuardaCelularScreen } from "./GuardaCelularScreen";
 import { scheduleDailyReminder } from "@/lib/dailyReminder";
+import { analytics } from "@/lib/analytics";
 import {
   FONT,
   SERIF,
