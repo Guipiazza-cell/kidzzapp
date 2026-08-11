@@ -300,6 +300,13 @@ const BoraScreen = ({ onBack }: Props) => {
       setSurpriseSalva(false);
       return;
     }
+    analytics.activityCompleted({
+      tab: "bora",
+      activity_id: act.id || act.titulo,
+      duration_seconds: (act.tela_min ?? 0) * 60,
+      title: act.titulo,
+      persist: false,
+    });
     refreshStats();
   };
 
