@@ -337,7 +337,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
             <p className="text-[11px] text-muted-foreground leading-snug mb-3">
               {ent.plan === "free"
                 ? `Você está acompanhando ${childName} no plano gratuito.`
-                : `Obrigado por apoiar o desenvolvimento de ${childName}. ❤️`}
+                : `Obrigado por apoiar o desenvolvimento de ${childName}.&nbsp;`}
             </p>
             {ent.plan === "free" ? (
               <button
