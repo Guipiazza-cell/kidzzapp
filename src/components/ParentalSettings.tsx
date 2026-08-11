@@ -16,9 +16,9 @@ const AMBER = "#E8821A";
 const AMBER_DEEP = "#C96B0E";
 
 const AGE_RANGES = [
-  { range: "0-3", label: "0 a 3 anos", emoji: "👶", description: "Sons, cores e palavras curtas." },
-  { range: "3-7", label: "3 a 7 anos", emoji: "🧒", description: "Historinhas e exemplos do dia a dia." },
-  { range: "7-10", label: "7 a 10 anos", emoji: "🧑‍🎓", description: "Curiosidades e desafios científicos." },
+  { range: "0-3", label: "2 a 5 anos", emoji: "\n", description: "Sons, cores e palavras curtas." },
+  { range: "3-7", label: "6 a 9 anos", emoji: "\n", description: "Historinhas e exemplos do dia a dia." },
+  { range: "7-10", label: "10 a 12 anos", emoji: "\n", description: "Curiosidades e desafios científicos." },
 ];
 
 const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
@@ -109,14 +109,14 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
           <div className={`rounded-2xl p-4 text-center ${isPremium ? "kid-gradient-premium text-white" : "bg-muted"}`}>
             <p className="font-extrabold text-lg">
               {plan === "premium"
-                ? "⚡ Kidzz Premium Ativo"
+                ? "\u00a0Kidzz Premium Ativo"
                 : isPremium
                 ? "⭐ Plano Kidzz Ativo"
                 : "Plano Gratuito"}
             </p>
             <p className="text-sm opacity-80">
               {isPremium
-                ? "Você tem acesso completo. ✨"
+                ? "Você tem acesso completo.\u00a0"
                 : "Experimente algumas perguntas e 1 história por dia."}
             </p>
           </div>
@@ -184,7 +184,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
 
           {/* Child info */}
           <div className="bg-muted/50 rounded-2xl p-3">
-            <p className="font-bold text-sm text-foreground">👧 Nome da criança</p>
+            <p className="font-bold text-sm text-foreground">{"\u00a0"}Nome da criança</p>
             <p className="text-sm text-muted-foreground">{profile?.child_name || "Não definido"}</p>
           </div>
 
