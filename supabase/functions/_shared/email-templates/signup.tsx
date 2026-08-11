@@ -24,34 +24,31 @@ interface SignupEmailProps {
 export const SignupEmail = ({
   siteName,
   siteUrl,
-  recipient,
   confirmationUrl,
 }: SignupEmailProps) => (
-  <Html lang="en" dir="ltr">
+  <Html lang="pt-BR" dir="ltr">
     <Head />
-    <Preview>Confirm your email for {siteName}</Preview>
+    <Preview>Confirme seu e-mail e comece a usar o Kidzz</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirm your email</Heading>
+        <Text style={brand}>Kidzz</Text>
+        <Heading style={h1}>Bem-vindo ao Kidzz</Heading>
         <Text style={text}>
-          Thanks for signing up for{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          !
+          Que bom ter você aqui. Falta só um passo para desligar a tela e ligar a
+          infância com o seu filho.
         </Text>
         <Text style={text}>
-          Please confirm your email address (
-          <Link href={`mailto:${recipient}`} style={link}>
-            {recipient}
-          </Link>
-          ) by clicking the button below:
+          Toque no botão abaixo para confirmar seu e-mail:
         </Text>
         <Button style={button} href={confirmationUrl}>
-          Verify Email
+          Confirmar meu e-mail
         </Button>
         <Text style={footer}>
-          If you didn't create an account, you can safely ignore this email.
+          Se você não criou uma conta no{' '}
+          <Link href={siteUrl} style={link}>
+            {siteName}
+          </Link>
+          , pode ignorar este e-mail com tranquilidade.
         </Text>
       </Container>
     </Body>
@@ -60,27 +57,46 @@ export const SignupEmail = ({
 
 export default SignupEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily:
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+}
+const container = {
+  padding: '32px 28px',
+  maxWidth: '520px',
+  backgroundColor: '#F7F6F2',
+  borderRadius: '20px',
+}
+const brand = {
+  fontSize: '13px',
+  letterSpacing: '2px',
+  textTransform: 'uppercase' as const,
+  color: '#8FBF7F',
   fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
+  margin: '0 0 18px',
+}
+const h1 = {
+  fontSize: '24px',
+  fontWeight: 'bold' as const,
+  color: '#2E2E2E',
+  margin: '0 0 18px',
 }
 const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
+  fontSize: '16px',
+  color: '#5A5A5A',
+  lineHeight: '1.6',
+  margin: '0 0 20px',
 }
-const link = { color: 'inherit', textDecoration: 'underline' }
+const link = { color: '#6FA65D', textDecoration: 'underline' }
 const button = {
-  backgroundColor: '#000000',
+  backgroundColor: '#8FBF7F',
   color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
+  fontSize: '16px',
+  fontWeight: 'bold' as const,
+  borderRadius: '20px',
+  padding: '14px 28px',
   textDecoration: 'none',
+  display: 'inline-block',
 }
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const footer = { fontSize: '13px', color: '#8C8C8C', margin: '32px 0 0', lineHeight: '1.6' }
