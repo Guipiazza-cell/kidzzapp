@@ -477,10 +477,10 @@ const StatCard = ({ icon, value, label, tone }: { icon: React.ReactNode; value: 
   </div>
 );
 
-const Section = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
+const Section = ({ title, children }: { title: string; emoji?: string; children: React.ReactNode }) => (
   <div className="bg-muted/30 rounded-2xl p-3.5">
     <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground mb-2">
-      {emoji} {title}
+      &nbsp;{title}
     </p>
     {children}
   </div>
