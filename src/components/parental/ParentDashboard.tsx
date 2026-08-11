@@ -296,7 +296,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </Section>
 
           {/* Routine */}
-          <Section title="Rotina" emoji="🎯">
+          <Section title="ROTINA">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-muted-foreground font-semibold">Hoje</span>
               <span className="text-sm font-extrabold text-foreground">{routinePercent}%</span>
