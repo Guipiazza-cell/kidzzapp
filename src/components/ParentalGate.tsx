@@ -5,6 +5,7 @@ import { haptic } from "@/lib/haptics";
 import { supabase } from "@/integrations/supabase/client";
 import PinSetupForm from "@/components/parental/PinSetupForm";
 import {
+  APP_ORIGIN,
   DEFAULT_PIN_HASH,
   PIN_ATTEMPTS_KEY,
   PIN_LOCK_DURATION_MS,
