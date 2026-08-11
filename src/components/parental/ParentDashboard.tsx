@@ -404,7 +404,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </button>
 
           <p className="text-center text-[10px] text-muted-foreground font-bold">
-            ❤️ Mais de 1.000 famílias acompanham assim
+            &nbsp;Mais de 1.000 famílias acompanham assim
           </p>
         </div>
       )}
