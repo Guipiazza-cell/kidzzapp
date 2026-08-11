@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Leaf, X } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 type Props = {
   open: boolean;
   minutes: number;
   childName?: string;
+  activityId?: string;
+  activityTitle?: string;
   onDone: () => void;
   onCancel: () => void;
 };
@@ -15,7 +18,15 @@ type Props = {
  * Única tela de contagem do fluxo Bora (não há outra fora dela).
  * Cronômetro premium: anel circular + glass + dígitos serif.
  */
-export const GuardaCelularScreen = ({ open, minutes, childName = "", onDone, onCancel }: Props) => {
+export const GuardaCelularScreen = ({
+  open,
+  minutes,
+  childName = "",
+  activityId,
+  activityTitle,
+  onDone,
+  onCancel,
+}: Props) => {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -23,9 +34,13 @@ export const GuardaCelularScreen = ({ open, minutes, childName = "", onDone, onC
       setElapsed(0);
       return;
     }
+    analytics.activityStarted({
+      tab: "bora",
+      activity_id: activityId || activityTitle || "bora_timer",
+    });
     const t = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(t);
-  }, [open]);
+  }, [open, activityId, activityTitle]);
 
   const target = Math.max(1, minutes) * 60;
   const progress = Math.min(1, elapsed / target);
