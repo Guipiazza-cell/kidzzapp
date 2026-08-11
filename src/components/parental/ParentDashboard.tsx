@@ -234,7 +234,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="text-lg font-black text-foreground leading-tight truncate">
-            Semana de {childName} 📊
+            Semana do(a) {childName}&nbsp;
           </h2>
           <p className="text-[11px] text-muted-foreground font-bold capitalize">{weekLabel}</p>
         </div>
