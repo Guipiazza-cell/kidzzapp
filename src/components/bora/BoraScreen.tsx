@@ -471,6 +471,8 @@ const BoraScreen = ({ onBack }: Props) => {
         open={guardaOpen}
         minutes={TODAY_ACTIVITY.tela_min}
         childName={firstName}
+        activityId={(TODAY_ACTIVITY as { id?: string }).id}
+        activityTitle={TODAY_ACTIVITY.titulo}
         onDone={handleGuardaDone}
         onCancel={() => setGuardaOpen(false)}
       />
