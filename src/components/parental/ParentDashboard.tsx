@@ -317,7 +317,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </Section>
 
           {/* Acompanhe o [NOME] - assinatura */}
-          <Section title={`Acompanhe ${childName}`} emoji="👨‍👩‍👧">
+          <Section title={`ACOMPANHE ${childName.toUpperCase()}`}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Crown className={`w-4 h-4 ${ent.plan === "premium" ? "text-amber-500" : ent.plan === "kidzz" ? "text-emerald-600" : "text-muted-foreground"}`} />
