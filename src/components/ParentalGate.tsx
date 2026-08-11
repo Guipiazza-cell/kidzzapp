@@ -164,7 +164,7 @@ const ParentalGate = ({ onSuccess, onCancel }: ParentalGateProps) => {
       setRecoveryMsg(
         error
           ? "Não deu para enviar agora. Tente de novo em instantes."
-          : "Enviamos um link para o e-mail da conta. Abra por lá para criar um novo PIN."
+          : "Prontinho! Abra o e-mail da sua conta e toque no link para criar seu PIN. Leva menos de um minuto."
       );
     } catch {
       setRecoveryMsg("Não deu para enviar agora. Tente de novo em instantes.");
