@@ -166,7 +166,7 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
                       : "bg-muted text-muted-foreground hover:bg-primary/10"
                   }`}
                 >
-                  <span className="text-lg block">{emoji}</span>
+                  <span className="text-lg block whitespace-pre-wrap">{emoji}</span>
                   {label}
                   <span className="block text-[9px] mt-0.5 opacity-70">{description}</span>
                 </button>
