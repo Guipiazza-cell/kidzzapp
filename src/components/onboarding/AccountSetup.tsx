@@ -140,6 +140,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
+  const [pinStep, setPinStep] = useState(false);
   const submittingRef = useRef(false);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
