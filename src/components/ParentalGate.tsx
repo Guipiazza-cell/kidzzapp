@@ -5,6 +5,7 @@ import { haptic } from "@/lib/haptics";
 import { supabase } from "@/integrations/supabase/client";
 import PinSetupForm from "@/components/parental/PinSetupForm";
 import {
+  APP_ORIGIN,
   DEFAULT_PIN_HASH,
   PIN_ATTEMPTS_KEY,
   PIN_LOCK_DURATION_MS,
@@ -159,7 +160,7 @@ const ParentalGate = ({ onSuccess, onCancel }: ParentalGateProps) => {
         return;
       }
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-pin`,
+        redirectTo: `${APP_ORIGIN}/reset-pin`,
       });
       setRecoveryMsg(
         error

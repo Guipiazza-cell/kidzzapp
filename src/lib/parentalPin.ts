@@ -9,6 +9,9 @@ export const PIN_LOCK_DURATION_MS = 60 * 1000;
 export const DEFAULT_PIN_HASH =
   "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
 
+/** Origem de produção fixa para links de recuperação (nunca preview). */
+export const APP_ORIGIN = "https://kidzz.app";
+
 export async function sha256Hex(input: string): Promise<string> {
   const buf = new TextEncoder().encode(input);
   const hash = await crypto.subtle.digest("SHA-256", buf);
