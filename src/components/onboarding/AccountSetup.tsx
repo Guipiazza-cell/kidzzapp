@@ -343,6 +343,22 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
     []
   );
 
+  if (pinStep) {
+    return (
+      <div className="flex flex-col min-h-full px-6 pt-10 pb-10 items-center justify-center">
+        <div className="w-full max-w-sm">
+          <h2 className="font-black text-foreground text-center" style={{ fontSize: 22 }}>
+            Crie o PIN dos pais
+          </h2>
+          <p className="text-center text-muted-foreground mt-2 mb-5" style={{ fontSize: 14 }}>
+            4 dígitos para proteger a Área dos Pais. Só o adulto precisa saber.
+          </p>
+          <PinSetupForm saveLabel="Salvar e entrar" onSaved={onDone} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="min-h-[100dvh] flex flex-col items-center px-5 relative overflow-y-auto overflow-x-hidden overscroll-contain"
