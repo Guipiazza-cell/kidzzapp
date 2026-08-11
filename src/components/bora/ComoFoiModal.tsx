@@ -50,13 +50,21 @@ export const ComoFoiModal = ({ open, onClose, onSaved, activity, criancaId, chil
         const up = await supabase.storage.from("momentos").upload(path, photoFile, { contentType: photoFile.type, upsert: false });
         if (!up.error) foto_url = path;
       }
-      await supabase.from("conclusoes").insert({
+      const { error } = await supabase.from("conclusoes").insert({
         user_id: user.id,
         crianca_id: criancaId || null,
         activity_id: activity.id || null,
         titulo_snapshot: activity.titulo,
         tela_min: activity.tela_min,
         foto_url,
+      });
+      if (error) throw error;
+      analytics.activityCompleted({
+        tab: "bora",
+        activity_id: activity.id || activity.titulo,
+        duration_seconds: (activity.tela_min ?? 0) * 60,
+        title: activity.titulo,
+        persist: false,
       });
       setSaved(true);
       onSaved?.();
