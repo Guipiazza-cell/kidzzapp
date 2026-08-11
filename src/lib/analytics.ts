@@ -11,6 +11,7 @@ export type TabName =
   | "sonhos"
   | "historias"
   | "brincar"
+  | "bora"
   | "rotina"
   | "momentos"
   | "cinema"
