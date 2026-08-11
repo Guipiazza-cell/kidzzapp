@@ -261,6 +261,18 @@ const ParentalSettings = ({ onClose }: ParentalSettingsProps) => {
             </button>
           )}
 
+          {/* Alterar PIN dos pais */}
+          <div className="bg-muted/50 rounded-2xl p-4">
+            <p className="font-bold text-sm text-foreground mb-1">Alterar PIN dos pais</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              4 dígitos. Escolha algo que só você saiba.
+            </p>
+            <PinSetupForm
+              saveLabel="Salvar novo PIN"
+              onSaved={() => toast.success("PIN dos pais atualizado!")}
+            />
+          </div>
+
           {/* Support email */}
           <div className="bg-muted/50 rounded-2xl p-3 text-center">
             <p className="font-bold text-sm text-foreground">📧 Suporte</p>
