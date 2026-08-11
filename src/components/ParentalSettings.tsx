@@ -7,6 +7,7 @@ import { useAffiliate } from "@/hooks/useAffiliate";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import QuestionHistoryPanel from "@/components/parental/QuestionHistoryPanel";
+import PinSetupForm from "@/components/parental/PinSetupForm";
 
 interface ParentalSettingsProps {
   onClose: () => void;
