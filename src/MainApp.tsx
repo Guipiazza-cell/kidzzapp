@@ -70,6 +70,7 @@ const MainApp = () => {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/landing" element={<Landing />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/reset-pin" element={<ResetPin />} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="/assinatura" element={<ProtectedRoute><MinhaAssinatura /></ProtectedRoute>} />
               <Route path="/criancas" element={<ProtectedRoute><MinhasCriancas /></ProtectedRoute>} />
