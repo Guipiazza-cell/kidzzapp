@@ -277,7 +277,7 @@ const ParentDashboard = ({ onClose, onOpenSettings, onOpenUpgrade }: Props) => {
           </Section>
 
           {/* Top moments */}
-          <Section title="Momentos da semana" emoji="✨">
+          <Section title="MOMENTOS DA SEMANA">
             {topMoments.length === 0 ? (
               <p className="text-xs text-muted-foreground">As perguntas favoritas vão aparecer aqui.</p>
             ) : (
