@@ -178,6 +178,11 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       // Refetch profile so Index sees onboarding_done=true and drops into the app.
       try { await refreshProfile(); } catch {}
       setSuccess(true);
+      // Passo do adulto: criar o PIN dos pais antes de entrar no app.
+      if (!hasCustomPin()) {
+        setTimeout(() => setPinStep(true), 450);
+        return;
+      }
       setTimeout(() => onDone(), 450);
     },
     [onDone, refreshProfile]
