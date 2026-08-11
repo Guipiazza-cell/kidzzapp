@@ -303,13 +303,17 @@ const ParentalGate = ({ onSuccess, onCancel }: ParentalGateProps) => {
           )}
         </div>
 
+        <p className="text-[11px] leading-tight text-center text-muted-foreground mt-5">
+          Não sabe o PIN? Sem problema, é só tocar abaixo.
+        </p>
+
         {/* Recuperação por e-mail (não abre troca de PIN direto) */}
         <button
           onClick={handleForgotPin}
           disabled={sendingRecovery}
-          className="w-full text-xs text-muted-foreground hover:text-foreground mt-4 underline disabled:opacity-40 min-h-[44px]"
+          className="w-full text-xs text-muted-foreground hover:text-foreground mt-2 underline disabled:opacity-40 min-h-[44px]"
         >
-          {sendingRecovery ? "Enviando e-mail..." : "Esqueci o PIN"}
+          {sendingRecovery ? "Enviando e-mail..." : "Primeiro acesso ou esqueceu o PIN?"}
         </button>
         {recoveryMsg && (
           <p className="text-xs text-center text-muted-foreground mt-2">{recoveryMsg}</p>
