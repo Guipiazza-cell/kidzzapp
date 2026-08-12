@@ -333,6 +333,10 @@ const BoraScreen = ({ onBack }: Props) => {
       try {
         window.localStorage.setItem(DIARY_KEY, JSON.stringify(next));
       } catch {}
+      // Gatilho de paywall no fluxo principal (Bora fazer → Como foi → salvar)
+      if (!isPremium && next.completions >= 1 && next.completions <= 3) {
+        setTimeout(() => openPaywall("after_completion"), 500);
+      }
       return next;
     });
     const nome = profile?.child_name || "A família";
