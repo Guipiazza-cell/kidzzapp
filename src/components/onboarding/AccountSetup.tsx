@@ -141,6 +141,17 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
   const [pinStep, setPinStep] = useState(false);
+  const [skippedAccount, setSkippedAccount] = useState(false);
+
+  /** "Continuar sem conta": ninguém entra no app sem um PIN próprio. */
+  const handleSkipAccount = useCallback(() => {
+    if (hasCustomPin()) {
+      onDone();
+      return;
+    }
+    setSkippedAccount(true);
+    setPinStep(true);
+  }, [onDone]);
   const submittingRef = useRef(false);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
