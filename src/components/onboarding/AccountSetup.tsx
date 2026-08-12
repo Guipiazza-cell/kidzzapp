@@ -632,7 +632,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       </div>
 
       <button
-        onClick={onDone}
+        onClick={handleSkipAccount}
         className="mt-auto pt-6 font-semibold"
         style={{ color: "#9BB0A0", fontSize: 13 }}
       >
