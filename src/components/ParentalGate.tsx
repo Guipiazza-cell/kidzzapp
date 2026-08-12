@@ -305,7 +305,7 @@ const ParentalGate = ({ onSuccess, onCancel }: ParentalGateProps) => {
         </div>
 
         <p className="text-[11px] leading-tight text-center text-muted-foreground mt-5">
-          Não sabe o PIN? Sem problema, é só tocar abaixo.
+          {"\n"}
         </p>
 
         {/* Recuperação por e-mail (não abre troca de PIN direto) */}
