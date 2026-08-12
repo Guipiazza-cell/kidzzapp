@@ -353,7 +353,11 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           <p className="text-center text-muted-foreground mt-2 mb-5" style={{ fontSize: 14 }}>
             4 dígitos para proteger a Área dos Pais. Só o adulto precisa saber.
           </p>
-          <PinSetupForm saveLabel="Salvar e entrar" onSaved={onDone} />
+          <PinSetupForm
+            saveLabel="Salvar e entrar"
+            onSaved={onDone}
+            noAccountWarning={skippedAccount}
+          />
         </div>
       </div>
     );
