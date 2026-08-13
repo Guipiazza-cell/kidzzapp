@@ -374,7 +374,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           className="w-full max-w-md mb-3 text-center text-sm font-semibold rounded-2xl px-4 py-3"
           style={{ background: "#FDECE2", color: "#C0673E" }}
         >
-          Conexão com a nuvem indisponível - você pode continuar sem conta.
+          Conexão com a nuvem indisponível - verifique sua internet e tente novamente.
         </div>
       )}
 
