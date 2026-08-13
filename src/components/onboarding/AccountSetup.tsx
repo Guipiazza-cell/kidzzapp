@@ -616,13 +616,12 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         )}
       </div>
 
-      <button
-        onClick={handleSkipAccount}
-        className="mt-auto pt-6 font-semibold"
-        style={{ color: "#9BB0A0", fontSize: 13 }}
+      <p
+        className="mt-auto pt-6 text-center font-semibold"
+        style={{ color: "#9BB0A0", fontSize: 13, maxWidth: 320 }}
       >
-        Agora não - continuar sem conta
-      </button>
+        A conta é necessária para salvar as memórias e recuperar o PIN dos pais por e-mail.
+      </p>
     </div>
   );
 };

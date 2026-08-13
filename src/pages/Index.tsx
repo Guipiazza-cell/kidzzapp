@@ -523,15 +523,13 @@ const Index = () => {
     if (!interests || interests.length === 0) {
       return <InterestsOnboarding key="interesses-unico" />;
     }
-    if (!isAuthed && !accountStepDone) {
+    // Conta obrigatória: sem sessão real, não entra no app.
+    if (!isAuthed) {
       return (
         <AccountSetup
           key="account-unico"
           childName={profile.child_name}
-          onDone={() => {
-            try { window.localStorage.setItem("kidzz_account_step_done", "1"); } catch {}
-            setAccountStepDone(true);
-          }}
+          onDone={() => setAccountStepDone(true)}
         />
       );
     }
