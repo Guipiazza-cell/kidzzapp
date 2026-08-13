@@ -6,8 +6,6 @@ interface PinSetupFormProps {
   /** Chamado após o PIN ser salvo com sucesso. */
   onSaved: () => void;
   saveLabel?: string;
-  /** Mostra aviso de que não há recuperação por e-mail (uso sem conta). */
-  noAccountWarning?: boolean;
 }
 
 /** Dois campos de 4 dígitos (novo PIN + confirmar). Reutilizado em onboarding,
@@ -15,11 +13,11 @@ interface PinSetupFormProps {
 export const PinSetupForm = ({
   onSaved,
   saveLabel = "Salvar PIN",
-  noAccountWarning = false,
 }: PinSetupFormProps) => {
   const [newPin, setNewPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const mismatch =
     newPin.length === 4 && confirmPin.length === 4 && newPin !== confirmPin;
