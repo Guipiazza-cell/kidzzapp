@@ -141,17 +141,6 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
   const [pinStep, setPinStep] = useState(false);
-  const [skippedAccount, setSkippedAccount] = useState(false);
-
-  /** "Continuar sem conta": ninguém entra no app sem um PIN próprio. */
-  const handleSkipAccount = useCallback(() => {
-    if (hasCustomPin()) {
-      onDone();
-      return;
-    }
-    setSkippedAccount(true);
-    setPinStep(true);
-  }, [onDone]);
   const submittingRef = useRef(false);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
@@ -364,11 +353,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           <p className="text-center text-muted-foreground mt-2 mb-5" style={{ fontSize: 14 }}>
             4 dígitos para proteger a Área dos Pais. Só o adulto precisa saber.
           </p>
-          <PinSetupForm
-            saveLabel="Salvar e entrar"
-            onSaved={onDone}
-            noAccountWarning={skippedAccount}
-          />
+          <PinSetupForm saveLabel="Salvar e entrar" onSaved={onDone} />
         </div>
       </div>
     );
