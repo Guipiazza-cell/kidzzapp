@@ -336,13 +336,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const fetchProfile = useCallback(async (userId: string): Promise<Profile> => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("child_name, age_range, child_interests, questions_used, stories_used, last_usage_date, voice_enabled, is_admin, points, streak_days, last_streak_date, level, onboarding_done")
       .eq("id", userId)
       .single();
 
     const guest = getGuestProfile();
+
+    if (error && error.code !== "PGRST116") {
+      // Transient failure (network, token mid-refresh, replica lag) — NEVER treat as an empty/guest profile.
+      // Throw so callers keep the existing profile state instead of zeroing it out.
+      throw error;
+    }
 
     if (data) {
       const prof = resetDailyIfNeeded(data as unknown as Profile);
@@ -366,6 +372,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     return mergeProfileDraft(guest, userId);
   }, [resetDailyIfNeeded]);
+
 
   useEffect(() => {
     let mounted = true;
@@ -796,9 +803,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
-    const prof = await fetchProfile(user.id);
-    setProfile(prof);
+    try {
+      const prof = await fetchProfile(user.id);
+      setProfile(prof);
+    } catch (e) {
+      console.warn("[Auth] refreshProfile failed - keeping current profile", e);
+    }
   }, [user, fetchProfile]);
+
 
   return (
     <AuthContext.Provider value={{
