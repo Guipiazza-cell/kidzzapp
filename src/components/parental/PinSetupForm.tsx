@@ -26,9 +26,20 @@ export const PinSetupForm = ({
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
-    const ok = await savePin(newPin);
+    setSaveError(null);
+    let ok = false;
+    try {
+      ok = await savePin(newPin);
+    } catch {
+      ok = false;
+    }
     setSaving(false);
-    if (!ok) return;
+    if (!ok) {
+      setSaveError(
+        "Não conseguimos salvar o PIN neste aparelho. Saia do modo privado do navegador e tente de novo."
+      );
+      return;
+    }
     haptic("success");
     setNewPin("");
     setConfirmPin("");
