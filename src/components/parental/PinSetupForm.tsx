@@ -50,10 +50,9 @@ export const PinSetupForm = ({
 
   return (
     <div>
-      {noAccountWarning && (
-        <p className="text-sm text-amber-700 bg-amber-50 rounded-2xl px-4 py-3 mb-4 text-center leading-relaxed">
-          Como você não criou uma conta, se esquecer esse PIN não tem como
-          recuperar por e-mail — só reinstalando o app.
+      {saveError && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-2xl px-4 py-3 mb-4 text-center leading-relaxed">
+          {saveError}
         </p>
       )}
       <label className="sr-only" htmlFor="pin-new">Novo PIN</label>
