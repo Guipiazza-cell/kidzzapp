@@ -6,8 +6,6 @@ interface PinSetupFormProps {
   /** Chamado após o PIN ser salvo com sucesso. */
   onSaved: () => void;
   saveLabel?: string;
-  /** Mostra aviso de que não há recuperação por e-mail (uso sem conta). */
-  noAccountWarning?: boolean;
 }
 
 /** Dois campos de 4 dígitos (novo PIN + confirmar). Reutilizado em onboarding,
@@ -15,11 +13,11 @@ interface PinSetupFormProps {
 export const PinSetupForm = ({
   onSaved,
   saveLabel = "Salvar PIN",
-  noAccountWarning = false,
 }: PinSetupFormProps) => {
   const [newPin, setNewPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const mismatch =
     newPin.length === 4 && confirmPin.length === 4 && newPin !== confirmPin;
@@ -28,9 +26,20 @@ export const PinSetupForm = ({
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
-    const ok = await savePin(newPin);
+    setSaveError(null);
+    let ok = false;
+    try {
+      ok = await savePin(newPin);
+    } catch {
+      ok = false;
+    }
     setSaving(false);
-    if (!ok) return;
+    if (!ok) {
+      setSaveError(
+        "Não conseguimos salvar o PIN neste aparelho. Saia do modo privado do navegador e tente de novo."
+      );
+      return;
+    }
     haptic("success");
     setNewPin("");
     setConfirmPin("");
@@ -41,10 +50,9 @@ export const PinSetupForm = ({
 
   return (
     <div>
-      {noAccountWarning && (
-        <p className="text-sm text-amber-700 bg-amber-50 rounded-2xl px-4 py-3 mb-4 text-center leading-relaxed">
-          Como você não criou uma conta, se esquecer esse PIN não tem como
-          recuperar por e-mail — só reinstalando o app.
+      {saveError && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-2xl px-4 py-3 mb-4 text-center leading-relaxed">
+          {saveError}
         </p>
       )}
       <label className="sr-only" htmlFor="pin-new">Novo PIN</label>

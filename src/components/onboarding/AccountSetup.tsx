@@ -141,17 +141,6 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
   const [pinStep, setPinStep] = useState(false);
-  const [skippedAccount, setSkippedAccount] = useState(false);
-
-  /** "Continuar sem conta": ninguém entra no app sem um PIN próprio. */
-  const handleSkipAccount = useCallback(() => {
-    if (hasCustomPin()) {
-      onDone();
-      return;
-    }
-    setSkippedAccount(true);
-    setPinStep(true);
-  }, [onDone]);
   const submittingRef = useRef(false);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
@@ -364,11 +353,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           <p className="text-center text-muted-foreground mt-2 mb-5" style={{ fontSize: 14 }}>
             4 dígitos para proteger a Área dos Pais. Só o adulto precisa saber.
           </p>
-          <PinSetupForm
-            saveLabel="Salvar e entrar"
-            onSaved={onDone}
-            noAccountWarning={skippedAccount}
-          />
+          <PinSetupForm saveLabel="Salvar e entrar" onSaved={onDone} />
         </div>
       </div>
     );
@@ -389,7 +374,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           className="w-full max-w-md mb-3 text-center text-sm font-semibold rounded-2xl px-4 py-3"
           style={{ background: "#FDECE2", color: "#C0673E" }}
         >
-          Conexão com a nuvem indisponível - você pode continuar sem conta.
+          Conexão com a nuvem indisponível - verifique sua internet e tente novamente.
         </div>
       )}
 
@@ -631,13 +616,12 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         )}
       </div>
 
-      <button
-        onClick={handleSkipAccount}
-        className="mt-auto pt-6 font-semibold"
-        style={{ color: "#9BB0A0", fontSize: 13 }}
+      <p
+        className="mt-auto pt-6 text-center font-semibold"
+        style={{ color: "#9BB0A0", fontSize: 13, maxWidth: 320 }}
       >
-        Agora não - continuar sem conta
-      </button>
+        A conta é necessária para salvar as memórias e recuperar o PIN dos pais por e-mail.
+      </p>
     </div>
   );
 };
