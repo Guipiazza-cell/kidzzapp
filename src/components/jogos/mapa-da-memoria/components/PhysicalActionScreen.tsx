@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Sparkles, RotateCcw, CheckCircle2, PartyPopper } from 'lucide-react';
 import { PhysicalAction, ScenarioDefinition } from '../types';
@@ -10,12 +10,20 @@ interface PhysicalActionScreenProps { action: PhysicalAction; scenario: Scenario
 
 export const PhysicalActionScreen: React.FC<PhysicalActionScreenProps> = ({ action, userStory, onRestart }) => {
   const [completed, setCompleted] = useState(false);
+  const startedAtRef = useRef<number>(Date.now());
 
   const handleCompleteMission = () => {
+    if (completed) return;
     setCompleted(true);
     playChime(784);
-    analytics.activityCompleted({ tab: "brincar", activity_id: "mapa-da-memoria" });
+    analytics.activityCompleted({
+      tab: "brincar",
+      activity_id: "mapa-da-memoria",
+      duration_seconds: Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000)),
+      title: "Mapa da Memória",
+    });
   };
+
 
   return (
     <div className="relative z-20 flex flex-col items-center justify-between w-full h-full px-5 py-4 overflow-y-auto">
