@@ -32,7 +32,7 @@ const BR_IC = `${BR}/icons`;
 const GAME_ICON: Record<string, string> = {
   memory: `${BR_IC}/game-memory.png`,
   "pixel-pula": `${BR_IC}/game-pula.png`,
-  reaction: `${BR_IC}/game-reaction.png`,
+  "segredo-do-kidzz": `${BR_IC}/game-reaction.png`,
   emotions: `${BR_IC}/game-emotions.png`,
   create: `${BR_IC}/game-create.png`,
   word: `${BR_IC}/game-word.png`,
@@ -59,7 +59,7 @@ const MemoryGame = lazy(() => import("./games/MemoryGame"));
 const HangmanGame = lazy(() => import("./games/HangmanGame"));
 const DailyChallengeGame = lazy(() => import("./games/DailyChallengeGame"));
 const PixelPulaGame = lazy(() => import("./games/PixelPulaGame"));
-const ReactionGame = lazy(() => import("./games/ReactionGame"));
+const SegredoDoKidzzGame = lazy(() => import("@/components/jogos/segredo-do-kidzz/App"));
 const EmotionsGame = lazy(() => import("./games/EmotionsGame"));
 const CreateGame = lazy(() => import("./games/CreateGame"));
 
@@ -69,7 +69,7 @@ type GameId =
   | "memory"
   | "hangman"
   | "daily"
-  | "reaction"
+  | "segredo-do-kidzz"
   | "emotions"
   | "create";
 
@@ -152,7 +152,7 @@ const GAMES: {
 }[] = [
   { id: "memory", label: "Memória", emoji: "🧠", sub: "Grátis para todos", bgColor: "linear-gradient(135deg, hsl(280 65% 65%), hsl(265 70% 55%))" },
   { id: "pixel-pula", label: "Kidzz Pula!", emoji: "🦎", sub: "3 partidas por dia", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", premium: true, isNew: true },
-  { id: "reaction", label: "Reação", emoji: "⚡", sub: "Quão rápido você é?", bgColor: "linear-gradient(135deg, hsl(45 95% 55%), hsl(25 90% 50%))", premium: true, isNew: true },
+  { id: "segredo-do-kidzz", label: "O Segredo do Kidzz", emoji: "🌿", sub: "Adivinhe o bicho da floresta", bgColor: "linear-gradient(135deg, hsl(45 95% 55%), hsl(25 90% 50%))", premium: true, isNew: true },
   { id: "emotions", label: "Emoções", emoji: "💞", sub: "Mundo dos sentimentos", bgColor: "linear-gradient(135deg, hsl(320 70% 60%), hsl(280 65% 55%))", premium: true, isNew: true },
   { id: "create", label: "Eu Crio", emoji: "✨", sub: "Invente uma história", bgColor: "linear-gradient(135deg, hsl(200 75% 60%), hsl(260 70% 55%))", premium: true, isNew: true },
   { id: "word", label: "Caça Palavras", emoji: "🔍", sub: "Encontre as palavras", bgColor: "linear-gradient(135deg, hsl(200 75% 60%), hsl(210 80% 50%))", premium: true },
@@ -1229,17 +1229,7 @@ const KidzzPlay = ({
                   onHome={() => setActiveGame(null)}
                 />
               )}
-              {activeGame === "reaction" && (
-                <ReactionGame
-                  onScore={handleScore}
-                  onReaction={() => {}}
-                  onOpenAchievements={() => {
-                    setActiveGame(null);
-                    onOpenAchievements?.();
-                  }}
-                  onHome={() => setActiveGame(null)}
-                />
-              )}
+              {activeGame === "segredo-do-kidzz" && <SegredoDoKidzzGame />}
               {activeGame === "emotions" && (
                 <EmotionsGame
                   onScore={handleScore}
