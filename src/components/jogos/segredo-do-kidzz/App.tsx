@@ -8,17 +8,29 @@ import { GameScreen } from './components/GameScreen';
 import { CelebrationScreen } from './components/CelebrationScreen';
 import { DrawingOutroScreen } from './components/DrawingOutroScreen';
 import { soundFx } from './audio/soundEffects';
+import { analytics } from '@/lib/analytics';
 
 export default function SegredoDoKidzzApp() {
   const [phase, setPhase] = useState<GamePhase>('intro');
+  const startedAtRef = React.useRef<number>(Date.now());
+
+  const trackCompletion = () => {
+    const duration = Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000));
+    analytics.activityCompleted({
+      tab: 'brincar',
+      activity_id: 'segredo-do-kidzz',
+      duration_seconds: duration,
+      title: 'O Segredo do Kidzz',
+    });
+  };
   const [selectedCreature, setSelectedCreature] = useState<Creature>(() => getRandomCreature());
   const [settings, setSettings] = useState<GameSettings>({ roundDuration: 75, soundEnabled: true, ambientSound: true, playMode: 'classic' });
 
   const handleUpdateSettings = (newSettings: Partial<GameSettings>) => { setSettings((prev) => ({ ...prev, ...newSettings })); };
   const handleProceedToReadyCheck = () => { setPhase('ready_check'); };
-  const handleConfirmReady = () => { setPhase('playing'); };
-  const handleVictory = () => { setPhase('celebration'); };
-  const handleTimeout = () => { soundFx.playClueChime(4); setPhase('celebration'); };
+  const handleConfirmReady = () => { startedAtRef.current = Date.now(); setPhase('playing'); };
+  const handleVictory = () => { trackCompletion(); setPhase('celebration'); };
+  const handleTimeout = () => { soundFx.playClueChime(4); trackCompletion(); setPhase('celebration'); };
   const handleProceedToDrawing = () => { setPhase('drawing_outro'); };
   const handleRetryNewCreature = () => { const nextCreature = getRandomCreature(selectedCreature.id); setSelectedCreature(nextCreature); setPhase('playing'); };
   const handleBackToIntro = () => { setPhase('intro'); };
