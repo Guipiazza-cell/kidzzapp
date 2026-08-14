@@ -31,7 +31,7 @@ const BR_IC = `${BR}/icons`;
 /** Ícones premium 3D - jogos */
 const GAME_ICON: Record<string, string> = {
   memory: `${BR_IC}/game-memory.png`,
-  "pixel-pula": `${BR_IC}/game-pula.png`,
+  "mapa-da-memoria": `${BR_IC}/game-pula.png`,
   "segredo-do-kidzz": `${BR_IC}/game-reaction.png`,
   emotions: `${BR_IC}/game-emotions.png`,
   create: `${BR_IC}/game-create.png`,
@@ -58,14 +58,15 @@ const WordSearchGame = lazy(() => import("./games/WordSearchGame"));
 const MemoryGame = lazy(() => import("./games/MemoryGame"));
 const HangmanGame = lazy(() => import("./games/HangmanGame"));
 const DailyChallengeGame = lazy(() => import("./games/DailyChallengeGame"));
-const PixelPulaGame = lazy(() => import("./games/PixelPulaGame"));
+const MapaDaMemoriaGame = lazy(() => import("@/components/jogos/mapa-da-memoria/App"));
 const SegredoDoKidzzGame = lazy(() => import("@/components/jogos/segredo-do-kidzz/App"));
 const EmotionsGame = lazy(() => import("./games/EmotionsGame"));
 const CreateGame = lazy(() => import("./games/CreateGame"));
 
 type GameId =
-  | "pixel-pula"
+  | "mapa-da-memoria"
   | "word"
+
   | "memory"
   | "hangman"
   | "daily"
@@ -151,7 +152,7 @@ const GAMES: {
   isNew?: boolean;
 }[] = [
   { id: "memory", label: "Memória", emoji: "🧠", sub: "Grátis para todos", bgColor: "linear-gradient(135deg, hsl(280 65% 65%), hsl(265 70% 55%))" },
-  { id: "pixel-pula", label: "Kidzz Pula!", emoji: "🦎", sub: "3 partidas por dia", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", premium: true, isNew: true },
+  { id: "mapa-da-memoria", label: "Mapa da Memória", emoji: "🗺️", sub: "Revivam uma lembrança juntos", bgColor: "linear-gradient(135deg, hsl(140 70% 55%), hsl(155 65% 45%))", premium: true, isNew: true },
   { id: "segredo-do-kidzz", label: "O Segredo do Kidzz", emoji: "🌿", sub: "Adivinhe o bicho da floresta", bgColor: "linear-gradient(135deg, hsl(45 95% 55%), hsl(25 90% 50%))", premium: true, isNew: true },
   { id: "emotions", label: "Emoções", emoji: "💞", sub: "Mundo dos sentimentos", bgColor: "linear-gradient(135deg, hsl(320 70% 60%), hsl(280 65% 55%))", premium: true, isNew: true },
   { id: "create", label: "Eu Crio", emoji: "✨", sub: "Invente uma história", bgColor: "linear-gradient(135deg, hsl(200 75% 60%), hsl(260 70% 55%))", premium: true, isNew: true },
@@ -407,29 +408,10 @@ const KidzzPlay = ({
     const def = GAMES.find((g) => g.id === id);
     if (!def) return;
     if (def.premium && !isPremium) {
-      if (id === "pixel-pula") {
-        try {
-          const today = new Date().toISOString().slice(0, 10);
-          const raw = localStorage.getItem("kidzz_pula_daily") || "{}";
-          const obj = JSON.parse(raw);
-          const used = obj.date === today ? Number(obj.count) || 0 : 0;
-          if (used >= 3) {
-            setShowPremiumCTA(true);
-            return;
-          }
-          localStorage.setItem(
-            "kidzz_pula_daily",
-            JSON.stringify({ date: today, count: used + 1 }),
-          );
-        } catch {
-          /* noop */
-        }
-        setActiveGame(id);
-        return;
-      }
       setShowPremiumCTA(true);
       return;
     }
+
     setActiveGame(id);
   };
 
@@ -1185,17 +1167,8 @@ const KidzzPlay = ({
                 </div>
               }
             >
-              {activeGame === "pixel-pula" && (
-                <PixelPulaGame
-                  onScore={handleScore}
-                  onReaction={() => {}}
-                  onOpenAchievements={() => {
-                    setActiveGame(null);
-                    onOpenAchievements?.();
-                  }}
-                  onHome={() => setActiveGame(null)}
-                />
-              )}
+              {activeGame === "mapa-da-memoria" && <MapaDaMemoriaGame />}
+
               {activeGame === "word" && (
                 <WordSearchGame
                   onScore={handleScore}
