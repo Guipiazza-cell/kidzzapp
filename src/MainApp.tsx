@@ -26,6 +26,8 @@ const Admin = lazy(() => import("./pages/Admin"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
 const MinhaAssinatura = lazy(() => import("./pages/MinhaAssinatura"));
 const MinhasCriancas = lazy(() => import("./pages/MinhasCriancas"));
+import OnboardingGate from "@/components/onboarding/OnboardingGate";
+
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -33,8 +35,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // Não prender em tela preta se o auth demorar: após o fail-open do Auth
   // isReady vira true. Enquanto isso, null é ok por no máx ~3s.
   if (!isReady) return null;
-  return <>{children}</>;
+  // Guard central de onboarding: cobre QUALQUER rota autenticada.
+  return <OnboardingGate>{children}</OnboardingGate>;
 };
+
 
 const MainApp = () => {
   useEffect(() => {
