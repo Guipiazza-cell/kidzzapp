@@ -33,8 +33,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // Não prender em tela preta se o auth demorar: após o fail-open do Auth
   // isReady vira true. Enquanto isso, null é ok por no máx ~3s.
   if (!isReady) return null;
-  return <>{children}</>;
+  // Guard central de onboarding: cobre QUALQUER rota autenticada.
+  return <OnboardingGate>{children}</OnboardingGate>;
 };
+
 
 const MainApp = () => {
   useEffect(() => {
