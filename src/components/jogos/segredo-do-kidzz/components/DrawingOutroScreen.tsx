@@ -10,7 +10,7 @@ interface DrawingOutroScreenProps {
 
 export const DrawingOutroScreen: React.FC<DrawingOutroScreenProps> = ({ creature, onRestartWhenReady }) => {
   const [hasDrawnOnPaper, setHasDrawnOnPaper] = useState(false);
-  const [showDigitalCanvas, setShowDigitalCanvas] = useState(false);
+  const [showDigitalCanvas, setShowDigitalCanvas] = useState(true);
   const [selectedColor, setSelectedColor] = useState(creature.drawingGuide.colors[0] || '#7C3AED');
   const [brushSize] = useState(6);
 
@@ -85,7 +85,7 @@ export const DrawingOutroScreen: React.FC<DrawingOutroScreenProps> = ({ creature
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between p-4 sm:p-5 text-[#1E1B4B] bg-gradient-to-b from-[#F5F3FB] via-[#EFEBF8] to-[#E9E4F5] overflow-y-auto no-scrollbar rounded-[32px] shadow-2xl animate-in fade-in duration-300">
+    <div className="relative w-full h-full flex flex-col gap-2 p-4 sm:p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] text-[#1E1B4B] bg-gradient-to-b from-[#F5F3FB] via-[#EFEBF8] to-[#E9E4F5] overflow-y-auto overscroll-contain no-scrollbar rounded-[32px] shadow-2xl animate-in fade-in duration-300">
       <div className="relative z-10 flex flex-col items-center text-center mt-1">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-white text-xs font-extrabold text-[#7C3AED] shadow-sm mb-1.5">
           <Palette className="w-3.5 h-3.5 text-[#7C3AED]" />
@@ -134,7 +134,7 @@ export const DrawingOutroScreen: React.FC<DrawingOutroScreenProps> = ({ creature
       <div className="relative z-10 my-1">
         <button type="button" onClick={() => { soundFx.playTap(); setShowDigitalCanvas(!showDigitalCanvas); }} className="text-[11px] text-[#7C3AED] font-bold flex items-center gap-1 mx-auto hover:text-[#5B21B6] transition-colors cursor-pointer">
           <Sparkles className="w-3 h-3 text-[#EAB308]" />
-          <span>{showDigitalCanvas ? 'Fechar Prancheta Digital' : 'Desenhar na Tela (Opcional)'}</span>
+          <span>{showDigitalCanvas ? 'Fechar Prancheta Digital' : 'Abrir Prancheta Digital'}</span>
         </button>
         {showDigitalCanvas && (
           <div className="mt-1.5 p-2.5 liquid-glass-white rounded-[20px] shadow-md animate-in fade-in duration-200">
