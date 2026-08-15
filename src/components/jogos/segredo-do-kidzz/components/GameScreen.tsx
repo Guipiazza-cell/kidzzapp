@@ -69,12 +69,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   }, [isRevealed, showMissModal]);
 
   const handleNextClue = () => {
+    // Guard: evita que um único toque (ghost click / duplo disparo em telas
+    // com botões próximos) avance duas dicas de uma vez.
+    const now = Date.now();
+    if (now - lastAdvanceRef.current < 600) return;
+    lastAdvanceRef.current = now;
     if (clueStep < totalClues - 1) {
       const nextStep = clueStep + 1;
       setClueStep(nextStep);
       soundFx.playClueChime(nextStep);
     }
   };
+
 
   const handleVictory = () => {
     setIsRevealed(true);
