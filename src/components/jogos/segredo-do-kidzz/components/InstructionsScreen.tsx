@@ -25,7 +25,7 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between p-4 sm:p-5 bg-gradient-to-b from-[#F5F3FB] via-[#EFEBF8] to-[#E9E4F5] text-[#1E1B4B] overflow-y-auto no-scrollbar">
+    <div className="relative w-full h-full flex flex-col gap-2 p-4 sm:p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] bg-gradient-to-b from-[#F5F3FB] via-[#EFEBF8] to-[#E9E4F5] text-[#1E1B4B] overflow-y-auto overscroll-contain no-scrollbar">
       <div className="absolute top-[-40px] left-[-40px] w-64 h-64 bg-[radial-gradient(circle,rgba(196,181,253,0.3),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
       <div className="absolute top-1/3 right-[-40px] w-64 h-64 bg-[radial-gradient(circle,rgba(110,231,183,0.25),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
       <div className="absolute bottom-[-30px] left-1/4 w-72 h-72 bg-[radial-gradient(circle,rgba(252,211,77,0.2),transparent_70%)] pointer-events-none rounded-full blur-3xl" />

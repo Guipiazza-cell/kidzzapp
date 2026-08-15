@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Sparkles,
   CheckCircle2,
@@ -41,6 +41,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [showHeartPulse, setShowHeartPulse] = useState(false);
   const [isCardMinimized, setIsCardMinimized] = useState(false);
   const [showMissModal, setShowMissModal] = useState(false);
+  const lastAdvanceRef = useRef(0);
 
   const totalClues = creature.clues.length;
   const currentClue = creature.clues[Math.min(clueStep, totalClues - 1)];
@@ -50,6 +51,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     setClueStep(0);
     setIsRevealed(false);
     setShowMissModal(false);
+    lastAdvanceRef.current = 0;
   }, [creature.id, settings.roundDuration]);
 
   useEffect(() => {
@@ -69,12 +71,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   }, [isRevealed, showMissModal]);
 
   const handleNextClue = () => {
+    // Guard: evita que um único toque (ghost click / duplo disparo em telas
+    // com botões próximos) avance duas dicas de uma vez.
+    const now = Date.now();
+    if (now - lastAdvanceRef.current < 600) return;
+    lastAdvanceRef.current = now;
     if (clueStep < totalClues - 1) {
       const nextStep = clueStep + 1;
       setClueStep(nextStep);
       soundFx.playClueChime(nextStep);
     }
   };
+
 
   const handleVictory = () => {
     setIsRevealed(true);
@@ -100,7 +108,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0D0B1C] rounded-[32px] shadow-2xl border border-white/20">
+    <div className="relative w-full h-full flex flex-col overflow-hidden bg-[#0D0B1C] rounded-[32px] shadow-2xl border border-white/20">
       <div className="absolute inset-0 z-0">
         <ThreeForestScene creature={creature} currentClueStep={clueStep} isRevealed={isRevealed} onHeartClick={handleHeartPulse} />
       </div>
@@ -113,7 +121,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </div>
       )}
 
-      <div className="relative z-20 p-3 flex flex-col gap-1.5">
+      <div className="relative z-20 p-3 flex flex-col gap-1.5 shrink-0">
         <HeaderTimer
           timeLeft={timeLeft}
           totalTime={settings.roundDuration}
@@ -141,7 +149,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </div>
       </div>
 
-      <div className="relative z-20 mt-auto px-3 pb-1 pointer-events-none">
+      <div className="relative z-20 mt-auto px-3 pb-2 pointer-events-none max-h-[45%] overflow-y-auto no-scrollbar">
         {!isCardMinimized ? (
           <div className="p-3 rounded-[22px] bg-black/35 backdrop-blur-md border border-white/20 text-white shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto">
             <div className="flex items-center justify-between gap-1 mb-1">
@@ -167,24 +175,24 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         )}
       </div>
 
-      <div className="relative z-20 p-3 pt-1 bg-gradient-to-t from-[#0D0B1C] via-[#0D0B1C]/80 to-transparent flex flex-col gap-1.5">
+      <div className="relative z-20 shrink-0 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] bg-gradient-to-t from-[#0D0B1C] via-[#0D0B1C]/85 to-transparent flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" id="btn-next-clue" disabled={clueStep >= totalClues - 1} onClick={handleNextClue} className={`py-3 px-3 rounded-[18px] font-serif font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer ${clueStep < totalClues - 1 ? 'liquid-glass-white text-[#1E1B4B] hover:scale-[1.02]' : 'bg-white/10 text-white/40 border border-white/10 cursor-not-allowed'}`}>
+          <button type="button" id="btn-next-clue" disabled={clueStep >= totalClues - 1} onClick={handleNextClue} className={`py-3.5 px-3 min-h-[48px] rounded-[18px] font-serif font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer ${clueStep < totalClues - 1 ? 'liquid-glass-white text-[#1E1B4B] hover:scale-[1.02]' : 'bg-white/10 text-white/40 border border-white/10 cursor-not-allowed'}`}>
             <span>Próxima Dica</span>
             <ChevronRight className="w-4 h-4" />
           </button>
-          <button type="button" id="btn-guessed-right" onClick={handleVictory} className="py-3 px-3 rounded-[18px] font-serif font-bold text-xs liquid-glass-card-emerald text-white flex items-center justify-center gap-1.5 shadow-xl hover:scale-[1.02] active:scale-95 transition-all cursor-pointer">
+          <button type="button" id="btn-guessed-right" onClick={handleVictory} className="py-3.5 px-3 min-h-[48px] rounded-[18px] font-serif font-bold text-xs liquid-glass-card-emerald text-white flex items-center justify-center gap-1.5 shadow-xl hover:scale-[1.02] active:scale-95 transition-all cursor-pointer">
             <div className="gloss-overlay" />
             <CheckCircle2 className="w-4 h-4 relative z-10" />
             <span className="relative z-10 font-bold">Acertou! Revelar</span>
           </button>
         </div>
-        <div className="flex items-center justify-between pt-0.5 px-1">
-          <button type="button" onClick={handleOpenMissModal} className="text-[11px] text-[#FCA5A5] hover:text-white font-bold flex items-center gap-1 transition-colors cursor-pointer py-0.5">
+        <div className="flex items-center justify-between gap-3 px-1">
+          <button type="button" onClick={handleOpenMissModal} className="text-[11px] text-[#FCA5A5] hover:text-white font-bold flex items-center gap-1 transition-colors cursor-pointer py-2 min-h-[44px]">
             <XCircle className="w-3.5 h-3.5 text-[#F87171]" />
             <span>Errou? Tentar outro bicho</span>
           </button>
-          <button type="button" onClick={onExitToHome} className="text-[11px] text-white/60 hover:text-white font-medium flex items-center gap-1 transition-colors cursor-pointer py-0.5">
+          <button type="button" onClick={onExitToHome} className="text-[11px] text-white/60 hover:text-white font-medium flex items-center gap-1 transition-colors cursor-pointer py-2 min-h-[44px]">
             <Home className="w-3 h-3 text-white/50" />
             <span>Início</span>
           </button>
