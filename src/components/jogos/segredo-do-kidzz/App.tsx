@@ -37,13 +37,13 @@ export default function SegredoDoKidzzApp() {
   const handleRestart = () => { const nextCreature = getRandomCreature(selectedCreature.id); setSelectedCreature(nextCreature); setPhase('intro'); };
 
   return (
-    <main className="min-h-screen w-full bg-[#E8E4F3] flex items-center justify-center p-0 sm:p-4 md:p-6 select-none overflow-hidden font-sans">
+    <main className="min-h-screen w-full bg-[#0D0B1C] flex items-center justify-center p-0 sm:p-4 md:p-6 select-none overflow-hidden font-sans">
       <div className="fixed inset-0 pointer-events-none opacity-60">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#c4b5fd]/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#6ee7b7]/25 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-[#fcd34d]/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#7C3AED]/12 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#10B981]/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-[#F59E0B]/8 rounded-full blur-3xl" />
       </div>
-      <div className="relative w-full max-w-[420px] h-[100dvh] sm:h-[840px] sm:max-h-[92vh] sm:rounded-[38px] overflow-hidden bg-[#F5F3FB] shadow-[0_25px_70px_rgba(76,29,149,0.18)] border-0 sm:border-[5px] sm:border-white flex flex-col">
+      <div className="relative w-full max-w-[420px] h-[100dvh] sm:h-[840px] sm:max-h-[92vh] sm:rounded-[38px] overflow-hidden bg-[#0D0B1C] shadow-[0_25px_70px_rgba(76,29,149,0.28)] border-0 sm:border-[5px] sm:border-white/20 flex flex-col">
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-white/80 to-transparent z-40" />
         <AnimatePresence mode="wait">
           {phase === 'intro' && (

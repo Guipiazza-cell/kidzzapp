@@ -175,7 +175,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         )}
       </div>
 
-      <div className="relative z-20 shrink-0 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] bg-gradient-to-t from-[#0D0B1C] via-[#0D0B1C]/85 to-transparent flex flex-col gap-3">
+      <div className="relative z-20 shrink-0 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+168px)] bg-gradient-to-t from-[#0D0B1C] via-[#0D0B1C]/85 to-transparent flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-2">
           <button type="button" id="btn-next-clue" disabled={clueStep >= totalClues - 1} onClick={handleNextClue} className={`py-3.5 px-3 min-h-[48px] rounded-[18px] font-serif font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer ${clueStep < totalClues - 1 ? 'liquid-glass-white text-[#1E1B4B] hover:scale-[1.02]' : 'bg-white/10 text-white/40 border border-white/10 cursor-not-allowed'}`}>
             <span>Próxima Dica</span>
