@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, Ear, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
+import ChameleonMascot from '@/components/ChameleonMascot';
 import { GameSettings } from '../types';
 import { soundFx } from '../audio/soundEffects';
 
@@ -10,9 +11,9 @@ export const ReadyCheckScreen: React.FC<ReadyCheckScreenProps> = ({ settings, on
   const getModeLabel = () => { if (settings.playMode === 'mimic') return 'Modo Mímica'; if (settings.playMode === 'questions') return 'Modo Perguntas'; return 'Modo Falado'; };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between p-4 sm:p-5 bg-gradient-to-b from-[#F5F3FB] via-[#EFEBF8] to-[#E9E4F5] text-[#1E1B4B] overflow-y-auto no-scrollbar">
-      <div className="absolute top-[-30px] right-[-30px] w-64 h-64 bg-[radial-gradient(circle,rgba(147,197,253,0.3),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
-      <div className="absolute bottom-[-30px] left-[-30px] w-64 h-64 bg-[radial-gradient(circle,rgba(196,181,253,0.35),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
+    <div className="relative w-full h-full flex flex-col justify-between p-4 sm:p-5 pb-[calc(env(safe-area-inset-bottom)+168px)] bg-gradient-to-b from-[#0D0B1C] via-[#121026] to-[#0D0B1C] text-white overflow-y-auto no-scrollbar">
+      <div className="absolute top-[-30px] right-[-30px] w-64 h-64 bg-[radial-gradient(circle,rgba(124,58,237,0.18),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
+      <div className="absolute bottom-[-30px] left-[-30px] w-64 h-64 bg-[radial-gradient(circle,rgba(196,181,253,0.16),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
       <div className="relative z-10 flex items-center justify-between pt-1">
         <button type="button" onClick={() => { soundFx.playTap(); onBack(); }} className="w-10 h-10 rounded-full liquid-glass-white flex items-center justify-center text-[#4338CA] hover:scale-105 active:scale-95 transition-all cursor-pointer" aria-label="Voltar">
           <ArrowLeft className="w-5 h-5 text-[#4338CA]" />
@@ -22,10 +23,16 @@ export const ReadyCheckScreen: React.FC<ReadyCheckScreenProps> = ({ settings, on
           <span>Hora do Segredo</span>
         </div>
       </div>
+      <div className="relative z-10 flex flex-col items-center text-center mt-1">
+        <div className="relative">
+          <ChameleonMascot mood="curious" size="md" interactive={false} className="relative z-10" />
+          <div className="absolute -inset-2 bg-[#7C3AED]/15 rounded-full blur-2xl pointer-events-none" />
+        </div>
+      </div>
       <div className="relative z-10 mt-2 text-left">
-        <span className="text-[11px] font-black tracking-widest uppercase text-[#7C3AED] block mb-0.5">PREPARAÇÃO</span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-serif text-[#1E1B4B] leading-tight tracking-tight">Atenção <span className="text-[#6D28D9]">Dupla!</span></h1>
-        <p className="text-xs text-[#6B7280] mt-0.5 font-medium">{getModeLabel()} • {settings.roundDuration} segundos</p>
+        <span className="text-[11px] font-black tracking-widest uppercase text-[#C4B5FD] block mb-0.5">PREPARAÇÃO</span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-serif text-white leading-tight tracking-tight">Atenção <span className="text-[#FED439]">Dupla!</span></h1>
+        <p className="text-xs text-white/70 mt-0.5 font-medium">{getModeLabel()} • {settings.roundDuration} segundos</p>
       </div>
       <div className="relative z-10 my-2 liquid-glass-card-purple rounded-[26px] p-4 text-white flex flex-col items-center text-center shadow-lg">
         <div className="gloss-overlay" />
@@ -55,7 +62,7 @@ export const ReadyCheckScreen: React.FC<ReadyCheckScreenProps> = ({ settings, on
           <span className="relative z-10 text-white font-extrabold tracking-wide drop-shadow-sm">Pronto, só eu tô vendo!</span>
           <ArrowRight className="w-4 h-4 relative z-10" />
         </button>
-        <button type="button" onClick={() => { soundFx.playTap(); onBack(); }} className="w-full py-1 text-xs font-semibold text-[#6B7280] hover:text-[#1E1B4B] transition-colors text-center">Voltar às configurações</button>
+        <button type="button" onClick={() => { soundFx.playTap(); onBack(); }} className="w-full py-1 text-xs font-semibold text-white/70 hover:text-white transition-colors text-center">Voltar às configurações</button>
       </div>
     </div>
   );
