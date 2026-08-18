@@ -384,7 +384,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         className="text-center font-black mt-4 leading-tight"
         style={{ color: "#2E4438", fontSize: 28, maxWidth: 360 }}
       >
-        Guarde as memórias do {childName || "seu pequeno"} ✨
+        Guarde as memórias do {childName || "seu pequeno"}&nbsp;
       </h1>
       <p
         className="text-center mt-3 font-semibold"
@@ -409,8 +409,8 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           role="tablist"
         >
           {([
-            { id: "email", label: "📧 Email" },
-            { id: "phone", label: "📱 Telefone" },
+            { id: "email", label: "\u00a0Email" },
+            { id: "phone", label: "\u00a0Telefone" },
           ] as const).map((t) => {
             const active = tab === t.id;
             return (
