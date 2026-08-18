@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sparkles, Eye, Ear, Play, Shuffle, HelpCircle, Trophy } from 'lucide-react';
-import ChameleonMascot from '@/components/ChameleonMascot';
+import heroSegredo from '../assets/hero_segredo_do_kidzz.png.asset.json';
 import { Creature, GameSettings } from '../types';
 import { getRandomCreature } from '../data/creatures';
 import { soundFx } from '../audio/soundEffects';
@@ -44,7 +44,13 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
 
       <div className="relative z-10 flex flex-col items-center text-center mt-1">
         <div className="relative">
-          <ChameleonMascot mood="happy" size="md" interactive={false} className="relative z-10" />
+          <img
+            src={heroSegredo.url}
+            alt="Camaleão Kidzz no jogo O Segredo do Kidzz"
+            className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 object-contain drop-shadow-2xl"
+            loading="eager"
+            decoding="async"
+          />
           <div className="absolute -inset-2 bg-[#7C3AED]/15 rounded-full blur-2xl pointer-events-none" />
         </div>
       </div>
