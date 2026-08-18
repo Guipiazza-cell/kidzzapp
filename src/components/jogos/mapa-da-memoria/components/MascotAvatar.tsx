@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 import { MascotPose } from '../types';
 import { playHeartbeatPulse } from '../utils/soundEffects';
 
-import mascotHeartImg from '../assets/images/mascot_heart_pose.jpg';
+import heroMapa from '../assets/hero_mapa_da_memoria.png.asset.json';
 import mascotListeningImg from '../assets/images/mascot_listening.jpg';
 import mascotPointingImg from '../assets/images/mascot_pointing.jpg';
 import mascotHugImg from '../assets/images/mascot_warm_hug.jpg';
 
 interface MascotAvatarProps { pose?: MascotPose; size?: 'sm' | 'md' | 'lg' | 'hero' | 'full'; className?: string; showHeartBadge?: boolean; interactive?: boolean; framed?: boolean; }
 
-const POSE_IMAGES: Record<MascotPose, string> = { heart: mascotHeartImg, listening: mascotListeningImg, pointing: mascotPointingImg, hug: mascotHugImg };
+const POSE_IMAGES: Record<MascotPose, string> = { heart: heroMapa.url, listening: mascotListeningImg, pointing: mascotPointingImg, hug: mascotHugImg };
 
 export const MascotAvatar: React.FC<MascotAvatarProps> = ({ pose = 'heart', size = 'md', className = '', showHeartBadge = true, interactive = true, framed = true }) => {
   const imgSrc = POSE_IMAGES[pose] || mascotHeartImg;

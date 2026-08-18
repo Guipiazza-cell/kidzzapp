@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sparkles, Eye, Ear, Play, Shuffle, HelpCircle, Trophy } from 'lucide-react';
-import ChameleonMascot from '@/components/ChameleonMascot';
+import heroSegredo from '../../assets/hero_segredo_do_kidzz.png.asset.json';
 import { Creature, GameSettings } from '../types';
 import { getRandomCreature } from '../data/creatures';
 import { soundFx } from '../audio/soundEffects';
