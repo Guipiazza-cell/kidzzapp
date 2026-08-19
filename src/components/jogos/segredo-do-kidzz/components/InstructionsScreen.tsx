@@ -26,42 +26,56 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col gap-2 p-4 sm:p-5 pb-[calc(env(safe-area-inset-bottom)+168px)] bg-gradient-to-b from-[#0D0B1C] via-[#121026] to-[#0D0B1C] text-white overflow-y-auto overscroll-contain no-scrollbar">
-      <div className="absolute top-[-40px] left-[-40px] w-64 h-64 bg-[radial-gradient(circle,rgba(124,58,237,0.18),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
+    <div className="relative w-full h-full flex flex-col bg-gradient-to-b from-[#0D0B1C] via-[#121026] to-[#0D0B1C] text-white overflow-y-auto overscroll-contain no-scrollbar">
+      {/* HERO full-bleed no topo */}
+      <div className="relative w-full shrink-0">
+        <img
+          src={heroWide.url}
+          alt="Camaleão Kidzz na floresta — O Segredo do Kidzz"
+          className="w-full h-[46vw] max-h-[280px] min-h-[190px] object-cover object-center select-none"
+          loading="eager"
+          decoding="async"
+        />
+        {/* degradê de fusão com o conteúdo */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(13,11,28,0.55) 0%, rgba(13,11,28,0) 28%, rgba(13,11,28,0.35) 62%, rgba(13,11,28,0.88) 88%, #0D0B1C 100%)",
+          }}
+        />
+        {/* brilho premium lateral */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_70%_60%_at_50%_35%,rgba(252,211,77,0.14),transparent_70%)]" />
+
+        {/* chips sobre o hero */}
+        <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-3 pt-[calc(env(safe-area-inset-top)+8px)]">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-white text-xs font-bold text-[#4338CA] shadow-lg">
+            <Sparkles className="w-3.5 h-3.5 text-[#EAB308] fill-current" />
+            <span>Kidzz • Jogo em Dupla</span>
+          </div>
+          <div className="flex items-center gap-1 px-3 py-1 rounded-full liquid-glass-white text-xs font-bold text-[#4338CA] shadow-lg">
+            <Trophy className="w-3.5 h-3.5 text-[#EAB308] fill-current" />
+            <span>20 Bichos</span>
+          </div>
+        </div>
+
+        {/* título sobre a base do hero */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-2 text-left">
+          <span className="text-[11px] font-black tracking-widest uppercase text-[#C4B5FD] block mb-0.5 drop-shadow">BRINCAR EM DUPLA</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-serif text-white leading-tight tracking-tight drop-shadow-lg">
+            Adivinhe o bicho <br /><span className="text-[#FED439]">da floresta!</span>
+          </h1>
+        </div>
+      </div>
+
+      <div className="relative flex flex-col gap-2 px-4 sm:px-5 pt-2 pb-[calc(env(safe-area-inset-bottom)+168px)]">
       <div className="absolute top-1/3 right-[-40px] w-64 h-64 bg-[radial-gradient(circle,rgba(16,185,129,0.14),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
       <div className="absolute bottom-[-30px] left-1/4 w-72 h-72 bg-[radial-gradient(circle,rgba(252,211,77,0.12),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
 
-      <div className="relative z-10 flex items-center justify-between pt-1">
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full liquid-glass-white text-xs font-bold text-[#4338CA]">
-          <Sparkles className="w-3.5 h-3.5 text-[#EAB308] fill-current" />
-          <span>Kidzz • Jogo em Dupla</span>
-        </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-full liquid-glass-white text-xs font-bold text-[#4338CA]">
-          <Trophy className="w-3.5 h-3.5 text-[#EAB308] fill-current" />
-          <span>20 Bichos</span>
-        </div>
+      <div className="relative z-10 text-left">
+        <p className="text-xs text-white/70 font-medium leading-normal">Um amigo olha a tela e dá as dicas. O outro amigo fica de costas e tenta acertar!</p>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center text-center mt-1">
-        <div className="relative">
-          <img
-            src={heroSegredo.url}
-            alt="Camaleão Kidzz no jogo O Segredo do Kidzz"
-            className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 object-contain drop-shadow-2xl"
-            loading="eager"
-            decoding="async"
-          />
-          <div className="absolute -inset-2 bg-[#7C3AED]/15 rounded-full blur-2xl pointer-events-none" />
-        </div>
-      </div>
-
-      <div className="relative z-10 mt-1 mb-1 text-left">
-        <span className="text-[11px] font-black tracking-widest uppercase text-[#C4B5FD] block mb-0.5">BRINCAR EM DUPLA</span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-serif text-white leading-tight tracking-tight">
-          Adivinhe o bicho <br /><span className="text-[#FED439]">da floresta!</span>
-        </h1>
-        <p className="text-xs text-white/70 mt-1 font-medium leading-normal">Um amigo olha a tela e dá as dicas. O outro amigo fica de costas e tenta acertar!</p>
-      </div>
 
       <div className="relative z-10 grid grid-cols-2 gap-2.5 my-1.5">
         <div className="liquid-glass-card-purple rounded-[22px] p-3 text-white flex flex-col justify-between relative overflow-hidden group">
