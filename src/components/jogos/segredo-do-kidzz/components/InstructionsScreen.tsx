@@ -32,7 +32,7 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
         <img
           src={heroWide.url}
           alt="Camaleão Kidzz na floresta — O Segredo do Kidzz"
-          className="w-full h-[46vw] max-h-[280px] min-h-[190px] object-cover object-center select-none"
+          className="w-full h-[58vw] max-h-[360px] min-h-[240px] object-cover object-center select-none"
           loading="eager"
           decoding="async"
         />
@@ -41,7 +41,7 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(180deg, rgba(13,11,28,0.55) 0%, rgba(13,11,28,0) 28%, rgba(13,11,28,0.35) 62%, rgba(13,11,28,0.88) 88%, #0D0B1C 100%)",
+              "linear-gradient(180deg, rgba(13,11,28,0.45) 0%, rgba(13,11,28,0) 30%, rgba(13,11,28,0.45) 55%, rgba(13,11,28,0.92) 82%, #0D0B1C 100%)",
           }}
         />
         {/* brilho premium lateral */}
@@ -59,8 +59,8 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
           </div>
         </div>
 
-        {/* título sobre a base do hero */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-4 pb-2 text-left">
+        {/* título posicionado mais abaixo, rente ao conteúdo */}
+        <div className="absolute bottom-4 left-0 right-0 z-10 px-4 pb-2 text-left">
           <span className="text-[11px] font-black tracking-widest uppercase text-[#C4B5FD] block mb-0.5 drop-shadow">BRINCAR EM DUPLA</span>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-serif text-white leading-tight tracking-tight drop-shadow-lg">
             Adivinhe o bicho <br /><span className="text-[#FED439]">da floresta!</span>
@@ -72,9 +72,6 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
       <div className="absolute top-1/3 right-[-40px] w-64 h-64 bg-[radial-gradient(circle,rgba(16,185,129,0.14),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
       <div className="absolute bottom-[-30px] left-1/4 w-72 h-72 bg-[radial-gradient(circle,rgba(252,211,77,0.12),transparent_70%)] pointer-events-none rounded-full blur-3xl" />
 
-      <div className="relative z-10 text-left">
-        <p className="text-xs text-white/70 font-medium leading-normal">Um amigo olha a tela e dá as dicas. O outro amigo fica de costas e tenta acertar!</p>
-      </div>
 
 
       <div className="relative z-10 grid grid-cols-2 gap-2.5 my-1.5">
