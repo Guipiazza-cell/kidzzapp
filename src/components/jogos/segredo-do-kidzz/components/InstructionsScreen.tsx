@@ -162,6 +162,8 @@ export const InstructionsScreen: React.FC<InstructionsScreenProps> = ({ selected
         <Play className="w-5 h-5 fill-current relative z-10" />
         <span className="relative z-10 text-white font-extrabold tracking-wide drop-shadow-sm">Começar a Brincadeira</span>
       </button>
+      </div>
     </div>
+
   );
 };
