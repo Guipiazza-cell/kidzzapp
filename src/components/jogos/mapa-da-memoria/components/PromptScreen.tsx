@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Sparkles, HeartHandshake, ArrowRight } from 'lucide-react';
-import { MascotAvatar } from './MascotAvatar';
+import heroWide from '../assets/hero_mapa_wide.jpg.asset.json';
 import { playChime, playHeartbeatPulse } from '../utils/soundEffects';
 
 interface PromptScreenProps { onSubmit: (text: string) => void; }
@@ -63,7 +63,7 @@ export const PromptScreen: React.FC<PromptScreenProps> = ({ onSubmit }) => {
         </motion.div>
       </div>
 
-      <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.5 }} className="w-full max-w-sm flex flex-col gap-2.5">
+      <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.5 }} className="w-full max-w-sm px-5 flex flex-col gap-2.5">
         <div className="relative rounded-[24px] frosted-glass-card p-3.5 focus-within:border-white/70 transition-all shadow-2xl overflow-hidden">
           <div className="absolute -top-8 -right-8 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
           <textarea value={text} onChange={(e) => setText(e.target.value.slice(0, maxLength))} placeholder="Digite aqui uma lembrança boa (ex: o dia que fomos tomar sorvete e pingou na roupa...)" rows={2} className="w-full bg-transparent text-sm text-white placeholder-white/45 resize-none outline-none leading-relaxed font-mulish" autoFocus />
@@ -81,7 +81,7 @@ export const PromptScreen: React.FC<PromptScreenProps> = ({ onSubmit }) => {
           </div>
         </div>
       </motion.form>
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="w-full max-w-sm pt-3 pb-1">
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="w-full max-w-sm px-5 pt-3 pb-3">
         <button type="button" onClick={() => handleSubmit()} disabled={!isValid} className={`relative w-full py-3.5 px-6 rounded-full flex items-center justify-center gap-2.5 font-bold uppercase tracking-widest text-[12px] transition-all shadow-2xl cursor-pointer ${isValid ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-[#064e3b] border-2 border-white/80 shadow-[0_10px_30px_rgba(255,234,167,0.4)] hover:scale-[1.02] active:scale-[0.98]' : 'bg-white/10 text-white/40 border border-white/20 cursor-not-allowed'}`}>
           <Compass className={`w-4 h-4 ${isValid ? 'text-[#064e3b] animate-bounce' : 'text-white/30'}`} />
           <span>Começar o Mapa da Memória</span>
