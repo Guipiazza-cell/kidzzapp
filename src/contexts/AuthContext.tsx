@@ -415,6 +415,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
+          analytics.identify(currentSession.user.id, { email: currentSession.user.email ?? undefined });
           // Libera a UI já com seed guest/draft - não espera o fetch do profile.
           const seed = getGuestProfile();
           setProfile(seed);
