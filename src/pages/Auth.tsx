@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { lovable } from "@/integrations/lovable/index";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -27,6 +28,29 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<"google" | "apple" | null>(null);
+
+  const handleOAuth = async (provider: "google" | "apple") => {
+    setOauthLoading(provider);
+    try {
+      if (safeNext) sessionStorage.setItem("kidzz_post_login_next", safeNext);
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Não conseguimos entrar agora, tente novamente");
+        setOauthLoading(null);
+        return;
+      }
+      if (result.redirected) return;
+      postLogin();
+    } catch {
+      toast.error("Não conseguimos entrar agora, tente novamente");
+    } finally {
+      setOauthLoading(null);
+    }
+  };
+
 
   useEffect(() => {
     if (user && !isCheckoutFlow) postLogin();
