@@ -29,17 +29,40 @@ export const PromptScreen: React.FC<PromptScreenProps> = ({ onSubmit }) => {
   const isValid = text.trim().length > 0;
 
   return (
-    <div className="relative z-20 flex flex-col items-center justify-between w-full h-full px-5 py-3 overflow-y-auto">
-      <div className="flex flex-col items-center text-center w-full max-w-sm pt-1">
-        <MascotAvatar pose="listening" size="md" className="mb-2" />
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full frosted-glass-pill text-[11px] text-[#ffeaa7] shadow-sm mb-2 border border-white/30"><Sparkles className="w-3.5 h-3.5 text-yellow-300" /><span className="font-semibold tracking-wide">Caça ao Tesouro das Memórias</span></div>
-        <motion.h2 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.5 }} className="text-xl sm:text-[23px] font-serif italic text-white leading-snug tracking-tight mb-1.5 drop-shadow-md">Qual momento feliz vamos reviver juntos?</motion.h2>
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="w-full grid grid-cols-3 gap-1.5 p-2 rounded-2xl bg-black/20 border border-white/15 my-2 text-center">
+    <div className="relative z-20 flex flex-col items-center justify-between w-full h-full overflow-y-auto overscroll-contain">
+      {/* HERO full-bleed no topo (padrão do Segredo do Kidzz) */}
+      <div className="relative w-full shrink-0">
+        <img
+          src={heroWide.url}
+          alt="Camaleão Kidzz com o mapa da memória na floresta"
+          className="w-full h-[58vw] max-h-[360px] min-h-[220px] object-cover object-center select-none"
+          loading="eager"
+          decoding="async"
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(6,78,59,0.35) 0%, rgba(9,23,16,0) 32%, rgba(9,23,16,0.45) 58%, rgba(9,23,16,0.9) 84%, #0d2a1f 100%)',
+          }}
+        />
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_70%_60%_at_50%_35%,rgba(255,234,167,0.14),transparent_70%)]" />
+        <div className="absolute bottom-3 left-0 right-0 z-10 px-5">
+          <span className="text-[10px] font-black tracking-[0.18em] uppercase text-[#ffeaa7] block mb-0.5 drop-shadow">Mapa da Memória</span>
+          <h2 className="text-xl sm:text-2xl font-serif italic text-white leading-tight tracking-tight drop-shadow-lg">
+            Qual momento feliz vamos reviver?
+          </h2>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center text-center w-full max-w-sm px-5 pt-2">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="w-full grid grid-cols-3 gap-1.5 p-2 rounded-2xl bg-black/20 border border-white/15 mb-2 text-center">
           <div className="flex flex-col items-center"><span className="w-5 h-5 rounded-full bg-amber-400/30 text-amber-300 text-[10px] font-bold flex items-center justify-center mb-0.5">1</span><span className="text-[10px] text-white/90 font-medium leading-tight">Escreva ou escolha</span></div>
           <div className="flex flex-col items-center"><span className="w-5 h-5 rounded-full bg-emerald-400/30 text-emerald-300 text-[10px] font-bold flex items-center justify-center mb-0.5">2</span><span className="text-[10px] text-white/90 font-medium leading-tight">Abra os segredos</span></div>
           <div className="flex flex-col items-center"><span className="w-5 h-5 rounded-full bg-yellow-400/30 text-yellow-300 text-[10px] font-bold flex items-center justify-center mb-0.5">3</span><span className="text-[10px] text-white/90 font-medium leading-tight">Faça a missão real</span></div>
         </motion.div>
       </div>
+
       <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.5 }} className="w-full max-w-sm flex flex-col gap-2.5">
         <div className="relative rounded-[24px] frosted-glass-card p-3.5 focus-within:border-white/70 transition-all shadow-2xl overflow-hidden">
           <div className="absolute -top-8 -right-8 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none" />
