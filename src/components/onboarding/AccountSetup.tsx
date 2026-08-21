@@ -353,7 +353,45 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           boxShadow: "0 10px 30px rgba(46,68,56,0.08)",
         }}
       >
+        <button
+          onClick={handleAppleSignIn}
+          disabled={appleLoading || loading || cloudBlocked}
+          className="w-full font-black active:scale-95 transition-transform flex items-center justify-center gap-2"
+          style={{
+            height: 56,
+            borderRadius: 20,
+            background: "#000000",
+            color: "#FFFFFF",
+            fontSize: 16,
+            opacity: appleLoading || loading || cloudBlocked ? 0.6 : 1,
+          }}
+        >
+          {appleLoading ? (
+            <>
+              <span
+                className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"
+                aria-hidden
+              />
+              Conectando…
+            </>
+          ) : (
+            <>
+              <span aria-hidden style={{ fontSize: 20, lineHeight: 1 }}></span>
+              Continuar com Apple
+            </>
+          )}
+        </button>
+
+        <div className="flex items-center gap-3 my-4">
+          <span style={{ flex: 1, height: 1, background: "#E4EDE4" }} />
+          <span className="font-bold" style={{ color: "#9BB0A0", fontSize: 13 }}>
+            ou com e-mail
+          </span>
+          <span style={{ flex: 1, height: 1, background: "#E4EDE4" }} />
+        </div>
+
         <div className="flex flex-col gap-3">
+
           <input
             type="email"
             inputMode="email"
