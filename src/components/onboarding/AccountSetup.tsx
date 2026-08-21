@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/contexts/AuthContext";
 import PinSetupForm from "@/components/parental/PinSetupForm";
 import { hasCustomPin } from "@/lib/parentalPin";
@@ -107,11 +108,15 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [cloudBlocked, setCloudBlocked] = useState(false);
   const [pinStep, setPinStep] = useState(false);
   const submittingRef = useRef(false);
+  const oauthHandledRef = useRef(false);
+
+
 
   useEffect(() => {
     let cancelled = false;
@@ -156,6 +161,56 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
     },
     [onDone, refreshProfile]
   );
+
+  // Retorno do OAuth (Apple): a pessoa volta autenticada -> roda o MESMO
+  // finishSuccess (sync do perfil convidado + PIN + onDone).
+  useEffect(() => {
+    let active = true;
+    const run = async (userId?: string) => {
+      if (!userId || oauthHandledRef.current) return;
+      oauthHandledRef.current = true;
+      setAppleLoading(false);
+      await finishSuccess(userId);
+    };
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!active) return;
+        if (data.session?.user) await run(data.session.user.id);
+      } catch {}
+    })();
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return;
+      if (event === "SIGNED_IN" && session?.user) void run(session.user.id);
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [finishSuccess]);
+
+  const handleAppleSignIn = useCallback(async () => {
+    if (appleLoading || loading) return;
+    setError(null);
+    setAppleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("apple", {
+        redirect_uri: `${window.location.origin}/`,
+      });
+      if (result.error) {
+        setError("Não foi possível entrar com a Apple agora. Tente pelo e-mail.");
+        setAppleLoading(false);
+        return;
+      }
+      if (result.redirected) return; // navegador vai redirecionar
+      // Sessão já definida: o listener acima chama finishSuccess.
+    } catch {
+      setError("Não foi possível entrar com a Apple agora. Tente pelo e-mail.");
+      setAppleLoading(false);
+    }
+  }, [appleLoading, loading]);
+
+
 
   const handleEmailSubmit = useCallback(async () => {
     if (submittingRef.current) return;
@@ -298,7 +353,45 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           boxShadow: "0 10px 30px rgba(46,68,56,0.08)",
         }}
       >
+        <button
+          onClick={handleAppleSignIn}
+          disabled={appleLoading || loading || cloudBlocked}
+          className="w-full font-black active:scale-95 transition-transform flex items-center justify-center gap-2"
+          style={{
+            height: 56,
+            borderRadius: 20,
+            background: "#000000",
+            color: "#FFFFFF",
+            fontSize: 16,
+            opacity: appleLoading || loading || cloudBlocked ? 0.6 : 1,
+          }}
+        >
+          {appleLoading ? (
+            <>
+              <span
+                className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"
+                aria-hidden
+              />
+              Conectando…
+            </>
+          ) : (
+            <>
+              <span aria-hidden style={{ fontSize: 20, lineHeight: 1 }}></span>
+              Continuar com Apple
+            </>
+          )}
+        </button>
+
+        <div className="flex items-center gap-3 my-4">
+          <span style={{ flex: 1, height: 1, background: "#E4EDE4" }} />
+          <span className="font-bold" style={{ color: "#9BB0A0", fontSize: 13 }}>
+            ou com e-mail
+          </span>
+          <span style={{ flex: 1, height: 1, background: "#E4EDE4" }} />
+        </div>
+
         <div className="flex flex-col gap-3">
+
           <input
             type="email"
             inputMode="email"
