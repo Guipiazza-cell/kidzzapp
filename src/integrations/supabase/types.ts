@@ -454,6 +454,24 @@ export type Database = {
         }
         Relationships: []
       }
+      kidzz_os_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value_json: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value_json: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value_json?: Json
+        }
+        Relationships: []
+      }
       kidzz_questions_log: {
         Row: {
           age_range: string | null
@@ -569,6 +587,7 @@ export type Database = {
       profiles: {
         Row: {
           age_range: string | null
+          boas_vindas_enviado_em: string | null
           child_interests: string[]
           child_name: string
           created_at: string
@@ -591,6 +610,7 @@ export type Database = {
         }
         Insert: {
           age_range?: string | null
+          boas_vindas_enviado_em?: string | null
           child_interests?: string[]
           child_name?: string
           created_at?: string
@@ -613,6 +633,7 @@ export type Database = {
         }
         Update: {
           age_range?: string | null
+          boas_vindas_enviado_em?: string | null
           child_interests?: string[]
           child_name?: string
           created_at?: string
