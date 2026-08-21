@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PinSetupForm from "@/components/parental/PinSetupForm";
 import { hasCustomPin } from "@/lib/parentalPin";
-
+import { analytics, consumeOnboardingSeconds } from "@/lib/analytics";
 
 interface AccountSetupProps {
   childName: string;
@@ -45,27 +45,6 @@ const translateAuthError = (msg: string): string => {
   return "Algo não deu certo. Tente novamente em instantes.";
 };
 
-const formatBrPhone = (raw: string): string => {
-  const digits = raw.replace(/\D/g, "").slice(0, 11);
-  const ddd = digits.slice(0, 2);
-  const first = digits.slice(2, 7);
-  const second = digits.slice(7, 11);
-  let out = "";
-  if (digits.length === 0) return "";
-  out = `+55 (${ddd}`;
-  if (digits.length >= 2) out += ")";
-  if (first) out += ` ${first}`;
-  if (second) out += `-${second}`;
-  return out;
-};
-
-const toE164 = (raw: string): string => {
-  const digits = raw.replace(/\D/g, "");
-  return `+55${digits.startsWith("55") ? digits.slice(2) : digits}`;
-};
-
-import { analytics, consumeOnboardingSeconds } from "@/lib/analytics";
-
 /** Converte "3-7" / "5" / "7-10" numa idade inteira utilizável. */
 export const parseIdade = (value: unknown): number | null => {
   if (typeof value === "number" && Number.isFinite(value)) return Math.round(value);
@@ -84,8 +63,6 @@ const syncGuestProfile = async (userId: string) => {
   const interesses: string[] = guest.child_interests ?? [];
   const materiais: string[] = guest.materiais_em_casa ?? [];
   try {
-    // Fonte de verdade: grava profile E cria/atualiza a criança em `criancas`
-    // no mesmo passo, de forma idempotente.
     const { error } = await (supabase as any).rpc("complete_onboarding_v2", {
       p_child_name: nome,
       p_idade: idade,
@@ -94,7 +71,6 @@ const syncGuestProfile = async (userId: string) => {
     });
     if (error) {
       console.warn("[AccountSetup] complete_onboarding_v2 failed", error);
-      // Fallback: RPC antiga + insert direto da criança.
       await (supabase as any).rpc("complete_onboarding", {
         p_child_name: nome,
         p_age_range: guest.age_range ?? null,
@@ -121,20 +97,14 @@ const syncGuestProfile = async (userId: string) => {
   }
 };
 
-
-type Tab = "email" | "phone";
 type Mode = "signup" | "signin";
 
 const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const { refreshProfile } = useAuth();
-  const [tab, setTab] = useState<Tab>("email");
   const [mode, setMode] = useState<Mode>("signup");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -142,8 +112,6 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
   const [cloudBlocked, setCloudBlocked] = useState(false);
   const [pinStep, setPinStep] = useState(false);
   const submittingRef = useRef(false);
-
-  const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -178,10 +146,8 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           seconds_to_complete: consumeOnboardingSeconds(),
         });
       }
-      // Refetch profile so Index sees onboarding_done=true and drops into the app.
       try { await refreshProfile(); } catch {}
       setSuccess(true);
-      // Passo do adulto: criar o PIN dos pais antes de entrar no app.
       if (!hasCustomPin()) {
         setTimeout(() => setPinStep(true), 450);
         return;
@@ -198,10 +164,12 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
     const cleanEmail = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       setError("Confira o email digitado.");
+      submittingRef.current = false;
       return;
     }
     if (password.length < 6) {
       setError("A senha precisa ter pelo menos 6 caracteres.");
+      submittingRef.current = false;
       return;
     }
     setLoading(true);
@@ -213,7 +181,6 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           options: { emailRedirectTo: `${window.location.origin}/` },
         });
         if (err) {
-          // If the email already exists, try sign-in transparently
           const m = (err.message || "").toLowerCase();
           if (m.includes("already") || m.includes("registered") || m.includes("exists")) {
             const { data: signInData, error: signInErr } =
@@ -228,7 +195,6 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           setError(translateAuthError(err.message));
           return;
         }
-        // Ensure we have a session (if email confirmation is on, signUp returns no session)
         if (!data.session) {
           const { data: signInData } = await supabase.auth.signInWithPassword({
             email: cleanEmail,
@@ -256,75 +222,6 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
       submittingRef.current = false;
     }
   }, [email, password, mode, finishSuccess]);
-
-  const handlePhoneSend = useCallback(async () => {
-    setError(null);
-    const digits = phone.replace(/\D/g, "");
-    if (digits.length < 10) {
-      setError("Digite um número válido com DDD.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { error: err } = await supabase.auth.signInWithOtp({
-        phone: toE164(phone),
-      });
-      if (err) {
-        const m = err.message.toLowerCase();
-        if (m.includes("provider") || m.includes("not enabled") || m.includes("phone")) {
-          setError("Login por telefone chega em breve! Use email por enquanto 💛");
-          setTimeout(() => {
-            setTab("email");
-            setError(null);
-          }, 1800);
-          return;
-        }
-        setError(translateAuthError(err.message));
-        return;
-      }
-      setOtpSent(true);
-    } catch (err: any) {
-      setError(translateAuthError(err?.message || ""));
-    } finally {
-      setLoading(false);
-    }
-  }, [phone]);
-
-  const handleOtpVerify = useCallback(async () => {
-    setError(null);
-    const token = otp.join("");
-    if (token.length !== 6) {
-      setError("Digite os 6 dígitos do código.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { data, error: err } = await supabase.auth.verifyOtp({
-        phone: toE164(phone),
-        token,
-        type: "sms",
-      });
-      if (err) {
-        setError(translateAuthError(err.message));
-        return;
-      }
-      await finishSuccess(data.user?.id);
-    } catch (err: any) {
-      setError(translateAuthError(err?.message || ""));
-    } finally {
-      setLoading(false);
-    }
-  }, [otp, phone, finishSuccess]);
-
-  const handleOtpChange = (idx: number, val: string) => {
-    const digit = val.replace(/\D/g, "").slice(-1);
-    setOtp((prev) => {
-      const next = [...prev];
-      next[idx] = digit;
-      return next;
-    });
-    if (digit && idx < 5) otpRefs.current[idx + 1]?.focus();
-  };
 
   const primaryDisabled = loading || cloudBlocked;
 
@@ -393,7 +290,6 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         Crie sua conta gratuita em segundos e acesse de qualquer aparelho.
       </p>
 
-
       <div
         className="w-full max-w-md mt-6 p-5"
         style={{
@@ -402,156 +298,35 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
           boxShadow: "0 10px 30px rgba(46,68,56,0.08)",
         }}
       >
-        {/* Tabs */}
-        <div
-          className="flex p-1 rounded-2xl mb-4"
-          style={{ background: "#F0F5EF" }}
-          role="tablist"
-        >
-          {([
-            { id: "email", label: "\u00a0Email" },
-            { id: "phone", label: "\u00a0Telefone" },
-          ] as const).map((t) => {
-            const active = tab === t.id;
-            return (
-              <button
-                key={t.id}
-                role="tab"
-                aria-selected={active}
-                onClick={() => {
-                  setTab(t.id);
-                  setError(null);
-                  setOtpSent(false);
-                }}
-                className="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
-                style={{
-                  background: active ? "#FFFFFF" : "transparent",
-                  color: active ? "#2E4438" : "#7A9282",
-                  boxShadow: active ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
-                }}
-              >
-                {t.label}
-              </button>
-            );
-          })}
+        <div className="flex flex-col gap-3">
+          <input
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+            onFocus={(e) =>
+              (e.currentTarget.style.boxShadow =
+                "0 0 0 3px rgba(127,176,105,0.35)")
+            }
+            onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
+          />
+          <input
+            type="password"
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            placeholder="Senha (mín. 6 caracteres)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={inputStyle}
+            onFocus={(e) =>
+              (e.currentTarget.style.boxShadow =
+                "0 0 0 3px rgba(127,176,105,0.35)")
+            }
+            onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
+          />
         </div>
-
-        <AnimatePresence mode="wait">
-          {tab === "email" ? (
-            <motion.div
-              key="email"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col gap-3"
-            >
-              <input
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) =>
-                  (e.currentTarget.style.boxShadow =
-                    "0 0 0 3px rgba(127,176,105,0.35)")
-                }
-                onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
-              />
-              <input
-                type="password"
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                placeholder="Senha (mín. 6 caracteres)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) =>
-                  (e.currentTarget.style.boxShadow =
-                    "0 0 0 3px rgba(127,176,105,0.35)")
-                }
-                onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="phone"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col gap-3"
-            >
-              {!otpSent ? (
-                <input
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  placeholder="+55 (11) 9XXXX-XXXX"
-                  value={phone}
-                  onChange={(e) => setPhone(formatBrPhone(e.target.value))}
-                  style={inputStyle}
-                  onFocus={(e) =>
-                    (e.currentTarget.style.boxShadow =
-                      "0 0 0 3px rgba(127,176,105,0.35)")
-                  }
-                  onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
-                />
-              ) : (
-                <>
-                  <p
-                    className="text-center text-sm font-semibold"
-                    style={{ color: "#5A7A66" }}
-                  >
-                    Digite o código que enviamos para {phone}
-                  </p>
-                  <div className="flex justify-between gap-2">
-                    {otp.map((d, i) => (
-                      <input
-                        key={i}
-                        ref={(el) => (otpRefs.current[i] = el)}
-                        value={d}
-                        inputMode="numeric"
-                        maxLength={1}
-                        onChange={(e) => handleOtpChange(i, e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Backspace" && !otp[i] && i > 0) {
-                            otpRefs.current[i - 1]?.focus();
-                          }
-                        }}
-                        style={{
-                          width: "100%",
-                          minWidth: 0,
-                          maxWidth: 44,
-                          flex: 1,
-                          height: 56,
-                          textAlign: "center",
-                          fontSize: 22,
-                          fontWeight: 800,
-                          border: "1px solid #D8E5D8",
-                          borderRadius: 14,
-                          color: "#2E4438",
-                          background: "#FFFFFF",
-                          outline: "none",
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => {
-                      setOtpSent(false);
-                      setOtp(["", "", "", "", "", ""]);
-                      setError(null);
-                    }}
-                    className="text-sm font-semibold underline"
-                    style={{ color: "#7A9282" }}
-                  >
-                    Trocar número
-                  </button>
-                </>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {error && (
           <motion.p
@@ -565,11 +340,7 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
         )}
 
         <button
-          onClick={() => {
-            if (tab === "email") return handleEmailSubmit();
-            if (!otpSent) return handlePhoneSend();
-            return handleOtpVerify();
-          }}
+          onClick={handleEmailSubmit}
           disabled={primaryDisabled}
           className="w-full mt-4 font-black text-white active:scale-95 transition-transform"
           style={{
@@ -591,29 +362,25 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
               />
               Um instante…
             </span>
-          ) : tab === "email" ? (
-            mode === "signup" ? "Criar conta gratuita" : "Entrar"
-          ) : !otpSent ? (
-            "Enviar código SMS"
+          ) : mode === "signup" ? (
+            "Criar conta gratuita"
           ) : (
-            "Verificar código"
+            "Entrar"
           )}
         </button>
 
-        {tab === "email" && (
-          <button
-            onClick={() => {
-              setMode((m) => (m === "signup" ? "signin" : "signup"));
-              setError(null);
-            }}
-            className="w-full mt-3 text-sm font-bold"
-            style={{ color: "#5A8F4E" }}
-          >
-            {mode === "signup"
-              ? "Já tenho conta - Entrar"
-              : "Criar conta nova"}
-          </button>
-        )}
+        <button
+          onClick={() => {
+            setMode((m) => (m === "signup" ? "signin" : "signup"));
+            setError(null);
+          }}
+          className="w-full mt-3 text-sm font-bold"
+          style={{ color: "#5A8F4E" }}
+        >
+          {mode === "signup"
+            ? "Já tenho conta - Entrar"
+            : "Criar conta nova"}
+        </button>
       </div>
 
       <p
