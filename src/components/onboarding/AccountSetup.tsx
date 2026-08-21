@@ -162,6 +162,56 @@ const AccountSetup = ({ childName, onDone }: AccountSetupProps) => {
     [onDone, refreshProfile]
   );
 
+  // Retorno do OAuth (Apple): a pessoa volta autenticada -> roda o MESMO
+  // finishSuccess (sync do perfil convidado + PIN + onDone).
+  useEffect(() => {
+    let active = true;
+    const run = async (userId?: string) => {
+      if (!userId || oauthHandledRef.current) return;
+      oauthHandledRef.current = true;
+      setAppleLoading(false);
+      await finishSuccess(userId);
+    };
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!active) return;
+        if (data.session?.user) await run(data.session.user.id);
+      } catch {}
+    })();
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return;
+      if (event === "SIGNED_IN" && session?.user) void run(session.user.id);
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [finishSuccess]);
+
+  const handleAppleSignIn = useCallback(async () => {
+    if (appleLoading || loading) return;
+    setError(null);
+    setAppleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("apple", {
+        redirect_uri: `${window.location.origin}/`,
+      });
+      if (result.error) {
+        setError("Não foi possível entrar com a Apple agora. Tente pelo e-mail.");
+        setAppleLoading(false);
+        return;
+      }
+      if (result.redirected) return; // navegador vai redirecionar
+      // Sessão já definida: o listener acima chama finishSuccess.
+    } catch {
+      setError("Não foi possível entrar com a Apple agora. Tente pelo e-mail.");
+      setAppleLoading(false);
+    }
+  }, [appleLoading, loading]);
+
+
+
   const handleEmailSubmit = useCallback(async () => {
     if (submittingRef.current) return;
     submittingRef.current = true;
